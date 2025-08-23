@@ -1,18 +1,27 @@
 package com.google.common.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CaseFormat_ESTestTest3 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.UPPER_UNDERSCORE;
-        String string0 = caseFormat0.convert(caseFormat0, " ALUEZ");
-        assertEquals(" ALUEZ", string0);
+    /**
+     * Verifies that converting a string from a format to the very same format
+     * returns the original string unchanged. This is an identity conversion.
+     */
+    @Test
+    public void to_shouldReturnUnchangedString_whenConvertingToSameFormat() {
+        // Arrange
+        CaseFormat format = CaseFormat.UPPER_UNDERSCORE;
+        String originalString = " ALUEZ";
+
+        // Act
+        String result = format.to(format, originalString);
+
+        // Assert
+        assertEquals(originalString, result);
     }
 }
