@@ -1,33 +1,41 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-public class CustomCategoryURLGenerator_ESTestTest17 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CustomCategoryURLGenerator} class, focusing on the equals() method.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
-        assertTrue(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
-        Vector<String> vector0 = new Vector<String>();
-        vector0.add("N8)j");
-        customCategoryURLGenerator1.addURLSeries(vector0);
-        Stack<String> stack0 = new Stack<String>();
-        stack0.add((String) null);
-        customCategoryURLGenerator0.addURLSeries(stack0);
-        boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
-        assertFalse(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method correctly identifies two generators as unequal
+     * when their URL series lists contain different content.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenUrlSeriesHaveDifferentContent() {
+        // Arrange: Create two generators that are initially identical.
+        CustomCategoryURLGenerator generator1 = new CustomCategoryURLGenerator();
+        CustomCategoryURLGenerator generator2 = new CustomCategoryURLGenerator();
+
+        // Sanity check: two newly created generators should be equal.
+        assertEquals("Newly created generators should be equal", generator1, generator2);
+
+        // Arrange: Add URL series with different content to each generator.
+        // One list contains a null, the other a non-null string.
+        List<String> urlsForGenerator1 = Collections.singletonList(null);
+        List<String> urlsForGenerator2 = Collections.singletonList("http://www.jfree.org/jfreechart/");
+
+        generator1.addURLSeries(urlsForGenerator1);
+        generator2.addURLSeries(urlsForGenerator2);
+
+        // Act & Assert: The generators should no longer be equal.
+        assertNotEquals("Generators with different URL series content should not be equal", generator1, generator2);
+
+        // Assert: The equals method should be symmetric.
+        assertNotEquals("The equals method should be symmetric", generator2, generator1);
     }
 }
