@@ -2,57 +2,54 @@ package com.google.common.graph;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.testing.EqualsTester;
-import java.util.Collection;
+
 import java.util.Set;
-import org.jspecify.annotations.NullUnmarked;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-public class EndpointPairTestTest10 {
+/**
+ * Tests for the live, unmodifiable view returned by {@link Graph#edges()}.
+ */
+@RunWith(JUnit4.class)
+public class GraphEdgesTest {
 
-    private static final Integer N0 = 0;
-
-    private static final Integer N1 = 1;
-
-    private static final Integer N2 = 2;
-
-    private static final Integer N3 = 3;
-
-    private static final Integer N4 = 4;
-
-    private static final String E12 = "1-2";
-
-    private static final String E12_A = "1-2a";
-
-    private static final String E21 = "2-1";
-
-    private static final String E13 = "1-3";
-
-    private static final String E44 = "4-4";
-
-    private static void containsExactlySanityCheck(Collection<?> collection, Object... varargs) {
-        assertThat(collection).hasSize(varargs.length);
-        for (Object obj : varargs) {
-            assertThat(collection).contains(obj);
-        }
-        assertThat(collection).containsExactly(varargs);
-    }
+    private static final Integer NODE_1 = 1;
+    private static final Integer NODE_2 = 2;
 
     @Test
-    public void endpointPair_unmodifiableView() {
-        MutableGraph<Integer> directedGraph = GraphBuilder.directed().build();
-        Set<EndpointPair<Integer>> edges = directedGraph.edges();
-        directedGraph.putEdge(N1, N2);
-        containsExactlySanityCheck(edges, EndpointPair.ordered(N1, N2));
-        directedGraph.putEdge(N2, N1);
-        containsExactlySanityCheck(edges, EndpointPair.ordered(N1, N2), EndpointPair.ordered(N2, N1));
-        directedGraph.removeEdge(N1, N2);
-        directedGraph.removeEdge(N2, N1);
-        containsExactlySanityCheck(edges);
-        assertThrows(UnsupportedOperationException.class, () -> edges.add(EndpointPair.ordered(N1, N2)));
+    public void edges_returnsLiveUnmodifiableView() {
+        // Arrange
+        MutableGraph<Integer> graph = GraphBuilder.directed().build();
+        Set<EndpointPair<Integer>> edgesView = graph.edges();
+
+        // The view should be empty initially
+        assertThat(edgesView).isEmpty();
+
+        // Act: Add an edge to the graph
+        // Assert: The view should reflect the change immediately
+        graph.putEdge(NODE_1, NODE_2);
+        assertThat(edgesView).containsExactly(EndpointPair.ordered(NODE_1, NODE_2));
+
+        // Act: Add another edge
+        // Assert: The view should reflect the new edge as well
+        graph.putEdge(NODE_2, NODE_1);
+        assertThat(edgesView).containsExactly(
+                EndpointPair.ordered(NODE_1, NODE_2), EndpointPair.ordered(NODE_2, NODE_1));
+
+        // Act: Remove an edge from the graph
+        // Assert: The view should be updated
+        graph.removeEdge(NODE_1, NODE_2);
+        assertThat(edgesView).containsExactly(EndpointPair.ordered(NODE_2, NODE_1));
+
+        // Act: Remove the final edge
+        // Assert: The view should now be empty
+        graph.removeEdge(NODE_2, NODE_1);
+        assertThat(edgesView).isEmpty();
+
+        // Assert: The view itself is unmodifiable
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> edgesView.add(EndpointPair.ordered(NODE_1, NODE_2)));
     }
 }
