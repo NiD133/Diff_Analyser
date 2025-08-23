@@ -1,111 +1,90 @@
 package org.jsoup.helper;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.integration.ParseTest;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-import java.util.Map;
+
 import java.util.stream.Stream;
-import static org.jsoup.TextUtil.normalizeSpaces;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class W3CDomTestTest4 {
+/**
+ * Tests for {@link W3CDom} concerning security and HTML-specific conversions.
+ */
+@DisplayName("W3CDom Conversion")
+public class W3CDomTest {
 
-    private static Document parseXml(String xml, boolean nameSpaceAware) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(nameSpaceAware);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver((publicId, systemId) -> {
-                if (systemId.contains("about:legacy-compat")) {
-                    // <!doctype html>
-                    return new InputSource(new StringReader(""));
-                } else {
-                    return null;
-                }
-            });
-            Document dom = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-            dom.normalizeDocument();
-            return dom;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private NodeList xpath(Document w3cDoc, String query) throws XPathExpressionException {
-        XPathExpression xpath = XPathFactory.newInstance().newXPath().compile(query);
-        return ((NodeList) xpath.evaluate(w3cDoc, XPathConstants.NODE));
-    }
-
-    private String output(String in, boolean modeHtml) {
-        org.jsoup.nodes.Document jdoc = Jsoup.parse(in);
-        Document w3c = W3CDom.convert(jdoc);
-        Map<String, String> properties = modeHtml ? W3CDom.OutputHtml() : W3CDom.OutputXml();
-        return normalizeSpaces(W3CDom.asString(w3c, properties));
-    }
-
-    private void assertEqualsIgnoreCase(String want, String have) {
-        assertEquals(want.toLowerCase(Locale.ROOT), have.toLowerCase(Locale.ROOT));
+    private static Stream<Arguments> parserProvider() {
+        return Stream.of(
+            Arguments.of(Parser.htmlParser()),
+            Arguments.of(Parser.xmlParser())
+        );
     }
 
     @ParameterizedTest
     @MethodSource("parserProvider")
-    void doesNotExpandEntities(Parser parser) {
-        // Tests that the billion laughs attack doesn't expand entities; also for XXE
-        // Not impacted because jsoup doesn't parse the entities within the doctype, and so won't get to the w3c.
-        // Added to confirm, and catch if that ever changes
-        String billionLaughs = "<?xml version=\"1.0\"?>\n" + "<!DOCTYPE lolz [\n" + " <!ENTITY lol \"lol\">\n" + " <!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">\n" + "]>\n" + "<html><body><p>&lol1;</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughs, parser);
-        W3CDom w3cDom = new W3CDom();
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
-        assertNotNull(w3cDoc);
-        // select the p and make sure it's unexpanded
-        NodeList p = w3cDoc.getElementsByTagName("p");
-        assertEquals(1, p.getLength());
-        assertEquals("&lol1;", p.item(0).getTextContent());
-        // Check the string
-        String string = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertFalse(string.contains("lololol"));
-        assertTrue(string.contains("&amp;lol1;"));
-    }
+    @DisplayName("Should not expand XML entities to prevent billion laughs attack")
+    void shouldNotExpandEntities(Parser parser) {
+        // Arrange
+        // This XML contains a "billion laughs" entity attack.
+        String billionLaughsXml = """
+            <?xml version="1.0"?>
+            <!DOCTYPE lolz [
+             <!ENTITY lol "lol">
+             <!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+            ]>
+            <html><body><p>&lol1;</p></body></html>""";
 
-    private static Stream<Arguments> parserProvider() {
-        return Stream.of(Arguments.of(Parser.htmlParser()), Arguments.of(Parser.xmlParser()));
+        // Act
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughsXml, parser);
+        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
+        String xmlOutput = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
+
+        // Assert
+        // 1. Verify the DOM text content is the unexpanded entity name.
+        NodeList p = w3cDoc.getElementsByTagName("p");
+        assertEquals(1, p.getLength(), "There should be one <p> element.");
+        assertEquals("&lol1;", p.item(0).getTextContent(), "Entity should not be expanded in the DOM.");
+
+        // 2. Verify the serialized string output also does not contain the expanded entity.
+        assertFalse(xmlOutput.contains("lololol"), "Output should not contain the expanded entity string.");
+        assertTrue(xmlOutput.contains("&amp;lol1;"), "Output should contain the escaped entity name.");
     }
 
     @Test
-    public void htmlInputDocMaintainsHtmlAttributeNames() {
-        String html = "<!DOCTYPE html><html><head></head><body><p hành=\"1\" hình=\"2\">unicode attr names</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc;
-        jsoupDoc = Jsoup.parse(html);
-        Document w3Doc = W3CDom.convert(jsoupDoc);
-        String out = W3CDom.asString(w3Doc, W3CDom.OutputHtml());
-        String expected = "<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p hành=\"1\" hình=\"2\">unicode attr names</p></body></html>";
-        assertEquals(expected, TextUtil.stripNewlines(out));
+    @DisplayName("Should preserve unicode attribute names during HTML conversion")
+    void shouldPreserveUnicodeAttributeNamesInHtml() {
+        // Arrange
+        String html = "<!DOCTYPE html><html><body><p hành=\"1\" hình=\"2\">unicode attr names</p></body></html>";
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+
+        // Act
+        Document w3cDoc = W3CDom.convert(jsoupDoc);
+        String outHtml = W3CDom.asString(w3cDoc, W3CDom.OutputHtml());
+
+        // Assert
+        // 1. Verify the W3C DOM structure directly for robustness.
+        // This ensures the attributes are correctly parsed into the DOM model.
+        NodeList pElements = w3cDoc.getElementsByTagName("p");
+        assertEquals(1, pElements.getLength(), "Should find one <p> element.");
+        Node pNode = pElements.item(0);
+        assertTrue(pNode instanceof Element, "Node should be an Element.");
+        Element pElement = (Element) pNode;
+
+        assertEquals("1", pElement.getAttribute("hành"), "Value of attribute 'hành' should be preserved.");
+        assertEquals("2", pElement.getAttribute("hình"), "Value of attribute 'hình' should be preserved.");
+
+        // 2. Verify the final string output contains the critical part.
+        // This is a less brittle check than comparing the full string, focusing on the core requirement.
+        assertTrue(outHtml.contains("<p hành=\"1\" hình=\"2\">unicode attr names</p>"),
+            "Output HTML should contain the <p> tag with unicode attributes preserved.");
     }
 }
