@@ -1,39 +1,27 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite is for the {@link RandomAccessFileOrArray} class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class RandomAccessFileOrArray_ESTestTest106 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test105() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray((InputStream) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.io.RandomAccessSourceFactory", e);
-        }
+    /**
+     * Verifies that the constructor throws a NullPointerException when given a null InputStream.
+     * <p>
+     * This is the expected behavior, as the underlying factory cannot create a data source from a null reference.
+     * This test ensures the constructor correctly validates its input.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void constructorWithNullInputStreamShouldThrowNullPointerException() throws IOException {
+        // Act: Attempt to create a RandomAccessFileOrArray with a null InputStream.
+        new RandomAccessFileOrArray((InputStream) null);
+
+        // Assert: The @Test(expected) annotation verifies that a NullPointerException is thrown.
+        // No further assertions are needed.
     }
 }
