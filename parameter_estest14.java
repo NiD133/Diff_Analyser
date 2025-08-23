@@ -1,27 +1,42 @@
 package com.google.common.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
 
-public class Parameter_ESTestTest14 extends Parameter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Class<Annotation> class0 = Annotation.class;
-        TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter(invokable0, 1563, typeToken0, annotationArray0, class0);
-        Invokable<Parameter, Annotation> invokable1 = (Invokable<Parameter, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Parameter parameter1 = new Parameter(invokable1, 1563, typeToken0, annotationArray0, class0);
-        boolean boolean0 = parameter0.equals(parameter1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that two Parameter instances are not equal if they belong to different
+     * declaring invokables, even when all other properties (position, type) are identical.
+     */
+    @Test
+    public void equals_returnsFalse_whenDeclaringInvokablesDiffer() {
+        // Arrange
+        // 1. Create two distinct mock Invokable instances to represent different methods/constructors.
+        Invokable<?, ?> declaringInvokableOne = mock(Invokable.class);
+        Invokable<?, ?> declaringInvokableTwo = mock(Invokable.class);
+
+        // 2. Define common properties for the parameters.
+        int parameterPosition = 0;
+        TypeToken<Annotation> parameterType = TypeToken.of(Annotation.class);
+        Annotation[] noAnnotations = new Annotation[0];
+        Class<Annotation> annotatedType = Annotation.class; // Used for an internal constructor argument.
+
+        // 3. Create two Parameter instances. They are identical in every way except for their
+        //    declaring Invokable.
+        Parameter parameterOne = new Parameter(
+                declaringInvokableOne, parameterPosition, parameterType, noAnnotations, annotatedType);
+        Parameter parameterTwo = new Parameter(
+                declaringInvokableTwo, parameterPosition, parameterType, noAnnotations, annotatedType);
+
+        // Act & Assert
+        // The equals method should return false because the parameters belong to different invokables.
+        assertFalse("Parameters with different declaring invokables should not be equal",
+                parameterOne.equals(parameterTwo));
     }
 }
