@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2016 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.common.graph;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -29,76 +13,110 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** Tests for {@link EndpointPair} and {@link Graph#edges()}. */
+/**
+ * Focused tests for EndpointPair and the Set<EndpointPair<N>> views returned by Graph.edges()
+ * and Network.asGraph().edges().
+ *
+ * Test layout:
+ * - EndpointPair construction/behavior (ordered, unordered, self-loop, equals, adjacentNode).
+ * - Graph.edges() content for directed/undirected graphs.
+ * - Network.asGraph().edges() content for directed/undirected networks.
+ * - Edges view is live and unmodifiable.
+ * - contains() semantics for edges in directed/undirected graphs.
+ */
 @RunWith(JUnit4.class)
 @NullUnmarked
 public final class EndpointPairTest {
+
+  // Common node and edge IDs used across tests for readability.
   private static final Integer N0 = 0;
   private static final Integer N1 = 1;
   private static final Integer N2 = 2;
   private static final Integer N3 = 3;
   private static final Integer N4 = 4;
+
   private static final String E12 = "1-2";
-  private static final String E12_A = "1-2a";
+  private static final String E12_A = "1-2a"; // parallel to E12
   private static final String E21 = "2-1";
   private static final String E13 = "1-3";
   private static final String E44 = "4-4";
 
-  // Test for EndpointPair class
+  // -------------------------------------------------------------------
+  // EndpointPair construction and basic behavior
+  // -------------------------------------------------------------------
 
   @Test
-  public void testOrderedEndpointPair() {
-    EndpointPair<String> ordered = EndpointPair.ordered("source", "target");
-    assertThat(ordered.isOrdered()).isTrue();
-    assertThat(ordered).containsExactly("source", "target").inOrder();
-    assertThat(ordered.source()).isEqualTo("source");
-    assertThat(ordered.target()).isEqualTo("target");
-    assertThat(ordered.nodeU()).isEqualTo("source");
-    assertThat(ordered.nodeV()).isEqualTo("target");
-    assertThat(ordered.adjacentNode("source")).isEqualTo("target");
-    assertThat(ordered.adjacentNode("target")).isEqualTo("source");
-    assertThat(ordered.toString()).isEqualTo("<source -> target>");
+  public void orderedPair_basicBehavior() {
+    // Given
+    EndpointPair<String> orderedPair = EndpointPair.ordered("source", "target");
+
+    // Then
+    assertThat(orderedPair.isOrdered()).isTrue();
+    assertThat(orderedPair).containsExactly("source", "target").inOrder();
+    assertThat(orderedPair.source()).isEqualTo("source");
+    assertThat(orderedPair.target()).isEqualTo("target");
+    assertThat(orderedPair.nodeU()).isEqualTo("source");
+    assertThat(orderedPair.nodeV()).isEqualTo("target");
+    assertThat(orderedPair.adjacentNode("source")).isEqualTo("target");
+    assertThat(orderedPair.adjacentNode("target")).isEqualTo("source");
+    assertThat(orderedPair.toString()).isEqualTo("<source -> target>");
   }
 
   @Test
-  public void testUnorderedEndpointPair() {
-    EndpointPair<String> unordered = EndpointPair.unordered("chicken", "egg");
-    assertThat(unordered.isOrdered()).isFalse();
-    assertThat(unordered).containsExactly("chicken", "egg");
-    assertThat(ImmutableSet.of(unordered.nodeU(), unordered.nodeV()))
+  public void unorderedPair_basicBehavior() {
+    // Given
+    EndpointPair<String> unorderedPair = EndpointPair.unordered("chicken", "egg");
+
+    // Then
+    assertThat(unorderedPair.isOrdered()).isFalse();
+    assertThat(unorderedPair).containsExactly("chicken", "egg");
+    assertThat(ImmutableSet.of(unorderedPair.nodeU(), unorderedPair.nodeV()))
         .containsExactly("chicken", "egg");
-    assertThat(unordered.adjacentNode(unordered.nodeU())).isEqualTo(unordered.nodeV());
-    assertThat(unordered.adjacentNode(unordered.nodeV())).isEqualTo(unordered.nodeU());
-    assertThat(unordered.toString()).contains("chicken");
-    assertThat(unordered.toString()).contains("egg");
+    assertThat(unorderedPair.adjacentNode(unorderedPair.nodeU())).isEqualTo(unorderedPair.nodeV());
+    assertThat(unorderedPair.adjacentNode(unorderedPair.nodeV())).isEqualTo(unorderedPair.nodeU());
+    // String form should include both endpoints (order unspecified).
+    assertThat(unorderedPair.toString()).contains("chicken");
+    assertThat(unorderedPair.toString()).contains("egg");
   }
 
   @Test
-  public void testSelfLoop() {
-    EndpointPair<String> unordered = EndpointPair.unordered("node", "node");
-    assertThat(unordered.isOrdered()).isFalse();
-    assertThat(unordered).containsExactly("node", "node");
-    assertThat(unordered.nodeU()).isEqualTo("node");
-    assertThat(unordered.nodeV()).isEqualTo("node");
-    assertThat(unordered.adjacentNode("node")).isEqualTo("node");
-    assertThat(unordered.toString()).isEqualTo("[node, node]");
+  public void unorderedPair_selfLoop() {
+    // Given
+    EndpointPair<String> selfLoop = EndpointPair.unordered("node", "node");
+
+    // Then
+    assertThat(selfLoop.isOrdered()).isFalse();
+    assertThat(selfLoop).containsExactly("node", "node");
+    assertThat(selfLoop.nodeU()).isEqualTo("node");
+    assertThat(selfLoop.nodeV()).isEqualTo("node");
+    assertThat(selfLoop.adjacentNode("node")).isEqualTo("node");
+    assertThat(selfLoop.toString()).isEqualTo("[node, node]");
   }
 
   @Test
-  public void testAdjacentNode_nodeNotIncident() {
-    ImmutableList<MutableNetwork<Integer, String>> testNetworks =
-        ImmutableList.of(
-            NetworkBuilder.directed().<Integer, String>build(),
-            NetworkBuilder.undirected().<Integer, String>build());
-    for (MutableNetwork<Integer, String> network : testNetworks) {
-      network.addEdge(1, 2, "1-2");
-      EndpointPair<Integer> endpointPair = network.incidentNodes("1-2");
-      assertThrows(IllegalArgumentException.class, () -> endpointPair.adjacentNode(3));
-    }
+  public void adjacentNode_throwsWhenNodeNotIncident_inDirectedNetwork() {
+    // Given
+    MutableNetwork<Integer, String> network = NetworkBuilder.directed().build();
+    network.addEdge(1, 2, E12);
+    EndpointPair<Integer> endpoints = network.incidentNodes(E12);
+
+    // Then
+    assertThrows(IllegalArgumentException.class, () -> endpoints.adjacentNode(3));
   }
 
   @Test
-  public void testEquals() {
+  public void adjacentNode_throwsWhenNodeNotIncident_inUndirectedNetwork() {
+    // Given
+    MutableNetwork<Integer, String> network = NetworkBuilder.undirected().build();
+    network.addEdge(1, 2, E12);
+    EndpointPair<Integer> endpoints = network.incidentNodes(E12);
+
+    // Then
+    assertThrows(IllegalArgumentException.class, () -> endpoints.adjacentNode(3));
+  }
+
+  @Test
+  public void equals_orderedAndUnordered() {
     EndpointPair<String> ordered = EndpointPair.ordered("a", "b");
     EndpointPair<String> orderedMirror = EndpointPair.ordered("b", "a");
     EndpointPair<String> unordered = EndpointPair.unordered("a", "b");
@@ -111,19 +129,23 @@ public final class EndpointPairTest {
         .testEquals();
   }
 
-  // Tests for Graph.edges() and Network.asGraph().edges() methods
-  // TODO(user): Move these to a more appropriate location in the test suite.
+  // -------------------------------------------------------------------
+  // Graph.edges() content
+  // -------------------------------------------------------------------
 
   @Test
-  public void endpointPair_directedGraph() {
-    MutableGraph<Integer> directedGraph = GraphBuilder.directed().allowsSelfLoops(true).build();
-    directedGraph.addNode(N0);
-    directedGraph.putEdge(N1, N2);
-    directedGraph.putEdge(N2, N1);
-    directedGraph.putEdge(N1, N3);
-    directedGraph.putEdge(N4, N4);
-    containsExactlySanityCheck(
-        directedGraph.edges(),
+  public void graph_edges_directed() {
+    // Given
+    MutableGraph<Integer> graph = GraphBuilder.directed().allowsSelfLoops(true).build();
+    graph.addNode(N0); // isolated node
+    graph.putEdge(N1, N2);
+    graph.putEdge(N2, N1);
+    graph.putEdge(N1, N3);
+    graph.putEdge(N4, N4); // self-loop
+
+    // Then
+    assertContainsExactly(
+        graph.edges(),
         EndpointPair.ordered(N1, N2),
         EndpointPair.ordered(N2, N1),
         EndpointPair.ordered(N1, N3),
@@ -131,31 +153,41 @@ public final class EndpointPairTest {
   }
 
   @Test
-  public void endpointPair_undirectedGraph() {
-    MutableGraph<Integer> undirectedGraph = GraphBuilder.undirected().allowsSelfLoops(true).build();
-    undirectedGraph.addNode(N0);
-    undirectedGraph.putEdge(N1, N2);
-    undirectedGraph.putEdge(N2, N1); // does nothing
-    undirectedGraph.putEdge(N1, N3);
-    undirectedGraph.putEdge(N4, N4);
-    containsExactlySanityCheck(
-        undirectedGraph.edges(),
+  public void graph_edges_undirected() {
+    // Given
+    MutableGraph<Integer> graph = GraphBuilder.undirected().allowsSelfLoops(true).build();
+    graph.addNode(N0); // isolated node
+    graph.putEdge(N1, N2);
+    graph.putEdge(N2, N1); // no-op for undirected graphs
+    graph.putEdge(N1, N3);
+    graph.putEdge(N4, N4); // self-loop
+
+    // Then
+    assertContainsExactly(
+        graph.edges(),
         EndpointPair.unordered(N1, N2),
         EndpointPair.unordered(N1, N3),
         EndpointPair.unordered(N4, N4));
   }
 
+  // -------------------------------------------------------------------
+  // Network.asGraph().edges() content
+  // -------------------------------------------------------------------
+
   @Test
-  public void endpointPair_directedNetwork() {
-    MutableNetwork<Integer, String> directedNetwork =
+  public void network_asGraph_edges_directed() {
+    // Given
+    MutableNetwork<Integer, String> network =
         NetworkBuilder.directed().allowsSelfLoops(true).build();
-    directedNetwork.addNode(N0);
-    directedNetwork.addEdge(N1, N2, E12);
-    directedNetwork.addEdge(N2, N1, E21);
-    directedNetwork.addEdge(N1, N3, E13);
-    directedNetwork.addEdge(N4, N4, E44);
-    containsExactlySanityCheck(
-        directedNetwork.asGraph().edges(),
+    network.addNode(N0); // isolated node
+    network.addEdge(N1, N2, E12);
+    network.addEdge(N2, N1, E21);
+    network.addEdge(N1, N3, E13);
+    network.addEdge(N4, N4, E44); // self-loop
+
+    // Then
+    assertContainsExactly(
+        network.asGraph().edges(),
         EndpointPair.ordered(N1, N2),
         EndpointPair.ordered(N2, N1),
         EndpointPair.ordered(N1, N3),
@@ -163,83 +195,104 @@ public final class EndpointPairTest {
   }
 
   @Test
-  public void endpointPair_undirectedNetwork() {
-    MutableNetwork<Integer, String> undirectedNetwork =
+  public void network_asGraph_edges_undirected_parallelEdgesDoNotDuplicateGraphEdges() {
+    // Given
+    MutableNetwork<Integer, String> network =
         NetworkBuilder.undirected().allowsParallelEdges(true).allowsSelfLoops(true).build();
-    undirectedNetwork.addNode(N0);
-    undirectedNetwork.addEdge(N1, N2, E12);
-    undirectedNetwork.addEdge(N2, N1, E12_A); // adds parallel edge, won't be in Graph edges
-    undirectedNetwork.addEdge(N1, N3, E13);
-    undirectedNetwork.addEdge(N4, N4, E44);
-    containsExactlySanityCheck(
-        undirectedNetwork.asGraph().edges(),
+    network.addNode(N0); // isolated node
+    network.addEdge(N1, N2, E12);
+    network.addEdge(N2, N1, E12_A); // parallel edge; Graph edges view remains deduplicated
+    network.addEdge(N1, N3, E13);
+    network.addEdge(N4, N4, E44); // self-loop
+
+    // Then
+    assertContainsExactly(
+        network.asGraph().edges(),
         EndpointPair.unordered(N1, N2),
         EndpointPair.unordered(N1, N3),
         EndpointPair.unordered(N4, N4));
   }
 
+  // -------------------------------------------------------------------
+  // Edges view characteristics
+  // -------------------------------------------------------------------
+
   @Test
-  public void endpointPair_unmodifiableView() {
-    MutableGraph<Integer> directedGraph = GraphBuilder.directed().build();
-    Set<EndpointPair<Integer>> edges = directedGraph.edges();
+  public void edgesLiveView_isUnmodifiable() {
+    // Given
+    MutableGraph<Integer> graph = GraphBuilder.directed().build();
+    Set<EndpointPair<Integer>> edgesView = graph.edges();
 
-    directedGraph.putEdge(N1, N2);
-    containsExactlySanityCheck(edges, EndpointPair.ordered(N1, N2));
+    // The view is live.
+    graph.putEdge(N1, N2);
+    assertContainsExactly(edgesView, EndpointPair.ordered(N1, N2));
 
-    directedGraph.putEdge(N2, N1);
-    containsExactlySanityCheck(edges, EndpointPair.ordered(N1, N2), EndpointPair.ordered(N2, N1));
+    graph.putEdge(N2, N1);
+    assertContainsExactly(
+        edgesView, EndpointPair.ordered(N1, N2), EndpointPair.ordered(N2, N1));
 
-    directedGraph.removeEdge(N1, N2);
-    directedGraph.removeEdge(N2, N1);
-    containsExactlySanityCheck(edges);
+    graph.removeEdge(N1, N2);
+    graph.removeEdge(N2, N1);
+    assertContainsExactly(edgesView);
 
-    assertThrows(
-        UnsupportedOperationException.class, () -> edges.add(EndpointPair.ordered(N1, N2)));
+    // And unmodifiable.
+    assertThrows(UnsupportedOperationException.class, () -> edgesView.add(EndpointPair.ordered(N1, N2)));
   }
 
-  @Test
-  public void endpointPair_undirected_contains() {
-    MutableGraph<Integer> undirectedGraph = GraphBuilder.undirected().allowsSelfLoops(true).build();
-    undirectedGraph.putEdge(N1, N1);
-    undirectedGraph.putEdge(N1, N2);
-    Set<EndpointPair<Integer>> edges = undirectedGraph.edges();
+  // -------------------------------------------------------------------
+  // contains() semantics on edges views
+  // -------------------------------------------------------------------
 
+  @Test
+  public void edges_contains_forUndirectedGraph() {
+    // Given
+    MutableGraph<Integer> graph = GraphBuilder.undirected().allowsSelfLoops(true).build();
+    graph.putEdge(N1, N1);
+    graph.putEdge(N1, N2);
+    Set<EndpointPair<Integer>> edges = graph.edges();
+
+    // Then
     assertThat(edges).hasSize(2);
     assertThat(edges).contains(EndpointPair.unordered(N1, N1));
     assertThat(edges).contains(EndpointPair.unordered(N1, N2));
     assertThat(edges).contains(EndpointPair.unordered(N2, N1)); // equal to unordered(N1, N2)
 
-    // ordered endpoints not compatible with undirected graph
+    // Ordered endpoint pairs are incompatible with undirected graphs.
     assertThat(edges).doesNotContain(EndpointPair.ordered(N1, N2));
 
-    assertThat(edges).doesNotContain(EndpointPair.unordered(N2, N2)); // edge not present
-    assertThat(edges).doesNotContain(EndpointPair.unordered(N3, N4)); // nodes not in graph
+    // Non-existent edges
+    assertThat(edges).doesNotContain(EndpointPair.unordered(N2, N2));
+    assertThat(edges).doesNotContain(EndpointPair.unordered(N3, N4));
   }
 
   @Test
-  public void endpointPair_directed_contains() {
-    MutableGraph<Integer> directedGraph = GraphBuilder.directed().allowsSelfLoops(true).build();
-    directedGraph.putEdge(N1, N1);
-    directedGraph.putEdge(N1, N2);
-    Set<EndpointPair<Integer>> edges = directedGraph.edges();
+  public void edges_contains_forDirectedGraph() {
+    // Given
+    MutableGraph<Integer> graph = GraphBuilder.directed().allowsSelfLoops(true).build();
+    graph.putEdge(N1, N1);
+    graph.putEdge(N1, N2);
+    Set<EndpointPair<Integer>> edges = graph.edges();
 
+    // Then
     assertThat(edges).hasSize(2);
     assertThat(edges).contains(EndpointPair.ordered(N1, N1));
     assertThat(edges).contains(EndpointPair.ordered(N1, N2));
 
-    // unordered endpoints not OK for directed graph (undefined behavior)
+    // Unordered endpoint pairs are not valid for directed graphs.
     assertThat(edges).doesNotContain(EndpointPair.unordered(N1, N2));
 
-    assertThat(edges).doesNotContain(EndpointPair.ordered(N2, N1)); // wrong order
-    assertThat(edges).doesNotContain(EndpointPair.ordered(N2, N2)); // edge not present
-    assertThat(edges).doesNotContain(EndpointPair.ordered(N3, N4)); // nodes not in graph
+    // Wrong order or non-existent edges
+    assertThat(edges).doesNotContain(EndpointPair.ordered(N2, N1));
+    assertThat(edges).doesNotContain(EndpointPair.ordered(N2, N2));
+    assertThat(edges).doesNotContain(EndpointPair.ordered(N3, N4));
   }
 
-  private static void containsExactlySanityCheck(Collection<?> collection, Object... varargs) {
-    assertThat(collection).hasSize(varargs.length);
-    for (Object obj : varargs) {
-      assertThat(collection).contains(obj);
-    }
-    assertThat(collection).containsExactly(varargs);
+  // -------------------------------------------------------------------
+  // Helpers
+  // -------------------------------------------------------------------
+
+  @SafeVarargs
+  private static <T> void assertContainsExactly(Collection<T> actual, T... expected) {
+    assertThat(actual).containsExactly((Object[]) expected);
   }
 }
