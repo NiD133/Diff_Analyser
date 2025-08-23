@@ -1,36 +1,29 @@
 package org.jsoup.internal;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class StringUtil_ESTestTest26 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil#padding(int)} method.
+ */
+public class StringUtilPaddingTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        // Undeclared exception!
-        try {
-            StringUtil.padding((-1));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // width must be >= 0
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    // The ExpectedException rule allows for clean, declarative testing of exceptions.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void paddingWithNegativeWidthThrowsIllegalArgumentException() {
+        // Arrange: Define the expected exception type and message.
+        // This makes the test's intent clear from the start.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("width must be >= 0");
+
+        // Act: Call the method with an invalid argument that should trigger the exception.
+        StringUtil.padding(-1);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // The 'thrown' rule handles the assertion implicitly.
     }
 }
