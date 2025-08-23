@@ -1,34 +1,50 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.*;
 
 public class JsonIgnoreProperties_ESTestTest22 extends JsonIgnoreProperties_ESTest_scaffolding {
 
+    /**
+     * Tests that `withoutIgnoreUnknown()` creates a new Value instance
+     * with the 'ignoreUnknown' property set to false, while preserving all other properties.
+     */
     @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[8];
-        String[] stringArray0 = new String[0];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        jsonIgnoreProperties_ValueArray0[0] = jsonIgnoreProperties_Value0;
-        Set<String> set0 = jsonIgnoreProperties_ValueArray0[0].findIgnoredForDeserialization();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.construct(set0, true, true, false, true);
-        assertFalse(jsonIgnoreProperties_Value1.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getMerge());
-        jsonIgnoreProperties_ValueArray0[7] = jsonIgnoreProperties_Value1;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_ValueArray0[7].withoutIgnoreUnknown();
-        assertTrue(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value2.getMerge());
-        assertFalse(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertFalse(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value1));
+    public void withoutIgnoreUnknown_shouldCreateNewInstanceWithIgnoreUnknownSetToFalse() {
+        // Arrange: Create an initial Value instance with ignoreUnknown=true.
+        Set<String> ignoredProperties = Collections.emptySet();
+        JsonIgnoreProperties.Value originalValue = JsonIgnoreProperties.Value.construct(
+                ignoredProperties,
+                /* ignoreUnknown */ true,
+                /* allowGetters */ true,
+                /* allowSetters */ false,
+                /* merge */ true
+        );
+        assertTrue("Precondition: originalValue should have ignoreUnknown set to true.",
+                originalValue.getIgnoreUnknown());
+
+        // Act: Call the method under test.
+        JsonIgnoreProperties.Value updatedValue = originalValue.withoutIgnoreUnknown();
+
+        // Assert: Verify the properties of the new Value instance.
+
+        // 1. The 'ignoreUnknown' property should now be false.
+        assertFalse("The updated value should have ignoreUnknown set to false.",
+                updatedValue.getIgnoreUnknown());
+
+        // 2. All other properties should be unchanged.
+        assertTrue("allowGetters should remain true.", updatedValue.getAllowGetters());
+        assertFalse("allowSetters should remain false.", updatedValue.getAllowSetters());
+        assertTrue("merge should remain true.", updatedValue.getMerge());
+        assertEquals("The set of ignored properties should be unchanged.",
+                originalValue.getIgnored(), updatedValue.getIgnored());
+
+        // 3. The method must return a new, distinct instance.
+        assertNotSame("A new instance should have been created.", originalValue, updatedValue);
+        assertNotEquals("The new instance should not be equal to the original.", originalValue, updatedValue);
     }
 }
