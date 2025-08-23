@@ -1,34 +1,46 @@
 package org.apache.commons.jxpath;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BasicNodeSet_ESTestTest1 extends BasicNodeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        BasicVariables basicVariables0 = new BasicVariables();
-        QName qName0 = new QName("5>?Fr~\"n B, <j");
-        VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
-        variablePointer0.setIndex(1805);
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        basicNodeSet0.add((Pointer) variablePointer0);
-        // Undeclared exception!
+/**
+ * Test suite for {@link BasicNodeSet}.
+ */
+// The original test class name is kept for consistency, but EvoSuite dependencies are removed.
+public class BasicNodeSet_ESTestTest1 {
+
+    /**
+     * Tests that calling toString() on a BasicNodeSet throws an IllegalArgumentException
+     * if it contains a pointer to a variable that has not been declared.
+     *
+     * The toString() method internally tries to resolve the value of each pointer,
+     * which triggers the exception.
+     */
+    @Test
+    public void toString_whenContainsPointerToUndeclaredVariable_throwsIllegalArgumentException() {
+        // Arrange
+        // 1. Create a variable context that does not have any variables declared.
+        BasicVariables variables = new BasicVariables();
+        QName undeclaredVariableName = new QName("undeclaredVar");
+
+        // 2. Create a pointer that refers to the undeclared variable.
+        Pointer pointerToUndeclaredVariable = new VariablePointer(variables, undeclaredVariableName);
+
+        // 3. Create the node set and add the pointer to it.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+        nodeSet.add(pointerToUndeclaredVariable);
+
+        // Act & Assert
         try {
-            basicNodeSet0.toString();
-            fail("Expecting exception: IllegalArgumentException");
+            nodeSet.toString();
+            fail("Expected an IllegalArgumentException because the node set contains a pointer to an undeclared variable.");
         } catch (IllegalArgumentException e) {
-            //
-            // No such variable: '5>?Fr~\"n B, <j'
-            //
-            verifyException("org.apache.commons.jxpath.BasicVariables", e);
+            // Verify the exception message is correct.
+            assertEquals("No such variable: 'undeclaredVar'", e.getMessage());
         }
     }
 }
