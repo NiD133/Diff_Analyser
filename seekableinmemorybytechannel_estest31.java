@@ -1,22 +1,26 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SeekableInMemoryByteChannel_ESTestTest31 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the SeekableInMemoryByteChannel class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
-        long long0 = seekableInMemoryByteChannel0.size();
-        assertEquals(0L, long0);
+    /**
+     * Verifies that a new SeekableInMemoryByteChannel, created with the default
+     * constructor, has an initial size of zero.
+     */
+    @Test
+    public void newlyCreatedChannelShouldHaveZeroSize() {
+        // Arrange: Create a new channel, which should be empty by default.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+
+        // Act: Get the size of the newly created channel.
+        long size = channel.size();
+
+        // Assert: The size should be 0.
+        assertEquals("A new channel created without initial data should have a size of 0.", 0L, size);
     }
 }
