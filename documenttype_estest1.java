@@ -1,25 +1,42 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for the DocumentType node.
+ * Note: The original test class name 'DocumentType_ESTestTest1' was preserved,
+ * but a more conventional name would be 'DocumentTypeTest'.
+ */
 public class DocumentType_ESTestTest1 extends DocumentType_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DocumentType documentType0 = new DocumentType("]1!E6Z>?G", "]1!E6Z>?G", "jcEA3& P6-6$CAL");
-        StringWriter stringWriter0 = new StringWriter();
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(stringWriter0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        documentType0.outerHtmlHead(quietAppendable0, document_OutputSettings0);
-        assertEquals("<!DOCTYPE ]1!E6Z>?G PUBLIC \"]1!E6Z>?G\" \"jcEA3& P6-6$CAL\">", stringWriter0.toString());
+    /**
+     * Verifies that the outer HTML is correctly generated for a DocumentType
+     * that includes both a PUBLIC and a SYSTEM identifier.
+     */
+    @Test
+    public void outerHtmlHeadRendersDoctypeWithPublicAndSystemIds() {
+        // Arrange: Create a DocumentType using a standard, recognizable doctype
+        // for clarity (HTML 4.01 Transitional).
+        String name = "html";
+        String publicId = "-//W3C//DTD HTML 4.01 Transitional//EN";
+        String systemId = "http://www.w3.org/TR/html4/loose.dtd";
+        DocumentType docType = new DocumentType(name, publicId, systemId);
+
+        StringWriter writer = new StringWriter();
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        String expectedHtml = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">";
+
+        // Act: Render the doctype's outer HTML to the writer.
+        // The QuietAppendable is an internal detail that wraps the writer.
+        docType.outerHtmlHead(QuietAppendable.wrap(writer), outputSettings);
+        String actualHtml = writer.toString();
+
+        // Assert: Check if the rendered HTML matches the expected format.
+        assertEquals(expectedHtml, actualHtml);
     }
 }
