@@ -1,0 +1,68 @@
+package org.threeten.extra.chrono;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.time.Clock;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.chrono.ChronoLocalDateTime;
+import java.time.chrono.ChronoZonedDateTime;
+import java.time.chrono.Era;
+import java.time.chrono.HijrahDate;
+import java.time.chrono.JapaneseDate;
+import java.time.chrono.JapaneseEra;
+import java.time.chrono.ThaiBuddhistEra;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.temporal.ValueRange;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.mock.java.time.MockClock;
+import org.evosuite.runtime.mock.java.time.MockInstant;
+import org.evosuite.runtime.mock.java.time.MockLocalDate;
+import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
+import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
+import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
+import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
+import org.junit.runner.RunWith;
+
+public class JulianChronology_ESTestTest16 extends JulianChronology_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test15() throws Throwable {
+        JulianChronology julianChronology0 = new JulianChronology();
+        HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
+        ChronoField chronoField0 = ChronoField.ERA;
+        Long long0 = new Long(867L);
+        hashMap0.put(chronoField0, long0);
+        ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
+        // Undeclared exception!
+        try {
+            julianChronology0.resolveDate(hashMap0, resolverStyle0);
+            fail("Expecting exception: DateTimeException");
+        } catch (DateTimeException e) {
+            //
+            // Invalid value for Era (valid values 0 - 1): 867
+            //
+            verifyException("java.time.temporal.ValueRange", e);
+        }
+    }
+}
