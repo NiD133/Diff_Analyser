@@ -1,29 +1,28 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest58 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class, focusing on the {@code set} method.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
-        try {
-            jsonArray0.set((-1), jsonArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling {@code set()} with a negative index throws an
+     * {@link IndexOutOfBoundsException}, as the index is out of the array's bounds.
+     */
+    @Test
+    public void set_withNegativeIndex_throwsIndexOutOfBoundsException() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        JsonElement elementToSet = new JsonPrimitive("any-value");
+
+        // Act & Assert
+        // The set method is expected to throw an exception when the index is invalid.
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            jsonArray.set(-1, elementToSet);
+        });
     }
 }
