@@ -1,18 +1,29 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class OptionBuilder_ESTestTest7 extends OptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the deprecated {@link OptionBuilder} class.
+ * This test suite assumes that the static state of OptionBuilder is reset between test runs.
+ */
+public class OptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        OptionBuilder.hasArgs(235);
-        Option option0 = OptionBuilder.create((String) null);
-        assertEquals(235, option0.getArgs());
+    /**
+     * Tests that an Option created after calling hasArgs(int) has the specified number of arguments.
+     */
+    @Test
+    public void hasArgsWithCountShouldSetTheNumberOfArguments() {
+        // Arrange: Define the expected number of arguments and configure the builder.
+        final int expectedArgCount = 235;
+        OptionBuilder.hasArgs(expectedArgCount);
+
+        // Act: Create an Option. The builder uses the static state set above.
+        // The short name (null) is not relevant for this test.
+        Option option = OptionBuilder.create(null);
+
+        // Assert: Verify that the created option has the correct number of arguments.
+        assertEquals("The number of arguments should match the value set.",
+                     expectedArgCount, option.getArgs());
     }
 }
