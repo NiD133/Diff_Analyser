@@ -1,31 +1,38 @@
 package org.jfree.chart.entity;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LegendItemEntity_ESTestTest4 extends LegendItemEntity_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-        Object object0 = legendItemEntity0.clone();
-        XIntervalSeriesCollection<Integer> xIntervalSeriesCollection0 = new XIntervalSeriesCollection<Integer>();
-        legendItemEntity0.setDataset(xIntervalSeriesCollection0);
-        boolean boolean0 = legendItemEntity0.equals(object0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+/**
+ * Tests for the {@link LegendItemEntity} class, focusing on the equals() method.
+ */
+public class LegendItemEntityTest {
+
+    /**
+     * Verifies that two LegendItemEntity objects are not equal if one has a
+     * different dataset.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenDatasetIsDifferent() throws CloneNotSupportedException {
+        // Arrange: Create an entity and a perfect clone of it.
+        Rectangle2D.Double area = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+        LegendItemEntity<String> originalEntity = new LegendItemEntity<>(area);
+        LegendItemEntity<String> clonedEntity = (LegendItemEntity<String>) originalEntity.clone();
+
+        // Sanity check: the fresh clone should be equal to the original.
+        assertEquals("A fresh clone should be equal to the original", originalEntity, clonedEntity);
+
+        // Act: Modify the dataset of the original entity.
+        XIntervalSeriesCollection<String> differentDataset = new XIntervalSeriesCollection<>();
+        originalEntity.setDataset(differentDataset);
+
+        // Assert: The original entity should no longer be equal to the unchanged clone.
+        assertNotEquals("Entity should not be equal to its clone after its dataset is modified",
+                originalEntity, clonedEntity);
     }
 }
