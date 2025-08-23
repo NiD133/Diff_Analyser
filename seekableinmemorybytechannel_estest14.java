@@ -1,31 +1,32 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest14 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
-        seekableInMemoryByteChannel0.close();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1169);
-        try {
-            seekableInMemoryByteChannel0.read(byteBuffer0);
-            fail("Expecting exception: ClosedChannelException");
-        } catch (ClosedChannelException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
-        }
+    /**
+     * Verifies that attempting to read from a channel that has been closed
+     * results in a {@link ClosedChannelException}.
+     */
+    @Test(expected = ClosedChannelException.class)
+    public void readFromClosedChannelShouldThrowClosedChannelException() throws IOException {
+        // Arrange: Create a channel and then immediately close it.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+        channel.close();
+        ByteBuffer buffer = ByteBuffer.allocate(128);
+
+        // Act: Attempt to read data from the closed channel.
+        // The exception is expected here.
+        channel.read(buffer);
+
+        // Assert: The test passes if a ClosedChannelException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
