@@ -1,39 +1,29 @@
 package org.apache.commons.jxpath.ri.compiler;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.ParentContext;
-import org.apache.commons.jxpath.ri.axes.PrecedingOrFollowingContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.axes.SelfContext;
-import org.apache.commons.jxpath.ri.axes.UnionContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CoreOperation_ESTestTest9 extends CoreOperation_ESTest_scaffolding {
+/**
+ * Tests for {@link CoreOperation} focusing on exception handling with invalid operand types.
+ */
+public class CoreOperationTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Expression[] expressionArray0 = new Expression[0];
-        CoreOperationAnd coreOperationAnd0 = new CoreOperationAnd(expressionArray0);
-        CoreOperationMod coreOperationMod0 = new CoreOperationMod(coreOperationAnd0, coreOperationAnd0);
-        // Undeclared exception!
-        try {
-            coreOperationMod0.compute((EvalContext) null);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that a {@link CoreOperationMod} (modulo) throws an {@link ArithmeticException}
+     * when its operands evaluate to non-numeric values.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void modOperationWithBooleanOperandsThrowsArithmeticException() {
+        // Arrange: Create a boolean expression. An 'and' operation with no arguments
+        // evaluates to a boolean, which is an invalid type for the 'mod' operator.
+        Expression booleanExpression = new CoreOperationAnd(new Expression[0]);
+
+        // Create a 'mod' operation with the boolean expression as both left and right operands.
+        // This is equivalent to an expression like 'true mod true'.
+        CoreOperation modOperation = new CoreOperationMod(booleanExpression, booleanExpression);
+
+        // Act & Assert: Attempting to compute the result should throw an ArithmeticException
+        // because the 'mod' operator cannot be applied to boolean values.
+        // The expected exception is declared in the @Test annotation, making a try-catch block unnecessary.
+        modOperation.compute(null); // The EvalContext is not relevant for this failure path.
     }
 }
