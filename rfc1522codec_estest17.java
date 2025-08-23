@@ -1,30 +1,42 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest17 extends RFC1522Codec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        BCodec bCodec0 = new BCodec();
+/**
+ * Contains tests for the RFC1522Codec class, focusing on decoding error handling.
+ */
+public class RFC1522CodecTest {
+
+    /**
+     * Tests that decodeText throws a DecoderException when the input string is malformed
+     * because it is missing the required charset token.
+     */
+    @Test
+    public void decodeTextWithMissingCharsetShouldThrowException() {
+        // Arrange
+        BCodec codec = new BCodec();
+        // An RFC 1522 encoded word must have the format "=?charset?encoding?encoded-text?=".
+        // This input is malformed because the 'charset' part between the first two '?' is empty.
+        String malformedEncodedWord = "=?^-?=";
+
+        // Act & Assert
         try {
-            bCodec0.decodeText("=?^-?=");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // RFC 1522 violation: charset token not found
-            //
-            verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
+            codec.decodeText(malformedEncodedWord);
+            fail("Expected DecoderException to be thrown due to missing charset.");
+        } catch (DecoderException e) {
+            // This is the expected outcome.
+            String expectedMessage = "RFC 1522 violation: charset token not found";
+            assertEquals(expectedMessage, e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+            // The decodeText method also declares this checked exception.
+            // We fail the test if it's thrown, as it's not expected for this specific input.
+            fail("Caught an unexpected UnsupportedEncodingException: " + e.getMessage());
         }
     }
 }
