@@ -1,58 +1,31 @@
 package com.fasterxml.jackson.core.io;
 
-import java.util.Random;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class NumberOutputTestTest3 {
+/**
+ * Unit tests for the optimized integer division method {@link NumberOutput#divBy1000(int)}.
+ * This class focuses on verifying the correctness of this specific optimization.
+ */
+class NumberOutputDivBy1000Test {
 
-    private void assertIntPrint(int value) {
-        String exp = "" + value;
-        String act = printToString(value);
-        if (!exp.equals(act)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + ")");
-        }
-        String alt = NumberOutput.toString(value);
-        if (!exp.equals(alt)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + ")");
-        }
-    }
-
-    private void assertLongPrint(long value, int index) {
-        String exp = "" + value;
-        String act = printToString(value);
-        if (!exp.equals(act)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + "; number index " + index + ")");
-        }
-        String alt = NumberOutput.toString(value);
-        if (!exp.equals(alt)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + "; number index " + index + ")");
-        }
-    }
-
-    private String printToString(int value) {
-        char[] buffer = new char[12];
-        int offset = NumberOutput.outputInt(value, buffer, 0);
-        return new String(buffer, 0, offset);
-    }
-
-    private String printToString(long value) {
-        char[] buffer = new char[22];
-        int offset = NumberOutput.outputLong(value, buffer, 0);
-        return new String(buffer, 0, offset);
-    }
-
+    /**
+     * Exhaustively tests that {@link NumberOutput#divBy1000(int)} produces the same result
+     * as standard Java integer division for all integers from 0 to 999,999.
+     * This ensures the optimization is correct for a common range of small, positive values.
+     */
     @Test
-    void divBy1000Small() {
+    void divBy1000_shouldMatchStandardDivisionForSmallPositiveIntegers() {
         for (int number = 0; number <= 999_999; ++number) {
             int expected = number / 1000;
             int actual = NumberOutput.divBy1000(number);
-            if (expected != actual) {
-                // only construct String if fail
-                fail("With " + number + " should get " + expected + ", got: " + actual);
-            }
+
+            // Using a lambda for the message improves performance, as the string is only
+            // constructed if the assertion fails.
+            assertEquals(expected, actual,
+                    () -> String.format("divBy1000(%d) - Expected: %d, Actual: %d",
+                            number, expected, actual));
         }
     }
 }
