@@ -1,32 +1,31 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest43 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that calling notNullParam with a null object throws an
+     * IllegalArgumentException with a specific, helpful message.
+     */
+    @Test
+    public void notNullParam_withNullObject_throwsIllegalArgumentException() {
+        // Arrange
+        String parameterName = "f";
+        String expectedMessage = "The parameter 'f' must not be null.";
+
+        // Act & Assert
         try {
-            Validate.notNullParam((Object) null, "f");
-            fail("Expecting exception: IllegalArgumentException");
+            Validate.notNullParam(null, parameterName);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // The parameter 'f' must not be null.
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // This is the expected outcome. Now, we verify the message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
