@@ -1,54 +1,35 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
 import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class AbstractPartial_ESTestTest34 extends AbstractPartial_ESTest_scaffolding {
+/**
+ * Tests for the {@link AbstractPartial#isEqual(ReadablePartial)} method.
+ */
+public class AbstractPartialTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        LocalDateTime localDateTime0 = LocalDateTime.now();
-        // Undeclared exception!
-        try {
-            localDateTime0.isEqual((ReadablePartial) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Partial cannot be null
-            //
-            verifyException("org.joda.time.base.AbstractPartial", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that isEqual() throws an IllegalArgumentException when the provided
+     * partial is null, as per the method's contract.
+     */
+    @Test
+    public void isEqual_whenComparingWithNull_throwsIllegalArgumentException() {
+        // Arrange: Create an instance of a class that extends AbstractPartial.
+        LocalDateTime partial = LocalDateTime.now();
+
+        // Arrange: Set up the expectation for an exception.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Partial cannot be null");
+
+        // Act: Call the method with a null argument, which should trigger the exception.
+        partial.isEqual(null);
+
+        // Assert: The ExpectedException rule automatically verifies the exception and its message.
     }
 }
