@@ -1,17 +1,26 @@
 package org.apache.commons.io;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IOCase_ESTestTest6 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        IOCase iOCase0 = IOCase.valueOf("SENSITIVE");
-        assertEquals(IOCase.SENSITIVE, iOCase0);
+    @Test
+    public void valueOf_shouldReturnSensitiveEnum_whenGivenSensitiveString() {
+        // The standard Enum.valueOf() method should correctly map
+        // the string "SENSITIVE" to the IOCase.SENSITIVE constant.
+
+        // Arrange
+        final IOCase expected = IOCase.SENSITIVE;
+        final String inputName = "SENSITIVE";
+
+        // Act
+        final IOCase actual = IOCase.valueOf(inputName);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
