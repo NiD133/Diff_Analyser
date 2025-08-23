@@ -1,34 +1,34 @@
 package org.apache.commons.collections4.iterators;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class BoundedIterator_ESTestTest6 extends BoundedIterator_ESTest_scaffolding {
+/**
+ * Tests for the constructor of {@link BoundedIterator}.
+ */
+public class BoundedIteratorConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BoundedIterator<Boolean> boundedIterator0 = null;
+    /**
+     * Tests that the constructor throws a NullPointerException when the decorated
+     * iterator is null. The constructor contract explicitly forbids a null iterator.
+     */
+    @Test
+    public void testConstructorThrowsNullPointerExceptionForNullIterator() {
+        // GIVEN: A null iterator argument.
+        // The offset and max arguments are valid but arbitrary for this test.
+        final long offset = 0L;
+        final long max = 10L;
+
         try {
-            boundedIterator0 = new BoundedIterator<Boolean>((Iterator<? extends Boolean>) null, 0L, 0L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // iterator
-            //
-            verifyException("java.util.Objects", e);
+            // WHEN: A BoundedIterator is constructed with a null iterator.
+            new BoundedIterator<Object>(null, offset, max);
+            fail("Expected a NullPointerException to be thrown for a null iterator.");
+        } catch (final NullPointerException e) {
+            // THEN: A NullPointerException is caught, and its message is verified.
+            // The message "iterator" is expected from Objects.requireNonNull(iterator, "iterator").
+            assertEquals("iterator", e.getMessage());
         }
     }
 }
