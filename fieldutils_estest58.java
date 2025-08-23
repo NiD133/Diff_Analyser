@@ -1,33 +1,34 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains an improved test case for the {@link FieldUtils} class.
+ */
 public class FieldUtils_ESTestTest58 extends FieldUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        RoundingMode roundingMode0 = RoundingMode.DOWN;
-        // Undeclared exception!
-        try {
-            FieldUtils.safeDivide((-9223372036854775804L), (long) (-1), roundingMode0);
-            //  fail("Expecting exception: ArithmeticException");
-            // Unstable assertion
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows a long: -9223372036854775804 / -1
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that {@link FieldUtils#safeDivide(long, long, RoundingMode)} throws an
+     * {@link ArithmeticException} when the division would result in an overflow.
+     *
+     * The canonical case for long division overflow is dividing {@link Long#MIN_VALUE}
+     * by -1, as the mathematical result ({@code Long.MAX_VALUE + 1}) cannot be
+     * represented as a long.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void safeDivide_withMinValueAndMinusOne_shouldThrowArithmeticException() {
+        // The dividend is the smallest possible long value.
+        final long dividend = Long.MIN_VALUE;
+
+        // The divisor is -1.
+        final long divisor = -1L;
+
+        // A rounding mode is required, but it does not affect the overflow check in this edge case.
+        final RoundingMode roundingMode = RoundingMode.DOWN;
+
+        // This operation is expected to throw an ArithmeticException because the result
+        // (9,223,372,036,854,775,808) is greater than Long.MAX_VALUE.
+        FieldUtils.safeDivide(dividend, divisor, roundingMode);
     }
 }
