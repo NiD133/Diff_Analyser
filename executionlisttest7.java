@@ -1,42 +1,21 @@
 package com.google.common.util.concurrent;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import com.google.common.testing.NullPointerTester;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class ExecutionListTestTest7 extends TestCase {
+/**
+ * Nullness tests for {@link ExecutionList}.
+ */
+@RunWith(JUnit4.class)
+public class ExecutionListNullnessTest {
 
-    private final ExecutionList list = new ExecutionList();
-
-    private static final Runnable THROWING_RUNNABLE = new Runnable() {
-
-        @Override
-        public void run() {
-            throw new RuntimeException();
-        }
-    };
-
-    private class MockRunnable implements Runnable {
-
-        final CountDownLatch countDownLatch;
-
-        MockRunnable(CountDownLatch countDownLatch) {
-            this.countDownLatch = countDownLatch;
-        }
-
-        @Override
-        public void run() {
-            countDownLatch.countDown();
-        }
-    }
-
-    public void testNulls() {
-        new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
-    }
+  @Test
+  public void publicMethods_rejectNullArguments() {
+    // NullPointerTester from Guava's testing library automatically verifies that
+    // all public methods of a class throw NullPointerException when passed a null
+    // argument for any parameter that is not explicitly marked as @Nullable.
+    new NullPointerTester().testAllPublicInstanceMethods(new ExecutionList());
+  }
 }
