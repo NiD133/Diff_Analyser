@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest7 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Weeks weeks0 = Weeks.ONE;
-        Minutes minutes0 = weeks0.toStandardMinutes();
-        assertEquals(10080, minutes0.getMinutes());
+    /**
+     * Tests that converting one week to standard minutes yields the correct result.
+     * A standard week is defined as 7 days, a standard day as 24 hours,
+     * and a standard hour as 60 minutes.
+     */
+    @Test
+    public void toStandardMinutes_forOneWeek_returnsCorrectNumberOfMinutes() {
+        // Arrange
+        Weeks oneWeek = Weeks.ONE;
+        
+        // The expected number of minutes in one standard week (7 days * 24 hours * 60 minutes)
+        final int expectedMinutes = 7 * 24 * 60;
+
+        // Act
+        Minutes actualMinutes = oneWeek.toStandardMinutes();
+
+        // Assert
+        assertEquals(expectedMinutes, actualMinutes.getMinutes());
     }
 }
