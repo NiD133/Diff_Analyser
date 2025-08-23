@@ -26,28 +26,44 @@ import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link org.apache.commons.lang3.text.translate.LookupTranslator}.
+ * Unit tests for {@link org.apache.commons.lang3.text.translate.LookupTranslator}.
  */
 @Deprecated
 class LookupTranslatorTest extends AbstractLangTest {
 
+    /**
+     * Tests basic translation functionality of the LookupTranslator.
+     * Translates "one" to "two".
+     */
     @Test
-    void testBasicLookup() throws IOException {
-        final LookupTranslator lt = new LookupTranslator(new CharSequence[][] { { "one", "two" } });
-        final StringWriter out = new StringWriter();
-        final int result = lt.translate("one", 0, out);
-        assertEquals(3, result, "Incorrect code point consumption");
-        assertEquals("two", out.toString(), "Incorrect value");
+    void testBasicTranslation() throws IOException {
+        // Arrange
+        final LookupTranslator translator = new LookupTranslator(new CharSequence[][] { { "one", "two" } });
+        final StringWriter outputWriter = new StringWriter();
+
+        // Act
+        final int consumedChars = translator.translate("one", 0, outputWriter);
+
+        // Assert
+        assertEquals(3, consumedChars, "The number of characters consumed is incorrect.");
+        assertEquals("two", outputWriter.toString(), "The translated output is incorrect.");
     }
 
-    // Tests: https://issues.apache.org/jira/browse/LANG-882
+    /**
+     * Tests translation using StringBuffer inputs.
+     * Verifies the fix for LANG-882.
+     */
     @Test
-    void testLang882() throws IOException {
-        final LookupTranslator lt = new LookupTranslator(new CharSequence[][] { { new StringBuffer("one"), new StringBuffer("two") } });
-        final StringWriter out = new StringWriter();
-        final int result = lt.translate(new StringBuffer("one"), 0, out);
-        assertEquals(3, result, "Incorrect code point consumption");
-        assertEquals("two", out.toString(), "Incorrect value");
-    }
+    void testTranslationWithStringBuffer() throws IOException {
+        // Arrange
+        final LookupTranslator translator = new LookupTranslator(new CharSequence[][] { { new StringBuffer("one"), new StringBuffer("two") } });
+        final StringWriter outputWriter = new StringWriter();
 
+        // Act
+        final int consumedChars = translator.translate(new StringBuffer("one"), 0, outputWriter);
+
+        // Assert
+        assertEquals(3, consumedChars, "The number of characters consumed is incorrect.");
+        assertEquals("two", outputWriter.toString(), "The translated output is incorrect.");
+    }
 }
