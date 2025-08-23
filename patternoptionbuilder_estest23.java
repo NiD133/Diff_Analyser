@@ -1,17 +1,28 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest23 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Options options0 = PatternOptionBuilder.parsePattern("");
-        assertNotNull(options0);
+    /**
+     * Tests that parsing an empty pattern string results in an empty, but non-null,
+     * Options object.
+     */
+    @Test
+    public void parsePattern_WithEmptyString_ShouldReturnEmptyOptions() {
+        // Arrange: Define an empty pattern string.
+        final String emptyPattern = "";
+
+        // Act: Parse the empty pattern.
+        final Options options = PatternOptionBuilder.parsePattern(emptyPattern);
+
+        // Assert: The resulting Options object should be non-null and contain no options.
+        assertNotNull("The returned Options object should not be null.", options);
+        assertTrue("The returned Options object should be empty.", options.getOptions().isEmpty());
     }
 }
