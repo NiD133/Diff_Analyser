@@ -1,31 +1,24 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest39 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeMultiply((-9223372036854775808L), (-9223372036854775808L));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows a long: -9223372036854775808 * -9223372036854775808
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that safeMultiply(long, long) throws an ArithmeticException when the
+     * multiplication result would overflow the range of a long.
+     *
+     * This test case uses Long.MIN_VALUE * Long.MIN_VALUE, which is a classic
+     * overflow scenario.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void safeMultiply_shouldThrowExceptionOnLongOverflow() {
+        // The safeMultiply method is expected to throw an ArithmeticException
+        // because the result of multiplying Long.MIN_VALUE by itself is too large
+        // to be stored in a long.
+        FieldUtils.safeMultiply(Long.MIN_VALUE, Long.MIN_VALUE);
     }
 }
