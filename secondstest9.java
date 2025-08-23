@@ -1,35 +1,23 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest9 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void getFieldType_shouldReturnSecondsType() {
+        // Arrange
+        Seconds seconds = Seconds.seconds(20);
+        DurationFieldType expectedType = DurationFieldType.seconds();
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act
+        DurationFieldType actualType = seconds.getFieldType();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testGetFieldType() {
-        Seconds test = Seconds.seconds(20);
-        assertEquals(DurationFieldType.seconds(), test.getFieldType());
+        // Assert
+        assertEquals(expectedType, actualType);
     }
 }
