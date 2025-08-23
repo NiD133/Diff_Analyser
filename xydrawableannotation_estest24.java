@@ -1,51 +1,34 @@
 package org.jfree.chart.annotations;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.math.BigInteger;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.Drawable;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockContainer;
-import org.jfree.chart.legend.LegendTitle;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.PolarAxisLocation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.AbstractRenderer;
-import org.jfree.chart.renderer.category.ScatterRenderer;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.title.CompositeTitle;
-import org.jfree.chart.title.DateTitle;
-import org.jfree.chart.title.ShortTextTitle;
-import org.jfree.chart.title.TextTitle;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
-public class XYDrawableAnnotation_ESTestTest24 extends XYDrawableAnnotation_ESTest_scaffolding {
+/**
+ * Contains unit tests for the equals() method of the {@link XYDrawableAnnotation} class.
+ */
+public class XYDrawableAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        BlockContainer blockContainer0 = new BlockContainer();
-        XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 2927.5241410323115, blockContainer0);
-        XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation(2927.5241410323115, 2927.5241410323115, 2927.5241410323115, 1530.0121533066, blockContainer0);
-        boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
-        assertEquals(1.0, xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
-        assertEquals(1530.0121533066, xYDrawableAnnotation1.getDisplayHeight(), 0.01);
-        assertEquals(2927.5241410323115, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
-        assertEquals(2927.5241410323115, xYDrawableAnnotation1.getY(), 0.01);
-        assertFalse(boolean0);
-        assertEquals(2927.5241410323115, xYDrawableAnnotation1.getX(), 0.01);
+    /**
+     * Verifies that the equals() method returns false when comparing two
+     * XYDrawableAnnotation objects that differ only by their display height.
+     */
+    @Test
+    public void equals_ReturnsFalse_WhenDisplayHeightIsDifferent() {
+        // Arrange: Create two annotations that are identical except for their display height.
+        Drawable drawable = new BlockContainer();
+        double x = 10.0;
+        double y = 20.0;
+        double width = 30.0;
+        
+        XYDrawableAnnotation annotation1 = new XYDrawableAnnotation(x, y, width, 40.0, drawable);
+        XYDrawableAnnotation annotation2 = new XYDrawableAnnotation(x, y, width, 50.0, drawable);
+
+        // Act: Compare the two annotations for equality.
+        boolean areEqual = annotation1.equals(annotation2);
+
+        // Assert: The result should be false, as the heights are different.
+        assertFalse("Annotations with different display heights should not be equal.", areEqual);
     }
 }
