@@ -1,31 +1,31 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest15 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for {@link Uncheck#getAsBoolean(IOBooleanSupplier)}.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        IOBooleanSupplier iOBooleanSupplier0 = mock(IOBooleanSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn(true).when(iOBooleanSupplier0).getAsBoolean();
-        boolean boolean0 = Uncheck.getAsBoolean(iOBooleanSupplier0);
-        assertTrue(boolean0);
+    /**
+     * Tests that Uncheck.getAsBoolean() correctly returns the value from the
+     * underlying supplier when the supplier does not throw an exception.
+     */
+    @Test
+    public void getAsBooleanShouldReturnValueFromSupplierWhenNoExceptionIsThrown() throws IOException {
+        // Arrange: Create a mock IOBooleanSupplier that returns 'true'.
+        final IOBooleanSupplier mockSupplier = mock(IOBooleanSupplier.class);
+        when(mockSupplier.getAsBoolean()).thenReturn(true);
+
+        // Act: Call the method under test with the mock supplier.
+        final boolean result = Uncheck.getAsBoolean(mockSupplier);
+
+        // Assert: Verify that the method returned the value from the supplier.
+        assertTrue("The result should be true, as provided by the supplier.", result);
     }
 }
