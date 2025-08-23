@@ -1,32 +1,49 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.joda.time.chrono.GJChronology;
+import org.junit.Test;
 
-public class CalendarConverter_ESTestTest1 extends CalendarConverter_ESTest_scaffolding {
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        CalendarConverter calendarConverter0 = new CalendarConverter();
-        ZoneOffset zoneOffset0 = ZoneOffset.MIN;
-        TimeZone timeZone0 = TimeZone.getTimeZone((ZoneId) zoneOffset0);
-        MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
-        Chronology chronology0 = calendarConverter0.getChronology((Object) mockGregorianCalendar0, (Chronology) null);
-        assertNotNull(chronology0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Unit tests for {@link CalendarConverter}.
+ */
+public class CalendarConverterTest {
+
+    /**
+     * Tests that getChronology correctly infers a GJChronology from a GregorianCalendar
+     * and preserves the calendar's time zone when no explicit chronology is provided.
+     */
+    @Test
+    public void getChronology_forGregorianCalendar_returnsGJChronologyWithCorrectZone() {
+        // Arrange
+        // Use the singleton instance as recommended by the class design.
+        final CalendarConverter converter = CalendarConverter.INSTANCE;
+
+        // Create a standard GregorianCalendar with a specific, non-default time zone.
+        final TimeZone jdkTimeZone = TimeZone.getTimeZone("America/New_York");
+        final GregorianCalendar calendar = new GregorianCalendar(jdkTimeZone);
+        final DateTimeZone expectedZone = DateTimeZone.forTimeZone(jdkTimeZone);
+
+        // Act
+        // Pass null for the chronology to let the converter determine it from the input object.
+        final Chronology actualChronology = converter.getChronology(calendar, null);
+
+        // Assert
+        // The converter should select GJChronology for a GregorianCalendar input, as per Javadoc.
+        assertNotNull("The resulting chronology should not be null.", actualChronology);
+        assertTrue("The chronology should be an instance of GJChronology.",
+                   actualChronology instanceof GJChronology);
+
+        // The time zone from the calendar should be correctly converted and applied.
+        assertEquals("The chronology's time zone should match the calendar's.",
+                     expectedZone, actualChronology.getZone());
     }
 }
