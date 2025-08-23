@@ -5,25 +5,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.Transformer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ObjectGraphIteratorTestTest6 extends AbstractIteratorTest<Object> {
+/**
+ * Tests the ObjectGraphIterator with a complex, tree-like object structure.
+ * This class verifies that the iterator can correctly navigate a graph
+ * containing nested iterators, empty branches, and multiple levels of depth.
+ */
+public class ObjectGraphIteratorComplexGraphTest extends AbstractIteratorTest<Object> {
 
     protected String[] testArray = { "One", "Two", "Three", "Four", "Five", "Six" };
 
     protected List<String> list1;
-
     protected List<String> list2;
-
     protected List<String> list3;
-
     protected List<Iterator<String>> iteratorList;
 
     @Override
@@ -55,57 +57,58 @@ public class ObjectGraphIteratorTestTest6 extends AbstractIteratorTest<Object> {
         iteratorList.add(list3.iterator());
     }
 
-    static class Branch {
+    // --- Test domain objects for graph traversal ---
 
-        List<Leaf> leaves = new ArrayList<>();
-
-        Leaf addLeaf() {
-            leaves.add(new Leaf());
-            return getLeaf(leaves.size() - 1);
-        }
-
-        Leaf getLeaf(final int index) {
-            return leaves.get(index);
-        }
-
-        Iterator<Leaf> leafIterator() {
-            return leaves.iterator();
-        }
-    }
-
+    /** A mock object representing the root of the graph. */
     static class Forest {
-
-        List<Tree> trees = new ArrayList<>();
-
+        final List<Tree> trees = new ArrayList<>();
         Tree addTree() {
-            trees.add(new Tree());
-            return getTree(trees.size() - 1);
+            final Tree tree = new Tree();
+            trees.add(tree);
+            return tree;
         }
-
-        Tree getTree(final int index) {
-            return trees.get(index);
-        }
-
         Iterator<Tree> treeIterator() {
             return trees.iterator();
         }
     }
 
-    static class Leaf {
-
-        String color;
-
-        String getColor() {
-            return color;
+    /** A mock object representing a node in the graph. */
+    static class Tree {
+        final List<Branch> branches = new ArrayList<>();
+        Branch addBranch() {
+            final Branch branch = new Branch();
+            branches.add(branch);
+            return branch;
         }
-
-        void setColor(final String color) {
-            this.color = color;
+        Iterator<Branch> branchIterator() {
+            return branches.iterator();
         }
     }
 
-    static class LeafFinder implements Transformer<Object, Object> {
+    /** A mock object representing a sub-node in the graph. */
+    static class Branch {
+        final List<Leaf> leaves = new ArrayList<>();
+        Leaf addLeaf() {
+            final Leaf leaf = new Leaf();
+            leaves.add(leaf);
+            return leaf;
+        }
+        Iterator<Leaf> leafIterator() {
+            return leaves.iterator();
+        }
+    }
 
+    /** A mock object representing a terminal node (a leaf) in the graph. */
+    static class Leaf {
+        // No behavior needed for this test
+    }
+
+    /**
+     * A Transformer that navigates the object graph.
+     * It returns an iterator for container nodes (Forest, Tree, Branch)
+     * and the node itself for terminal nodes (Leaf).
+     */
+    static class LeafFinder implements Transformer<Object, Object> {
         @Override
         public Object transform(final Object input) {
             if (input instanceof Forest) {
@@ -118,59 +121,83 @@ public class ObjectGraphIteratorTestTest6 extends AbstractIteratorTest<Object> {
                 return ((Branch) input).leafIterator();
             }
             if (input instanceof Leaf) {
-                return input;
+                return input; // Return the leaf itself
             }
-            throw new ClassCastException();
+            throw new ClassCastException("Unsupported object type: " + input.getClass().getName());
         }
     }
 
-    static class Tree {
+    /** A helper class to hold the constructed graph and the expected results. */
+    private static class TestGraph {
+        final Forest forest;
+        final List<Leaf> expectedLeaves;
 
-        List<Branch> branches = new ArrayList<>();
-
-        Branch addBranch() {
-            branches.add(new Branch());
-            return getBranch(branches.size() - 1);
-        }
-
-        Iterator<Branch> branchIterator() {
-            return branches.iterator();
-        }
-
-        Branch getBranch(final int index) {
-            return branches.get(index);
+        TestGraph(final Forest forest, final List<Leaf> expectedLeaves) {
+            this.forest = forest;
+            this.expectedLeaves = expectedLeaves;
         }
     }
 
-    @Test
-    void testIteration_Transformed2() {
+    /**
+     * Creates a complex graph structure for testing.
+     * The graph contains multiple trees, branches, and leaves, including
+     * an empty tree and an empty branch to test edge cases.
+     *
+     * @return A {@link TestGraph} instance containing the graph root and the expected list of leaves.
+     */
+    private TestGraph createComplexForestWithExpectedLeaves() {
         final Forest forest = new Forest();
+        final List<Leaf> expectedLeaves = new ArrayList<>();
+
+        // Tree 1: Contains two branches with leaves.
+        final Tree tree1 = forest.addTree();
+        final Branch tree1branch1 = tree1.addBranch();
+        expectedLeaves.add(tree1branch1.addLeaf());
+        expectedLeaves.add(tree1branch1.addLeaf());
+        final Branch tree1branch2 = tree1.addBranch();
+        expectedLeaves.add(tree1branch2.addLeaf());
+
+        // Tree 2: An empty tree with no branches. The iterator should skip this.
         forest.addTree();
-        forest.addTree();
-        forest.addTree();
-        final Branch b1 = forest.getTree(0).addBranch();
-        final Branch b2 = forest.getTree(0).addBranch();
-        final Branch b3 = forest.getTree(2).addBranch();
-        /* Branch b4 = */
-        forest.getTree(2).addBranch();
-        final Branch b5 = forest.getTree(2).addBranch();
-        final Leaf l1 = b1.addLeaf();
-        final Leaf l2 = b1.addLeaf();
-        final Leaf l3 = b2.addLeaf();
-        final Leaf l4 = b3.addLeaf();
-        final Leaf l5 = b5.addLeaf();
-        final Iterator<Object> it = new ObjectGraphIterator<>(forest, new LeafFinder());
-        assertTrue(it.hasNext());
-        assertSame(l1, it.next());
-        assertTrue(it.hasNext());
-        assertSame(l2, it.next());
-        assertTrue(it.hasNext());
-        assertSame(l3, it.next());
-        assertTrue(it.hasNext());
-        assertSame(l4, it.next());
-        assertTrue(it.hasNext());
-        assertSame(l5, it.next());
-        assertFalse(it.hasNext());
-        assertThrows(NoSuchElementException.class, () -> it.next());
+
+        // Tree 3: Contains three branches, one of which is empty.
+        final Tree tree3 = forest.addTree();
+        final Branch tree3branch1 = tree3.addBranch();
+        expectedLeaves.add(tree3branch1.addLeaf());
+
+        // This branch has no leaves. The iterator should skip it.
+        tree3.addBranch();
+
+        final Branch tree3branch3 = tree3.addBranch();
+        expectedLeaves.add(tree3branch3.addLeaf());
+
+        return new TestGraph(forest, expectedLeaves);
+    }
+
+    /**
+     * Tests that the iterator correctly traverses a complex object graph using a transformer
+     * to find all terminal 'Leaf' nodes. It verifies the order of traversal and the
+     * iterator's termination behavior.
+     */
+    @Test
+    void testIteratorTraversesComplexGraphWithTransformer() {
+        // Arrange: Create a complex object graph and define the expected traversal order.
+        final TestGraph testData = createComplexForestWithExpectedLeaves();
+        final Forest forest = testData.forest;
+        final List<Leaf> expectedLeaves = testData.expectedLeaves;
+
+        // Act: Create the iterator to traverse the graph.
+        final Iterator<Object> iterator = new ObjectGraphIterator<>(forest, new LeafFinder());
+
+        // Assert: Verify that the iterator visits all leaves in the expected order.
+        for (final Leaf expectedLeaf : expectedLeaves) {
+            assertTrue(iterator.hasNext(), "Iterator should have more leaves.");
+            assertSame(expectedLeaf, iterator.next(), "Iterator returned an unexpected leaf.");
+        }
+
+        // Assert: Verify that the iterator correctly reports that it is exhausted.
+        assertFalse(iterator.hasNext(), "Iterator should be exhausted after visiting all leaves.");
+        assertThrows(NoSuchElementException.class, iterator::next,
+                "Calling next() on an exhausted iterator should throw NoSuchElementException.");
     }
 }
