@@ -1,41 +1,41 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class is derived from an EvoSuite-generated class.
+ * The contained test has been refactored for clarity.
+ */
 public class PreciseDurationDateTimeField_ESTestTest3 extends PreciseDurationDateTimeField_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
-        MillisDurationField millisDurationField0 = (MillisDurationField) MillisDurationField.INSTANCE;
-        JulianChronology julianChronology0 = JulianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-        long long0 = preciseDateTimeField0.roundCeiling(0L);
-        assertEquals(0L, long0);
+    /**
+     * Tests that roundCeiling() for an instant that is already on a unit boundary (like the epoch 0L)
+     * returns the instant itself, without rounding up.
+     */
+    @Test
+    public void roundCeiling_whenInstantIsOnBoundary_returnsSameInstant() {
+        // Arrange: Create a simple millisecond-based field.
+        // The roundCeiling method is implemented in the abstract PreciseDurationDateTimeField class,
+        // so we use a concrete subclass (PreciseDateTimeField) for testing.
+        // The unit field (milliseconds) is the key component for this test. The range field (seconds)
+        // is required by the constructor but is not used by the roundCeiling method.
+        PreciseDateTimeField millisecondField = new PreciseDateTimeField(
+                DateTimeFieldType.millisOfSecond(),
+                MillisDurationField.INSTANCE,
+                ISOChronology.getInstanceUTC().seconds());
+
+        long epochInstant = 0L;
+
+        // Act: Call the method under test.
+        long roundedInstant = millisecondField.roundCeiling(epochInstant);
+
+        // Assert: The value should be unchanged because 0 is a perfect multiple of the unit (1 millisecond).
+        assertEquals("Rounding the epoch (0L) up to the nearest millisecond should not change it.",
+                epochInstant, roundedInstant);
     }
 }
