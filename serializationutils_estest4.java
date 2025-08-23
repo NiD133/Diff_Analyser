@@ -1,31 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class SerializationUtils_ESTestTest4 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.SerializationUtils}.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        byte[] byteArray0 = SerializationUtils.serialize((Serializable) null);
-        Object object0 = SerializationUtils.deserialize(byteArray0);
-        assertNull(object0);
+    /**
+     * Tests that serializing and then deserializing a null object results in a null object.
+     * This is a common round-trip scenario.
+     */
+    @Test
+    public void testSerializeAndDeserializeNull() {
+        // Arrange: The object to be serialized is null.
+        // No explicit object creation is needed.
+
+        // Act: Serialize the null object and then deserialize the resulting byte array.
+        final byte[] serializedData = SerializationUtils.serialize(null);
+        final Object result = SerializationUtils.deserialize(serializedData);
+
+        // Assert: The deserialized object should also be null.
+        assertNull("Deserializing a serialized null object should result in null", result);
     }
 }
