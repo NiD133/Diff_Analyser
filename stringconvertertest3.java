@@ -1,107 +1,193 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class StringConverterTestTest3 extends TestCase {
+import java.util.Locale;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+import static org.junit.Assert.assertEquals;
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+/**
+ * Unit tests for {@link StringConverter} focusing on getInstantMillis.
+ * This suite tests the conversion of various ISO 8601 string formats to milliseconds.
+ */
+public class StringConverterTest {
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+    private static final DateTimeZone ZONE_PLUS_8 = DateTimeZone.forOffsetHours(8);
+    private static final Chronology ISO_CHRONOLOGY_PLUS_8 = ISOChronology.getInstance(ZONE_PLUS_8);
+    private static final Chronology ISO_CHRONOLOGY_DEFAULT_ZONE = ISOChronology.getInstance();
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
+    private DateTimeZone originalDefaultZone;
+    private Locale originalDefaultLocale;
 
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
+    @Before
+    public void setUp() {
+        // Isolate tests from system defaults
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultLocale = Locale.getDefault();
+        DateTimeZone.setDefault(DateTimeZone.forID("Europe/London"));
         Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
+    @After
+    public void tearDown() {
+        // Restore system defaults
+        DateTimeZone.setDefault(originalDefaultZone);
+        Locale.setDefault(originalDefaultLocale);
     }
 
-    //-----------------------------------------------------------------------
-    public void testGetInstantMillis_Object() throws Exception {
-        DateTime dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 1, 1, 0, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004T+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 1, 0, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06T+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-161T+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 0, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-W24-3T+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 7, 0, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-W24T+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 0, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 24, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 24, 48, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 30, 0, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12.5+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 24, 30, 0, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24.5+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 24, 48, 500, EIGHT);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.5+08:00", ISO_EIGHT));
-        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO));
+    @Test
+    public void getInstantMillis_parsesFullDateTimeWithMillis() {
+        String input = "2004-06-09T12:24:48.501+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesYearOnlyString() {
+        String input = "2004T+08:00";
+        DateTime expected = new DateTime(2004, 1, 1, 0, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesYearMonthString() {
+        String input = "2004-06T+08:00";
+        DateTime expected = new DateTime(2004, 6, 1, 0, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateOnlyString() {
+        String input = "2004-06-09T+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 0, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesOrdinalDateString() {
+        // An ordinal date represents the year and the day of the year (1-366).
+        // The 161st day of 2004 is June 9th.
+        String input = "2004-161T+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 0, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesWeekDateString() {
+        // A week date represents the year, the week of the year, and the day of the week (1-7).
+        // 2004-W24-3 is the 3rd day (Wednesday) of the 24th week of 2004, which is June 9th.
+        String input = "2004-W24-3T+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 0, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesYearAndWeekString() {
+        // If the day of the week is omitted, it defaults to the first day (Monday).
+        // The 24th week of 2004 starts on Monday, June 7th.
+        String input = "2004-W24T+08:00";
+        DateTime expected = new DateTime(2004, 6, 7, 0, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateTimeWithHour() {
+        String input = "2004-06-09T12+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 0, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateTimeWithMinute() {
+        String input = "2004-06-09T12:24+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateTimeWithSecond() {
+        String input = "2004-06-09T12:24:48+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateTimeWithFractionalHour() {
+        // 12.5 hours is 12 hours and 30 minutes.
+        String input = "2004-06-09T12.5+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 30, 0, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateTimeWithFractionalMinute() {
+        // 24.5 minutes is 24 minutes and 30 seconds.
+        String input = "2004-06-09T12:24.5+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 30, 0, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesDateTimeWithFractionalSecond() {
+        // 48.5 seconds is 48 seconds and 500 milliseconds.
+        String input = "2004-06-09T12:24:48.5+08:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 500, ZONE_PLUS_8);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_PLUS_8);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_parsesStringWithDefaultChronology() {
+        // The input string has no time zone, so it's parsed using the default zone (set to London in setUp).
+        String input = "2004-06-09T12:24:48.501";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, DateTimeZone.forID("Europe/London"));
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(input, ISO_CHRONOLOGY_DEFAULT_ZONE);
+
+        assertEquals(expected.getMillis(), actualMillis);
     }
 }
