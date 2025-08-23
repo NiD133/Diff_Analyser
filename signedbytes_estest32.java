@@ -1,18 +1,21 @@
 package com.google.common.primitives;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SignedBytes_ESTestTest32 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Comparator<byte[]> comparator0 = SignedBytes.lexicographicalComparator();
-        assertNotNull(comparator0);
+    @Test
+    public void lexicographicalComparator_shouldReturnNonNullInstance() {
+        // When the lexicographicalComparator method is called
+        Comparator<byte[]> comparator = SignedBytes.lexicographicalComparator();
+
+        // Then a non-null Comparator instance should be returned
+        assertNotNull("The lexicographical comparator should never be null.", comparator);
     }
 }
