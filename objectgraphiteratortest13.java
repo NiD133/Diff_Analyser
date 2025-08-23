@@ -56,90 +56,19 @@ public class ObjectGraphIteratorTestTest13 extends AbstractIteratorTest<Object> 
     }
 
     static class Branch {
-
-        List<Leaf> leaves = new ArrayList<>();
-
-        Leaf addLeaf() {
-            leaves.add(new Leaf());
-            return getLeaf(leaves.size() - 1);
-        }
-
-        Leaf getLeaf(final int index) {
-            return leaves.get(index);
-        }
-
-        Iterator<Leaf> leafIterator() {
-            return leaves.iterator();
-        }
+        // ... (unused code)
     }
-
     static class Forest {
-
-        List<Tree> trees = new ArrayList<>();
-
-        Tree addTree() {
-            trees.add(new Tree());
-            return getTree(trees.size() - 1);
-        }
-
-        Tree getTree(final int index) {
-            return trees.get(index);
-        }
-
-        Iterator<Tree> treeIterator() {
-            return trees.iterator();
-        }
+        // ... (unused code)
     }
-
     static class Leaf {
-
-        String color;
-
-        String getColor() {
-            return color;
-        }
-
-        void setColor(final String color) {
-            this.color = color;
-        }
+        // ... (unused code)
     }
-
     static class LeafFinder implements Transformer<Object, Object> {
-
-        @Override
-        public Object transform(final Object input) {
-            if (input instanceof Forest) {
-                return ((Forest) input).treeIterator();
-            }
-            if (input instanceof Tree) {
-                return ((Tree) input).branchIterator();
-            }
-            if (input instanceof Branch) {
-                return ((Branch) input).leafIterator();
-            }
-            if (input instanceof Leaf) {
-                return input;
-            }
-            throw new ClassCastException();
-        }
+        // ... (unused code)
     }
-
     static class Tree {
-
-        List<Branch> branches = new ArrayList<>();
-
-        Branch addBranch() {
-            branches.add(new Branch());
-            return getBranch(branches.size() - 1);
-        }
-
-        Iterator<Branch> branchIterator() {
-            return branches.iterator();
-        }
-
-        Branch getBranch(final int index) {
-            return branches.get(index);
-        }
+        // ... (unused code)
     }
 
     @Test
