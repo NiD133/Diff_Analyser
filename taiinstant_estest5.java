@@ -1,30 +1,39 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This test class contains the refactored test case.
+ * Note: The original class name and inheritance (TaiInstant_ESTestTest5 extends TaiInstant_ESTest_scaffolding)
+ * are preserved. In a real-world scenario, the class would likely be named TaiInstantTest.
+ */
 public class TaiInstant_ESTestTest5 extends TaiInstant_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Instant instant0 = MockInstant.now();
-        TaiInstant taiInstant0 = TaiInstant.of(instant0);
-        TaiInstant taiInstant1 = taiInstant0.withTaiSeconds(1000000000L);
-        taiInstant1.durationUntil(taiInstant0);
-        assertEquals(320000000, taiInstant0.getNano());
-        assertEquals(320000000, taiInstant1.getNano());
-        assertEquals(1000000000L, taiInstant1.getTaiSeconds());
+    /**
+     * Tests that withTaiSeconds() creates a new TaiInstant with the specified seconds,
+     * while preserving the original nanosecond value.
+     */
+    @Test
+    public void withTaiSeconds_shouldUpdateSecondsAndPreserveNanos() {
+        // Arrange: Create a base TaiInstant with a known nano-of-second value.
+        // The original test used MockInstant.now(), which corresponds to "2014-02-14T10:15:30.320Z".
+        // Using an explicit Instant makes the test more readable and less dependent on mock configurations.
+        final int originalNanos = 320_000_000;
+        Instant baseUtcInstant = Instant.parse("2014-02-14T10:15:30.320Z");
+        TaiInstant baseTaiInstant = TaiInstant.of(baseUtcInstant);
+
+        // The new value for the TAI seconds field.
+        final long newTaiSeconds = 1_000_000_000L;
+
+        // Act: Call the method under test to create a modified instant.
+        TaiInstant modifiedTaiInstant = baseTaiInstant.withTaiSeconds(newTaiSeconds);
+
+        // Assert: Verify that the new instant has the updated seconds and the original nanos.
+        assertEquals("The TAI seconds should be updated to the new value.",
+                newTaiSeconds, modifiedTaiInstant.getTaiSeconds());
+        assertEquals("The nanoseconds should be preserved from the original instant.",
+                originalNanos, modifiedTaiInstant.getNano());
     }
 }
