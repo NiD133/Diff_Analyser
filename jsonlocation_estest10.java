@@ -1,24 +1,39 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest10 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonLocation} class.
+ * This improved version replaces an auto-generated test with a clear,
+ * human-readable one.
+ */
+public class JsonLocationTest {
 
+    /**
+     * Verifies that offsetDescription() returns a specific "UNKNOWN" message
+     * when the byte offset is not available (i.e., is negative).
+     */
     @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Object object0 = new Object();
-        ContentReference contentReference0 = JsonLocation._wrap(object0);
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference0, (-1L), 1L, 0, 0);
-        String string0 = jsonLocation0.offsetDescription();
-        assertEquals("byte offset: #UNKNOWN", string0);
-        assertEquals(1L, jsonLocation0.getCharOffset());
-        assertEquals(0, jsonLocation0.getColumnNr());
-        assertEquals(0, jsonLocation0.getLineNr());
+    public void offsetDescriptionShouldReturnUnknownWhenByteOffsetIsNegative() {
+        // Arrange: Create a JsonLocation with an unknown byte offset (-1).
+        Object sourceObject = new Object();
+        ContentReference contentReference = JsonLocation._wrap(sourceObject);
+
+        long unknownByteOffset = -1L;
+        // The other location parameters are not relevant for this specific behavior.
+        long charOffset = 1L;
+        int line = 1;
+        int column = 1;
+
+        JsonLocation location = new JsonLocation(contentReference, unknownByteOffset, charOffset, line, column);
+
+        // Act: Get the offset description string.
+        String description = location.offsetDescription();
+
+        // Assert: The description should indicate that the byte offset is unknown.
+        String expectedDescription = "byte offset: #UNKNOWN";
+        assertEquals(expectedDescription, description);
     }
 }
