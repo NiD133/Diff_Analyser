@@ -1,59 +1,31 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This test class contains an improved version of a generated test case
+ * for the {@link CompositeSet} class.
+ */
 public class CompositeSet_ESTestTest47 extends CompositeSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        CompositeSet<Boolean> compositeSet0 = new CompositeSet<Boolean>();
-        assertNotNull(compositeSet0);
-        Object object0 = new Object();
-        assertNotNull(object0);
-        boolean boolean0 = compositeSet0.equals(object0);
-        assertFalse(compositeSet0.contains(boolean0));
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method of a CompositeSet returns false when
+     * compared with an object that is not a Set.
+     *
+     * This adheres to the contract of the java.util.Set interface, which
+     * specifies that for equals() to be true, the other object must also be a Set.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenComparedWithNonSetObject() {
+        // Arrange: Create an empty CompositeSet and a non-Set object for comparison.
+        CompositeSet<Object> compositeSet = new CompositeSet<>();
+        Object nonSetObject = new Object();
+
+        // Act: Call the equals() method.
+        boolean result = compositeSet.equals(nonSetObject);
+
+        // Assert: Verify that the result is false, as expected.
+        assertFalse("A CompositeSet should not be equal to an object that is not a Set.", result);
     }
 }
