@@ -1,140 +1,81 @@
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import com.itextpdf.testutils.TestResourceUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import com.itextpdf.awt.geom.AffineTransform;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class SimpleTextExtractionStrategyTestTest8 {
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-    String TEXT1 = "TEXT1 TEXT1";
+/**
+ * Tests the spacing detection logic of the {@link SimpleTextExtractionStrategy}.
+ */
+public class SimpleTextExtractionStrategySpacingTest {
 
-    String TEXT2 = "TEXT2 TEXT2";
+    private static final String TEXT_CHUNK_1 = "TEXT1 TEXT1";
+    private static final String TEXT_CHUNK_2 = "TEXT2 TEXT2";
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    public TextExtractionStrategy createRenderListenerForTest() {
-        return new SimpleTextExtractionStrategy();
-    }
-
-    byte[] createPdfWithXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        PdfTemplate template = writer.getDirectContent().createTemplate(100, 100);
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        template.moveText(5, template.getHeight() - 5);
-        template.showText(xobjectText);
-        template.endText();
-        Image xobjectImage = Image.getInstance(template);
-        doc.add(xobjectImage);
-        doc.add(new Paragraph("C"));
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private static byte[] createPdfWithArrayText(String directContentTj) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.transform(AffineTransform.getTranslateInstance(100, 500));
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append(directContentTj + "\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithArrayText(String text1, String text2, int spaceInPoints) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append("[(" + text1 + ")" + (-spaceInPoints) + "(" + text2 + ")]TJ\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithRotatedText(String text1, String text2, float rotation, boolean moveTextToNextLine, float moveTextDelta) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        float x = document.getPageSize().getWidth() / 2;
-        float y = document.getPageSize().getHeight() / 2;
-        cb.transform(AffineTransform.getTranslateInstance(x, y));
-        cb.moveTo(-10, 0);
-        cb.lineTo(10, 0);
-        cb.moveTo(0, -10);
-        cb.lineTo(0, 10);
-        cb.stroke();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.transform(AffineTransform.getRotateInstance(rotation / 180f * Math.PI));
-        cb.showText(text1);
-        if (moveTextToNextLine)
-            cb.moveText(0, moveTextDelta);
-        else
-            cb.transform(AffineTransform.getTranslateInstance(moveTextDelta, 0));
-        cb.showText(text2);
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static class SingleCharacterSimpleTextExtractionStrategy extends SimpleTextExtractionStrategy {
-
-        @Override
-        public void renderText(TextRenderInfo renderInfo) {
-            for (TextRenderInfo tri : renderInfo.getCharacterRenderInfos()) super.renderText(tri);
-        }
-    }
-
+    /**
+     * This test verifies that SimpleTextExtractionStrategy correctly inserts a space
+     * when two text chunks are separated by a large positioning adjustment,
+     * which is a common way to create word spacing in a PDF.
+     */
     @Test
-    public void testWordSpacingCausedByExplicitGlyphPositioning() throws Exception {
-        byte[] bytes = createPdfWithArrayText(TEXT1, TEXT2, 250);
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
+    public void testWordSpacingCausedByExplicitGlyphPositioning() throws IOException, com.itextpdf.text.DocumentException {
+        // Arrange
+        // A positioning adjustment of -250 thousandths of a text unit is used to create a visual gap.
+        final int spacingAdjustment = 250;
+        byte[] pdfBytes = createPdfWithSpacedTextUsingTjOperator(TEXT_CHUNK_1, TEXT_CHUNK_2, spacingAdjustment);
+        
+        PdfReader reader = new PdfReader(pdfBytes);
+        TextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+        String expectedText = TEXT_CHUNK_1 + " " + TEXT_CHUNK_2;
+
+        // Act
+        String extractedText = PdfTextExtractor.getTextFromPage(reader, 1, strategy);
+
+        // Assert
+        // The strategy should interpret the visual gap created by the TJ operator as a word-separating space.
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    /**
+     * Creates a PDF where two text chunks are separated by a positioning adjustment
+     * rather than a literal space character. This is achieved using the PDF 'TJ' operator.
+     * <p>
+     * The TJ operator takes an array of strings and numbers. The numbers represent
+     * horizontal adjustments in thousandths of a text unit. A negative number moves the
+     * subsequent text to the right, effectively creating a space.
+     *
+     * @param text1             The first text chunk.
+     * @param text2             The second text chunk.
+     * @param spacingAdjustment The spacing adjustment in thousandths of a text unit.
+     * @return A byte array representing the generated PDF.
+     */
+    private byte[] createPdfWithSpacedTextUsingTjOperator(String text1, String text2, int spacingAdjustment)
+            throws IOException, com.itextpdf.text.DocumentException {
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.LETTER);
+            PdfWriter writer = PdfWriter.getInstance(document, byteStream);
+            document.open();
+
+            PdfContentByte cb = writer.getDirectContent();
+            cb.beginText();
+            cb.setFontAndSize(BaseFont.createFont(), 12);
+            
+            // The format "[ (string1) adjustment (string2) ] TJ" positions string2 relative to string1.
+            // A negative adjustment value moves the text to the right, creating a space.
+            String tjOperator = String.format("[(%s) %d (%s)]TJ\n", text1, -spacingAdjustment, text2);
+            cb.getInternalBuffer().append(tjOperator);
+            
+            cb.endText();
+            document.close();
+            return byteStream.toByteArray();
+        }
     }
 }
