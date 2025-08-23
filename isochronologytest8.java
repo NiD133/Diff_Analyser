@@ -1,91 +1,56 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ISOChronologyTestTest8 extends TestCase {
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the duration fields of ISOChronology.
+ * This test focuses on the name, support, and precision of each duration field.
+ */
+public class ISOChronologyDurationFieldTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    private static final DateTimeZone UTC = DateTimeZone.UTC;
+    private static final DateTimeZone GMT = DateTimeZone.forID("Etc/GMT");
+    private static final DateTimeZone OFFSET_PLUS_1 = DateTimeZone.forOffsetHours(1);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+    @Before
+    public void setUp() {
+        // Save and set default settings to ensure tests are predictable.
+        // Using a non-fixed zone like London helps test behavior related to DST.
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+        TimeZone.setDefault(LONDON.toTimeZone());
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
+    @After
+    public void tearDown() {
+        // Restore original default settings to avoid side-effects on other tests.
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    public void testDurationFields() {
-        final ISOChronology iso = ISOChronology.getInstance();
+    @Test
+    public void testFieldNames() {
+        Chronology iso = ISOChronology.getInstanceUTC();
         assertEquals("eras", iso.eras().getName());
         assertEquals("centuries", iso.centuries().getName());
         assertEquals("years", iso.years().getName());
@@ -98,66 +63,69 @@ public class ISOChronologyTestTest8 extends TestCase {
         assertEquals("minutes", iso.minutes().getName());
         assertEquals("seconds", iso.seconds().getName());
         assertEquals("millis", iso.millis().getName());
-        assertEquals(false, iso.eras().isSupported());
-        assertEquals(true, iso.centuries().isSupported());
-        assertEquals(true, iso.years().isSupported());
-        assertEquals(true, iso.weekyears().isSupported());
-        assertEquals(true, iso.months().isSupported());
-        assertEquals(true, iso.weeks().isSupported());
-        assertEquals(true, iso.days().isSupported());
-        assertEquals(true, iso.halfdays().isSupported());
-        assertEquals(true, iso.hours().isSupported());
-        assertEquals(true, iso.minutes().isSupported());
-        assertEquals(true, iso.seconds().isSupported());
-        assertEquals(true, iso.millis().isSupported());
-        assertEquals(false, iso.centuries().isPrecise());
-        assertEquals(false, iso.years().isPrecise());
-        assertEquals(false, iso.weekyears().isPrecise());
-        assertEquals(false, iso.months().isPrecise());
-        assertEquals(false, iso.weeks().isPrecise());
-        assertEquals(false, iso.days().isPrecise());
-        assertEquals(false, iso.halfdays().isPrecise());
-        assertEquals(true, iso.hours().isPrecise());
-        assertEquals(true, iso.minutes().isPrecise());
-        assertEquals(true, iso.seconds().isPrecise());
-        assertEquals(true, iso.millis().isPrecise());
-        final ISOChronology isoUTC = ISOChronology.getInstanceUTC();
-        assertEquals(false, isoUTC.centuries().isPrecise());
-        assertEquals(false, isoUTC.years().isPrecise());
-        assertEquals(false, isoUTC.weekyears().isPrecise());
-        assertEquals(false, isoUTC.months().isPrecise());
-        assertEquals(true, isoUTC.weeks().isPrecise());
-        assertEquals(true, isoUTC.days().isPrecise());
-        assertEquals(true, isoUTC.halfdays().isPrecise());
-        assertEquals(true, isoUTC.hours().isPrecise());
-        assertEquals(true, isoUTC.minutes().isPrecise());
-        assertEquals(true, isoUTC.seconds().isPrecise());
-        assertEquals(true, isoUTC.millis().isPrecise());
-        final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
-        final ISOChronology isoGMT = ISOChronology.getInstance(gmt);
-        assertEquals(false, isoGMT.centuries().isPrecise());
-        assertEquals(false, isoGMT.years().isPrecise());
-        assertEquals(false, isoGMT.weekyears().isPrecise());
-        assertEquals(false, isoGMT.months().isPrecise());
-        assertEquals(true, isoGMT.weeks().isPrecise());
-        assertEquals(true, isoGMT.days().isPrecise());
-        assertEquals(true, isoGMT.halfdays().isPrecise());
-        assertEquals(true, isoGMT.hours().isPrecise());
-        assertEquals(true, isoGMT.minutes().isPrecise());
-        assertEquals(true, isoGMT.seconds().isPrecise());
-        assertEquals(true, isoGMT.millis().isPrecise());
-        final DateTimeZone offset = DateTimeZone.forOffsetHours(1);
-        final ISOChronology isoOffset1 = ISOChronology.getInstance(offset);
-        assertEquals(false, isoOffset1.centuries().isPrecise());
-        assertEquals(false, isoOffset1.years().isPrecise());
-        assertEquals(false, isoOffset1.weekyears().isPrecise());
-        assertEquals(false, isoOffset1.months().isPrecise());
-        assertEquals(true, isoOffset1.weeks().isPrecise());
-        assertEquals(true, isoOffset1.days().isPrecise());
-        assertEquals(true, isoOffset1.halfdays().isPrecise());
-        assertEquals(true, isoOffset1.hours().isPrecise());
-        assertEquals(true, isoOffset1.minutes().isPrecise());
-        assertEquals(true, isoOffset1.seconds().isPrecise());
-        assertEquals(true, isoOffset1.millis().isPrecise());
+    }
+
+    @Test
+    public void testFieldSupport() {
+        Chronology iso = ISOChronology.getInstanceUTC();
+        assertFalse("Eras field should not be supported", iso.eras().isSupported());
+        assertTrue("Centuries field should be supported", iso.centuries().isSupported());
+        assertTrue("Years field should be supported", iso.years().isSupported());
+        assertTrue("Weekyears field should be supported", iso.weekyears().isSupported());
+        assertTrue("Months field should be supported", iso.months().isSupported());
+        assertTrue("Weeks field should be supported", iso.weeks().isSupported());
+        assertTrue("Days field should be supported", iso.days().isSupported());
+        assertTrue("Halfdays field should be supported", iso.halfdays().isSupported());
+        assertTrue("Hours field should be supported", iso.hours().isSupported());
+        assertTrue("Minutes field should be supported", iso.minutes().isSupported());
+        assertTrue("Seconds field should be supported", iso.seconds().isSupported());
+        assertTrue("Millis field should be supported", iso.millis().isSupported());
+    }
+
+    @Test
+    public void testPrecision_InZoneWithDaylightSaving() {
+        // In a zone with DST like Europe/London, day-based fields are imprecise due to DST transitions.
+        // ISOChronology.getInstance() should use the default zone (set to LONDON in setUp).
+        Chronology isoDefault = ISOChronology.getInstance();
+        assertFieldPrecision(isoDefault, false);
+
+        // Explicitly getting the chronology for the same zone should yield the same result.
+        Chronology isoLondon = ISOChronology.getInstance(LONDON);
+        assertFieldPrecision(isoLondon, false);
+    }
+
+    @Test
+    public void testPrecision_InFixedOffsetZones() {
+        // For fixed-offset zones (UTC, GMT, +01:00), day-based fields are precise
+        // as there are no DST transitions to make their length variable.
+        assertFieldPrecision(ISOChronology.getInstance(UTC), true);
+        assertFieldPrecision(ISOChronology.getInstance(GMT), true);
+        assertFieldPrecision(ISOChronology.getInstance(OFFSET_PLUS_1), true);
+    }
+
+    /**
+     * Asserts the precision of duration fields for a given chronology.
+     *
+     * @param chronology The chronology to test.
+     * @param areDayFieldsPrecise The expected precision for day-based fields (days, weeks, halfdays),
+     *                            which is true for fixed-offset zones and false for zones with DST.
+     */
+    private void assertFieldPrecision(Chronology chronology, boolean areDayFieldsPrecise) {
+        // Time-based fields are always precise.
+        assertTrue(chronology.millis().isPrecise());
+        assertTrue(chronology.seconds().isPrecise());
+        assertTrue(chronology.minutes().isPrecise());
+        assertTrue(chronology.hours().isPrecise());
+
+        // Date-based fields with variable lengths (e.g., year, month) are never precise.
+        assertFalse(chronology.centuries().isPrecise());
+        assertFalse(chronology.years().isPrecise());
+        assertFalse(chronology.months().isPrecise());
+        assertFalse(chronology.weekyears().isPrecise());
+
+        // Day-based fields are only precise in fixed-offset time zones.
+        assertEquals(areDayFieldsPrecise, chronology.halfdays().isPrecise());
+        assertEquals(areDayFieldsPrecise, chronology.days().isPrecise());
+        assertEquals(areDayFieldsPrecise, chronology.weeks().isPrecise());
     }
 }
