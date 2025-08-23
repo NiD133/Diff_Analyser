@@ -1,27 +1,30 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumericEntityUnescaper_ESTestTest11 extends NumericEntityUnescaper_ESTest_scaffolding {
+/**
+ * Unit tests for {@link NumericEntityUnescaper}.
+ */
+public class NumericEntityUnescaperTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        NumericEntityUnescaper.OPTION[] numericEntityUnescaper_OPTIONArray0 = new NumericEntityUnescaper.OPTION[0];
-        NumericEntityUnescaper numericEntityUnescaper0 = new NumericEntityUnescaper(numericEntityUnescaper_OPTIONArray0);
-        char[] charArray0 = new char[8];
-        charArray0[4] = '&';
-        charArray0[5] = '#';
-        charArray0[6] = 'x';
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        String string0 = numericEntityUnescaper0.translate((CharSequence) charBuffer0);
-        assertEquals("\u0000\u0000\u0000\u0000&#x\u0000", string0);
+    /**
+     * Tests that an incomplete hexadecimal entity, which is missing its hex digits,
+     * is not translated and is passed through unchanged.
+     */
+    @Test
+    public void shouldNotTranslateIncompleteHexEntityMissingDigits() {
+        // Arrange
+        // The default constructor creates an unescaper that requires a semicolon,
+        // which is a standard configuration for this test.
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        final String input = "This text contains an incomplete entity &#x and should not be changed.";
+
+        // Act
+        final String result = unescaper.translate(input);
+
+        // Assert
+        // The input string should be returned as-is because the entity is malformed.
+        assertEquals(input, result);
     }
 }
