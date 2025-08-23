@@ -12,7 +12,7 @@ public class CharSequenceUtils_ESTestTest13 extends CharSequenceUtils_ESTest_sca
 
     @Test(timeout = 4000)
     public void test12() throws Throwable {
-        int int0 = CharSequenceUtils.lastIndexOf("', is neither of type Map.Entry nor an Array", "/VQAuqQP6w", (-731));
+        int int0 = CharSequenceUtils.lastIndexOf("', is neither of type Map.Entry nor an Array", "/VQAuqQP 6w", (-731));
         assertEquals((-1), int0);
     }
 }
