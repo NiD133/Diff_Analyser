@@ -1,45 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Symmetry010Chronology_ESTestTest40 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Tests for the range of supported fields in {@link Symmetry010Chronology}.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = Symmetry010Chronology.INSTANCE;
-        ChronoField chronoField0 = ChronoField.YEAR_OF_ERA;
-        ValueRange valueRange0 = symmetry010Chronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+    /**
+     * Verifies that the range for the YEAR_OF_ERA field is correctly defined.
+     * <p>
+     * According to the chronology's implementation, the year of era should range
+     * from 1 to 1,000,000, inclusive.
+     */
+    @Test
+    public void range_forYearOfEra_returnsCorrectRange() {
+        // Arrange
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        ValueRange expectedRange = ValueRange.of(1, 1_000_000L);
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.YEAR_OF_ERA);
+
+        // Assert
+        assertEquals("The range for YEAR_OF_ERA is incorrect.", expectedRange, actualRange);
     }
 }
