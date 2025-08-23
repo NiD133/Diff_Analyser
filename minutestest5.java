@@ -1,41 +1,69 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class MinutesTestTest5 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    // (before the late 90's they were all over the place)
+/**
+ * Unit tests for the {@link Minutes#minutesIn(ReadableInterval)} factory method.
+ */
+@DisplayName("Minutes.minutesIn(ReadableInterval)")
+class Minutes_MinutesInTest {
+
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    @DisplayName("should return zero minutes for a null interval")
+    void returnsZeroForNullInterval() {
+        // Act
+        Minutes result = Minutes.minutesIn(null);
+
+        // Assert
+        assertEquals(Minutes.ZERO, result);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    @DisplayName("should return zero minutes for a zero-length interval")
+    void returnsZeroForZeroLengthInterval() {
+        // Arrange
+        DateTime pointInTime = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+        Interval zeroLengthInterval = new Interval(pointInTime, pointInTime);
+
+        // Act
+        Minutes result = Minutes.minutesIn(zeroLengthInterval);
+
+        // Assert
+        assertEquals(Minutes.ZERO, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_minutesIn_RInterval() {
+    @Test
+    @DisplayName("should return the correct number of minutes for a standard interval")
+    void returnsCorrectMinutesForPositiveInterval() {
+        // Arrange
         DateTime start = new DateTime(2006, 6, 9, 12, 3, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2006, 6, 9, 12, 6, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2006, 6, 9, 12, 9, 0, 0, PARIS);
-        assertEquals(0, Minutes.minutesIn((ReadableInterval) null).getMinutes());
-        assertEquals(3, Minutes.minutesIn(new Interval(start, end1)).getMinutes());
-        assertEquals(0, Minutes.minutesIn(new Interval(start, start)).getMinutes());
-        assertEquals(0, Minutes.minutesIn(new Interval(end1, end1)).getMinutes());
-        assertEquals(6, Minutes.minutesIn(new Interval(start, end2)).getMinutes());
+        DateTime end = new DateTime(2006, 6, 9, 12, 6, 0, 0, PARIS);
+        Interval threeMinuteInterval = new Interval(start, end);
+
+        // Act
+        Minutes result = Minutes.minutesIn(threeMinuteInterval);
+
+        // Assert
+        assertEquals(Minutes.THREE, result);
+    }
+
+    @Test
+    @DisplayName("should calculate minutes correctly for a longer interval")
+    void returnsCorrectMinutesForLongerInterval() {
+        // Arrange
+        DateTime start = new DateTime(2006, 6, 9, 12, 3, 0, 0, PARIS);
+        DateTime end = new DateTime(2006, 6, 9, 12, 9, 0, 0, PARIS);
+        Interval sixMinuteInterval = new Interval(start, end);
+
+        // Act
+        Minutes result = Minutes.minutesIn(sixMinuteInterval);
+
+        // Assert
+        assertEquals(6, result.getMinutes());
     }
 }
