@@ -1,32 +1,39 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest3 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        assertEquals("ROOT", jsonWriteContext0.getTypeDesc());
-        jsonWriteContext0.reset(240);
-        int int0 = jsonWriteContext0.writeFieldName("");
-        assertFalse(jsonWriteContext0.inRoot());
-        assertEquals(4, int0);
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its state transitions
+ * and behavior when writing JSON components.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Verifies that calling {@code writeFieldName} on a context that is not a JSON object
+     * (e.g., an array) correctly returns the {@code STATUS_EXPECT_VALUE} status code.
+     * This behavior is expected because field names are only valid within an object structure.
+     */
+    @Test
+    public void writeFieldName_whenContextIsNotObject_shouldReturnExpectValueStatus() throws Exception {
+        // Arrange: Create a context and put it into a non-object state.
+        // An array context is a good example of a state where writing a field name is invalid.
+        JsonWriteContext context = JsonWriteContext.createRootContext();
+        context.reset(JsonStreamContext.TYPE_ARRAY);
+
+        // Act: Attempt to write a field name, which should be an invalid operation
+        // for an array context.
+        int status = context.writeFieldName("anyFieldName");
+
+        // Assert: The returned status should indicate that a value was expected,
+        // as field names are not allowed in an array context.
+        assertEquals("Status should indicate a value is expected",
+                JsonWriteContext.STATUS_EXPECT_VALUE, status);
+
+        // A secondary check to ensure the context's state was correctly updated after the reset.
+        assertFalse("Context should no longer be in the root state", context.inRoot());
     }
 }
