@@ -1,18 +1,28 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class BinaryCodec_ESTestTest12 extends BinaryCodec_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods of the {@link BinaryCodec} class.
+ */
+public class BinaryCodecTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        char[] charArray0 = new char[0];
-        byte[] byteArray0 = BinaryCodec.fromAscii(charArray0);
-        assertEquals(0, byteArray0.length);
+    /**
+     * Tests that {@link BinaryCodec#fromAscii(char[])} correctly handles an empty
+     * character array by returning an empty byte array.
+     */
+    @Test
+    public void fromAscii_withEmptyCharArray_returnsEmptyByteArray() {
+        // Arrange: Create an empty character array as input.
+        final char[] emptyAsciiChars = new char[0];
+
+        // Act: Call the method under test.
+        final byte[] result = BinaryCodec.fromAscii(emptyAsciiChars);
+
+        // Assert: Verify that the result is an empty, non-null byte array.
+        assertNotNull("The result should not be null.", result);
+        assertEquals("The resulting byte array should be empty.", 0, result.length);
     }
 }
