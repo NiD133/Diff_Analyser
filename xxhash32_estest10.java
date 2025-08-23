@@ -1,27 +1,29 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XXHash32_ESTestTest10 extends XXHash32_ESTest_scaffolding {
+/**
+ * Tests for the {@link XXHash32} class, focusing on error handling for invalid arguments.
+ */
+public class XXHash32Test {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        XXHash32 xXHash32_0 = new XXHash32();
-        byte[] byteArray0 = new byte[25];
-        // Undeclared exception!
-        try {
-            xXHash32_0.update(byteArray0, 374761393, (int) (byte) 16);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 374761393
-            //
-            verifyException("org.apache.commons.codec.digest.XXHash32", e);
-        }
+    /**
+     * Verifies that the update() method throws an ArrayIndexOutOfBoundsException
+     * when the starting offset is outside the bounds of the input data array.
+     * This ensures the method correctly handles invalid offset arguments.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void updateWithOffsetGreaterThanArrayLengthShouldThrowException() {
+        // Arrange: Create a hash instance and prepare input data with an invalid offset.
+        final XXHash32 hash = new XXHash32();
+        final byte[] data = new byte[10];
+        final int lengthToRead = 5;
+        
+        // An offset that is clearly outside the valid range of the 'data' array.
+        final int outOfBoundsOffset = 15;
+
+        // Act: Attempt to update the hash with an out-of-bounds offset.
+        // The @Test(expected=...) annotation will assert that the expected exception is thrown.
+        hash.update(data, outOfBoundsOffset, lengthToRead);
     }
 }
