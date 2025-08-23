@@ -1,17 +1,26 @@
 package org.apache.commons.compress.compressors.lzma;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LZMAUtils_ESTestTest6 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        String string0 = LZMAUtils.getUncompressedFilename("");
-        assertEquals("", string0);
+    /**
+     * Tests that getUncompressedFileName returns an empty string when the input is an empty string.
+     * This is the expected behavior, as an empty string has no compression suffix to remove.
+     */
+    @Test
+    public void getUncompressedFileName_shouldReturnEmptyString_whenGivenEmptyString() {
+        // Arrange
+        final String inputFilename = "";
+
+        // Act
+        final String result = LZMAUtils.getUncompressedFileName(inputFilename);
+
+        // Assert
+        assertEquals("The method should return the input string unmodified.", "", result);
     }
 }
