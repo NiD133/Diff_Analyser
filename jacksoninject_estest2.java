@@ -1,22 +1,28 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JacksonInject_ESTestTest2 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.forId((Object) null);
-        Boolean boolean0 = Boolean.valueOf(false);
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withOptional(boolean0);
-        String string0 = jacksonInject_Value1.toString();
-        assertEquals("JacksonInject.Value(id=null,useInput=null,optional=false)", string0);
+    @Test
+    public void toString_shouldReflectOptionalProperty_whenSetToFalse() {
+        // Arrange
+        // Create a base JacksonInject.Value instance with a null ID.
+        // By default, 'useInput' and 'optional' will also be null.
+        JacksonInject.Value baseValue = JacksonInject.Value.forId(null);
+        String expectedToString = "JacksonInject.Value(id=null,useInput=null,optional=false)";
+
+        // Act
+        // Create a new instance by setting the 'optional' property to false.
+        JacksonInject.Value valueWithOptionalSet = baseValue.withOptional(false);
+        String actualToString = valueWithOptionalSet.toString();
+
+        // Assert
+        // Verify that the string representation correctly includes the 'optional=false' part.
+        assertEquals(expectedToString, actualToString);
     }
 }
