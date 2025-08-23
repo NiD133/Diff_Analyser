@@ -1,17 +1,30 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class QueryParser_ESTestTest22 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link QueryParser} class.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse("[%s=%s]");
-        assertNotNull(evaluator0);
+    /**
+     * Verifies that the parser correctly handles an attribute selector
+     * where the attribute name and value contain percent signs.
+     * The parser should treat these as literal characters, not format specifiers.
+     */
+    @Test
+    public void shouldParseAttributeSelectorWithPercentSigns() {
+        // Arrange
+        String queryWithPercentSigns = "[%s=%s]";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(queryWithPercentSigns);
+
+        // Assert
+        assertNotNull("The parser should return a non-null evaluator for a valid query.", evaluator);
+        assertEquals("The string representation of the evaluator should match the original query.",
+                "[%s=%s]", evaluator.toString());
     }
 }
