@@ -1,45 +1,34 @@
 package com.itextpdf.text.xml.xmp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest31 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        XmpWriter xmpWriter0 = new XmpWriter(pipedOutputStream0, (PdfDictionary) null);
+/**
+ * Test suite for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that the XmpWriter can be constructed successfully with a null
+     * PdfDictionary, as it should gracefully handle this input without
+     * throwing a NullPointerException.
+     */
+    @Test
+    public void constructorWithNullPdfDictionaryShouldCreateInstance() throws IOException {
+        // Arrange: Create a dummy output stream and a null PdfDictionary.
+        OutputStream dummyOutputStream = new ByteArrayOutputStream();
+        PdfDictionary nullInfoDictionary = null;
+
+        // Act: Attempt to create an XmpWriter instance with the null dictionary.
+        XmpWriter xmpWriter = new XmpWriter(dummyOutputStream, nullInfoDictionary);
+
+        // Assert: The constructor should complete successfully, and the resulting object should not be null.
+        assertNotNull("XmpWriter instance should be successfully created even with a null info dictionary.", xmpWriter);
     }
 }
