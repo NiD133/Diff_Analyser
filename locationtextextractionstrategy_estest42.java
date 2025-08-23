@@ -1,40 +1,44 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LocationTextExtractionStrategy_ESTestTest42 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = new Matrix(8, 2);
-        PdfOCProperties pdfOCProperties0 = new PdfOCProperties();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfOCProperties0);
-        LinkedList<MarkedContentInfo> linkedList0 = new LinkedList<MarkedContentInfo>();
-        graphicsState0.font = cMapAwareDocumentFont0;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedList0);
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        LocationTextExtractionStrategy.DUMP_STATE = true;
-        String string0 = locationTextExtractionStrategy0.getResultantText();
-        assertEquals("", string0);
+/**
+ * This test class contains the improved version of the original test case.
+ * The original scaffolding and runner-specific annotations have been removed for clarity,
+ * focusing on a standard JUnit 4 and Mockito setup.
+ */
+public class LocationTextExtractionStrategyImprovedTest {
+
+    /**
+     * Verifies that getResultantText returns an empty string when the strategy
+     * processes a TextRenderInfo object that contains no text.
+     *
+     * This scenario can occur in a real PDF if, for example, a font's decoding
+     * process fails or if an empty text object is present.
+     */
+    @Test
+    public void getResultantText_whenRenderInfoHasNoText_returnsEmptyString() {
+        // Arrange
+        // Create a mock TextRenderInfo that simulates a text rendering operation
+        // that results in an empty string. This isolates the strategy from the
+        // complexities of font decoding and other dependencies.
+        TextRenderInfo emptyTextRenderInfo = mock(TextRenderInfo.class);
+        when(emptyTextRenderInfo.getText()).thenReturn("");
+
+        LocationTextExtractionStrategy strategy = new LocationTextExtractionStrategy();
+
+        // Act
+        // The strategy is asked to process the (empty) text rendering information.
+        // It should correctly handle this by not adding any text chunks.
+        strategy.renderText(emptyTextRenderInfo);
+        String result = strategy.getResultantText();
+
+        // Assert
+        // Since the rendered text was empty, the strategy should produce an empty result.
+        assertEquals("Expected an empty string when no text is rendered.", "", result);
     }
 }
