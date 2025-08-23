@@ -1,33 +1,44 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Test;
 
-public class JsonWriteContext_ESTestTest39 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext(dupDetector0);
-        int int0 = jsonWriteContext0.writeFieldName((String) null);
-        assertEquals(4, int0);
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertEquals("root", jsonWriteContext0.typeDesc());
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on its state transitions.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Verifies that writing a field name to a root context correctly transitions
+     * its state to expect a value, and that its structural properties remain unchanged.
+     */
+    @Test
+    public void writeFieldNameOnRootContext_shouldReturnStatusExpectValue() throws JsonProcessingException {
+        // Arrange: Create a root-level JsonWriteContext.
+        // A DupDetector is required, but its behavior is not under test here.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(dupDetector);
+
+        // Assert initial state for clarity
+        assertEquals("Initial state should be root", "root", rootContext.typeDesc());
+        assertEquals("Initial nesting depth should be 0", 0, rootContext.getNestingDepth());
+        assertEquals("Initial entry count should be 0", 0, rootContext.getEntryCount());
+
+        // Act: Write a field name to the context. The name itself (null in this case)
+        // is not critical for testing this specific state transition.
+        int status = rootContext.writeFieldName(null);
+
+        // Assert: The context should now expect a value, and its core properties should be unchanged.
+        assertEquals("Status should indicate a value is expected next",
+                JsonWriteContext.STATUS_EXPECT_VALUE, status);
+
+        // The context is still the root context with no entries.
+        assertEquals("Type description should remain 'root'", "root", rootContext.typeDesc());
+        assertEquals("Nesting depth should still be 0", 0, rootContext.getNestingDepth());
+        assertEquals("Entry count is not incremented until a value is written",
+                0, rootContext.getEntryCount());
     }
 }
