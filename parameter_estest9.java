@@ -1,29 +1,28 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest9 extends Parameter_ESTest_scaffolding {
+/**
+ * An improved test for the {@link Parameter} class constructor.
+ * This test case focuses on constructor argument validation.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[1];
-        Parameter parameter0 = null;
-        try {
-            parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that the Parameter constructor throws a NullPointerException
+     * when the declaring Invokable is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructor_whenDeclaringInvokableIsNull_throwsNullPointerException() {
+        // The Parameter constructor is package-private, so this test must reside in the same package.
+        // It is expected to throw a NullPointerException because the first argument (the 'declaration'
+        // Invokable) is non-nullable. The other arguments are provided with valid dummy values.
+        new Parameter(
+            /* declaration */ null,
+            /* position */ 0,
+            /* type */ TypeToken.of(String.class),
+            /* annotations */ new Annotation[0],
+            /* annotatedType */ null);
     }
 }
