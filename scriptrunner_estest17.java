@@ -1,29 +1,34 @@
 package org.apache.ibatis.jdbc;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
+
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ScriptRunner_ESTestTest17 extends ScriptRunner_ESTest_scaffolding {
+import static org.mockito.Mockito.mock;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ScriptRunner scriptRunner0 = new ScriptRunner((Connection) null);
-        scriptRunner0.setEscapeProcessing(true);
+/**
+ * Test suite for the ScriptRunner class, focusing on its configuration setters.
+ */
+public class ScriptRunnerTest {
+
+    /**
+     * Verifies that the setEscapeProcessing method can be called without error.
+     * <p>
+     * This test ensures the setter for the 'escapeProcessing' flag functions correctly.
+     * As the ScriptRunner class does not provide a corresponding getter for this property,
+     * the test's success is defined by the absence of any exceptions during the method call.
+     */
+    @Test
+    public void shouldSetEscapeProcessingFlag() {
+        // Arrange: Create a ScriptRunner instance with a mock Connection.
+        // Using a mock is better practice than passing null, even if the connection is not used by this setter.
+        Connection mockConnection = mock(Connection.class);
+        ScriptRunner scriptRunner = new ScriptRunner(mockConnection);
+
+        // Act: Call the setter for the escapeProcessing property.
+        scriptRunner.setEscapeProcessing(true);
+
+        // Assert: The test passes if the 'Act' phase completes without throwing an exception.
+        // No explicit assertion is needed here.
     }
 }
