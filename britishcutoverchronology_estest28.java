@@ -1,48 +1,30 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
+import static org.junit.Assert.assertEquals;
+
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BritishCutoverChronology_ESTestTest28 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for the prolepticYear method in {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        JulianEra julianEra0 = JulianEra.BC;
-        int int0 = britishCutoverChronology0.prolepticYear(julianEra0, 1778);
-        assertEquals((-1777), int0);
+    @Test
+    public void prolepticYear_withBCEra_isCalculatedAsOneMinusYearOfEra() {
+        // The proleptic year for the BC era is defined as 1 minus the year-of-era.
+        // This test verifies that 1778 BC corresponds to the proleptic year -1777.
+
+        // Arrange
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        Era bcEra = JulianEra.BC;
+        int yearOfEra = 1778;
+        int expectedProlepticYear = 1 - yearOfEra; // 1 - 1778 = -1777
+
+        // Act
+        int actualProlepticYear = chronology.prolepticYear(bcEra, yearOfEra);
+
+        // Assert
+        assertEquals("Proleptic year for BC era should be 1 - yearOfEra", expectedProlepticYear, actualProlepticYear);
     }
 }
