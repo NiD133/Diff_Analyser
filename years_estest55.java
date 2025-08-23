@@ -1,18 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest55 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        Years years0 = Years.TWO;
-        String string0 = years0.toString();
-        assertEquals("P2Y", string0);
+    /**
+     * Tests that the toString() method returns the period in the standard ISO8601 format "PnY".
+     */
+    @Test
+    public void toString_shouldReturnISO8601Format() {
+        // Arrange
+        Years twoYears = Years.TWO;
+        String expectedFormat = "P2Y";
+
+        // Act
+        String actualFormat = twoYears.toString();
+
+        // Assert
+        assertEquals(expectedFormat, actualFormat);
     }
 }
