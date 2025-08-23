@@ -1,69 +1,59 @@
 package com.google.gson.functional;
 
 import static com.google.common.truth.Truth.assertThat;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import org.junit.Test;
 
-public class TypeAdapterRuntimeTypeWrapperTestTest1 {
+/**
+ * Tests how Gson handles custom serializers in the presence of inheritance.
+ */
+public class CustomSerializerForBaseTypeTest {
 
-    private static class Base {
-    }
+  // A simple base class for polymorphism testing.
+  private static class Animal {}
 
-    private static class Subclass extends Base {
+  // A subclass to represent the runtime type.
+  private static class Dog extends Animal {
+    @SuppressWarnings("unused")
+    String breed = "Golden Retriever";
+  }
 
-        @SuppressWarnings("unused")
-        String f = "test";
-    }
+  // A container class where the declared type of the field is the base class.
+  private static class PetCarrier {
+    // The field is declared as Animal but holds a Dog instance at runtime.
+    @SuppressWarnings("unused")
+    Animal animal = new Dog();
+  }
 
-    private static class Container {
+  private static final String CUSTOM_SERIALIZED_VALUE = "custom-animal";
+  private static final String EXPECTED_JSON = "{\"animal\":\"" + CUSTOM_SERIALIZED_VALUE + "\"}";
 
-        @SuppressWarnings("unused")
-        Base b = new Subclass();
-    }
+  /**
+   * Tests that a custom JsonSerializer registered for a base type is used for serializing an
+   * instance of a subclass. This behavior bypasses the default reflective adapter that Gson would
+   * normally use for the subclass's runtime type.
+   */
+  @Test
+  public void toJson_whenSerializerRegisteredForBaseType_usesItForSubclassInstance() {
+    // Arrange: Create a Gson instance with a custom serializer for the Animal base class.
+    JsonSerializer<Animal> animalSerializer =
+        (src, typeOfSrc, context) -> new JsonPrimitive(CUSTOM_SERIALIZED_VALUE);
 
-    private static class Deserializer implements JsonDeserializer<Base> {
+    Gson gson = new GsonBuilder()
+        .registerTypeAdapter(Animal.class, animalSerializer)
+        .create();
 
-        @Override
-        public Base deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-            throw new AssertionError("not needed for this test");
-        }
-    }
+    PetCarrier petCarrier = new PetCarrier();
 
-    private static class CyclicBase {
+    // Act: Serialize the container object.
+    String json = gson.toJson(petCarrier);
 
-        @SuppressWarnings("unused")
-        CyclicBase f;
-    }
-
-    private static class CyclicSub extends CyclicBase {
-
-        @SuppressWarnings("unused")
-        int i;
-
-        CyclicSub(int i) {
-            this.i = i;
-        }
-    }
-
-    /**
-     * When custom {@link JsonSerializer} is registered for Base should prefer that over reflective
-     * adapter for Subclass for serialization.
-     */
-    @Test
-    public void testJsonSerializer() {
-        Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, (JsonSerializer<Base>) (src, typeOfSrc, context) -> new JsonPrimitive("serializer")).create();
-        String json = gson.toJson(new Container());
-        assertThat(json).isEqualTo("{\"b\":\"serializer\"}");
-    }
+    // Assert: Verify that the custom serializer for the base type was used, not the
+    // reflective adapter for the subclass.
+    assertThat(json).isEqualTo(EXPECTED_JSON);
+  }
 }
