@@ -1,19 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IllegalFieldValueException_ESTestTest26 extends IllegalFieldValueException_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IllegalFieldValueException}.
+ */
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Byte byte0 = new Byte((byte) 0);
-        IllegalFieldValueException illegalFieldValueException0 = new IllegalFieldValueException("", byte0, byte0, byte0);
-        illegalFieldValueException0.getFieldName();
-        assertEquals("Value 0 for  must be in the range [0,0]", illegalFieldValueException0.getMessage());
+    @Test
+    public void testMessageIsCorrectlyFormattedForNumericValueAndEmptyFieldName() {
+        // Arrange
+        String fieldName = "";
+        Number illegalValue = Byte.valueOf((byte) 0);
+        Number lowerBound = Byte.valueOf((byte) 0);
+        Number upperBound = Byte.valueOf((byte) 0);
+
+        String expectedMessage = "Value 0 for  must be in the range [0,0]";
+
+        // Act
+        IllegalFieldValueException exception = new IllegalFieldValueException(
+                fieldName, illegalValue, lowerBound, upperBound);
+
+        // Assert
+        assertEquals("The exception message should be formatted correctly.",
+                expectedMessage, exception.getMessage());
     }
 }
