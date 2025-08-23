@@ -1,37 +1,37 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest25 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        LinkedList<HashCodeAndEqualsMockWrapper> linkedList0 = new LinkedList<HashCodeAndEqualsMockWrapper>();
-        HashCodeAndEqualsMockWrapper hashCodeAndEqualsMockWrapper0 = HashCodeAndEqualsMockWrapper.of(linkedList0);
-        linkedList0.add(hashCodeAndEqualsMockWrapper0);
-        // Undeclared exception!
-        try {
-            hashCodeAndEqualsSafeSet0.addAll(linkedList0);
-            fail("Expecting exception: AssertionError");
-        } catch (AssertionError e) {
-            //
-            // WRONG
-            //
-        }
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
+
+    @Test
+    public void addAllShouldHandleCircularReferencesWithoutError() {
+        // Arrange: Create a list that contains a wrapper of itself.
+        // This structure would cause a StackOverflowError in a standard HashSet
+        // if its hashCode() or equals() method were called, due to infinite recursion.
+        List<Object> listWithCircularReference = new LinkedList<>();
+        Object wrapper = HashCodeAndEqualsMockWrapper.of(listWithCircularReference);
+        listWithCircularReference.add(wrapper);
+
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+
+        // Act: Add all elements from the self-referencing list to the safeSet.
+        // The set is expected to handle this gracefully by using identity-based
+        // equality and hashing, thus avoiding the recursion.
+        boolean wasModified = safeSet.addAll(listWithCircularReference);
+
+        // Assert: The operation should succeed, and the set should contain the element.
+        assertTrue("The set should report that it was modified.", wasModified);
+        assertEquals("The set should contain exactly one element.", 1, safeSet.size());
+        assertTrue("The set should contain the wrapper from the original list.", safeSet.contains(wrapper));
     }
 }
