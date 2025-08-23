@@ -1,33 +1,36 @@
 package com.fasterxml.jackson.core.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import java.io.ByteArrayInputStream;
-import java.io.CharConversionException;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Unit tests for the {@link DataFormatMatcher} class.
+ * This test focuses on the state of a matcher instance representing a non-match.
+ */
 public class DataFormatMatcher_ESTestTest8 extends DataFormatMatcher_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(byteArray0);
-        MatchStrength matchStrength0 = MatchStrength.NO_MATCH;
-        DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher((JsonFactory) null, matchStrength0);
-        dataFormatMatcher0.hasMatch();
-        assertEquals(MatchStrength.NO_MATCH, dataFormatMatcher0.getMatchStrength());
+    /**
+     * Verifies that a DataFormatMatcher created with a 'NO_MATCH' strength
+     * correctly reports its state via hasMatch() and getMatchStrength().
+     */
+    @Test
+    public void shouldCorrectlyReportNoMatchWhenCreatedWithNoMatchStrength() {
+        // Arrange: Set up the input and the expected match result.
+        // In this case, we simulate a scenario where no data format was matched.
+        byte[] emptyInput = new byte[0];
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(emptyInput);
+        MatchStrength noMatchStrength = MatchStrength.NO_MATCH;
+        JsonFactory nonMatchingFactory = null; // A null factory is appropriate for a non-match.
+
+        // Act: Create the DataFormatMatcher with the non-matching result.
+        DataFormatMatcher matcher = inputAccessor.createMatcher(nonMatchingFactory, noMatchStrength);
+
+        // Assert: Verify the matcher's state reflects the lack of a match.
+        assertFalse("A matcher with NO_MATCH strength should return false for hasMatch().", matcher.hasMatch());
+        assertEquals("The match strength should be correctly reported as NO_MATCH.",
+                MatchStrength.NO_MATCH, matcher.getMatchStrength());
     }
 }
