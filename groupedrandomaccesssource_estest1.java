@@ -1,27 +1,57 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GroupedRandomAccessSource_ESTestTest1 extends GroupedRandomAccessSource_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-        byte[] byteArray0 = new byte[11];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        int int0 = groupedRandomAccessSource0.get(10L, byteArray0, 5, 5);
-        assertEquals(5, int0);
+/**
+ * Unit tests for the {@link GroupedRandomAccessSource} class, focusing on data retrieval logic.
+ */
+public class GroupedRandomAccessSourceTest {
+
+    /**
+     * Tests that the get() method can successfully read a block of data
+     * that spans across the boundary of two underlying sources.
+     */
+    @Test
+    public void get_whenReadingAcrossSourceBoundary_writesCorrectData() throws IOException {
+        // Arrange
+        // Create two distinct sources with identifiable data.
+        byte[] sourceData1 = "0123456789".getBytes(); // length = 10
+        byte[] sourceData2 = "abcdefghij".getBytes(); // length = 10
+
+        RandomAccessSource source1 = new ArrayRandomAccessSource(sourceData1);
+        RandomAccessSource source2 = new ArrayRandomAccessSource(sourceData2);
+
+        // Group the sources. The total length will be 20.
+        // Source 1 covers indices 0-9.
+        // Source 2 covers indices 10-19.
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(new RandomAccessSource[]{source1, source2});
+
+        // We will read 4 bytes starting at position 8. This read will cross the boundary
+        // between source1 and source2, reading the last 2 bytes from source1 ('8', '9')
+        // and the first 2 bytes from source2 ('a', 'b').
+        final long readPosition = 8;
+        final int readLength = 4;
+        final int bufferOffset = 2;
+        byte[] destinationBuffer = new byte[10]; // A buffer larger than needed to test the offset
+
+        // Act
+        int bytesRead = groupedSource.get(readPosition, destinationBuffer, bufferOffset, readLength);
+
+        // Assert
+        // 1. Verify that the method reports the correct number of bytes read.
+        assertEquals("The number of bytes read should match the requested length.", readLength, bytesRead);
+
+        // 2. Verify that the correct data was written into the destination buffer at the correct offset.
+        byte[] expectedBufferContent = {
+                0, 0, // Un-touched prefix due to offset
+                '8', '9', 'a', 'b', // The data read from the grouped source
+                0, 0, 0, 0 // Un-touched suffix
+        };
+        assertArrayEquals("The data read into the buffer is incorrect.", expectedBufferContent, destinationBuffer);
     }
 }
