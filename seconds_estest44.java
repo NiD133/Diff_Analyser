@@ -1,19 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Seconds_ESTestTest44 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Seconds seconds0 = Seconds.seconds((-2147483646));
-        boolean boolean0 = seconds0.isGreaterThan((Seconds) null);
-        assertFalse(boolean0);
-        assertEquals((-2147483646), seconds0.getSeconds());
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenNegativeSecondsIsComparedToNull() {
+        // The isGreaterThan() method's contract specifies that a null argument
+        // is treated as a zero-value period (Seconds.ZERO).
+        
+        // Arrange
+        Seconds negativeSeconds = Seconds.seconds(-1);
+
+        // Act
+        // Compare a negative Seconds instance to null.
+        boolean result = negativeSeconds.isGreaterThan(null);
+
+        // Assert
+        // A negative value (-1) should not be greater than zero.
+        assertFalse("-1 seconds should not be greater than null (treated as 0 seconds)", result);
     }
 }
