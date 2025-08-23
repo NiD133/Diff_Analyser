@@ -1,21 +1,33 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Soundex_ESTestTest22 extends Soundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Soundex} class.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        char[] charArray0 = new char[8];
-        Soundex soundex0 = new Soundex(charArray0);
-        String string0 = soundex0.encode("");
-        assertEquals(4, soundex0.getMaxLength());
-        assertEquals("", string0);
-        assertNotNull(string0);
+    /**
+     * Tests that encoding an empty string correctly results in an empty string.
+     */
+    @Test
+    public void shouldReturnEmptyStringWhenEncodingEmptyString() {
+        // Arrange
+        // The original test created a Soundex instance with a custom mapping.
+        // However, the encoding of an empty string is a special case that is
+        // independent of the mapping, so the default constructor is sufficient and simpler.
+        Soundex soundex = new Soundex();
+
+        // Act
+        String result = soundex.encode("");
+
+        // Assert
+        // The primary assertion is that an empty input produces an empty output.
+        assertEquals("Encoding an empty string should return an empty string.", "", result);
+
+        // The original test also verified the default max length. We retain this check for completeness.
+        // Note: The getMaxLength() method is deprecated.
+        assertEquals("The default max length should be 4.", 4, soundex.getMaxLength());
     }
 }
