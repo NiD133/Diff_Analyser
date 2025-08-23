@@ -1,23 +1,29 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import java.io.IOException;
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest11 extends LineIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LineIterator} class.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StringReader stringReader0 = new StringReader("remove not supported");
-        BufferedReader bufferedReader0 = new BufferedReader(stringReader0, 2745);
-        LineIterator lineIterator0 = new LineIterator(bufferedReader0);
-        lineIterator0.close();
+    /**
+     * Tests that the close() method can be called on a newly created iterator
+     * without any prior operations. This ensures that the iterator can be safely
+     * closed even if it's never used to iterate, for example, in a
+     * try-with-resources block where an early return occurs.
+     */
+    @Test
+    public void testCloseOnUnusedIteratorSucceeds() throws IOException {
+        // Arrange: Create a LineIterator with some sample content.
+        StringReader reader = new StringReader("line1\nline2");
+        LineIterator lineIterator = new LineIterator(reader);
+
+        // Act & Assert:
+        // The test's purpose is to ensure that closing an unused iterator
+        // does not cause an error. The test passes if no exception is thrown.
+        lineIterator.close();
     }
 }
