@@ -1,27 +1,28 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LinkedTreeMap_ESTestTest4 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Test suite for the {@link LinkedTreeMap} class.
+ */
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Integer integer0 = new Integer((-2139));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        int int0 = linkedTreeMap0.size();
-        assertEquals(1, int0);
+    /**
+     * Verifies that the size of the map is correctly reported as 1
+     * after a single element is added to an empty map.
+     */
+    @Test
+    public void size_returnsOne_afterAddingFirstElement() {
+        // Arrange: Create an empty map.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+
+        // Act: Add a single key-value pair.
+        // Note: The original test used putIfAbsent(), which for an empty map
+        // behaves identically to put(). Using put() is more direct and clear.
+        map.put(1, "value1");
+
+        // Assert: Verify that the size of the map is now 1.
+        assertEquals(1, map.size());
     }
 }
