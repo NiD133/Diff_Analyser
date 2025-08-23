@@ -1,28 +1,23 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest15 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        boolean boolean0 = StringUtil.isWhitespace(0);
-        assertFalse(boolean0);
+    @Test
+    public void isWhitespaceShouldReturnFalseForNulCharacter() {
+        // The isWhitespace() method checks for characters considered whitespace in the HTML spec.
+        // The NUL character (codepoint 0) is a control character, not HTML whitespace.
+        
+        int nulCodepoint = 0;
+        
+        assertFalse(
+            "The NUL character (codepoint 0) should not be considered whitespace", 
+            StringUtil.isWhitespace(nulCodepoint)
+        );
     }
 }
