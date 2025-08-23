@@ -1,26 +1,30 @@
 package org.jfree.data.general;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
 import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertSame;
 
-public class DefaultKeyedValueDataset_ESTestTest9 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        SerialDate serialDate0 = SerialDate.createInstance(1670);
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset(serialDate0, 2958465);
-        Comparable comparable0 = defaultKeyedValueDataset0.getKey();
-        assertSame(serialDate0, comparable0);
+    /**
+     * Verifies that getKey() returns the same key object that was provided
+     * to the constructor.
+     */
+    @Test
+    public void getKey_whenDatasetIsConstructedWithKey_returnsTheSameKeyInstance() {
+        // Arrange: Create a dataset with a specific key and a value.
+        SerialDate expectedKey = SerialDate.createInstance(1670);
+        Number value = 2958465;
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset(expectedKey, value);
+
+        // Act: Retrieve the key from the dataset.
+        Comparable<?> actualKey = dataset.getKey();
+
+        // Assert: The retrieved key should be the exact same instance as the original key.
+        assertSame("The key returned by getKey() should be the same instance "
+                   + "provided to the constructor.", expectedKey, actualKey);
     }
 }
