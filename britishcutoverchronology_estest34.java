@@ -1,48 +1,31 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
+import static org.junit.Assert.assertEquals;
+
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
 import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BritishCutoverChronology_ESTestTest34 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        ChronoField chronoField0 = ChronoField.YEAR;
-        ValueRange valueRange0 = britishCutoverChronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+    @Test
+    public void range_forYearField_returnsCorrectRange() {
+        // Arrange
+        // The YEAR field represents the proleptic year.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        
+        // The expected range for the proleptic year is defined as a constant in the chronology.
+        // Minimum: -999,998, Maximum: 999,999.
+        ValueRange expectedRange = ValueRange.of(-999_998, 999_999);
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.YEAR);
+
+        // Assert
+        assertEquals("The range for the YEAR field should match the documented proleptic year range",
+                expectedRange, actualRange);
     }
 }
