@@ -1,18 +1,22 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class RefinedSoundex_ESTestTest5 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link org.apache.commons.codec.language.RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-        String string0 = refinedSoundex0.encode((String) null);
-        assertNull(string0);
+    @Test
+    public void encodeShouldReturnNullWhenInputIsNull() {
+        // Arrange
+        RefinedSoundex soundexEncoder = new RefinedSoundex();
+
+        // Act
+        String result = soundexEncoder.encode(null);
+
+        // Assert
+        assertNull("Encoding a null string should return null.", result);
     }
 }
