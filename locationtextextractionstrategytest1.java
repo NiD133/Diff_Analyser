@@ -1,37 +1,33 @@
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.itextpdf.awt.geom.AffineTransform;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
-import com.itextpdf.text.pdf.PdfTextArray;
-import com.itextpdf.text.pdf.PdfWriter;
 
-public class LocationTextExtractionStrategyTestTest1 extends SimpleTextExtractionStrategyTest {
+import java.io.ByteArrayOutputStream;
+
+/**
+ * Tests the text ordering capabilities of {@link LocationTextExtractionStrategy},
+ * specifically its handling of text chunks based on their vertical (Y-axis) position.
+ */
+public class LocationTextExtractionStrategyYPositionTest extends SimpleTextExtractionStrategyTest {
 
     @Override
     @Before
     public void setUp() throws Exception {
+        // Method from base class, no setup needed for this specific test.
     }
 
     @Override
     @After
     public void tearDown() throws Exception {
+        // Method from base class, no teardown needed for this specific test.
     }
 
     @Override
@@ -39,210 +35,69 @@ public class LocationTextExtractionStrategyTestTest1 extends SimpleTextExtractio
         return new LocationTextExtractionStrategy();
     }
 
-    private byte[] createPdfWithNegativeCharSpacing(String str1, float charSpacing, String str2) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        PdfContentByte canvas = writer.getDirectContent();
-        canvas.beginText();
-        canvas.setFontAndSize(BaseFont.createFont(), 12);
-        canvas.moveText(45, doc.getPageSize().getHeight() - 45);
-        PdfTextArray ta = new PdfTextArray();
-        ta.add(str1);
-        ta.add(charSpacing);
-        ta.add(str2);
-        canvas.showText(ta);
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private byte[] createPdfWithRotatedXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        boolean rotate = true;
-        PdfTemplate template = writer.getDirectContent().createTemplate(20, 100);
-        template.setColorStroke(BaseColor.GREEN);
-        template.rectangle(0, 0, template.getWidth(), template.getHeight());
-        template.stroke();
-        AffineTransform tx = new AffineTransform();
-        if (rotate) {
-            tx.translate(0, template.getHeight());
-            tx.rotate(-90 / 180f * Math.PI);
-        }
-        template.transform(tx);
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        if (rotate)
-            template.moveText(0, template.getWidth() - 12);
-        else
-            template.moveText(0, template.getHeight() - 12);
-        template.showText(xobjectText);
-        template.endText();
-        Image xobjectImage = Image.getInstance(template);
-        if (rotate)
-            xobjectImage.setRotationDegrees(90);
-        doc.add(xobjectImage);
-        doc.add(new Paragraph("C"));
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private byte[] createSimplePdf(Rectangle pageSize, final String... text) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document(pageSize);
-        PdfWriter.getInstance(document, byteStream);
-        document.open();
-        for (String string : text) {
-            document.add(new Paragraph(string));
-            document.newPage();
-        }
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    protected byte[] createPdfWithOverlappingTextHorizontal(String[] text1, String[] text2) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        PdfContentByte canvas = writer.getDirectContent();
-        float ystart = 500;
-        float xstart = 50;
-        canvas.beginText();
-        canvas.setFontAndSize(BaseFont.createFont(), 12);
-        float x = xstart;
-        float y = ystart;
-        for (String text : text1) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            x += 70.0;
-        }
-        x = xstart + 12;
-        y = ystart;
-        for (String text : text2) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            x += 70.0;
-        }
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private PdfReader createPdfWithOverlappingTextVertical(String[] text1, String[] text2) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        PdfContentByte canvas = writer.getDirectContent();
-        float ystart = 500;
-        canvas.beginText();
-        canvas.setFontAndSize(BaseFont.createFont(), 12);
-        float x = 50;
-        float y = ystart;
-        for (String text : text1) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            y -= 25.0;
-        }
-        y = ystart - 13;
-        for (String text : text2) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            y -= 25.0;
-        }
-        canvas.endText();
-        doc.close();
-        return new PdfReader(baos.toByteArray());
-    }
-
-    private byte[] createPdfWithSupescript(String regularText, String superscriptText) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter.getInstance(document, byteStream);
-        document.open();
-        document.add(new Chunk(regularText));
-        Chunk c2 = new Chunk(superscriptText);
-        c2.setTextRise(7.0f);
-        document.add(c2);
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private byte[] createPdfWithFontSpacingEqualsCharSpacing() throws DocumentException, IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        BaseFont font = BaseFont.createFont();
-        int fontSize = 12;
-        float charSpace = font.getWidth(' ') / 1000.0f;
-        PdfContentByte canvas = writer.getDirectContent();
-        canvas.beginText();
-        canvas.setFontAndSize(font, fontSize);
-        canvas.moveText(45, doc.getPageSize().getHeight() - 45);
-        canvas.setCharacterSpacing(-charSpace * fontSize);
-        PdfTextArray textArray = new PdfTextArray();
-        textArray.add("P");
-        textArray.add(-226.2f);
-        textArray.add("r");
-        textArray.add(-231.8f);
-        textArray.add("e");
-        textArray.add(-230.8f);
-        textArray.add("f");
-        textArray.add(-238);
-        textArray.add("a");
-        textArray.add(-238.9f);
-        textArray.add("c");
-        textArray.add(-228.9f);
-        textArray.add("e");
-        canvas.showText(textArray);
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private byte[] createPdfWithLittleFontSize() throws IOException, DocumentException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        BaseFont font = BaseFont.createFont();
-        PdfContentByte canvas = writer.getDirectContent();
-        canvas.beginText();
-        canvas.setFontAndSize(font, 0.2f);
-        canvas.moveText(45, doc.getPageSize().getHeight() - 45);
-        PdfTextArray textArray = new PdfTextArray();
-        textArray.add("P");
-        textArray.add("r");
-        textArray.add("e");
-        textArray.add("f");
-        textArray.add("a");
-        textArray.add("c");
-        textArray.add("e");
-        textArray.add(" ");
-        canvas.showText(textArray);
-        canvas.setFontAndSize(font, 10);
-        canvas.showText(textArray);
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
-
+    /**
+     * Tests that the strategy correctly orders text that is vertically interleaved,
+     * simulating two columns of text where one is slightly offset downwards.
+     * The expected result is that text is sorted by its Y-position, resulting in
+     * an interleaved output.
+     */
     @Test
-    public void testYPosition() throws Exception {
-        PdfReader r = createPdfWithOverlappingTextVertical(new String[] { "A", "B", "C", "D" }, new String[] { "AA", "BB", "CC", "DD" });
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("A\nAA\nB\nBB\nC\nCC\nD\nDD", text);
+    public void getTextFromPage_whenTextIsVerticallyInterleaved_ordersTextCorrectly() throws Exception {
+        // Arrange: Create a PDF with two columns of text that are vertically interleaved.
+        String[] column1 = {"A", "B", "C", "D"};
+        String[] column2 = {"AA", "BB", "CC", "DD"};
+        PdfReader pdfReader = createPdfWithTwoInterleavedColumnsOfText(column1, column2);
+        String expectedText = "A\nAA\nB\nBB\nC\nCC\nD\nDD";
+
+        // Act: Extract text using the LocationTextExtractionStrategy.
+        String actualText = PdfTextExtractor.getTextFromPage(pdfReader, 1, createRenderListenerForTest());
+
+        // Assert: Verify that the extracted text is ordered by vertical position.
+        Assert.assertEquals(expectedText, actualText);
+    }
+
+    /**
+     * Creates a PDF document with two columns of text at the same X-coordinate.
+     * The second column is shifted down vertically so that its lines appear between
+     * the lines of the first column.
+     *
+     * @param text1 The strings for the first column.
+     * @param text2 The strings for the second (interleaved) column.
+     * @return A {@link PdfReader} for the generated PDF.
+     */
+    private PdfReader createPdfWithTwoInterleavedColumnsOfText(String[] text1, String[] text2) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Document doc = new Document();
+        PdfWriter writer = PdfWriter.getInstance(doc, baos);
+        doc.open();
+
+        PdfContentByte canvas = writer.getDirectContent();
+        canvas.beginText();
+        canvas.setFontAndSize(BaseFont.createFont(), 12);
+
+        final float xPosition = 50;
+        final float initialYPosition = 500;
+        final float lineHeight = 25.0f;
+
+        // Draw the first column of text.
+        float currentY = initialYPosition;
+        for (String text : text1) {
+            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, xPosition, currentY, 0);
+            currentY -= lineHeight;
+        }
+
+        // Draw the second column, starting it at a Y-position that falls between
+        // the first and second lines of the first column. A -13 offset is slightly
+        // more than half the line height, ensuring proper interleaving.
+        currentY = initialYPosition - (lineHeight / 2.0f) - 1; // e.g., 500 - 12.5 - 1 = 486.5
+        for (String text : text2) {
+            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, xPosition, currentY, 0);
+            currentY -= lineHeight;
+        }
+
+        canvas.endText();
+        doc.close();
+
+        return new PdfReader(baos.toByteArray());
     }
 }
