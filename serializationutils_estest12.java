@@ -1,39 +1,43 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializationUtils_ESTestTest12 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Test suite for the exception handling in {@link SerializationUtils}.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        // Undeclared exception!
+    /**
+     * Tests that calling deserialize with a stream that throws an IOException
+     * correctly wraps the original exception in a SerializationException.
+     */
+    @Test
+    public void deserializeWithFailingStreamShouldThrowSerializationException() {
+        // Arrange: A PipedInputStream that is not connected to a PipedOutputStream
+        // will throw an IOException ("Pipe not connected") upon any read attempt.
+        // This simulates any failing input stream.
+        final InputStream failingStream = new PipedInputStream();
+
+        // Act & Assert
         try {
-            SerializationUtils.deserialize((InputStream) pipedInputStream0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
+            SerializationUtils.deserialize(failingStream);
+            fail("Expected a SerializationException to be thrown due to the underlying IOException.");
+        } catch (final SerializationException e) {
+            // The method should wrap the underlying IOException in a SerializationException.
+            final Throwable cause = e.getCause();
+
+            assertNotNull("The exception should have a cause.", cause);
+            assertTrue("The cause should be an instance of IOException.", cause instanceof IOException);
+            assertEquals("The cause message should indicate a pipe connection issue.",
+                         "Pipe not connected", cause.getMessage());
         }
     }
 }
