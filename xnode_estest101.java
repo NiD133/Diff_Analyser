@@ -1,42 +1,49 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.Locale;
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest101 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test100() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("2pY", "2pY");
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        Locale.IsoCountryCode locale_IsoCountryCode0 = Locale.IsoCountryCode.PART1_ALPHA2;
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Class<Locale.IsoCountryCode> class0 = Locale.IsoCountryCode.class;
-        // Undeclared exception!
-        try {
-            xNode0.getEnumAttribute(class0, "2pY", locale_IsoCountryCode0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // No enum constant java.util.Locale.IsoCountryCode.2pY
-            //
-            verifyException("java.lang.Enum", e);
-        }
+  /**
+   * Verifies that getEnumAttribute() throws an IllegalArgumentException
+   * when the attribute's value does not match any constant in the specified enum.
+   */
+  @Test
+  public void getEnumAttributeShouldThrowExceptionForInvalidEnumValue() {
+    // Arrange
+    final String attributeName = "countryCode";
+    final String invalidAttributeValue = "INVALID_CODE";
+
+    // Create a DOM Node with an attribute that has an invalid enum value.
+    // IIOMetadataNode is a concrete implementation of org.w3c.dom.Node suitable for testing.
+    Node node = new IIOMetadataNode();
+    ((IIOMetadataNode) node).setAttribute(attributeName, invalidAttributeValue);
+
+    // The XPathParser is not used for attribute parsing, so it can be null.
+    // The variables map is also not needed for this test.
+    XNode xNode = new XNode(null, node, new Properties());
+
+    // A default value that should not be used, as an exception is expected.
+    Locale.IsoCountryCode defaultValue = Locale.IsoCountryCode.PART1_ALPHA2;
+
+    // Act & Assert
+    try {
+      xNode.getEnumAttribute(Locale.IsoCountryCode.class, attributeName, defaultValue);
+      fail("Expected an IllegalArgumentException to be thrown for an invalid enum value.");
+    } catch (IllegalArgumentException e) {
+      // Verify that the exception message clearly indicates the cause of the error.
+      String expectedMessage = "No enum constant " + Locale.IsoCountryCode.class.getName() + "." + invalidAttributeValue;
+      assertEquals(expectedMessage, e.getMessage());
     }
+  }
 }
