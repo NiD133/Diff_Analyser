@@ -1,47 +1,44 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest43 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for the {@link CharStreams} utility class.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Writer writer0 = CharStreams.nullWriter();
-        StringReader stringReader0 = new StringReader("Funnels.unencodedCharsFunnel()");
-        long long0 = CharStreams.copyReaderToWriter(stringReader0, writer0);
-        assertEquals(30L, long0);
-        long long1 = CharStreams.copyReaderToWriter(stringReader0, writer0);
-        assertEquals(0L, long1);
+    /**
+     * Verifies that copying from a Reader to a Writer:
+     * 1. Copies all characters and returns the correct count on the first attempt.
+     * 2. Copies zero characters on a subsequent attempt after the reader is exhausted.
+     */
+    @Test
+    public void copyFromReaderToWriter_copiesAllContentOnFirstCallAndNothingOnSecond() throws IOException {
+        // Arrange: Create a reader with known content and a writer that discards output.
+        String content = "Funnels.unencodedCharsFunnel()";
+        Reader reader = new StringReader(content);
+        Writer writer = CharStreams.nullWriter();
+
+        // Act & Assert: First copy
+        // The reader is new, so all content should be copied.
+        long charsCopied = CharStreams.copyReaderToWriter(reader, writer);
+        assertEquals(
+                "The number of copied characters should match the input string length.",
+                (long) content.length(),
+                charsCopied);
+
+        // Act & Assert: Second copy
+        // The reader has been exhausted by the first copy, so no more content should be read.
+        long additionalCharsCopied = CharStreams.copyReaderToWriter(reader, writer);
+        assertEquals(
+                "Copying from an exhausted reader should result in zero characters copied.",
+                0L,
+                additionalCharsCopied);
     }
 }
