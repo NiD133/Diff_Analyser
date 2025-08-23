@@ -1,38 +1,48 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import org.junit.Test;
+
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest24 extends UTF8Writer_ESTest_scaffolding {
+/**
+ * This test suite focuses on verifying the behavior of the {@link UTF8Writer} class.
+ */
+public class UTF8WriterTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, (OutputStream) null);
-        uTF8Writer0.write("", (int) (byte) (-19), (-1981));
-        assertEquals((-56613888), UTF8Writer.SURROGATE_BASE);
+    /**
+     * Verifies that calling {@link UTF8Writer#write(String, int, int)} with a negative
+     * length value correctly throws an {@link IndexOutOfBoundsException}.
+     * <p>
+     * This behavior is mandated by the general contract of {@link java.io.Writer}.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void writeString_withNegativeLength_shouldThrowException() throws Exception {
+        // Arrange: Set up the necessary context and the UTF8Writer instance.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                ContentReference.unknown(),
+                false);
+
+        // The OutputStream can be null because the method should throw an exception
+        // before attempting any actual I/O operations.
+        UTF8Writer writer = new UTF8Writer(ioContext, (OutputStream) null);
+
+        final String stringToWrite = "";
+        final int anyOffset = -19; // The offset value is not the primary focus here.
+        final int negativeLength = -1981; // A negative length is an invalid argument.
+
+        // Act: Attempt to write a portion of a string using a negative length.
+        writer.write(stringToWrite, anyOffset, negativeLength);
+
+        // Assert: The test succeeds if an IndexOutOfBoundsException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
