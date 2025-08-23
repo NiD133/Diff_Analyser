@@ -1,31 +1,24 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class HexDump_ESTestTest22 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} class.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        HexDump hexDump0 = new HexDump();
+    /**
+     * Tests that the public constructor of the HexDump utility class can be
+     * instantiated without throwing an exception. This is often done for
+     * code coverage, as the class is intended to be used via its static methods.
+     */
+    @Test
+    public void testConstructor() {
+        // The HexDump class is a utility class with static methods.
+        // The source Javadoc notes: "Instances should NOT be constructed in standard programming."
+        // This test simply confirms that its public constructor is callable and returns a non-null instance.
+        final HexDump hexDump = new HexDump();
+        assertNotNull("A new HexDump instance should not be null.", hexDump);
     }
 }
