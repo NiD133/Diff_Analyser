@@ -1,29 +1,35 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest15 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("j");
-        char[] charArray0 = new char[4];
-        int int0 = serializedString0.appendUnquoted(charArray0, 1);
-        assertEquals(1, int0);
-        assertArrayEquals(new char[] { '\u0000', 'j', '\u0000', '\u0000' }, charArray0);
+    /**
+     * Tests that {@link SerializedString#appendUnquoted(char[], int)} correctly
+     * appends the unquoted string value into a character array at a specified offset.
+     */
+    @Test
+    public void appendUnquotedShouldAppendValueToCharArrayAtGivenOffset() {
+        // Arrange: Set up the test data and environment.
+        final SerializedString serializedString = new SerializedString("j");
+        final char[] destinationBuffer = new char[4];
+        final int offset = 1;
+        final char[] expectedBuffer = new char[]{'\u0000', 'j', '\u0000', '\u0000'};
+
+        // Act: Call the method under test.
+        final int charsAppended = serializedString.appendUnquoted(destinationBuffer, offset);
+
+        // Assert: Verify the results.
+        // 1. Check that the returned value is the number of characters appended.
+        assertEquals("The method should return the length of the appended string.", 1, charsAppended);
+
+        // 2. Check that the destination buffer was modified correctly.
+        assertArrayEquals("The string's character should be placed at the specified offset.",
+                expectedBuffer, destinationBuffer);
     }
 }
