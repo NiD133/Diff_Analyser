@@ -1,18 +1,28 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SegmentUtils_ESTestTest20 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * This test suite verifies the behavior of the {@link SegmentUtils} class.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        long[] longArray0 = new long[0];
-        int int0 = SegmentUtils.countMatches(longArray0, (IMatcher) null);
-        assertEquals(0, int0);
+    /**
+     * Tests that {@code countMatches} correctly returns 0 when given an empty array.
+     * This is a fundamental edge case to ensure the method handles empty inputs gracefully.
+     */
+    @Test
+    public void countMatchesShouldReturnZeroForEmptyArray() {
+        // Arrange: Define an empty array of flags. The matcher is null because it will
+        // not be used when iterating over an empty array.
+        final long[] emptyFlags = new long[0];
+        final IMatcher matcher = null;
+
+        // Act: Call the method under test with the empty array.
+        final int matchCount = SegmentUtils.countMatches(emptyFlags, matcher);
+
+        // Assert: Verify that the number of matches is zero.
+        assertEquals("The count of matches in an empty array should be zero.", 0, matchCount);
     }
 }
