@@ -1,19 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest24 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Minutes minutes0 = Minutes.ZERO;
-        Weeks weeks0 = minutes0.toStandardWeeks();
-        int int0 = weeks0.getWeeks();
-        assertEquals(0, int0);
+    /**
+     * Verifies that converting a period of zero minutes to standard weeks
+     * results in a Weeks object representing zero weeks.
+     */
+    @Test
+    public void getWeeks_shouldReturnZero_whenCreatedFromZeroMinutes() {
+        // Arrange: Define the input and the expected outcome.
+        Minutes zeroMinutes = Minutes.ZERO;
+        int expectedWeeks = 0;
+
+        // Act: Perform the action under test - converting minutes to weeks.
+        Weeks actualWeeks = zeroMinutes.toStandardWeeks();
+
+        // Assert: Verify that the actual result matches the expected result.
+        assertEquals(expectedWeeks, actualWeeks.getWeeks());
     }
 }
