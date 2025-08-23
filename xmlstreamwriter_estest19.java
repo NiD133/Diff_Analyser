@@ -1,41 +1,34 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+/**
+ * Contains tests for {@link XmlStreamWriter}.
+ * This class focuses on a specific test case that was improved for clarity.
+ */
 public class XmlStreamWriter_ESTestTest19 extends XmlStreamWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-        Writer writer0 = xmlStreamWriter0.append((CharSequence) null);
-        char[] charArray0 = new char[1];
-        writer0.write(charArray0);
-        // Undeclared exception!
-        try {
-            xmlStreamWriter0.write((char[]) null, 2049, 2049);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling write() with a null buffer throws a NullPointerException
+     * after the internal writer has already been initialized. The first write call
+     * triggers encoding detection and sets up an internal delegate writer. Subsequent
+     * calls are passed to this delegate.
+     */
+    @Test(expected = NullPointerException.class)
+    public void writeWithNullBufferAfterInitializationThrowsNPE() throws IOException {
+        // Arrange: Create an XmlStreamWriter and ensure its internal writer is initialized.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final XmlStreamWriter xmlStreamWriter = new XmlStreamWriter(outputStream);
+
+        // Act 1: Perform an initial write to trigger encoding detection and
+        // initialize the internal delegate writer.
+        xmlStreamWriter.write(new char[]{'<', '?'});
+
+        // Act 2: Attempt to write from a null buffer.
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
+        xmlStreamWriter.write(null, 0, 1);
     }
 }
