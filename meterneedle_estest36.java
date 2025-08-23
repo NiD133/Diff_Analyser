@@ -1,34 +1,33 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MeterNeedle_ESTestTest36 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Tests for the default state of the {@link MeterNeedle} class, using a
+ * concrete {@link ShipNeedle} implementation.
+ */
+public class MeterNeedleDefaultsTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        shipNeedle0.getTransform();
-        assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
-        assertEquals(5, shipNeedle0.getSize());
-        assertEquals(0.5, shipNeedle0.getRotateY(), 0.01);
+    /**
+     * Verifies that the default constructor of a MeterNeedle subclass
+     * (ShipNeedle) correctly initializes its properties to the expected
+     * default values.
+     */
+    @Test
+    public void testDefaultConstructorInitializesPropertiesCorrectly() {
+        // Arrange: Create a new ShipNeedle instance. Since MeterNeedle is abstract,
+        // we test its default state through a concrete subclass.
+        ShipNeedle needle = new ShipNeedle();
+
+        // Act: No action is required as we are testing the state immediately
+        // after construction.
+
+        // Assert: Verify that the properties have their expected default values.
+        final double delta = 0.0; // Using 0.0 delta as values should be exact.
+        
+        assertEquals("Default size should be 5.", 5, needle.getSize());
+        assertEquals("Default rotateX should be 0.5.", 0.5, needle.getRotateX(), delta);
+        assertEquals("Default rotateY should be 0.5.", 0.5, needle.getRotateY(), delta);
     }
 }
