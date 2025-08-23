@@ -1,22 +1,28 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest30 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(1018.9124, 1.0);
-        pairedStatsAccumulator0.add(1.0, Double.NaN);
-        LinearTransformation linearTransformation0 = pairedStatsAccumulator0.leastSquaresFit();
-        assertNotNull(linearTransformation0);
+    @Test
+    public void leastSquaresFit_withNaNValue_returnsNaNTransformation() {
+        // Arrange
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(1018.9124, 1.0);
+        accumulator.add(1.0, Double.NaN); // Add a pair containing a non-finite value
+
+        // Act
+        LinearTransformation fit = accumulator.leastSquaresFit();
+
+        // Assert
+        // Per the documentation, if the dataset contains any non-finite values,
+        // the result of leastSquaresFit() should be a NaN transformation.
+        assertTrue(
+                "Expected a NaN transformation when a NaN value is present in the data",
+                fit.isNan());
     }
 }
