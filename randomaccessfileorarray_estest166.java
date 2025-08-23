@@ -1,40 +1,28 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import org.junit.Test;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This class contains tests for the RandomAccessFileOrArray class.
+ * Note: The class name and inheritance are preserved from the original EvoSuite-generated code.
+ * In a typical, human-written test suite, this class would be named RandomAccessFileOrArrayTest.
+ */
 public class RandomAccessFileOrArray_ESTestTest166 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test165() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.skipBytes(127);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that skipBytes() throws a NullPointerException when the RandomAccessFileOrArray
+     * is constructed with a null data source. This ensures the method correctly handles an
+     * invalid object state and prevents unexpected runtime errors.
+     */
+    @Test(expected = NullPointerException.class)
+    public void skipBytesThrowsNullPointerExceptionWhenConstructedWithNullSource() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance with a null internal source.
+        RandomAccessFileOrArray randomAccessFileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act: Attempt to skip bytes. This should fail because the internal source is null.
+        // Assert: The @Test(expected) annotation verifies that a NullPointerException is thrown.
+        randomAccessFileOrArray.skipBytes(127);
     }
 }
