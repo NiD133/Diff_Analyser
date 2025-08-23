@@ -1,25 +1,24 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest19 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setSerializeNulls(false);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value((-6037.94604733024));
-        assertEquals(Strictness.LEGACY_STRICT, jsonWriter0.getStrictness());
+/**
+ * Test suite for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    @Test
+    public void newJsonTreeWriter_shouldHaveLegacyStrictnessByDefault() {
+        // Arrange: Create a new instance of the writer.
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act: Retrieve the strictness level.
+        Strictness actualStrictness = writer.getStrictness();
+
+        // Assert: Verify that the default strictness is LEGACY_STRICT.
+        assertEquals(Strictness.LEGACY_STRICT, actualStrictness);
     }
 }
