@@ -1,42 +1,41 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class YearsTestTest20 extends TestCase {
+/**
+ * Unit tests for the {@link Years} class, focusing on the negated() method.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that negating a Years object returns a new instance with the opposite value
+     * and does not modify the original object.
+     */
+    @Test
+    public void negated_returnsNewInstanceWithOppositeSign_andPreservesOriginal() {
+        // Arrange: Create an initial Years instance.
+        final Years initialYears = Years.years(12);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act: Negate the initial instance.
+        final Years negatedYears = initialYears.negated();
+
+        // Assert:
+        // 1. The new instance should have the correct, negated value.
+        assertEquals("The negated value should be -12.", -12, negatedYears.getYears());
+        
+        // 2. The original instance should remain unchanged, confirming immutability.
+        assertEquals("The original value should still be 12.", 12, initialYears.getYears());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testNegated() {
-        Years test = Years.years(12);
-        assertEquals(-12, test.negated().getYears());
-        assertEquals(12, test.getYears());
-        try {
-            Years.MIN_VALUE.negated();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    /**
+     * Tests that attempting to negate Years.MIN_VALUE throws an ArithmeticException,
+     * as negating the minimum integer value causes an overflow.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void negated_whenValueIsMinValue_throwsArithmeticException() {
+        // Act: Attempt to negate the minimum possible value.
+        // This is expected to throw an ArithmeticException due to integer overflow.
+        Years.MIN_VALUE.negated();
     }
 }
