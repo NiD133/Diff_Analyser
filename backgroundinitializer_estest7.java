@@ -1,43 +1,35 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
+/**
+ * Tests for {@link BackgroundInitializer}.
+ * This test class focuses on specific scenarios and edge cases.
+ */
 public class BackgroundInitializer_ESTestTest7 extends BackgroundInitializer_ESTest_scaffolding {
 
+    /**
+     * Verifies that setExternalExecutor() throws an IllegalStateException
+     * if it is called after the initializer has already been started.
+     * The executor service cannot be changed once initialization is in progress.
+     */
     @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        BackgroundInitializer<Object> backgroundInitializer0 = new BackgroundInitializer<Object>();
-        backgroundInitializer0.getExternalExecutor();
-        BackgroundInitializer<Delayed> backgroundInitializer1 = new BackgroundInitializer<Delayed>((ExecutorService) null);
-        backgroundInitializer1.start();
-        backgroundInitializer1.start();
-        // Undeclared exception!
-        try {
-            backgroundInitializer1.setExternalExecutor((ExecutorService) null);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Cannot set ExecutorService after start()!
-            //
-            verifyException("org.apache.commons.lang3.concurrent.BackgroundInitializer", e);
-        }
+    public void setExternalExecutorShouldThrowIllegalStateExceptionWhenCalledAfterStart() {
+        // Arrange: Create a background initializer and start it.
+        final BackgroundInitializer<Object> initializer = new BackgroundInitializer<>();
+        initializer.start();
+
+        // Act & Assert: Attempting to set an executor after starting should fail.
+        // We use assertThrows to verify that the expected exception is thrown.
+        final IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> initializer.setExternalExecutor(null)
+        );
+
+        // Verify the exception has the expected message.
+        assertEquals("Cannot set ExecutorService after start()!", exception.getMessage());
     }
 }
