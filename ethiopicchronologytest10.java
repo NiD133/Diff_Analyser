@@ -1,102 +1,50 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Test;
 
-public class EthiopicChronologyTestTest10 extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+/**
+ * Verifies the properties of the standard time-related fields in EthiopicChronology.
+ *
+ * <p>This test ensures that fields like 'hourOfDay', 'minuteOfHour', etc., are correctly
+ * configured, supported, and have their expected programmatic names. These fields are
+ * fundamental to the chronology's time-keeping functionality.
+ */
+public class EthiopicChronologyTimeFieldsTest {
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+    // The test focuses on the chronology's internal structure, so a specific time zone
+    // like UTC is sufficient and ensures test consistency across different environments.
+    private static final Chronology ETHIOPIC_CHRONOLOGY_UTC = EthiopicChronology.getInstanceUTC();
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void testTimeFields_areSupportedAndNamedCorrectly() {
+        // This test confirms that EthiopicChronology supports the standard time fields
+        // and that they are correctly named, which is a basic sanity check.
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.halfdayOfDay(), "halfdayOfDay");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.clockhourOfHalfday(), "clockhourOfHalfday");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.hourOfHalfday(), "hourOfHalfday");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.clockhourOfDay(), "clockhourOfDay");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.hourOfDay(), "hourOfDay");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.minuteOfDay(), "minuteOfDay");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.minuteOfHour(), "minuteOfHour");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.secondOfDay(), "secondOfDay");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.secondOfMinute(), "secondOfMinute");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.millisOfDay(), "millisOfDay");
+        assertFieldIsSupportedAndHasName(ETHIOPIC_CHRONOLOGY_UTC.millisOfSecond(), "millisOfSecond");
     }
 
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testTimeFields() {
-        final EthiopicChronology ethiopic = EthiopicChronology.getInstance();
-        assertEquals("halfdayOfDay", ethiopic.halfdayOfDay().getName());
-        assertEquals("clockhourOfHalfday", ethiopic.clockhourOfHalfday().getName());
-        assertEquals("hourOfHalfday", ethiopic.hourOfHalfday().getName());
-        assertEquals("clockhourOfDay", ethiopic.clockhourOfDay().getName());
-        assertEquals("hourOfDay", ethiopic.hourOfDay().getName());
-        assertEquals("minuteOfDay", ethiopic.minuteOfDay().getName());
-        assertEquals("minuteOfHour", ethiopic.minuteOfHour().getName());
-        assertEquals("secondOfDay", ethiopic.secondOfDay().getName());
-        assertEquals("secondOfMinute", ethiopic.secondOfMinute().getName());
-        assertEquals("millisOfDay", ethiopic.millisOfDay().getName());
-        assertEquals("millisOfSecond", ethiopic.millisOfSecond().getName());
-        assertEquals(true, ethiopic.halfdayOfDay().isSupported());
-        assertEquals(true, ethiopic.clockhourOfHalfday().isSupported());
-        assertEquals(true, ethiopic.hourOfHalfday().isSupported());
-        assertEquals(true, ethiopic.clockhourOfDay().isSupported());
-        assertEquals(true, ethiopic.hourOfDay().isSupported());
-        assertEquals(true, ethiopic.minuteOfDay().isSupported());
-        assertEquals(true, ethiopic.minuteOfHour().isSupported());
-        assertEquals(true, ethiopic.secondOfDay().isSupported());
-        assertEquals(true, ethiopic.secondOfMinute().isSupported());
-        assertEquals(true, ethiopic.millisOfDay().isSupported());
-        assertEquals(true, ethiopic.millisOfSecond().isSupported());
+    /**
+     * Helper assertion that checks if a DateTimeField is supported and has the expected name.
+     *
+     * @param field        the DateTimeField to check
+     * @param expectedName the name the field is expected to have
+     */
+    private void assertFieldIsSupportedAndHasName(DateTimeField field, String expectedName) {
+        assertTrue("Field '" + expectedName + "' should be supported", field.isSupported());
+        assertEquals("Field '" + expectedName + "' has an incorrect name", expectedName, field.getName());
     }
 }
