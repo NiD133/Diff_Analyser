@@ -1,30 +1,31 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
-public class FixedOrderComparator_ESTestTest17 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of {@link FixedOrderComparator}.
+ */
+public class FixedOrderComparator_ESTestTest17 {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        FixedOrderComparator<Object>[] fixedOrderComparatorArray0 = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 4);
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(fixedOrderComparatorArray0);
-        fixedOrderComparatorArray0[0] = fixedOrderComparator0;
-        FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator<Object>>(fixedOrderComparatorArray0);
-        boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when comparing two
+     * FixedOrderComparator instances that were constructed with different
+     * item orderings.
+     */
+    @Test
+    public void equalsShouldReturnFalseForComparatorsWithDifferentOrderings() {
+        // Arrange: Create two comparators with the same items but in a different order.
+        // This setup is much clearer than the original's complex array manipulation
+        // while testing the same core principle: inequality due to different internal order maps.
+        final FixedOrderComparator<String> comparatorA = new FixedOrderComparator<>("Mercury", "Venus", "Earth");
+        final FixedOrderComparator<String> comparatorB = new FixedOrderComparator<>("Earth", "Venus", "Mercury");
+
+        // Act & Assert: The comparators should not be considered equal.
+        assertFalse("Comparators with different orderings should not be equal", comparatorA.equals(comparatorB));
+
+        // A more idiomatic and concise way to assert inequality:
+        assertNotEquals(comparatorA, comparatorB);
     }
 }
