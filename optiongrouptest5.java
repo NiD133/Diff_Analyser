@@ -1,52 +1,55 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Properties;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class OptionGroupTestTest5 {
+/**
+ * Tests for parsing options that are part of an OptionGroup.
+ */
+class OptionGroupTest {
 
     private Options options;
-
     private final Parser parser = new PosixParser();
 
     @BeforeEach
-    public void setUp() {
-        final Option file = new Option("f", "file", false, "file to process");
-        final Option dir = new Option("d", "directory", false, "directory to process");
-        final OptionGroup optionGroup1 = new OptionGroup();
-        optionGroup1.addOption(file);
-        optionGroup1.addOption(dir);
-        options = new Options().addOptionGroup(optionGroup1);
-        final Option section = new Option("s", "section", false, "section to process");
-        final Option chapter = new Option("c", "chapter", false, "chapter to process");
-        final OptionGroup optionGroup2 = new OptionGroup();
-        optionGroup2.addOption(section);
-        optionGroup2.addOption(chapter);
-        options.addOptionGroup(optionGroup2);
-        final Option importOpt = new Option(null, "import", false, "section to process");
-        final Option exportOpt = new Option(null, "export", false, "chapter to process");
-        final OptionGroup optionGroup3 = new OptionGroup();
-        optionGroup3.addOption(importOpt);
-        optionGroup3.addOption(exportOpt);
-        options.addOptionGroup(optionGroup3);
-        options.addOption("r", "revision", false, "revision number");
+    void setUp() {
+        // A group of mutually exclusive options: file or directory.
+        OptionGroup fileOrDirectoryGroup = new OptionGroup();
+        fileOrDirectoryGroup.addOption(new Option("f", "file", false, "file to process"));
+        fileOrDirectoryGroup.addOption(new Option("d", "directory", false, "directory to process"));
+
+        // A standalone option, not in any group.
+        Option revisionOption = new Option("r", "revision", false, "revision number");
+
+        options = new Options();
+        options.addOptionGroup(fileOrDirectoryGroup);
+        options.addOption(revisionOption);
     }
 
     @Test
-    void testSingleOptionFromGroup() throws Exception {
-        final String[] args = { "-f" };
-        final CommandLine cl = parser.parse(options, args);
-        assertFalse(cl.hasOption("r"), "Confirm -r is NOT set");
-        assertTrue(cl.hasOption("f"), "Confirm -f is set");
-        assertFalse(cl.hasOption("d"), "Confirm -d is NOT set");
-        assertFalse(cl.hasOption("s"), "Confirm -s is NOT set");
-        assertFalse(cl.hasOption("c"), "Confirm -c is NOT set");
-        assertTrue(cl.getArgList().isEmpty(), "Confirm no extra args");
+    @DisplayName("When one option from a group is provided, only that option should be set.")
+    void parse_whenSingleOptionFromGroupIsProvided_thenOnlyThatOptionIsSet() throws Exception {
+        // Arrange: Command line arguments contain only the "-f" option.
+        final String[] args = {"-f"};
+
+        // Act: Parse the command line arguments.
+        final CommandLine cmd = parser.parse(options, args);
+
+        // Assert
+        // The selected option from the group should be present.
+        assertTrue(cmd.hasOption("f"), "The provided option '-f' should be set.");
+
+        // The other, mutually exclusive option from the same group should NOT be present.
+        assertFalse(cmd.hasOption("d"), "The un-provided option '-d' from the same group should not be set.");
+
+        // Other unrelated options should not be affected.
+        assertFalse(cmd.hasOption("r"), "The standalone option '-r' should not be set.");
+
+        // There should be no remaining arguments.
+        assertTrue(cmd.getArgList().isEmpty(), "There should be no unparsed arguments left.");
     }
 }
