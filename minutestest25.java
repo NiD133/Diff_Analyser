@@ -1,47 +1,74 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class MinutesTestTest25 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the {@link Minutes#dividedBy(int)} method.
+ */
+public class MinutesDividedByTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void dividedBy_withValidDivisor_returnsCorrectlyCalculatedMinutes() {
+        // Arrange
+        final Minutes twelveMinutes = Minutes.minutes(12);
+
+        // Act & Assert
+        assertEquals(Minutes.minutes(6), twelveMinutes.dividedBy(2));
+        assertEquals(Minutes.minutes(4), twelveMinutes.dividedBy(3));
+        assertEquals(Minutes.minutes(3), twelveMinutes.dividedBy(4));
+        assertEquals(Minutes.minutes(2), twelveMinutes.dividedBy(6));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void dividedBy_withUnevenDivisor_truncatesResult() {
+        // Arrange
+        final Minutes twelveMinutes = Minutes.minutes(12);
+
+        // Act
+        Minutes result = twelveMinutes.dividedBy(5);
+
+        // Assert
+        // 12 / 5 = 2.4, which truncates to 2
+        assertEquals("Division should use integer division, truncating the result.",
+                Minutes.minutes(2), result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void dividedBy_isAnImmutableOperation() {
+        // Arrange
+        final Minutes originalMinutes = Minutes.minutes(12);
+        final Minutes expectedOriginalMinutes = Minutes.minutes(12);
+
+        // Act
+        originalMinutes.dividedBy(2);
+
+        // Assert
+        assertEquals("The original Minutes object should not be modified.",
+                expectedOriginalMinutes, originalMinutes);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void dividedBy_one_returnsSameInstance() {
+        // Arrange
+        final Minutes testMinutes = Minutes.minutes(12);
+
+        // Act
+        Minutes result = testMinutes.dividedBy(1);
+
+        // Assert
+        assertSame("Dividing by 1 should return the same instance.", testMinutes, result);
     }
 
-    public void testDividedBy_int() {
-        Minutes test = Minutes.minutes(12);
-        assertEquals(6, test.dividedBy(2).getMinutes());
-        assertEquals(12, test.getMinutes());
-        assertEquals(4, test.dividedBy(3).getMinutes());
-        assertEquals(3, test.dividedBy(4).getMinutes());
-        assertEquals(2, test.dividedBy(5).getMinutes());
-        assertEquals(2, test.dividedBy(6).getMinutes());
-        assertSame(test, test.dividedBy(1));
-        try {
-            Minutes.ONE.dividedBy(0);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void dividedBy_zero_throwsArithmeticException() {
+        // Arrange
+        Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        oneMinute.dividedBy(0);
+        // Assert: Handled by the 'expected' parameter of the @Test annotation.
     }
 }
