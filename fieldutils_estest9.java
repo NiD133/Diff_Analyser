@@ -1,31 +1,35 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FieldUtils_ESTestTest9 extends FieldUtils_ESTest_scaffolding {
+/**
+ * A test suite for the utility methods in the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeMultiply((-9223372036854775808L), (-7));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows a long: -9223372036854775808 * -7
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that safeMultiply(long, int) throws an ArithmeticException
+     * when the result of the multiplication would overflow the range of a long.
+     * This is tested using the edge case of Long.MIN_VALUE.
+     */
+    @Test
+    void safeMultiply_whenOverflowOccurs_throwsArithmeticException() {
+        // Arrange: Define inputs that are known to cause an overflow.
+        // Multiplying Long.MIN_VALUE by a negative number is a classic overflow case.
+        long value = Long.MIN_VALUE;
+        int multiplier = -7;
+
+        // Act & Assert: Call the method and verify that it throws the expected exception.
+        ArithmeticException thrown = assertThrows(
+            ArithmeticException.class,
+            () -> FieldUtils.safeMultiply(value, multiplier),
+            "Expected safeMultiply to throw an exception due to overflow, but it did not."
+        );
+
+        // Assert: Further verify that the exception message is correct and informative.
+        String expectedMessage = "Multiplication overflows a long: -9223372036854775808 * -7";
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
