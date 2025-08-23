@@ -1,50 +1,42 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest5 extends CollectionSortedBag_ESTest_scaffolding {
+import java.util.ConcurrentModificationException;
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        TreeBag<Locale.FilteringMode> treeBag0 = new TreeBag<Locale.FilteringMode>();
-        Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.MAP_EXTENDED_RANGES;
-        CollectionSortedBag<Locale.FilteringMode> collectionSortedBag0 = new CollectionSortedBag<Locale.FilteringMode>(treeBag0);
-        collectionSortedBag0.add(locale_FilteringMode0, 1407);
-        // Undeclared exception!
-        collectionSortedBag0.retainAll(treeBag0);
+/**
+ * Tests for edge cases in {@link CollectionSortedBag}, particularly those
+ * involving concurrent modification.
+ */
+public class CollectionSortedBagTest {
+
+    /**
+     * Verifies that calling retainAll() on a decorated bag with its own underlying
+     * bag as the argument throws a ConcurrentModificationException.
+     *
+     * This tests a specific scenario where an operation on a decorator uses the
+     * decorated collection as a parameter. This can lead to unsafe concurrent
+     * iteration and modification if the decorator's implementation is not careful
+     * to avoid modifying the collection while iterating over it.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void retainAllWithUnderlyingBagAsArgumentShouldThrowConcurrentModificationException() {
+        // Arrange
+        final SortedBag<Locale.FilteringMode> underlyingBag = new TreeBag<>();
+        final SortedBag<Locale.FilteringMode> decoratedBag = new CollectionSortedBag<>(underlyingBag);
+
+        // Add an element to the bag. The bag must not be empty for the
+        // retainAll iterator to run and potentially trigger the concurrent modification.
+        final Locale.FilteringMode sampleElement = Locale.FilteringMode.MAP_EXTENDED_RANGES;
+        decoratedBag.add(sampleElement);
+
+        // Act & Assert
+        // The following call is expected to throw a ConcurrentModificationException.
+        // The retainAll method iterates over the decorator, which in turn iterates
+        // over the underlying bag. Passing the underlying bag as an argument can
+        // cause it to be modified while the iteration is in progress.
+        decoratedBag.retainAll(underlyingBag);
     }
 }
