@@ -1,40 +1,35 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest33 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        StyleContext styleContext0 = StyleContext.getDefaultStyleContext();
-        Font font0 = styleContext0.getFont("\"IAf&@`u", 1447, 1447);
-        Color color0 = Color.cyan;
-        LabelBlock labelBlock0 = new LabelBlock("\"IAf&@`u", font0, color0);
-        Color color1 = (Color) labelBlock0.getPaint();
-        assertEquals(255, color1.getGreen());
+    /**
+     * Verifies that the getPaint() method correctly returns the Paint object
+     * that was provided in the constructor.
+     */
+    @Test
+    public void getPaintShouldReturnColorSetInConstructor() {
+        // Arrange: Define the test data and create the object under test.
+        String labelText = "Test Label";
+        Font labelFont = new Font("SansSerif", Font.PLAIN, 12);
+        Paint expectedPaint = Color.CYAN;
+
+        LabelBlock labelBlock = new LabelBlock(labelText, labelFont, expectedPaint);
+
+        // Act: Call the method being tested.
+        Paint actualPaint = labelBlock.getPaint();
+
+        // Assert: Check if the result matches the expected outcome.
+        assertEquals("The paint returned should be the one set in the constructor.",
+                     expectedPaint, actualPaint);
     }
 }
