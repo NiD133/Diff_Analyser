@@ -1,40 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
-public class XmlTreeBuilder_ESTestTest47 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmlTreeBuilder} class, focusing on its stack operations.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        // Undeclared exception!
-        try {
-            xmlTreeBuilder0.pop();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayDeque", e);
-        }
+    /**
+     * Verifies that calling pop() on a new XmlTreeBuilder with an empty element stack
+     * correctly throws a NoSuchElementException.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void popOnEmptyStackThrowsNoSuchElementException() {
+        // Arrange: Create a new XmlTreeBuilder, which has an empty internal stack.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+
+        // Act: Attempt to pop an element from the empty stack.
+        // Assert: The @Test(expected) annotation asserts that a NoSuchElementException is thrown.
+        xmlTreeBuilder.pop();
     }
 }
