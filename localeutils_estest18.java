@@ -1,20 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest18 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale((Locale) null);
-        assertEquals("eng", locale0.getISO3Language());
+    /**
+     * Tests that toLocale(Locale) returns the system's default Locale when the input is null.
+     */
+    @Test
+    public void toLocale_withNullLocale_shouldReturnDefaultLocale() {
+        // Arrange
+        // The method's contract states it should return the default locale for a null input.
+        final Locale expectedLocale = Locale.getDefault();
+
+        // Act
+        final Locale actualLocale = LocaleUtils.toLocale((Locale) null);
+
+        // Assert
+        assertEquals(expectedLocale, actualLocale);
     }
 }
