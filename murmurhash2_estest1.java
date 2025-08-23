@@ -1,17 +1,33 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MurmurHash2_ESTestTest1 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        long long0 = MurmurHash2.hash64("bPH \"XdK'x'8?hr", 4, 0);
-        assertEquals((-7207201254813729732L), long0);
+    /**
+     * Tests that hashing a zero-length substring of a String returns the correct pre-calculated 64-bit hash value.
+     * The content of the string and the starting offset should not affect the result when the length is zero,
+     * as this effectively hashes an empty string.
+     */
+    @Test
+    public void hash64ShouldReturnCorrectHashForZeroLengthSubstring() {
+        // Arrange
+        // The specific string and starting offset are irrelevant when the length is 0.
+        final String input = "bPH \"XdK'x'8?hr";
+        final int from = 4;
+        final int length = 0; // The key parameter for this test case
+
+        // This is the expected hash for an empty input with the default seed used by this method overload.
+        final long expectedHash = -7207201254813729732L;
+
+        // Act
+        final long actualHash = MurmurHash2.hash64(input, from, length);
+
+        // Assert
+        assertEquals(expectedHash, actualHash);
     }
 }
