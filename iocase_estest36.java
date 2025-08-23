@@ -1,18 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest36 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        IOCase iOCase0 = IOCase.SENSITIVE;
-        boolean boolean0 = iOCase0.checkEndsWith("|,?])9N.", "|,?])9N.");
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link IOCase#checkEndsWith(String, String)} returns true
+     * for a case-sensitive match when the string is identical to the suffix.
+     */
+    @Test
+    public void checkEndsWith_sensitive_shouldReturnTrueForIdenticalString() {
+        // Arrange
+        final IOCase sensitiveCase = IOCase.SENSITIVE;
+        final String text = "ApacheCommons.IO";
+        final String suffix = "ApacheCommons.IO";
+
+        // Act
+        final boolean result = sensitiveCase.checkEndsWith(text, suffix);
+
+        // Assert
+        assertTrue("Expected the string to end with the suffix in a case-sensitive comparison", result);
     }
 }
