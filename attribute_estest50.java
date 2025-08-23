@@ -1,29 +1,33 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest50 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class, focusing on HTML serialization.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("XII YZ}5!", "async");
-        String string0 = attribute0.html();
-        assertEquals("XII_YZ}5!=\"async\"", string0);
+    /**
+     * Verifies that the html() method correctly sanitizes an attribute key
+     * containing invalid characters (like a space) by replacing them.
+     * According to jsoup's implementation, a space in an attribute key
+     * should be replaced with an underscore.
+     */
+    @Test
+    public void htmlShouldSanitizeInvalidCharactersInAttributeKey() {
+        // Arrange
+        String keyWithInvalidSpace = "XII YZ}5!";
+        String value = "async";
+        Attribute attribute = Attribute.createFromEncoded(keyWithInvalidSpace, value);
+
+        // The expected HTML, with the invalid space in the key replaced by an underscore.
+        String expectedHtml = "XII_YZ}5!=\"async\"";
+
+        // Act
+        String actualHtml = attribute.html();
+
+        // Assert
+        assertEquals("The HTML output should have a sanitized key.", expectedHtml, actualHtml);
     }
 }
