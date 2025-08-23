@@ -1,37 +1,35 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class QuarterDateFormat_ESTestTest6 extends QuarterDateFormat_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link QuarterDateFormat} class, focusing on constructor argument validation.
+ */
+public class QuarterDateFormatTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        String[] stringArray0 = new String[6];
-        QuarterDateFormat quarterDateFormat0 = null;
+    /**
+     * Verifies that the constructor throws an {@link IllegalArgumentException}
+     * when the provided TimeZone is null. The constructor should not accept
+     * a null 'zone' argument.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionForNullTimeZone() {
+        // Arrange: Define arguments for the constructor, with a null TimeZone
+        // to trigger the expected exception.
+        TimeZone nullZone = null;
+        String[] quarterSymbols = QuarterDateFormat.REGULAR_QUARTERS;
+        boolean quarterFirst = true;
+
+        // Act & Assert: Attempt to create an instance and verify the specific exception.
         try {
-            quarterDateFormat0 = new QuarterDateFormat((TimeZone) null, stringArray0, true);
-            fail("Expecting exception: IllegalArgumentException");
+            new QuarterDateFormat(nullZone, quarterSymbols, quarterFirst);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception occurred.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'zone' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is correct, ensuring the right validation failed.
+            assertEquals("Null 'zone' argument.", e.getMessage());
         }
     }
 }
