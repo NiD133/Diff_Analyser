@@ -1,35 +1,33 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
+/**
+ * Test suite for the {@link XNode} class.
+ * This specific test focuses on constructor argument validation.
+ */
+// The original test class name and inheritance are kept for context.
+// In a real-world scenario, the class might be renamed to XNodeTest.
 public class XNode_ESTestTest67 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test066() throws Throwable {
-        Properties properties0 = new Properties();
-        XNode xNode0 = null;
-        try {
-            xNode0 = new XNode((XPathParser) null, (Node) null, properties0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that the XNode constructor throws a NullPointerException
+     * when the provided Node object is null. This is expected because the
+     * constructor immediately tries to access the node's properties.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNPEWhenNodeIsNull() {
+        // Arrange: Prepare the arguments for the constructor.
+        // The Node is intentionally set to null to trigger the exception.
+        Properties variables = new Properties();
+        Node nullNode = null;
+        XPathParser nullParser = null;
+
+        // Act & Assert:
+        // Attempt to construct an XNode with a null Node.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        new XNode(nullParser, nullNode, variables);
     }
 }
