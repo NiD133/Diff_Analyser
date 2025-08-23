@@ -3,48 +3,84 @@ package org.apache.commons.compress.utils;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class SeekableInMemoryByteChannelTestTest13 {
+/**
+ * Tests for {@link SeekableInMemoryByteChannel}.
+ */
+class SeekableInMemoryByteChannelTest {
 
-    private final byte[] testData = "Some data".getBytes(UTF_8);
+    private final byte[] sampleData = "Some data".getBytes(UTF_8);
 
-    /*
-     * <q>Setting the position to a value that is greater than the current size is legal but does not change the size of the entity. A later attempt to write
-     * bytes at such a position will cause the entity to grow to accommodate the new bytes; the values of any bytes between the previous end-of-file and the
-     * newly-written bytes are unspecified.</q>
+    /**
+     * Tests that writing to a position beyond the current end of the channel
+     * correctly grows the channel size and leaves a gap, as per the
+     * {@link SeekableByteChannel} contract. For this implementation, the gap
+     * is filled with null bytes.
      */
-    public void writingToAPositionAfterEndGrowsChannel() throws Exception {
-        try (SeekableByteChannel c = new SeekableInMemoryByteChannel()) {
-            c.position(2);
-            assertEquals(2, c.position());
-            final ByteBuffer inData = ByteBuffer.wrap(testData);
-            assertEquals(testData.length, c.write(inData));
-            assertEquals(testData.length + 2, c.size());
-            c.position(2);
-            final ByteBuffer readBuffer = ByteBuffer.allocate(testData.length);
-            c.read(readBuffer);
-            assertArrayEquals(testData, Arrays.copyOf(readBuffer.array(), testData.length));
+    @Test
+    void shouldGrowChannelWhenWritingPastEnd() throws IOException {
+        // Arrange
+        final int gapSize = 2;
+        final byte[] expectedContent = new byte[gapSize + sampleData.length];
+        System.arraycopy(sampleData, 0, expectedContent, gapSize, sampleData.length);
+
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel()) {
+            // Act: Position the channel past the current end (0) and write data.
+            channel.position(gapSize);
+            final int bytesWritten = channel.write(ByteBuffer.wrap(sampleData));
+
+            // Assert
+            assertEquals(sampleData.length, bytesWritten,
+                "The number of bytes written should match the source data length.");
+            assertEquals(expectedContent.length, channel.size(),
+                "The new channel size should include the gap and the written data.");
+
+            // Verify the entire content by reading it back.
+            final byte[] actualContent = new byte[(int) channel.size()];
+            channel.position(0);
+            channel.read(ByteBuffer.wrap(actualContent));
+
+            assertArrayEquals(expectedContent, actualContent,
+                "The channel should contain a gap of null bytes followed by the written data.");
         }
     }
 
+    /**
+     * Tests that truncating the channel to a shorter length correctly reduces
+     * its size, discards the extra data, and adjusts the position if it was
+     * beyond the new size.
+     */
     @Test
-    void testShouldTruncateContentsProperly() {
-        // given
-        try (SeekableInMemoryByteChannel c = new SeekableInMemoryByteChannel(testData)) {
-            // when
-            c.truncate(4);
-            // then
-            final byte[] bytes = Arrays.copyOf(c.array(), (int) c.size());
-            assertEquals("Some", new String(bytes, UTF_8));
+    void truncateShouldReduceSizeAndContentAndAdjustPosition() throws IOException {
+        // Arrange
+        final int truncatedSize = 4;
+        final byte[] expectedData = "Some".getBytes(UTF_8);
+
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel(sampleData)) {
+            // Set position to the end, which is beyond the new truncated size.
+            channel.position(sampleData.length);
+
+            // Act
+            channel.truncate(truncatedSize);
+
+            // Assert
+            assertEquals(truncatedSize, channel.size(),
+                "Channel size should be reduced to the specified truncated size.");
+            assertEquals(truncatedSize, channel.position(),
+                "Position should be moved to the new, truncated size.");
+
+            // Verify the content is correctly truncated by reading it back.
+            final byte[] actualData = new byte[truncatedSize];
+            channel.position(0);
+            final int bytesRead = channel.read(ByteBuffer.wrap(actualData));
+
+            assertEquals(truncatedSize, bytesRead, "Should read the exact number of truncated bytes.");
+            assertArrayEquals(expectedData, actualData, "Channel content should match the expected truncated data.");
         }
     }
 }
