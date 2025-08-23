@@ -1,21 +1,28 @@
 package org.apache.commons.lang3.exception;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultExceptionContext_ESTestTest5 extends DefaultExceptionContext_ESTest_scaffolding {
+/**
+ * Tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        String string0 = defaultExceptionContext0.getFormattedExceptionMessage("Ikm:Ms");
-        assertEquals("Ikm:Ms", string0);
+    /**
+     * Tests that getFormattedExceptionMessage() returns the base message unchanged
+     * when the context contains no values.
+     */
+    @Test
+    public void getFormattedExceptionMessage_withEmptyContext_shouldReturnBaseMessage() {
+        // Arrange
+        final DefaultExceptionContext emptyContext = new DefaultExceptionContext();
+        final String baseMessage = "Detail message.";
+
+        // Act
+        final String formattedMessage = emptyContext.getFormattedExceptionMessage(baseMessage);
+
+        // Assert
+        assertEquals("The formatted message should be identical to the base message for an empty context.",
+                baseMessage, formattedMessage);
     }
 }
