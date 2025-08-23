@@ -1,18 +1,28 @@
 package org.apache.ibatis.cache;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CacheKey_ESTestTest9 extends CacheKey_ESTest_scaffolding {
+/**
+ * Tests for the {@link CacheKey} class.
+ */
+public class CacheKeyTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        CacheKey cacheKey0 = new CacheKey();
-        boolean boolean0 = cacheKey0.equals((Object) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method correctly returns false
+     * when a CacheKey object is compared with null. This adheres to the
+     * general contract of Object.equals().
+     */
+    @Test
+    public void shouldReturnFalseWhenComparingWithNull() {
+        // Arrange: Create a new CacheKey instance.
+        CacheKey cacheKey = new CacheKey();
+
+        // Act: Compare the instance to null.
+        boolean isEqual = cacheKey.equals(null);
+
+        // Assert: The result should be false.
+        assertFalse("A CacheKey instance must not be equal to null.", isEqual);
     }
 }
