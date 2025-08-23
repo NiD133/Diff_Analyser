@@ -1,29 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-public class PdfDictionary_ESTestTest11 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        PdfName pdfName0 = PdfName.MAC_ROMAN_ENCODING;
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.putEx(pdfName0, pdfName0);
-        PdfObject pdfObject0 = pdfResources0.get(pdfName0);
-        assertFalse(pdfObject0.isNull());
+    /**
+     * Verifies that an object added to a PdfDictionary using the putEx() method
+     * can be successfully retrieved using the get() method.
+     */
+    @Test
+    public void get_afterPutEx_shouldReturnTheAddedObject() {
+        // Arrange: Create a dictionary and a key-value pair to be added.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName testKey = PdfName.ENCODING;
+        PdfName testValue = PdfName.MAC_ROMAN_ENCODING;
+
+        // Act: Add the key-value pair to the dictionary and then retrieve the value.
+        dictionary.putEx(testKey, testValue);
+        PdfObject retrievedValue = dictionary.get(testKey);
+
+        // Assert: Verify that the retrieved object is the same one that was added.
+        assertNotNull("The retrieved value should not be null.", retrievedValue);
+        assertFalse("The retrieved value should not be a PdfNull object.", retrievedValue.isNull());
+        assertEquals("The retrieved value should be identical to the original value.", testValue, retrievedValue);
     }
 }
