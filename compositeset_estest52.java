@@ -1,66 +1,37 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest52 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet0);
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        assertNotNull(compositeSet0);
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        Object object0 = new Object();
-        assertNotNull(object0);
-        boolean boolean0 = compositeSet0.contains(linkedHashSet0);
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        assertFalse(boolean0);
+    /**
+     * Tests that the contains() method returns false when checking for the
+     * presence of one of its component sets as an element. A CompositeSet
+     * contains the *elements* of its component sets, not the component sets
+     * themselves.
+     */
+    @Test
+    public void containsShouldReturnFalseWhenCheckingForComponentSetInstance() {
+        // Arrange
+        final Set<Integer> componentSet = new LinkedHashSet<>();
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>(componentSet);
+
+        // Sanity check to ensure the initial state is as expected.
+        assertTrue("The composite set should be empty upon creation.", compositeSet.isEmpty());
+
+        // Act
+        // Check if the composite set contains the component set instance itself as an element.
+        final boolean result = compositeSet.contains(componentSet);
+
+        // Assert
+        assertFalse("A composite set should not contain its component set as an element.", result);
     }
 }
