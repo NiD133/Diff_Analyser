@@ -1,12 +1,17 @@
 package org.apache.commons.collections4.bag;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.SortedBag;
 import org.junit.jupiter.api.Test;
 
-public class TreeBagTestTest1<T> extends AbstractSortedBagTest<T> {
+/**
+ * Extension of {@link AbstractSortedBagTest} for exercising the {@link TreeBag}.
+ *
+ * @param <T> the type of elements in the bag being tested.
+ */
+public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
 
     @Override
     public String getCompatibilityVersion() {
@@ -18,6 +23,10 @@ public class TreeBagTestTest1<T> extends AbstractSortedBagTest<T> {
         return new TreeBag<>();
     }
 
+    /**
+     * Creates a new bag with known string elements for testing purposes.
+     * This fixture is used by tests inherited from {@link AbstractSortedBagTest}.
+     */
     @SuppressWarnings("unchecked")
     public SortedBag<T> setupBag() {
         final SortedBag<T> bag = makeObject();
@@ -28,9 +37,21 @@ public class TreeBagTestTest1<T> extends AbstractSortedBagTest<T> {
         return bag;
     }
 
+    /**
+     * Verifies that adding an object that does not implement {@link Comparable}
+     * to a TreeBag using its default natural ordering throws an IllegalArgumentException.
+     * <p>
+     * This test corresponds to the issue reported in COLLECTIONS-265.
+     * </p>
+     */
     @Test
-    void testCollections265() {
+    void testAddNonComparableObjectThrowsIllegalArgumentException() {
+        // Arrange: Create a TreeBag that uses natural ordering (the default)
+        // and an object that is not comparable.
         final Bag<Object> bag = new TreeBag<>();
-        assertThrows(IllegalArgumentException.class, () -> bag.add(new Object()));
+        final Object nonComparableObject = new Object();
+
+        // Act & Assert: Attempting to add the non-Comparable object should fail.
+        assertThrows(IllegalArgumentException.class, () -> bag.add(nonComparableObject));
     }
 }
