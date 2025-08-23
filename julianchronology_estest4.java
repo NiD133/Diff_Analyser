@@ -1,61 +1,36 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
+
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for {@link JulianChronology#resolveDate(Map, ResolverStyle)}.
+ */
+// The original test class name is kept for context.
 public class JulianChronology_ESTestTest4 extends JulianChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        JulianDate julianDate0 = JulianDate.now();
-        JulianChronology julianChronology0 = julianDate0.getChronology();
-        HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
-        ChronoField chronoField0 = ChronoField.EPOCH_DAY;
-        Long long0 = new Long(3L);
-        hashMap0.put(chronoField0, long0);
-        ResolverStyle resolverStyle0 = ResolverStyle.LENIENT;
-        JulianDate julianDate1 = julianChronology0.resolveDate(hashMap0, resolverStyle0);
-        assertFalse(julianDate1.equals((Object) julianDate0));
+    @Test
+    public void resolveDate_fromEpochDay_returnsCorrectDate() {
+        // Arrange
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        long epochDayValue = 3L; // Corresponds to 1970-01-04 in the ISO calendar.
+        Map<TemporalField, Long> fieldValues = Map.of(ChronoField.EPOCH_DAY, epochDayValue);
+
+        // The expected date is 1969-12-22 in the Julian calendar.
+        // We create it directly from the epoch day for a robust and clear comparison.
+        JulianDate expectedDate = julianChronology.dateEpochDay(epochDayValue);
+
+        // Act
+        // Resolve the map of fields to a JulianDate.
+        JulianDate resolvedDate = julianChronology.resolveDate(fieldValues, ResolverStyle.LENIENT);
+
+        // Assert
+        assertEquals(expectedDate, resolvedDate);
     }
 }
