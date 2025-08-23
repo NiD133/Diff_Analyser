@@ -1,47 +1,27 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class InternationalFixedChronology_ESTestTest9 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link InternationalFixedChronology} class.
+ *
+ * Note: The original test class name "InternationalFixedChronology_ESTestTest9"
+ * and its scaffolding have been replaced with a standard naming convention for clarity.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        InternationalFixedEra internationalFixedEra0 = internationalFixedChronology0.eraOf(1);
-        assertEquals(InternationalFixedEra.CE, internationalFixedEra0);
+    @Test
+    public void eraOf_shouldReturnCEEra_whenValueIs1() {
+        // Arrange: The International Fixed Chronology has only one era, CE, represented by the value 1.
+        // We use the recommended singleton instance for the chronology.
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        InternationalFixedEra expectedEra = InternationalFixedEra.CE;
+
+        // Act: Call the method under test to get the era for the numeric value 1.
+        InternationalFixedEra actualEra = chronology.eraOf(1);
+
+        // Assert: Verify that the returned era is the correct Common Era (CE) instance.
+        assertEquals(expectedEra, actualEra);
     }
 }
