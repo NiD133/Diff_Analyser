@@ -1,56 +1,30 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JulianChronology_ESTestTest37 extends JulianChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JulianChronology} class.
+ */
+public class JulianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        JulianChronology julianChronology0 = JulianChronology.INSTANCE;
-        ChronoField chronoField0 = ChronoField.YEAR_OF_ERA;
-        ValueRange valueRange0 = julianChronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+    /**
+     * Verifies that the range() method returns the correct and expected
+     * value range for the YEAR_OF_ERA field in the Julian chronology.
+     */
+    @Test
+    public void shouldReturnCorrectRangeForYearOfEra() {
+        // Arrange: Define the expected range for YEAR_OF_ERA.
+        // According to the JulianChronology's definition, this is 1 to 999,999.
+        ValueRange expectedRange = ValueRange.of(1, 999_999);
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+
+        // Act: Get the actual range from the chronology for the specified field.
+        ValueRange actualRange = julianChronology.range(ChronoField.YEAR_OF_ERA);
+
+        // Assert: Verify that the actual range matches the expected range.
+        assertEquals("The range for YEAR_OF_ERA should be from 1 to 999,999.", expectedRange, actualRange);
     }
 }
