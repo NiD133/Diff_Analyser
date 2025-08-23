@@ -1,40 +1,52 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.ChoiceFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Circle;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.impl.BufferedLine;
-import org.locationtech.spatial4j.shape.impl.BufferedLineString;
 import org.locationtech.spatial4j.shape.impl.PointImpl;
 
-public class WKTWriter_ESTestTest3 extends WKTWriter_ESTest_scaffolding {
+import java.text.NumberFormat;
+import java.util.Locale;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for {@link WKTWriter}.
+ */
+public class WKTWriterTest {
+
+    /**
+     * This test verifies that the WKTWriter's append method correctly uses a
+     * provided NumberFormat to format a Point's coordinates.
+     */
     @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        WKTWriter wKTWriter0 = new WKTWriter();
-        StringBuilder stringBuilder0 = new StringBuilder((CharSequence) "WKT");
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        PointImpl pointImpl0 = new PointImpl(4883.694876, 4.0, spatialContext0);
-        NumberFormat numberFormat0 = NumberFormat.getPercentInstance();
-        wKTWriter0.append(stringBuilder0, pointImpl0, numberFormat0);
-        assertEquals("WKT488,369% 400%", stringBuilder0.toString());
+    public void appendShouldFormatPointUsingProvidedNumberFormat() {
+        // Arrange
+        WKTWriter wktWriter = new WKTWriter();
+        SpatialContext spatialContext = SpatialContext.GEO;
+        Point point = new PointImpl(4883.694876, 4.0, spatialContext);
+
+        // Use a specific format (percent) to test the writer's behavior.
+        // The PercentInstance format multiplies by 100 and adds a '%' sign.
+        // It also uses locale-specific grouping and rounding.
+        // Note: Using a specific Locale (e.g., US) makes the test deterministic
+        // regardless of the default locale of the machine running the test.
+        //  - X: 4883.694876 * 100 -> 488369.4876 -> "488,369%"
+        //  - Y: 4.0 * 100         -> 400.0         -> "400%"
+        NumberFormat percentFormat = NumberFormat.getPercentInstance(Locale.US);
+
+        // The StringBuilder has some initial content to ensure we are appending correctly.
+        String initialContent = "PREFIX ";
+        StringBuilder stringBuilder = new StringBuilder(initialContent);
+
+        String expectedFormattedPoint = "488,369% 400%";
+        String expectedResult = initialContent + expectedFormattedPoint;
+
+        // Act
+        wktWriter.append(stringBuilder, point, percentFormat);
+
+        // Assert
+        assertEquals("The point coordinates should be appended using the provided percent format.",
+                expectedResult, stringBuilder.toString());
     }
 }
