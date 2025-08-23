@@ -1,20 +1,25 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeConstants;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for the EthiopicChronology class.
+ */
+// The original test class name `EthiopicChronology_ESTestTest9` and scaffolding are kept for context.
 public class EthiopicChronology_ESTestTest9 extends EthiopicChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0, 1);
-        assertEquals(1, EthiopicChronology.EE);
+    /**
+     * Tests that the public constant for the Ethiopic Era (EE) is correctly
+     * defined as being equivalent to the Common Era (CE).
+     */
+    @Test
+    public void ethiopianEraConstant_shouldBeEqualToCommonEra() {
+        // The source code defines EthiopicChronology.EE as being equivalent to DateTimeConstants.CE.
+        // This test verifies that this fundamental constant has the expected value.
+        assertEquals("The Ethiopic Era constant (EE) should be equal to the Common Era constant (CE).",
+                DateTimeConstants.CE, EthiopicChronology.EE);
     }
 }
