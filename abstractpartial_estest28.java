@@ -1,47 +1,46 @@
 package org.joda.time.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
+import static org.junit.Assert.assertEquals; // Only assertEquals is used for this test
 import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
 import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
 
-public class AbstractPartial_ESTestTest28 extends AbstractPartial_ESTest_scaffolding {
+/**
+ * Tests for duration operations on the MonthDay class, which extends AbstractPartial.
+ * This test specifically verifies the behavior of subtracting week-based durations.
+ */
+// Renamed the class to reflect the specific Joda-Time class being tested (MonthDay)
+// and the type of operations (Duration Operations).
+// The "_ESTest_scaffolding" part is an EvoSuite artifact; in a real project,
+// its contents would ideally be integrated or the inheritance removed if not needed.
+public class MonthDayDurationOperationsTest extends AbstractPartial_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        MonthDay monthDay0 = new MonthDay();
-        Weeks weeks0 = Weeks.TWO;
-        MonthDay monthDay1 = monthDay0.minus(weeks0);
-        assertTrue(monthDay1.equals((Object) monthDay0));
+    /**
+     * Verifies that subtracting a 'Weeks' duration from a 'MonthDay' object
+     * does not change the MonthDay's month or day fields.
+     * This is expected behavior because MonthDay represents only the month and day,
+     * independent of the year, and thus cannot meaningfully apply week-based
+     * duration changes without a year context.
+     */
+    @Test(timeout = 4000) // Keep the timeout as it's a valid test attribute.
+    // Renamed the method to clearly describe the specific behavior being tested.
+    public void testMonthDay_minusWeeks_hasNoEffect() {
+        // Arrange: Set up the initial state for the test.
+        // Create a MonthDay object representing the current month and day.
+        MonthDay initialMonthDay = new MonthDay();
+        // Define a duration of two weeks.
+        Weeks weeksToSubtract = Weeks.TWO;
+
+        // Act: Perform the operation being tested.
+        // Subtract the weeks duration from the MonthDay.
+        MonthDay monthDayAfterSubtraction = initialMonthDay.minus(weeksToSubtract);
+
+        // Assert: Verify the outcome.
+        // Confirm that the MonthDay object remains unchanged after subtracting weeks.
+        // This assertion includes a descriptive message for better failure diagnosis.
+        assertEquals("Subtracting weeks from a MonthDay should not change its month or day fields " +
+                     "as MonthDay lacks year context to resolve such durations.",
+                     initialMonthDay,
+                     monthDayAfterSubtraction);
     }
 }
