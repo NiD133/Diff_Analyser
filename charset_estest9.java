@@ -1,20 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class CharSet_ESTestTest9 extends CharSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSet}.
+ */
+public class CharSetTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        String[] stringArray0 = new String[9];
-        stringArray0[2] = "pDqg&f|G+l]-#pX9-?k";
-        CharSet charSet0 = CharSet.getInstance(stringArray0);
-        boolean boolean0 = charSet0.contains('T');
-        assertTrue(boolean0);
+    /**
+     * Tests that CharSet.contains() returns true for a character that falls
+     * within a defined character range (e.g., "A-Z").
+     */
+    @Test
+    public void testContainsReturnsTrueForCharacterWithinRange() {
+        // Arrange: Create a CharSet representing all uppercase ASCII letters.
+        // The "A-Z" syntax defines a range from 'A' to 'Z'.
+        CharSet uppercaseLetters = CharSet.getInstance("A-Z");
+
+        // Act & Assert: Verify that a character within that range is correctly identified.
+        // The character 'T' is expected to be in the set.
+        assertTrue(
+            "contains('T') should return true for a CharSet defined with the range 'A-Z'",
+            uppercaseLetters.contains('T')
+        );
     }
 }
