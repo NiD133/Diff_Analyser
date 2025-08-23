@@ -1,80 +1,42 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
+import org.jfree.chart.ui.Size2D;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest25 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(15, 15);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range(0.0, 0.0);
-        assertEquals(0.0, range0.getCentralValue(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getUpperBound(), 0.01);
-        assertEquals("Range[0.0,0.0]", range0.toString());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals(0.0, range0.getCentralValue(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getUpperBound(), 0.01);
-        assertEquals("Range[0.0,0.0]", range0.toString());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        Size2D size2D0 = gridArrangement0.arrangeFR(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals(0.0, range0.getCentralValue(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getUpperBound(), 0.01);
-        assertEquals("Range[0.0,0.0]", range0.toString());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(0.0, range0.getLowerBound(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals("Size2D[width=0.0, height=0.0]", size2D0.toString());
-        assertEquals(0.0, size2D0.getHeight(), 0.01);
-        assertEquals(0.0, size2D0.getWidth(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(0.0, size2D0.height, 0.01);
-        assertEquals(0.0, size2D0.width, 0.01);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for the GridArrangement class.
+ * This test focuses on the arrangeFR method.
+ */
+public class GridArrangementTest {
+
+    /**
+     * Verifies that arranging an empty container within a zero-sized constraint
+     * results in a size of zero.
+     */
+    @Test
+    public void arrangeFR_withEmptyContainerAndZeroSizedConstraint_returnsZeroSize() {
+        // Arrange: Set up an arrangement for an empty container with a constraint
+        // that effectively allows zero width and zero height.
+        GridArrangement arrangement = new GridArrangement(15, 15);
+        BlockContainer emptyContainer = new BlockContainer();
+        
+        // A constraint with a zero-length range for both width and height defines a 0x0 area.
+        Range zeroRange = new Range(0.0, 0.0);
+        RectangleConstraint zeroSizeConstraint = new RectangleConstraint(zeroRange, zeroRange);
+
+        // Act: Arrange the empty container. The arrangeFR method is for a Fixed-width,
+        // Ranged-height scenario, but the core logic should handle this edge case gracefully.
+        Size2D arrangedSize = arrangement.arrangeFR(emptyContainer, null, zeroSizeConstraint);
+
+        // Assert: The resulting arranged size should be 0.0 x 0.0.
+        assertNotNull("The arranged size should not be null.", arrangedSize);
+        assertEquals("Width should be zero for a zero-sized constraint.", 0.0, arrangedSize.getWidth(), 0.0);
+        assertEquals("Height should be zero for a zero-sized constraint.", 0.0, arrangedSize.getHeight(), 0.0);
     }
 }
