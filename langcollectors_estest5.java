@@ -1,20 +1,31 @@
 package org.apache.commons.lang3.stream;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LangCollectors_ESTestTest5 extends LangCollectors_ESTest_scaffolding {
+import java.util.stream.Stream;
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) null);
-        assertNotNull(collector0);
+/**
+ * Unit tests for {@link LangCollectors}.
+ */
+public class LangCollectorsTest {
+
+    /**
+     * Tests that using the collector from {@link LangCollectors#joining(CharSequence)}
+     * with a null delimiter throws a {@link NullPointerException} during the terminal
+     * collection operation.
+     * <p>
+     * The collector itself can be created with a null delimiter, but the operation fails
+     * upon use because the underlying {@link java.util.StringJoiner} requires a non-null
+     * delimiter. This test verifies this runtime behavior.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void testJoiningWithNullDelimiterShouldThrowNPEWhenUsed() {
+        // Arrange: Create a stream of elements to be joined.
+        Stream<String> stream = Stream.of("a", "b", "c");
+
+        // Act: Attempt to collect the stream using the collector with a null delimiter.
+        // This terminal operation is expected to throw a NullPointerException.
+        stream.collect(LangCollectors.joining(null));
     }
 }
