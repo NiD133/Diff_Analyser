@@ -1,44 +1,36 @@
 package org.apache.commons.cli.help;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest11 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Contains tests for the static utility method {@link TextHelpAppendable#indexOfWrap(CharSequence, int, int)}.
+ *
+ * Note: The original test class name 'TextHelpAppendable_ESTestTest11' suggests it was
+ * auto-generated. This refactored version focuses on improving the clarity and maintainability
+ * of the test method.
+ */
+public class TextHelpAppendable_ESTestTest11 {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StringWriter stringWriter0 = new StringWriter();
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        int int0 = TextHelpAppendable.indexOfWrap(stringBuffer0, 74, 1047);
-        assertEquals(0, int0);
+    /**
+     * Verifies that indexOfWrap returns the length of the text when the starting
+     * position for the search is out of bounds (i.e., greater than the text's length).
+     */
+    @Test
+    public void indexOfWrapShouldReturnTextLengthWhenStartIsOutOfBounds() {
+        // Arrange
+        // Use an empty text to test the boundary condition.
+        final CharSequence emptyText = new StringBuffer();
+        final int width = 74; // This value is not relevant for this specific scenario but is required by the method signature.
+        final int startPosition = 100; // Any position > emptyText.length() (which is 0) serves to test the out-of-bounds case.
+
+        // Act
+        final int wrapIndex = TextHelpAppendable.indexOfWrap(emptyText, width, startPosition);
+
+        // Assert
+        // The method is expected to return the length of the text, which is 0 for an empty text.
+        assertEquals("The wrap index should be the length of the text for an out-of-bounds start position.",
+                emptyText.length(), wrapIndex);
     }
 }
