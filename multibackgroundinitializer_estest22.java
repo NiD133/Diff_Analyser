@@ -1,43 +1,37 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
 
-public class MultiBackgroundInitializer_ESTestTest22 extends MultiBackgroundInitializer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer((ExecutorService) null);
-        BackgroundInitializer.builder();
-        MockException mockException0 = new MockException("RY`@<.S-tgH |");
-        Exception exception0 = multiBackgroundInitializer0.getTypedException(mockException0);
-        MultiBackgroundInitializer.MultiBackgroundInitializerResults multiBackgroundInitializer_MultiBackgroundInitializerResults0 = multiBackgroundInitializer0.initialize();
-        multiBackgroundInitializer0.getTypedException(exception0);
-        multiBackgroundInitializer_MultiBackgroundInitializerResults0.initializerNames();
-        // Undeclared exception!
+/**
+ * This test class focuses on the behavior of the MultiBackgroundInitializer.MultiBackgroundInitializerResults class.
+ * The original test class name, MultiBackgroundInitializer_ESTestTest22, is kept for context,
+ * but a more descriptive name like "MultiBackgroundInitializerResultsTest" would be preferable.
+ */
+public class MultiBackgroundInitializer_ESTestTest22 {
+
+    /**
+     * Verifies that calling getException() with a null name on the results of an
+     * initializer that has no children throws a NoSuchElementException.
+     */
+    @Test
+    public void getExceptionWithNullNameOnEmptyResultsThrowsNoSuchElementException() throws Exception {
+        // Arrange: Create a MultiBackgroundInitializer with no child initializers
+        // and retrieve its results object.
+        MultiBackgroundInitializer initializer = new MultiBackgroundInitializer();
+        MultiBackgroundInitializer.MultiBackgroundInitializerResults results = initializer.initialize();
+
+        // Act & Assert: Attempt to get an exception for a null initializer name.
         try {
-            multiBackgroundInitializer_MultiBackgroundInitializerResults0.getException((String) null);
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // No child initializer with name null
-            //
-            verifyException("org.apache.commons.lang3.concurrent.MultiBackgroundInitializer$MultiBackgroundInitializerResults", e);
+            results.getException(null);
+            fail("Expected a NoSuchElementException to be thrown, but it was not.");
+        } catch (final NoSuchElementException e) {
+            // Verify the exception message to confirm the cause of the failure.
+            assertEquals("No child initializer with name null", e.getMessage());
         }
     }
 }
