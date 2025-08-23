@@ -1,31 +1,37 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest2 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        jsonWriteContext0.reset(50000, (Object) null);
-        int int0 = jsonWriteContext0.writeValue();
-        assertEquals(1, jsonWriteContext0.getEntryCount());
-        assertEquals(0, int0);
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its state
+ * management during JSON writing.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Tests that calling {@code writeValue()} on a new root context correctly
+     * updates the state. It should increment the value count and return the
+     * status indicating that the write was successful without needing a separator.
+     */
+    @Test
+    public void writeValue_onNewRootContext_returnsStatusOKAndIncrementsCount() {
+        // Arrange: Create a new root-level JSON write context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+
+        // Act: Simulate writing the first value in the context.
+        int writeStatus = rootContext.writeValue();
+
+        // Assert: Verify the context's state is updated as expected.
+
+        // The first call to writeValue in a root context should return STATUS_OK_AS_IS.
+        assertEquals("The write status should indicate success without needing a separator.",
+                JsonWriteContext.STATUS_OK_AS_IS, writeStatus);
+
+        // The entry count should now be 1.
+        assertEquals("The entry count should be 1 after writing one value.",
+                1, rootContext.getEntryCount());
     }
 }
