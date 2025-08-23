@@ -1,24 +1,49 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class TagSet_ESTestTest2 extends TagSet_ESTest_scaffolding {
+/**
+ * Tests for the {@link TagSet} class.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        TagSet tagSet0 = new TagSet();
-        Tag tag0 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|");
-        tag0.set((-301));
-        ParseSettings parseSettings0 = ParseSettings.preserveCase;
-        Tag tag1 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|", parseSettings0);
-        assertTrue(tag1.preserveWhitespace());
+    /**
+     * Verifies that when a tag is requested multiple times from a TagSet, the same
+     * cached instance is returned, and any modifications to that instance persist.
+     */
+    @Test
+    public void valueOf_forExistingTag_returnsCachedInstanceWithModifications() {
+        // Arrange
+        TagSet tagSet = new TagSet();
+        String tagName = "custom-tag";
+        String namespace = "custom-ns";
+        ParseSettings settings = ParseSettings.preserveCase;
+
+        // Act:
+        // 1. Get a tag for the first time. This creates and caches it in the TagSet.
+        Tag initialTag = tagSet.valueOf(tagName, namespace);
+
+        // 2. Modify the state of the cached tag instance.
+        // Note: set() is a package-private method. This test can call it because it resides
+        // in the same package. We set the PreserveWhitespace option to test if the
+        // modification persists on subsequent retrievals.
+        initialTag.set(Tag.PreserveWhitespace);
+
+        // 3. Request the same tag again using a different `valueOf` overload.
+        Tag retrievedTag = tagSet.valueOf(tagName, namespace, settings);
+
+        // Assert
+        // Verify that the TagSet returned the exact same instance, not a copy.
+        assertSame(
+            "The TagSet should return the cached instance of the Tag.",
+            initialTag,
+            retrievedTag);
+
+        // Verify that the modification made to the initial instance is reflected.
+        assertTrue(
+            "The retrieved tag should reflect the 'preserveWhitespace' modification.",
+            retrievedTag.preserveWhitespace());
     }
 }
