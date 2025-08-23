@@ -1,45 +1,43 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest5 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.construct(false, (Object) null, errorReportConfiguration0);
-        IOContext iOContext0 = new IOContext((StreamReadConstraints) null, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        Enumeration<FilterInputStream> enumeration0 = (Enumeration<FilterInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, sequenceInputStream0, (byte[]) null, 64, 256);
-        int int0 = mergedStream0.read((byte[]) null, 0, 256);
-        assertEquals((-1), int0);
+/**
+ * Unit tests for the {@link MergedStream} class, focusing on its reading behavior under various conditions.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Tests that when a MergedStream is created with no internal buffer (the "merged" part)
+     * and an already-empty underlying input stream, it correctly signals the end of the stream
+     * by returning -1 on a read attempt.
+     */
+    @Test
+    public void read_whenBufferIsNullAndStreamIsEmpty_returnsEndOfStream() throws IOException {
+        // --- Arrange ---
+        // An empty underlying stream.
+        InputStream emptyUnderlyingStream = new ByteArrayInputStream(new byte[0]);
+        
+        // The MergedStream is constructed with a null buffer, meaning it will
+        // immediately delegate to the underlying stream. The IOContext is not needed
+        // for this scenario, so we can pass null.
+        MergedStream mergedStream = new MergedStream(null, emptyUnderlyingStream, null, 0, 0);
+        
+        byte[] targetBuffer = new byte[256];
+
+        // --- Act ---
+        // Attempt to read from the stream.
+        int bytesRead = mergedStream.read(targetBuffer, 0, targetBuffer.length);
+
+        // --- Assert ---
+        // Since both the internal buffer and the underlying stream are empty,
+        // the read operation should return -1 to indicate the end of the stream.
+        assertEquals("Should return -1 for an empty stream with no merged buffer", -1, bytesRead);
     }
 }
