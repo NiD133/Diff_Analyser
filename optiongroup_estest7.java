@@ -1,19 +1,25 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class OptionGroup_ESTestTest7 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        Collection<Option> collection0 = optionGroup0.getOptions();
-        assertNotNull(collection0);
+    @Test
+    public void getOptionsOnNewGroupShouldReturnEmptyCollection() {
+        // Arrange: Create a new, empty OptionGroup.
+        OptionGroup optionGroup = new OptionGroup();
+
+        // Act: Retrieve the collection of options.
+        Collection<Option> options = optionGroup.getOptions();
+
+        // Assert: The collection should be non-null and empty.
+        assertNotNull("The options collection should never be null.", options);
+        assertTrue("A new OptionGroup should have no options.", options.isEmpty());
     }
 }
