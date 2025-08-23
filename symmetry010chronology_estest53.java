@@ -1,45 +1,33 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
+import static org.junit.Assert.assertEquals;
+
 import java.time.chrono.Era;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Symmetry010Chronology_ESTestTest53 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Symmetry010Chronology} class.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        IsoEra isoEra0 = IsoEra.CE;
-        Symmetry010Date symmetry010Date0 = symmetry010Chronology0.date((Era) isoEra0, 10, 10, 10);
-        assertEquals(IsoEra.CE, symmetry010Date0.getEra());
+    @Test
+    public void date_withEraYearMonthDay_shouldCreateDateWithCorrectEra() {
+        // This test verifies that the date factory method `date(Era, int, int, int)`
+        // correctly assigns the provided era to the created Symmetry010Date object.
+
+        // Arrange
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        Era expectedEra = IsoEra.CE;
+        int yearOfEra = 10;
+        int month = 10;
+        int dayOfMonth = 10;
+
+        // Act
+        Symmetry010Date createdDate = chronology.date(expectedEra, yearOfEra, month, dayOfMonth);
+
+        // Assert
+        assertEquals("The era of the created date should match the input era.",
+                expectedEra, createdDate.getEra());
     }
 }
