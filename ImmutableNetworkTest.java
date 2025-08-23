@@ -23,88 +23,62 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/**
- * Tests for {@link ImmutableNetwork}. Test methods are named using the convention
- * `method_condition_expectedBehavior`.
- */
+/** Tests for {@link ImmutableNetwork}. */
 @RunWith(JUnit4.class)
 @NullUnmarked
 public class ImmutableNetworkTest {
 
-  private static final String NODE_A = "A";
-  private static final String NODE_B = "B";
-  private static final String EDGE_AA = "AA";
-  private static final String EDGE_AB = "AB";
-  private static final Integer EDGE_10 = 10;
-
   @Test
-  public void copyOf_createsImmutableCopy_unaffectedBySourceChanges() {
-    // Arrange: Create a mutable network
+  public void immutableNetwork() {
     MutableNetwork<String, Integer> mutableNetwork = NetworkBuilder.directed().build();
-    mutableNetwork.addNode(NODE_A);
-
-    // Act: Create an immutable copy
+    mutableNetwork.addNode("A");
     ImmutableNetwork<String, Integer> immutableNetwork = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Assert: The copy is an immutable network instance with the same contents
     assertThat(immutableNetwork.asGraph()).isInstanceOf(ImmutableGraph.class);
     assertThat(immutableNetwork).isNotInstanceOf(MutableNetwork.class);
     assertThat(immutableNetwork).isEqualTo(mutableNetwork);
 
-    // Act: Modify the original mutable network
-    mutableNetwork.addNode(NODE_B);
-
-    // Assert: The immutable copy is not affected by the change
+    mutableNetwork.addNode("B");
     assertThat(immutableNetwork).isNotEqualTo(mutableNetwork);
-    assertThat(immutableNetwork.nodes()).containsExactly(NODE_A);
   }
 
   @Test
-  public void copyOf_fromImmutableNetwork_returnsSameInstance() {
-    // Arrange: Create an immutable network
-    ImmutableNetwork<String, String> immutableNetwork =
+  public void copyOfImmutableNetwork_optimized() {
+    Network<String, String> network1 =
         ImmutableNetwork.copyOf(NetworkBuilder.directed().<String, String>build());
+    Network<String, String> network2 = ImmutableNetwork.copyOf(network1);
 
-    // Act: Call copyOf on the immutable network
-    Network<String, String> copy = ImmutableNetwork.copyOf(immutableNetwork);
-
-    // Assert: The copy is the same instance (an optimization)
-    assertThat(copy).isSameInstanceAs(immutableNetwork);
+    assertThat(network2).isSameInstanceAs(network1);
   }
 
   @Test
-  public void edgesConnecting_inDirectedNetwork() {
-    // Arrange
+  public void edgesConnecting_directed() {
     MutableNetwork<String, String> mutableNetwork =
         NetworkBuilder.directed().allowsSelfLoops(true).build();
-    mutableNetwork.addEdge(NODE_A, NODE_A, EDGE_AA);
-    mutableNetwork.addEdge(NODE_A, NODE_B, EDGE_AB);
+    mutableNetwork.addEdge("A", "A", "AA");
+    mutableNetwork.addEdge("A", "B", "AB");
     Network<String, String> network = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Assert
-    assertThat(network.edgesConnecting(NODE_A, NODE_A)).containsExactly(EDGE_AA);
-    assertThat(network.edgesConnecting(NODE_A, NODE_B)).containsExactly(EDGE_AB);
-    assertThat(network.edgesConnecting(NODE_B, NODE_A)).isEmpty();
+    assertThat(network.edgesConnecting("A", "A")).containsExactly("AA");
+    assertThat(network.edgesConnecting("A", "B")).containsExactly("AB");
+    assertThat(network.edgesConnecting("B", "A")).isEmpty();
   }
 
   @Test
-  public void edgesConnecting_inUndirectedNetwork() {
-    // Arrange
+  public void edgesConnecting_undirected() {
     MutableNetwork<String, String> mutableNetwork =
         NetworkBuilder.undirected().allowsSelfLoops(true).build();
-    mutableNetwork.addEdge(NODE_A, NODE_A, EDGE_AA);
-    mutableNetwork.addEdge(NODE_A, NODE_B, EDGE_AB);
+    mutableNetwork.addEdge("A", "A", "AA");
+    mutableNetwork.addEdge("A", "B", "AB");
     Network<String, String> network = ImmutableNetwork.copyOf(mutableNetwork);
 
-    // Assert
-    assertThat(network.edgesConnecting(NODE_A, NODE_A)).containsExactly(EDGE_AA);
-    assertThat(network.edgesConnecting(NODE_A, NODE_B)).containsExactly(EDGE_AB);
-    assertThat(network.edgesConnecting(NODE_B, NODE_A)).containsExactly(EDGE_AB);
+    assertThat(network.edgesConnecting("A", "A")).containsExactly("AA");
+    assertThat(network.edgesConnecting("A", "B")).containsExactly("AB");
+    assertThat(network.edgesConnecting("B", "A")).containsExactly("AB");
   }
 
   @Test
-  public void builder_fromNetworkBuilder_inheritsConfiguration() {
-    // Act
+  public void immutableNetworkBuilder_appliesNetworkBuilderConfig() {
     ImmutableNetwork<String, Integer> emptyNetwork =
         NetworkBuilder.directed()
             .allowsSelfLoops(true)
@@ -112,7 +86,6 @@ public class ImmutableNetworkTest {
             .<String, Integer>immutable()
             .build();
 
-    // Assert
     assertThat(emptyNetwork.isDirected()).isTrue();
     assertThat(emptyNetwork.allowsSelfLoops()).isTrue();
     assertThat(emptyNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
@@ -124,57 +97,53 @@ public class ImmutableNetworkTest {
    */
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public void builder_fromNetworkBuilder_isUnaffectedBySubsequentSourceBuilderChanges() {
-    // Arrange: Create a NetworkBuilder and an ImmutableNetwork.Builder from it
+  public void immutableNetworkBuilder_copiesNetworkBuilder() {
     NetworkBuilder<String, Object> networkBuilder =
         NetworkBuilder.directed()
             .allowsSelfLoops(true)
-            .nodeOrder(ElementOrder.<String>natural());
+            .<String>nodeOrder(ElementOrder.<String>natural());
     ImmutableNetwork.Builder<String, Integer> immutableNetworkBuilder =
         networkBuilder.<String, Integer>immutable();
 
-    // Act: Modify the original NetworkBuilder
+    // Update NetworkBuilder, but this shouldn't impact immutableNetworkBuilder
     networkBuilder.allowsSelfLoops(false).nodeOrder(ElementOrder.<String>unordered());
+
     ImmutableNetwork<String, Integer> emptyNetwork = immutableNetworkBuilder.build();
 
-    // Assert: The built network used the original configuration, not the modified one
     assertThat(emptyNetwork.isDirected()).isTrue();
     assertThat(emptyNetwork.allowsSelfLoops()).isTrue();
     assertThat(emptyNetwork.nodeOrder()).isEqualTo(ElementOrder.<String>natural());
   }
 
   @Test
-  public void builder_addNode_succeeds() {
+  public void immutableNetworkBuilder_addNode() {
     ImmutableNetwork<String, Integer> network =
-        NetworkBuilder.directed().<String, Integer>immutable().addNode(NODE_A).build();
+        NetworkBuilder.directed().<String, Integer>immutable().addNode("A").build();
 
-    assertThat(network.nodes()).containsExactly(NODE_A);
+    assertThat(network.nodes()).containsExactly("A");
     assertThat(network.edges()).isEmpty();
   }
 
   @Test
-  public void builder_addEdge_withNodes_succeeds() {
+  public void immutableNetworkBuilder_putEdgeFromNodes() {
     ImmutableNetwork<String, Integer> network =
-        NetworkBuilder.directed()
-            .<String, Integer>immutable()
-            .addEdge(NODE_A, NODE_B, EDGE_10)
-            .build();
+        NetworkBuilder.directed().<String, Integer>immutable().addEdge("A", "B", 10).build();
 
-    assertThat(network.nodes()).containsExactly(NODE_A, NODE_B).inOrder();
-    assertThat(network.edges()).containsExactly(EDGE_10);
-    assertThat(network.incidentNodes(EDGE_10)).isEqualTo(EndpointPair.ordered(NODE_A, NODE_B));
+    assertThat(network.nodes()).containsExactly("A", "B");
+    assertThat(network.edges()).containsExactly(10);
+    assertThat(network.incidentNodes(10)).isEqualTo(EndpointPair.ordered("A", "B"));
   }
 
   @Test
-  public void builder_addEdge_withEndpointPair_succeeds() {
+  public void immutableNetworkBuilder_putEdgeFromEndpointPair() {
     ImmutableNetwork<String, Integer> network =
         NetworkBuilder.directed()
             .<String, Integer>immutable()
-            .addEdge(EndpointPair.ordered(NODE_A, NODE_B), EDGE_10)
+            .addEdge(EndpointPair.ordered("A", "B"), 10)
             .build();
 
-    assertThat(network.nodes()).containsExactly(NODE_A, NODE_B).inOrder();
-    assertThat(network.edges()).containsExactly(EDGE_10);
-    assertThat(network.incidentNodes(EDGE_10)).isEqualTo(EndpointPair.ordered(NODE_A, NODE_B));
+    assertThat(network.nodes()).containsExactly("A", "B");
+    assertThat(network.edges()).containsExactly(10);
+    assertThat(network.incidentNodes(10)).isEqualTo(EndpointPair.ordered("A", "B"));
   }
 }
