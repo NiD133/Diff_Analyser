@@ -1,22 +1,43 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest32 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        ContentReference contentReference0 = ContentReference.rawReference(true, (Object) null);
-        StringBuilder stringBuilder0 = new StringBuilder();
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference0, (long) (-3036), 500, (-1291));
-        jsonLocation0.appendOffsetDescription(stringBuilder0);
-        assertEquals("line: 500, column: UNKNOWN", stringBuilder0.toString());
-        assertEquals((-1L), jsonLocation0.getByteOffset());
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Verifies that appendOffsetDescription() correctly formats the output
+     * when the column number is negative, which signifies an unknown column.
+     * In this case, it should display "UNKNOWN" for the column value.
+     */
+    @Test
+    public void appendOffsetDescription_withNegativeColumn_shouldRenderColumnAsUnknown() {
+        // Arrange
+        final int lineNumber = 500;
+        final int unknownColumn = -1291; // A negative value indicates an unknown column.
+        final long charOffset = -3036L; // This value is not used by appendOffsetDescription.
+        final String expectedDescription = "line: 500, column: UNKNOWN";
+
+        // The source reference is required but its content is not relevant for this test.
+        ContentReference contentReference = ContentReference.rawReference(false, null);
+        JsonLocation location = new JsonLocation(contentReference, charOffset, lineNumber, unknownColumn);
+
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        // Act
+        location.appendOffsetDescription(descriptionBuilder);
+
+        // Assert
+        assertEquals("The generated description should indicate an unknown column.",
+                expectedDescription, descriptionBuilder.toString());
+
+        // This constructor overload sets the byte offset to -1, which we can also verify.
+        assertEquals("Byte offset should be -1 as per the constructor used.",
+                -1L, location.getByteOffset());
     }
 }
