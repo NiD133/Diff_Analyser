@@ -1,39 +1,46 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequenceReader_ESTestTest4 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+// Note: The original test class name "SequenceReader_ESTestTest4" and scaffolding
+// have been removed for clarity in this standalone example.
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        Reader[] readerArray0 = new Reader[2];
-        readerArray0[0] = (Reader) stringReader0;
-        readerArray0[1] = (Reader) stringReader0;
-        SequenceReader sequenceReader0 = new SequenceReader(readerArray0);
-        char[] charArray0 = new char[3];
+    /**
+     * Tests that an IOException is thrown when the same reader instance is used
+     * multiple times in a sequence.
+     * <p>
+     * The SequenceReader is expected to close a reader once it's exhausted (reaches EOF).
+     * A subsequent attempt to read from the same, now-closed instance should fail.
+     * </p>
+     */
+    @Test
+    public void shouldThrowIOExceptionWhenSameReaderInstanceIsReused() throws IOException {
+        // Arrange
+        // A single, empty reader instance that will be used twice in the sequence.
+        final Reader reusedEmptyReader = new StringReader("");
+        final SequenceReader sequenceReader = new SequenceReader(reusedEmptyReader, reusedEmptyReader);
+        final char[] buffer = new char[10];
+
+        // Act & Assert
         try {
-            sequenceReader0.read(charArray0, 1, 1);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
+            // The first read attempt on the sequence will exhaust the first (empty) reader
+            // and close it. The sequence then advances to the second reader, which is the
+            // same instance, and attempts to read again. This will fail.
+            sequenceReader.read(buffer, 0, buffer.length);
+            fail("Expected an IOException because the underlying reader is closed after its first use.");
+        } catch (final IOException e) {
+            // Verify that the exception is the expected one from a closed stream.
+            assertEquals("Stream closed", e.getMessage());
         }
     }
 }
