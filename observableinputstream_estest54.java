@@ -1,48 +1,29 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ObservableInputStream_ESTestTest54 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream}.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        BufferedInputStream bufferedInputStream0 = new BufferedInputStream((InputStream) null);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(bufferedInputStream0);
-        try {
-            observableInputStream0.consume();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.BufferedInputStream", e);
-        }
+    @Test
+    public void consumeShouldPropagateIOExceptionFromClosedUnderlyingStream() {
+        // Arrange: Create an ObservableInputStream with an effectively closed underlying stream.
+        // A BufferedInputStream initialized with a null source stream will throw an
+        // IOException("Stream closed") on any read attempt.
+        final InputStream closedUnderlyingStream = new BufferedInputStream(null);
+        final ObservableInputStream observableInputStream = new ObservableInputStream(closedUnderlyingStream);
+
+        // Act & Assert: Verify that calling consume() propagates the expected IOException
+        // from the underlying stream.
+        final IOException thrown = assertThrows(IOException.class, observableInputStream::consume);
+        assertEquals("Stream closed", thrown.getMessage());
     }
 }
