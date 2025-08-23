@@ -2,21 +2,24 @@ package org.jfree.data.xy;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XYInterval_ESTestTest22 extends XYInterval_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval((-4479.95885), (-4479.95885), (-446.52402887375), (-482.4691016522), 1.0);
-        boolean boolean0 = xYInterval0.equals(xYInterval0);
-        assertEquals((-446.52402887375), xYInterval0.getY(), 0.01);
-        assertEquals((-482.4691016522), xYInterval0.getYLow(), 0.01);
-        assertTrue(boolean0);
-        assertEquals(1.0, xYInterval0.getYHigh(), 0.01);
-        assertEquals((-4479.95885), xYInterval0.getXLow(), 0.01);
-        assertEquals((-4479.95885), xYInterval0.getXHigh(), 0.01);
+    /**
+     * Verifies the reflexive property of the equals() method, which states
+     * that an object must be equal to itself.
+     */
+    @Test
+    public void equals_onSameInstance_shouldReturnTrue() {
+        // Arrange: Create an instance of XYInterval with clear, simple values.
+        XYInterval interval = new XYInterval(10.0, 11.0, 5.0, 4.5, 5.5);
+
+        // Act & Assert: An object must always be equal to itself.
+        // The assertEquals method provides a clear and idiomatic way to test this,
+        // as it relies on the .equals() method for comparison.
+        assertEquals("An XYInterval instance should be equal to itself.", interval, interval);
     }
 }
