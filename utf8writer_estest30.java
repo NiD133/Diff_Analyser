@@ -1,45 +1,56 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+// The original class name 'UTF8Writer_ESTestTest30' is non-descriptive.
+// A better name would be 'UTF8WriterTest'.
 public class UTF8Writer_ESTestTest30 extends UTF8Writer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, (OutputStream) null);
+    /**
+     * Tests that the convertSurrogate() method correctly throws an IOException
+     * when provided with an invalid second part of a surrogate pair.
+     *
+     * In this scenario, the first part of the surrogate is implicitly 0 (the default),
+     * and the second part is a value far outside the valid range.
+     */
+    @Test
+    public void convertSurrogate_withInvalidSecondPart_throwsIOException() throws IOException {
+        // Arrange
+        // The IOContext is required by the UTF8Writer constructor.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                ContentReference.unknown(),
+                false // isResourceManaged
+        );
+
+        // The OutputStream is not used by the convertSurrogate method, so it can be null for this test.
+        UTF8Writer writer = new UTF8Writer(ioContext, (OutputStream) null);
+
+        // An integer value that is well outside the valid range for the second surrogate character (0xDC00-0xDFFF).
+        int invalidSecondSurrogate = 20000000; // 0x1312d00 in hex
+
+        // Act & Assert
         try {
-            uTF8Writer0.convertSurrogate(20000000);
-            fail("Expecting exception: IOException");
+            writer.convertSurrogate(invalidSecondSurrogate);
+            fail("Expected an IOException to be thrown for an invalid surrogate pair");
         } catch (IOException e) {
-            //
-            // Broken surrogate pair: first char 0x0, second 0x1312d00; illegal combination
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            // The first surrogate part is 0 because it was never set.
+            String expectedMessage = "Broken surrogate pair: first char 0x0, second 0x1312d00; illegal combination";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
