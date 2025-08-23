@@ -1,23 +1,31 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+import static org.junit.Assert.assertEquals;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest70 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec("l4");
-        Charset charset0 = quotedPrintableCodec0.getCharset();
-        assertEquals("ISO-8859-4", charset0.name());
+    /**
+     * Tests that the constructor accepting a charset name correctly resolves
+     * a known alias to its canonical charset name.
+     */
+    @Test
+    public void constructorShouldSetCorrectCharsetWhenAliasIsProvided() {
+        // Arrange
+        // "l4" is a known alias for the "ISO-8859-4" charset.
+        final String charsetAlias = "l4";
+        final String expectedCanonicalCharsetName = "ISO-8859-4";
+
+        // Act
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(charsetAlias);
+        final Charset actualCharset = codec.getCharset();
+
+        // Assert
+        assertEquals("The codec should resolve the charset alias to its canonical name.",
+                     expectedCanonicalCharsetName, actualCharset.name());
     }
 }
