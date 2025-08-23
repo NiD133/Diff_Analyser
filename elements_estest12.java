@@ -1,36 +1,33 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class Elements_ESTestTest12 extends Elements_ESTest_scaffolding {
+/**
+ * Tests for the {@link Elements#tagName(String)} method.
+ */
+public class ElementsTagNameTest {
 
-    @Test(timeout = 4000)
-    public void test011() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.tagName("<m-2,eXTA:N5y7");
-        assertSame(elements0, elements1);
+    @Test
+    public void tagNameShouldBeChainable() {
+        // Arrange: Create a simple document and get all its elements.
+        Document doc = Document.createShell(""); // A shell doc contains <html>, <head>, <body>
+        Elements elements = doc.getAllElements();
+        
+        // Act: Call the tagName method to rename the elements.
+        Elements returnedElements = elements.tagName("div");
+
+        // Assert: The method should return the same instance to allow for method chaining.
+        assertSame(
+            "The tagName() method must return the same instance for chaining.",
+            elements,
+            returnedElements
+        );
+
+        // Also assert that the underlying elements were actually modified.
+        assertEquals(3, doc.select("div").size());
+        assertEquals(0, doc.select("html, head, body").size());
     }
 }
