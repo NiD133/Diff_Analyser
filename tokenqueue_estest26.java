@@ -1,26 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest26 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class, focusing on its exception handling.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("dMk");
-        // Undeclared exception!
-        try {
-            tokenQueue0.matchesAny((char[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.CharacterReader", e);
-        }
+    /**
+     * Verifies that the {@code matchesAny(char...)} method throws a NullPointerException
+     * when the input character array is null. This ensures the method correctly handles
+     * invalid arguments.
+     */
+    @Test(expected = NullPointerException.class)
+    public void matchesAnyShouldThrowNullPointerExceptionForNullInput() {
+        // Arrange: Create a TokenQueue instance. The initial content is not relevant for this test.
+        TokenQueue tokenQueue = new TokenQueue("some data");
+
+        // Act: Call the method under test with a null argument.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        tokenQueue.matchesAny((char[]) null);
     }
 }
