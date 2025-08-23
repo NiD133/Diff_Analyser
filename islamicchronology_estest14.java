@@ -1,22 +1,26 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IslamicChronology_ESTestTest14 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        boolean boolean0 = islamicChronology0.isLeapYear(1);
-        assertFalse(boolean0);
+    @Test
+    public void isLeapYear_shouldReturnFalse_forFirstYearInDefaultChronology() {
+        // The Islamic calendar year 1 is not a leap year in the default (16-based) pattern.
+        // This test verifies the isLeapYear method for a known non-leap year.
+
+        // Arrange
+        IslamicChronology chronology = IslamicChronology.getInstance();
+        int year = 1;
+
+        // Act
+        boolean isLeap = chronology.isLeapYear(year);
+
+        // Assert
+        assertFalse("Year 1 should not be a leap year in the default Islamic chronology", isLeap);
     }
 }
