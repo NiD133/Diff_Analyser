@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest37 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        Years years0 = Years.years(0);
-        Years years1 = years0.plus((Years) null);
-        assertEquals(0, years1.getYears());
+    /**
+     * Tests that adding a null Years object is a no-op, as specified
+     * by the Javadoc for the plus() method.
+     */
+    @Test
+    public void plus_whenAddingNull_isANoOp() {
+        // Arrange
+        final Years initialYears = Years.ZERO;
+
+        // Act
+        final Years result = initialYears.plus((Years) null);
+
+        // Assert
+        // The result should be an object equal to the original.
+        assertEquals(initialYears, result);
     }
 }
