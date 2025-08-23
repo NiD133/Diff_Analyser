@@ -1,25 +1,33 @@
 package org.jsoup.select;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class QueryParser_ESTestTest2 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for {@link QueryParser}, focusing on error handling for invalid selector syntax.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        // Undeclared exception!
-        try {
-            QueryParser.parse("RV,LfO:4},X");
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Could not parse query 'RV,LfO:4},X': unexpected token at 'fO:4},X'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
-        }
+    // The ExpectedException rule allows us to declaratively specify what exception we expect to be thrown.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void parse_shouldThrowExceptionForMalformedQueryWithUnexpectedToken() {
+        // Arrange: Define a syntactically incorrect CSS query.
+        // The query "RV,L fO: 4},X" is invalid because after the selector list "RV,L",
+        // the subsequent token " fO: 4},X" is not a valid selector component.
+        // The parser expects a new selector (e.g., a tag, #id, or .class) but finds an unrecognized token.
+        String malformedQuery = "RV,L fO: 4},X";
+        String expectedErrorMessage = "Could not parse query 'RV,L fO: 4},X': unexpected token at ' fO: 4},X'";
+
+        // Expect: An IllegalStateException with a specific message detailing the parsing error.
+        // This makes the test's purpose clear before the action is even performed.
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage(expectedErrorMessage);
+
+        // Act: Attempt to parse the malformed query, which should trigger the expected exception.
+        QueryParser.parse(malformedQuery);
     }
 }
