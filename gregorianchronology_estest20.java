@@ -1,24 +1,30 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GregorianChronology_ESTestTest20 extends GregorianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        Chronology chronology0 = gregorianChronology0.withZone(dateTimeZone0);
-        assertSame(gregorianChronology0, chronology0);
+/**
+ * Unit tests for the GregorianChronology class.
+ */
+public class GregorianChronologyTest {
+
+    /**
+     * Tests that calling withZone() on the UTC GregorianChronology instance with the UTC zone
+     * returns the same instance. This verifies a common optimization path.
+     */
+    @Test
+    public void withZone_onUtcInstanceWithUtcZone_returnsSameInstance() {
+        // Arrange: Get the singleton instance of GregorianChronology for the UTC time zone.
+        GregorianChronology utcChronology = GregorianChronology.getInstanceUTC();
+
+        // Act: Request the chronology for the same UTC zone.
+        Chronology resultChronology = utcChronology.withZone(DateTimeZone.UTC);
+
+        // Assert: The returned object should be the exact same instance, not a new one.
+        assertSame("Expected withZone(UTC) on the UTC instance to return itself",
+                utcChronology, resultChronology);
     }
 }
