@@ -1,43 +1,36 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class ModuloAxis_ESTestTest37 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * This test class was improved from an auto-generated test. In a real-world
+ * scenario, the class name 'ModuloAxis_ESTestTest37' would be renamed to
+ * 'ModuloAxisTest'.
+ */
+public class ModuloAxis_ESTestTest37 {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        boolean boolean0 = moduloAxis0.equals(moduloAxis0);
-        assertTrue(boolean0);
-        assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
-        assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
+    /**
+     * Verifies that a newly created ModuloAxis instance has the correct default
+     * display range and that its equals() method is reflexive (an object is
+     * equal to itself).
+     */
+    @Test
+    public void newInstance_shouldHaveDefaultDisplayRangeAndBeEqualToItself() {
+        // Arrange: Create a ModuloAxis with a sample range and label.
+        Range fixedRange = new Range(0.0, 360.0);
+        ModuloAxis axis = new ModuloAxis("Test Axis", fixedRange);
+
+        // Assert: Check the initial state and basic object contract.
+
+        // 1. Verify that the constructor sets the default display range correctly.
+        // The default is a circle-like range from 270 to 90 degrees.
+        assertEquals("Default display start value should be 270.0", 270.0, axis.getDisplayStart(), 0.01);
+        assertEquals("Default display end value should be 90.0", 90.0, axis.getDisplayEnd(), 0.01);
+
+        // 2. Verify the reflexivity property of the equals() method.
+        assertTrue("An object should always be equal to itself.", axis.equals(axis));
     }
 }
