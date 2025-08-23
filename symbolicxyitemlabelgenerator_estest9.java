@@ -1,28 +1,34 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.data.time.DynamicTimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest9 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test8() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        TimeSeriesCollection<ChronoLocalDate> timeSeriesCollection0 = new TimeSeriesCollection<ChronoLocalDate>();
-        String string0 = symbolicXYItemLabelGenerator0.generateLabel(timeSeriesCollection0, (-1034), (-4019));
-        assertNull(string0);
+/**
+ * Unit tests for the {@link SymbolicXYItemLabelGenerator} class.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
+
+    /**
+     * Verifies that generateLabel() returns null when the series and item indices
+     * are out of bounds for the given dataset. Negative indices are always considered
+     * out of bounds.
+     */
+    @Test
+    public void generateLabel_withOutOfBoundsIndices_shouldReturnNull() {
+        // Arrange
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+        // Use an empty dataset, for which any index is out of bounds.
+        XYDataset emptyDataset = new TimeSeriesCollection();
+        int invalidSeriesIndex = -1;
+        int invalidItemIndex = -1;
+
+        // Act
+        String label = generator.generateLabel(emptyDataset, invalidSeriesIndex, invalidItemIndex);
+
+        // Assert
+        assertNull("The generated label should be null for out-of-bounds indices.", label);
     }
 }
