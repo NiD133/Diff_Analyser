@@ -1,29 +1,31 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest17 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Test suite for {@link HashCodeAndEqualsSafeSet}.
+ * Note: The original test was auto-generated. This version has been refactored
+ * for human readability and maintainability.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Object object0 = new Object();
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.add(object0);
-        boolean boolean1 = hashCodeAndEqualsSafeSet0.add(object0);
-        assertFalse(boolean1 == boolean0);
+    @Test
+    public void add_shouldReturnFalse_whenAddingDuplicateElement() {
+        // Arrange
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+        Object element = new Object();
+
+        // Act
+        // The first attempt to add a new element should succeed.
+        boolean firstAddResult = safeSet.add(element);
+
+        // The second attempt to add the same element should fail, as Sets do not allow duplicates.
+        boolean secondAddResult = safeSet.add(element);
+
+        // Assert
+        assertTrue("First add() of a new element should return true.", firstAddResult);
+        assertFalse("Second add() of the same element should return false.", secondAddResult);
     }
 }
