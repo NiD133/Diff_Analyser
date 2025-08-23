@@ -1,41 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest120 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileOrArray} class, focusing on read operations at the end of the data source.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test119() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.read(byteArray0, 0, 2480);
-        try {
-            randomAccessFileOrArray0.readUnsignedIntLE();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that calling readUnsignedIntLE() when the file pointer is at the end of the data source
+     * correctly throws an EOFException.
+     *
+     * This test ensures that the class properly handles attempts to read past the end of the available data.
+     */
+    @Test(expected = EOFException.class)
+    public void readUnsignedIntLE_whenAtEndOfFile_throwsEOFException() throws IOException {
+        // Arrange: Create a data source and position the pointer at its end.
+        byte[] sourceData = new byte[5]; // The content doesn't matter, only the length.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+        
+        // Explicitly move the pointer to the end of the data source.
+        fileOrArray.seek(fileOrArray.length());
+
+        // Act: Attempt to read a 4-byte integer. This operation is expected to fail
+        // because there are no bytes left to read.
+        fileOrArray.readUnsignedIntLE();
+
+        // Assert: The test expects an EOFException, which is verified by the @Test annotation.
     }
 }
