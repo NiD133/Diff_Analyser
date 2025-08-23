@@ -1,30 +1,27 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest13 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ConverterSet} class, focusing on the copyInto method.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Converter[] converterArray0 = new Converter[7];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        Converter[] converterArray1 = new Converter[1];
-        // Undeclared exception!
-        try {
-            converterSet0.copyInto(converterArray1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that copyInto() throws an ArrayIndexOutOfBoundsException
+     * when the destination array is smaller than the number of converters in the set.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void copyInto_shouldThrowException_whenDestinationArrayIsTooSmall() {
+        // Arrange: Create a ConverterSet with 7 converters.
+        Converter[] sourceConverters = new Converter[7];
+        ConverterSet converterSet = new ConverterSet(sourceConverters);
+
+        // Arrange: Create a destination array that is too small to hold the converters.
+        Converter[] destinationArray = new Converter[1];
+
+        // Act: Attempt to copy the converters into the smaller destination array.
+        // The @Test(expected=...) annotation will assert that the correct exception is thrown.
+        converterSet.copyInto(destinationArray);
     }
 }
