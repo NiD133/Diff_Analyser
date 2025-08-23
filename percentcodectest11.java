@@ -1,27 +1,39 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class PercentCodecTestTest11 {
+// Renamed from PercentCodecTestTest11 to follow standard naming conventions.
+class PercentCodecTest {
 
+    /**
+     * Tests that the PercentCodec correctly handles the 'plusForSpace' option
+     * for both encoding and decoding, ensuring a successful round-trip.
+     */
     @Test
-    void testPercentEncoderDecoderWithPlusForSpace() throws Exception {
-        final String input = "a b c d";
+    void shouldEncodeSpacesAsPlusAndDecodeBackWhenPlusForSpaceIsEnabled() throws EncoderException, DecoderException {
+        // Arrange
+        final String originalString = "a b c d";
+        final String expectedEncodedString = "a+b+c+d";
+        // Instantiate codec with the 'plusForSpace' option enabled.
         final PercentCodec percentCodec = new PercentCodec(null, true);
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String(encoded, StandardCharsets.UTF_8);
-        assertEquals("a+b+c+d", encodedS, "PercentCodec plus for space encoding test");
-        final byte[] decode = percentCodec.decode(encoded);
-        assertEquals(new String(decode, StandardCharsets.UTF_8), input, "PercentCodec plus for space decoding test");
+
+        // Act: Encode the string
+        final byte[] encodedBytes = percentCodec.encode(originalString.getBytes(StandardCharsets.UTF_8));
+        final String actualEncodedString = new String(encodedBytes, StandardCharsets.UTF_8);
+
+        // Assert: Verify that spaces were encoded to pluses
+        assertEquals(expectedEncodedString, actualEncodedString);
+
+        // Act: Decode the encoded bytes back to the original form
+        final byte[] decodedBytes = percentCodec.decode(encodedBytes);
+        final String roundTripString = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        // Assert: Verify that the decoded string matches the original
+        assertEquals(originalString, roundTripString);
     }
 }
