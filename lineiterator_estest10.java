@@ -1,24 +1,35 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
+import static org.junit.Assert.assertTrue;
+
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest10 extends LineIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LineIterator} class.
+ * This refactored test focuses on improving clarity and maintainability.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StringReader stringReader0 = new StringReader("w*N4EtL4abL*9i`");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        lineIterator0.hasNext();
-        boolean boolean0 = lineIterator0.hasNext();
-        assertTrue(boolean0);
+    /**
+     * Verifies that hasNext() is idempotent, meaning it can be called multiple times
+     * without changing the iterator's state, and it consistently returns true
+     * when there is a next line available.
+     */
+    @Test
+    public void hasNextShouldReturnTrueWhenCalledMultipleTimesOnSingleLineInput() {
+        // Arrange: Create a LineIterator with a single line of text.
+        StringReader reader = new StringReader("a single line");
+        LineIterator lineIterator = new LineIterator(reader);
+
+        // Act: Call hasNext() twice without calling next().
+        // The first call reads and caches the line from the reader.
+        boolean firstCallResult = lineIterator.hasNext();
+        // The second call should return true based on the cached line.
+        boolean secondCallResult = lineIterator.hasNext();
+
+        // Assert: Verify that both calls returned true.
+        assertTrue("First call to hasNext() should return true for a non-empty reader.", firstCallResult);
+        assertTrue("Second call to hasNext() should also return true before next() is called.", secondCallResult);
     }
 }
