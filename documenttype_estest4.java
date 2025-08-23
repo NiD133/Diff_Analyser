@@ -1,22 +1,23 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentType_ESTestTest4 extends DocumentType_ESTest_scaffolding {
+/**
+ * Tests for the {@link DocumentType} class.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        DocumentType documentType0 = new DocumentType("C0pe>FSNio5LQF[+", "C0pe>FSNio5LQF[+", "org.jsoup.helper.Validate");
-        String string0 = documentType0.nodeName();
-        assertEquals("#doctype", string0);
+    @Test
+    public void nodeNameShouldAlwaysReturnHashDoctype() {
+        // Arrange: Create a DocumentType instance. The constructor arguments (name, publicId, systemId)
+        // are irrelevant for this test, as the nodeName is a fixed value for this type.
+        DocumentType docType = new DocumentType("html", "", "");
+
+        // Act: Retrieve the node name.
+        String nodeName = docType.nodeName();
+
+        // Assert: The node name for a DocumentType must always be "#doctype".
+        assertEquals("#doctype", nodeName);
     }
 }
