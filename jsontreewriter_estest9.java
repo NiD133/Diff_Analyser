@@ -1,26 +1,28 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest9 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setSerializeNulls(false);
-        Short short0 = new Short((short) 85);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value((Number) short0);
-        assertFalse(jsonWriter0.getSerializeNulls());
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    @Test
+    public void writingNumberValue_shouldNotAlterSerializeNullsSetting() {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.setSerializeNulls(false);
+
+        // Act
+        // The value() method returns the same writer instance for chaining,
+        // so we can perform the action and then assert on the original object.
+        writer.value(Short.valueOf((short) 85));
+
+        // Assert
+        assertFalse("The serializeNulls setting should be preserved after writing a value.",
+                writer.getSerializeNulls());
     }
 }
