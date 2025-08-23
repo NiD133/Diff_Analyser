@@ -1,26 +1,26 @@
 package org.apache.commons.compress.archivers.cpio;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CpioUtil_ESTestTest12 extends CpioUtil_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CpioUtil} class.
+ */
+public class CpioUtilTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        // Undeclared exception!
-        try {
-            CpioUtil.byteArray2long(byteArray0, true);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-        }
+    /**
+     * Tests that byteArray2long throws an UnsupportedOperationException
+     * when the input byte array has a length that is not a multiple of two,
+     * as specified by its contract.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void byteArray2longShouldThrowExceptionForOddLengthArray() {
+        // Arrange: Create a byte array with an odd length (3).
+        // The method documentation states it only accepts lengths that are multiples of 2.
+        byte[] oddLengthInput = new byte[3];
+        boolean swapHalfWord = true; // The value of this parameter is irrelevant for this test.
+
+        // Act: Call the method with the invalid input.
+        // Assert: The @Test(expected=...) annotation handles the exception assertion.
+        CpioUtil.byteArray2long(oddLengthInput, swapHalfWord);
     }
 }
