@@ -1,55 +1,51 @@
 package org.apache.commons.io.input;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
+
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest5 {
+/**
+ * Tests for {@link BoundedReader} focusing on its interaction with other Readers.
+ */
+// Renamed class from BoundedReaderTestTest5 for clarity and correctness.
+public class BoundedReaderTest {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * This test verifies that a {@link LineNumberReader} wrapping a {@link BoundedReader}
+     * correctly terminates when reading a stream that ends with a newline character.
+     * <p>
+     * This test was added to prevent a regression of a bug where this specific
+     * combination of readers could lead to an infinite loop. The test passes if it
+     * completes within the specified timeout.
+     * </p>
+     */
     @Test
-    void testLineNumberReaderAndStringReaderLastLineEolYes() {
-        assertTimeout(TIMEOUT, () -> testLineNumberReader(new StringReader(STRING_END_EOL)));
+    void lineReaderOnBoundedReaderShouldTerminateForStreamEndingWithNewline() {
+        // Arrange
+        final String inputEndingWithNewline = "0\n1\n2\n";
+        // A bound large enough that it won't be reached. This ensures the test focuses
+        // on the interaction between the readers, not the bounding behavior itself.
+        final int largeBound = 10_000_000;
+        final Reader boundedReader = new BoundedReader(new StringReader(inputEndingWithNewline), largeBound);
+        final LineNumberReader lineReader = new LineNumberReader(boundedReader);
+
+        // Act & Assert
+        // The test's purpose is to ensure the read loop terminates.
+        // assertTimeout will fail the test if the loop hangs, thus confirming the fix.
+        assertTimeout(TIMEOUT, () -> {
+            try (lineReader) {
+                while (lineReader.readLine() != null) {
+                    // Keep reading until the end of the stream is reached.
+                }
+            }
+        });
     }
 }
