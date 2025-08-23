@@ -1,18 +1,29 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest38 extends IOCase_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link IOCase} enum.
+ * This specific test case was refactored for clarity from a machine-generated version.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = iOCase0.checkEndsWith("krmipp?jw", (String) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that checkEndsWith() returns false when the suffix argument is null.
+     * The Javadoc for checkEndsWith specifies this behavior, and it should be
+     * consistent regardless of the case-sensitivity rule.
+     */
+    @Test
+    public void checkEndsWithShouldReturnFalseWhenSuffixIsNull() {
+        // Arrange
+        final IOCase ioCase = IOCase.INSENSITIVE;
+        final String text = "Apache Commons IO";
+
+        // Act
+        final boolean result = ioCase.checkEndsWith(text, null);
+
+        // Assert
+        assertFalse("checkEndsWith must return false if the suffix is null.", result);
     }
 }
