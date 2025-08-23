@@ -1,31 +1,24 @@
 package org.apache.commons.jxpath.ri.compiler;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.ParentContext;
-import org.apache.commons.jxpath.ri.axes.PrecedingOrFollowingContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.axes.SelfContext;
-import org.apache.commons.jxpath.ri.axes.UnionContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CoreOperation_ESTestTest1 extends CoreOperation_ESTest_scaffolding {
+/**
+ * Tests the string representation of a {@link CoreOperationUnion}.
+ * This test focuses on the edge case where the operation is created with no operands.
+ */
+public class CoreOperationUnionToStringTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Expression[] expressionArray0 = new Expression[0];
-        CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
-        String string0 = coreOperationUnion0.toString();
-        assertEquals("", string0);
+    @Test
+    public void toString_withNoOperands_returnsEmptyString() {
+        // Arrange: Create a CoreOperationUnion with an empty array of expressions (operands).
+        Expression[] noOperands = new Expression[0];
+        CoreOperationUnion unionOperation = new CoreOperationUnion(noOperands);
+
+        // Act: Get the string representation of the operation.
+        String result = unionOperation.toString();
+
+        // Assert: The result should be an empty string.
+        assertEquals("The string representation of a union with no operands should be empty", "", result);
     }
 }
