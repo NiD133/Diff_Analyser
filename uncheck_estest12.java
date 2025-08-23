@@ -1,31 +1,28 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest12 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class, focusing on the getAsInt method.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        IOIntSupplier iOIntSupplier0 = mock(IOIntSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn(0).when(iOIntSupplier0).getAsInt();
-        int int0 = Uncheck.getAsInt(iOIntSupplier0);
-        assertEquals(0, int0);
+    /**
+     * Tests that {@link Uncheck#getAsInt(IOIntSupplier)} returns the value from the
+     * supplier when the supplier executes successfully without throwing an IOException.
+     */
+    @Test
+    public void getAsInt_shouldReturnValueFromSupplier_whenSupplierSucceeds() {
+        // Arrange: Define the expected value and create a supplier that returns it.
+        // Using a lambda is clearer and more concise than using a mock for this simple case.
+        final int expectedValue = 0;
+        final IOIntSupplier successfulSupplier = () -> expectedValue;
+
+        // Act: Call the method under test with the successful supplier.
+        final int actualValue = Uncheck.getAsInt(successfulSupplier);
+
+        // Assert: Verify that the returned value is the one provided by the supplier.
+        assertEquals(expectedValue, actualValue);
     }
 }
