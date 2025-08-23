@@ -2,21 +2,42 @@ package com.fasterxml.jackson.core;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonLocation_ESTestTest44 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        JsonLocation jsonLocation0 = new JsonLocation((Object) null, 62, 500, (-2898), (-26));
-        String string0 = jsonLocation0.toString();
-        assertEquals((-26), jsonLocation0.getColumnNr());
-        assertEquals(500L, jsonLocation0.getCharOffset());
-        assertEquals("[Source: UNKNOWN; byte offset: #62]", string0);
-        assertEquals((-2898), jsonLocation0.getLineNr());
+    /**
+     * Tests that the {@link JsonLocation#toString()} method produces a concise and
+     * informative string when the source reference is null.
+     * <p>
+     * The expected format should indicate an "UNKNOWN" source and include the byte offset,
+     * while omitting other details like line or column number, even if they are provided.
+     */
+    @Test
+    public void toString_withNullSource_shouldDescribeSourceAsUnknownAndShowByteOffset() {
+        // Arrange
+        Object sourceRef = null;
+        long byteOffset = 62L;
+        long charOffset = 500L;
+        int lineNumber = -2898;
+        int columnNumber = -26;
+
+        String expectedDescription = "[Source: UNKNOWN; byte offset: #62]";
+
+        // Act
+        // Note: Using the deprecated constructor to match the original test's scenario.
+        JsonLocation location = new JsonLocation(sourceRef, byteOffset, charOffset, lineNumber, columnNumber);
+        String actualDescription = location.toString();
+
+        // Assert
+        // 1. Verify the primary behavior: the string representation.
+        assertEquals(expectedDescription, actualDescription);
+
+        // 2. Verify the constructor correctly assigned all properties.
+        assertEquals(charOffset, location.getCharOffset());
+        assertEquals(lineNumber, location.getLineNr());
+        assertEquals(columnNumber, location.getColumnNr());
     }
 }
