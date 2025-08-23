@@ -1,31 +1,26 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ * This class focuses on testing the initialization logic.
+ */
 public class SpatialContextFactory_ESTestTest25 extends SpatialContextFactory_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        // Undeclared exception!
-        try {
-            spatialContextFactory0.init((Map<String, String>) null, classLoader0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
-        }
+    /**
+     * Verifies that the init() method throws a NullPointerException
+     * when the configuration arguments map is null, as this is a required parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void init_withNullArgsMap_shouldThrowNullPointerException() {
+        // Arrange
+        SpatialContextFactory factory = new SpatialContextFactory();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act & Assert
+        // The init method is expected to throw a NullPointerException because the 'args' map is null.
+        // The @Test(expected = ...) annotation handles the verification.
+        factory.init(null, classLoader);
     }
 }
