@@ -1,82 +1,69 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertSame;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class IslamicChronologyTestTest4 extends TestCase {
-
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+/**
+ * Tests the factory methods of {@link IslamicChronology}.
+ * This test focuses on verifying that the getInstance() methods return cached, singleton-like
+ * instances for each time zone.
+ */
+public class IslamicChronologyGetInstanceTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
+    // Fields to restore system defaults after test execution
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+    @Before
+    public void setUp() {
+        // Back up original system defaults and set a known default for the test
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+        
+        // Set the default time zone to LONDON to test getInstance() without arguments
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
+    @After
+    public void tearDown() {
+        // Restore the original system settings to ensure test isolation
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    //-----------------------------------------------------------------------
-    public void testEquality() {
-        assertSame(IslamicChronology.getInstance(TOKYO), IslamicChronology.getInstance(TOKYO));
-        assertSame(IslamicChronology.getInstance(LONDON), IslamicChronology.getInstance(LONDON));
-        assertSame(IslamicChronology.getInstance(PARIS), IslamicChronology.getInstance(PARIS));
-        assertSame(IslamicChronology.getInstanceUTC(), IslamicChronology.getInstanceUTC());
-        assertSame(IslamicChronology.getInstance(), IslamicChronology.getInstance(LONDON));
+    /**
+     * Tests that IslamicChronology.getInstance() returns the same cached instance for the same time zone.
+     * This verifies the singleton pattern used for performance.
+     */
+    @Test
+    public void testGetInstance_cachesInstancesByZone() {
+        // Calling getInstance with the same zone should return the exact same object
+        assertSame("Instances for TOKYO should be cached",
+                IslamicChronology.getInstance(TOKYO), IslamicChronology.getInstance(TOKYO));
+        assertSame("Instances for LONDON should be cached",
+                IslamicChronology.getInstance(LONDON), IslamicChronology.getInstance(LONDON));
+        assertSame("Instances for PARIS should be cached",
+                IslamicChronology.getInstance(PARIS), IslamicChronology.getInstance(PARIS));
+        assertSame("Instances for UTC should be cached",
+                IslamicChronology.getInstanceUTC(), IslamicChronology.getInstanceUTC());
+
+        // Verify that getInstance() uses the default time zone (set to LONDON in setUp)
+        assertSame("getInstance() should return the instance for the default zone",
+                IslamicChronology.getInstance(), IslamicChronology.getInstance(LONDON));
     }
 }
