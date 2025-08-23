@@ -1,49 +1,42 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
 import org.jfree.data.statistics.SimpleHistogramBin;
 import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ClusteredXYBarRenderer_ESTestTest7 extends ClusteredXYBarRenderer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        Integer integer0 = JLayeredPane.MODAL_LAYER;
-        SimpleHistogramDataset<Integer> simpleHistogramDataset0 = new SimpleHistogramDataset<Integer>(integer0);
-        SimpleHistogramBin simpleHistogramBin0 = new SimpleHistogramBin((-901.5175700727494), (-465.48054286));
-        simpleHistogramDataset0.addBin(simpleHistogramBin0);
-        Range range0 = clusteredXYBarRenderer0.findDomainBounds(simpleHistogramDataset0);
-        assertEquals((-683.4990564663747), range0.getCentralValue(), 0.01);
+/**
+ * A collection of tests for the {@link ClusteredXYBarRenderer#findDomainBounds(XYDataset)} method.
+ */
+public class ClusteredXYBarRendererDomainBoundsTest {
+
+    /**
+     * Verifies that findDomainBounds() correctly calculates the range for a dataset
+     * that contains a single histogram bin. The expected range should match the
+     * boundaries of that single bin.
+     */
+    @Test
+    public void findDomainBounds_withSingleBinHistogram_returnsRangeOfBin() {
+        // Arrange: Create a renderer and a dataset with one bin from -10.0 to 0.0
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        SimpleHistogramDataset dataset = new SimpleHistogramDataset("Test Series");
+
+        final double binLowerBound = -10.0;
+        final double binUpperBound = 0.0;
+        dataset.addBin(new SimpleHistogramBin(binLowerBound, binUpperBound));
+
+        // Act: Calculate the domain bounds from the dataset
+        Range domainBounds = renderer.findDomainBounds(dataset);
+
+        // Assert: The calculated bounds should match the bin's boundaries
+        assertNotNull("The domain bounds should not be null.", domainBounds);
+        assertEquals("The lower bound should match the bin's lower bound.", 
+                     binLowerBound, domainBounds.getLowerBound(), 0.0);
+        assertEquals("The upper bound should match the bin's upper bound.", 
+                     binUpperBound, domainBounds.getUpperBound(), 0.0);
     }
 }
