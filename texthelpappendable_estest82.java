@@ -1,47 +1,43 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class TextHelpAppendable_ESTestTest82 extends TextHelpAppendable_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test81() throws Throwable {
-        PipedWriter pipedWriter0 = new PipedWriter();
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(pipedWriter0);
-        LinkedHashSet<CharSequence> linkedHashSet0 = new LinkedHashSet<CharSequence>();
-        textHelpAppendable0.appendList(true, linkedHashSet0);
-        assertEquals(3, textHelpAppendable0.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
-        assertEquals(1, textHelpAppendable0.getLeftPad());
+/**
+ * Test suite for the TextHelpAppendable class.
+ * This class contains the refactored test case.
+ */
+public class TextHelpAppendable_ESTestTest82 { // Retaining original class name for context
+
+    /**
+     * Verifies that calling appendList with an empty collection produces no output
+     * and does not alter the default configuration of the TextHelpAppendable instance.
+     */
+    @Test
+    public void appendListWithEmptyCollectionShouldNotChangeStateOrProduceOutput() throws IOException {
+        // Arrange: Create a TextHelpAppendable with a StringWriter to capture output.
+        StringWriter writer = new StringWriter();
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(writer);
+
+        // Act: Call the method under test with an empty collection.
+        helpAppendable.appendList(true, Collections.emptyList());
+
+        // Assert: Verify that the behavior is correct.
+
+        // 1. No output should have been written.
+        assertEquals("Appending an empty list should not write any output.", "", writer.toString());
+
+        // 2. The configuration properties should remain at their default values.
+        assertEquals("Indent should remain at the default value.",
+                TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
+        assertEquals("Max width should remain at the default value.",
+                TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
+        assertEquals("Left pad should remain at the default value.",
+                TextHelpAppendable.DEFAULT_LEFT_PAD, helpAppendable.getLeftPad());
     }
 }
