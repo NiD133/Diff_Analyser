@@ -1,37 +1,29 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * Unit tests for {@link PeriodFormatter}.
+ */
+// The original test class name `PeriodFormatter_ESTestTest44` and its scaffolding
+// parent suggest it was auto-generated. This improved version is part of the same class.
 public class PeriodFormatter_ESTestTest44 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        PeriodFormatterBuilder.Composite periodFormatterBuilder_Composite0 = new PeriodFormatterBuilder.Composite(linkedList0);
-        PeriodFormatter periodFormatter0 = new PeriodFormatter((PeriodPrinter) null, periodFormatterBuilder_Composite0);
-        boolean boolean0 = periodFormatter0.isPrinter();
-        assertFalse(boolean0);
+    /**
+     * Tests that isPrinter() returns false when the PeriodFormatter is constructed
+     * with a null PeriodPrinter.
+     */
+    @Test
+    public void isPrinter_shouldReturnFalse_whenFormatterHasNoPrinter() {
+        // Arrange: Create a PeriodFormatter with a null printer.
+        // The parser component is irrelevant for this test, so it can also be null.
+        PeriodFormatter formatter = new PeriodFormatter(null, null);
+
+        // Act: Check if the formatter is capable of printing.
+        boolean result = formatter.isPrinter();
+
+        // Assert: The formatter should not be identified as a printer.
+        assertFalse("A formatter created with a null printer should not be a printer.", result);
     }
 }
