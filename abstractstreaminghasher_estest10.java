@@ -1,32 +1,37 @@
 package com.google.common.hash;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AbstractStreamingHasher_ESTestTest10 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for the state management of {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(2479);
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher1 = (Crc32cHashFunction.Crc32cHasher) crc32cHashFunction_Crc32cHasher0.putBytes(byteBuffer0);
-        crc32cHashFunction_Crc32cHasher1.processRemaining(byteBuffer0);
-        // Undeclared exception!
+    /**
+     * Verifies that once the hash() method is called on a hasher,
+     * it can no longer be updated with new data.
+     */
+    @Test
+    public void putData_afterHashIsCalculated_throwsIllegalStateException() {
+        // Arrange: Create a hasher and add some data.
+        // We use Crc32cHasher as a concrete implementation of the abstract class under test.
+        HashFunction crc32c = new Crc32cHashFunction();
+        Hasher hasher = crc32c.newHasher();
+        hasher.putInt(42); // Add some initial data.
+
+        // Act: Finalize the hash calculation. This should put the hasher in a "used" state.
+        hasher.hash();
+
+        // Assert: Any subsequent attempt to add data should fail.
         try {
-            crc32cHashFunction_Crc32cHasher0.putChar('M');
-            fail("Expecting exception: IllegalStateException");
+            hasher.putChar('M');
+            fail("Expected an IllegalStateException because the hasher has already been used.");
         } catch (IllegalStateException e) {
-            //
-            // The behavior of calling any method after calling hash() is undefined.
-            //
-            verifyException("com.google.common.hash.Crc32cHashFunction$Crc32cHasher", e);
+            // This is the expected behavior. We can optionally check the message for more specificity.
+            assertEquals("Cannot use Hasher after calling #hash() on it", e.getMessage());
         }
     }
 }
