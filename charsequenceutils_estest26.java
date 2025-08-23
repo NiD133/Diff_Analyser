@@ -1,27 +1,25 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest26 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(84);
-        // Undeclared exception!
-        try {
-            CharSequenceUtils.subSequence(charBuffer0, (-233));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.HeapCharBuffer", e);
-        }
+    /**
+     * Tests that CharSequenceUtils.subSequence throws an IndexOutOfBoundsException
+     * when the starting index is negative, which is an invalid argument.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void subSequence_shouldThrowIndexOutOfBoundsException_whenStartIndexIsNegative() {
+        // Arrange
+        final CharSequence sequence = "any sequence";
+        final int negativeStartIndex = -1;
+
+        // Act
+        // This call is expected to throw an IndexOutOfBoundsException,
+        // which is verified by the @Test(expected=...) annotation.
+        CharSequenceUtils.subSequence(sequence, negativeStartIndex);
     }
 }
