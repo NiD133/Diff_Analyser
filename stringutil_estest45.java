@@ -1,32 +1,35 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class StringUtil_ESTestTest45 extends StringUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        linkedList0.add((Object) "");
-        linkedList0.offer("");
-        ListIterator<Object> listIterator0 = linkedList0.listIterator();
-        StringUtil.join((Iterator<?>) listIterator0, "");
-        assertFalse(listIterator0.hasNext());
+/**
+ * Test suite for {@link StringUtil}.
+ */
+public class StringUtilTest {
+
+    /**
+     * Verifies that the join(Iterator, String) method fully consumes the provided iterator.
+     * After the join operation is complete, the iterator should be exhausted.
+     */
+    @Test
+    public void joinWithIteratorConsumesTheIterator() {
+        // Arrange: Create a list of strings and get an iterator for it.
+        List<String> items = new LinkedList<>(Arrays.asList("first", "second"));
+        Iterator<String> iterator = items.iterator();
+
+        // Act: Join the elements using the iterator.
+        String result = StringUtil.join(iterator, ",");
+
+        // Assert: Check that the resulting string is correct and the iterator is now empty.
+        assertEquals("first,second", result);
+        assertFalse("The iterator should be fully consumed after the join operation.", iterator.hasNext());
     }
 }
