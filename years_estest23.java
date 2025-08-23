@@ -1,26 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Years_ESTestTest23 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Years years0 = Years.MAX_VALUE;
-        // Undeclared exception!
-        try {
-            years0.plus(years0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 2147483647 + 2147483647
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that adding the maximum possible Years value to itself results in an
+     * ArithmeticException due to integer overflow.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void plus_whenResultExceedsMaxValue_throwsArithmeticException() {
+        // Arrange
+        Years maxYears = Years.MAX_VALUE;
+
+        // Act
+        // This operation should overflow since Integer.MAX_VALUE + Integer.MAX_VALUE
+        // is greater than Integer.MAX_VALUE.
+        maxYears.plus(maxYears);
+
+        // Assert
+        // The test is expected to throw an ArithmeticException, which is
+        // declared in the @Test annotation.
     }
 }
