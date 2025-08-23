@@ -1,26 +1,31 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains an improved version of an auto-generated test case
+ * for the {@link NumberOutput} class.
+ *
+ * The original class name `NumberOutput_ESTestTest24` and its scaffolding parent
+ * are preserved to maintain compatibility with the existing test suite structure.
+ */
 public class NumberOutput_ESTestTest24 extends NumberOutput_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(7174648137343063403L, byteArray0, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 5
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with a byte array buffer that is
+     * too small to hold the number's string representation throws an
+     * {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLongThrowsExceptionWhenBufferIsTooSmall() {
+        // Arrange: A long value that requires more bytes than the buffer provides.
+        // The number 7,174,648,137,343,063,403L is 19 digits long and requires 19 bytes.
+        long largeNumber = 7174648137343063403L;
+        byte[] insufficientBuffer = new byte[5]; // The buffer is intentionally too small.
+
+        // Act & Assert: Attempt to write the long into the buffer.
+        // The test expects an ArrayIndexOutOfBoundsException, which is declared
+        // in the @Test annotation above.
+        NumberOutput.outputLong(largeNumber, insufficientBuffer, 0);
     }
 }
