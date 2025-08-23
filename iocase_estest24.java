@@ -1,18 +1,30 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest24 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        boolean boolean0 = iOCase0.checkRegionMatches("System", (-1121), (String) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@code checkRegionMatches} correctly returns false when called with
+     * invalid arguments, specifically a negative start index and a null search string.
+     * This ensures the method is robust against improper inputs.
+     */
+    @Test
+    public void checkRegionMatchesShouldReturnFalseForNegativeStartIndexAndNullSearchString() {
+        // Arrange
+        IOCase ioCase = IOCase.SYSTEM;
+        String text = "System";
+        int negativeStartIndex = -1121;
+        String searchString = null;
+
+        // Act
+        boolean matches = ioCase.checkRegionMatches(text, negativeStartIndex, searchString);
+
+        // Assert
+        assertFalse("Expected checkRegionMatches to return false for invalid inputs", matches);
     }
 }
