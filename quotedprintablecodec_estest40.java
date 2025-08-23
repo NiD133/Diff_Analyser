@@ -1,24 +1,31 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
+import java.nio.charset.Charset;
+import org.apache.commons.codec.DecoderException;
+import org.junit.Test;
+
+// Note: The class name and inheritance are kept from the original for context.
+// In a real-world scenario, this class would likely be renamed to QuotedPrintableCodecTest.
 public class QuotedPrintableCodec_ESTestTest40 extends QuotedPrintableCodec_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.decode((String) null, charset0);
-        assertNull(string0);
+    /**
+     * Tests that the decode(String, Charset) method correctly handles a null input
+     * by returning null, as per its contract.
+     */
+    @Test
+    public void decodeWithNullStringShouldReturnNull() throws DecoderException {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final String nullInput = null;
+        // The charset is required by the method signature but is not used when the input is null.
+        final Charset charset = Charset.defaultCharset();
+
+        // Act
+        final String result = codec.decode(nullInput, charset);
+
+        // Assert
+        assertNull("Decoding a null string should return null.", result);
     }
 }
