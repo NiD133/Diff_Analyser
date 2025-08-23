@@ -1,23 +1,31 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class NodeIterator_ESTestTest5 extends NodeIterator_ESTest_scaffolding {
+/**
+ * Test suite for NodeIterator, focusing on traversal edge cases.
+ */
+public class NodeIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("   ", "   ");
-        Element element0 = document0.prependChild(document0);
-        Class<FormElement> class0 = FormElement.class;
-        NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(element0, class0);
-        // Undeclared exception!
-        nodeIterator0.next();
+    /**
+     * Verifies that the NodeIterator fails with a StackOverflowError when traversing a cyclic
+     * node structure (i.e., a node that is an ancestor of itself), which prevents an infinite loop.
+     */
+    @Test(expected = StackOverflowError.class, timeout = 4000)
+    public void nextThrowsStackOverflowErrorOnCyclicNodeStructure() {
+        // Arrange: Create a document and then make it a child of itself to form a cycle.
+        // This simulates a malformed DOM structure that could cause infinite loops.
+        Document document = Parser.parseBodyFragment("", "");
+        document.prependChild(document); // The document node is now its own child.
+
+        // Create an iterator starting from the root of this cyclic structure.
+        // The specific node type to filter for (FormElement) is not important; the test
+        // focuses on the traversal logic itself.
+        NodeIterator<FormElement> iterator = new NodeIterator<>(document, FormElement.class);
+
+        // Act: Attempting to find the next node in a cyclic graph should lead to
+        // unbounded recursion, which is expected to result in a StackOverflowError.
+        iterator.next();
     }
 }
