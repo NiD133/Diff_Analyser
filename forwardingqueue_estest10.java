@@ -1,21 +1,28 @@
 package com.google.common.collect;
 
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ForwardingQueue_ESTestTest10 extends ForwardingQueue_ESTest_scaffolding {
+/**
+ * Tests for the standard helper implementations in {@link ForwardingQueue}.
+ */
+public class ForwardingQueueTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        EvictingQueue<Object> evictingQueue0 = EvictingQueue.create((int) 'b');
-        Object object0 = evictingQueue0.standardPoll();
-        assertNull(object0);
+    /**
+     * Verifies that {@code standardPoll()} returns {@code null} when called on an empty queue,
+     * which is the expected behavior according to the {@link java.util.Queue#poll()} contract.
+     */
+    @Test
+    public void standardPoll_onEmptyQueue_returnsNull() {
+        // Arrange: Create an empty EvictingQueue.
+        // We use EvictingQueue as a concrete implementation of the abstract ForwardingQueue.
+        EvictingQueue<Object> queue = EvictingQueue.create(10);
+
+        // Act: Call the standardPoll() helper method on the empty queue.
+        Object result = queue.standardPoll();
+
+        // Assert: The result should be null, as the queue is empty.
+        assertNull("standardPoll() on an empty queue should return null", result);
     }
 }
