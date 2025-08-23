@@ -1,25 +1,30 @@
 package org.apache.ibatis.mapping;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Properties;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.decorators.BlockingCache;
-import org.apache.ibatis.cache.decorators.SynchronizedCache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CacheBuilder_ESTestTest12 extends CacheBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        CacheBuilder cacheBuilder0 = new CacheBuilder("");
-        Integer integer0 = new Integer(1);
-        CacheBuilder cacheBuilder1 = cacheBuilder0.size(integer0);
-        Cache cache0 = cacheBuilder1.build();
-        assertEquals("", cache0.getId());
+/**
+ * Test suite for the {@link CacheBuilder} class.
+ */
+public class CacheBuilderTest {
+
+    /**
+     * Verifies that the ID provided to the CacheBuilder is correctly assigned
+     * to the final Cache instance after it is built.
+     */
+    @Test
+    public void buildShouldCreateCacheWithCorrectId() {
+        // Arrange: Create a CacheBuilder with a specific ID.
+        // The original test used an empty string, which is a valid edge case.
+        String expectedId = "";
+        CacheBuilder cacheBuilder = new CacheBuilder(expectedId);
+
+        // Act: Configure a property (like size) and then build the cache.
+        Cache builtCache = cacheBuilder.size(1).build();
+
+        // Assert: The ID of the built cache must match the one provided during construction.
+        assertEquals(expectedId, builtCache.getId());
     }
 }
