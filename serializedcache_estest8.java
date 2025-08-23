@@ -1,27 +1,33 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest8 extends SerializedCache_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        String string0 = serializedCache0.getId();
-        assertNull(string0);
+/**
+ * This test class focuses on the ID-related behavior of the SerializedCache decorator.
+ * The original test name `SerializedCache_ESTestTest8` is kept for context, but in a
+ * real-world scenario, this test would be part of a comprehensive `SerializedCacheTest` class.
+ */
+public class SerializedCache_ESTestTest8 {
+
+    /**
+     * Verifies that SerializedCache correctly delegates the getId() call to its
+     * underlying (delegate) cache. This test specifically checks the scenario where the
+     * delegate cache's ID is null.
+     */
+    @Test
+    public void shouldReturnNullForIdWhenDelegateIdIsNull() {
+        // Arrange: Create a delegate cache with a null ID and wrap it in a SerializedCache.
+        Cache delegateCache = new PerpetualCache(null);
+        Cache serializedCache = new SerializedCache(delegateCache);
+
+        // Act: Get the ID from the SerializedCache decorator.
+        String actualId = serializedCache.getId();
+
+        // Assert: The returned ID should be null, matching the delegate cache's ID.
+        assertNull("The ID from the decorator should be null, as it is delegated from the wrapped cache.", actualId);
     }
 }
