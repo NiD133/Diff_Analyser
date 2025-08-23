@@ -1,40 +1,32 @@
 package org.apache.commons.io.file;
 
+import org.apache.commons.io.file.Counters.PathCounters;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class CleaningPathVisitor_ESTestTest2 extends CleaningPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link CleaningPathVisitor}.
+ */
+public class CleaningPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
-        String[] stringArray0 = new String[1];
-        CleaningPathVisitor cleaningPathVisitor0 = new CleaningPathVisitor(counters_PathCounters0, stringArray0);
-        // Undeclared exception!
-        try {
-            cleaningPathVisitor0.preVisitDirectory((Path) null, (BasicFileAttributes) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Arrays", e);
-        }
+    /**
+     * Tests that preVisitDirectory throws a NullPointerException when the directory path is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void preVisitDirectory_withNullPath_throwsNullPointerException() throws IOException {
+        // Arrange: Create a visitor with valid, empty dependencies.
+        final PathCounters pathCounters = new CountingPathVisitor.Builder().getPathCounters();
+        final String[] noExclusions = {}; // Use an empty array for clarity and robustness.
+        final CleaningPathVisitor cleaningVisitor = new CleaningPathVisitor(pathCounters, noExclusions);
+
+        // Act: Call the method with a null path, which is expected to fail.
+        // The BasicFileAttributes argument can also be null for this test case.
+        cleaningVisitor.preVisitDirectory((Path) null, (BasicFileAttributes) null);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // by the @Test(expected=...) annotation.
     }
 }
