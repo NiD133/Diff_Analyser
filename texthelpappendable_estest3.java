@@ -1,55 +1,49 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest3 extends TextHelpAppendable_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        arrayList0.add(textStyle0);
-        ArrayList<String> arrayList1 = new ArrayList<String>();
-        ArrayList<String> arrayList2 = new ArrayList<String>();
-        arrayList2.add("_uFdX>H}$Z");
-        arrayList1.add("");
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>(comparator0);
-        priorityQueue0.add(arrayList1);
-        TableDefinition tableDefinition0 = TableDefinition.from("a", arrayList0, arrayList2, priorityQueue0);
-        textHelpAppendable0.appendTable(tableDefinition0);
-        assertEquals(3, textHelpAppendable0.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
+/**
+ * Test suite for {@link TextHelpAppendable}.
+ * This class contains the refactored test case.
+ */
+public class TextHelpAppendableRefactoredTest {
+
+    /**
+     * Tests that appending a table does not alter the default formatting settings
+     * (indentation and max width) of the TextHelpAppendable instance.
+     */
+    @Test
+    public void appendTableShouldNotAlterDefaultFormattingSettings() throws IOException {
+        // Arrange: Set up the TextHelpAppendable and a simple table definition.
+        // Use a StringWriter to prevent console output and allow for potential output assertions.
+        StringWriter writer = new StringWriter();
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(writer);
+
+        // Define a minimal table. The content is not important for this test.
+        List<TextStyle> styles = Collections.singletonList(TextStyle.DEFAULT);
+        List<String> headers = Collections.singletonList("Header");
+        Collection<List<String>> rows = Collections.singletonList(Collections.singletonList("Cell Data"));
+
+        // Assuming a TableDefinition factory method with the signature:
+        // from(title, styles, headers, rows) as implied by the original test.
+        TableDefinition tableDefinition = TableDefinition.from("Table Title", styles, headers, rows);
+
+        // Act: Call the method under test.
+        helpAppendable.appendTable(tableDefinition);
+
+        // Assert: Verify that the default settings remain unchanged.
+        assertEquals("Default indent should be unchanged after appending a table.",
+            TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
+
+        assertEquals("Default max width should be unchanged after appending a table.",
+            TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
     }
 }
