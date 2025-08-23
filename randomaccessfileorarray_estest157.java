@@ -1,40 +1,44 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest157 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test156() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
+
+    /**
+     * Verifies that the constructor correctly propagates an IOException
+     * when the provided InputStream fails during a read operation.
+     *
+     * The constructor for RandomAccessFileOrArray attempts to read the entire
+     * content of the given InputStream. This test supplies an unconnected
+     * PipedInputStream, which is guaranteed to throw an IOException upon the
+     * first read attempt, ensuring the constructor's error handling is robust.
+     */
+    @Test
+    public void constructorWithFailingInputStreamShouldThrowIOException() {
+        // Arrange: Create an input stream that is known to fail on read.
+        // A PipedInputStream that is not connected to a PipedOutputStream
+        // will throw an IOException("Pipe not connected") on any read attempt.
+        PipedInputStream failingInputStream = new PipedInputStream();
+
         try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray(pipedInputStream0);
-            fail("Expecting exception: IOException");
-        } catch (Throwable e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedInputStream", e);
+            // Act: Attempt to construct the object with the failing stream.
+            new RandomAccessFileOrArray(failingInputStream);
+            
+            // Assert: If the constructor completes without an exception, the test fails.
+            fail("Expected an IOException to be thrown because the input stream cannot be read.");
+        } catch (IOException e) {
+            // Assert: Verify that the correct IOException was thrown.
+            // The message "Pipe not connected" is the specific behavior of PipedInputStream.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
