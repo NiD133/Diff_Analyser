@@ -1,54 +1,30 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class OrderedProperties_ESTestTest33 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests for the {@link OrderedProperties} class.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Enumeration<?> enumeration0 = orderedProperties0.propertyNames();
-        BiFunction<Object, Object, Object> biFunction0 = (BiFunction<Object, Object, Object>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(biFunction0).apply(any(), any());
-        Object object0 = orderedProperties0.compute(enumeration0, biFunction0);
-        assertNull(object0);
+    /**
+     * Tests that calling compute() on a non-existent key with a remapping function
+     * that returns null will result in null and not add the key to the properties.
+     */
+    @Test
+    public void computeShouldReturnNullAndNotAddKeyWhenFunctionReturnsNullForNonExistentKey() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final String nonExistentKey = "key.that.does.not.exist";
+
+        // Act: Call compute with a function that returns null.
+        // According to the Map#compute contract, this should not add a new entry.
+        final Object result = properties.compute(nonExistentKey, (key, value) -> null);
+
+        // Assert
+        assertNull("The result of compute() should be null when the remapping function returns null.", result);
+        assertTrue("The properties map should remain empty because the key was not added.", properties.isEmpty());
     }
 }
