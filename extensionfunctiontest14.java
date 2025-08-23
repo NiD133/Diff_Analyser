@@ -1,108 +1,103 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 import org.apache.commons.jxpath.AbstractJXPathTest;
 import org.apache.commons.jxpath.ClassFunctions;
-import org.apache.commons.jxpath.ExpressionContext;
-import org.apache.commons.jxpath.Function;
 import org.apache.commons.jxpath.FunctionLibrary;
-import org.apache.commons.jxpath.Functions;
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.NodeSet;
 import org.apache.commons.jxpath.PackageFunctions;
-import org.apache.commons.jxpath.Pointer;
 import org.apache.commons.jxpath.TestBean;
-import org.apache.commons.jxpath.Variables;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.util.JXPath11CompatibleTypeConverter;
 import org.apache.commons.jxpath.util.TypeConverter;
 import org.apache.commons.jxpath.util.TypeUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ExtensionFunctionTestTest14 extends AbstractJXPathTest {
+/**
+ * Tests for extension function calls in JXPath.
+ * This suite verifies various ways of defining and calling static Java methods
+ * from XPath expressions.
+ */
+@DisplayName("Extension Function Tests")
+class ExtensionFunctionTest {
 
-    private Functions functions;
+    private static JXPathContext context;
 
-    private JXPathContext context;
+    private TypeConverter originalTypeConverter;
 
-    private TestBean testBean;
+    @BeforeAll
+    static void setUpClass() {
+        // The JXPathContext and its function library are expensive to set up
+        // and are read-only for these tests. Using @BeforeAll makes the setup
+        // run only once for all tests in this class.
+        final TestBean testBean = new TestBean();
+        context = JXPathContext.newContext(testBean);
 
-    private TypeConverter typeConverter;
+        final FunctionLibrary functionLibrary = new FunctionLibrary();
+        // Maps static methods in TestFunctions to the "test:" prefix.
+        functionLibrary.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
+        // Maps static methods in TestFunctions2 to the same "test:" prefix.
+        // JXPath resolves this by using the last one added for a given function signature.
+        functionLibrary.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
+        // Allows calling static methods from a specific package using the "jxpathtest:" prefix.
+        functionLibrary.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
+        // Allows calling static methods using their fully qualified class name without a prefix.
+        functionLibrary.addFunctions(new PackageFunctions("", null));
 
-    @Override
+        context.setFunctions(functionLibrary);
+    }
+
     @BeforeEach
-    public void setUp() {
-        if (context == null) {
-            testBean = new TestBean();
-            context = JXPathContext.newContext(testBean);
-            final Variables vars = context.getVariables();
-            vars.declareVariable("test", new TestFunctions(4, "test"));
-            final FunctionLibrary lib = new FunctionLibrary();
-            lib.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
-            lib.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
-            lib.addFunctions(new PackageFunctions("", "call"));
-            lib.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
-            lib.addFunctions(new PackageFunctions("", null));
-            context.setFunctions(lib);
-            context.getVariables().declareVariable("List.class", List.class);
-            context.getVariables().declareVariable("NodeSet.class", NodeSet.class);
-        }
-        functions = new ClassFunctions(TestFunctions.class, "test");
-        typeConverter = TypeUtils.getTypeConverter();
+    void setUp() {
+        // Back up the original type converter to ensure test isolation.
+        originalTypeConverter = TypeUtils.getTypeConverter();
     }
 
     @AfterEach
-    public void tearDown() {
-        TypeUtils.setTypeConverter(typeConverter);
-    }
-
-    private static final class Context implements ExpressionContext {
-
-        private final Object object;
-
-        public Context(final Object object) {
-            this.object = object;
-        }
-
-        @Override
-        public List<Pointer> getContextNodeList() {
-            return null;
-        }
-
-        @Override
-        public Pointer getContextNodePointer() {
-            return NodePointer.newNodePointer(null, object, Locale.getDefault());
-        }
-
-        @Override
-        public JXPathContext getJXPathContext() {
-            return null;
-        }
-
-        @Override
-        public int getPosition() {
-            return 0;
-        }
+    void tearDown() {
+        // Restore the original type converter to avoid side effects on other tests.
+        TypeUtils.setTypeConverter(originalTypeConverter);
     }
 
     @Test
-    void testStaticMethodCall() {
+    @DisplayName("Call static method via ClassFunctions prefix")
+    void callStaticMethodUsingClassFunctions() {
+        // Asserts that a static method can be called using a prefix defined by ClassFunctions.
         assertXPathValue(context, "string(test:build(8, 'goober'))", "foo=8; bar=goober");
-        // Call a static method using PackageFunctions and class name
+    }
+
+    @Test
+    @DisplayName("Call static method via PackageFunctions prefix")
+    void callStaticMethodUsingPackageFunctions() {
+        // Asserts that a static method can be called using a prefix and class name
+        // as defined by PackageFunctions.
         assertXPathValue(context, "string(jxpathtest:TestFunctions.build(8, 'goober'))", "foo=8; bar=goober");
-        // Call a static method with a fully qualified class name
-        assertXPathValue(context, "string(" + TestFunctions.class.getName() + ".build(8, 'goober'))", "foo=8; bar=goober");
-        // Two ClassFunctions are sharing the same prefix.
-        // This is TestFunctions2
+    }
+
+    @Test
+    @DisplayName("Call static method via fully qualified class name")
+    void callStaticMethodUsingFullyQualifiedClassName() {
+        // Asserts that a static method can be called using its fully qualified class name
+        // when PackageFunctions is configured with no prefix.
+        final String fqcn = TestFunctions.class.getName();
+        final String xpath = String.format("string(%s.build(8, 'goober'))", fqcn);
+        assertXPathValue(context, xpath, "foo=8; bar=goober");
+    }
+
+    @Test
+    @DisplayName("Function resolution with conflicting prefixes favors the last one added")
+    void functionResolutionWithConflictingPrefixes() {
+        // TestFunctions and TestFunctions2 both register functions with the "test:" prefix.
+        // TestFunctions2 was added last, so its 'increment' method should be resolved.
         assertXPathValue(context, "string(test:increment(8))", "9");
-        // See that a NodeSet gets properly converted to a string
+    }
+
+    @Test
+    @DisplayName("Function argument converts NodeSet to its value")
+    void functionArgumentConvertsNodeSet() {
+        // Asserts that a NodeSet passed as an argument to an extension function
+        // is correctly converted to its underlying value (in this case, a String).
         assertXPathValue(context, "test:string(/beans/name)", "Name 1");
     }
 }
