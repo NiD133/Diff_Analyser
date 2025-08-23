@@ -1,25 +1,27 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class DefaultKeyedValueDataset_ESTestTest8 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        Comparable comparable0 = defaultKeyedValueDataset0.getKey();
-        assertNull(comparable0);
+    /**
+     * Verifies that getKey() returns null for a dataset that has just been
+     * instantiated and is empty.
+     */
+    @Test
+    public void getKey_whenDatasetIsEmpty_returnsNull() {
+        // Arrange: Create a new dataset using the default constructor.
+        // This results in an empty dataset with no key or value.
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset();
+
+        // Act: Retrieve the key from the empty dataset.
+        Comparable<?> key = dataset.getKey();
+
+        // Assert: The key should be null, as no data has been set.
+        assertNull("Expected getKey() to return null for a new, empty dataset.", key);
     }
 }
