@@ -1,35 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest25 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its handling of invalid arguments.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("Rklr,bQx~YNd\"");
-        // Undeclared exception!
-        try {
-            serializedString0.appendQuotedUTF8((byte[]) null, 0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.SerializedString", e);
-        }
+    /**
+     * Verifies that the {@code appendQuotedUTF8} method throws a {@code NullPointerException}
+     * when the provided destination buffer is null. This is the expected behavior, as the
+     * method cannot write to a non-existent buffer.
+     */
+    @Test(expected = NullPointerException.class)
+    public void appendQuotedUTF8_whenBufferIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create a SerializedString instance. The actual string content is not
+        // relevant for this test case, as the check for a null buffer happens first.
+        SerializedString serializedString = new SerializedString("any-value");
+        byte[] nullBuffer = null;
+        int offset = 0;
+
+        // Act: Attempt to append the string's UTF-8 representation to a null buffer.
+        // The @Test(expected) annotation will handle the assertion.
+        serializedString.appendQuotedUTF8(nullBuffer, offset);
+
+        // Assert: The test will pass if a NullPointerException is thrown, as specified by
+        // the @Test annotation. If no exception or a different one is thrown, the test will fail.
     }
 }
