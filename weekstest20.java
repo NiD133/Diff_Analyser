@@ -1,45 +1,63 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-public class WeeksTestTest20 extends TestCase {
+/**
+ * Test case for the {@link Weeks#plus(int)} method.
+ * 
+ * This test suite verifies the behavior of adding an integer value to a Weeks object,
+ * including standard addition, handling of edge cases like adding zero, and overflow conditions.
+ */
+public class WeeksTest extends TestCase {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that adding a positive number of weeks results in a new Weeks
+     * object with the correct value, and that the original object remains unchanged (is immutable).
+     */
+    public void testPlus_int_addsValueCorrectly() {
+        // Arrange
+        final Weeks twoWeeks = Weeks.weeks(2);
+        final int weeksToAdd = 3;
+        final Weeks expectedResult = Weeks.weeks(5);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        final Weeks actualResult = twoWeeks.plus(weeksToAdd);
+
+        // Assert
+        assertEquals("2 + 3 should result in 5 weeks", expectedResult, actualResult);
+        assertEquals("Original Weeks object should be immutable", Weeks.weeks(2), twoWeeks);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    /**
+     * Tests that adding zero to a Weeks object is a no-op and returns the same instance.
+     * This confirms an optimization where no new object is created.
+     */
+    public void testPlus_int_addingZeroReturnsSameInstance() {
+        // Arrange
+        final Weeks oneWeek = Weeks.ONE;
+
+        // Act
+        final Weeks result = oneWeek.plus(0);
+
+        // Assert
+        assertSame("Adding zero should return the same instance", oneWeek, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+    /**
+     * Tests that adding a value that causes an integer overflow
+     * correctly throws an ArithmeticException.
+     */
+    public void testPlus_int_throwsExceptionOnOverflow() {
+        // Arrange
+        final Weeks maxWeeks = Weeks.MAX_VALUE;
+        final int weeksToAdd = 1;
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testPlus_int() {
-        Weeks test2 = Weeks.weeks(2);
-        Weeks result = test2.plus(3);
-        assertEquals(2, test2.getWeeks());
-        assertEquals(5, result.getWeeks());
-        assertEquals(1, Weeks.ONE.plus(0).getWeeks());
+        // Act & Assert
         try {
-            Weeks.MAX_VALUE.plus(1);
-            fail();
+            maxWeeks.plus(weeksToAdd);
+            fail("Expected an ArithmeticException to be thrown due to overflow");
         } catch (ArithmeticException ex) {
-            // expected
+            // This is the expected behavior, so the test passes.
         }
     }
 }
