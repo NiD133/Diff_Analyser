@@ -1,35 +1,30 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class Elements_ESTestTest148 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test147() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.next();
-        assertNotSame(elements1, elements0);
+    /**
+     * Tests that calling the {@link Elements#next()} method on an empty Elements
+     * collection returns a new, empty collection rather than null or the same instance.
+     */
+    @Test
+    public void nextOnEmptyElementsShouldReturnNewEmptyList() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act: Call the next() method to get the next sibling elements.
+        Elements result = emptyElements.next();
+
+        // Assert: The result should be a new, non-null, empty Elements collection.
+        assertNotNull("The result of next() should not be null.", result);
+        assertTrue("The resulting collection should be empty.", result.isEmpty());
+        assertNotSame("A new Elements instance should be returned.", emptyElements, result);
     }
 }
