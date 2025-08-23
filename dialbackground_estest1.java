@@ -1,43 +1,58 @@
 package org.jfree.chart.plot.dial;
 
+import org.jfree.chart.plot.Plot;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
 
-public class DialBackground_ESTestTest1 extends DialBackground_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-1620.962466736), (-824.5089), (-3175.7), (-3175.7));
-        FastScatterPlot fastScatterPlot0 = new FastScatterPlot();
-        JFreeChart jFreeChart0 = new JFreeChart("", fastScatterPlot0);
-        Rectangle rectangle0 = new Rectangle(10, 1);
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo((EntityCollection) null);
-        BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(1, 91, chartRenderingInfo0);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset((Number) 0.5F);
-        DialPlot dialPlot0 = new DialPlot(defaultValueDataset0);
-        dialBackground0.draw(graphics2D0, dialPlot0, rectangle0, rectangle2D_Double0);
-        assertEquals(5.0, rectangle0.getCenterX(), 0.01);
+/**
+ * Contains tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
+
+    /**
+     * Verifies that the draw method correctly fills the specified view area
+     * with the default background color (white).
+     */
+    @Test
+    public void draw_withDefaultPaint_shouldFillViewRectangleWithWhite() {
+        // Arrange
+        DialBackground dialBackground = new DialBackground(); // Default paint is Color.WHITE
+
+        // Create a test image and graphics context to draw on.
+        int imageWidth = 100;
+        int imageHeight = 100;
+        BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+
+        // Pre-fill the image with a different color to ensure the draw method is responsible for the change.
+        g2.setColor(Color.BLUE);
+        g2.fillRect(0, 0, imageWidth, imageHeight);
+
+        // Define the area where the background should be drawn.
+        Rectangle2D view = new Rectangle2D.Double(10, 20, 50, 60);
+
+        // The 'plot' and 'frame' arguments are ignored by the draw method, so we can pass nulls or dummies.
+        Plot plot = null;
+        Rectangle2D frame = new Rectangle2D.Double();
+
+        // Act
+        dialBackground.draw(g2, (DialPlot) plot, frame, view);
+
+        // Assert
+        // Check a pixel inside the view rectangle to confirm it was painted white.
+        int pixelInsideX = 25;  // 10 + 15
+        int pixelInsideY = 45;  // 20 + 25
+        assertEquals("Pixel inside the view area should be white.", Color.WHITE.getRGB(), image.getRGB(pixelInsideX, pixelInsideY));
+
+        // Check a pixel outside the view rectangle to confirm it was not changed.
+        int pixelOutsideX = 5;
+        int pixelOutsideY = 5;
+        assertEquals("Pixel outside the view area should remain unchanged.", Color.BLUE.getRGB(), image.getRGB(pixelOutsideX, pixelOutsideY));
     }
 }
