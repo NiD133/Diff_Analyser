@@ -1,38 +1,35 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest25 extends MergedStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MergedStream} class, focusing on its
+ * adherence to the {@link java.io.InputStream} contract.
+ */
+public class MergedStreamTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[12];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, 1, 1);
-        mergedStream0.reset();
+    /**
+     * Verifies that calling {@code reset()} on a {@link MergedStream} instance
+     * without a preceding call to {@code mark()} throws an {@link IOException}.
+     * This behavior is mandated by the {@link java.io.InputStream#reset()} contract.
+     */
+    @Test(expected = IOException.class)
+    public void resetWithoutMarkShouldThrowIOException() throws IOException {
+        // Arrange: Create a MergedStream. The specific contents of the buffer and
+        // underlying stream are not relevant for this test case, as we are only
+        // testing the reset() behavior.
+        byte[] buffer = new byte[8];
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]);
+        
+        // The MergedStream is created with an empty prepended buffer (start == end).
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, buffer, 1, 1);
+
+        // Act: Attempt to reset the stream without having marked it first.
+        // Assert: An IOException is expected, as declared in the @Test annotation.
+        mergedStream.reset();
     }
 }
