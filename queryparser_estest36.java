@@ -1,17 +1,23 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest36 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the CSS selector parser in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":root");
-        assertEquals(":root", evaluator0.toString());
+    @Test
+    public void parsesRootPseudoSelectorCorrectly() {
+        // Arrange: Define the CSS query for the :root pseudo-selector.
+        String query = ":root";
+
+        // Act: Parse the query to get an Evaluator.
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert: The string representation of the resulting evaluator should match the original query.
+        // This confirms that the :root pseudo-selector was parsed into the correct Evaluator type.
+        assertEquals(":root", evaluator.toString());
     }
 }
