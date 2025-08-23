@@ -1,32 +1,27 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class UtcInstant_ESTestTest32 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(86399999998838L, 86399999998838L);
-        // Undeclared exception!
-        try {
-            utcInstant0.plus((Duration) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.scale.TaiInstant", e);
-        }
+    /**
+     * Tests that the plus() method throws a NullPointerException when a null duration is provided.
+     * This adheres to the method's contract, which specifies the duration must not be null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testPlus_throwsExceptionForNullDuration() {
+        // Arrange: Create a standard UtcInstant instance. The specific value is not
+        // important for this test, so a common constant like EPOCH is used for clarity.
+        UtcInstant instant = UtcInstant.of(Instant.EPOCH);
+        Duration nullDuration = null;
+
+        // Act: Attempt to add a null duration to the instant.
+        // The test framework will assert that a NullPointerException is thrown here.
+        instant.plus(nullDuration);
     }
 }
