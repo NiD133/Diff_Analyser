@@ -1,27 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Entities_ESTestTest42 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Entities} class.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        boolean boolean0 = Entities.isNamedEntity("Racute");
-        assertTrue(boolean0);
+    /**
+     * Verifies that {@link Entities#isNamedEntity(String)} correctly identifies a valid,
+     * known HTML named entity.
+     */
+    @Test
+    public void isNamedEntity_withValidEntityName_returnsTrue() {
+        // Arrange: "Racute" is a valid HTML named entity for the character 'Ŕ'.
+        String validEntityName = "Racute";
+
+        // Act: Call the method under test.
+        boolean isEntity = Entities.isNamedEntity(validEntityName);
+
+        // Assert: The method should return true for a valid entity name.
+        assertTrue("'" + validEntityName + "' should be recognized as a valid named entity.", isEntity);
     }
 }
