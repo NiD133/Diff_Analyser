@@ -1,18 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest60 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        Seconds seconds0 = Seconds.TWO;
-        int int0 = seconds0.getSeconds();
-        assertEquals(2, int0);
+    /**
+     * Verifies that getSeconds() on the constant Seconds.TWO returns the integer value 2.
+     */
+    @Test
+    public void getSeconds_shouldReturnCorrectValueForConstantTwo() {
+        // Arrange
+        Seconds twoSeconds = Seconds.TWO;
+        int expectedSeconds = 2;
+
+        // Act
+        int actualSeconds = twoSeconds.getSeconds();
+
+        // Assert
+        assertEquals(expectedSeconds, actualSeconds);
     }
 }
