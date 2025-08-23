@@ -1,18 +1,27 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TokenQueue_ESTestTest11 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("Jkl):ip4E/0M");
-        boolean boolean0 = tokenQueue0.matches("rD@)L`r>t");
-        assertFalse(boolean0);
+    /**
+     * Verifies that {@link TokenQueue#matches(String)} returns false when the
+     * sequence at the front of the queue does not match the provided string.
+     */
+    @Test
+    public void matches_withNonMatchingSequence_shouldReturnFalse() {
+        // Arrange: Create a queue with some initial data.
+        TokenQueue queue = new TokenQueue("QueueData");
+        String nonMatchingSequence = "DifferentData";
+
+        // Act: Check if the queue starts with a sequence that is clearly different.
+        boolean result = queue.matches(nonMatchingSequence);
+
+        // Assert: The method should return false as the queue does not start with the given sequence.
+        assertFalse("Expected matches() to return false for a non-matching sequence.", result);
     }
 }
