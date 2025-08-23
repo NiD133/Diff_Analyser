@@ -1,20 +1,30 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JacksonInject_ESTestTest25 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its
+ * immutable factory methods.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.empty();
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withUseInput((Boolean) null);
-        assertSame(jacksonInject_Value1, jacksonInject_Value0);
+    /**
+     * Verifies that the wither-style method {@code withUseInput} returns the
+     * same instance if the new value is identical to the existing one.
+     * This is an important optimization for immutable objects to avoid
+     * unnecessary allocations.
+     */
+    @Test
+    public void withUseInput_whenValueIsUnchanged_shouldReturnSameInstance() {
+        // Arrange: Create an empty Value instance. By default, its 'useInput' property is null.
+        JacksonInject.Value initialValue = JacksonInject.Value.empty();
+
+        // Act: Call withUseInput with null, which does not change the object's state.
+        JacksonInject.Value resultValue = initialValue.withUseInput(null);
+
+        // Assert: The method should return the original instance, not a new one.
+        assertSame("Expected the same instance to be returned for an unchanged value",
+                initialValue, resultValue);
     }
 }
