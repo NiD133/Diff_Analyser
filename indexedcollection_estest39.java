@@ -1,67 +1,47 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest39 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Transformer<Integer, Integer> transformer0 = ExceptionTransformer.exceptionTransformer();
-        IndexedCollection<Integer, Integer> indexedCollection0 = IndexedCollection.uniqueIndexedCollection((Collection<Integer>) linkedList0, transformer0);
-        Integer integer0 = new Integer((-574));
-        linkedList0.add(integer0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link IndexedCollection} class.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that if the key transformer throws an exception during an addAll operation,
+     * the exception is propagated to the caller.
+     */
+    @Test
+    public void addAllShouldPropagateExceptionFromKeyTransformer() {
+        // Arrange
+        // 1. Create a transformer that always throws a RuntimeException.
+        final Transformer<Integer, Integer> exceptionThrowingTransformer =
+                ExceptionTransformer.exceptionTransformer();
+
+        // 2. Create an IndexedCollection using this transformer.
+        //    The decorated collection is initially empty.
+        final IndexedCollection<Integer, Integer> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(new LinkedList<>(), exceptionThrowingTransformer);
+
+        // 3. Create a collection with an element to add.
+        final Collection<Integer> elementsToAdd = Collections.singletonList(-574);
+
+        // Act & Assert
         try {
-            indexedCollection0.addAll(linkedList0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionTransformer invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionTransformer", e);
+            indexedCollection.addAll(elementsToAdd);
+            fail("Expected a RuntimeException to be thrown by the ExceptionTransformer.");
+        } catch (final RuntimeException e) {
+            // Verify that the caught exception is the one thrown by the transformer.
+            assertEquals("ExceptionTransformer invoked", e.getMessage());
         }
     }
 }
