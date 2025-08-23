@@ -1,31 +1,47 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
 import org.mockito.internal.stubbing.InvocationContainerImpl;
-import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest15 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(2161L, 2161L, noMoreInteractions0, false);
-        MockSettingsImpl<Object> mockSettingsImpl0 = new MockSettingsImpl<Object>();
-        InvocationContainerImpl invocationContainerImpl0 = new InvocationContainerImpl(mockSettingsImpl0);
-        VerificationDataImpl verificationDataImpl0 = new VerificationDataImpl(invocationContainerImpl0, (InvocationMatcher) null);
-        // Undeclared exception!
-        verificationOverTimeImpl0.verify(verificationDataImpl0);
+/**
+ * This test case focuses on how VerificationOverTimeImpl handles exceptions
+ * from its delegate verification mode.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * Verifies that the verify() method propagates a NullPointerException when the
+     * delegated VerificationMode (NoMoreInteractions) fails due to invalid VerificationData.
+     *
+     * <p><b>Scenario:</b> The {@link VerificationData} is created with a null {@code InvocationMatcher}.
+     * The {@link NoMoreInteractions} mode does not support this and will throw a
+     * {@code NullPointerException} when its verify method is called. This test ensures that
+     * {@code VerificationOverTimeImpl} correctly propagates this underlying exception.
+     */
+    @Test
+    public void verifyShouldPropagateNPEWhenDelegateFailsOnNullInvocationMatcher() {
+        // Arrange
+        long durationMillis = 100L;
+        long pollingPeriodMillis = 10L;
+        VerificationMode delegateMode = new NoMoreInteractions();
+
+        // The system under test, configured to poll the delegate mode.
+        VerificationOverTimeImpl verificationOverTime =
+            new VerificationOverTimeImpl(pollingPeriodMillis, durationMillis, delegateMode, false);
+
+        // Create verification data with a null InvocationMatcher, which will cause the delegate to fail.
+        InvocationContainerImpl emptyInvocationContainer = new InvocationContainerImpl(new MockSettingsImpl<>());
+        VerificationDataImpl verificationDataWithNullMatcher = new VerificationDataImpl(emptyInvocationContainer, null);
+
+        // Act & Assert
+        // We expect a NullPointerException because the NoMoreInteractions delegate cannot handle
+        // a null InvocationMatcher from the verification data.
+        assertThrows(NullPointerException.class, () -> {
+            verificationOverTime.verify(verificationDataWithNullMatcher);
+        });
     }
 }
