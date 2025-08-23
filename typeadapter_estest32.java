@@ -1,35 +1,33 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest32 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeAdapter} class, focusing on the behavior of the
+ * {@link TypeAdapter#nullSafe()} wrapper.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        // Undeclared exception!
-        try {
-            typeAdapter0.write((JsonWriter) null, (Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.TypeAdapter$NullSafeTypeAdapter", e);
-        }
+    /**
+     * Verifies that calling {@code write} on a null-safe adapter with a null {@link JsonWriter}
+     * results in a {@link NullPointerException}.
+     *
+     * <p>The internal {@code NullSafeTypeAdapter} implementation first checks if the value to be
+     * written is null. If it is, it immediately tries to call {@code out.nullValue()}. When the
+     * provided {@code JsonWriter} instance ('out') is null, this invocation causes the NPE.
+     */
+    @Test(expected = NullPointerException.class)
+    public void writeOnNullSafeAdapterWithNullWriterThrowsNPE() throws IOException {
+        // Arrange: Create a base TypeAdapter and wrap it to be null-safe.
+        // Gson.FutureTypeAdapter is a convenient, existing concrete implementation.
+        TypeAdapter<Object> delegateAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+
+        // Act & Assert: Call write with a null JsonWriter.
+        // The value being written is also null to ensure the null-handling branch
+        // within the null-safe adapter is executed.
+        nullSafeAdapter.write(null, null);
     }
 }
