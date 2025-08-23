@@ -1,34 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class TaiInstant_ESTestTest29 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the TaiInstant class.
+ * This test focuses on handling null arguments in the plus() method.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        // Undeclared exception!
-        try {
-            taiInstant0.plus((Duration) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.scale.TaiInstant", e);
-        }
+    /**
+     * Tests that calling plus() with a null Duration throws a NullPointerException.
+     * The contract of the plus(Duration) method specifies that the duration must not be null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void plus_whenDurationIsNull_throwsNullPointerException() {
+        // Arrange: Create a TaiInstant instance. The specific value is not important.
+        TaiInstant instant = TaiInstant.ofTaiSeconds(0L, 0L);
+        Duration nullDuration = null;
+
+        // Act: Attempt to add a null duration to the instant.
+        // The test expects this line to throw a NullPointerException.
+        instant.plus(nullDuration);
+
+        // Assert: The expected exception is verified by the @Test(expected=...) annotation.
     }
 }
