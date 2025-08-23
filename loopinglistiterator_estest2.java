@@ -1,28 +1,33 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link LoopingListIterator#size()} method.
+ */
+// The original test class name and hierarchy are preserved.
 public class LoopingListIterator_ESTestTest2 extends LoopingListIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Integer integer0 = new Integer(0);
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        linkedList0.add(integer0);
-        LoopingListIterator<Integer> loopingListIterator0 = new LoopingListIterator<Integer>(linkedList0);
-        int int0 = loopingListIterator0.size();
-        assertEquals(1, int0);
+    /**
+     * Tests that the size() method returns the correct number of elements
+     * for an iterator based on a non-empty list.
+     */
+    @Test
+    public void testSizeReturnsCorrectSizeForNonEmptyList() {
+        // Arrange: Create a list with a single element.
+        final List<Integer> list = new LinkedList<>();
+        list.add(42); // Use a distinct value to avoid confusion with indices or counts.
+
+        final LoopingListIterator<Integer> iterator = new LoopingListIterator<>(list);
+
+        // Act: Get the size from the iterator.
+        final int actualSize = iterator.size();
+
+        // Assert: The iterator's size should match the underlying list's size.
+        assertEquals("The iterator's size should be 1 for a list with one element.", 1, actualSize);
     }
 }
