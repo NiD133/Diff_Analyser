@@ -2,34 +2,47 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest52 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This class contains a test for the {@link LinkedTreeMap#removeInternal(LinkedTreeMap.Node, boolean)} method.
+ */
+public class LinkedTreeMapInternalRemoveTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap0 = new LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer>();
-        LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap_Node0 = new LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, Integer>(true);
-        LinkedTreeMap<Integer, Integer> linkedTreeMap1 = new LinkedTreeMap<Integer, Integer>();
-        LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap_Node1 = new LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, Integer>(true, linkedTreeMap_Node0, linkedTreeMap1, linkedTreeMap_Node0, linkedTreeMap_Node0);
-        // Undeclared exception!
+    /**
+     * Tests that {@link LinkedTreeMap#removeInternal(LinkedTreeMap.Node, boolean)} throws an
+     * {@link AssertionError} when trying to remove a node whose parent-child link is inconsistent.
+     *
+     * <p>The {@code removeInternal} method relies on the tree's internal consistency. It assumes
+     * that if a node has a parent, that parent node must in turn have a reference to the node as
+     * either its left or right child.
+     *
+     * <p>This test manually constructs a node that violates this assumption: the node has a parent
+     * reference, but the parent does not have a corresponding child reference. Calling
+     * {@code removeInternal} on this node is expected to trigger an internal assertion check and
+     * fail.
+     */
+    @Test
+    public void removeInternal_whenNodeIsNotChildOfItsParent_throwsAssertionError() {
+        // Arrange: Create a map and a node with an inconsistent parent-child relationship.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+
+        // Create a standalone node to act as a "fake" parent. This node is not part of the map's tree.
+        LinkedTreeMap.Node<String, Integer> fakeParent = new LinkedTreeMap.Node<>(true);
+
+        // Create the node to be removed. We manually link it to `fakeParent`.
+        // Crucially, `fakeParent` does not have a corresponding `left` or `right` child
+        // reference pointing back to this node. This creates the inconsistent state.
+        LinkedTreeMap.Node<String, Integer> nodeToRemove =
+            new LinkedTreeMap.Node<>(true, fakeParent, "some-key", fakeParent, fakeParent);
+
+        // Act & Assert: Attempting to remove the node with the broken link should throw an AssertionError.
         try {
-            linkedTreeMap0.removeInternal(linkedTreeMap_Node1, true);
-            fail("Expecting exception: AssertionError");
+            map.removeInternal(nodeToRemove, true);
+            fail("Expected an AssertionError due to the inconsistent parent-child link.");
         } catch (AssertionError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // This is the expected outcome.
+            // The original test's comment indicated the exception has no message.
+            assertNull("The AssertionError should not have a message.", e.getMessage());
         }
     }
 }
