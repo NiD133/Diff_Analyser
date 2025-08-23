@@ -1,39 +1,37 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest5 {
+/**
+ * Tests for {@link URLCodec}.
+ */
+// The class name has been simplified from "URLCodecTestTest5" to "URLCodecTest"
+// to follow standard naming conventions and improve readability.
+class URLCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
-    }
+    // The unused static fields (SWISS_GERMAN_STUFF_UNICODE, RUSSIAN_STUFF_UNICODE)
+    // and helper methods (constructString, validateState) have been removed.
+    // They were not used by any test, adding clutter and making the code harder
+    // to understand. A test class should only contain code relevant to its tests.
 
     @Test
-    void testDecodeStringWithNull() throws Exception {
+    // The test method name now clearly describes the scenario and expected outcome.
+    // The unnecessary "throws Exception" clause was removed, as the code path for a
+    // null input is not expected to throw any exceptions.
+    void decodeWithNullStringShouldReturnNull() {
+        // Arrange
         final URLCodec urlCodec = new URLCodec();
-        final String test = null;
-        final String result = urlCodec.decode(test, "charset");
-        assertNull(result, "Result should be null");
+        final String nullInput = null;
+
+        // Act
+        // The decode method returns null immediately if the input string is null.
+        // We pass a valid charset name for correctness, although it is not used in this case.
+        final String result = urlCodec.decode(nullInput, StandardCharsets.UTF_8.name());
+
+        // Assert
+        assertNull(result, "Decoding a null string should return null.");
     }
 }
