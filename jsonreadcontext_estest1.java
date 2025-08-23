@@ -1,29 +1,38 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest1 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(187, 187, dupDetector0);
-        JsonReadContext jsonReadContext1 = new JsonReadContext(jsonReadContext0, dupDetector0, (-499), (-499), (-499));
-        boolean boolean0 = jsonReadContext1.expectComma();
-        assertEquals(1, jsonReadContext1.getEntryCount());
-        assertFalse(boolean0);
+/**
+ * Unit tests for the {@link JsonReadContext} class.
+ */
+public class JsonReadContextTest {
+
+    /**
+     * Tests that a comma is not expected before the first element in a new context.
+     * The `expectComma()` method should return false on its first invocation for a given context.
+     */
+    @Test
+    public void expectComma_shouldReturnFalse_forFirstElementInNewContext() {
+        // Arrange: Create a parent context and then a new child (array) context.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonReadContext rootContext = JsonReadContext.createRootContext(dupDetector);
+        JsonReadContext arrayContext = rootContext.createChildArrayContext(1, 10);
+
+        // A new context should have an entry count of 0.
+        assertEquals("Pre-condition: A new context should have zero entries.", 0, arrayContext.getEntryCount());
+
+        // Act: Call the method under test.
+        boolean commaExpected = arrayContext.expectComma();
+
+        // Assert: Verify the behavior.
+        // A comma is never expected before the first element.
+        assertFalse("A comma should not be expected for the first element.", commaExpected);
+        
+        // The call to expectComma() increments the internal counter.
+        assertEquals("Post-condition: Entry count should be 1 after the first check.", 1, arrayContext.getEntryCount());
     }
 }
