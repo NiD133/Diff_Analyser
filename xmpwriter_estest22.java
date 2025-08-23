@@ -1,45 +1,38 @@
 package com.itextpdf.text.xml.xmp;
 
+import com.itextpdf.xmp.XMPException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest22 extends XmpWriter_ESTest_scaffolding {
+/**
+ * This test verifies the behavior of the {@link XmpWriter#addDocInfoProperty(Object, String)} method.
+ */
+public class XmpWriterTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "Producer", (-1));
-        xmpWriter0.addDocInfoProperty("Producer", "illegal.p.value");
+    /**
+     * Tests that setting the "Producer" document information property
+     * executes successfully without throwing an exception.
+     * <p>
+     * This ensures that the method correctly handles one of the standard
+     * document information dictionary keys.
+     * </p>
+     */
+    @Test
+    public void addDocInfoProperty_withProducerKey_shouldNotThrowException() throws XMPException, IOException {
+        // Arrange: Create an XmpWriter instance.
+        // A null OutputStream is acceptable here because the test does not serialize the XMP data.
+        // The encoding ("Producer") and extraSpace (-1) values are unusual but retained from the
+        // original auto-generated test case.
+        XmpWriter xmpWriter = new XmpWriter((OutputStream) null, "Producer", -1);
+        String producerKey = "Producer";
+        String producerValue = "My Custom PDF Producer";
+
+        // Act: Call the method under test to set the "Producer" property.
+        xmpWriter.addDocInfoProperty(producerKey, producerValue);
+
+        // Assert: The test passes if the 'Act' phase completes without throwing an exception.
+        // No explicit assertion is needed for this type of test.
     }
 }
