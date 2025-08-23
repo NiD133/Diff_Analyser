@@ -1,20 +1,28 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CopticChronology_ESTestTest12 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CopticChronology}.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-        int int0 = copticChronology0.getMinYear();
-        assertEquals((-292269337), int0);
+    /**
+     * Tests that getMinYear() returns the correct, documented minimum supported year.
+     */
+    @Test
+    public void getMinYear_shouldReturnCorrectMinimumSupportedYear() {
+        // Arrange
+        // The expected minimum year is defined as a private constant in CopticChronology.
+        final int expectedMinYear = -292269337;
+        CopticChronology copticChronology = CopticChronology.getInstanceUTC();
+
+        // Act
+        int actualMinYear = copticChronology.getMinYear();
+
+        // Assert
+        assertEquals("The minimum year should match the defined constant.",
+                expectedMinYear, actualMinYear);
     }
 }
