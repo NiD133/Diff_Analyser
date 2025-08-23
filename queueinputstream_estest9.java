@@ -1,33 +1,31 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueueInputStream_ESTestTest9 extends QueueInputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        QueueInputStream queueInputStream0 = new QueueInputStream();
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            queueInputStream0.read(byteArray0, 2005, 2005);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Range [2005, 2005 + 2005) out of bounds for length 0
-            //
-            verifyException("org.apache.commons.io.input.QueueInputStream", e);
-        }
+/**
+ * Tests for {@link QueueInputStream}.
+ */
+public class QueueInputStreamTest {
+
+    /**
+     * Tests that calling read() with an offset that is outside the bounds of the
+     * destination buffer correctly throws an IndexOutOfBoundsException.
+     */
+    @Test
+    public void testReadWithBufferThrowsExceptionForOutOfBoundsOffset() {
+        // Arrange
+        final QueueInputStream inputStream = new QueueInputStream();
+        final byte[] emptyBuffer = new byte[0];
+        final int outOfBoundsOffset = 1;
+        final int anyLength = 1;
+
+        // Act & Assert
+        // The read method should throw an exception because the offset (1) is
+        // greater than the buffer's length (0).
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            inputStream.read(emptyBuffer, outOfBoundsOffset, anyLength);
+        });
     }
 }
