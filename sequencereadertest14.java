@@ -1,74 +1,50 @@
 package org.apache.commons.io.input;
 
-import static org.apache.commons.io.IOUtils.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest14 {
+/**
+ * Tests for the skip() functionality of {@link SequenceReader}.
+ */
+public class SequenceReaderTest {
 
-    private static final char NUL = 0;
-
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
-
-    private void checkRead(final Reader reader, final String expected) throws IOException {
+    /**
+     * Verifies that the content of the given reader matches the expected string.
+     *
+     * @param reader   The reader to read from.
+     * @param expected The expected string content.
+     * @throws IOException if an I/O error occurs.
+     */
+    private void assertReaderContentEquals(final Reader reader, final String expected) throws IOException {
         for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
-
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
-
-    private static class CustomReader extends Reader {
-
-        boolean closed;
-
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
+            assertEquals(expected.charAt(i), (char) reader.read(), "Character at index " + i + " should match.");
         }
     }
 
     @Test
-    void testSkip() throws IOException {
-        try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
-            assertEquals(3, reader.skip(3));
-            checkRead(reader, "Bar");
-            assertEquals(0, reader.skip(3));
+    void whenSkipCrossesReaderBoundary_thenNextReadIsFromSecondReader() throws IOException {
+        // Arrange: Create a SequenceReader from two separate StringReaders.
+        final String firstReaderContent = "Foo";
+        final String secondReaderContent = "Bar";
+        final Reader reader1 = new StringReader(firstReaderContent);
+        final Reader reader2 = new StringReader(secondReaderContent);
+
+        try (Reader sequenceReader = new SequenceReader(reader1, reader2)) {
+            // Act: Skip the exact length of the first reader's content.
+            final long skippedChars = sequenceReader.skip(firstReaderContent.length());
+
+            // Assert: The correct number of characters were skipped, and the
+            // subsequent read operation correctly pulls from the second reader.
+            assertEquals(firstReaderContent.length(), skippedChars, "Should skip all characters of the first reader.");
+            assertReaderContentEquals(sequenceReader, secondReaderContent);
+
+            // Act & Assert: Attempting to skip again at the end of the stream should result in zero skipped characters.
+            final long extraSkippedChars = sequenceReader.skip(10);
+            assertEquals(0, extraSkippedChars, "Should not skip any characters once the stream is exhausted.");
         }
     }
 }
