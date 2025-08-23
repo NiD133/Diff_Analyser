@@ -1,35 +1,31 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
+import static org.junit.Assert.assertEquals;
+
+import org.joda.time.DateTimeField;
 import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest18 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+/**
+ * Provides unit tests for the {@link PreciseDurationDateTimeField} class.
+ * <p>
+ * Since PreciseDurationDateTimeField is abstract, its behavior is tested
+ * through a concrete implementation, such as the millisOfSecond field
+ * from a standard chronology.
+ */
+public class PreciseDurationDateTimeFieldTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        LocalTime localTime0 = LocalTime.MIDNIGHT;
-        String string0 = localTime0.toString();
-        assertEquals("00:00:00.000", string0);
+    @Test
+    public void getUnitMillis_forMillisOfSecondField_returnsOne() {
+        // Arrange: Obtain a concrete instance of PreciseDurationDateTimeField.
+        // The millisOfSecond field from GJChronology serves as a representative example.
+        DateTimeField field = GJChronology.getInstanceUTC().millisOfSecond();
+        PreciseDurationDateTimeField preciseField = (PreciseDurationDateTimeField) field;
+
+        // Act: Call the method under test.
+        long unitMillis = preciseField.getUnitMillis();
+
+        // Assert: The unit for the millisOfSecond field must be 1 millisecond.
+        assertEquals("The unit millis for millisOfSecond should be 1", 1L, unitMillis);
     }
 }
