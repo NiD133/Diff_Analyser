@@ -1,38 +1,29 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LabelBlock_ESTestTest2 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        labelBlock0.setURLText("");
-        String string0 = labelBlock0.getURLText();
-        assertEquals("", string0);
+    /**
+     * Verifies that the URL text set on a LabelBlock can be retrieved correctly.
+     * This test covers the basic functionality of the setURLText() and getURLText() methods.
+     */
+    @Test
+    public void testSetAndGetURLText() {
+        // Arrange: Create a LabelBlock instance and define the expected URL.
+        LabelBlock labelBlock = new LabelBlock("A sample label");
+        String expectedUrl = "https://www.jfree.org/jfreechart/";
+
+        // Act: Set the URL text and then retrieve it.
+        labelBlock.setURLText(expectedUrl);
+        String actualUrl = labelBlock.getURLText();
+
+        // Assert: Verify that the retrieved URL matches the expected URL.
+        assertEquals("The retrieved URL should match the one that was set.",
+                expectedUrl, actualUrl);
     }
 }
