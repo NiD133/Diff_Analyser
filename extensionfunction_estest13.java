@@ -1,35 +1,31 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ExtensionFunction_ESTestTest13 extends ExtensionFunction_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        QName qName0 = new QName("org.apache.commons.jxpath.ri.compiler.ExtensionFunction");
-        ExtensionFunction extensionFunction0 = new ExtensionFunction(qName0, (Expression[]) null);
-        QName qName1 = extensionFunction0.getFunctionName();
-        assertSame(qName1, qName0);
+/**
+ * Unit tests for the {@link ExtensionFunction} class.
+ */
+public class ExtensionFunctionTest {
+
+    /**
+     * Verifies that getFunctionName() returns the same QName instance
+     * that was provided to the constructor.
+     */
+    @Test
+    public void getFunctionNameShouldReturnTheNameSetInConstructor() {
+        // Arrange: Create a QName for the function and instantiate ExtensionFunction.
+        QName expectedFunctionName = new QName("test:my-function");
+        Expression[] noArguments = null; // The function has no arguments for this test.
+        ExtensionFunction extensionFunction = new ExtensionFunction(expectedFunctionName, noArguments);
+
+        // Act: Call the method under test.
+        QName actualFunctionName = extensionFunction.getFunctionName();
+
+        // Assert: Verify that the returned QName is the exact same instance.
+        assertSame("The getter should return the identical QName instance passed to the constructor.",
+                expectedFunctionName, actualFunctionName);
     }
 }
