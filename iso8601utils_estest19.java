@@ -1,31 +1,40 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class ISO8601Utils_ESTestTest19 extends ISO8601Utils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition(0);
+/**
+ * Test suite for {@link ISO8601Utils}, focusing on parsing failure scenarios.
+ */
+public class ISO8601UtilsTest {
+
+    /**
+     * Verifies that parsing a date string with an excessively long year throws a ParseException.
+     *
+     * <p>The ISO 8601 standard expects a 4-digit year. This test provides a 9-digit year,
+     * which causes the parser to fail when it encounters an unexpected character after
+     * consuming what it believes to be a complete date-only value.
+     */
+    @Test
+    public void parse_withInvalidYearFormat_shouldThrowParseException() {
+        // Arrange: Define an invalid ISO 8601 date string and a starting position.
+        // The year '190690348' is invalid as it exceeds the expected 4-digit length.
+        String invalidDateString = "190690348-12-04T21:42:26Z";
+        ParsePosition position = new ParsePosition(0);
+
+        // Act & Assert: Attempt to parse the string and verify the correct exception is thrown.
         try {
-            ISO8601Utils.parse("190690348-12-04T21:42:26Z", parsePosition0);
-            fail("Expecting exception: ParseException");
+            ISO8601Utils.parse(invalidDateString, position);
+            fail("A ParseException was expected but not thrown.");
         } catch (ParseException e) {
-            //
-            // Failed to parse date [\"190690348-12-04T21:42:26Z\"]: Invalid time zone indicator '8'
-            //
-            verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
+            // The parser fails at index 8 (the character '8') because it expects a timezone indicator.
+            String expectedMessage = "Failed to parse date [\"" + invalidDateString + "\"]: Invalid time zone indicator '8'";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
