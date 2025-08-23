@@ -1,40 +1,28 @@
 package org.apache.commons.compress.compressors.gzip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
 public class GzipCompressorOutputStream_ESTestTest5 extends GzipCompressorOutputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        byte[] byteArray0 = new byte[0];
-        gzipCompressorOutputStream0.close();
+    @Test
+    public void writeAfterCloseThrowsIOException() throws IOException {
+        // Arrange: Create a GzipCompressorOutputStream and then close it.
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(byteArrayOutputStream);
+        gzipOutputStream.close();
+
+        // Act & Assert: Attempting to write to the closed stream should fail.
         try {
-            gzipCompressorOutputStream0.write(byteArray0, 2860, 2860);
-            fail("Expecting exception: IOException");
+            gzipOutputStream.write(new byte[1], 0, 1);
+            fail("Expected an IOException to be thrown when writing to a closed stream.");
         } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("org.apache.commons.compress.CompressFilterOutputStream", e);
+            // Verify that the exception has the expected message.
+            assertEquals("Stream closed", e.getMessage());
         }
     }
 }
