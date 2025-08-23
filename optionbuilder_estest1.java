@@ -1,18 +1,28 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class OptionBuilder_ESTestTest1 extends OptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the deprecated {@link OptionBuilder} class.
+ */
+public class OptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Class<String> class0 = String.class;
-        OptionBuilder optionBuilder0 = OptionBuilder.withType((Object) class0);
-        assertNotNull(optionBuilder0);
+    /**
+     * Tests that the deprecated {@code withType(Object)} method returns a non-null
+     * OptionBuilder instance, ensuring backward compatibility is maintained.
+     */
+    @Test
+    public void withType_usingDeprecatedObjectArgument_shouldReturnBuilderInstance() {
+        // Arrange
+        // The cast to Object is necessary to specifically invoke the deprecated
+        // method signature `withType(Object)` instead of `withType(Class<?>)`.
+        Object optionType = String.class;
+
+        // Act
+        OptionBuilder builder = OptionBuilder.withType(optionType);
+
+        // Assert
+        assertNotNull("The builder instance should not be null", builder);
     }
 }
