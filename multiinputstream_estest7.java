@@ -1,41 +1,48 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
+import static org.junit.Assert.fail;
+
+import com.google.common.io.ByteSource;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.List;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest7 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ArrayList<ByteSource> arrayList0 = new ArrayList<ByteSource>();
-        ByteSource byteSource0 = ByteSource.empty();
-        arrayList0.add(byteSource0);
-        ListIterator<ByteSource> listIterator0 = arrayList0.listIterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(listIterator0);
-        LinkedHashSet<ByteSource> linkedHashSet0 = new LinkedHashSet<ByteSource>();
-        linkedHashSet0.add(byteSource0);
-        arrayList0.addAll((Collection<? extends ByteSource>) linkedHashSet0);
-        // Undeclared exception!
+    /**
+     * Verifies that the MultiInputStream fails with a ConcurrentModificationException
+     * if the underlying collection that provides the iterator is modified after the
+     * stream has been created. This demonstrates the stream's adherence to the
+     * fail-fast behavior of Java's collection iterators.
+     */
+    @Test
+    public void read_whenBackingCollectionIsModified_throwsConcurrentModificationException() throws IOException {
+        // Arrange: Create a MultiInputStream from an iterator over a list of ByteSources.
+        List<ByteSource> byteSources = new ArrayList<>();
+        byteSources.add(ByteSource.empty());
+
+        Iterator<ByteSource> iterator = byteSources.iterator();
+        // The MultiInputStream constructor calls iterator.next() to open the first stream.
+        MultiInputStream multiStream = new MultiInputStream(iterator);
+
+        // Act: Modify the underlying list *after* the iterator has been created and used.
+        // This invalidates the iterator's state for any subsequent operations.
+        byteSources.add(ByteSource.empty());
+
+        // Assert: Expect a ConcurrentModificationException when trying to read from the stream.
+        // Reading from the initial empty source returns -1, causing MultiInputStream to advance
+        // to the next source. The subsequent call to iterator.hasNext() will then fail.
         try {
-            multiInputStream0.read();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayList$Itr", e);
+            multiStream.read();
+            fail("Expected ConcurrentModificationException was not thrown.");
+        } catch (ConcurrentModificationException expected) {
+            // Test passes: the expected exception was caught.
         }
     }
 }
