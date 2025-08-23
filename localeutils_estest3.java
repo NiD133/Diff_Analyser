@@ -1,28 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class LocaleUtils_ESTestTest3 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that toLocale() throws an IllegalArgumentException when given a string
+     * that does not conform to the expected "language_country_variant" format.
+     */
+    @Test
+    public void toLocaleShouldThrowIllegalArgumentExceptionForInvalidFormat() {
+        // Arrange: Define an input string that is not a valid locale format.
+        // The string "íslenska" is the Icelandic word for "Icelandic".
+        final String invalidLocaleString = "\u00EDslenska";
+        final String expectedMessage = "Invalid locale format: " + invalidLocaleString;
+
+        // Act & Assert
         try {
-            LocaleUtils.toLocale("\u00EDslenska");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: \u00EDslenska
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
+            LocaleUtils.toLocale(invalidLocaleString);
+            fail("Expected an IllegalArgumentException to be thrown for invalid format.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message is correct, as it provides
+            // useful feedback to the developer using the LocaleUtils class.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
