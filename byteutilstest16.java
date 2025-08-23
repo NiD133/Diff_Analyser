@@ -1,27 +1,32 @@
 package org.apache.commons.compress.utils;
 
 import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.util.Arrays;
 import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest16 {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+class ByteUtilsTest {
 
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(ByteUtils.ByteSupplier, int)} throws an
+     * IllegalArgumentException if the requested length is greater than 8, which is the
+     * size of a long.
+     */
     @Test
-    void testFromLittleEndianFromSupplierThrowsForLengthTooBig() {
-        assertThrows(IllegalArgumentException.class, () -> fromLittleEndian(new InputStreamByteSupplier(new ByteArrayInputStream(ByteUtils.EMPTY_BYTE_ARRAY)), 9));
+    void fromLittleEndianWithSupplierShouldThrowForLengthGreaterThanEight() {
+        // Arrange
+        // The length check happens before any bytes are read, so an empty supplier is sufficient.
+        final InputStreamByteSupplier supplier = new InputStreamByteSupplier(
+                new ByteArrayInputStream(ByteUtils.EMPTY_BYTE_ARRAY));
+        final int invalidLength = 9; // A long is 8 bytes, so 9 is an invalid length.
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> fromLittleEndian(supplier, invalidLength),
+                "Should throw an exception for a length greater than 8.");
     }
 }
