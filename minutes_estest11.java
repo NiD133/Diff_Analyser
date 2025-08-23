@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest11 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Minutes minutes0 = Minutes.ONE;
-        Duration duration0 = minutes0.toStandardDuration();
-        assertEquals(60000L, duration0.getMillis());
+    /**
+     * Tests that converting {@link Minutes#ONE} to a standard duration results in the
+     * correct number of milliseconds (60,000).
+     */
+    @Test
+    public void toStandardDuration_forOneMinute_returnsCorrectDurationInMilliseconds() {
+        // Arrange
+        Minutes oneMinute = Minutes.ONE;
+        long expectedMilliseconds = DateTimeConstants.MILLIS_PER_MINUTE;
+
+        // Act
+        Duration duration = oneMinute.toStandardDuration();
+
+        // Assert
+        assertEquals("One minute should be equivalent to 60,000 milliseconds",
+                     expectedMilliseconds, duration.getMillis());
     }
 }
