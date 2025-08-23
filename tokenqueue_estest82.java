@@ -1,18 +1,22 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TokenQueue_ESTestTest82 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test81() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("%>-8wJ/e4'{T9H");
-        boolean boolean0 = tokenQueue0.matches('2');
-        assertFalse(boolean0);
+    @Test
+    public void matchesCharShouldReturnFalseWhenNextCharDoesNotMatch() {
+        // Arrange: Create a queue that starts with a '%' character.
+        TokenQueue queue = new TokenQueue("%>-8wJ/e4'{T9H");
+
+        // Act: Check if the queue starts with a '2', which it does not.
+        boolean result = queue.matches('2');
+
+        // Assert: The result should be false because the first character is not '2'.
+        assertFalse("The queue should not match a character that is not at the current position.", result);
     }
 }
