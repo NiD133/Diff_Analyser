@@ -1,40 +1,36 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest20 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        // Undeclared exception!
-        try {
-            shapeCollection0.get(1341);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 1341, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+/**
+ * Contains tests for the ShapeCollection class, focusing on method contracts and
+ * exception handling.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Verifies that calling get() on an empty ShapeCollection with any index
+     * throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getShouldThrowIndexOutOfBoundsExceptionForInvalidIndex() {
+        // Arrange: Create an empty ShapeCollection.
+        // The collection is backed by an empty list, so any index will be out of bounds.
+        List<Shape> emptyShapeList = new ArrayList<>();
+        SpatialContext spatialContext = SpatialContext.GEO;
+        ShapeCollection<Shape> emptyCollection = new ShapeCollection<>(emptyShapeList, spatialContext);
+
+        // Act: Attempt to access an element at an index that does not exist.
+        // The original test used a large arbitrary index (1341). Using 0 is
+        // sufficient and clearer for demonstrating the error on an empty collection.
+        emptyCollection.get(0);
+
+        // Assert: The test expects an IndexOutOfBoundsException, which is declared
+        // in the @Test annotation. The test will pass if this exception is thrown
+        // and fail otherwise.
     }
 }
