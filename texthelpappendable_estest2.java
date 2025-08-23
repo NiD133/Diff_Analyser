@@ -1,47 +1,24 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest2 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        char[] charArray0 = new char[6];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        textHelpAppendable0.appendHeader(1, charBuffer0);
-        assertEquals(1, textHelpAppendable0.getLeftPad());
-        assertEquals(3, textHelpAppendable0.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
+    @Test
+    public void systemOutShouldCreateInstanceWithDefaultFormattingValues() {
+        // Arrange & Act: Create a TextHelpAppendable instance using the factory method.
+        TextHelpAppendable helpFormatter = TextHelpAppendable.systemOut();
+
+        // Assert: Verify that the instance is configured with the default formatting values.
+        assertEquals("Default left pad should be set correctly",
+                     TextHelpAppendable.DEFAULT_LEFT_PAD, helpFormatter.getLeftPad());
+        assertEquals("Default indent should be set correctly",
+                     TextHelpAppendable.DEFAULT_INDENT, helpFormatter.getIndent());
+        assertEquals("Default max width should be set correctly",
+                     TextHelpAppendable.DEFAULT_WIDTH, helpFormatter.getMaxWidth());
     }
 }
