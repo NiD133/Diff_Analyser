@@ -1,42 +1,64 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest4 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the factory method {@link Minutes#minutesBetween(ReadablePartial, ReadablePartial)}.
+ */
+public class MinutesTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void minutesBetween_shouldReturnPositiveMinutes_whenEndIsAfterStart() {
+        // Arrange
+        LocalTime startTime = new LocalTime(12, 3);
+        LocalTime endTime = new LocalTime(12, 6);
+
+        // Act
+        Minutes result = Minutes.minutesBetween(startTime, endTime);
+
+        // Assert
+        assertEquals(3, result.getMinutes());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void minutesBetween_shouldReturnZeroMinutes_whenStartAndEndAreSame() {
+        // Arrange
+        LocalTime time = new LocalTime(12, 3);
+
+        // Act
+        Minutes result = Minutes.minutesBetween(time, time);
+
+        // Assert
+        assertEquals(0, result.getMinutes());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void minutesBetween_shouldReturnNegativeMinutes_whenStartIsAfterEnd() {
+        // Arrange
+        LocalTime startTime = new LocalTime(12, 6);
+        LocalTime endTime = new LocalTime(12, 3);
+
+        // Act
+        Minutes result = Minutes.minutesBetween(startTime, endTime);
+
+        // Assert
+        assertEquals(-3, result.getMinutes());
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test
+    @SuppressWarnings("deprecation") // Testing interoperability with deprecated TimeOfDay
+    public void minutesBetween_shouldCalculateCorrectly_forDifferentReadablePartialTypes() {
+        // Arrange
+        LocalTime startTime = new LocalTime(12, 3);
+        // TimeOfDay is a deprecated ReadablePartial implementation.
+        TimeOfDay endTime = new TimeOfDay(12, 9);
 
-    public void testFactory_minutesBetween_RPartial() {
-        LocalTime start = new LocalTime(12, 3);
-        LocalTime end1 = new LocalTime(12, 6);
-        @SuppressWarnings("deprecation")
-        TimeOfDay end2 = new TimeOfDay(12, 9);
-        assertEquals(3, Minutes.minutesBetween(start, end1).getMinutes());
-        assertEquals(0, Minutes.minutesBetween(start, start).getMinutes());
-        assertEquals(0, Minutes.minutesBetween(end1, end1).getMinutes());
-        assertEquals(-3, Minutes.minutesBetween(end1, start).getMinutes());
-        assertEquals(6, Minutes.minutesBetween(start, end2).getMinutes());
+        // Act
+        Minutes result = Minutes.minutesBetween(startTime, endTime);
+
+        // Assert
+        assertEquals(6, result.getMinutes());
     }
 }
