@@ -1,31 +1,36 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest12 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test011() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Long long0 = new Long(0L);
-        Long long1 = xNode0.getLongBody(long0);
-        assertEquals(0L, (long) long1);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getLongBody() returns the provided default value
+     * when the node's body is empty.
+     */
+    @Test
+    public void getLongBodyShouldReturnDefaultValueWhenBodyIsEmpty() {
+        // Arrange
+        // An empty IIOMetadataNode serves as a mock Node with no text content.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        Long defaultValue = 0L;
+
+        // Act
+        // Attempt to get the body as a Long, providing a default value.
+        Long result = xNode.getLongBody(defaultValue);
+
+        // Assert
+        // The result should be the default value, as the node's body is empty and cannot be parsed.
+        assertEquals(defaultValue, result);
     }
 }
