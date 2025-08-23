@@ -1,22 +1,25 @@
 package com.google.common.collect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CompactLinkedHashSet_ESTestTest7 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        CompactLinkedHashSet<Integer> compactLinkedHashSet0 = CompactLinkedHashSet.createWithExpectedSize(31);
-        Spliterator<Integer> spliterator0 = compactLinkedHashSet0.spliterator();
-        assertNotNull(spliterator0);
+    @Test
+    public void spliterator_onEmptySet_shouldReturnNonNull() {
+        // Arrange: Create an empty CompactLinkedHashSet.
+        // Using create() is more direct for this purpose than specifying an initial capacity.
+        CompactLinkedHashSet<Integer> emptySet = CompactLinkedHashSet.create();
+
+        // Act: Get the spliterator from the empty set.
+        Spliterator<Integer> spliterator = emptySet.spliterator();
+
+        // Assert: Verify that the returned spliterator is not null.
+        assertNotNull("spliterator() on an empty set should never return null.", spliterator);
     }
 }
