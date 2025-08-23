@@ -1,23 +1,44 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest48 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        ContentReference contentReference0 = ContentReference.redacted();
-        JsonLocation jsonLocation0 = new JsonLocation((Object) contentReference0, (-578L), 500, 500);
-        int int0 = jsonLocation0.getColumnNr();
-        assertEquals((-578L), jsonLocation0.getCharOffset());
-        assertEquals(500, jsonLocation0.getLineNr());
-        assertEquals(500, int0);
-        assertEquals((-1L), jsonLocation0.getByteOffset());
+/**
+ * Contains tests for the {@link JsonLocation} class, focusing on its
+ * constructor and accessor methods.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Verifies that a JsonLocation object, when created, correctly stores the
+     * provided location details (line, column, offsets) and that its getter
+     * methods return these values.
+     */
+    @Test
+    public void testConstructorAndGetters() {
+        // Arrange: Define the location parameters and create a JsonLocation instance.
+        ContentReference dummyContentReference = ContentReference.redacted();
+        final long expectedCharOffset = -578L;
+        final int expectedLineNumber = 500;
+        final int expectedColumnNumber = 500;
+        
+        // This test uses a deprecated constructor:
+        // new JsonLocation(Object srcRef, long totalChars, int lineNr, int columnNr)
+        // Internally, this constructor sets the byte offset to -1.
+        JsonLocation location = new JsonLocation(dummyContentReference, expectedCharOffset, expectedLineNumber, expectedColumnNumber);
+
+        // Act: Retrieve the properties from the created object using its getters.
+        int actualColumnNumber = location.getColumnNr();
+        int actualLineNumber = location.getLineNr();
+        long actualCharOffset = location.getCharOffset();
+        long actualByteOffset = location.getByteOffset();
+
+        // Assert: Verify that the retrieved values match the expected values.
+        assertEquals("Column number should match the constructor argument", expectedColumnNumber, actualColumnNumber);
+        assertEquals("Line number should match the constructor argument", expectedLineNumber, actualLineNumber);
+        assertEquals("Character offset should match the constructor argument", expectedCharOffset, actualCharOffset);
+        assertEquals("Byte offset should be -1 for this specific constructor", -1L, actualByteOffset);
     }
 }
