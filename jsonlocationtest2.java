@@ -1,69 +1,146 @@
 package com.fasterxml.jackson.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.io.ContentReference;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonLocationTestTest2 extends JUnit5TestBase {
+/**
+ * Tests for the {@link JsonLocation#toString()} method to ensure it produces
+ * human-readable and accurate source descriptions for various input types.
+ */
+public class JsonLocationToStringTest extends JUnit5TestBase {
 
-    private void _verifyContentDisabled(JsonParseException e) {
-        verifyException(e, "unrecognized token");
-        JsonLocation loc = e.getLocation();
-        assertNull(loc.contentReference().getRawContent());
-        assertThat(loc.sourceDescription()).startsWith("REDACTED");
-    }
+    // Constants for common location parameters to improve readability
+    private static final int LINE_NUMBER = 1;
+    private static final int COLUMN_NUMBER = 2;
+    private static final long TOTAL_CHARS = 10L;
+    private static final long TOTAL_BYTES = 10L;
 
-    private ContentReference _sourceRef(String rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length(), ErrorReportConfiguration.defaults());
-    }
+    // A simple test class used as a source reference object
+    private static class Foobar {}
 
-    private ContentReference _sourceRef(char[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
+    @Test
+    void toStringWithNullSourceShouldDefaultToUnknown() {
+        // Arrange
+        // The JsonLocation constructor handles a null ContentReference by using ContentReference.unknown()
+        JsonLocation location = new JsonLocation(null, 10L, 10L, 3, 2);
+        String expected = "[Source: UNKNOWN; line: 3, column: 2]";
 
-    private ContentReference _sourceRef(byte[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
+        // Act
+        String actual = location.toString();
 
-    private ContentReference _sourceRef(byte[] rawSrc, int offset, int length) {
-        return ContentReference.construct(true, rawSrc, offset, length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(InputStream rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(File rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _rawSourceRef(boolean textual, Object rawSrc) {
-        return ContentReference.rawReference(textual, rawSrc);
-    }
-
-    static class Foobar {
+        // Assert
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    void basicToString() throws Exception {
-        // no location; presumed to be Binary due to defaulting
-        assertEquals("[Source: UNKNOWN; line: 3, column: 2]", new JsonLocation(null, 10L, 10L, 3, 2).toString());
-        // Short String
-        assertEquals("[Source: (String)\"string-source\"; line: 1, column: 2]", new JsonLocation(_sourceRef("string-source"), 10L, 10L, 1, 2).toString());
-        // Short char[]
-        assertEquals("[Source: (char[])\"chars-source\"; line: 1, column: 2]", new JsonLocation(_sourceRef("chars-source".toCharArray()), 10L, 10L, 1, 2).toString());
-        // Short byte[]
-        assertEquals("[Source: (byte[])\"bytes-source\"; line: 1, column: 2]", new JsonLocation(_sourceRef("bytes-source".getBytes("UTF-8")), 10L, 10L, 1, 2).toString());
-        // InputStream
-        assertEquals("[Source: (ByteArrayInputStream); line: 1, column: 2]", new JsonLocation(_sourceRef(new ByteArrayInputStream(new byte[0])), 10L, 10L, 1, 2).toString());
-        // Class<?> that specifies source type
-        assertEquals("[Source: (InputStream); line: 1, column: 2]", new JsonLocation(_rawSourceRef(true, InputStream.class), 10L, 10L, 1, 2).toString());
-        // misc other
-        Foobar srcRef = new Foobar();
-        assertEquals("[Source: (" + srcRef.getClass().getName() + "); line: 1, column: 2]", new JsonLocation(_rawSourceRef(true, srcRef), 10L, 10L, 1, 2).toString());
+    void toStringWithStringSourceShouldIncludeStringInDescription() {
+        // Arrange
+        ContentReference contentRef = createContentReference("string-source");
+        JsonLocation location = new JsonLocation(contentRef, TOTAL_BYTES, TOTAL_CHARS, LINE_NUMBER, COLUMN_NUMBER);
+        String expected = "[Source: (String)\"string-source\"; line: 1, column: 2]";
+
+        // Act
+        String actual = location.toString();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void toStringWithCharArraySourceShouldIncludeCharArrayInDescription() {
+        // Arrange
+        ContentReference contentRef = createContentReference("chars-source".toCharArray());
+        JsonLocation location = new JsonLocation(contentRef, TOTAL_BYTES, TOTAL_CHARS, LINE_NUMBER, COLUMN_NUMBER);
+        String expected = "[Source: (char[])\"chars-source\"; line: 1, column: 2]";
+
+        // Act
+        String actual = location.toString();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void toStringWithByteArraySourceShouldIncludeByteArrayInDescription() throws Exception {
+        // Arrange
+        ContentReference contentRef = createContentReference("bytes-source".getBytes("UTF-8"));
+        JsonLocation location = new JsonLocation(contentRef, TOTAL_BYTES, TOTAL_CHARS, LINE_NUMBER, COLUMN_NUMBER);
+        String expected = "[Source: (byte[])\"bytes-source\"; line: 1, column: 2]";
+
+        // Act
+        String actual = location.toString();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void toStringWithInputStreamSourceShouldIncludeStreamTypeInDescription() {
+        // Arrange
+        ContentReference contentRef = createContentReference(new ByteArrayInputStream(new byte[0]));
+        JsonLocation location = new JsonLocation(contentRef, TOTAL_BYTES, TOTAL_CHARS, LINE_NUMBER, COLUMN_NUMBER);
+        String expected = "[Source: (ByteArrayInputStream); line: 1, column: 2]";
+
+        // Act
+        String actual = location.toString();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void toStringWithClassAsSourceShouldIncludeClassNameInDescription() {
+        // Arrange
+        ContentReference contentRef = createRawContentReference(true, InputStream.class);
+        JsonLocation location = new JsonLocation(contentRef, TOTAL_BYTES, TOTAL_CHARS, LINE_NUMBER, COLUMN_NUMBER);
+        String expected = "[Source: (InputStream); line: 1, column: 2]";
+
+        // Act
+        String actual = location.toString();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void toStringWithObjectAsSourceShouldIncludeObjectClassNameInDescription() {
+        // Arrange
+        Foobar sourceObject = new Foobar();
+        ContentReference contentRef = createRawContentReference(true, sourceObject);
+        JsonLocation location = new JsonLocation(contentRef, TOTAL_BYTES, TOTAL_CHARS, LINE_NUMBER, COLUMN_NUMBER);
+        String expected = "[Source: (" + Foobar.class.getName() + "); line: 1, column: 2]";
+
+        // Act
+        String actual = location.toString();
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    // --- Helper methods for creating ContentReference instances ---
+
+    private ContentReference createContentReference(String rawSrc) {
+        return ContentReference.construct(true, rawSrc, 0, rawSrc.length(), ErrorReportConfiguration.defaults());
+    }
+
+    private ContentReference createContentReference(char[] rawSrc) {
+        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
+    }
+
+    private ContentReference createContentReference(byte[] rawSrc) {
+        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
+    }
+
+    private ContentReference createContentReference(InputStream rawSrc) {
+        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
+    }
+
+    private ContentReference createRawContentReference(boolean textual, Object rawSrc) {
+        return ContentReference.rawReference(textual, rawSrc);
     }
 }
