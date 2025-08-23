@@ -1,37 +1,37 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
-public class JsonTreeReader_ESTestTest69 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test068() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        // Undeclared exception!
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+class JsonTreeReaderTest {
+
+    @Test
+    void nextJsonElement_whenAtEndOfEmptyArray_throwsIllegalStateException() {
+        // Arrange
+        JsonArray emptyArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyArray);
+        
+        // To position the reader at the end of the array, we must first consume the BEGIN_ARRAY token.
+        // According to the JsonReader API, this can be done by calling beginArray().
         try {
-            jsonTreeReader0.nextJsonElement();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Unexpected END_ARRAY when reading a JsonElement.
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            reader.beginArray();
+        } catch (Exception e) {
+            // This is part of the setup and is not expected to fail.
+            // If it does, we wrap it in an unchecked exception to fail the test.
+            throw new AssertionError("Test setup failed: could not begin array", e);
         }
+
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            reader.nextJsonElement();
+        }, "Expected nextJsonElement() to throw when no elements are left in the array.");
+
+        assertEquals("Unexpected END_ARRAY when reading a JsonElement.", exception.getMessage());
     }
 }
