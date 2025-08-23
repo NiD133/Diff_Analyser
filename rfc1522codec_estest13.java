@@ -1,24 +1,34 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RFC1522Codec_ESTestTest13 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BCodec} class, focusing on its RFC 1522 encoding functionality.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        String string0 = bCodec0.encodeText("@~_=I", "UTF-8");
-        assertNotNull(string0);
-        assertEquals("=?UTF-8?B?QH5fPUk=?=", string0);
+    /**
+     * Tests that the {@link BCodec#encodeText(String, String)} method correctly encodes a simple
+     * ASCII string into the RFC 1522 "encoded-word" format using Base64 encoding.
+     */
+    @Test
+    public void testEncodeTextWithSimpleAsciiString() throws Exception {
+        // Arrange
+        final BCodec bCodec = new BCodec();
+        final String plainText = "@~_=I";
+        final String charset = "UTF-8";
+
+        // The expected RFC 1522 format is "=?charset?encoding?encoded-text?=".
+        // For BCodec, the encoding is 'B' (Base64).
+        // The Base64 encoding of "@~_=I" is "QH5fPUk=".
+        final String expectedEncodedString = "=?UTF-8?B?QH5fPUk=?=";
+
+        // Act
+        final String actualEncodedString = bCodec.encodeText(plainText, charset);
+
+        // Assert
+        assertEquals("The encoded string should match the expected RFC 1522 format.",
+                     expectedEncodedString, actualEncodedString);
     }
 }
