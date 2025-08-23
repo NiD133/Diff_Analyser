@@ -1,31 +1,19 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest33 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeDivide(0L, 0L);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // / by zero
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that safeDivide() throws an ArithmeticException when the divisor is zero,
+     * as specified by the method's contract.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void safeDivideByZeroThrowsArithmeticException() {
+        // The safeDivide method must throw an ArithmeticException when attempting to divide by zero.
+        FieldUtils.safeDivide(10L, 0L);
     }
 }
