@@ -1,49 +1,40 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
+
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest45 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        BritishCutoverDate britishCutoverDate0 = BritishCutoverDate.from(britishCutoverChronology0.CUTOVER);
-        JulianEra julianEra0 = britishCutoverDate0.getEra();
-        BritishCutoverDate britishCutoverDate1 = britishCutoverChronology0.date((Era) julianEra0, 5, 5, 5);
-        assertNotSame(britishCutoverDate0, britishCutoverDate1);
+/**
+ * Tests for the {@link BritishCutoverChronology} class, focusing on date creation.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Tests that the chronology can create a date from an era, year, month, and day.
+     * This test uses a date that falls within the Julian calendar period (before 1752).
+     */
+    @Test
+    public void dateWithEra_forEarlyJulianDate_createsCorrectDate() {
+        // Arrange
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        Era adEra = JulianEra.AD;
+        int year = 5;
+        int month = 5;
+        int day = 5;
+        
+        // The expected date is May 5, 5 AD, which falls under the Julian calendar rules.
+        BritishCutoverDate expectedDate = BritishCutoverDate.of(year, month, day);
+
+        // Act
+        // Create a date using the era, year-of-era, month, and day.
+        BritishCutoverDate actualDate = chronology.date(adEra, year, month, day);
+
+        // Assert
+        // Verify that the created date has the correct value.
+        assertEquals("The created date should be equal to the expected date.", expectedDate, actualDate);
+        assertEquals("Era should be AD.", adEra, actualDate.getEra());
+        assertEquals("Year should match.", year, actualDate.getYear());
     }
 }
