@@ -1,31 +1,44 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.File;
+
 import java.io.FileInputStream;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Vector;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link PatternOptionBuilder} focusing on file type patterns.
+ */
 public class PatternOptionBuilderTestTest3 {
 
+    private static final String EXISTING_FILE_PATH = "src/test/resources/org/apache/commons/cli/existing-readable.file";
+
     @Test
-    void testExistingFilePattern() throws Exception {
+    @DisplayName("Pattern with '<' should create an option that returns a FileInputStream for an existing file")
+    void parsePattern_shouldReturnFileInputStream_whenUsingExistingFilePattern() throws Exception {
+        // ARRANGE
+        // The '<' character in a pattern string configures an option to expect a path
+        // to an existing file and to create a FileInputStream from it.
         final Options options = PatternOptionBuilder.parsePattern("g<");
         final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] { "-g", "src/test/resources/org/apache/commons/cli/existing-readable.file" });
-        final Object parsedReadableFileStream = line.getOptionObject("g");
-        assertNotNull(parsedReadableFileStream, "option g not parsed");
-        assertInstanceOf(FileInputStream.class, parsedReadableFileStream, "option g not FileInputStream");
+        final String[] args = {"-g", EXISTING_FILE_PATH};
+        Object optionValue = null;
+
+        try {
+            // ACT
+            final CommandLine commandLine = parser.parse(options, args);
+            optionValue = commandLine.getOptionObject("g");
+
+            // ASSERT
+            // The returned object should be a valid, non-null FileInputStream.
+            // assertInstanceOf performs a null check implicitly.
+            assertInstanceOf(FileInputStream.class, optionValue,
+                "The option object should be a FileInputStream for the specified file.");
+        } finally {
+            // CLEANUP: Ensure the opened resource is closed to prevent leaks.
+            if (optionValue instanceof FileInputStream) {
+                ((FileInputStream) optionValue).close();
+            }
+        }
     }
 }
