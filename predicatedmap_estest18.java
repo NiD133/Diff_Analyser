@@ -1,53 +1,47 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest18 extends PredicatedMap_ESTest_scaffolding {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Predicate<Object> predicate0 = ExceptionPredicate.exceptionPredicate();
-        HashMap<Predicate<Object>, Predicate<Object>> hashMap0 = new HashMap<Predicate<Object>, Predicate<Object>>();
-        hashMap0.put(predicate0, predicate0);
-        PredicatedMap<Predicate<Object>, Predicate<Object>> predicatedMap0 = null;
-        try {
-            predicatedMap0 = new PredicatedMap<Predicate<Object>, Predicate<Object>>(hashMap0, predicate0, predicate0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionPredicate invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionPredicate", e);
-        }
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+/**
+ * Tests the constructor of {@link PredicatedMap} to ensure it correctly validates
+ * pre-existing entries in the decorated map.
+ */
+public class PredicatedMapConstructorTest {
+
+    /**
+     * Verifies that the PredicatedMap constructor throws a RuntimeException
+     * when an existing key in the decorated map fails the key predicate's validation.
+     */
+    @Test
+    public void constructorShouldThrowExceptionWhenKeyPredicateFailsForExistingEntry() {
+        // Arrange: Create a predicate that always throws a RuntimeException.
+        // This simulates a validation failure.
+        final Predicate<Object> failingPredicate = ExceptionPredicate.exceptionPredicate();
+
+        // Arrange: Create a map with a pre-existing entry. The PredicatedMap constructor
+        // is expected to validate this entry upon initialization.
+        final Map<Predicate<Object>, Predicate<Object>> initialMap = new HashMap<>();
+        initialMap.put(failingPredicate, failingPredicate);
+
+        // Act & Assert: Attempt to create a PredicatedMap.
+        // The constructor should evaluate the failingPredicate against the existing key,
+        // which will trigger a RuntimeException. We use assertThrows to catch and
+        // verify this expected exception.
+        final RuntimeException thrown = assertThrows(
+            RuntimeException.class,
+            () -> new PredicatedMap<>(initialMap, failingPredicate, failingPredicate)
+        );
+
+        // Assert: Confirm that the caught exception is the one from our predicate,
+        // ensuring that the validation logic was indeed executed.
+        assertEquals("ExceptionPredicate invoked", thrown.getMessage());
     }
 }
