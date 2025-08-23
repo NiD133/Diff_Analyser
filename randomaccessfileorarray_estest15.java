@@ -1,36 +1,49 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest15 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test014() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[2] = (byte) (-9);
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.readShort();
-        int int0 = randomAccessFileOrArray0.readUnsignedShort();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(63232, int0);
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ * This specific test focuses on the readUnsignedShort() method.
+ */
+public class RandomAccessFileOrArrayTest {
+
+    /**
+     * Verifies that readUnsignedShort() correctly reads two bytes as a big-endian
+     * unsigned short integer and advances the file pointer accordingly.
+     */
+    @Test
+    public void readUnsignedShort_readsTwoBytesAndReturnsCorrectUnsignedValue() throws IOException {
+        // Arrange
+        // Create a byte array where the third and fourth bytes represent the unsigned short 0xF700.
+        // 0xF7 is -9 in a signed byte.
+        // 0xF700 in decimal is (247 * 256) + 0 = 63232.
+        byte[] inputData = {
+                0x00, 0x00,       // Bytes for the initial readShort() to skip
+                (byte) 0xF7, 0x00, // The two bytes to be read as an unsigned short
+                0x00, 0x00, 0x00, 0x00
+        };
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputData);
+
+        // Act
+        // 1. Skip the first two bytes to position the pointer at our target data.
+        reader.readShort();
+
+        // 2. Read the unsigned short value, which is the focus of this test.
+        int actualValue = reader.readUnsignedShort();
+
+        // Assert
+        // Verify that the correct unsigned short value was read.
+        int expectedValue = 63232;
+        assertEquals("The unsigned short value should be read correctly.", expectedValue, actualValue);
+
+        // Verify that the file pointer has advanced by a total of 4 bytes (2 for readShort, 2 for readUnsignedShort).
+        long expectedFilePointer = 4L;
+        long actualFilePointer = reader.getFilePointer();
+        assertEquals("The file pointer should be advanced to the correct position.", expectedFilePointer, actualFilePointer);
     }
 }
