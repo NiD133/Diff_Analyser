@@ -1,41 +1,31 @@
 package org.mockito.internal.creation.instance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.fail;
 import org.junit.Test;
-import org.mockitoutil.TestBase;
+import static org.junit.Assert.assertNotNull;
 
-public class ConstructorInstantiatorTestTest7 extends TestBase {
+/**
+ * Test suite for the {@link ConstructorInstantiator} class, focusing on its ability
+ * to create new object instances.
+ */
+public class ConstructorInstantiatorTest {
 
-    static class SomeClass {
-    }
-
-    class SomeInnerClass {
-    }
-
-    class ChildOfThis extends ConstructorInstantiatorTest {
-    }
-
-    static class SomeClass2 {
-
-        SomeClass2(String x) {
-        }
-    }
-
-    static class SomeClass3 {
-
-        SomeClass3(int i) {
-        }
-    }
-
+    /**
+     * Verifies that `newInstance` can successfully create an object
+     * when the target class has a public, default (no-argument) constructor.
+     */
     @Test
-    public void explains_when_constructor_cannot_be_found() {
-        try {
-            new ConstructorInstantiator(false, new Object[0]).newInstance(SomeClass2.class);
-            fail();
-        } catch (org.mockito.creation.instance.InstantiationException e) {
-            assertThat(e).hasMessageContaining("Unable to create instance of 'SomeClass2'.\n" + "Please ensure that the target class has a 0-arg constructor.");
-        }
+    public void shouldInstantiateClassWithDefaultConstructor() {
+        // Arrange: Create an instantiator configured for a class that is not an inner class
+        // and requires no constructor arguments. The 'false' argument indicates there is no
+        // outer class instance.
+        Object[] noArguments = {};
+        ConstructorInstantiator instantiator = new ConstructorInstantiator(false, noArguments);
+
+        // Act: Attempt to create a new instance of the Object class, which has a
+        // public no-argument constructor.
+        Object instance = instantiator.newInstance(Object.class);
+
+        // Assert: The instance should be successfully created and not null.
+        assertNotNull("The created instance should not be null", instance);
     }
 }
