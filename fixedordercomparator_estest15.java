@@ -1,27 +1,32 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+import static org.junit.Assert.assertEquals;
 
-public class FixedOrderComparator_ESTestTest15 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Test suite for the {@link FixedOrderComparator} class, focusing on its hashCode contract.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        LinkedList<Comparable<Object>> linkedList0 = new LinkedList<Comparable<Object>>();
-        FixedOrderComparator<Comparable<Object>> fixedOrderComparator0 = new FixedOrderComparator<Comparable<Object>>(linkedList0);
-        fixedOrderComparator0.hashCode();
+    /**
+     * Tests that calling hashCode() on a FixedOrderComparator initialized with an empty
+     * list is consistent. A key contract of the hashCode() method is that it must
+     * consistently return the same integer, provided no information used in equals
+     * comparisons on the object is modified.
+     */
+    @Test
+    public void hashCodeShouldBeConsistentForEmptyComparator() {
+        // Arrange: Create a comparator with no defined order (an empty list).
+        final FixedOrderComparator<Object> emptyComparator = new FixedOrderComparator<>(Collections.emptyList());
+
+        // Act: Calculate the hash code multiple times to check for consistency.
+        final int firstHashCode = emptyComparator.hashCode();
+        final int secondHashCode = emptyComparator.hashCode();
+
+        // Assert: The hash code should be the same for each call.
+        // This also implicitly verifies that the method completes without throwing an exception.
+        assertEquals("hashCode() must return a consistent value for the same object.",
+                     firstHashCode, secondHashCode);
     }
 }
