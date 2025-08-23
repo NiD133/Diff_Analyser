@@ -1,29 +1,30 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest2 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test001() throws Throwable {
-        Long long0 = new Long(0L);
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(long0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        long long1 = jsonTreeReader0.nextLong();
-        assertEquals(0L, long1);
+    /**
+     * Tests that {@link JsonTreeReader#nextLong()} correctly reads and returns
+     * the long value from a {@link JsonPrimitive}.
+     */
+    @Test
+    public void nextLong_whenReadingLongPrimitive_returnsCorrectValue() throws IOException {
+        // Arrange
+        long expectedValue = 0L;
+        JsonPrimitive jsonPrimitive = new JsonPrimitive(expectedValue);
+        JsonTreeReader reader = new JsonTreeReader(jsonPrimitive);
+
+        // Act
+        long actualValue = reader.nextLong();
+
+        // Assert
+        assertEquals("The reader should return the correct long value.", expectedValue, actualValue);
     }
 }
