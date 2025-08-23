@@ -1,28 +1,35 @@
 package org.jfree.chart.labels;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest10 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Tests for the cloning and equality behavior of the {@link SymbolicXYItemLabelGenerator} class.
+ *
+ * Note: The original test class name 'SymbolicXYItemLabelGenerator_ESTestTest10' 
+ * was simplified to 'SymbolicXYItemLabelGeneratorTest' for clarity.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test9() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        Object object0 = symbolicXYItemLabelGenerator0.clone();
-        boolean boolean0 = symbolicXYItemLabelGenerator0.equals(object0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the clone() method produces an object that is equal to the
+     * original in state, but is a distinct instance in memory. This is a key
+     * part of the Java clone contract.
+     */
+    @Test
+    public void clone_shouldProduceEqualButNotSameInstance() throws CloneNotSupportedException {
+        // Arrange: Create an instance of the label generator.
+        SymbolicXYItemLabelGenerator original = new SymbolicXYItemLabelGenerator();
+
+        // Act: Create a clone of the original instance.
+        SymbolicXYItemLabelGenerator clone = (SymbolicXYItemLabelGenerator) original.clone();
+
+        // Assert: Verify the clone contract.
+        // 1. The clone must not be the same object as the original.
+        assertNotSame("The cloned object should be a new instance.", original, clone);
+        
+        // 2. The clone must be equal to the original.
+        assertEquals("The cloned object should be equal to the original.", original, clone);
     }
 }
