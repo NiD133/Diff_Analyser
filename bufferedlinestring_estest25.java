@@ -1,36 +1,31 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest25 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        BufferedLineString bufferedLineString0 = null;
-        try {
-            bufferedLineString0 = new BufferedLineString(linkedList0, (-116.02777), (SpatialContext) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BufferedLineString", e);
-        }
+/**
+ * Unit tests for {@link BufferedLineString}.
+ */
+public class BufferedLineStringTest {
+
+    /**
+     * Tests that the BufferedLineString constructor throws a NullPointerException
+     * if the provided SpatialContext is null, specifically when the list of points is empty.
+     * This scenario triggers a call to `ctx.makeCollection()`, which fails on a null context.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNPEForNullContextWhenPointListIsEmpty() {
+        // Arrange
+        List<Point> emptyPoints = Collections.emptyList();
+        double buffer = 10.0; // The buffer value is arbitrary for this test.
+        SpatialContext nullContext = null;
+
+        // Act & Assert
+        // This should throw a NullPointerException because the context is used internally.
+        new BufferedLineString(emptyPoints, buffer, nullContext);
     }
 }
