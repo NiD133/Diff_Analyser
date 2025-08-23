@@ -2,22 +2,31 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TagSet_ESTestTest23 extends TagSet_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TagSet} class.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        TagSet tagSet0 = TagSet.Html();
-        tagSet0.valueOf("_-$>", "pr!", "pr!", true);
-        Tag tag0 = tagSet0.get("_-$>", "pr!");
-        assertEquals("pr!", tag0.normalName());
-        assertNotNull(tag0);
+    @Test
+    public void getShouldRetrieveTagCreatedByValueOf() {
+        // Arrange
+        TagSet tagSet = TagSet.Html();
+        String tagName = "MyCustomTag"; // A mixed-case name to test case preservation
+        String normalName = "mycustomtag"; // A pre-normalized (lowercase) name
+        String namespace = "customNS";
+        boolean preserveCase = true;
+
+        // Act: Create a new tag via valueOf and then retrieve it using get.
+        // The valueOf method adds the tag to the internal set.
+        tagSet.valueOf(tagName, normalName, namespace, preserveCase);
+        Tag retrievedTag = tagSet.get(tagName, namespace);
+
+        // Assert
+        assertNotNull("The tag should have been created and be retrievable.", retrievedTag);
+        assertEquals("The retrieved tag should have the pre-supplied normal name.",
+                     normalName, retrievedTag.normalName());
+        assertEquals("The original case-sensitive tag name should be preserved.",
+                     tagName, retrievedTag.getName());
     }
 }
