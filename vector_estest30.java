@@ -1,19 +1,27 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Vector_ESTestTest30 extends Vector_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Vector vector0 = new Vector((-2905.637F), (-2905.637F), (-1.0F));
-        Vector vector1 = vector0.subtract(vector0);
-        assertEquals(1.6885452E7F, vector0.lengthSquared(), 0.01F);
-        assertEquals(0.0F, vector1.length(), 0.01F);
+    /**
+     * Tests that subtracting a vector from itself results in a zero vector.
+     * A zero vector is a vector where all components are zero.
+     */
+    @Test
+    public void subtract_whenVectorIsSubtractedFromItself_shouldReturnZeroVector() {
+        // Arrange: Create an arbitrary vector and the expected zero vector result.
+        Vector vector = new Vector(10.5f, -20.0f, 30.1f);
+        Vector expectedZeroVector = new Vector(0.0f, 0.0f, 0.0f);
+
+        // Act: Subtract the vector from itself.
+        Vector result = vector.subtract(vector);
+
+        // Assert: The resulting vector should be the zero vector.
+        assertEquals(expectedZeroVector, result);
     }
 }
