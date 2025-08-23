@@ -1,62 +1,45 @@
 package com.google.common.primitives;
 
-import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
+
 import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest2 extends TestCase {
+/**
+ * Tests for {@link SignedBytes} static methods.
+ */
+@GwtCompatible
+@RunWith(JUnit4.class)
+public class SignedBytesTest {
 
-    private static final byte[] EMPTY = {};
+    private static final byte MIN_BYTE = Byte.MIN_VALUE;
+    private static final byte MAX_BYTE = Byte.MAX_VALUE;
 
-    private static final byte[] ARRAY1 = { (byte) 1 };
+    private static final byte[] TYPICAL_VALUES = {MIN_BYTE, -1, 0, 1, MAX_BYTE};
 
-    private static final byte LEAST = Byte.MIN_VALUE;
-
-    private static final byte GREATEST = Byte.MAX_VALUE;
-
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
-
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
+    @Test
+    public void saturatedCast_withValueInRange_returnsSameValue() {
+        for (byte value : TYPICAL_VALUES) {
+            assertThat(SignedBytes.saturatedCast((long) value))
+                .isEqualTo(value);
         }
     }
 
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
+    @Test
+    public void saturatedCast_withValueAboveMax_saturatesToMaxValue() {
+        assertThat(SignedBytes.saturatedCast(MAX_BYTE + 1L))
+            .isEqualTo(MAX_BYTE);
+        assertThat(SignedBytes.saturatedCast(Long.MAX_VALUE))
+            .isEqualTo(MAX_BYTE);
     }
 
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    public void testSaturatedCast() {
-        for (byte value : VALUES) {
-            assertThat(SignedBytes.saturatedCast((long) value)).isEqualTo(value);
-        }
-        assertThat(SignedBytes.saturatedCast(GREATEST + 1L)).isEqualTo(GREATEST);
-        assertThat(SignedBytes.saturatedCast(LEAST - 1L)).isEqualTo(LEAST);
-        assertThat(SignedBytes.saturatedCast(Long.MAX_VALUE)).isEqualTo(GREATEST);
-        assertThat(SignedBytes.saturatedCast(Long.MIN_VALUE)).isEqualTo(LEAST);
+    @Test
+    public void saturatedCast_withValueBelowMin_saturatesToMinValue() {
+        assertThat(SignedBytes.saturatedCast(MIN_BYTE - 1L))
+            .isEqualTo(MIN_BYTE);
+        assertThat(SignedBytes.saturatedCast(Long.MIN_VALUE))
+            .isEqualTo(MIN_BYTE);
     }
 }
