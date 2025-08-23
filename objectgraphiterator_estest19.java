@@ -1,53 +1,37 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ObjectGraphIterator_ESTestTest19 extends ObjectGraphIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Integer integer0 = new Integer((-1265));
-        ObjectGraphIterator<Integer> objectGraphIterator0 = new ObjectGraphIterator<Integer>(integer0, (Transformer<? super Integer, ? extends Integer>) null);
-        Integer integer1 = objectGraphIterator0.next();
-        assertEquals((-1265), (int) integer1);
+/**
+ * Unit tests for {@link ObjectGraphIterator}.
+ */
+public class ObjectGraphIteratorTest {
+
+    /**
+     * Tests that an ObjectGraphIterator initialized with a single, non-iterator root object
+     * and a null transformer will return that root object as its only element.
+     *
+     * A null transformer should result in a simple iteration over the initial root object.
+     */
+    @Test
+    public void testIteratorWithSingleRootAndNullTransformerReturnsRoot() {
+        // Arrange: Define a root object and create an iterator with a null transformer.
+        final Integer rootObject = -1265;
+        final ObjectGraphIterator<Integer> iterator = new ObjectGraphIterator<>(rootObject, null);
+
+        // Assert: Before iterating, hasNext() should be true.
+        assertTrue("Iterator should have an element before the first call to next()", iterator.hasNext());
+
+        // Act: Retrieve the next element from the iterator.
+        final Integer result = iterator.next();
+
+        // Assert: The retrieved element should be the original root object,
+        // and the iterator should now be exhausted.
+        assertEquals("The first element returned should be the root object", rootObject, result);
+        assertFalse("Iterator should be exhausted after returning the single root object", iterator.hasNext());
     }
 }
