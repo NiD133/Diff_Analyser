@@ -1,37 +1,53 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GroupedRandomAccessSource_ESTestTest13 extends GroupedRandomAccessSource_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[4];
-        MappedChannelRandomAccessSource mappedChannelRandomAccessSource0 = new MappedChannelRandomAccessSource((FileChannel) null, 2L, 2L);
-        randomAccessSourceArray0[0] = (RandomAccessSource) mappedChannelRandomAccessSource0;
-        randomAccessSourceArray0[1] = (RandomAccessSource) mappedChannelRandomAccessSource0;
-        byte[] byteArray0 = new byte[7];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[2] = (RandomAccessSource) arrayRandomAccessSource0;
-        IndependentRandomAccessSource independentRandomAccessSource0 = new IndependentRandomAccessSource(randomAccessSourceArray0[1]);
-        randomAccessSourceArray0[3] = (RandomAccessSource) independentRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
+/**
+ * Contains tests for the {@link GroupedRandomAccessSource} class.
+ */
+public class GroupedRandomAccessSourceTest {
+
+    /**
+     * Verifies that a get() call on a GroupedRandomAccessSource throws an IOException
+     * if the read operation is directed to an underlying source that has not been opened.
+     */
+    @Test
+    public void get_whenUnderlyingSourceIsNotOpen_throwsIOException() throws IOException {
+        // --- Arrange ---
+
+        // Create a valid source to act as a prefix, which will offset the subsequent source.
+        RandomAccessSource prefixSource = new ArrayRandomAccessSource(new byte[5]); // length = 5
+
+        // Create an "unopened" source by instantiating MappedChannelRandomAccessSource with a null FileChannel.
+        // This simulates a source that is not ready for I/O operations.
+        RandomAccessSource unopenedSource = new MappedChannelRandomAccessSource(null, 0L, 10L); // length = 10
+
+        // Combine the sources into a group. The `unopenedSource` will be responsible for
+        // handling requests for offsets starting from 5 (the length of `prefixSource`).
+        // - prefixSource:   covers global offsets 0-4
+        // - unopenedSource: covers global offsets 5-14
+        RandomAccessSource[] sources = {prefixSource, unopenedSource};
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(sources);
+
+        // Define a read operation that targets a position within the range of the unopened source.
+        long readPositionWithinUnopenedSource = 7L;
+        byte[] destinationBuffer = new byte[10];
+
+        // --- Act & Assert ---
+
+        // Expect an IOException because the read at position 7 targets the unopened source.
         try {
-            groupedRandomAccessSource0.get(2L, byteArray0, (int) (byte) 109, (int) (byte) 43);
-            fail("Expecting exception: IOException");
+            groupedSource.get(readPositionWithinUnopenedSource, destinationBuffer, 0, destinationBuffer.length);
+            fail("Expected an IOException to be thrown when reading from an unopened underlying source, but none was thrown.");
         } catch (IOException e) {
-            //
-            // RandomAccessSource not opened
-            //
-            verifyException("com.itextpdf.text.io.MappedChannelRandomAccessSource", e);
+            // Verify that the correct exception was thrown, indicating the source was not open.
+            assertEquals("RandomAccessSource not opened", e.getMessage());
         }
     }
 }
