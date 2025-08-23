@@ -1,18 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest70 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit test for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        Minutes minutes0 = Minutes.MIN_VALUE;
-        int int0 = minutes0.getMinutes();
-        assertEquals(Integer.MIN_VALUE, int0);
+    @Test
+    public void getMinutes_returnsCorrectValue_forMinValueConstant() {
+        // Arrange: Get the constant representing the minimum number of minutes.
+        Minutes minValue = Minutes.MIN_VALUE;
+
+        // Act: Call the getMinutes() method to retrieve the integer value.
+        int actualMinutes = minValue.getMinutes();
+
+        // Assert: The returned value should be equal to Integer.MIN_VALUE.
+        assertEquals(Integer.MIN_VALUE, actualMinutes);
     }
 }
