@@ -1,51 +1,27 @@
 package org.apache.commons.collections4.properties;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest36 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link OrderedProperties} class.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        orderedProperties0.clear();
-        assertTrue(orderedProperties0.isEmpty());
+    /**
+     * Tests that calling the clear() method on an already empty OrderedProperties instance
+     * correctly results in the instance remaining empty. This verifies the behavior
+     * for the edge case of clearing a collection that contains no elements.
+     */
+    @Test
+    public void testClearOnEmptyPropertiesLeavesItEmpty() {
+        // Arrange: Create a new, empty OrderedProperties instance.
+        final OrderedProperties properties = new OrderedProperties();
+
+        // Act: Call the clear() method on the empty instance.
+        properties.clear();
+
+        // Assert: Verify that the properties instance is still empty.
+        assertTrue("Calling clear() on an empty properties object should leave it empty.", properties.isEmpty());
     }
 }
