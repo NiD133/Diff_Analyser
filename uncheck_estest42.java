@@ -1,30 +1,28 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest42 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class, focusing on the apply method.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        IOFunction<String, String> iOFunction0 = IOFunction.identity();
-        String string0 = Uncheck.apply(iOFunction0, "http");
-        assertEquals("http", string0);
+    /**
+     * Tests that {@link Uncheck#apply(IOFunction, Object)} correctly returns the
+     * result of the given function when no IOException is thrown.
+     */
+    @Test
+    public void applyShouldReturnResultOfIOFunction() {
+        // Arrange: Create an identity function that simply returns its input.
+        final IOFunction<String, String> identityFunction = IOFunction.identity();
+        final String input = "http";
+
+        // Act: Call the Uncheck.apply method with the function and input.
+        final String result = Uncheck.apply(identityFunction, input);
+
+        // Assert: Verify that the result is the same as the input.
+        assertEquals(input, result);
     }
 }
