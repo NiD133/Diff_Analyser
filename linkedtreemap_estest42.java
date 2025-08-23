@@ -1,25 +1,26 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LinkedTreeMap_ESTestTest42 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Test suite for the {@link LinkedTreeMap.Node} inner class.
+ */
+public class LinkedTreeMapNodeTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        LinkedTreeMap.Node<Object, Integer> linkedTreeMap_Node0 = new LinkedTreeMap.Node<Object, Integer>(true);
-        boolean boolean0 = linkedTreeMap_Node0.equals(linkedTreeMap_Node0);
-        assertTrue(boolean0);
+    /**
+     * Tests the reflexive property of the equals() method.
+     * A Node instance should always be equal to itself.
+     */
+    @Test
+    public void nodeShouldBeEqualToItself() {
+        // Arrange: Create a header node instance.
+        // The constructor `new Node(boolean)` is used for creating the special header node.
+        LinkedTreeMap.Node<Object, Integer> node = new LinkedTreeMap.Node<>(true);
+
+        // Act & Assert: Verify that the node's equals() method returns true when
+        // compared with the same instance.
+        boolean isEqual = node.equals(node);
+        assertTrue("A node instance should always be equal to itself.", isEqual);
     }
 }
