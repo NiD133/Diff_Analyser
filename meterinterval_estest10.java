@@ -1,34 +1,31 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MeterInterval_ESTestTest10 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        MeterInterval meterInterval0 = null;
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when the
+     * 'range' argument is null. The constructor has a non-null check for this
+     * critical parameter.
+     */
+    @Test
+    public void constructor_withNullRange_throwsIllegalArgumentException() {
+        // Act and Assert
         try {
-            meterInterval0 = new MeterInterval("9+XJTk=~|", (Range) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to create an interval with a valid label but a null range.
+            new MeterInterval("Normal", null);
+            fail("Expected an IllegalArgumentException, but it was not thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'range' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("Null 'range' argument.", e.getMessage());
         }
     }
 }
