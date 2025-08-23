@@ -1,20 +1,24 @@
 package com.google.common.primitives;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SignedBytes_ESTestTest24 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[0] = (byte) 16;
-        byte byte0 = SignedBytes.min(byteArray0);
-        assertEquals((byte) 0, byte0);
+    @Test
+    public void min_shouldReturnZero_whenArrayContainsZeroAndPositiveValues() {
+        // Arrange: Create an array with a mix of positive values and zero.
+        // Zero is the smallest signed byte in this set.
+        byte[] numbers = {16, 5, 127, 0, 8};
+        byte expectedMin = 0;
+
+        // Act: Find the minimum value in the array.
+        byte actualMin = SignedBytes.min(numbers);
+
+        // Assert: Verify that the minimum value found is indeed zero.
+        assertEquals(expectedMin, actualMin);
     }
 }
