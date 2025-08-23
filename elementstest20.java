@@ -2,25 +2,35 @@ package org.jsoup.select;
 
 import org.jsoup.Jsoup;
 import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ElementsTestTest20 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests for the {@link Elements#unwrap()} method.
+ */
+@DisplayName("Elements#unwrap")
+class ElementsUnwrapTest {
 
     @Test
-    public void unwrapP() {
-        String h = "<p><a>One</a> Two</p> Three <i>Four</i> <p>Fix <i>Six</i></p>";
-        Document doc = Jsoup.parse(h);
+    @DisplayName("should remove selected elements but keep their children")
+    void unwrapShouldRemoveSelectedElementsButKeepChildren() {
+        // Arrange: Set up the initial HTML structure.
+        // The HTML contains two <p> tags that we want to remove.
+        String html = "<p><a>One</a> Two</p> Three <i>Four</i> <p>Fix <i>Six</i></p>";
+        Document doc = Jsoup.parseBodyFragment(html);
+
+        // Act: Select all <p> elements and unwrap them.
+        // This should remove the <p> tags, promoting their contents to be siblings
+        // of the other nodes.
         doc.select("p").unwrap();
-        assertEquals("<a>One</a> Two Three <i>Four</i> Fix <i>Six</i>", TextUtil.stripNewlines(doc.body().html()));
+
+        // Assert: Verify that the <p> tags are gone but their content remains.
+        String expectedHtml = "<a>One</a> Two Three <i>Four</i> Fix <i>Six</i>";
+        String actualHtml = TextUtil.stripNewlines(doc.body().html());
+
+        assertEquals(expectedHtml, actualHtml);
     }
 }
