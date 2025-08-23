@@ -1,38 +1,48 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest15 {
+/**
+ * Tests for the QuotedPrintableCodec with a focus on strict decoding behavior.
+ */
+public class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
+    /**
+     * Tests that the strict decoder correctly handles and skips various types of line breaks
+     * as per RFC 1521. This includes soft line breaks (e.g., "=\r\n") as well as
+     * literal CR, LF, and CRLF sequences that are not part of a valid soft line break.
+     */
     @Test
-    void testSkipNotEncodedCRLF() throws Exception {
-        final String qpdata = "CRLF in an\n encoded text should be=20=\r\n\rskipped in the\r decoding.";
-        final String expected = "CRLF in an encoded text should be skipped in the decoding.";
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-        assertEquals(expected, qpcodec.decode(qpdata));
-        final String encoded = qpcodec.encode(expected);
-        assertEquals(expected, qpcodec.decode(encoded));
+    @DisplayName("Strict decoder should skip various line break types in encoded text")
+    void strictDecoder_whenDecodingTextWithVariousLineBreaks_thenSkipsThem() throws DecoderException, EncoderException {
+        // Arrange
+        // The strict codec should handle different line break representations.
+        final QuotedPrintableCodec strictCodec = new QuotedPrintableCodec(true);
+
+        // This input contains a mix of line breaks:
+        // - A bare line feed (\n)
+        // - A soft line break (=\r\n)
+        // - Two bare carriage returns (\r)
+        final String encodedTextWithMixedLineBreaks = "CRLF in an\n encoded text should be=20=\r\n\rskipped in the\r decoding.";
+        final String expectedDecodedText = "CRLF in an encoded text should be skipped in the decoding.";
+
+        // Act: Decode the text containing the mixed line breaks.
+        final String actualDecodedText = strictCodec.decode(encodedTextWithMixedLineBreaks);
+
+        // Assert: The decoder should strip all line breaks and decode the content.
+        assertEquals(expectedDecodedText, actualDecodedText);
+
+        // --- Round-trip consistency check ---
+        // Arrange & Act: Encode the clean text and decode it again.
+        final String roundTripEncoded = strictCodec.encode(expectedDecodedText);
+        final String roundTripDecoded = strictCodec.decode(roundTripEncoded);
+
+        // Assert: The result of the round-trip should be identical to the original clean text.
+        assertEquals(expectedDecodedText, roundTripDecoded);
     }
 }
