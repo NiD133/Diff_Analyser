@@ -1,40 +1,35 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Tests the behavior of the {@link RandomAccessFileOrArray} class when its
+ * underlying data source is null.
+ */
+// Note: The test class retains its original name and inheritance
+// to remain compatible with its test suite.
 public class RandomAccessFileOrArray_ESTestTest170 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test169() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        randomAccessFileOrArray0.pushBack((byte) 13);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readLine();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that readLine() throws a NullPointerException when the underlying
+     * RandomAccessSource is null.
+     * <p>
+     * This test specifically covers a scenario where a byte is pushed back before
+     * readLine() is called. The first internal read consumes the pushed-back byte,
+     * but a subsequent read attempt on the null source triggers the expected exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readLineWithNullSourceAfterPushBackShouldThrowNullPointerException() throws Throwable {
+        // Arrange: Create a RandomAccessFileOrArray instance with a null source.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+        
+        // Prime the pushback buffer. This ensures the first read inside readLine() succeeds.
+        // The character '\r' (byte 13) is used as it's a line-ending character.
+        fileOrArray.pushBack((byte) '\r');
+
+        // Act & Assert: Attempting to read a line should cause a NullPointerException
+        // when the code tries to read from the null source after consuming the pushed-back byte.
+        fileOrArray.readLine();
     }
 }
