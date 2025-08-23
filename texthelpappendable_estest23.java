@@ -1,44 +1,30 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest23 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TextHelpAppendable} class.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        textHelpAppendable0.setLeftPad((-2020));
-        int int0 = textHelpAppendable0.getLeftPad();
-        assertEquals((-2020), int0);
+    /**
+     * Tests that the getLeftPad() method correctly returns the value
+     * previously set by setLeftPad().
+     */
+    @Test
+    public void shouldSetAndGetLeftPadding() {
+        // Arrange
+        // The Appendable can be null for this test as it's not used by the set/get methods.
+        final TextHelpAppendable helpAppendable = new TextHelpAppendable(null);
+        final int expectedLeftPad = -2020;
+
+        // Act
+        helpAppendable.setLeftPad(expectedLeftPad);
+        final int actualLeftPad = helpAppendable.getLeftPad();
+
+        // Assert
+        assertEquals("The retrieved left pad value should match the value that was set.",
+                     expectedLeftPad, actualLeftPad);
     }
 }
