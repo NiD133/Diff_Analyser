@@ -1,27 +1,27 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest38 extends JsonArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonArray#getAsDouble()} method.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add("=^K4eh7 E_%>\"E3QB7U");
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsDouble();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+    /**
+     * Verifies that calling getAsDouble() on a JsonArray containing a single,
+     * non-numeric string element throws a NumberFormatException.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void getAsDouble_withSingleNonNumericString_throwsNumberFormatException() {
+        // Arrange: Create a JsonArray and add a string that cannot be parsed as a double.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add("not a valid double");
+
+        // Act: Attempt to get the element as a double.
+        // This call is expected to throw a NumberFormatException.
+        jsonArray.getAsDouble();
+
+        // Assert: The test succeeds if the expected NumberFormatException is thrown.
+        // This is handled by the @Test(expected = ...) annotation.
     }
 }
