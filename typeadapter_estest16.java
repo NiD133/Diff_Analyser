@@ -1,36 +1,37 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
+
 import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class TypeAdapter_ESTestTest16 extends TypeAdapter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        StringReader stringReader0 = new StringReader("");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        try {
-            typeAdapter0.read(jsonReader0);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // End of input at line 1 column 1 path $
-            //
-            verifyException("com.google.gson.stream.JsonReader", e);
-        }
+    /**
+     * Tests that calling {@code read()} on a null-safe adapter with an empty input stream
+     * throws an {@link EOFException}.
+     * <p>
+     * The {@code nullSafe()} wrapper first checks the next token in the stream. For an empty
+     * input, this check immediately results in an end-of-file condition before any
+     * delegation to the wrapped adapter can occur.
+     */
+    @Test
+    public void nullSafeReadFromEmptyInputShouldThrowEofException() {
+        // Arrange: Create a null-safe adapter and a JSON reader with empty input.
+        TypeAdapter<Object> delegateAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+        JsonReader jsonReader = new JsonReader(new StringReader(""));
+
+        // Act & Assert: Verify that reading from the empty stream throws an EOFException.
+        EOFException exception = assertThrows(EOFException.class, () -> {
+            nullSafeAdapter.read(jsonReader);
+        });
+
+        // Also assert the exception message to ensure it's the expected error.
+        assertEquals("End of input at line 1 column 1 path $", exception.getMessage());
     }
 }
