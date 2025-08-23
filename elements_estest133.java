@@ -1,37 +1,39 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class Elements_ESTestTest133 extends Elements_ESTest_scaffolding {
+/**
+ * This test class focuses on the val() methods of the Elements class.
+ * The original test was automatically generated and tested a confusing edge case.
+ * This version clarifies the intended behavior.
+ */
+public class Elements_ESTestTest133 {
 
-    @Test(timeout = 4000)
-    public void test132() throws Throwable {
-        Document document0 = Parser.parse("nly http & htps prtocols supported", "nly http & htps prtocols supported");
-        Elements elements0 = document0.getAllElements();
-        elements0.val("*mxmNg");
-        String string0 = elements0.val();
-        assertEquals("*mxmNg", string0);
+    /**
+     * Verifies that val(String) sets the value for all form elements in the collection,
+     * and val() retrieves the value from the first element.
+     */
+    @Test
+    public void val_setsValueOnAllElements_andGetsValueFromFirst() {
+        // Arrange: Create a document with form elements and select them.
+        // The val() methods are designed to work with form elements like <input>, <textarea>, etc.
+        Document doc = Jsoup.parse("<input name='one' value='a'> <input name='two' value='b'>");
+        Elements inputs = doc.select("input");
+
+        // Act: Set a new value on all selected elements.
+        // The val(String) setter updates all elements in the collection.
+        inputs.val("new value");
+        
+        // The val() getter retrieves the value from the *first* element in the collection.
+        String retrievedVal = inputs.val();
+
+        // Assert: Verify that the retrieved value matches the value that was set.
+        assertEquals("The value from the first element should be updated.", "new value", retrievedVal);
+        
+        // For completeness, also verify that the second element was updated too.
+        assertEquals("The value of the second element should also be updated.", "new value", inputs.get(1).val());
     }
 }
