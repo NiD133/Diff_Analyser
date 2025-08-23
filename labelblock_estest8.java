@@ -1,40 +1,42 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.jfree.chart.util.Size2D;
 
-public class LabelBlock_ESTestTest8 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link LabelBlock} class, focusing on layout and arrangement logic.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("{VWG-Lf]Z_E1vj+i'tt");
-        BufferedImage bufferedImage0 = new BufferedImage(11, 1028, 11);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        Size2D size2D0 = labelBlock0.arrange(graphics2D0, rectangleConstraint0);
-        assertEquals(13.0, size2D0.getHeight(), 0.01);
+    /**
+     * Verifies that the arrange method correctly calculates the natural height of the block
+     * when no constraints are applied. The expected height is determined by the metrics
+     * of the default font used by the LabelBlock.
+     */
+    @Test
+    public void testArrangeWithNoConstraintCalculatesCorrectNaturalHeight() {
+        // Arrange: Create a LabelBlock, which uses a default font ("SansSerif", PLAIN, 10).
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+
+        // The arrange method requires a Graphics2D context to measure the text.
+        // A dummy 1x1 image is created solely to obtain this graphics context.
+        BufferedImage dummyImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = dummyImage.createGraphics();
+
+        // Use RectangleConstraint.NONE to allow the block to determine its own size.
+        RectangleConstraint noConstraint = RectangleConstraint.NONE;
+
+        // Act: Calculate the block's size.
+        Size2D arrangedSize = labelBlock.arrange(g2, noConstraint);
+
+        // Assert: The calculated height should match the expected height for the default font.
+        // This value is based on the font's line metrics.
+        final double expectedHeight = 13.0;
+        assertEquals("The height should match the natural height of the text based on the default font.",
+                expectedHeight, arrangedSize.getHeight(), 0.01);
     }
 }
