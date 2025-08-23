@@ -1,83 +1,55 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.Test;
 
-public class StringConverterTestTest31 extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
-
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the behavior of {@link StringConverter#setInto(ReadWritableInterval, Object, Chronology)}
+ * when parsing an interval string.
+ */
+public class StringConverterIntervalTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
+    @Test
+    public void setInto_shouldParseIsoIntervalStringAndUseDefaultChronology_whenChronologyIsNull() {
+        // The StringConverter uses the default Chronology (and thus default time zone)
+        // when a null Chronology is passed. This test verifies this behavior by
+        // setting a specific default time zone and checking the result.
+        DateTimeZone originalDefaultZone = DateTimeZone.getDefault();
+        try {
+            // Arrange: Set a specific default time zone for this test.
+            DateTimeZone.setDefault(LONDON);
 
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
+            final String intervalString = "2003-08-09/2004-06-09";
+            // An empty interval that will be updated by the method under test.
+            final MutableInterval intervalToUpdate = new MutableInterval(0L, 0L);
 
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
+            // Define the expected result explicitly, using the LONDON time zone.
+            final DateTime expectedStart = new DateTime(2003, 8, 9, 0, 0, 0, 0, LONDON);
+            final DateTime expectedEnd = new DateTime(2004, 6, 9, 0, 0, 0, 0, LONDON);
+            final Interval expectedInterval = new Interval(expectedStart, expectedEnd);
 
-    private static Chronology ISO;
+            // Act: Call the method under test with a null chronology.
+            StringConverter.INSTANCE.setInto(intervalToUpdate, intervalString, null);
 
-    private static Chronology JULIAN;
+            // Assert: Verify that the interval was updated correctly.
+            assertEquals("The updated interval should match the parsed string.",
+                    expectedInterval, intervalToUpdate);
+            
+            // Also, explicitly verify that the chronology is the default (ISO in the LONDON zone).
+            assertEquals("The interval's chronology should be the default.",
+                    ISOChronology.getInstance(LONDON), intervalToUpdate.getChronology());
 
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoInterval_Object_Chronology3() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(m, "2003-08-09/2004-06-09", null);
-        assertEquals(new DateTime(2003, 8, 9, 0, 0, 0, 0), m.getStart());
-        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0), m.getEnd());
-        assertEquals(ISOChronology.getInstance(), m.getChronology());
+        } finally {
+            // Teardown: Restore the original default time zone to avoid side effects.
+            DateTimeZone.setDefault(originalDefaultZone);
+        }
     }
 }
