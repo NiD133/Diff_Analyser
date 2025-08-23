@@ -1,0 +1,27 @@
+package org.apache.ibatis.type;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.time.YearMonth;
+import org.apache.ibatis.session.Configuration;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.junit.runner.RunWith;
+
+public class BaseTypeHandler_ESTestTest2 extends BaseTypeHandler_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test01() throws Throwable {
+        YearMonthTypeHandler yearMonthTypeHandler0 = new YearMonthTypeHandler();
+        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
+        doReturn((String) null).when(callableStatement0).getString(anyInt());
+        YearMonth yearMonth0 = yearMonthTypeHandler0.getResult(callableStatement0, 0);
+        assertNull(yearMonth0);
+    }
+}
