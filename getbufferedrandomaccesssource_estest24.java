@@ -1,23 +1,29 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GetBufferedRandomAccessSource_ESTestTest24 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link GetBufferedRandomAccessSource} class.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        long long0 = getBufferedRandomAccessSource0.length();
-        assertEquals(8L, long0);
+    /**
+     * Verifies that the length() method correctly returns the length of the
+     * underlying data source.
+     */
+    @Test
+    public void length_shouldReturnLengthOfUnderlyingSource() {
+        // Arrange: Create an underlying source with a known length.
+        final int expectedLength = 8;
+        byte[] sourceData = new byte[expectedLength];
+        RandomAccessSource underlyingSource = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
+
+        // Act: Call the length() method on the buffered source.
+        long actualLength = bufferedSource.length();
+
+        // Assert: The returned length should match the underlying source's length.
+        assertEquals(expectedLength, actualLength);
     }
 }
