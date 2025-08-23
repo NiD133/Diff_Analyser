@@ -1,31 +1,46 @@
 package org.jfree.data;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparableObjectItem_ESTestTest8 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Comparable<Object> comparable0 = (Comparable<Object>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(comparable0).toString();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, (Object) null);
-        ComparableObjectItem comparableObjectItem1 = new ComparableObjectItem(comparableObjectItem0, (Object) null);
-        // Undeclared exception!
-        try {
-            comparableObjectItem1.compareTo(comparableObjectItem0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // class org.evosuite.shaded.org.mockito.codegen.Comparable$MockitoMock$1384067238 cannot be cast to class org.jfree.data.ComparableObjectItem (org.evosuite.shaded.org.mockito.codegen.Comparable$MockitoMock$1384067238 is in unnamed module of loader org.evosuite.instrumentation.InstrumentingClassLoader @4995c230; org.jfree.data.ComparableObjectItem is in unnamed module of loader org.evosuite.instrumentation.InstrumentingClassLoader @3d9f867a)
-            //
-            verifyException("org.jfree.data.ComparableObjectItem", e);
-        }
+    /**
+     * This test verifies that a ClassCastException is thrown when the compareTo method
+     * is called on items whose internal 'Comparable' objects are of incompatible types.
+     *
+     * The compareTo method in ComparableObjectItem delegates the comparison to its
+     * internal 'comparable' member. This test creates a scenario where this delegation
+     * results in an attempt to compare a ComparableObjectItem with a simple String,
+     * which correctly causes a ClassCastException.
+     */
+    @Test(expected = ClassCastException.class)
+    public void compareToShouldThrowClassCastExceptionForIncompatibleComparableTypes() {
+        // Arrange: Create two items with a nested, incompatible structure.
+
+        // 1. Create a simple comparable object (a String).
+        Comparable<String> simpleComparable = "key1";
+
+        // 2. Create the first item using the simple comparable.
+        ComparableObjectItem itemWithSimpleComparable = new ComparableObjectItem(simpleComparable, "value1");
+
+        // 3. Create a second item where the 'comparable' part is the *first item* itself.
+        // This creates a nested structure: itemWithNestedComparable -> itemWithSimpleComparable -> String
+        ComparableObjectItem itemWithNestedComparable = new ComparableObjectItem(itemWithSimpleComparable, "value2");
+
+        // Act: Attempt to compare the two items.
+        // This will internally call:
+        // itemWithNestedComparable.getComparable().compareTo(itemWithSimpleComparable.getComparable())
+        // which translates to:
+        // itemWithSimpleComparable.compareTo(simpleComparable)
+        //
+        // Since 'simpleComparable' is a String and not a ComparableObjectItem,
+        // the compareTo method of ComparableObjectItem will throw a ClassCastException.
+        itemWithNestedComparable.compareTo(itemWithSimpleComparable);
+
+        // Assert: The @Test(expected) annotation asserts that a ClassCastException is thrown.
+        // If no exception is thrown, the test will fail automatically.
     }
 }
