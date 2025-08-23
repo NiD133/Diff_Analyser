@@ -1,24 +1,45 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.Reader;
+import org.junit.Test;
+
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonParser_ESTestTest10 extends JsonParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        StringReader stringReader0 = new StringReader("|h|[8&ZGQ1Fbg]Xp");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        jsonParser0.parse(jsonReader0);
-        JsonElement jsonElement0 = jsonParser0.parse(jsonReader0);
-        assertFalse(jsonElement0.isJsonObject());
+/**
+ * Test for {@link JsonParser} focusing on parsing multiple elements from a stream.
+ */
+public class JsonParserTest {
+
+    @Test
+    public void parseReader_whenStreamContainsMultipleJsonElements_parsesElementsSequentially() {
+        // Arrange
+        // A string containing two consecutive, top-level JSON elements: a string and an array.
+        // The parseReader(JsonReader) method is designed to handle such streams.
+        String multiElementJson = "\"first\" [1, 2, 3]";
+        JsonReader jsonReader = new JsonReader(new StringReader(multiElementJson));
+
+        // Act
+        // The first call to parseReader() should consume the string element.
+        JsonElement firstElement = JsonParser.parseReader(jsonReader);
+        // The second call should consume the array element.
+        JsonElement secondElement = JsonParser.parseReader(jsonReader);
+
+        // Assert
+        // Verify the first element was parsed correctly.
+        assertTrue("First element should be a JsonPrimitive", firstElement.isJsonPrimitive());
+        assertEquals("first", firstElement.getAsString());
+
+        // Verify the second element was parsed correctly.
+        assertTrue("Second element should be a JsonArray", secondElement.isJsonArray());
+
+        // For completeness, verify the content of the array.
+        JsonArray jsonArray = secondElement.getAsJsonArray();
+        assertEquals(3, jsonArray.size());
+        assertEquals(1, jsonArray.get(0).getAsInt());
+        assertEquals(2, jsonArray.get(1).getAsInt());
+        assertEquals(3, jsonArray.get(2).getAsInt());
     }
 }
