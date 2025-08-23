@@ -1,33 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class QueueInputStream_ESTestTest14 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link QueueInputStream.Builder}.
+ */
+public class QueueInputStreamBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        QueueInputStream.Builder queueInputStream_Builder0 = QueueInputStream.builder();
-        Duration duration0 = Duration.ofHours((-2277L));
-        // Undeclared exception!
+    /**
+     * Tests that {@link QueueInputStream.Builder#setTimeout(Duration)} throws
+     * an {@link IllegalArgumentException} when given a negative duration.
+     */
+    @Test
+    public void setTimeoutShouldThrowIllegalArgumentExceptionForNegativeDuration() {
+        // Arrange: Create a builder and a negative timeout duration.
+        final QueueInputStream.Builder builder = QueueInputStream.builder();
+        final Duration negativeTimeout = Duration.ofMillis(-1);
+        final String expectedErrorMessage = "timeout must not be negative";
+
+        // Act & Assert: Attempt to set the negative timeout and verify the exception.
         try {
-            queueInputStream_Builder0.setTimeout(duration0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // timeout must not be negative
-            //
-            verifyException("org.apache.commons.io.input.QueueInputStream$Builder", e);
+            builder.setTimeout(negativeTimeout);
+            fail("Expected an IllegalArgumentException to be thrown for a negative timeout.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the caught exception has the expected error message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
