@@ -1,30 +1,41 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BoundedReader_ESTestTest17 extends BoundedReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        stringReader0.close();
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 198);
-        try {
-            boundedReader0.mark(198);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
-        }
+/**
+ * Test suite for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
+
+    /**
+     * Tests that calling mark() on a BoundedReader propagates the IOException
+     * from the underlying reader if it has been closed.
+     */
+    @Test
+    public void markShouldThrowIOExceptionWhenUnderlyingReaderIsClosed() throws IOException {
+        // Arrange: Create a reader and close it immediately.
+        final Reader closedReader = new StringReader("This content will not be read.");
+        closedReader.close();
+
+        // Wrap the closed reader in a BoundedReader.
+        final BoundedReader boundedReader = new BoundedReader(closedReader, 100);
+        final int arbitraryReadAheadLimit = 50;
+
+        // Act & Assert: Verify that calling mark() throws an IOException.
+        // We use assertThrows for a clear and concise exception check.
+        IOException thrown = assertThrows(
+            IOException.class,
+            () -> boundedReader.mark(arbitraryReadAheadLimit)
+        );
+
+        // Further assert that the exception message is the one expected from the closed StringReader.
+        assertEquals("Stream closed", thrown.getMessage());
     }
 }
