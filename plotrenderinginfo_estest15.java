@@ -1,35 +1,31 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PlotRenderingInfo_ESTestTest15 extends PlotRenderingInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-        // Undeclared exception!
-        try {
-            plotRenderingInfo0.getSubplotIndex((Point2D) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'source' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+/**
+ * Unit tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
+
+    /**
+     * Verifies that calling getSubplotIndex() with a null point
+     * throws an IllegalArgumentException.
+     */
+    @Test
+    public void getSubplotIndex_withNullPoint_shouldThrowIllegalArgumentException() {
+        // Arrange
+        PlotRenderingInfo info = new PlotRenderingInfo(null);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> info.getSubplotIndex(null)
+        );
+
+        assertEquals("Null 'source' argument.", exception.getMessage());
     }
 }
