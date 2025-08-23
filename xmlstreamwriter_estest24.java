@@ -1,32 +1,31 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmlStreamWriter_ESTestTest24 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link XmlStreamWriter}.
+ */
+public class XmlStreamWriterTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream(pipedInputStream0);
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-        String string0 = xmlStreamWriter0.getDefaultEncoding();
-        assertEquals("UTF-8", string0);
+    /**
+     * Verifies that the XmlStreamWriter constructor that accepts an OutputStream
+     * uses UTF-8 as the default encoding when no encoding is specified.
+     */
+    @Test
+    public void constructorWithOutputStreamShouldSetDefaultEncodingToUtf8() {
+        // Arrange: Create a simple OutputStream and instantiate the writer.
+        // A ByteArrayOutputStream is used as a lightweight, in-memory stream.
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+
+        // Act: Retrieve the default encoding from the writer.
+        final String defaultEncoding = writer.getDefaultEncoding();
+
+        // Assert: Check if the default encoding is UTF-8 as expected.
+        assertEquals("The default encoding should be UTF-8", "UTF-8", defaultEncoding);
     }
 }
