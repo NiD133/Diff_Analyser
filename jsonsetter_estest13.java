@@ -1,26 +1,39 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonSetter_ESTestTest13 extends JsonSetter_ESTest_scaffolding {
+/**
+ * This test class focuses on the functionality of the {@link JsonSetter.Value} class.
+ */
+public class JsonSetter_ESTestTest13 {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JsonSetter jsonSetter0 = mock(JsonSetter.class, CALLS_REAL_METHODS);
-        doReturn((Nulls) null).when(jsonSetter0).contentNulls();
-        doReturn((Nulls) null).when(jsonSetter0).nulls();
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.from(jsonSetter0);
-        Nulls nulls0 = Nulls.DEFAULT;
-        Nulls nulls1 = Nulls.SKIP;
-        JsonSetter.Value jsonSetter_Value1 = jsonSetter_Value0.withValueNulls(nulls0, nulls1);
-        jsonSetter_Value1.nonDefaultContentNulls();
-        assertEquals(Nulls.DEFAULT, jsonSetter_Value1.getValueNulls());
-        assertEquals(Nulls.SKIP, jsonSetter_Value1.getContentNulls());
+    /**
+     * Tests that the factory method {@link JsonSetter.Value#withValueNulls(Nulls, Nulls)}
+     * correctly creates a new instance with both value and content null handling strategies updated.
+     */
+    @Test
+    public void withValueNulls_shouldUpdateBothValueAndContentNulls() {
+        // Arrange: Create an initial JsonSetter.Value with unspecified null handling.
+        // Using construct(null, null) is a clearer way to achieve the state
+        // that the original test created using mocks.
+        JsonSetter.Value initialValue = JsonSetter.Value.construct(null, null);
+
+        final Nulls desiredValueNulls = Nulls.DEFAULT;
+        final Nulls desiredContentNulls = Nulls.SKIP;
+
+        // Act: Create a new Value instance by applying the new null handling strategies.
+        JsonSetter.Value updatedValue = initialValue.withValueNulls(desiredValueNulls, desiredContentNulls);
+
+        // Assert: Verify that the new instance has the correctly updated properties.
+        assertEquals("Value nulls should be updated",
+                desiredValueNulls, updatedValue.getValueNulls());
+        assertEquals("Content nulls should be updated",
+                desiredContentNulls, updatedValue.getContentNulls());
+
+        // Assert the behavior of the non-default accessor, making its purpose clear.
+        // Since contentNulls is SKIP (not DEFAULT), it should be returned directly.
+        assertEquals("nonDefaultContentNulls() should return the specific value when it's not DEFAULT",
+                desiredContentNulls, updatedValue.nonDefaultContentNulls());
     }
 }
