@@ -1,62 +1,72 @@
 package com.google.common.primitives;
 
 import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
+
 import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import junit.framework.TestCase;
 import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest1 extends TestCase {
+/**
+ * Tests for {@link SignedBytes}.
+ *
+ * <p>This refactored test focuses on the {@code checkedCast} method, splitting the original
+ * monolithic test into focused, descriptively named test cases.
+ */
+@GwtCompatible
+@J2ktIncompatible // Original test was not J2kt compatible
+@NullMarked
+@RunWith(JUnit4.class)
+public class SignedBytesTest {
 
-    private static final byte[] EMPTY = {};
+  private static final byte MIN_BYTE = Byte.MIN_VALUE;
+  private static final byte MAX_BYTE = Byte.MAX_VALUE;
 
-    private static final byte[] ARRAY1 = { (byte) 1 };
-
-    private static final byte LEAST = Byte.MIN_VALUE;
-
-    private static final byte GREATEST = Byte.MAX_VALUE;
-
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
-
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
-        }
+  /** Tests that valid long values are cast correctly to bytes. */
+  @Test
+  public void checkedCast_withValidByteValues_returnsSameValue() {
+    byte[] validValues = {MIN_BYTE, -1, 0, 1, MAX_BYTE};
+    for (byte value : validValues) {
+      assertThat(SignedBytes.checkedCast((long) value)).isEqualTo(value);
     }
+  }
 
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
+  /** Tests that a value just larger than the maximum byte value throws an exception. */
+  @Test
+  public void checkedCast_withValueJustOverMax_throwsIllegalArgumentException() {
+    long outOfRangeValue = (long) MAX_BYTE + 1;
 
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
+    IllegalArgumentException exception =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(outOfRangeValue));
 
-    public void testCheckedCast() {
-        for (byte value : VALUES) {
-            assertThat(SignedBytes.checkedCast((long) value)).isEqualTo(value);
-        }
-        assertCastFails(GREATEST + 1L);
-        assertCastFails(LEAST - 1L);
-        assertCastFails(Long.MAX_VALUE);
-        assertCastFails(Long.MIN_VALUE);
-    }
+    assertThat(exception).hasMessageThat().contains(String.valueOf(outOfRangeValue));
+  }
+
+  /** Tests that a value just smaller than the minimum byte value throws an exception. */
+  @Test
+  public void checkedCast_withValueJustUnderMin_throwsIllegalArgumentException() {
+    long outOfRangeValue = (long) MIN_BYTE - 1;
+
+    IllegalArgumentException exception =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(outOfRangeValue));
+
+    assertThat(exception).hasMessageThat().contains(String.valueOf(outOfRangeValue));
+  }
+
+  /** Tests that extreme long values (MIN_VALUE and MAX_VALUE) throw an exception. */
+  @Test
+  public void checkedCast_withExtremeLongValues_throwsIllegalArgumentException() {
+    // Test with Long.MAX_VALUE
+    IllegalArgumentException maxException =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(Long.MAX_VALUE));
+    assertThat(maxException).hasMessageThat().contains(String.valueOf(Long.MAX_VALUE));
+
+    // Test with Long.MIN_VALUE
+    IllegalArgumentException minException =
+        assertThrows(IllegalArgumentException.class, () -> SignedBytes.checkedCast(Long.MIN_VALUE));
+    assertThat(minException).hasMessageThat().contains(String.valueOf(Long.MIN_VALUE));
+  }
 }
