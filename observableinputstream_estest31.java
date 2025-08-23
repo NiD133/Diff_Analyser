@@ -1,47 +1,22 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest31 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ObservableInputStream} class.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        ObservableInputStream observableInputStream0 = null;
-        try {
-            observableInputStream0 = new ObservableInputStream((ObservableInputStream.AbstractBuilder<?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.ProxyInputStream", e);
-        }
+    /**
+     * Tests that the constructor throws a NullPointerException when a null builder is provided.
+     * This constructor is package-private and relies on the superclass {@link ProxyInputStream}
+     * to handle the builder, which is where the NullPointerException is expected to originate.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullBuilderShouldThrowNullPointerException() {
+        // The constructor under test is package-private, so this test must be in the same package.
+        // It is expected to throw a NullPointerException because the superclass constructor
+        // will attempt to access the null builder reference.
+        new ObservableInputStream((ObservableInputStream.AbstractBuilder<?>) null);
     }
 }
