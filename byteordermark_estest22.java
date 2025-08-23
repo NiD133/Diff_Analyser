@@ -1,19 +1,30 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteOrderMark_ESTestTest22 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ByteOrderMark}.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        int[] intArray0 = new int[6];
-        ByteOrderMark byteOrderMark0 = new ByteOrderMark("Bt^D2-fqe2We[-^J#", intArray0);
-        String string0 = byteOrderMark0.getCharsetName();
-        assertEquals("Bt^D2-fqe2We[-^J#", string0);
+    /**
+     * Tests that the getCharsetName() method returns the exact string
+     * that was passed to the constructor.
+     */
+    @Test
+    public void testGetCharsetNameReturnsConstructorValue() {
+        // Arrange: Create a ByteOrderMark with a specific charset name.
+        // The actual byte values are irrelevant for this test, but the array cannot be empty.
+        final String expectedCharsetName = "CUSTOM-CHARSET-123";
+        final int[] anyNonEmptyBytes = {0x01, 0x02, 0x03};
+        final ByteOrderMark bom = new ByteOrderMark(expectedCharsetName, anyNonEmptyBytes);
+
+        // Act: Retrieve the charset name from the object.
+        final String actualCharsetName = bom.getCharsetName();
+
+        // Assert: Verify that the retrieved name matches the expected name.
+        assertEquals("The charset name should match the one provided in the constructor.",
+                expectedCharsetName, actualCharsetName);
     }
 }
