@@ -1,17 +1,28 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Separators_ESTestTest36 extends Separators_ESTest_scaffolding {
+/**
+ * Contains tests for the inner enum {@link Separators.Spacing}.
+ */
+public class SeparatorsSpacingTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.BOTH;
-        String string0 = separators_Spacing0.apply('p');
-        assertEquals(" p ", string0);
+    /**
+     * Verifies that {@link Separators.Spacing#BOTH} correctly applies a single
+     * space both before and after the given separator character.
+     */
+    @Test
+    public void apply_withBothSpacing_shouldAddSpaceBeforeAndAfterSeparator() {
+        // Arrange: Define the spacing type and the input character.
+        Separators.Spacing spacing = Separators.Spacing.BOTH;
+        char separatorChar = 'p';
+        String expectedOutput = " p ";
+
+        // Act: Apply the spacing to the character.
+        String actualOutput = spacing.apply(separatorChar);
+
+        // Assert: Check if the output matches the expected format.
+        assertEquals(expectedOutput, actualOutput);
     }
 }
