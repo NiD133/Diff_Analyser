@@ -1,35 +1,38 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.EOFException;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest27 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeAdapter} class.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        StringReader stringReader0 = new StringReader("");
+    /**
+     * Verifies that calling fromJson() with an empty Reader results in an EOFException.
+     * This is the expected behavior because the underlying JsonReader cannot find a
+     * JSON token to parse.
+     */
+    @Test
+    public void fromJson_withEmptyReader_shouldThrowEOFException() throws Exception {
+        // Arrange: Create a TypeAdapter and an empty input reader.
+        // The specific TypeAdapter implementation is not critical here; the behavior
+        // is handled by the base fromJson(Reader) method.
+        TypeAdapter<Object> typeAdapter = new Gson.FutureTypeAdapter<>().nullSafe();
+        Reader emptyReader = new StringReader("");
+
+        // Act & Assert
         try {
-            typeAdapter0.fromJson((Reader) stringReader0);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // End of input at line 1 column 1 path $
-            //
-            verifyException("com.google.gson.stream.JsonReader", e);
+            typeAdapter.fromJson(emptyReader);
+            fail("Expected an EOFException to be thrown for an empty reader, but it completed successfully.");
+        } catch (EOFException expected) {
+            // Verify that the exception message is correct, confirming the source of the error.
+            assertEquals("End of input at line 1 column 1 path $", expected.getMessage());
         }
     }
 }
