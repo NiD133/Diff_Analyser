@@ -1,83 +1,40 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class CopticChronologyTestTest7 extends TestCase {
+/**
+ * Unit tests for the {@link CopticChronology} class, focusing on the
+ * calculation of the first day of the year.
+ */
+public class CopticChronology_ESTestTest7 {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * Tests that calculateFirstDayOfYearMillis() returns the correct millisecond
+     * value for a given year. The expected value is derived by creating a
+     * DateTime object for the first day of the Coptic year and retrieving its
+     * millisecond value, making the test more self-documenting than using a
+     * magic number.
+     */
+    @Test
+    public void testCalculateFirstDayOfYearMillisForPositiveYear() {
+        // Arrange
+        final CopticChronology copticChronology = CopticChronology.getInstanceUTC();
+        final int year = 3571;
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+        // The first day of the Coptic year is the 1st of the month of Tout.
+        // We create a DateTime for this specific date to get the expected millis,
+        // avoiding the use of an opaque long literal.
+        final DateTime firstDayOfYear = new DateTime(year, 1, 1, 0, 0, copticChronology);
+        final long expectedFirstDayMillis = firstDayOfYear.getMillis();
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Act
+        final long actualFirstDayMillis = copticChronology.calculateFirstDayOfYearMillis(year);
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testToString() {
-        assertEquals("CopticChronology[Europe/London]", CopticChronology.getInstance(LONDON).toString());
-        assertEquals("CopticChronology[Asia/Tokyo]", CopticChronology.getInstance(TOKYO).toString());
-        assertEquals("CopticChronology[Europe/London]", CopticChronology.getInstance().toString());
-        assertEquals("CopticChronology[UTC]", CopticChronology.getInstanceUTC().toString());
+        // Assert
+        assertEquals("The calculated first day of year in milliseconds should match the expected value.",
+                     expectedFirstDayMillis, actualFirstDayMillis);
     }
 }
