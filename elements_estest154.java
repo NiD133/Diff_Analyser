@@ -1,43 +1,25 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
+/**
+ * This test focuses on the behavior of the {@link Elements#deselect(int)} method.
+ * Note: The original class name and inheritance are preserved as they might be part of a larger, generated test suite.
+ */
 public class Elements_ESTestTest154 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test153() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
-        try {
-            elements0.deselect(665);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 665, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+    /**
+     * Verifies that calling deselect() on an empty Elements collection
+     * throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void deselectOnEmptyListThrowsException() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act & Assert: Attempt to deselect an element at index 0.
+        // Since the list is empty, this action is expected to throw an
+        // IndexOutOfBoundsException. The @Test annotation handles the assertion.
+        emptyElements.deselect(0);
     }
 }
