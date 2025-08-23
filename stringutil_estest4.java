@@ -1,28 +1,41 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest4 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil#isHexDigit(char) method.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        boolean boolean0 = StringUtil.isHexDigit('a');
-        assertTrue(boolean0);
+    @Test
+    public void isHexDigit_shouldReturnTrue_forLowerCaseHexCharacter() {
+        // The character 'a' is a valid hexadecimal digit.
+        assertTrue("'a' should be recognized as a hex digit", StringUtil.isHexDigit('a'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnTrue_forUpperCaseHexCharacter() {
+        // The character 'F' is a valid hexadecimal digit.
+        assertTrue("'F' should be recognized as a hex digit", StringUtil.isHexDigit('F'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnTrue_forNumericDigit() {
+        // The character '5' is a valid hexadecimal digit.
+        assertTrue("'5' should be recognized as a hex digit", StringUtil.isHexDigit('5'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnFalse_forNonHexCharacter() {
+        // The character 'g' is not a valid hexadecimal digit.
+        assertFalse("'g' should not be recognized as a hex digit", StringUtil.isHexDigit('g'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnFalse_forSymbol() {
+        // The character '$' is not a valid hexadecimal digit.
+        assertFalse("'$' should not be recognized as a hex digit", StringUtil.isHexDigit('$'));
     }
 }
