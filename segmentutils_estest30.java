@@ -1,25 +1,32 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SegmentUtils_ESTestTest30 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * This test suite contains improved, more understandable tests for the {@link SegmentUtils} class.
+ * This specific test case focuses on how the countArgs method handles invalid input.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that countArgs() throws an IllegalArgumentException when the provided
+     * method descriptor string is malformed (i.e., does not start with an opening parenthesis).
+     */
+    @Test
+    public void countArgsThrowsExceptionForInvalidDescriptorFormat() {
+        // A valid method descriptor must start with '('.
+        // This input is invalid because it starts with a ')' instead.
+        final String malformedDescriptor = ") 8FhA()w";
+        final int arbitraryWidthForLongsAndDoubles = 10;
+
         try {
-            SegmentUtils.countArgs(") 8FhA()w", 10);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // No arguments
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+            SegmentUtils.countArgs(malformedDescriptor, arbitraryWidthForLongsAndDoubles);
+            fail("Expected an IllegalArgumentException due to the malformed descriptor.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("No arguments", e.getMessage());
         }
     }
 }
