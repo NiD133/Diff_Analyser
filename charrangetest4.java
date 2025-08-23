@@ -1,25 +1,41 @@
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CharRangeTestTest4 extends AbstractLangTest {
+/**
+ * Tests for {@link CharRange}.
+ *
+ * Note: The original class name "CharRangeTestTest4" was renamed to "CharRangeTest"
+ * to improve clarity and remove redundancy.
+ */
+public class CharRangeTest extends AbstractLangTest {
 
     @Test
-    void testConstructorAccessors_isIn_Reversed() {
-        final CharRange rangea = CharRange.isIn('e', 'a');
-        assertEquals('a', rangea.getStart());
-        assertEquals('e', rangea.getEnd());
-        assertFalse(rangea.isNegated());
-        assertEquals("a-e", rangea.toString());
+    @DisplayName("CharRange.isIn() creates a normalized range when start and end characters are reversed")
+    void isInShouldCreateNormalizedRangeForReversedArguments() {
+        // Background: The documentation for CharRange.isIn(start, end) states that if the
+        // arguments are in the wrong order, they are automatically reversed.
+        // This test verifies that behavior.
+
+        // Arrange: Define start and end characters in a reversed order.
+        final char startChar = 'e';
+        final char endChar = 'a';
+        final String expectedToString = "a-e";
+
+        // Act: Create a CharRange using the factory method under test.
+        final CharRange range = CharRange.isIn(startChar, endChar);
+
+        // Assert: The created range should be normalized (from 'a' to 'e') and not negated.
+        assertAll("Properties of range from CharRange.isIn('e', 'a')",
+            () -> assertEquals('a', range.getStart(), "Start should be the smaller character"),
+            () -> assertEquals('e', range.getEnd(), "End should be the larger character"),
+            () -> assertFalse(range.isNegated(), "The range should not be negated"),
+            () -> assertEquals(expectedToString, range.toString(), "The string representation should be normalized")
+        );
     }
 }
