@@ -1,23 +1,30 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertNotEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest29 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.ordered(locale_Category0, locale_Category0);
-        Object object0 = endpointPair0.source();
-        EndpointPair<Object> endpointPair1 = EndpointPair.unordered((Object) object0, (Object) endpointPair0);
-        boolean boolean0 = endpointPair1.equals(endpointPair0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that an ordered EndpointPair is never equal to an unordered one,
+     * even if they contain the same nodes, as specified by the equals() contract.
+     */
+    @Test
+    public void equals_returnsFalse_whenComparingOrderedAndUnorderedPairs() {
+        // Arrange: Create an ordered and an unordered pair with the same nodes.
+        String nodeU = "U";
+        String nodeV = "V";
+
+        EndpointPair<String> orderedPair = EndpointPair.ordered(nodeU, nodeV);
+        EndpointPair<String> unorderedPair = EndpointPair.unordered(nodeU, nodeV);
+
+        // Assert: Per the Javadoc, an ordered pair can never be equal to an unordered one.
+        // We use assertNotEquals to clearly state this expectation.
+        assertNotEquals(orderedPair, unorderedPair);
+        assertNotEquals(unorderedPair, orderedPair); // Also test the reverse comparison
     }
 }
