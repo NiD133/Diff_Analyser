@@ -1,28 +1,48 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest3 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandRange(2645.56006566, (-1.0), 0.0, (-388.0));
-        double double0 = bBoxCalculator0.getMinY();
-        assertEquals((-388.0), bBoxCalculator0.getMaxY(), 0.01);
-        assertEquals(0.0, double0, 0.01);
+/**
+ * Unit tests for the BBoxCalculator class.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that expandRange correctly updates the min and max Y coordinates
+     * based on the provided values, even if the input minY is greater than maxY.
+     * The BBoxCalculator should simply expand its bounds to include both values independently.
+     */
+    @Test
+    public void expandRangeShouldUpdateMinAndMaxYIndependently() {
+        // Arrange
+        // Using the default geodetic SpatialContext is sufficient for this test.
+        SpatialContext spatialContext = SpatialContext.GEO;
+        BBoxCalculator bboxCalculator = new BBoxCalculator(spatialContext);
+
+        // The test focuses on the Y coordinates. X values are arbitrary.
+        // The key aspect is that the input minY (0.0) is greater than the input maxY (-388.0).
+        double arbitraryMinX = 10.0;
+        double arbitraryMaxX = 20.0;
+        double inputMinY = 0.0;
+        double inputMaxY = -388.0;
+
+        // Act
+        // The BBoxCalculator is initially empty (minY=inf, maxY=-inf).
+        // After this call, the new minY should be min(inf, 0.0) = 0.0
+        // and the new maxY should be max(-inf, -388.0) = -388.0.
+        bboxCalculator.expandRange(arbitraryMinX, arbitraryMaxX, inputMinY, inputMaxY);
+
+        // Assert
+        // The delta is used for floating-point comparisons.
+        final double delta = 0.01;
+        
+        assertEquals("Min Y should be updated to the input minY value.",
+                inputMinY, bboxCalculator.getMinY(), delta);
+
+        assertEquals("Max Y should be updated to the input maxY value.",
+                inputMaxY, bboxCalculator.getMaxY(), delta);
     }
 }
