@@ -1,30 +1,41 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import org.junit.jupiter.api.Test;
 
-public class ByteOrderMarkTestTest10 {
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    private static final ByteOrderMark TEST_BOM_1 = new ByteOrderMark("test1", 1);
-
-    private static final ByteOrderMark TEST_BOM_2 = new ByteOrderMark("test2", 1, 2);
-
-    private static final ByteOrderMark TEST_BOM_3 = new ByteOrderMark("test3", 1, 2, 3);
+/**
+ * Tests for {@link ByteOrderMark#toString()}.
+ */
+@DisplayName("ByteOrderMark")
+class ByteOrderMarkTest {
 
     /**
-     * Tests {@link ByteOrderMark#toString()}
+     * Provides test cases for the toString() method.
+     * Each argument consists of a ByteOrderMark instance and its expected string representation.
+     *
+     * @return a stream of arguments for the parameterized test.
      */
-    @Test
-    void testToString() {
-        assertEquals("ByteOrderMark[test1: 0x1]", TEST_BOM_1.toString(), "test1 ");
-        assertEquals("ByteOrderMark[test2: 0x1,0x2]", TEST_BOM_2.toString(), "test2 ");
-        assertEquals("ByteOrderMark[test3: 0x1,0x2,0x3]", TEST_BOM_3.toString(), "test3 ");
+    private static Stream<Arguments> toStringTestCases() {
+        return Stream.of(
+            Arguments.of(new ByteOrderMark("SINGLE_BYTE", 0x01), "ByteOrderMark[SINGLE_BYTE: 0x1]"),
+            Arguments.of(new ByteOrderMark("TWO_BYTES", 0x01, 0x02), "ByteOrderMark[TWO_BYTES: 0x1,0x2]"),
+            Arguments.of(new ByteOrderMark("THREE_BYTES", 0x01, 0x02, 0x03), "ByteOrderMark[THREE_BYTES: 0x1,0x2,0x3]")
+        );
+    }
+
+    @DisplayName("toString() should return a correctly formatted string representation")
+    @ParameterizedTest(name = "for a BOM with {0}")
+    @MethodSource("toStringTestCases")
+    void testToString(final ByteOrderMark bom, final String expectedString) {
+        // Act
+        final String actualString = bom.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
