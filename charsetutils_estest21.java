@@ -1,18 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class CharSetUtils_ESTestTest21 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSetUtils}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        String[] stringArray0 = new String[2];
-        stringArray0[0] = "h|Bv_9mUP7'&Y";
-        boolean boolean0 = CharSetUtils.containsAny("h|Bv_9mUP7'&Y", stringArray0);
-        assertTrue(boolean0);
+    /**
+     * Tests that containsAny() returns true when the search set contains the input string itself,
+     * even if the set also contains null elements.
+     */
+    @Test
+    public void testContainsAnyReturnsTrueWhenSetIncludesTheSearchStringAndNull() {
+        // Arrange
+        final String inputString = "h|Bv_9mUP7'&Y";
+        // The set of characters to search for includes the input string and a null.
+        // This tests that the method correctly processes the valid string and ignores the null.
+        final String[] searchSet = {inputString, null};
+
+        // Act
+        final boolean found = CharSetUtils.containsAny(inputString, searchSet);
+
+        // Assert
+        assertTrue("Expected to find a match when the search set contains the input string.", found);
     }
 }
