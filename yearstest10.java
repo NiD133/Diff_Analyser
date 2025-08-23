@@ -1,39 +1,38 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class YearsTestTest10 extends TestCase {
+/**
+ * Unit tests for the isGreaterThan() method in the Years class.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenThisIsLarger() {
+        assertTrue("3 years should be greater than 2 years", Years.THREE.isGreaterThan(Years.TWO));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenValuesAreEqual() {
+        assertFalse("3 years should not be greater than 3 years", Years.THREE.isGreaterThan(Years.THREE));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenThisIsSmaller() {
+        assertFalse("2 years should not be greater than 3 years", Years.TWO.isGreaterThan(Years.THREE));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingPositiveToNull() {
+        // Per the method's contract, a null Years object is treated as zero years.
+        assertTrue("1 year should be greater than null (0 years)", Years.ONE.isGreaterThan(null));
     }
 
-    //-----------------------------------------------------------------------
-    public void testIsGreaterThan() {
-        assertEquals(true, Years.THREE.isGreaterThan(Years.TWO));
-        assertEquals(false, Years.THREE.isGreaterThan(Years.THREE));
-        assertEquals(false, Years.TWO.isGreaterThan(Years.THREE));
-        assertEquals(true, Years.ONE.isGreaterThan(null));
-        assertEquals(false, Years.years(-1).isGreaterThan(null));
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingNegativeToNull() {
+        // Per the method's contract, a null Years object is treated as zero years.
+        assertFalse("-1 years should not be greater than null (0 years)", Years.years(-1).isGreaterThan(null));
     }
 }
