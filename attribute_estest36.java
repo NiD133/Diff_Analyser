@@ -1,37 +1,33 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
+
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest36 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        MockPrintWriter mockPrintWriter0 = new MockPrintWriter("_5EN!+,Z,`");
-        // Undeclared exception!
-        try {
-            Attribute.html("'Dnco", "'Dnco", (Appendable) mockPrintWriter0, (Document.OutputSettings) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.nodes.Attribute", e);
-        }
+/**
+ * Tests for the static html rendering methods in the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that the static {@code Attribute.html()} method throws a NullPointerException
+     * when provided with null OutputSettings. The settings are essential for determining
+     * the correct HTML or XML syntax, so a null value is an invalid state.
+     */
+    @Test
+    public void htmlShouldThrowNullPointerExceptionForNullOutputSettings() {
+        // Arrange
+        StringWriter writer = new StringWriter();
+        String key = "id";
+        String value = "test";
+
+        // Act & Assert
+        // The html() method requires OutputSettings to function; passing null should fail fast.
+        assertThrows(NullPointerException.class, () -> {
+            // The deprecated version of the method is being tested here.
+            Attribute.html(key, value, writer, null);
+        });
     }
 }
