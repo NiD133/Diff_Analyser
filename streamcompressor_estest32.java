@@ -1,45 +1,41 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class StreamCompressor_ESTestTest32 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        byte[] byteArray0 = new byte[1];
+/**
+ * Test for the {@link StreamCompressor} class.
+ */
+public class StreamCompressorTest {
+
+    /**
+     * Tests that {@link StreamCompressor#writeCounted(byte[])} correctly propagates an
+     * {@link IOException} when the underlying {@link java.io.OutputStream} fails.
+     *
+     * <p>This is verified by attempting to write to an unconnected {@link PipedOutputStream},
+     * which is guaranteed to throw an IOException.</p>
+     */
+    @Test
+    public void writeCountedShouldPropagateIOExceptionFromUnderlyingStream() {
+        // Arrange: Create a StreamCompressor with an output stream that is known to fail on write.
+        // A PipedOutputStream that is not connected to a PipedInputStream will throw
+        // an IOException with the message "Pipe not connected".
+        PipedOutputStream unconnectedPipe = new PipedOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(unconnectedPipe);
+        byte[] dummyData = new byte[1];
+
+        // Act & Assert: Verify that the expected IOException is thrown and its message is correct.
         try {
-            streamCompressor0.writeCounted(byteArray0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
+            streamCompressor.writeCounted(dummyData);
+            fail("Expected an IOException to be thrown because the underlying pipe is not connected.");
+        } catch (final IOException e) {
+            // The StreamCompressor should faithfully propagate the exception from the PipedOutputStream.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
