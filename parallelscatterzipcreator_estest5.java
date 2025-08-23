@@ -1,36 +1,39 @@
 package org.apache.commons.compress.archivers.zip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
-import org.apache.commons.compress.parallel.InputStreamSupplier;
 import org.apache.commons.compress.parallel.ScatterGatherBackingStoreSupplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURI;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ParallelScatterZipCreator_ESTestTest5 extends ParallelScatterZipCreator_ESTest_scaffolding {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ForkJoinPool forkJoinPool0 = new ForkJoinPool();
-        ParallelScatterZipCreator parallelScatterZipCreator0 = new ParallelScatterZipCreator(forkJoinPool0, (ScatterGatherBackingStoreSupplier) null);
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Contains tests for the {@link ParallelScatterZipCreator} class.
+ * This refactored test focuses on constructor behavior.
+ */
+public class ParallelScatterZipCreator_ESTestTest5 {
+
+    /**
+     * Verifies that the ParallelScatterZipCreator constructor can be successfully
+     * instantiated even when provided with a null ScatterGatherBackingStoreSupplier.
+     *
+     * <p>This is valid behavior, as the backing store is only required when individual
+     * scatter streams are created later, not during the initial construction of the creator itself.</p>
+     */
+    @Test
+    public void constructorShouldSucceedWithNullBackingStoreSupplier() {
+        // Arrange: Set up the necessary components for the test.
+        // An ExecutorService is required by the constructor.
+        ExecutorService executorService = new ForkJoinPool();
+        ScatterGatherBackingStoreSupplier nullBackingStoreSupplier = null;
+
+        // Act: Execute the code under test.
+        // We expect this constructor call to complete without throwing an exception.
+        ParallelScatterZipCreator creator = new ParallelScatterZipCreator(executorService, nullBackingStoreSupplier);
+
+        // Assert: Verify the outcome.
+        // A non-null instance confirms that the object was created successfully.
+        assertNotNull("The ParallelScatterZipCreator should be instantiated successfully.", creator);
     }
 }
