@@ -1,43 +1,30 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import java.time.MonthDay;
+import static org.junit.Assert.assertEquals;
 
-public class DayOfMonth_ESTestTest10 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for {@link DayOfMonth}.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        dayOfMonth0.atMonth(1);
-        assertEquals(14, dayOfMonth0.getValue());
+    /**
+     * Tests that atMonth() correctly combines a DayOfMonth with a month
+     * to create a valid MonthDay object.
+     */
+    @Test
+    public void atMonth_combinesWithMonthIntToCreateCorrectMonthDay() {
+        // Arrange: Define a specific day of the month.
+        DayOfMonth day21 = DayOfMonth.of(21);
+        int january = Month.JANUARY.getValue();
+
+        // Act: Call the method under test to combine the day with the month.
+        MonthDay actualMonthDay = day21.atMonth(january);
+
+        // Assert: Verify that the resulting MonthDay is correct.
+        MonthDay expectedMonthDay = MonthDay.of(Month.JANUARY, 21);
+        assertEquals(expectedMonthDay, actualMonthDay);
     }
 }
