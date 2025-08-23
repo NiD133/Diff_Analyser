@@ -1,30 +1,30 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest8 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link JsonWriteContext} class, focusing on its state management.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        assertTrue(jsonWriteContext0.inRoot());
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.reset(1, (Object) null);
-        assertFalse(jsonWriteContext1.inRoot());
+    /**
+     * Verifies that calling the {@code reset} method on a root context correctly
+     * changes its type and updates its state to no longer be a root context.
+     */
+    @Test
+    public void resetOnRootContextShouldChangeTypeAndClearRootStatus() {
+        // Arrange: Create a root context and verify its initial state.
+        JsonWriteContext context = JsonWriteContext.createRootContext();
+        assertTrue("A newly created context should initially be in the root state.", context.inRoot());
+
+        // Act: Reset the context to represent an array.
+        JsonWriteContext resetContext = context.reset(JsonStreamContext.TYPE_ARRAY, null);
+
+        // Assert: Verify the context's state has been updated correctly.
+        assertSame("The reset() method should return the same instance for chaining.", context, resetContext);
+        assertFalse("After resetting, the context should no longer be in the root state.", resetContext.inRoot());
+        assertTrue("The context type should be updated to an array.", resetContext.inArray());
     }
 }
