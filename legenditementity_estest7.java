@@ -1,28 +1,29 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
 import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
 
-public class LegendItemEntity_ESTestTest7 extends LegendItemEntity_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LegendItemEntity} class.
+ */
+public class LegendItemEntityTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Rectangle rectangle0 = new Rectangle(0, 0, 0, 0);
-        LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle0);
-        String string0 = legendItemEntity0.toString();
-        assertEquals("LegendItemEntity: seriesKey=null, dataset=null", string0);
+    /**
+     * Verifies that the toString() method produces the correct output when the
+     * dataset and seriesKey properties have not been set (i.e., are null).
+     */
+    @Test
+    public void toString_withNullDatasetAndSeriesKey_returnsCorrectStringRepresentation() {
+        // Arrange: Create a LegendItemEntity with default (null) properties.
+        Rectangle area = new Rectangle(0, 0, 0, 0);
+        LegendItemEntity<String> legendItemEntity = new LegendItemEntity<>(area);
+        String expected = "LegendItemEntity: seriesKey=null, dataset=null";
+
+        // Act: Call the toString() method.
+        String actual = legendItemEntity.toString();
+
+        // Assert: Check if the output matches the expected format.
+        assertEquals(expected, actual);
     }
 }
