@@ -1,19 +1,31 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class Weeks_ESTestTest44 extends Weeks_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-        boolean boolean0 = weeks0.isGreaterThan((Weeks) null);
-        assertEquals(0, weeks0.getWeeks());
-        assertFalse(boolean0);
+    /**
+     * Tests that isGreaterThan() returns false when comparing a zero-week instance to null.
+     * <p>
+     * According to the Javadoc, a null comparison value is treated as a zero-value period.
+     * Therefore, this test effectively checks if zero is greater than zero.
+     */
+    @Test
+    public void isGreaterThan_whenComparingZeroWeeksToNull_shouldReturnFalse() {
+        // Arrange: Create a Weeks object with a value of zero.
+        // The standardWeeksIn() factory method returns zero for a null input.
+        Weeks zeroWeeks = Weeks.standardWeeksIn(null);
+        assertEquals("Precondition: standardWeeksIn(null) should create a Weeks object of 0.", 0, zeroWeeks.getWeeks());
+
+        // Act: Compare the zero-week object to null.
+        boolean result = zeroWeeks.isGreaterThan(null);
+
+        // Assert: The result should be false, as 0 is not greater than 0.
+        assertFalse("A zero-week period should not be greater than null (which is treated as zero).", result);
     }
 }
