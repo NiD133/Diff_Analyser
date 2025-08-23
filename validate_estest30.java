@@ -1,23 +1,20 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest30 extends Validate_ESTest_scaffolding {
+/**
+ * Test case for the {@link Validate#isFalse(boolean, String)} method.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Validate.isFalse(false, "");
+    /**
+     * Verifies that Validate.isFalse() completes normally (does not throw an exception)
+     * when the condition it checks is indeed false.
+     */
+    @Test
+    public void isFalseShouldNotThrowExceptionWhenConditionIsFalse() {
+        // The test's success is confirmed by this method call completing without
+        // throwing a ValidationException or any other error.
+        Validate.isFalse(false, "This message should not be seen");
     }
 }
