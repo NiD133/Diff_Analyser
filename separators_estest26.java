@@ -2,22 +2,36 @@ package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Separators_ESTestTest26 extends Separators_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Separators} class.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Separators separators0 = Separators.createDefaultInstance();
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.NONE;
-        Separators separators1 = separators0.withObjectEntrySpacing(separators_Spacing0);
-        assertEquals(',', separators1.getObjectEntrySeparator());
-        assertEquals(',', separators1.getArrayValueSeparator());
-        assertEquals(Separators.Spacing.NONE, separators1.getArrayValueSpacing());
-        assertEquals(':', separators1.getObjectFieldValueSeparator());
-        assertEquals(Separators.Spacing.BOTH, separators1.getObjectFieldValueSpacing());
-        assertSame(separators1, separators0);
+    /**
+     * Tests that calling a 'with...' method with the current value
+     * returns the same instance, avoiding unnecessary object allocation.
+     */
+    @Test
+    public void withObjectEntrySpacing_shouldReturnSameInstance_whenSpacingIsUnchanged() {
+        // Arrange: Create a default Separators instance.
+        // By default, object entry spacing is Spacing.NONE.
+        Separators initialSeparators = Separators.createDefaultInstance();
+        Separators.Spacing currentSpacing = Separators.Spacing.NONE;
+
+        // Act: Call the method with the same spacing value that the instance already has.
+        Separators resultSeparators = initialSeparators.withObjectEntrySpacing(currentSpacing);
+
+        // Assert: The method should return the original instance for efficiency,
+        // as no change was needed.
+        assertSame("Expected the same instance when the spacing value is not changed",
+                initialSeparators, resultSeparators);
+
+        // Verify that other properties remain unchanged as a sanity check.
+        assertEquals(',', resultSeparators.getObjectEntrySeparator());
+        assertEquals(':', resultSeparators.getObjectFieldValueSeparator());
+        assertEquals(Separators.Spacing.BOTH, resultSeparators.getObjectFieldValueSpacing());
+        assertEquals(',', resultSeparators.getArrayValueSeparator());
+        assertEquals(Separators.Spacing.NONE, resultSeparators.getArrayValueSpacing());
     }
 }
