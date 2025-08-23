@@ -1,26 +1,21 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Minutes_ESTestTest39 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit test for the {@link Minutes#dividedBy(int)} method.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Minutes minutes0 = Minutes.minutesIn((ReadableInterval) null);
-        // Undeclared exception!
-        try {
-            minutes0.dividedBy(0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // / by zero
-            //
-            verifyException("org.joda.time.Minutes", e);
-        }
+    @Test(expected = ArithmeticException.class)
+    public void dividedByZeroShouldThrowArithmeticException() {
+        // Arrange: Create an arbitrary Minutes instance. The specific value doesn't matter for this test.
+        Minutes tenMinutes = Minutes.minutes(10);
+
+        // Act: Attempt to divide the Minutes instance by zero.
+        // This action is expected to throw an ArithmeticException.
+        tenMinutes.dividedBy(0);
+
+        // Assert: The test passes if an ArithmeticException is thrown, as declared in the @Test annotation.
     }
 }
