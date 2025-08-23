@@ -1,23 +1,27 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest5 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Option option0 = new Option((String) null, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.toSyntaxOption(false);
-        assertEquals("", string0);
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
+
+    @Test
+    public void testToSyntaxOptionShouldReturnEmptyStringWhenOptionHasNoName() {
+        // Arrange: Create an Option that has neither a short nor a long name.
+        // This is an edge case for syntax generation.
+        final Option optionWithNoName = new Option(null, null);
+        final OptionFormatter formatter = OptionFormatter.from(optionWithNoName);
+
+        // Act: Generate the syntax string, treating the option as optional.
+        final String actualSyntax = formatter.toSyntaxOption(false);
+
+        // Assert: The resulting syntax string should be empty because there is no
+        // option name to display.
+        assertEquals("The syntax for an option with no name should be empty", "", actualSyntax);
     }
 }
