@@ -1,23 +1,30 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class QuotedPrintableCodec_ESTestTest61 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Contains tests for the static methods of the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecStaticTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        byte[] byteArray1 = QuotedPrintableCodec.encodeQuotedPrintable((BitSet) null, byteArray0, true);
-        assertNull(byteArray1);
+    /**
+     * Tests that encodeQuotedPrintable returns null when the provided BitSet of
+     * printable characters is null. This is a guard condition, and the method
+     * should handle this gracefully regardless of other parameters.
+     */
+    @Test
+    public void encodeQuotedPrintableWithNullBitSetShouldReturnNull() {
+        // Arrange: Create a sample byte array to be encoded. Its content is irrelevant
+        // for this test, as the null BitSet is the primary condition being tested.
+        final byte[] inputBytes = "any string".getBytes();
+        final boolean strictMode = true;
+
+        // Act: Call the method with a null BitSet.
+        final byte[] result = QuotedPrintableCodec.encodeQuotedPrintable((BitSet) null, inputBytes, strictMode);
+
+        // Assert: Verify that the method returns null as expected.
+        assertNull("The result should be null when the printable character BitSet is null.", result);
     }
 }
