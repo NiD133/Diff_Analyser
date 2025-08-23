@@ -1,43 +1,35 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Symmetry454Chronology_ESTestTest31 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Test class for the {@link Symmetry454Chronology}.
+ *
+ * Note: This class is an improved version of an auto-generated test case.
+ * The original class name "Symmetry454Chronology_ESTestTest31" was replaced
+ * with a more conventional name.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        boolean boolean0 = symmetry454Chronology0.isLeapYear(32L);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link Symmetry454Chronology#isLeapYear(long)} correctly identifies a non-leap year.
+     */
+    @Test
+    public void isLeapYear_returnsFalse_forNonLeapYear() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+
+        // The formula for a leap year is `(52 > ((52 * year + 146) % 293))`.
+        // For year 32, the expression `((52 * 32 + 146) % 293)` evaluates to exactly 52.
+        // Since `52 > 52` is false, year 32 is not a leap year. This makes it a good
+        // boundary case to test.
+        long year = 32L;
+
+        // Act
+        boolean isLeap = chronology.isLeapYear(year);
+
+        // Assert
+        assertFalse("Year 32 should not be a leap year.", isLeap);
     }
 }
