@@ -1,27 +1,37 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest4 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandRange(1.0, 1.0, (-388.0), 0.0);
-        double double0 = bBoxCalculator0.getMinY();
-        assertEquals((-388.0), double0, 0.01);
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    private final SpatialContext spatialContext = new SpatialContextFactory().newSpatialContext();
+
+    @Test
+    public void getMinYShouldReturnCorrectValueAfterExpandingWithSingleRange() {
+        // Arrange
+        BBoxCalculator bboxCalculator = new BBoxCalculator(spatialContext);
+        
+        // Define the range to be added to the calculator
+        final double expectedMinY = -388.0;
+        final double rangeMaxY = 0.0;
+        final double rangeMinX = 1.0;
+        final double rangeMaxX = 1.0;
+
+        // Act
+        // Expand the calculator's bounding box with the new range
+        bboxCalculator.expandRange(rangeMinX, rangeMaxX, expectedMinY, rangeMaxY);
+        double actualMinY = bboxCalculator.getMinY();
+
+        // Assert
+        // Verify that the calculator's minimum Y is now the minimum Y from the added range
+        assertEquals("The minimum Y should be updated after the first expansion.",
+                expectedMinY, actualMinY, 0.01);
     }
 }
