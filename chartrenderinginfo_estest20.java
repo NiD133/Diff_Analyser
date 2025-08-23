@@ -1,29 +1,31 @@
 package org.jfree.chart;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ChartRenderingInfo_ESTestTest20 extends ChartRenderingInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo(standardEntityCollection0);
-        EntityCollection entityCollection0 = chartRenderingInfo0.getEntityCollection();
-        assertEquals(0, entityCollection0.getEntityCount());
+/**
+ * Tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
+
+    /**
+     * Verifies that getEntityCollection() returns the same collection instance
+     * that was provided to the constructor.
+     */
+    @Test
+    public void getEntityCollectionShouldReturnCollectionProvidedInConstructor() {
+        // Arrange: Create an entity collection and a ChartRenderingInfo instance with it.
+        EntityCollection expectedCollection = new StandardEntityCollection();
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo(expectedCollection);
+
+        // Act: Retrieve the entity collection from the ChartRenderingInfo instance.
+        EntityCollection actualCollection = renderingInfo.getEntityCollection();
+
+        // Assert: The retrieved collection should be the same instance as the one provided.
+        assertSame("The entity collection should be the same instance provided to the constructor.",
+                expectedCollection, actualCollection);
     }
 }
