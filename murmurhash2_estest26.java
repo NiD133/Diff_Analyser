@@ -1,26 +1,26 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest26 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class, focusing on edge cases and invalid inputs.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash64(byteArray0, (int) (byte) (-1), (int) (byte) (-1));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -2
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that hash64() throws an ArrayIndexOutOfBoundsException when provided with a negative length.
+     * The underlying implementation attempts to access an array with a negative index,
+     * which is an invalid operation.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void hash64ShouldThrowExceptionForNegativeLength() {
+        // Arrange
+        final byte[] data = new byte[10]; // The data content is irrelevant for this test.
+        final int negativeLength = -1;
+        final int seed = 0; // The seed value is also irrelevant.
+
+        // Act & Assert
+        // This call is expected to throw an ArrayIndexOutOfBoundsException.
+        MurmurHash2.hash64(data, negativeLength, seed);
     }
 }
