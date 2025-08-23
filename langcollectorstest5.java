@@ -1,57 +1,28 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
+
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class LangCollectorsTestTest5 {
+/**
+ * Tests for the joining collectors in {@link LangCollectors}.
+ * This focuses on collectors that join elements of any type, not just CharSequence.
+ */
+@DisplayName("LangCollectors.joining")
+class LangCollectorsJoiningTest {
 
-    private static final Long _1L = Long.valueOf(1);
-
-    private static final Long _2L = Long.valueOf(2);
-
-    private static final Long _3L = Long.valueOf(3);
-
-    private static final Function<Object, String> TO_STRING = Objects::toString;
-
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
-    }
-
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
-
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
-
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
+    /**
+     * A simple fixture class to test joining of custom objects.
+     */
     private static final class Fixture {
-
-        int value;
+        private final int value;
 
         private Fixture(final int value) {
             this.value = value;
@@ -63,15 +34,85 @@ public class LangCollectorsTestTest5 {
         }
     }
 
-    @Test
-    void testJoinCollectNonStrings4Args() {
-        assertEquals("<>", join4());
-        assertEquals("<1>", join4(_1L));
-        assertEquals("<1-2>", join4(_1L, _2L));
-        assertEquals("<1-2-3>", join4(_1L, _2L, _3L));
-        assertEquals("<1-null-3>", join4(_1L, null, _3L));
-        assertEquals("<1-NUL-3>", join4NullToString(_1L, null, _3L));
-        assertEquals("<1-2>", join4(new AtomicLong(1), new AtomicLong(2)));
-        assertEquals("<1-2>", join4(new Fixture(1), new Fixture(2)));
+    @Nested
+    @DisplayName("with delimiter, prefix, suffix, and toString function")
+    class JoiningWithAllParametersTest {
+
+        private final Collector<Object, ?, String> standardCollector = LangCollectors.joining("-", "<", ">", Objects::toString);
+
+        @Test
+        void shouldReturnOnlyPrefixAndSuffixForEmptyInput() {
+            // Act
+            final String result = LangCollectors.collect(standardCollector);
+
+            // Assert
+            assertEquals("<>", result);
+        }
+
+        @Test
+        void shouldNotUseDelimiterForSingleElement() {
+            // Act
+            final String result = LangCollectors.collect(standardCollector, 1L);
+
+            // Assert
+            assertEquals("<1>", result);
+        }
+
+        @Test
+        void shouldJoinMultipleLongsWithDelimiter() {
+            // Act
+            final String result = LangCollectors.collect(standardCollector, 1L, 2L, 3L);
+
+            // Assert
+            assertEquals("<1-2-3>", result);
+        }
+
+        @Test
+        void shouldHandleNullElementsUsingDefaultToString() {
+            // Act
+            final String result = LangCollectors.collect(standardCollector, 1L, null, 3L);
+
+            // Assert
+            assertEquals("<1-null-3>", result, "A null element should be converted to the string 'null'");
+        }
+
+        @Test
+        void shouldJoinCustomObjectsUsingTheirToStringMethod() {
+            // Arrange
+            final Fixture fixture1 = new Fixture(1);
+            final Fixture fixture2 = new Fixture(2);
+
+            // Act
+            final String result = LangCollectors.collect(standardCollector, fixture1, fixture2);
+
+            // Assert
+            assertEquals("<1-2>", result);
+        }
+
+        @Test
+        void shouldJoinStandardLibraryObjectsUsingTheirToStringMethod() {
+            // Arrange
+            final AtomicLong atomicLong1 = new AtomicLong(1);
+            final AtomicLong atomicLong2 = new AtomicLong(2);
+
+            // Act
+            final String result = LangCollectors.collect(standardCollector, atomicLong1, atomicLong2);
+
+            // Assert
+            assertEquals("<1-2>", result);
+        }
+
+        @Test
+        void shouldHandleNullsUsingCustomToStringFunction() {
+            // Arrange
+            final Function<Object, String> customToString = obj -> Objects.toString(obj, "NUL");
+            final Collector<Object, ?, String> collectorWithCustomNull = LangCollectors.joining("-", "<", ">", customToString);
+
+            // Act
+            final String result = LangCollectors.collect(collectorWithCustomNull, 1L, null, 3L);
+
+            // Assert
+            assertEquals("<1-NUL-3>", result, "A null element should be converted using the provided function");
+        }
     }
 }
