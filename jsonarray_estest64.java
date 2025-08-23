@@ -1,24 +1,27 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class JsonArray_ESTestTest64 extends JsonArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonArray} class, focusing on convenience getter methods.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Boolean boolean0 = Boolean.valueOf(true);
-        jsonArray0.add(boolean0);
-        boolean boolean1 = jsonArray0.getAsBoolean();
-        assertTrue(boolean1);
+    /**
+     * Tests that {@link JsonArray#getAsBoolean()} correctly returns true
+     * when the array contains a single boolean element with the value {@code true}.
+     */
+    @Test
+    public void getAsBoolean_returnsTrue_whenArrayContainsSingleTrueElement() {
+        // Arrange: Create a JsonArray containing a single boolean `true` element.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(true);
+
+        // Act: Call the method under test.
+        boolean result = jsonArray.getAsBoolean();
+
+        // Assert: Verify that the returned value is true.
+        assertTrue("Expected getAsBoolean() to return true for an array with a single true element.", result);
     }
 }
