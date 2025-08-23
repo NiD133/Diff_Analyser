@@ -2,23 +2,29 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest25 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive("");
-        jsonArray0.add((JsonElement) jsonPrimitive0);
-        JsonElement jsonElement0 = jsonArray0.get(0);
-        assertFalse(jsonElement0.isJsonObject());
+    /**
+     * Verifies that an element retrieved from a JsonArray preserves its original type.
+     * Specifically, a JsonPrimitive should not be misidentified as a JsonObject.
+     */
+    @Test
+    public void get_retrievedPrimitiveElement_shouldNotBeJsonObject() {
+        // Arrange: Create a JsonArray and add a JsonPrimitive element to it.
+        JsonArray jsonArray = new JsonArray();
+        JsonPrimitive stringPrimitive = new JsonPrimitive("a string value");
+        jsonArray.add(stringPrimitive);
+
+        // Act: Retrieve the element from the array by its index.
+        JsonElement retrievedElement = jsonArray.get(0);
+
+        // Assert: Confirm that the retrieved element is not a JsonObject,
+        // ensuring its type integrity is maintained.
+        assertFalse("A retrieved JsonPrimitive should not be identified as a JsonObject.",
+                retrievedElement.isJsonObject());
     }
 }
