@@ -1,24 +1,38 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class PhoneticEngine_ESTestTest29 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        NameType nameType0 = NameType.SEPHARDIC;
-        RuleType ruleType0 = RuleType.APPROX;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false);
-        phoneticEngine0.getRuleType();
-        assertFalse(phoneticEngine0.isConcat());
-        assertEquals(20, phoneticEngine0.getMaxPhonemes());
+    /**
+     * Verifies that the three-argument constructor correctly initializes the engine's
+     * properties (NameType, RuleType, and concatenation flag) and that it correctly
+     * applies the default value for the maximum number of phonemes.
+     */
+    @Test
+    public void constructorShouldSetPropertiesAndUseDefaultMaxPhonemes() {
+        // Arrange
+        final NameType expectedNameType = NameType.SEPHARDIC;
+        final RuleType expectedRuleType = RuleType.APPROX;
+        final boolean expectedConcat = false;
+        final int expectedDefaultMaxPhonemes = 20; // As defined by DEFAULT_MAX_PHONEMES in the source
+
+        // Act
+        final PhoneticEngine engine = new PhoneticEngine(expectedNameType, expectedRuleType, expectedConcat);
+
+        // Assert
+        assertEquals("The name type should match the constructor argument.",
+                expectedNameType, engine.getNameType());
+        assertEquals("The rule type should match the constructor argument.",
+                expectedRuleType, engine.getRuleType());
+        assertFalse("The concat flag should be false as per the constructor argument.",
+                engine.isConcat());
+        assertEquals("The max phonemes should be set to the default value.",
+                expectedDefaultMaxPhonemes, engine.getMaxPhonemes());
     }
 }
