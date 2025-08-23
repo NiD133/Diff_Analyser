@@ -1,30 +1,35 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Attribute_ESTestTest76 extends Attribute_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link Attribute} class.
+ * This specific test case focuses on the behavior of attribute collapsing.
+ */
+public class Attribute_ESTestTest76 { // Retaining original class name for context
 
-    @Test(timeout = 4000)
-    public void test75() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("PTOx<F9r`[M>.0RAj)", "PTOx<F9r`[M>.0RAj)");
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        boolean boolean0 = attribute0.shouldCollapseAttribute(document_OutputSettings0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that an attribute is not collapsed if it is not a standard HTML boolean attribute.
+     * An attribute should only be collapsed (e.g., rendered as just 'disabled' instead of 'disabled=""')
+     * if it is a known boolean attribute like 'checked', 'disabled', 'selected', etc.
+     */
+    @Test
+    public void shouldNotCollapseWhenAttributeIsNotBoolean() {
+        // Arrange
+        // Create a custom attribute that is not a standard boolean attribute.
+        // The value is set to match the key, which is a condition that would cause
+        // a *boolean* attribute to be collapsed.
+        String attributeName = "data-custom";
+        Attribute attribute = new Attribute(attributeName, attributeName);
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+
+        // Act
+        // The shouldCollapseAttribute method is deprecated, but we are testing its logic.
+        @SuppressWarnings("deprecation")
+        boolean shouldCollapse = attribute.shouldCollapseAttribute(outputSettings);
+
+        // Assert
+        assertFalse("A non-boolean attribute should not be collapsed, even if its value matches its key.", shouldCollapse);
     }
 }
