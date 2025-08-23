@@ -1,43 +1,70 @@
 package org.jfree.chart.axis;
 
+import org.jfree.data.Range;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
-import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class ModuloAxis_ESTestTest34 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Tests for the {@link ModuloAxis} class, focusing on its equality logic and constructor behavior.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        ModuloAxis moduloAxis0 = new ModuloAxis("", (Range) null);
-        ModuloAxis moduloAxis1 = new ModuloAxis("", moduloAxis0.DEFAULT_RANGE);
-        boolean boolean0 = moduloAxis1.equals(moduloAxis0);
-        assertFalse(boolean0);
-        assertEquals(90.0, moduloAxis1.getDisplayEnd(), 0.01);
-        assertEquals(270.0, moduloAxis1.getDisplayStart(), 0.01);
+    private static final double DELTA = 0.01;
+
+    /**
+     * Verifies that the constructor correctly initializes the axis with its default
+     * display start and end values.
+     */
+    @Test
+    public void constructor_shouldSetDefaultDisplayRange() {
+        // Arrange
+        String axisLabel = "Angle";
+        Range fixedRange = new Range(0.0, 360.0);
+        
+        // Act
+        ModuloAxis axis = new ModuloAxis(axisLabel, fixedRange);
+
+        // Assert
+        // The default display range is from 270 to 90 degrees, which is useful
+        // for representations like a compass where 0/360 is at the top.
+        assertEquals("Default display start value should be 270.0", 270.0, axis.getDisplayStart(), DELTA);
+        assertEquals("Default display end value should be 90.0", 90.0, axis.getDisplayEnd(), DELTA);
+    }
+
+    /**
+     * Tests the equals() method, ensuring that two ModuloAxis instances with
+     * different 'fixedRange' properties are not considered equal.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenFixedRangesDiffer() {
+        // Arrange
+        String axisLabel = "Test Axis";
+        ModuloAxis axisWithNullRange = new ModuloAxis(axisLabel, null);
+        
+        // The DEFAULT_RANGE is inherited from ValueAxis and is new Range(0.0, 1.0).
+        ModuloAxis axisWithDefaultRange = new ModuloAxis(axisLabel, ModuloAxis.DEFAULT_RANGE);
+
+        // Act & Assert
+        // The 'fixedRange' is a critical part of the axis's state, so a difference
+        // should result in inequality.
+        assertNotEquals("Axes with different fixed ranges should not be equal",
+                axisWithDefaultRange, axisWithNullRange);
+    }
+
+    /**
+     * Tests the equals() method, ensuring that two ModuloAxis instances with
+     * identical properties are considered equal.
+     */
+    @Test
+    public void equals_shouldReturnTrue_whenPropertiesAreIdentical() {
+        // Arrange
+        String axisLabel = "Test Axis";
+        Range range = new Range(0.0, 100.0);
+        ModuloAxis axis1 = new ModuloAxis(axisLabel, range);
+        ModuloAxis axis2 = new ModuloAxis(axisLabel, range);
+
+        // Act & Assert
+        assertEquals("Axes with identical properties should be equal", axis1, axis2);
+        assertEquals("Hash codes for equal objects must be the same", axis1.hashCode(), axis2.hashCode());
     }
 }
