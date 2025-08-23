@@ -1,25 +1,20 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentUtils_ESTestTest9 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentUtils} class.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        // Undeclared exception!
-        try {
-            SegmentUtils.countBit16((int[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
+    /**
+     * Verifies that the {@code countBit16(int[])} method throws a
+     * {@code NullPointerException} when given a null array as input.
+     * This ensures the method correctly handles invalid arguments.
+     */
+    @Test(expected = NullPointerException.class)
+    public void countBit16ForIntArrayShouldThrowNPEForNullInput() {
+        // Calling the method with a null array is expected to fail fast.
+        SegmentUtils.countBit16((int[]) null);
     }
 }
