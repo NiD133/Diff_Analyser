@@ -1,29 +1,25 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class MappedRandomAccessFile_ESTestTest4 extends MappedRandomAccessFile_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MappedRandomAccessFile} class.
+ */
+public class MappedRandomAccessFileTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        MappedRandomAccessFile mappedRandomAccessFile0 = null;
-        try {
-            mappedRandomAccessFile0 = new MappedRandomAccessFile((String) null, "rw");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-        }
+    /**
+     * Verifies that the constructor throws a {@link NullPointerException}
+     * when the filename argument is null.
+     *
+     * This test ensures that the constructor correctly handles invalid null input
+     * for the file path, preventing potential NullPointerExceptions in downstream code.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructor_shouldThrowNullPointerException_whenFilenameIsNull() throws IOException {
+        // Act & Assert
+        // Attempt to create a MappedRandomAccessFile with a null filename.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        new MappedRandomAccessFile(null, "rw");
     }
 }
