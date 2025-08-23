@@ -1,39 +1,39 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest24 extends ArArchiveOutputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
+/**
+ * Tests for {@link ArArchiveOutputStream}.
+ */
+public class ArArchiveOutputStreamTest {
+
+    /**
+     * Verifies that attempting to add an archive entry with a name longer than 16 characters
+     * throws an IOException when using the default long file mode (LONGFILE_ERROR).
+     */
     @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        ArArchiveEntry arArchiveEntry0 = new ArArchiveEntry(" in ASI extra field", 0);
-        try {
-            arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // File name too long, > 16 chars:  in ASI extra field
-            //
-            verifyException("org.apache.commons.compress.archivers.ar.ArArchiveOutputStream", e);
-        }
+    public void putArchiveEntryWithLongNameFailsByDefault() {
+        // Arrange
+        String longFileName = "a-file-with-a-very-long-name.txt"; // 31 chars > 16
+        ArArchiveEntry entryWithLongName = new ArArchiveEntry(longFileName, 0);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream);
+
+        // Act & Assert
+        // The ArArchiveOutputStream is expected to throw an IOException because the file name
+        // exceeds the 16-character limit and the default behavior is to error out.
+        IOException exception = assertThrows(IOException.class, () -> {
+            arOut.putArchiveEntry(entryWithLongName);
+        });
+
+        // Verify the exception message is as expected.
+        String expectedMessage = "File name too long, > 16 chars: " + longFileName;
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
