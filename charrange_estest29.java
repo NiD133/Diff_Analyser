@@ -1,27 +1,46 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest29 extends CharRange_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CharRange} class.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        CharRange charRange0 = CharRange.isIn('8', 'A');
-        CharRange charRange1 = CharRange.isNotIn('Y', '@');
-        boolean boolean0 = charRange1.contains(charRange0);
-        assertEquals('8', charRange0.getStart());
-        assertEquals('A', charRange0.getEnd());
-        assertTrue(charRange1.isNegated());
-        assertEquals('Y', charRange1.getEnd());
-        assertFalse(boolean0);
-        assertEquals('@', charRange1.getStart());
+    /**
+     * Tests that a negated CharRange does not contain another range if their boundaries overlap.
+     *
+     * <p>This test verifies that a negated range, such as [^'@'-'Y'], correctly reports
+     * that it does not contain an inner range, ['8'-'A'], because the inner range
+     * includes characters ('@', 'A') that are explicitly excluded by the negated range.</p>
+     */
+    @Test
+    public void testContainsReturnsFalseWhenNegatedRangeOverlapsWithInnerRange() {
+        // Arrange
+        // A negated range that includes all characters EXCEPT those from '@' to 'Y'.
+        // The factory method correctly handles the inverted start/end characters ('Y', '@').
+        CharRange negatedRange = CharRange.isNotIn('Y', '@');
+
+        // A standard range that includes all characters from '8' to 'A'.
+        CharRange innerRange = CharRange.isIn('8', 'A');
+
+        // Act
+        // Check if the negated range contains the inner range.
+        boolean isContained = negatedRange.contains(innerRange);
+
+        // Assert
+        // The inner range ['8'-'A'] contains characters '@' and 'A'. The negatedRange
+        // [^'@'-'Y'] explicitly excludes these. Therefore, the result must be false.
+        assertFalse("A negated range should not contain a range it partially excludes", isContained);
+
+        // Also, verify the state of the ranges to ensure the setup is correct.
+        assertTrue("The containing range should be negated", negatedRange.isNegated());
+        assertEquals("Start of negated range should be '@'", '@', negatedRange.getStart());
+        assertEquals("End of negated range should be 'Y'", 'Y', negatedRange.getEnd());
+        assertEquals("Start of inner range should be '8'", '8', innerRange.getStart());
+        assertEquals("End of inner range should be 'A'", 'A', innerRange.getEnd());
     }
 }
