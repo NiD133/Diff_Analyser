@@ -1,28 +1,32 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RandomUtils_ESTestTest17 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.secureStrong();
-        // Undeclared exception!
-        try {
-            randomUtils0.randomInt((-1830), (-1830));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Both range values must be non-negative.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
-        }
+    /**
+     * Verifies that randomInt() throws an IllegalArgumentException when the
+     * range boundaries are negative, as the contract requires non-negative values.
+     */
+    @Test
+    void randomIntShouldThrowIllegalArgumentExceptionForNegativeRange() {
+        // Arrange: Create a RandomUtils instance.
+        final RandomUtils randomUtils = RandomUtils.secureStrong();
+        final int negativeBound = -1830;
+
+        // Act & Assert: Call the method with invalid arguments and verify the exception.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> randomUtils.randomInt(negativeBound, negativeBound),
+            "Expected randomInt() to throw for negative range values."
+        );
+
+        // Assert: Verify the exception message is correct.
+        assertEquals("Both range values must be non-negative.", thrown.getMessage());
     }
 }
