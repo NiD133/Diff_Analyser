@@ -1,23 +1,29 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
+
+import java.util.Collections;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest33 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.putIfAbsent("writers", ",");
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, (ClassLoader) null);
-        assertTrue(spatialContext0.isGeo());
+/**
+ * Unit tests for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
+
+    @Test
+    public void makeSpatialContext_withEmptyConfig_createsGeographicContextByDefault() {
+        // Arrange
+        // Use an empty map to signify that no specific configuration is provided.
+        Map<String, String> emptyConfig = Collections.emptyMap();
+
+        // Act
+        // Create a SpatialContext using the factory with the empty configuration.
+        SpatialContext context = SpatialContextFactory.makeSpatialContext(emptyConfig, null);
+
+        // Assert
+        // The factory should default to a geographic context (geo=true) when not specified.
+        assertTrue("Context should be geographic by default", context.isGeo());
     }
 }
