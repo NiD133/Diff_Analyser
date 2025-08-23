@@ -1,78 +1,103 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertFalse;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
 import org.jspecify.annotations.NullUnmarked;
 
-public class AtomicDoubleArrayTestTest12 extends JSR166TestCase {
+/**
+ * Tests for {@link AtomicDoubleArray#weakCompareAndSet(int, double, double)}.
+ */
+@NullUnmarked
+@GwtIncompatible
+@J2ktIncompatible
+public class AtomicDoubleArrayWeakCompareAndSetTest extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+    private static final double[] TEST_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Asserts that two double values are bitwise equal, which is the equality contract for
+     * AtomicDoubleArray.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
+    private static void assertBitEquals(String message, double expected, double actual) {
+        assertEquals(message, Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
     }
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+    private static void assertBitEquals(double expected, double actual) {
+        assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
     }
 
     /**
-     * repeated weakCompareAndSet succeeds in changing value when equal to expected
+     * Verifies that weakCompareAndSet successfully updates the value when the expected value is
+     * correct, and fails without modifying the value when the expected value is incorrect. The success
+     * case is tested in a loop to account for potential spurious failures.
      */
-    public void testWeakCompareAndSet() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            double prev = 0.0;
-            double unused = Math.E + Math.PI;
-            for (double x : VALUES) {
-                assertBitEquals(prev, aa.get(i));
-                assertFalse(aa.weakCompareAndSet(i, unused, x));
-                assertBitEquals(prev, aa.get(i));
-                while (!aa.weakCompareAndSet(i, prev, x)) {
-                    ;
+    public void testWeakCompareAndSet_updatesValueWhenExpectedMatches_andFailsWhenMismatched() {
+        // Arrange
+        final AtomicDoubleArray atomicArray = new AtomicDoubleArray(SIZE);
+        // A value guaranteed not to be in the array, to test mismatched expectations.
+        final double wrongExpectedValue = Math.E + Math.PI;
+
+        // Test on first and last elements to check for boundary errors.
+        for (int i : new int[] {0, SIZE - 1}) {
+            double currentValue = 0.0; // The array is initialized with 0.0.
+
+            // Iterate through a set of special double values.
+            for (double newValue : TEST_VALUES) {
+                // Pre-condition: Verify the value at index i is what we expect.
+                assertBitEquals(
+                    "Test setup failed: array value is not the expected initial value.",
+                    currentValue,
+                    atomicArray.get(i));
+
+                // --- Scenario 1: Failure case (mismatched expected value) ---
+                // Act: Attempt to set the new value using an incorrect expected value.
+                boolean failedResult = atomicArray.weakCompareAndSet(i, wrongExpectedValue, newValue);
+
+                // Assert: The operation should fail and the value should remain unchanged.
+                assertFalse(
+                    "weakCompareAndSet should return false for a mismatched expected value.", failedResult);
+                assertBitEquals(
+                    "The array value should not change on a failed weakCompareAndSet.",
+                    currentValue,
+                    atomicArray.get(i));
+
+                // --- Scenario 2: Success case (matching expected value) ---
+                // Act: Repeatedly attempt to set the new value with the correct expected value.
+                // A loop is necessary because weakCompareAndSet can fail spuriously even if the
+                // value matches, so we must retry until it succeeds.
+                while (!atomicArray.weakCompareAndSet(i, currentValue, newValue)) {
+                    // Loop until the operation succeeds.
                 }
-                assertBitEquals(x, aa.get(i));
-                prev = x;
+
+                // Assert: The value should now be updated.
+                assertBitEquals(
+                    "The array value should be updated after a successful weakCompareAndSet.",
+                    newValue,
+                    atomicArray.get(i));
+
+                // Prepare for the next iteration by updating the current value.
+                currentValue = newValue;
             }
         }
     }
