@@ -1,21 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArraySorter_ESTestTest5 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ArraySorter} class.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        int[] intArray0 = new int[7];
-        int[] intArray1 = ArraySorter.sort(intArray0);
-        assertArrayEquals(new int[] { 0, 0, 0, 0, 0, 0, 0 }, intArray1);
+    /**
+     * Tests that sorting an int array that is already sorted (containing only zeros)
+     * does not change its contents. It also verifies that the method returns the
+     * same array instance it was given, fulfilling its API contract.
+     */
+    @Test
+    public void testSortIntArray_withAllZeros_returnsSameInstanceUnchanged() {
+        // Arrange: Create an array of integers. By default, it's filled with zeros,
+        // so it's already in sorted order.
+        final int[] array = new int[7];
+        final int[] expected = {0, 0, 0, 0, 0, 0, 0};
+
+        // Act: Call the sort method on the already-sorted array.
+        final int[] sortedArray = ArraySorter.sort(array);
+
+        // Assert: Verify the array's contents are unchanged and that the
+        // returned object is the same instance as the input.
+        assertArrayEquals("The array contents should remain a sequence of zeros.", expected, sortedArray);
+        assertSame("The method should return the same array instance.", array, sortedArray);
     }
 }
