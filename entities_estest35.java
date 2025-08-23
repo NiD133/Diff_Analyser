@@ -1,36 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.jsoup.nodes.Document.OutputSettings;
 
-public class Entities_ESTestTest35 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for exception handling in {@link Entities#escape}.
+ */
+public class EntitiesEscapeTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            Entities.escape((QuietAppendable) null, "<^i1dEbS!x9O\nc", document_OutputSettings0, 3276);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.nodes.Entities", e);
-        }
+    /**
+     * Verifies that the escape method throws a NullPointerException if the destination Appendable is null.
+     * This ensures the method fails fast with invalid arguments, preventing potential errors downstream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void escapeShouldThrowNullPointerExceptionWhenAppendableIsNull() {
+        // Arrange: Create the necessary, non-null arguments for the method call.
+        // The specific values of these arguments are irrelevant to this test.
+        OutputSettings settings = new OutputSettings();
+        String anyString = "<data>";
+        int anyOptions = 0;
+
+        // Act: Call the method under test with a null Appendable.
+        // The @Test annotation will assert that a NullPointerException is thrown.
+        Entities.escape(null, anyString, settings, anyOptions);
     }
 }
