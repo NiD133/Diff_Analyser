@@ -1,35 +1,36 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import com.itextpdf.text.BadPdfFormatException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PdfImage_ESTestTest9 extends PdfImage_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        ImgJBIG2 imgJBIG2_0 = new ImgJBIG2(27, 27, byteArray0, byteArray0);
-        imgJBIG2_0.setIndentationLeft(27);
-        PdfIndirectReference pdfIndirectReference0 = new PdfIndirectReference();
-        PdfImage pdfImage0 = new PdfImage(imgJBIG2_0, "UnicodeBig", pdfIndirectReference0);
-        Image image0 = pdfImage0.getImage();
-        assertEquals(0, Image.ORIGINAL_NONE);
+public class PdfImage_ESTestTest9 { // Note: Test class name kept for context.
+
+    /**
+     * Tests that the getImage() method returns the same Image instance
+     * that was used to construct the PdfImage object.
+     */
+    @Test
+    public void getImageShouldReturnTheOriginalImageInstance() throws BadPdfFormatException {
+        // Arrange: Create a sample image and its dependencies for the PdfImage constructor.
+        byte[] imageData = new byte[1];
+        // ImgJBIG2 is a specific type of Image.
+        Image originalImage = new ImgJBIG2(27, 27, imageData, imageData);
+        originalImage.setIndentationLeft(27); // Set a property to verify its preservation.
+
+        String imageName = "MyTestImage";
+        PdfIndirectReference maskReference = new PdfIndirectReference();
+
+        // Act: Create a PdfImage wrapper and then retrieve the image from it.
+        PdfImage pdfImage = new PdfImage(originalImage, imageName, maskReference);
+        Image retrievedImage = pdfImage.getImage();
+
+        // Assert: Verify that the retrieved image is the exact same object as the original.
+        assertSame("The retrieved image should be the same instance as the original.", originalImage, retrievedImage);
+        assertEquals("Properties of the original image should be preserved.", 27.0f, retrievedImage.getIndentationLeft(), 0.0f);
     }
 }
