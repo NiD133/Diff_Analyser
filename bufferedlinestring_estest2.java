@@ -1,32 +1,40 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest2 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1498.3962), false, spatialContext0);
-        bufferedLineString0.hashCode();
-        assertEquals((-1498.3962), bufferedLineString0.getBuf(), 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for {@link BufferedLineString}.
+ */
+public class BufferedLineStringTest {
+
+    /**
+     * Tests that the constructor correctly initializes a BufferedLineString
+     * with an empty list of points and correctly stores the provided buffer value.
+     * This also verifies that a negative buffer is accepted, even though the
+     * documentation suggests otherwise.
+     */
+    @Test
+    public void constructorWithEmptyPointsShouldStoreBufferCorrectly() {
+        // Arrange
+        final double expectedBuffer = -1498.3962;
+        final double delta = 0.01;
+        
+        // Use a standard spatial context for simplicity.
+        SpatialContext spatialContext = SpatialContext.GEO;
+        List<Point> emptyPoints = Collections.emptyList();
+
+        // Act
+        BufferedLineString lineString = new BufferedLineString(emptyPoints, expectedBuffer, false, spatialContext);
+
+        // Assert
+        // Verify that the buffer value was stored correctly.
+        assertEquals(expectedBuffer, lineString.getBuf(), delta);
     }
 }
