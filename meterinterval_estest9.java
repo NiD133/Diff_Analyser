@@ -1,36 +1,41 @@
 package org.jfree.chart.plot;
 
+import org.jfree.data.Range;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
 
-public class MeterInterval_ESTestTest9 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        SystemColor systemColor0 = SystemColor.controlHighlight;
-        BasicStroke basicStroke0 = new BasicStroke();
-        MeterInterval meterInterval0 = null;
+/**
+ * Tests for the constructor of the {@link MeterInterval} class, focusing on invalid arguments.
+ */
+public class MeterIntervalConstructorTest {
+
+    /**
+     * Verifies that the MeterInterval constructor throws an IllegalArgumentException
+     * when the 'range' argument is null. A valid range is a mandatory requirement
+     * for creating an interval.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionWhenRangeIsNull() {
+        // Arrange: Define valid inputs for other parameters and the expected exception message.
+        String label = "Test Interval";
+        Paint dummyPaint = SystemColor.controlHighlight;
+        Stroke dummyStroke = new BasicStroke();
+        String expectedMessage = "Null 'range' argument.";
+
+        // Act & Assert: Attempt to create an instance with a null range and verify the exception.
         try {
-            meterInterval0 = new MeterInterval("org.jfree.chart.plot.MeterInterval", (Range) null, systemColor0, basicStroke0, systemColor0);
-            fail("Expecting exception: IllegalArgumentException");
+            new MeterInterval(label, null, dummyPaint, dummyStroke, dummyPaint);
+            fail("Expected an IllegalArgumentException because the range was null, but no exception was thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'range' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is correct, ensuring the right error is caught.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
