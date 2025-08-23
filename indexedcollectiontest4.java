@@ -1,9 +1,8 @@
 package org.apache.commons.collections4.collection;
 
-import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +10,14 @@ import java.util.Collection;
 import org.apache.commons.collections4.Transformer;
 import org.junit.jupiter.api.Test;
 
-public class IndexedCollectionTestTest4 extends AbstractCollectionTest<String> {
+/**
+ * Tests for IndexedCollection.
+ * This class focuses on specific behaviors of IndexedCollection not covered
+ * by the abstract test suite.
+ */
+public class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
+    //<editor-fold desc="Boilerplate from AbstractCollectionTest">
     protected Collection<String> decorateCollection(final Collection<String> collection) {
         return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
     }
@@ -66,7 +71,6 @@ public class IndexedCollectionTestTest4 extends AbstractCollectionTest<String> {
     }
 
     private static final class IntegerTransformer implements Transformer<String, Integer>, Serializable {
-
         private static final long serialVersionUID = 809439581555072949L;
 
         @Override
@@ -74,20 +78,35 @@ public class IndexedCollectionTestTest4 extends AbstractCollectionTest<String> {
             return Integer.valueOf(input);
         }
     }
+    //</editor-fold>
 
+    /**
+     * Tests that reindex() correctly updates the index after the decorated
+     * collection has been modified externally, which is a documented behavior.
+     */
     @Test
-    void testReindexUpdatesIndexWhenDecoratedCollectionIsModifiedSeparately() throws Exception {
-        final Collection<String> original = new ArrayList<>();
-        final IndexedCollection<Integer, String> indexed = decorateUniqueCollection(original);
-        original.add("1");
-        original.add("2");
-        original.add("3");
-        assertNull(indexed.get(1));
-        assertNull(indexed.get(2));
-        assertNull(indexed.get(3));
-        indexed.reindex();
-        assertEquals("1", indexed.get(1));
-        assertEquals("2", indexed.get(2));
-        assertEquals("3", indexed.get(3));
+    void reindexShouldUpdateIndexAfterUnderlyingCollectionIsModifiedExternally() {
+        // Arrange: Create an indexed collection decorating an empty list.
+        final Collection<String> underlyingCollection = new ArrayList<>();
+        final IndexedCollection<Integer, String> indexedCollection = decorateUniqueCollection(underlyingCollection);
+
+        // Act: Modify the underlying collection directly, bypassing the decorator.
+        underlyingCollection.add("1");
+        underlyingCollection.add("2");
+        underlyingCollection.add("3");
+
+        // Assert: The index is now out of sync and does not contain the new elements.
+        // This confirms that external modifications are not automatically detected.
+        assertNull(indexedCollection.get(1), "Index should be stale before reindex for key 1");
+        assertNull(indexedCollection.get(2), "Index should be stale before reindex for key 2");
+        assertNull(indexedCollection.get(3), "Index should be stale before reindex for key 3");
+
+        // Act: Manually trigger a re-index.
+        indexedCollection.reindex();
+
+        // Assert: The index is now synchronized with the underlying collection.
+        assertEquals("1", indexedCollection.get(1), "Index should be updated after reindex for key 1");
+        assertEquals("2", indexedCollection.get(2), "Index should be updated after reindex for key 2");
+        assertEquals("3", indexedCollection.get(3), "Index should be updated after reindex for key 3");
     }
 }
