@@ -1,28 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest14 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        char[] charArray0 = new char[7];
-        int int0 = serializedString0.appendUnquoted(charArray0, 1);
-        assertEquals(0, int0);
+    /**
+     * Verifies that appending an empty SerializedString to a character buffer
+     * results in zero characters being written.
+     */
+    @Test
+    public void appendUnquoted_shouldReturnZero_whenStringIsEmpty() {
+        // Arrange: Create an empty SerializedString and a destination buffer.
+        SerializedString emptyString = new SerializedString("");
+        char[] destinationBuffer = new char[10];
+        int offset = 0;
+
+        // Act: Attempt to append the empty string's unquoted value to the buffer.
+        int charsAppended = emptyString.appendUnquoted(destinationBuffer, offset);
+
+        // Assert: Verify that the method reports that zero characters were appended.
+        assertEquals("Appending an empty string should result in 0 characters being written.", 0, charsAppended);
     }
 }
