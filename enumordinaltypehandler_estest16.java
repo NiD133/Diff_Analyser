@@ -1,33 +1,37 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class EnumOrdinalTypeHandler_ESTestTest16 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for {@link EnumOrdinalTypeHandler}.
+ * This improved version focuses on clarity and standard testing practices.
+ */
+public class EnumOrdinalTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        JdbcType jdbcType0 = JdbcType.LONGVARBINARY;
-        // Undeclared exception!
-        try {
-            enumOrdinalTypeHandler0.setNonNullParameter((PreparedStatement) null, (-2025), jdbcType0, jdbcType0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
-        }
+    /**
+     * Verifies that setNonNullParameter throws a NullPointerException when the PreparedStatement is null.
+     * This is the expected behavior, as the method cannot set a parameter on a null statement.
+     */
+    @Test(expected = NullPointerException.class)
+    public void setNonNullParameterShouldThrowNpeForNullPreparedStatement() throws SQLException {
+        // Arrange
+        // Create a handler for a specific enum type, in this case, JdbcType.
+        EnumOrdinalTypeHandler<JdbcType> typeHandler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+
+        // Define arbitrary but valid parameters for the method call.
+        // Their specific values do not affect this test's outcome.
+        int anyColumnIndex = 1;
+        JdbcType anyEnumParameter = JdbcType.VARCHAR;
+
+        // Act
+        // Call the method with a null PreparedStatement, which should trigger the exception.
+        typeHandler.setNonNullParameter(null, anyColumnIndex, anyEnumParameter, null);
+
+        // Assert
+        // The @Test(expected = NullPointerException.class) annotation handles the assertion.
+        // The test will fail automatically if a NullPointerException is not thrown.
     }
 }
