@@ -2,18 +2,43 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonSetter_ESTestTest8 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on the
+ * behavior of its property accessors.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Nulls nulls0 = Nulls.DEFAULT;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.construct(nulls0, nulls0);
-        jsonSetter_Value0.nonDefaultValueNulls();
+    /**
+     * Tests that nonDefaultValueNulls() returns null when the instance
+     * is constructed with the default Nulls value.
+     */
+    @Test
+    public void nonDefaultValueNulls_shouldReturnNull_whenValueIsDefault() {
+        // Arrange: Create a JsonSetter.Value instance where valueNulls is Nulls.DEFAULT.
+        JsonSetter.Value setterValue = JsonSetter.Value.construct(Nulls.DEFAULT, Nulls.DEFAULT);
+
+        // Act: Call the method under test.
+        Nulls result = setterValue.nonDefaultValueNulls();
+
+        // Assert: The method should return null for a default value, as per its contract.
+        assertNull("Expected null when valueNulls is DEFAULT", result);
+    }
+
+    /**
+     * Tests that nonDefaultValueNulls() returns the actual value when the instance
+     * is constructed with a non-default Nulls value.
+     */
+    @Test
+    public void nonDefaultValueNulls_shouldReturnValue_whenValueIsNonDefault() {
+        // Arrange: Create a JsonSetter.Value instance with a specific, non-default value.
+        Nulls expectedNulls = Nulls.SET;
+        JsonSetter.Value setterValue = JsonSetter.Value.construct(expectedNulls, Nulls.DEFAULT);
+
+        // Act: Call the method under test.
+        Nulls result = setterValue.nonDefaultValueNulls();
+
+        // Assert: The method should return the specific value it was configured with.
+        assertEquals("Expected the non-default Nulls value to be returned", expectedNulls, result);
     }
 }
