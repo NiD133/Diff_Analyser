@@ -1,27 +1,30 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest11 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer(0);
-        byte[] byteArray0 = new byte[3];
-        // Undeclared exception!
-        try {
-            circularByteBuffer0.add(byteArray0, 1886, 0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: 1886
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
-        }
+    @Test
+    public void addWithOutOfBoundsOffsetThrowsIllegalArgumentException() {
+        // Arrange: Create a buffer and a source byte array.
+        // The offset is intentionally set to a value outside the bounds of the source array.
+        final CircularByteBuffer buffer = new CircularByteBuffer(0);
+        final byte[] sourceData = new byte[3];
+        final int invalidOffset = 1886;
+        final int length = 0; // Adding zero bytes, so buffer capacity is not a factor.
+
+        // Act & Assert: Verify that calling add() with an invalid offset throws an exception.
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            buffer.add(sourceData, invalidOffset, length);
+        });
+
+        // Further Assert: Check if the exception message is as expected, confirming the reason for failure.
+        assertEquals("Illegal offset: " + invalidOffset, exception.getMessage());
     }
 }
