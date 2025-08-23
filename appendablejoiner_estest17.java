@@ -1,33 +1,36 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class AppendableJoiner_ESTestTest17 extends AppendableJoiner_ESTest_scaffolding {
+/**
+ * Test suite for {@link AppendableJoiner}.
+ *
+ * This class contains tests that have been improved for clarity and maintainability
+ * from an auto-generated version.
+ */
+public class AppendableJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        AppendableJoiner.Builder<StringBuilder> appendableJoiner_Builder0 = new AppendableJoiner.Builder<StringBuilder>();
-        StringBuilder stringBuilder0 = new StringBuilder();
-        AppendableJoiner<StringBuilder> appendableJoiner0 = appendableJoiner_Builder0.get();
-        StringBuilder stringBuilder1 = appendableJoiner0.join(stringBuilder0, (Iterable<StringBuilder>) null);
-        assertEquals("", stringBuilder1.toString());
+    /**
+     * Tests that calling join() with a null iterable does not modify the
+     * target StringBuilder and returns the original instance.
+     */
+    @Test
+    public void joinWithNullIterableShouldNotModifyTarget() {
+        // Arrange
+        // A default joiner, which uses an empty delimiter, prefix, and suffix.
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().get();
+        final StringBuilder target = new StringBuilder();
+
+        // Act
+        // The method under test is called with a null iterable.
+        final StringBuilder result = joiner.join(target, (Iterable<Object>) null);
+
+        // Assert
+        // The target StringBuilder should remain unchanged (i.e., empty).
+        assertEquals("The content of the StringBuilder should be unchanged.", "", target.toString());
+        // The join method should return the same instance it was given.
+        assertSame("The returned instance should be the same as the target.", target, result);
     }
 }
