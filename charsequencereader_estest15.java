@@ -1,31 +1,26 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
-public class CharSequenceReader_ESTestTest15 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        // Undeclared exception!
-        try {
-            charSequenceReader0.read((CharBuffer) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that read(CharBuffer) throws a NullPointerException when the target buffer is null.
+     */
+    @Test
+    void read_intoNullBuffer_throwsNullPointerException() {
+        // Arrange
+        CharSequenceReader reader = new CharSequenceReader("test-sequence");
+
+        // Act & Assert
+        // The cast to (CharBuffer) is necessary to resolve ambiguity between
+        // read(CharBuffer) and other read() overloads.
+        assertThrows(NullPointerException.class, () -> reader.read((CharBuffer) null));
     }
 }
