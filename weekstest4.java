@@ -1,42 +1,57 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class WeeksTestTest4 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks#weeksBetween(ReadablePartial, ReadablePartial)} factory method.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void weeksBetween_withEndAfterStart_calculatesPositiveWeeks() {
+        // A 21-day period is exactly 3 weeks.
+        ReadablePartial start = new LocalDate(2006, 6, 9);
+        ReadablePartial end = new LocalDate(2006, 6, 30);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        Weeks expected = Weeks.THREE;
+        Weeks actual = Weeks.weeksBetween(start, end);
+
+        assertEquals(expected, actual);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    @Test
+    public void weeksBetween_withSameStartAndEnd_returnsZeroWeeks() {
+        ReadablePartial date = new LocalDate(2006, 6, 9);
+
+        Weeks expected = Weeks.ZERO;
+        Weeks actual = Weeks.weeksBetween(date, date);
+
+        assertEquals(expected, actual);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void weeksBetween_withEndBeforeStart_calculatesNegativeWeeks() {
+        // The same 21-day period, but with start and end dates swapped.
+        ReadablePartial start = new LocalDate(2006, 6, 30);
+        ReadablePartial end = new LocalDate(2006, 6, 9);
+
+        Weeks expected = Weeks.weeks(-3);
+        Weeks actual = Weeks.weeksBetween(start, end);
+
+        assertEquals(expected, actual);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test
+    @SuppressWarnings("deprecation") // Using deprecated YearMonthDay for test compatibility
+    public void weeksBetween_withDifferentPartialTypes_calculatesCorrectly() {
+        // A 42-day period (6 weeks) between a LocalDate and a YearMonthDay.
+        ReadablePartial start = new LocalDate(2006, 6, 9);
+        ReadablePartial end = new YearMonthDay(2006, 7, 21);
 
-    @SuppressWarnings("deprecation")
-    public void testFactory_weeksBetween_RPartial() {
-        LocalDate start = new LocalDate(2006, 6, 9);
-        LocalDate end1 = new LocalDate(2006, 6, 30);
-        YearMonthDay end2 = new YearMonthDay(2006, 7, 21);
-        assertEquals(3, Weeks.weeksBetween(start, end1).getWeeks());
-        assertEquals(0, Weeks.weeksBetween(start, start).getWeeks());
-        assertEquals(0, Weeks.weeksBetween(end1, end1).getWeeks());
-        assertEquals(-3, Weeks.weeksBetween(end1, start).getWeeks());
-        assertEquals(6, Weeks.weeksBetween(start, end2).getWeeks());
+        Weeks expected = Weeks.weeks(6);
+        Weeks actual = Weeks.weeksBetween(start, end);
+
+        assertEquals(expected, actual);
     }
 }
