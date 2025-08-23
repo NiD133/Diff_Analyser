@@ -1,40 +1,43 @@
 package org.apache.commons.compress.archivers.ar;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-public class ArArchiveOutputStream_ESTestTest16 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ArArchiveOutputStream}.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        arArchiveOutputStream0.close();
-        File file0 = MockFile.createTempFile(":C=p+mECIpN4Fl>pY", ":C=p+mECIpN4Fl>pY");
+    @Rule
+    public final TemporaryFolder tempFolder = new TemporaryFolder();
+
+    /**
+     * Verifies that attempting to create a new archive entry after the stream
+     * has been closed results in an IOException.
+     */
+    @Test
+    public void createArchiveEntryOnClosedStreamThrowsIOException() throws IOException {
+        // Arrange: Create a dummy file and an ArArchiveOutputStream, then close the stream.
+        final File dummyFile = tempFolder.newFile("test-file.txt");
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream);
+        arOut.close();
+
+        // Act & Assert: Attempting to create an entry should throw an IOException.
         try {
-            arArchiveOutputStream0.createArchiveEntry(file0, ":C=p+mECIpN4Fl>pY");
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream has already been finished.
-            //
-            verifyException("org.apache.commons.compress.archivers.ArchiveOutputStream", e);
+            arOut.createArchiveEntry(dummyFile, "archive-entry-name.txt");
+            fail("Expected an IOException because the stream is already closed.");
+        } catch (final IOException e) {
+            // Verify the exception message is correct.
+            final String expectedMessage = "Stream has already been finished.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
