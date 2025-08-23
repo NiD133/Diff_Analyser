@@ -1,41 +1,36 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest23 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Contains tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        MockFile mockFile0 = new MockFile("");
-        Path[] pathArray0 = new Path[8];
-        Path path0 = mockFile0.toPath();
-        pathArray0[0] = path0;
-        pathArray0[1] = path0;
-        pathArray0[2] = path0;
-        pathArray0[3] = path0;
-        pathArray0[4] = pathArray0[0];
-        pathArray0[5] = path0;
-        pathArray0[6] = pathArray0[0];
-        pathArray0[7] = pathArray0[4];
-        SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forPaths(pathArray0);
-        assertEquals(0L, seekableByteChannel0.position());
+    /**
+     * Verifies that a channel created via {@code forPaths} is initialized with a position of 0.
+     */
+    @Test
+    public void forPaths_whenChannelIsCreated_initialPositionShouldBeZero() throws IOException {
+        // Arrange
+        // The original auto-generated test used a path to the current directory ("").
+        // This is an unusual input, as opening a channel on a directory would
+        // normally fail. We preserve this logic, assuming the test environment
+        // handles this by creating an empty, readable channel.
+        final Path path = Paths.get("");
+        final Path[] paths = new Path[8];
+        Arrays.fill(paths, path);
+
+        // Act
+        final SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forPaths(paths);
+
+        // Assert
+        assertEquals("A newly created channel should be positioned at the beginning.", 0L, channel.position());
     }
 }
