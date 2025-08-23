@@ -1,49 +1,40 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest2 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        LocalTime localTime0 = LocalTime.fromMillisOfDay(9223372036854775807L, (Chronology) islamicChronology0);
-        LocalDateTime localDateTime0 = LocalDateTime.now();
-        LocalDateTime localDateTime1 = localDateTime0.withFields(localTime0);
-        boolean boolean0 = localDateTime1.isAfter(localDateTime0);
-        assertFalse(boolean0);
+/**
+ * Test class for the comparison methods in {@link AbstractPartial}.
+ * <p>
+ * This test uses {@link LocalDateTime} as a concrete implementation of
+ * a readable partial to test the behavior of methods like {@code isAfter()}.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Tests that isAfter() returns false when comparing a partial to another partial
+     * that represents a later point in time.
+     */
+    @Test
+    public void isAfter_shouldReturnFalse_whenPartialIsEarlierThanComparator() {
+        // Arrange: Create a specific date-time (noon) and a time that is clearly earlier (10 AM).
+        // Using fixed values instead of LocalDateTime.now() makes the test deterministic.
+        LocalDateTime noonOnSpecificDay = new LocalDateTime(2023, 10, 26, 12, 0, 0);
+        LocalTime tenAm = new LocalTime(10, 0, 0);
+
+        // Act: Create a new LocalDateTime by replacing the time part of the original
+        // with the earlier time. This results in 10 AM on the same day.
+        LocalDateTime tenAmOnSpecificDay = noonOnSpecificDay.withFields(tenAm);
+
+        // Assert: Verify that the 10 AM partial is not considered "after" the 12 PM partial.
+        boolean isAfter = tenAmOnSpecificDay.isAfter(noonOnSpecificDay);
+        assertFalse("10:00 should not be after 12:00 on the same day", isAfter);
+
+        // For additional clarity, we can also assert the state of our modified object.
+        assertEquals(new LocalDateTime(2023, 10, 26, 10, 0, 0), tenAmOnSpecificDay);
     }
 }
