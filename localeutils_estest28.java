@@ -1,21 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocaleUtils_ESTestTest28 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale("biTN-009");
-        assertEquals("bitn_009", locale0.toString());
-        assertNotNull(locale0);
+    /**
+     * Tests that {@link LocaleUtils#toLocale(String)} can correctly parse a string
+     * with a mixed-case language code, a dash separator, and a numeric area code for the country.
+     *
+     * The input "biTN-009" is expected to be parsed into a Locale with language "bitn"
+     * and country "009". This test verifies that the parsing logic correctly handles
+     * case normalization and separator type.
+     */
+    @Test
+    public void toLocaleShouldParseStringWithMixedCaseLanguageAndNumericCountry() {
+        // Arrange
+        final String localeString = "biTN-009";
+        final Locale expectedLocale = new Locale("bitn", "009");
+
+        // Act
+        final Locale actualLocale = LocaleUtils.toLocale(localeString);
+
+        // Assert
+        assertEquals(expectedLocale, actualLocale);
     }
 }
