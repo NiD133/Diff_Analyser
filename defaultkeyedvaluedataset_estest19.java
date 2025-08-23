@@ -2,29 +2,43 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
 
-public class DefaultKeyedValueDataset_ESTestTest19 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * A test suite for the equals() method in the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        MockDate mockDate0 = new MockDate(0, 1, 0);
-        OHLCDataItem oHLCDataItem0 = new OHLCDataItem(mockDate0, (-1.0), (-1.0), 0.0, 0.0, 0.0);
-        byte[] byteArray0 = new byte[5];
-        BigInteger bigInteger0 = new BigInteger(byteArray0);
-        DefaultKeyedValueDataset defaultKeyedValueDataset1 = new DefaultKeyedValueDataset(oHLCDataItem0, bigInteger0);
-        boolean boolean0 = defaultKeyedValueDataset0.equals(defaultKeyedValueDataset1);
-        assertFalse(boolean0);
+    /**
+     * Tests that an empty dataset is not considered equal to a dataset containing data.
+     * The equals() method should correctly handle comparisons between datasets with
+     * different content.
+     */
+    @Test
+    public void equals_whenComparingEmptyToNonEmptyDataset_shouldReturnFalse() {
+        // Arrange: Create two datasets, one empty and one with a key-value pair.
+        DefaultKeyedValueDataset emptyDataset = new DefaultKeyedValueDataset();
+        DefaultKeyedValueDataset datasetWithData = new DefaultKeyedValueDataset("Test Key", 123.45);
+
+        // Act: Compare the two datasets for equality.
+        boolean areEqual = emptyDataset.equals(datasetWithData);
+
+        // Assert: The datasets should not be equal.
+        assertFalse("An empty dataset should not be equal to a non-empty one.", areEqual);
+    }
+
+    /**
+     * A more idiomatic version of the same test using assertNotEquals for better
+     * readability and intent.
+     */
+    @Test
+    public void equals_comparingEmptyAndNonEmptyDatasets_shouldNotBeEqual() {
+        // Arrange
+        DefaultKeyedValueDataset emptyDataset = new DefaultKeyedValueDataset();
+        DefaultKeyedValueDataset datasetWithData = new DefaultKeyedValueDataset("Test Key", 123.45);
+
+        // Act & Assert: The two datasets should not be equal.
+        // The comparison should also be symmetric.
+        assertNotEquals(emptyDataset, datasetWithData);
+        assertNotEquals(datasetWithData, emptyDataset);
     }
 }
