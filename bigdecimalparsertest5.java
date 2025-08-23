@@ -1,40 +1,44 @@
 package com.fasterxml.jackson.core.io;
 
-import java.math.BigDecimal;
 import ch.randelshofer.fastdoubleparser.JavaBigDecimalParser;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class BigDecimalParserTestTest5 extends com.fasterxml.jackson.core.JUnit5TestBase {
+import java.math.BigDecimal;
 
-    static String genLongInvalidString() {
-        final int len = 1500;
-        final StringBuilder sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append("A");
-        }
-        return sb.toString();
-    }
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    static String genLongValidString(int len) {
-        final StringBuilder sb = new StringBuilder(len + 5);
-        sb.append("0.");
-        for (int i = 0; i < len; i++) {
-            sb.append('0');
-        }
-        sb.append('1');
-        return sb.toString();
-    }
+/**
+ * Unit tests for the {@link BigDecimalParser} class, focusing on specific edge cases.
+ */
+class BigDecimalParserTest extends com.fasterxml.jackson.core.JUnit5TestBase {
 
     @Test
-    void issueDatabind4694() {
-        final String str = "-11000.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        final BigDecimal expected = new BigDecimal(str);
-        assertEquals(expected, JavaBigDecimalParser.parseBigDecimal(str));
-        assertEquals(expected, BigDecimalParser.parse(str));
-        assertEquals(expected, BigDecimalParser.parseWithFastParser(str));
-        final char[] arr = str.toCharArray();
-        assertEquals(expected, BigDecimalParser.parse(arr, 0, arr.length));
-        assertEquals(expected, BigDecimalParser.parseWithFastParser(arr, 0, arr.length));
+    @DisplayName("Should correctly parse a very long decimal string (regression for databind#4694)")
+    void shouldParseVeryLongDecimalString_databind4694() {
+        // This specific long number string caused issues, as reported in databind#4694.
+        // It is used here to ensure all parsing methods behave consistently and correctly.
+        final String longDecimalString = "-11000.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000-";
+        final char[] longDecimalChars = longDecimalString.toCharArray();
+
+        // The expected value is derived from the standard Java BigDecimal constructor,
+        // which serves as the ground truth for this test.
+        final BigDecimal expected = new BigDecimal(longDecimalString);
+
+        // All parsing methods should produce the same, correct BigDecimal instance.
+        // We also verify against the reference FastDoubleParser implementation to ensure correctness.
+        assertAll("Verify all BigDecimalParser variants for a long decimal string",
+            () -> assertEquals(expected, JavaBigDecimalParser.parseBigDecimal(longDecimalString),
+                "Verification against reference FastDoubleParser failed."),
+            () -> assertEquals(expected, BigDecimalParser.parse(longDecimalString),
+                "BigDecimalParser.parse(String) failed."),
+            () -> assertEquals(expected, BigDecimalParser.parseWithFastParser(longDecimalString),
+                "BigDecimalParser.parseWithFastParser(String) failed."),
+            () -> assertEquals(expected, BigDecimalParser.parse(longDecimalChars, 0, longDecimalChars.length),
+                "BigDecimalParser.parse(char[]) failed."),
+            () -> assertEquals(expected, BigDecimalParser.parseWithFastParser(longDecimalChars, 0, longDecimalChars.length),
+                "BigDecimalParser.parseWithFastParser(char[]) failed.")
+        );
     }
 }
