@@ -1,40 +1,44 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest96 extends XNode_ESTest_scaffolding {
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test095() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("", "P29]`x-B?");
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getLongAttribute("");
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-            //
-            // For input string: \"P29]`x-B?\"
-            //
-            verifyException("java.lang.NumberFormatException", e);
-        }
+/**
+ * Test suite for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getLongAttribute throws a NumberFormatException
+     * when the attribute's value is not a valid long.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void getLongAttributeShouldThrowNumberFormatExceptionForNonNumericValue() {
+        // Arrange
+        final String attributeName = "id";
+        final String nonNumericValue = "this-is-not-a-number";
+
+        // Create a DOM node with an attribute that has a non-numeric value.
+        Node node = new IIOMetadataNode();
+        // IIOMetadataNode implements Element, so we can use setAttribute.
+        ((IIOMetadataNode) node).setAttribute(attributeName, nonNumericValue);
+
+        // Create dummy dependencies required by the XNode constructor.
+        XPathParser dummyParser = new XPathParser((Document) null);
+        Properties variables = new Properties();
+
+        XNode xNode = new XNode(dummyParser, node, variables);
+
+        // Act
+        // Attempt to parse the non-numeric attribute as a long.
+        // This call is expected to throw a NumberFormatException.
+        xNode.getLongAttribute(attributeName);
+
+        // Assert
+        // The @Test(expected) annotation handles the exception assertion.
     }
 }
