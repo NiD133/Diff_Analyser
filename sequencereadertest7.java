@@ -1,79 +1,84 @@
 package org.apache.commons.io.input;
 
-import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest7 {
+/**
+ * Understandable tests for the {@link SequenceReader} class, focusing on
+ * reading into a portion of a character array.
+ */
+public class SequenceReaderTest {
 
-    private static final char NUL = 0;
+    @Test
+    @DisplayName("read(char[], int, int) should read from multiple sources sequentially")
+    void read_intoCharArrayPortion_readsSequentiallyAndHandlesEof() throws IOException {
+        // Arrange
+        final String input1 = "Foo";
+        final String input2 = "Bar";
+        final char[] buffer = new char[10]; // Initialized with '\0' characters
 
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
+        try (Reader reader = new SequenceReader(new StringReader(input1), new StringReader(input2))) {
+            // Act 1: Read the first part ("Foo") into the middle of the buffer.
+            final int charsRead1 = reader.read(buffer, 3, 3);
 
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
+            // Assert 1: Verify "Foo" was read correctly.
+            assertEquals(3, charsRead1, "Should have read 3 chars from the first reader.");
+            char[] expectedBuffer1 = new char[10];
+            System.arraycopy(input1.toCharArray(), 0, expectedBuffer1, 3, input1.length());
+            assertArrayEquals(expectedBuffer1, buffer, "Buffer should contain 'Foo' at offset 3.");
 
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
+            // Act 2: Read the second part ("Bar") into the start of the buffer.
+            final int charsRead2 = reader.read(buffer, 0, 3);
 
-    private static class CustomReader extends Reader {
+            // Assert 2: Verify "Bar" was read, overwriting the start of the buffer.
+            assertEquals(3, charsRead2, "Should have read 3 chars from the second reader.");
+            char[] expectedBuffer2 = expectedBuffer1.clone(); // Start with the previous buffer state
+            System.arraycopy(input2.toCharArray(), 0, expectedBuffer2, 0, input2.length());
+            assertArrayEquals(expectedBuffer2, buffer, "Buffer should be updated with 'Bar' at offset 0.");
 
-        boolean closed;
+            // Act 3: Attempt to read past the end of the sequence.
+            final int eof = reader.read(buffer);
 
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
+            // Assert 3: Verify end-of-file is reached.
+            assertEquals(-1, eof, "Should return -1 to indicate the end of the sequence.");
         }
     }
 
     @Test
-    void testReadCharArrayPortion() throws IOException {
-        final char[] chars = new char[10];
-        try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
-            assertEquals(3, reader.read(chars, 3, 3));
-            checkArray(new char[] { NUL, NUL, NUL, 'F', 'o', 'o' }, chars);
-            assertEquals(3, reader.read(chars, 0, 3));
-            checkArray(new char[] { 'B', 'a', 'r', 'F', 'o', 'o', NUL }, chars);
-            assertEquals(-1, reader.read(chars));
-            assertThrows(IndexOutOfBoundsException.class, () -> reader.read(chars, 10, 10));
-            assertThrows(NullPointerException.class, () -> reader.read(null, 0, 10));
+    @DisplayName("read(char[], int, int) should throw IndexOutOfBoundsException for invalid bounds")
+    void read_intoCharArrayPortion_throwsIndexOutOfBoundsForInvalidBounds() throws IOException {
+        try (Reader reader = new SequenceReader(new StringReader("test"))) {
+            final char[] buffer = new char[10];
+
+            // Assert that calling read with a negative offset throws an exception.
+            assertThrows(IndexOutOfBoundsException.class, () -> reader.read(buffer, -1, 1),
+                "Offset cannot be negative.");
+
+            // Assert that calling read with a negative length throws an exception.
+            assertThrows(IndexOutOfBoundsException.class, () -> reader.read(buffer, 0, -1),
+                "Length cannot be negative.");
+
+            // Assert that calling read where offset + length exceeds buffer size throws an exception.
+            assertThrows(IndexOutOfBoundsException.class, () -> reader.read(buffer, 6, 5),
+                "Offset + length cannot exceed buffer length.");
+        }
+    }
+
+    @Test
+    @DisplayName("read(char[], int, int) should throw NullPointerException for a null buffer")
+    void read_intoCharArrayPortion_throwsNullPointerExceptionForNullBuffer() throws IOException {
+        try (Reader reader = new SequenceReader(new StringReader("test"))) {
+            // Assert that calling read with a null buffer throws an exception.
+            assertThrows(NullPointerException.class, () -> reader.read(null, 0, 1),
+                "Buffer cannot be null.");
         }
     }
 }
