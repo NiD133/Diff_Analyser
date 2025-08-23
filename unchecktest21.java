@@ -3,70 +3,52 @@ package org.apache.commons.io.function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest21 {
+/**
+ * Tests for the {@code Uncheck.test(IOPredicate, T)} method.
+ */
+class UncheckTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
+    @Test
+    @DisplayName("Should return the predicate's boolean result when no exception is thrown")
+    void test_whenPredicateSucceeds_returnsResult() {
+        // Arrange: Create a predicate that performs a side effect and returns true.
+        final AtomicReference<String> sideEffectState = new AtomicReference<>();
+        final String testInput = "input data";
+        final IOPredicate<String> successfulPredicate = input -> {
+            sideEffectState.set(input);
+            return true;
+        };
 
-    private static final String CAUSE_MESSAGE = "CauseMessage";
+        // Act: Execute the predicate via Uncheck.test.
+        final boolean result = Uncheck.test(successfulPredicate, testInput);
 
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+        // Assert: Verify the returned value and the side effect.
+        assertTrue(result, "Expected Uncheck.test to return true for a successful predicate.");
+        assertEquals(testInput, sideEffectState.get(), "The side effect of the predicate should be observable.");
     }
 
     @Test
-    void testTest() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.test(t -> {
-            throw new IOException();
-        }, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.test(TestConstants.THROWING_IO_PREDICATE, null));
-        assertTrue(Uncheck.test(t -> TestUtils.compareAndSetThrowsIO(ref1, t).equals(t), "new1"));
-        assertEquals("new1", ref1.get());
+    @DisplayName("Should wrap a thrown IOException in an UncheckedIOException")
+    void test_whenPredicateThrowsIOException_thenWrapsInUncheckedIOException() {
+        // Arrange: Create a predicate that always throws a specific IOException.
+        final IOException cause = new IOException("Test I/O failure");
+        final IOPredicate<Object> throwingPredicate = t -> {
+            throw cause;
+        };
+
+        // Act & Assert: Verify that Uncheck.test throws UncheckedIOException and that its cause is the original IOException.
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.test(throwingPredicate, "any input");
+        });
+        
+        assertEquals(cause, thrown.getCause(), "The cause of the UncheckedIOException should be the original IOException.");
     }
 }
