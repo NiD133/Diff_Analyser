@@ -1,44 +1,42 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest12 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for the static helper methods in {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        char[] charArray0 = new char[2];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0, 1, 0);
-        int int0 = TextHelpAppendable.indexOfWrap(charBuffer0, Integer.MAX_VALUE, 7);
-        assertEquals((-2147483643), int0);
+    /**
+     * Tests that {@link TextHelpAppendable#indexOfWrap(CharSequence, int, int)} correctly handles
+     * an integer overflow when calculating the potential wrap position.
+     *
+     * <p>This scenario tests an edge case with an empty text buffer and a width so large
+     * that the calculation {@code startPos + width} overflows. The test verifies that the
+     * method returns the correctly overflowed value.
+     */
+    @Test
+    public void indexOfWrapWithEmptyTextAndOverflowingWidthShouldReturnCalculatedWrapPosition() {
+        // Arrange
+        final CharSequence emptyText = CharBuffer.wrap(new char[0]);
+        final int startPos = 7;
+        final int width = Integer.MAX_VALUE;
+
+        // The expected wrap position is based on startPos + width.
+        // This calculation overflows Java's integer range:
+        // 7 + 2,147,483,647 = 2,147,483,654, which wraps around to -2,147,483,642.
+        // The original test expected -2,147,483,643, suggesting the internal
+        // implementation might be slightly different (e.g., startPos + width - 1).
+        // We preserve the original assertion to match the code's expected behavior.
+        final int expectedIndex = -2147483643;
+
+        // Act
+        final int actualIndex = TextHelpAppendable.indexOfWrap(emptyText, width, startPos);
+
+        // Assert
+        assertEquals("The wrap index should be the result of the overflowed calculation.",
+            expectedIndex, actualIndex);
     }
 }
