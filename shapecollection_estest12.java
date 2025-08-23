@@ -1,36 +1,35 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+// The original test class name and scaffolding are kept for context.
+// In a real-world scenario, the class would be renamed to something like "ShapeCollectionTest".
 public class ShapeCollection_ESTestTest12 extends ShapeCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        GeodesicSphereDistCalc.LawOfCosines geodesicSphereDistCalc_LawOfCosines0 = new GeodesicSphereDistCalc.LawOfCosines();
-        PointImpl pointImpl0 = new PointImpl(2630.69905510879, 2630.69905510879, spatialContext0);
-        Rectangle rectangle0 = shapeCollection0.getBoundingBox();
-        geodesicSphereDistCalc_LawOfCosines0.calcBoxByDistFromPt(pointImpl0, 2630.69905510879, spatialContext0, rectangle0);
-        Point point0 = shapeCollection0.getCenter();
-        assertEquals(0.0, point0.getY(), 0.01);
+    /**
+     * Tests that the center of an empty ShapeCollection in a geographic context
+     * defaults to the origin point (0, 0).
+     */
+    @Test
+    public void getCenter_ofEmptyCollection_shouldReturnGeoOrigin() {
+        // Arrange: Create an empty ShapeCollection using the standard geographic context.
+        List<Shape> emptyShapeList = Collections.emptyList();
+        SpatialContext geoContext = SpatialContext.GEO;
+        ShapeCollection<Shape> emptyShapeCollection = new ShapeCollection<>(emptyShapeList, geoContext);
+
+        // Act: Get the center of the empty collection.
+        Point centerPoint = emptyShapeCollection.getCenter();
+
+        // Assert: The center of an empty collection's bounding box is expected to be the origin.
+        assertNotNull("The center point should not be null.", centerPoint);
+        assertEquals("Center X-coordinate should be 0.0", 0.0, centerPoint.getX(), 0.0);
+        assertEquals("Center Y-coordinate should be 0.0", 0.0, centerPoint.getY(), 0.0);
     }
 }
