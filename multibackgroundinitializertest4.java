@@ -1,246 +1,170 @@
 package org.apache.commons.lang3.concurrent;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.AbstractLangTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class MultiBackgroundInitializerTestTest4 extends AbstractLangTest {
+/**
+ * Tests the executor management of {@link MultiBackgroundInitializer}.
+ *
+ * This test class verifies that if a child {@link BackgroundInitializer} is
+ * configured with its own {@link ExecutorService}, {@link MultiBackgroundInitializer}
+ * respects that and uses the dedicated executor for that child, while using its
+ * own managed executor for other children.
+ */
+public class MultiBackgroundInitializerExecutorTest extends AbstractLangTest {
 
-    /**
-     * Constant for the names of the child initializers.
-     */
-    private static final String CHILD_INIT = "childInitializer";
+    /** The name for the child initializer that uses the main executor. */
+    private static final String CHILD_USING_MAIN_EXECUTOR_NAME = "childInitializer";
 
-    /**
-     * A short time to wait for background threads to run.
-     */
-    protected static final long PERIOD_MILLIS = 50;
+    /** The name for the child initializer that uses its own dedicated executor. */
+    private static final String CHILD_WITH_DEDICATED_EXECUTOR_NAME = "childInitializerWithExecutor";
 
-    /**
-     * The initializer to be tested.
-     */
-    protected MultiBackgroundInitializer initializer;
+    /** The main initializer under test. */
+    private MultiBackgroundInitializer multiInitializer;
 
-    /**
-     * Tests whether a child initializer has been executed. Optionally the
-     * expected executor service can be checked, too.
-     *
-     * @param child the child initializer
-     * @param expExec the expected executor service (null if the executor should
-     * not be checked)
-     * @throws ConcurrentException if an error occurs
-     */
-    private void checkChild(final BackgroundInitializer<?> child, final ExecutorService expExec) throws ConcurrentException {
-        final AbstractChildBackgroundInitializer cinit = (AbstractChildBackgroundInitializer) child;
-        final Integer result = cinit.get().getInitializeCalls();
-        assertEquals(1, result.intValue(), "Wrong result");
-        assertEquals(1, cinit.initializeCalls, "Wrong number of executions");
-        if (expExec != null) {
-            assertEquals(expExec, cinit.currentExecutor, "Wrong executor service");
-        }
-    }
-
-    /**
-     * Helper method for testing the initialize() method. This method can
-     * operate with both an external and a temporary executor service.
-     *
-     * @return the result object produced by the initializer
-     * @throws org.apache.commons.lang3.concurrent.ConcurrentException so we don't have to catch it
-     */
-    private MultiBackgroundInitializer.MultiBackgroundInitializerResults checkInitialize() throws ConcurrentException {
-        final int count = 5;
-        for (int i = 0; i < count; i++) {
-            initializer.addInitializer(CHILD_INIT + i, createChildBackgroundInitializer());
-        }
-        initializer.start();
-        final MultiBackgroundInitializer.MultiBackgroundInitializerResults res = initializer.get();
-        assertEquals(count, res.initializerNames().size(), "Wrong number of child initializers");
-        for (int i = 0; i < count; i++) {
-            final String key = CHILD_INIT + i;
-            assertTrue(res.initializerNames().contains(key), "Name not found: " + key);
-            assertEquals(CloseableCounter.wrapInteger(1), res.getResultObject(key), "Wrong result object");
-            assertFalse(res.isException(key), "Exception flag");
-            assertNull(res.getException(key), "Got an exception");
-            checkChild(res.getInitializer(key), initializer.getActiveExecutor());
-        }
-        return res;
-    }
-
-    /**
-     * An overrideable method to create concrete implementations of
-     * {@code BackgroundInitializer} used for defining background tasks
-     * for {@code MultiBackgroundInitializer}.
-     */
-    protected AbstractChildBackgroundInitializer createChildBackgroundInitializer() {
-        return new MethodChildBackgroundInitializer();
-    }
+    /** A dedicated executor for a specific child initializer. */
+    private ExecutorService dedicatedChildExecutor;
 
     @BeforeEach
     public void setUp() {
-        initializer = new MultiBackgroundInitializer();
+        multiInitializer = new MultiBackgroundInitializer();
+        // A single-threaded executor is sufficient for this test's purpose.
+        dedicatedChildExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    @AfterEach
+    public void tearDown() throws InterruptedException {
+        // Ensure the dedicated executor is always shut down after a test.
+        if (dedicatedChildExecutor != null) {
+            dedicatedChildExecutor.shutdown();
+            if (!dedicatedChildExecutor.awaitTermination(1, TimeUnit.SECONDS)) {
+                fail("Executor service did not terminate in time.");
+            }
+        }
     }
 
     /**
-     * A mostly complete implementation of {@code BackgroundInitializer} used for
-     * defining background tasks for {@code MultiBackgroundInitializer}.
-     *
-     * Subclasses will contain the initializer, either as an method implementation
-     * or by using a supplier.
+     * Tests that a child initializer with its own executor uses it,
+     * while other children use the main initializer's executor.
      */
-    protected static class AbstractChildBackgroundInitializer extends BackgroundInitializer<CloseableCounter> {
+    @Test
+    void whenChildHasOwnExecutor_thenItIsUsedForThatChildOnly() throws ConcurrentException {
+        // Arrange: Create two child initializers. One will use the main executor,
+        // and the other will be assigned its own dedicated executor.
+        final TestChildInitializer childUsingMainExecutor = new TestChildInitializer();
+        final TestChildInitializer childWithOwnExecutor = new TestChildInitializer();
+        childWithOwnExecutor.setExternalExecutor(dedicatedChildExecutor);
 
-        /**
-         * Stores the current executor service.
-         */
-        volatile ExecutorService currentExecutor;
+        multiInitializer.addInitializer(CHILD_USING_MAIN_EXECUTOR_NAME, childUsingMainExecutor);
+        multiInitializer.addInitializer(CHILD_WITH_DEDICATED_EXECUTOR_NAME, childWithOwnExecutor);
 
-        /**
-         * An object containing the state we are testing
-         */
-        CloseableCounter counter = new CloseableCounter();
+        // Act: Start the main initializer and wait for all child tasks to complete.
+        multiInitializer.start();
+        multiInitializer.get(); // Throws ConcurrentException on errors.
 
-        /**
-         * A counter for the invocations of initialize().
-         */
-        volatile int initializeCalls;
+        // Assert: Verify each child was executed by the correct executor service.
+        assertChildExecution(childUsingMainExecutor, multiInitializer.getActiveExecutor());
+        assertChildExecution(childWithOwnExecutor, dedicatedChildExecutor);
+    }
 
-        /**
-         * An exception to be thrown by initialize().
-         */
-        Exception ex;
+    /**
+     * Verifies that a child initializer was executed exactly once on the expected executor.
+     *
+     * @param child The child initializer to check.
+     * @param expectedExecutor The executor service that should have run the child.
+     * @throws ConcurrentException if the child's get() method fails.
+     */
+    private void assertChildExecution(final TestChildInitializer child, final ExecutorService expectedExecutor) throws ConcurrentException {
+        final InitializationResult result = child.get();
+        assertNotNull(result, "Child initializer should have produced a result.");
+        assertEquals(1, result.getInitializeCalls(), "Child's initialize() should be called exactly once.");
+        assertEquals(expectedExecutor, child.getExecutingExecutor(), "Child should run on the expected executor service.");
+    }
 
-        /**
-         * A latch tests can use to control when initialize completes.
-         */
-        final CountDownLatch latch = new CountDownLatch(1);
+    // Inner classes below are test fixtures for creating controllable child initializers.
 
-        boolean waitForLatch;
+    /**
+     * A concrete implementation of {@link BackgroundInitializer} for testing purposes.
+     * It records which executor it was run on and how many times it was initialized.
+     */
+    private static class TestChildInitializer extends BackgroundInitializer<InitializationResult> {
 
+        /** Stores the executor service that ran the initialize() method. */
+        private volatile ExecutorService executingExecutor;
+
+        /** The result object that also tracks initialization state. */
+        private final InitializationResult result = new InitializationResult();
+
+        /** An optional latch to control the completion of the initialize() method for concurrency tests. */
+        private final CountDownLatch completionLatch = new CountDownLatch(1);
+        private boolean latchEnabled;
+
+        @Override
+        protected InitializationResult initialize() throws Exception {
+            executingExecutor = getActiveExecutor();
+            result.increment();
+
+            if (latchEnabled) {
+                completionLatch.await();
+            }
+            return result;
+        }
+
+        /** Returns the executor service captured during initialization. */
+        public ExecutorService getExecutingExecutor() {
+            return executingExecutor;
+        }
+
+        /** Call to make the initialize() method wait until releaseLatch() is called. */
         public void enableLatch() {
-            waitForLatch = true;
+            latchEnabled = true;
         }
 
-        public CloseableCounter getCloseableCounter() {
-            return counter;
-        }
-
-        /**
-         * Records this invocation. Optionally throws an exception.
-         */
-        protected CloseableCounter initializeInternal() throws Exception {
-            initializeCalls++;
-            currentExecutor = getActiveExecutor();
-            if (waitForLatch) {
-                latch.await();
-            }
-            if (ex != null) {
-                throw ex;
-            }
-            return counter.increment();
-        }
-
+        /** Releases the latch, allowing a waiting initialize() method to complete. */
         public void releaseLatch() {
-            latch.countDown();
+            completionLatch.countDown();
         }
     }
 
-    protected static class CloseableCounter {
-
-        // A convenience for testing that a CloseableCounter typed as Object has a specific initializeCalls value
-        public static CloseableCounter wrapInteger(final int i) {
-            return new CloseableCounter().setInitializeCalls(i);
-        }
-
-        /**
-         * The number of invocations of initialize().
-         */
-        volatile int initializeCalls;
-
-        /**
-         * Has the close consumer successfully reached this object.
-         */
-        volatile boolean closed;
-
-        public void close() {
-            closed = true;
-        }
-
-        @Override
-        public boolean equals(final Object other) {
-            if (other instanceof CloseableCounter) {
-                return initializeCalls == ((CloseableCounter) other).getInitializeCalls();
-            }
-            return false;
-        }
+    /**
+     * A simple class representing the result of an initialization.
+     * It primarily serves as a counter for how many times initialization occurred.
+     */
+    private static class InitializationResult {
+        private volatile int initializeCalls;
 
         public int getInitializeCalls() {
             return initializeCalls;
         }
 
+        public void increment() {
+            initializeCalls++;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            final InitializationResult other = (InitializationResult) obj;
+            return initializeCalls == other.initializeCalls;
+        }
+
         @Override
         public int hashCode() {
-            return initializeCalls;
-        }
-
-        public CloseableCounter increment() {
-            initializeCalls++;
-            return this;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        public CloseableCounter setInitializeCalls(final int i) {
-            initializeCalls = i;
-            return this;
-        }
-    }
-
-    protected static class MethodChildBackgroundInitializer extends AbstractChildBackgroundInitializer {
-
-        @Override
-        protected CloseableCounter initialize() throws Exception {
-            return initializeInternal();
-        }
-    }
-
-    /**
-     * Tests the behavior of initialize() if a child initializer has a specific
-     * executor service. Then this service should not be overridden.
-     *
-     * @throws org.apache.commons.lang3.concurrent.ConcurrentException so we don't have to catch it
-     */
-    @Test
-    void testInitializeChildWithExecutor() throws ConcurrentException, InterruptedException {
-        final String initExec = "childInitializerWithExecutor";
-        final ExecutorService exec = Executors.newSingleThreadExecutor();
-        try {
-            final AbstractChildBackgroundInitializer c1 = createChildBackgroundInitializer();
-            final AbstractChildBackgroundInitializer c2 = createChildBackgroundInitializer();
-            c2.setExternalExecutor(exec);
-            initializer.addInitializer(CHILD_INIT, c1);
-            initializer.addInitializer(initExec, c2);
-            initializer.start();
-            initializer.get();
-            checkChild(c1, initializer.getActiveExecutor());
-            checkChild(c2, exec);
-        } finally {
-            exec.shutdown();
-            exec.awaitTermination(1, TimeUnit.SECONDS);
+            return Integer.hashCode(initializeCalls);
         }
     }
 }
