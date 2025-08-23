@@ -1,85 +1,43 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 
-public class CopticChronologyTestTest6 extends TestCase {
+/**
+ * This test class focuses on the equality logic of the CopticChronology class.
+ */
+public class CopticChronologyEqualityTest {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * A custom value for the 'minimum days in the first week' setting, different from the default of 4.
+     */
+    private static final int CUSTOM_MIN_DAYS_IN_FIRST_WEEK = 1;
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+    /**
+     * Tests that two CopticChronology instances are not considered equal if they are
+     * configured with different values for 'minimum days in the first week'.
+     *
+     * <p>The default CopticChronology uses a value of 4 for this setting. This test
+     * creates a second instance with a custom value and asserts they are not equal,
+     * verifying that this configuration parameter is correctly handled in the equals() method.</p>
+     */
+    @Test
+    public void chronologiesWithDifferentMinDaysInFirstWeekShouldNotBeEqual() {
+        // Arrange: Create a default CopticChronology instance and one with a custom
+        // 'minDaysInFirstWeek' value. The default is 4.
+        CopticChronology defaultChronology = CopticChronology.getInstance();
+        CopticChronology chronologyWithCustomMinDays = CopticChronology.getInstance(
+            DateTimeZone.getDefault(),
+            CUSTOM_MIN_DAYS_IN_FIRST_WEEK
+        );
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testWithZone() {
-        assertSame(CopticChronology.getInstance(TOKYO), CopticChronology.getInstance(TOKYO).withZone(TOKYO));
-        assertSame(CopticChronology.getInstance(LONDON), CopticChronology.getInstance(TOKYO).withZone(LONDON));
-        assertSame(CopticChronology.getInstance(PARIS), CopticChronology.getInstance(TOKYO).withZone(PARIS));
-        assertSame(CopticChronology.getInstance(LONDON), CopticChronology.getInstance(TOKYO).withZone(null));
-        assertSame(CopticChronology.getInstance(PARIS), CopticChronology.getInstance().withZone(PARIS));
-        assertSame(CopticChronology.getInstance(PARIS), CopticChronology.getInstanceUTC().withZone(PARIS));
+        // Act & Assert: Verify that the two instances are not equal.
+        // The equals() method should account for the difference in 'minDaysInFirstWeek'.
+        assertNotEquals(
+            "Chronologies should not be equal if their 'minDaysInFirstWeek' differ.",
+            defaultChronology,
+            chronologyWithCustomMinDays
+        );
     }
 }
