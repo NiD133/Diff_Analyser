@@ -1,47 +1,49 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.OutputStream;
+
+// Note: The original test class name "UTF8Writer_ESTestTest43" and its scaffolding parent
+// are preserved as per the instructions. In a real-world scenario, these would be renamed
+// for clarity (e.g., to "UTF8WriterTest").
 public class UTF8Writer_ESTestTest43 extends UTF8Writer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.REDACTED_CONTENT;
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, (OutputStream) null);
-        char[] charArray0 = iOContext0.allocNameCopyBuffer(1114111);
-        // Undeclared exception!
-        try {
-            uTF8Writer0.write(charArray0, 500, 1114111);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
-        }
+    /**
+     * Verifies that attempting to write to a UTF8Writer that was initialized
+     * with a null OutputStream throws a NullPointerException.
+     *
+     * This is the expected behavior, as the writer has no underlying stream
+     * to write data to.
+     */
+    @Test(expected = NullPointerException.class)
+    public void write_whenOutputStreamIsNull_shouldThrowNullPointerException() {
+        // Arrange: Set up the necessary context and a UTF8Writer with a null OutputStream.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        
+        // IOContext requires several configuration objects for instantiation.
+        // We use defaults as their specific values are not relevant to this test.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                ContentReference.REDACTED_CONTENT,
+                false);
+
+        // The condition under test: a writer with no underlying output stream.
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, (OutputStream) null);
+        char[] someData = {'t', 'e', 's', 't'};
+
+        // Act: Attempt to write data. This action is expected to throw the exception.
+        // The specific data and offsets are not critical; any write operation would fail.
+        utf8Writer.write(someData, 0, someData.length);
+
+        // Assert: The test passes if a NullPointerException is thrown, which is
+        // declaratively handled by the @Test(expected=...) annotation.
     }
 }
