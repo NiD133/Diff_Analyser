@@ -1,29 +1,40 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest17 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(2115.863165, 2115.863165, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 2115.863165, spatialContext0);
-        double double0 = bufferedLine0.getArea(spatialContext0);
-        assertEquals(1.790750773201527E7, double0, 0.01);
-        assertTrue(bufferedLine0.hasArea());
+/**
+ * Test suite for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    @Test
+    public void getArea_forZeroLengthLine_returnsAreaOfSquareBoundingBox() {
+        // ARRANGE
+        // A zero-length BufferedLine is created by using the same start and end point.
+        // This shape is geometrically equivalent to a circle (a buffered point).
+        final SpatialContext context = SpatialContext.GEO;
+        final double buffer = 2115.863165;
+        final Point centerPoint = new PointImpl(0, 0, context);
+
+        BufferedLine zeroLengthLine = new BufferedLine(centerPoint, centerPoint, buffer, context);
+
+        // The area calculation for a zero-length buffered line is based on its square
+        // bounding box, not the area of a circle (π * r^2).
+        // The side of the square is 2 * buffer, so the area is (2 * buffer)^2.
+        double expectedArea = 4 * buffer * buffer;
+        final double DELTA = 0.01;
+
+        // ACT
+        double actualArea = zeroLengthLine.getArea(context);
+
+        // ASSERT
+        assertTrue("A buffered line with a non-zero buffer should have an area.", zeroLengthLine.hasArea());
+        assertEquals("The area of a zero-length line should be the area of its square bounding box.",
+                expectedArea, actualArea, DELTA);
     }
 }
