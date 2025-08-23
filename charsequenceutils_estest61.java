@@ -1,19 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest61 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder();
-        int int0 = CharSequenceUtils.indexOf(stringBuilder0, Integer.MAX_VALUE, Integer.MAX_VALUE);
-        assertEquals((-1), int0);
+    /**
+     * Tests that CharSequenceUtils.indexOf() returns -1 when the starting index
+     * is greater than the length of the CharSequence. This specific case uses an
+     * empty sequence, where any positive start index is out of bounds.
+     */
+    @Test
+    public void indexOf_withStartIndexGreaterThanLength_shouldReturnNotFound() {
+        // Arrange
+        final CharSequence emptySequence = new StringBuilder();
+        final int searchChar = 'a'; // The character being searched for is irrelevant in this case.
+        final int startIndex = 1;   // Any index > 0 is out of bounds for an empty sequence.
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(emptySequence, searchChar, startIndex);
+
+        // Assert
+        final int expectedIndex = -1; // -1 indicates "not found".
+        assertEquals("indexOf should return -1 when the start index is out of bounds.",
+                expectedIndex, actualIndex);
     }
 }
