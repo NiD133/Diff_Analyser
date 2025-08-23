@@ -1,20 +1,40 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest22 extends Seconds_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Seconds} class, focusing on arithmetic operations.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(352831696);
-        Seconds seconds1 = seconds0.plus(3058);
-        Seconds seconds2 = seconds0.minus(seconds1);
-        assertEquals(352834754, seconds1.getSeconds());
-        assertEquals((-3058), seconds2.getSeconds());
+    /**
+     * Tests that subtracting a larger Seconds object from a smaller one
+     * correctly results in a negative value. This verifies the behavior of
+     * the minus(Seconds) method.
+     */
+    @Test
+    public void minus_whenSubtractingLargerValue_shouldReturnCorrectNegativeResult() {
+        // Arrange: Set up the initial state and values for the test.
+        final int baseValue = 352831696;
+        final Seconds baseSeconds = Seconds.seconds(baseValue);
+        
+        final int amountToAdd = 3058;
+        
+        // Create a larger Seconds instance by adding a positive integer.
+        // This will be used as the subtrahend in the 'minus' operation.
+        final Seconds largerSeconds = baseSeconds.plus(amountToAdd);
+        
+        // Act: Perform the operation under test.
+        final Seconds difference = baseSeconds.minus(largerSeconds);
+
+        // Assert: Verify the outcome is as expected.
+        // The expected result is the negation of the amount that was added.
+        final int expectedDifference = -amountToAdd;
+        assertEquals(
+            "Subtracting a larger Seconds object should yield a negative result equal in magnitude to the difference.",
+            expectedDifference,
+            difference.getSeconds()
+        );
     }
 }
