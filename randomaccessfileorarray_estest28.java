@@ -1,35 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
 public class RandomAccessFileOrArray_ESTestTest28 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test027() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[1] = (byte) 16;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        short short0 = randomAccessFileOrArray0.readShortLE();
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals((short) 4096, short0);
+    /**
+     * Tests that readShortLE() correctly parses a 2-byte little-endian value
+     * and advances the internal pointer accordingly.
+     */
+    @Test
+    public void readShortLEShouldCorrectlyParseLittleEndianValueAndAdvancePointer() throws IOException {
+        // Arrange
+        // The short value 4096 is represented as 0x1000 in hexadecimal.
+        // In little-endian byte order, the least significant byte (0x00) comes first,
+        // followed by the most significant byte (0x10).
+        byte[] littleEndianBytes = {(byte) 0x00, (byte) 0x10};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(littleEndianBytes);
+
+        final short expectedValue = 4096;
+        final long expectedPointerPosition = 2L;
+
+        // Act
+        short actualValue = reader.readShortLE();
+        long actualPointerPosition = reader.getFilePointer();
+
+        // Assert
+        assertEquals("The little-endian short value was not read correctly.", expectedValue, actualValue);
+        assertEquals("The file pointer should advance by 2 bytes after reading a short.", expectedPointerPosition, actualPointerPosition);
     }
 }
