@@ -1,31 +1,36 @@
 package org.joda.time.field;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class FieldUtils_ESTestTest12 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeAdd((-1640), Integer.MIN_VALUE);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: -1640 + -2147483648
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that safeAdd(int, int) throws an ArithmeticException when the
+     * addition results in an integer underflow.
+     */
+    @Test
+    public void safeAdd_shouldThrowArithmeticException_onIntegerUnderflow() {
+        // Arrange: Define two integers that will cause an underflow when added.
+        // Integer.MIN_VALUE is -2,147,483,648. Adding any negative number will underflow.
+        final int value1 = -1640;
+        final int value2 = Integer.MIN_VALUE;
+
+        // Assert: Configure the expected exception type and message.
+        thrown.expect(ArithmeticException.class);
+        thrown.expectMessage(is("The calculation caused an overflow: -1640 + -2147483648"));
+
+        // Act: Call the method that is expected to throw the exception.
+        FieldUtils.safeAdd(value1, value2);
     }
 }
