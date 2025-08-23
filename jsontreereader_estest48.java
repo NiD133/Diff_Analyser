@@ -1,28 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest48 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test047() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        JsonToken jsonToken0 = jsonTreeReader0.peek();
-        assertEquals(JsonToken.BEGIN_ARRAY, jsonToken0);
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling peek() on a reader for a JsonArray
+     * correctly identifies the token as BEGIN_ARRAY.
+     */
+    @Test
+    public void peek_onJsonArray_returnsBeginArray() throws IOException {
+        // Arrange: Create a JsonTreeReader with an empty JsonArray.
+        JsonArray jsonArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(jsonArray);
+
+        // Act: Peek at the next token in the stream.
+        JsonToken actualToken = reader.peek();
+
+        // Assert: The token should be BEGIN_ARRAY.
+        assertEquals(JsonToken.BEGIN_ARRAY, actualToken);
     }
 }
