@@ -1,36 +1,33 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest30 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Attribute attribute0 = null;
+/**
+ * Test suite for the {@link Attribute} class.
+ * This snippet focuses on constructor validation.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that the Attribute constructor throws an IllegalArgumentException
+     * when initialized with an empty string as the key.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForEmptyAttributeKey() {
+        // The Attribute constructor must not accept an empty key.
+        // The value is irrelevant for this test case.
+        String emptyKey = "";
+        String anyValue = "some-value";
+
         try {
-            attribute0 = new Attribute("", "");
-            fail("Expecting exception: IllegalArgumentException");
+            new Attribute(emptyKey, anyValue);
+            fail("Expected an IllegalArgumentException to be thrown for an empty attribute key, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert that the correct exception was thrown with the expected message.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
