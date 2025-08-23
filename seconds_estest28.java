@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest28 extends Seconds_ESTest_scaffolding {
+/**
+ * A focused test suite for the division operations in the {@link Seconds} class.
+ */
+public class SecondsDividedByTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Seconds seconds0 = Seconds.THREE;
-        Seconds seconds1 = seconds0.MIN_VALUE.dividedBy(3600);
-        assertEquals((-596523), seconds1.getSeconds());
+    @Test
+    public void dividedBy_withMinValue_returnsCorrectlyTruncatedResult() {
+        // Arrange
+        // The Seconds.dividedBy() method uses integer division. This test verifies
+        // that dividing the minimum possible seconds value by a given divisor
+        // produces the correctly truncated integer result.
+        final int divisor = 3600;
+        final int expectedSeconds = Integer.MIN_VALUE / divisor; // -2,147,483,648 / 3600 = -596523
+
+        // Act
+        Seconds result = Seconds.MIN_VALUE.dividedBy(divisor);
+
+        // Assert
+        assertEquals("Division of MIN_VALUE should be correctly truncated",
+                     expectedSeconds, result.getSeconds());
     }
 }
