@@ -1,18 +1,30 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest17 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        IOCase iOCase0 = IOCase.SENSITIVE;
-        boolean boolean0 = iOCase0.checkRegionMatches("Sensitive", 258, "Insensitive");
-        assertFalse(boolean0);
+    /**
+     * Tests that checkRegionMatches() returns false when the starting index is out of bounds.
+     * The behavior should be consistent regardless of case sensitivity.
+     */
+    @Test
+    public void checkRegionMatchesShouldReturnFalseForOutOfBoundsStartIndex() {
+        // Arrange
+        final IOCase sensitiveCase = IOCase.SENSITIVE;
+        final String text = "A sample string";
+        final String searchString = "sample";
+        // An index deliberately set far beyond the bounds of the 'text' string.
+        final int outOfBoundsIndex = 100;
+
+        // Act
+        final boolean isMatch = sensitiveCase.checkRegionMatches(text, outOfBoundsIndex, searchString);
+
+        // Assert
+        assertFalse("checkRegionMatches should return false when the start index is out of bounds", isMatch);
     }
 }
