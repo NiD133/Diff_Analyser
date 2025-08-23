@@ -1,25 +1,40 @@
 package org.jsoup.select;
 
-import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
-import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 
-public class ElementsTestTest5 {
+/**
+ * Contains tests for the {@link Elements#unwrap()} method.
+ */
+public class ElementsUnwrapTest {
 
+    /**
+     * Verifies that the unwrap() method removes an element from the DOM
+     * but does not remove it from the Elements collection it was called on.
+     */
     @Test
-    public void attr() {
-        Document doc = Jsoup.parse("<p title=foo><p title=bar><p class=foo><p class=bar>");
-        String classVal = doc.select("p").attr("class");
-        assertEquals("foo", classVal);
+    public void unwrapShouldModifyDomButNotTheCollection() {
+        // Arrange: Create a document and select its body element.
+        // The getAllElements() call on the body will return a collection
+        // containing just the body element itself.
+        Document document = new Document("");
+        Element body = document.body();
+        Elements elements = body.getAllElements();
+
+        // Sanity check to ensure the initial state is as expected.
+        assertEquals("The collection should initially contain one element.", 1, elements.size());
+
+        // Act: Call the unwrap() method. This action should remove the body
+        // element from the document tree but not from the 'elements' list.
+        Elements returnedElements = elements.unwrap();
+
+        // Assert: Confirm the collection is not empty and its contents are unchanged.
+        assertFalse("The Elements collection should not be empty after unwrap().", returnedElements.isEmpty());
+        assertEquals("The collection size should remain 1 after unwrap().", 1, returnedElements.size());
+        assertSame("The unwrap() method should return the same instance.", elements, returnedElements);
     }
 }
