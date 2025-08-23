@@ -1,24 +1,40 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest11 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        int int0 = cachedDateTimeZone0.getStandardOffset(0L);
-        assertEquals((-2614), int0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that getStandardOffset() for a cached, fixed-offset zone
+     * returns the correct, unchanging offset.
+     *
+     * <p>For a time zone with a fixed offset (no daylight saving), the standard offset
+     * should always be equal to the zone's total offset.
+     */
+    @Test
+    public void getStandardOffset_forFixedZone_returnsUnderlyingZoneOffset() {
+        // Arrange
+        final int fixedOffsetMillis = -2614;
+        final long epochInstant = 0L;
+
+        // Create a non-cached, fixed-offset time zone.
+        DateTimeZone underlyingZone = DateTimeZone.forOffsetMillis(fixedOffsetMillis);
+
+        // Create the cached wrapper for the zone.
+        CachedDateTimeZone cachedZone = CachedDateTimeZone.forZone(underlyingZone);
+
+        // Act
+        // Request the standard offset from the cached zone.
+        int actualStandardOffset = cachedZone.getStandardOffset(epochInstant);
+
+        // Assert
+        // The returned standard offset should match the original fixed offset.
+        assertEquals(fixedOffsetMillis, actualStandardOffset);
     }
 }
