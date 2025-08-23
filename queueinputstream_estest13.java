@@ -1,27 +1,34 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class QueueInputStream_ESTestTest13 extends QueueInputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Unit tests for the {@link QueueInputStream} class.
+ */
+public class QueueInputStreamTest {
+
+    /**
+     * Tests that the read() method correctly retrieves a single byte value
+     * that has been placed into the backing queue.
+     */
     @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-        Integer integer0 = new Integer((-728));
-        priorityBlockingQueue0.add(integer0);
-        QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-        int int0 = queueInputStream0.read();
-        assertEquals(40, int0);
+    public void readShouldReturnByteFromQueue() {
+        // Arrange: Create a queue and add a single byte value to it.
+        BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+        final int expectedByte = 42;
+        queue.add(expectedByte);
+
+        final QueueInputStream inputStream = new QueueInputStream(queue);
+
+        // Act: Read the byte from the input stream.
+        final int actualByte = inputStream.read();
+
+        // Assert: The read byte should match the one added to the queue.
+        assertEquals(expectedByte, actualByte);
     }
 }
