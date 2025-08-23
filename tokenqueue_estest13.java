@@ -2,19 +2,25 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest13 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("k\"YT-6Ih:G~3zAw");
-        String string0 = tokenQueue0.consumeElementSelector();
-        assertEquals("k", string0);
-        boolean boolean0 = tokenQueue0.matchChomp("k");
-        assertFalse(boolean0);
+    @Test
+    public void consumeElementSelectorShouldConsumeSelectorAndAdvanceQueue() {
+        // Arrange: Create a queue where 'k' is a valid element selector followed by other characters.
+        TokenQueue queue = new TokenQueue("k\"YT -6Ih:G~3zAw");
+
+        // Act: Consume the element selector from the front of the queue.
+        String selector = queue.consumeElementSelector();
+
+        // Assert: The correct selector was consumed and returned.
+        assertEquals("The consumed selector should be 'k'", "k", selector);
+
+        // Assert: The queue's internal position has advanced past the consumed selector.
+        // A subsequent attempt to match the same selector should fail.
+        assertFalse("Queue should have advanced, so 'k' should not be matched again", queue.matchChomp("k"));
     }
 }
