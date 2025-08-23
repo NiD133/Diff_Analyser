@@ -1,21 +1,27 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonParser_ESTestTest6 extends JsonParser_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonParser}.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        JsonElement jsonElement0 = jsonParser0.parse("");
-        assertTrue(jsonElement0.isJsonNull());
+    @Test
+    public void parseString_withEmptyString_returnsJsonNull() {
+        // Arrange
+        String emptyJson = "";
+
+        // Act
+        // The deprecated `new JsonParser().parse(String)` is replaced with the
+        // recommended static method `JsonParser.parseString(String)`.
+        JsonElement result = JsonParser.parseString(emptyJson);
+
+        // Assert
+        // For backward compatibility, Gson's lenient parser treats an empty string
+        // as a JSON null value.
+        assertEquals(JsonNull.INSTANCE, result);
     }
 }
