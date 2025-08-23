@@ -1,30 +1,41 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import org.w3c.dom.Node;
+
+import javax.imageio.metadata.IIOMetadataNode;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest79 extends XNode_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test078() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Class<Locale.IsoCountryCode> class0 = Locale.IsoCountryCode.class;
-        xNode0.getEnumAttribute(class0, "", (Locale.IsoCountryCode) null);
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Tests that getEnumAttribute returns the provided default value (null in this case)
+     * when the requested attribute does not exist on the XML node.
+     */
+    @Test
+    public void getEnumAttributeShouldReturnDefaultValueWhenAttributeIsMissing() {
+        // Arrange
+        // 1. Create an XNode that wraps an empty DOM node, which has no attributes.
+        // We use IIOMetadataNode as a simple, concrete implementation of org.w3c.dom.Node.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+
+        // 2. Define the attribute we are looking for and the default value to use if it's not found.
+        String nonExistentAttributeName = "resultType";
+        Locale.IsoCountryCode defaultValue = null;
+
+        // Act
+        // 3. Attempt to retrieve the enum attribute.
+        Locale.IsoCountryCode result = xNode.getEnumAttribute(Locale.IsoCountryCode.class, nonExistentAttributeName, defaultValue);
+
+        // Assert
+        // 4. Verify that the method returned the default value, as the attribute was not present.
+        assertNull("Expected the default value (null) to be returned for a missing attribute.", result);
     }
 }
