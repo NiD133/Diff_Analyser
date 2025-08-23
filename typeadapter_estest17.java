@@ -1,27 +1,26 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest17 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the behavior of {@link TypeAdapter}, particularly focusing on recursive delegation scenarios.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Gson.FutureTypeAdapter<Integer> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Integer>();
-        gson_FutureTypeAdapter0.setDelegate(gson_FutureTypeAdapter0);
-        // Undeclared exception!
-        gson_FutureTypeAdapter0.fromJsonTree((JsonElement) null);
+    /**
+     * Verifies that a FutureTypeAdapter which delegates to itself will cause a
+     * StackOverflowError when its methods are called. This tests the behavior of
+     * infinitely recursive type adapter setups.
+     */
+    @Test(expected = StackOverflowError.class)
+    public void fromJsonTreeWithRecursiveDelegateThrowsStackOverflowError() {
+        // Arrange: Create a FutureTypeAdapter and set it as its own delegate
+        // to establish an infinite recursive loop.
+        Gson.FutureTypeAdapter<Object> recursiveAdapter = new Gson.FutureTypeAdapter<>();
+        recursiveAdapter.setDelegate(recursiveAdapter);
+
+        // Act: Call a method on the adapter. This will trigger the infinite recursion.
+        // The @Test(expected=...) annotation asserts that a StackOverflowError is thrown.
+        recursiveAdapter.fromJsonTree(null);
     }
 }
