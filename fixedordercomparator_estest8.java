@@ -1,41 +1,42 @@
 package org.apache.commons.collections4.comparators;
 
+import org.apache.commons.collections4.comparators.FixedOrderComparator.UnknownObjectBehavior;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest8 extends FixedOrderComparator_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Boolean[] booleanArray0 = new Boolean[21];
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-        FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-        fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-        Object object0 = new Object();
-        fixedOrderComparator0.compare(object0, booleanArray0[0]);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class focuses on the locking behavior of the FixedOrderComparator.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+public class FixedOrderComparatorLockingTest {
+
+    /**
+     * Tests that the comparator becomes locked after the first comparison,
+     * preventing further modifications. The internal checkLocked() method should
+     * throw an UnsupportedOperationException on a locked comparator.
+     */
+    @Test
+    public void checkLockedShouldThrowExceptionAfterAComparisonIsMade() {
+        // Arrange: Create a comparator configured to handle unknown objects without throwing an error.
+        // The comparator is initialized with an empty order, so any object will be "unknown".
+        final FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(Collections.emptyList());
+        comparator.setUnknownObjectBehavior(UnknownObjectBehavior.AFTER);
+
+        // Act: Perform a comparison. This action should trigger the internal lock.
+        comparator.compare(new Object(), new Object());
+
+        // Assert: Verify that calling checkLocked() now throws an exception,
+        // confirming the comparator is locked.
         try {
-            fixedOrderComparator0.checkLocked();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // Cannot modify a FixedOrderComparator after a comparison
-            //
-            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+            comparator.checkLocked();
+            fail("Expected an UnsupportedOperationException because the comparator should be locked.");
+        } catch (final UnsupportedOperationException e) {
+            // Check for the specific exception message to ensure the failure is for the correct reason.
+            assertEquals("Cannot modify a FixedOrderComparator after a comparison", e.getMessage());
         }
     }
 }
