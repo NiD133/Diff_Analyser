@@ -1,30 +1,32 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+import static org.junit.Assert.assertEquals;
 
-public class PlotRenderingInfo_ESTestTest5 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        Rectangle rectangle0 = new Rectangle();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        plotRenderingInfo0.setPlotArea(rectangle0);
-        Rectangle2D rectangle2D0 = plotRenderingInfo0.getPlotArea();
-        assertEquals(0.0, rectangle2D0.getMaxY(), 0.01);
+    /**
+     * Verifies that getPlotArea() correctly returns the Rectangle2D object
+     * that was previously set by setPlotArea().
+     */
+    @Test
+    public void getPlotArea_shouldReturnTheAreaPreviouslySet() {
+        // Arrange: Create a PlotRenderingInfo and a test rectangle.
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotRenderingInfo = new PlotRenderingInfo(chartRenderingInfo);
+        Rectangle2D expectedPlotArea = new Rectangle(10, 20, 300, 200);
+
+        // Act: Set the plot area and then retrieve it.
+        plotRenderingInfo.setPlotArea(expectedPlotArea);
+        Rectangle2D actualPlotArea = plotRenderingInfo.getPlotArea();
+
+        // Assert: The retrieved area should be identical to the one that was set.
+        assertEquals(expectedPlotArea, actualPlotArea);
     }
 }
