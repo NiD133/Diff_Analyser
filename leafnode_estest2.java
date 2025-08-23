@@ -1,21 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest2 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode abstract class.
+ * As LeafNode is abstract, we use a concrete subclass like DocumentType for instantiation.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        DocumentType documentType0 = new DocumentType("Gyb$AWbT${", "Gyb$AWbT${", "Gyb$AWbT${");
-        documentType0.doSetBaseUri("");
-        assertFalse(documentType0.hasParent());
+    @Test
+    public void shouldSetAndRetrieveBaseUri() {
+        // Arrange: Create an instance of a LeafNode using its concrete subclass, DocumentType.
+        DocumentType docType = new DocumentType("html", "", "");
+        String expectedBaseUri = "https://jsoup.org/";
+
+        // Act: Set the base URI. The doSetBaseUri method is the underlying implementation
+        // for setting the URI on a node.
+        docType.doSetBaseUri(expectedBaseUri);
+
+        // Assert: Verify that the base URI was set correctly by retrieving it.
+        String actualBaseUri = docType.baseUri();
+        assertEquals(expectedBaseUri, actualBaseUri);
     }
 }
