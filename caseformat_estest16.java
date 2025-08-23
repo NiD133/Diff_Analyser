@@ -1,19 +1,32 @@
 package com.google.common.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CaseFormat_ESTestTest16 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.UPPER_UNDERSCORE;
-        CaseFormat caseFormat1 = CaseFormat.LOWER_HYPHEN;
-        String string0 = caseFormat0.convert(caseFormat1, "-");
-        assertEquals("-", string0);
+    /**
+     * Tests that converting a string that consists only of a separator character
+     * from a different format results in the original string being returned.
+     *
+     * <p>The "best effort" conversion logic treats the input as a single word
+     * since it doesn't contain the source format's separator ('_'), and thus the
+     * "word" is returned unchanged.
+     */
+    @Test
+    public void to_whenInputIsOnlySeparatorFromDifferentFormat_returnsInputUnchanged() {
+        // Arrange
+        CaseFormat sourceFormat = CaseFormat.UPPER_UNDERSCORE;
+        CaseFormat targetFormat = CaseFormat.LOWER_HYPHEN;
+        String inputWithForeignSeparator = "-";
+
+        // Act
+        String result = sourceFormat.to(targetFormat, inputWithForeignSeparator);
+
+        // Assert
+        assertEquals(inputWithForeignSeparator, result);
     }
 }
