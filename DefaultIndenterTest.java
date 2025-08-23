@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -12,28 +13,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class DefaultIndenterTest {
 
     @Test
-    void testWithLinefeed() {
-        // Setup: Create a DefaultIndenter instance and modify its linefeed
-        DefaultIndenter originalIndenter = new DefaultIndenter();
-        DefaultIndenter modifiedIndenter = originalIndenter.withLinefeed("-XG'#x");
-        DefaultIndenter finalIndenter = modifiedIndenter.withLinefeed("-XG'#x");
+    void withLinefeed() {
+    DefaultIndenter defaultIndenter = new DefaultIndenter();
+    DefaultIndenter defaultIndenterTwo = defaultIndenter.withLinefeed("-XG'#x");
+    DefaultIndenter defaultIndenterThree = defaultIndenterTwo.withLinefeed("-XG'#x");
 
-        // Assertions: Verify the linefeed and object identity
-        assertEquals("-XG'#x", finalIndenter.getEol(), "Linefeed should be '-XG'#x'");
-        assertNotSame(finalIndenter, originalIndenter, "Final indenter should not be the same instance as the original");
-        assertSame(finalIndenter, modifiedIndenter, "Final indenter should be the same instance as the modified one");
-    }
+    assertEquals("-XG'#x", defaultIndenterThree.getEol());
+    assertNotSame(defaultIndenterThree, defaultIndenter);
+    assertSame(defaultIndenterThree, defaultIndenterTwo);
+  }
 
     @Test
-    void testWithIndent() {
-        // Setup: Create a DefaultIndenter instance and modify its indent
-        DefaultIndenter originalIndenter = new DefaultIndenter();
-        DefaultIndenter modifiedIndenter = originalIndenter.withIndent("9Qh/6,~n");
-        DefaultIndenter finalIndenter = modifiedIndenter.withIndent("9Qh/6,~n");
+    void withIndent() {
+    DefaultIndenter defaultIndenter = new DefaultIndenter();
+    DefaultIndenter defaultIndenterTwo = defaultIndenter.withIndent("9Qh/6,~n");
+    DefaultIndenter defaultIndenterThree = defaultIndenterTwo.withIndent("9Qh/6,~n");
 
-        // Assertions: Verify the end-of-line character and object identity
-        assertEquals(System.lineSeparator(), finalIndenter.getEol(), "EOL should be the system's line separator");
-        assertNotSame(finalIndenter, originalIndenter, "Final indenter should not be the same instance as the original");
-        assertSame(finalIndenter, modifiedIndenter, "Final indenter should be the same instance as the modified one");
-    }
+    assertEquals(System.lineSeparator(), defaultIndenterThree.getEol());
+    assertNotSame(defaultIndenterThree, defaultIndenter);
+    assertSame(defaultIndenterThree, defaultIndenterTwo);
+  }
+
 }
