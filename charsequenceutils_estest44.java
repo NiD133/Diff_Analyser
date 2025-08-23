@@ -1,20 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest44 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer();
-        StringBuilder stringBuilder0 = new StringBuilder(stringBuffer0);
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuilder0, 1114122, 0);
-        assertEquals((-1), int0);
+    /**
+     * Tests that lastIndexOf returns -1 when searching within an empty CharSequence.
+     * The specific character being searched for is irrelevant in this case.
+     */
+    @Test
+    public void lastIndexOf_withEmptyCharSequence_shouldReturnNotFound() {
+        // Arrange
+        final CharSequence emptyCharSequence = new StringBuilder();
+        // This value is an invalid Unicode code point, but any character would yield the same result.
+        final int searchChar = 1_114_122; 
+        final int startIndex = 0;
+        final int expected = -1;
+
+        // Act
+        final int actual = CharSequenceUtils.lastIndexOf(emptyCharSequence, searchChar, startIndex);
+
+        // Assert
+        assertEquals("Searching in an empty CharSequence should always return -1.", expected, actual);
     }
 }
