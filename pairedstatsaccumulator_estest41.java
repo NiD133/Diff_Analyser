@@ -1,22 +1,30 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest41 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(863464.0975884801, 38.358751);
-        pairedStatsAccumulator0.add((-2001.999), (-2001.999));
-        double double0 = pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-        assertEquals(1.0, double0, 0.01);
+    // A small tolerance for floating-point comparisons.
+    private static final double TOLERANCE = 1e-9;
+
+    @Test
+    public void pearsonsCorrelationCoefficient_withTwoPoints_isPerfectlyPositive() {
+        // Arrange: Any two distinct points that don't form a horizontal or vertical line
+        // will lie on a perfect line, resulting in a correlation of 1.0 or -1.0.
+        // We use simple points that clearly form a line with a positive slope (y = x + 1).
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(1.0, 2.0);
+        accumulator.add(3.0, 4.0);
+
+        // Act: Calculate Pearson's correlation coefficient.
+        double correlation = accumulator.pearsonsCorrelationCoefficient();
+
+        // Assert: The result should be 1.0, indicating a perfect positive linear correlation.
+        assertEquals(1.0, correlation, TOLERANCE);
     }
 }
