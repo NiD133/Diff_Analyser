@@ -1,107 +1,80 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 import org.apache.commons.jxpath.AbstractJXPathTest;
-import org.apache.commons.jxpath.ClassFunctions;
-import org.apache.commons.jxpath.ExpressionContext;
-import org.apache.commons.jxpath.Function;
 import org.apache.commons.jxpath.FunctionLibrary;
-import org.apache.commons.jxpath.Functions;
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.NodeSet;
 import org.apache.commons.jxpath.PackageFunctions;
-import org.apache.commons.jxpath.Pointer;
 import org.apache.commons.jxpath.TestBean;
-import org.apache.commons.jxpath.Variables;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.util.JXPath11CompatibleTypeConverter;
-import org.apache.commons.jxpath.util.TypeConverter;
-import org.apache.commons.jxpath.util.TypeUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ExtensionFunctionTestTest3 extends AbstractJXPathTest {
+import java.util.ArrayList;
+import java.util.List;
 
-    private Functions functions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests the invocation of methods on collection objects using JXPath extension functions.
+ */
+public class ExtensionFunctionCollectionTest extends AbstractJXPathTest {
 
     private JXPathContext context;
-
-    private TestBean testBean;
-
-    private TypeConverter typeConverter;
 
     @Override
     @BeforeEach
     public void setUp() {
-        if (context == null) {
-            testBean = new TestBean();
-            context = JXPathContext.newContext(testBean);
-            final Variables vars = context.getVariables();
-            vars.declareVariable("test", new TestFunctions(4, "test"));
-            final FunctionLibrary lib = new FunctionLibrary();
-            lib.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
-            lib.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
-            lib.addFunctions(new PackageFunctions("", "call"));
-            lib.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
-            lib.addFunctions(new PackageFunctions("", null));
-            context.setFunctions(lib);
-            context.getVariables().declareVariable("List.class", List.class);
-            context.getVariables().declareVariable("NodeSet.class", NodeSet.class);
-        }
-        functions = new ClassFunctions(TestFunctions.class, "test");
-        typeConverter = TypeUtils.getTypeConverter();
-    }
+        // The context is configured with a TestBean as the root object.
+        final TestBean testBean = new TestBean();
+        context = JXPathContext.newContext(testBean);
 
-    @AfterEach
-    public void tearDown() {
-        TypeUtils.setTypeConverter(typeConverter);
-    }
-
-    private static final class Context implements ExpressionContext {
-
-        private final Object object;
-
-        public Context(final Object object) {
-            this.object = object;
-        }
-
-        @Override
-        public List<Pointer> getContextNodeList() {
-            return null;
-        }
-
-        @Override
-        public Pointer getContextNodePointer() {
-            return NodePointer.newNodePointer(null, object, Locale.getDefault());
-        }
-
-        @Override
-        public JXPathContext getJXPathContext() {
-            return null;
-        }
-
-        @Override
-        public int getPosition() {
-            return 0;
-        }
+        // A FunctionLibrary with PackageFunctions allows JXPath to treat
+        // public methods of objects as extension functions (e.g., size(), add()).
+        final FunctionLibrary lib = new FunctionLibrary();
+        lib.addFunctions(new PackageFunctions("", null));
+        context.setFunctions(lib);
     }
 
     @Test
-    void testCollectionMethodCall() {
-        final List list = new ArrayList();
+    public void shouldInvokeMethodOnCollectionVariable() {
+        // Arrange
+        final List<String> list = new ArrayList<>();
         list.add("foo");
         context.getVariables().declareVariable("myList", list);
-        assertXPathValue(context, "size($myList)", Integer.valueOf(1));
-        assertXPathValue(context, "size(beans)", Integer.valueOf(2));
+
+        // Act & Assert: Call size() on a collection stored in a JXPath variable.
+        assertXPathValue(context, "size($myList)", 1);
+    }
+
+    @Test
+    public void shouldInvokeMethodOnCollectionProperty() {
+        // Arrange: The 'beans' property is part of the root TestBean.
+        // By default, it contains two elements.
+
+        // Act & Assert: Call size() on a collection that is a property of the context bean.
+        assertXPathValue(context, "size(beans)", 2);
+    }
+
+    @Test
+    public void shouldInvokeMethodWithSideEffectOnCollection() {
+        // Arrange
+        final List<String> list = new ArrayList<>();
+        list.add("foo");
+        context.getVariables().declareVariable("myList", list);
+
+        // Act: The 'add' method is invoked via an XPath expression.
         context.getValue("add($myList, 'hello')");
-        assertEquals(2, list.size(), "After adding an element");
-        final JXPathContext context = JXPathContext.newContext(new ArrayList());
-        assertEquals("0", String.valueOf(context.getValue("size(/)")), "Extension function on root collection");
+
+        // Assert: The invocation should modify the underlying Java list.
+        assertEquals(2, list.size(), "The 'add' method should have modified the list size.");
+    }
+
+    @Test
+    public void shouldInvokeMethodOnRootCollection() {
+        // Arrange: Create a new context where the root object itself is a collection.
+        final List<String> rootList = new ArrayList<>();
+        final JXPathContext collectionContext = JXPathContext.newContext(rootList);
+
+        // Act & Assert: Call size() on the root of the context.
+        assertXPathValue(collectionContext, "size(/)", 0);
     }
 }
