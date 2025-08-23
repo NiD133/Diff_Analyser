@@ -1,28 +1,41 @@
 package org.jfree.chart.annotations;
 
+import org.junit.jupiter.api.Test;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Stroke;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XYLineAnnotationTestTest5 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-    private static final double EPSILON = 0.000000001;
+/**
+ * Tests for the cloning behavior of the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotationTest {
 
     /**
-     * Confirm that cloning works.
+     * Verifies that the clone() method creates an independent copy that is
+     * equal to the original object, fulfilling the cloning contract.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
+    void testClone() throws CloneNotSupportedException {
+        // Arrange: Create an instance of XYLineAnnotation with specific properties.
         Stroke stroke = new BasicStroke(2.0f);
-        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0, stroke, Color.BLUE);
-        XYLineAnnotation a2 = (XYLineAnnotation) a1.clone();
-        assertNotSame(a1, a2);
-        assertSame(a1.getClass(), a2.getClass());
-        assertEquals(a1, a2);
+        XYLineAnnotation original = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0, stroke, Color.BLUE);
+
+        // Act: Create a clone of the original annotation.
+        XYLineAnnotation clone = (XYLineAnnotation) original.clone();
+
+        // Assert: Verify that the clone meets the general contract for Object.clone().
+        // 1. The clone must be a different object instance.
+        assertNotSame(original, clone, "The clone should be a new object instance.");
+
+        // 2. The clone must be of the exact same class as the original.
+        assertSame(original.getClass(), clone.getClass(), "The clone should be of the same class.");
+
+        // 3. The clone must be equal in value to the original.
+        assertEquals(original, clone, "The clone should be equal in value to the original.");
     }
 }
