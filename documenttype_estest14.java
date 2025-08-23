@@ -1,23 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentType_ESTestTest14 extends DocumentType_ESTest_scaffolding {
+/**
+ * Tests for the {@link DocumentType} class.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DocumentType documentType0 = new DocumentType("lwsGpi*`3ZN", "lwsGpi*`3ZN", "lwsGpi*`3ZN");
-        String string0 = documentType0.systemId();
-        assertEquals("#doctype", documentType0.nodeName());
-        assertEquals("lwsGpi*`3ZN", string0);
+    /**
+     * Verifies that the systemId() method correctly returns the system ID
+     * that was provided in the constructor.
+     */
+    @Test
+    public void systemIdReturnsValueFromConstructor() {
+        // Arrange: Create a DocumentType with distinct, readable values.
+        String name = "html";
+        String publicId = "-//W3C//DTD XHTML 1.0 Strict//EN";
+        String expectedSystemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd";
+        
+        DocumentType docType = new DocumentType(name, publicId, expectedSystemId);
+
+        // Act: Retrieve the system ID from the object.
+        String actualSystemId = docType.systemId();
+
+        // Assert: Check that the returned system ID matches the one provided.
+        assertEquals(expectedSystemId, actualSystemId);
     }
 }
