@@ -1,19 +1,31 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteOrderMark_ESTestTest24 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteOrderMark} class.
+ */
+public class ByteOrderMarkTest {
 
+    /**
+     * Tests that the get(int) method correctly retrieves the byte
+     * from the specified index in the internal byte array.
+     */
     @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        int[] intArray0 = new int[8];
-        ByteOrderMark byteOrderMark0 = new ByteOrderMark("U", intArray0);
-        int int0 = byteOrderMark0.get(3);
-        assertEquals(0, int0);
+    public void testGetShouldReturnByteAtSpecifiedIndex() {
+        // Arrange: Set up the test case with clear and descriptive data.
+        // Using distinct, non-zero byte values ensures we are fetching the correct value from the correct index.
+        final int[] bomBytes = {0x11, 0x22, 0x33, 0x44};
+        final ByteOrderMark bom = new ByteOrderMark("TEST-BOM", bomBytes);
+        
+        final int indexToTest = 2;
+        final int expectedByte = 0x33;
+
+        // Act: Call the method under test.
+        final int actualByte = bom.get(indexToTest);
+
+        // Assert: Verify the result is as expected.
+        assertEquals("The byte at the specified index should be returned.", expectedByte, actualByte);
     }
 }
