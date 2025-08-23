@@ -1,21 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArraySorter_ESTestTest26 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Tests for {@link ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        char[] charArray0 = new char[4];
-        char[] charArray1 = ArraySorter.sort(charArray0);
-        assertSame(charArray1, charArray0);
+    /**
+     * Tests that the sort(char[]) method sorts the array in-place
+     * and returns a reference to the same array instance.
+     * This fluent-style return is a key feature of the class.
+     */
+    @Test
+    public void sortCharArrayShouldSortInPlaceAndReturnSameInstance() {
+        // Arrange
+        char[] inputArray = {'c', 'a', 'd', 'b'};
+        char[] expectedSortedArray = {'a', 'b', 'c', 'd'};
+
+        // Act
+        char[] resultArray = ArraySorter.sort(inputArray);
+
+        // Assert
+        // 1. Verify that the method returns the same array instance, not a copy.
+        assertSame("The returned array should be the same instance as the input array.", inputArray, resultArray);
+
+        // 2. Verify that the original array has been sorted correctly.
+        assertArrayEquals("The input array should be sorted in ascending order.", expectedSortedArray, inputArray);
     }
 }
