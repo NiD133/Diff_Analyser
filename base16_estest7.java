@@ -1,29 +1,39 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Base16_ESTestTest7 extends Base16_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Base16 base16_0 = new Base16();
-        byte[] byteArray0 = new byte[7];
-        BaseNCodec.Context baseNCodec_Context0 = new BaseNCodec.Context();
-        // Undeclared exception!
+import org.apache.commons.codec.binary.BaseNCodec.Context;
+
+/**
+ * Contains tests for the {@link Base16} class, focusing on exception handling for invalid data.
+ */
+public class Base16_ESTestTest7 { // In a real-world scenario, this file would be merged into a single Base16Test.java
+
+    /**
+     * Tests that the decode method throws an IllegalArgumentException when it encounters a byte
+     * that is not part of the Base16 alphabet and the decoding policy is strict (the default).
+     */
+    @Test
+    public void decodeWithInvalidByteInStrictPolicyThrowsIllegalArgumentException() {
+        // Arrange
+        // The Base16 decoder uses a strict policy by default.
+        Base16 base16 = new Base16();
+        
+        // The byte value 0 (NUL character) is not a valid Base16 character ('0'-'9', 'A'-'F').
+        byte[] invalidEncodedData = new byte[] { (byte) 0 };
+        Context context = new Context();
+
+        // Act & Assert
         try {
-            base16_0.decode(byteArray0, (int) (byte) 6, (int) (byte) 6, baseNCodec_Context0);
-            fail("Expecting exception: IllegalArgumentException");
+            base16.decode(invalidEncodedData, 0, invalidEncodedData.length, context);
+            fail("Expected an IllegalArgumentException to be thrown for an invalid character.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid octet in encoded value: 0
-            //
-            verifyException("org.apache.commons.codec.binary.Base16", e);
+            // Verify that the exception message correctly identifies the invalid byte.
+            String expectedMessage = "Invalid octet in encoded value: 0";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
