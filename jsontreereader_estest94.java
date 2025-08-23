@@ -1,29 +1,36 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest94 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test093() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        jsonTreeReader0.skipValue();
-        assertFalse(jsonTreeReader0.isLenient());
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling skipValue() on an empty JSON object consumes the entire
+     * object, advancing the reader to the end of the document.
+     */
+    @Test
+    public void skipValueOnEmptyObjectConsumesTheObject() throws IOException {
+        // Arrange
+        JsonObject emptyObject = new JsonObject();
+        JsonTreeReader reader = new JsonTreeReader(emptyObject);
+
+        // Pre-condition check: The reader should be at the start of the object.
+        assertEquals(JsonToken.BEGIN_OBJECT, reader.peek());
+
+        // Act
+        reader.skipValue();
+
+        // Assert
+        // After skipping the object, the reader should be at the end of the document.
+        assertEquals(JsonToken.END_DOCUMENT, reader.peek());
+        
+        // The reader's default configuration (non-lenient) should not be affected.
+        assertFalse(reader.isLenient());
     }
 }
