@@ -1,19 +1,29 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IndexExtractor_ESTestTest1 extends IndexExtractor_ESTest_scaffolding {
+/**
+ * Tests the implementation of the {@code asIndexArray} method from the {@link IndexExtractor} interface.
+ * This test specifically verifies its behavior on an empty {@link SimpleBloomFilter}.
+ */
+public class IndexExtractorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Shape shape0 = Shape.fromKM(1856, 1856);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        int[] intArray0 = simpleBloomFilter0.asIndexArray();
-        assertEquals(0, intArray0.length);
+    /**
+     * Verifies that calling asIndexArray() on a newly created (and thus empty)
+     * Bloom filter returns an empty integer array.
+     */
+    @Test
+    public void asIndexArray_onEmptyFilter_returnsEmptyArray() {
+        // Arrange: Create an empty Bloom filter. The specific shape is not
+        // critical for this test as long as it's valid.
+        Shape shape = Shape.fromKM(1856, 1856);
+        IndexExtractor emptyFilter = new SimpleBloomFilter(shape);
+
+        // Act: Retrieve the indices from the empty filter.
+        int[] indices = emptyFilter.asIndexArray();
+
+        // Assert: The resulting array of indices should be empty.
+        assertEquals("An empty filter should produce an empty index array", 0, indices.length);
     }
 }
