@@ -1,68 +1,101 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -------------------
+ * ModuloAxisTest.java
+ * -------------------
+ * (C) Copyright 2007-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.axis;
 
 import org.jfree.chart.TestUtils;
+
 import org.jfree.data.Range;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link ModuloAxis} class.
+ * Tests for the {@link ModuloAxis} class.
  */
 public class ModuloAxisTest {
 
     /**
-     * Tests that a {@link ModuloAxis} object can be cloned correctly.
-     * The cloned object should be a separate instance but equal in content.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        ModuloAxis originalAxis = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis clonedAxis = (ModuloAxis) originalAxis.clone();
-        
-        assertNotSame(originalAxis, clonedAxis, "Cloned object should not be the same instance");
-        assertSame(originalAxis.getClass(), clonedAxis.getClass(), "Cloned object should be of the same class");
-        assertEquals(originalAxis, clonedAxis, "Cloned object should be equal in content");
+        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
+        ModuloAxis a2 = (ModuloAxis) a1.clone();
+        assertNotSame(a1, a2);
+        assertSame(a1.getClass(), a2.getClass());
+        assertEquals(a1, a2);
     }
 
     /**
-     * Tests the {@code equals} method to ensure it correctly distinguishes
-     * between different {@link ModuloAxis} objects based on their fields.
+     * Confirm that the equals method can distinguish all the required fields.
      */
     @Test
     public void testEquals() {
-        ModuloAxis axis1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis axis2 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        
-        assertEquals(axis1, axis2, "Axes with identical properties should be equal");
+        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
+        ModuloAxis a2 = new ModuloAxis("Test", new Range(0.0, 1.0));
+        assertEquals(a1, a2);
 
-        axis1.setDisplayRange(0.1, 1.1);
-        assertNotEquals(axis1, axis2, "Axes with different display ranges should not be equal");
-        
-        axis2.setDisplayRange(0.1, 1.1);
-        assertEquals(axis1, axis2, "Axes should be equal after setting the same display range");
+        a1.setDisplayRange(0.1, 1.1);
+        assertNotEquals(a1, a2);
+        a2.setDisplayRange(0.1, 1.1);
+        assertEquals(a1, a2);
     }
 
     /**
-     * Tests that two equal {@link ModuloAxis} objects have the same hash code.
+     * Two objects that are equal are required to return the same hashCode.
      */
     @Test
     public void testHashCode() {
-        ModuloAxis axis1 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis axis2 = new ModuloAxis("Test", new Range(0.0, 1.0));
-        
-        assertEquals(axis1, axis2, "Axes with identical properties should be equal");
-        assertEquals(axis1.hashCode(), axis2.hashCode(), "Equal axes should have the same hash code");
+        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
+        ModuloAxis a2 = new ModuloAxis("Test", new Range(0.0, 1.0));
+        assertEquals(a1, a2);
+        int h1 = a1.hashCode();
+        int h2 = a2.hashCode();
+        assertEquals(h1, h2);
     }
 
     /**
-     * Tests the serialization and deserialization of a {@link ModuloAxis} object.
-     * The deserialized object should be equal to the original.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        ModuloAxis originalAxis = new ModuloAxis("Test", new Range(0.0, 1.0));
-        ModuloAxis deserializedAxis = TestUtils.serialised(originalAxis);
-        
-        assertEquals(originalAxis, deserializedAxis, "Deserialized axis should be equal to the original");
+        ModuloAxis a1 = new ModuloAxis("Test", new Range(0.0, 1.0));
+        ModuloAxis a2 = TestUtils.serialised(a1);
+        assertEquals(a1, a2);
     }
+
 }
