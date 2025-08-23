@@ -1,50 +1,64 @@
 package org.apache.commons.collections4.map;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Map;
-import java.util.Set;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.TransformerUtils;
-import org.apache.commons.collections4.collection.TransformedCollectionTest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TransformedSortedMapTestTest2<K, V> extends AbstractSortedMapTest<K, V> {
-
-    @Override
-    public String getCompatibilityVersion() {
-        return "4";
-    }
-
-    @Override
-    public boolean isSubMapViewsSerializable() {
-        // TreeMap sub map views have a bug in deserialization.
-        return false;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public SortedMap<K, V> makeObject() {
-        return TransformedSortedMap.transformingSortedMap(new TreeMap<>(), (Transformer<? super K, ? extends K>) TransformerUtils.nopTransformer(), (Transformer<? super V, ? extends V>) TransformerUtils.nopTransformer());
-    }
+/**
+ * Tests the factory methods of {@link TransformedSortedMap}.
+ *
+ * <p>This class focuses on the specific behavior of the factory methods,
+ * providing a clear, concrete example of the transformation logic, separate
+ * from the generic Map contract tests.</p>
+ */
+public class TransformedSortedMapFactoryTest {
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testFactory_decorateTransform() {
-        final SortedMap<K, V> base = new TreeMap<>();
-        base.put((K) "A", (V) "1");
-        base.put((K) "B", (V) "2");
-        base.put((K) "C", (V) "3");
-        final SortedMap<K, V> trans = TransformedSortedMap.transformedSortedMap(base, null, (Transformer<? super V, ? extends V>) TransformedCollectionTest.STRING_TO_INTEGER_TRANSFORMER);
-        assertEquals(3, trans.size());
-        assertEquals(Integer.valueOf(1), trans.get("A"));
-        assertEquals(Integer.valueOf(2), trans.get("B"));
-        assertEquals(Integer.valueOf(3), trans.get("C"));
-        trans.put((K) "D", (V) "4");
-        assertEquals(Integer.valueOf(4), trans.get("D"));
+    @DisplayName("transformedSortedMap() should transform existing and new values")
+    void transformedSortedMap_whenDecorating_transformsExistingAndNewValues() {
+        // Arrange: Create a base map where values are string representations of numbers.
+        // The map is typed as <String, Object> to accommodate both the initial String values
+        // and the transformed Integer values.
+        final SortedMap<String, Object> originalMap = new TreeMap<>();
+        originalMap.put("A", "1");
+        originalMap.put("B", "2");
+        originalMap.put("C", "3");
+
+        // A transformer that converts String values to Integers.
+        // It is typed as Transformer<Object, Object> to match the map's value type,
+        // making the test fully type-safe.
+        final Transformer<Object, Object> valueTransformer = input -> {
+            if (input instanceof String) {
+                return Integer.valueOf((String) input);
+            }
+            // For this test, we assume only strings are put as values.
+            return input;
+        };
+
+        // Act: Create a transformed map using the factory that transforms existing elements.
+        final SortedMap<String, Object> transformedMap =
+            TransformedSortedMap.transformedSortedMap(originalMap, null, valueTransformer);
+
+        // Assert: Verify that the initial String values were transformed to Integers.
+        assertAll("Existing values should be transformed upon creation",
+            () -> assertEquals(3, transformedMap.size()),
+            () -> assertEquals(1, transformedMap.get("A")),
+            () -> assertEquals(2, transformedMap.get("B")),
+            () -> assertEquals(3, transformedMap.get("C"))
+        );
+
+        // Act: Add a new element with a String value.
+        transformedMap.put("D", "4");
+
+        // Assert: Verify that the newly added value was also transformed to an Integer.
+        assertAll("New value should be transformed on insertion",
+            () -> assertEquals(4, transformedMap.size()),
+            () -> assertEquals(4, transformedMap.get("D"))
+        );
     }
 }
