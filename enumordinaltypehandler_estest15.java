@@ -1,30 +1,29 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EnumOrdinalTypeHandler_ESTestTest15 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+import org.junit.jupiter.api.Test;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = null;
-        try {
-            enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>((Class<JdbcType>) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Type argument cannot be null
-            //
-            verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
-        }
-    }
+/**
+ * Tests for {@link EnumOrdinalTypeHandler}.
+ */
+class EnumOrdinalTypeHandlerTest {
+
+  /**
+   * The constructor should reject null arguments to ensure type safety.
+   * This test verifies that an {@link IllegalArgumentException} is thrown
+   * when the handler is instantiated with a null enum type.
+   */
+  @Test
+  void constructorShouldThrowIllegalArgumentExceptionForNullType() {
+    // Act & Assert
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+      // Attempt to create a handler with a null type class
+      new EnumOrdinalTypeHandler<>(null);
+    });
+
+    // Verify that the exception message is correct
+    assertEquals("Type argument cannot be null", exception.getMessage());
+  }
 }
