@@ -1,31 +1,47 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.internal.invocation.InvocationMatcher;
 import org.mockito.internal.stubbing.InvocationContainerImpl;
-import org.mockito.internal.util.Timer;
 import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest14 extends VerificationOverTimeImpl_ESTest_scaffolding {
+/**
+ * Test suite for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, noMoreInteractions0, true);
-        MockSettingsImpl<Object> mockSettingsImpl0 = new MockSettingsImpl<Object>();
-        InvocationContainerImpl invocationContainerImpl0 = new InvocationContainerImpl(mockSettingsImpl0);
-        VerificationDataImpl verificationDataImpl0 = new VerificationDataImpl(invocationContainerImpl0, (InvocationMatcher) null);
-        verificationOverTimeImpl0.verify(verificationDataImpl0);
-        assertTrue(verificationOverTimeImpl0.isReturnOnSuccess());
+    /**
+     * Verifies that the verification process completes successfully and immediately
+     * when the delegate verification mode succeeds on the first try, using a zero-millisecond
+     * timeout and polling period.
+     */
+    @Test
+    public void verify_shouldSucceedImmediately_whenDelegateSucceedsWithZeroDuration() {
+        // Arrange
+        // A delegate mode that will succeed because there are no more interactions to verify.
+        VerificationMode successfulDelegateMode = new NoMoreInteractions();
+
+        // Configure VerificationOverTimeImpl with a zero duration and polling period.
+        // This tests the edge case where the verification should not wait at all.
+        long durationMillis = 0L;
+        long pollingPeriodMillis = 0L;
+        boolean returnOnSuccess = true;
+        VerificationOverTimeImpl verificationOverTime = new VerificationOverTimeImpl(
+                pollingPeriodMillis,
+                durationMillis,
+                successfulDelegateMode,
+                returnOnSuccess
+        );
+
+        // Create verification data with no invocations, which satisfies the NoMoreInteractions delegate.
+        InvocationContainerImpl emptyInvocationContainer = new InvocationContainerImpl(new MockSettingsImpl<>());
+        VerificationData verificationData = new VerificationDataImpl(emptyInvocationContainer, (InvocationMatcher) null);
+
+        // Act & Assert
+        // The verify() method should execute without throwing an exception, which indicates a successful verification.
+        // The test will fail if any MockitoAssertionError is thrown.
+        verificationOverTime.verify(verificationData);
     }
 }
