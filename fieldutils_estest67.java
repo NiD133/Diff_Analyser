@@ -1,23 +1,24 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest67 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test66() throws Throwable {
-        long long0 = FieldUtils.safeMultiply((long) 0, (long) 0);
-        assertEquals(0L, long0);
+    @Test
+    public void safeMultiply_zeroTimesZero_shouldReturnZero() {
+        // Arrange
+        long value1 = 0L;
+        long value2 = 0L;
+        long expectedResult = 0L;
+
+        // Act
+        long actualResult = FieldUtils.safeMultiply(value1, value2);
+
+        // Assert
+        assertEquals(expectedResult, actualResult);
     }
 }
