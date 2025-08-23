@@ -1,30 +1,46 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+// Note: The original test was auto-generated. This version has been refactored
+// for improved understandability and maintainability.
 public class TaiInstant_ESTestTest12 extends TaiInstant_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Instant instant0 = MockInstant.ofEpochSecond(36204L, (-1L));
-        TaiInstant taiInstant0 = TaiInstant.of(instant0);
-        TaiInstant taiInstant1 = taiInstant0.withNano(0);
-        assertEquals(0, taiInstant1.getNano());
-        assertEquals(378727413L, taiInstant1.getTaiSeconds());
-        assertEquals(378727413L, taiInstant0.getTaiSeconds());
-        assertEquals(999999999, taiInstant0.getNano());
+    /**
+     * Tests that withNano() creates a new TaiInstant with the specified nano-of-second,
+     * while preserving the TAI seconds count. It also verifies the immutability of the
+     * original TaiInstant object.
+     */
+    @Test
+    public void withNano_returnsNewInstanceWithUpdatedNanosAndPreservesOriginal() {
+        // Arrange: Create an initial TaiInstant from a standard java.time.Instant.
+        // The original test used Instant.ofEpochSecond(36204L, -1L), which normalizes to
+        // 36203 seconds and 999,999,999 nanoseconds. We use the normalized values directly for clarity.
+        long initialEpochSecond = 36203L;
+        int initialNano = 999_999_999;
+        Instant utcInstant = Instant.ofEpochSecond(initialEpochSecond, initialNano);
+
+        // This is the expected TAI seconds value after converting the UTC Instant.
+        // The conversion logic is complex and accounts for leap seconds.
+        long expectedTaiSeconds = 378727413L;
+        TaiInstant originalTaiInstant = TaiInstant.of(utcInstant);
+
+        // Act: Call the withNano() method to create a new instant with a different nano value.
+        int newNanoValue = 0;
+        TaiInstant modifiedTaiInstant = originalTaiInstant.withNano(newNanoValue);
+
+        // Assert: Verify the state of the new, modified TaiInstant.
+        assertEquals("The new instance should have the updated nano-of-second value.",
+                newNanoValue, modifiedTaiInstant.getNano());
+        assertEquals("The new instance should have the same TAI seconds as the original.",
+                expectedTaiSeconds, modifiedTaiInstant.getTaiSeconds());
+
+        // Assert: Verify that the original TaiInstant remains unchanged (immutability).
+        assertEquals("Original instance's TAI seconds should not be changed.",
+                expectedTaiSeconds, originalTaiInstant.getTaiSeconds());
+        assertEquals("Original instance's nanos should not be changed.",
+                initialNano, originalTaiInstant.getNano());
     }
 }
