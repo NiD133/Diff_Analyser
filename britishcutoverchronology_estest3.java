@@ -1,52 +1,44 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
+
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest3 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        HashMap<TemporalField, Long> hashMap0 = new HashMap<TemporalField, Long>();
-        ChronoField chronoField0 = ChronoField.EPOCH_DAY;
-        Long long0 = new Long(763L);
-        hashMap0.putIfAbsent(chronoField0, long0);
-        ResolverStyle resolverStyle0 = ResolverStyle.STRICT;
-        BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.resolveDate(hashMap0, resolverStyle0);
-        assertNotNull(britishCutoverDate0);
+/**
+ * Tests for {@link BritishCutoverChronology#resolveDate(Map, ResolverStyle)}.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Tests that resolveDate correctly creates a date from a map containing only the EPOCH_DAY field.
+     */
+    @Test
+    public void resolveDate_fromEpochDay_returnsCorrectDate() {
+        // --- Arrange ---
+        // Use the singleton instance as recommended by the class Javadoc.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+
+        // The input is a map containing the EPOCH_DAY field.
+        // An epoch day of 763 corresponds to the ISO date 1972-02-04.
+        long epochDayValue = 763L;
+        Map<TemporalField, Long> fieldValues = Map.of(ChronoField.EPOCH_DAY, epochDayValue);
+
+        // The expected result is a BritishCutoverDate representing 1972-02-04.
+        // This date is after the 1752 cutover, so it behaves like a standard Gregorian date.
+        BritishCutoverDate expectedDate = BritishCutoverDate.of(1972, 2, 4);
+
+        // --- Act ---
+        // Resolve the map of fields to a date using a strict resolver style.
+        BritishCutoverDate resolvedDate = chronology.resolveDate(fieldValues, ResolverStyle.STRICT);
+
+        // --- Assert ---
+        // The original test only checked for a non-null result.
+        // A specific check for correctness is a much stronger and more useful assertion.
+        assertEquals(expectedDate, resolvedDate);
     }
 }
