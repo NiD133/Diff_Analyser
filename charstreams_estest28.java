@@ -1,52 +1,37 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
 import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest28 extends CharStreams_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link CharStreams} utility class.
+ * This specific test focuses on the behavior of the copy() method with unconnected streams.
+ */
+public class CharStreams_ESTestTest28 { // Note: Test class name kept for consistency.
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Writer writer0 = CharStreams.nullWriter();
-        PipedReader pipedReader0 = new PipedReader(2048);
+    /**
+     * Verifies that CharStreams.copy() throws an IOException when trying to read
+     * from a PipedReader that has not been connected to a PipedWriter.
+     */
+    @Test
+    public void copy_fromUnconnectedPipedReader_throwsIOException() {
+        // Arrange: Create a writer to copy to and a PipedReader that is not
+        // connected to any PipedWriter.
+        Writer nullWriter = CharStreams.nullWriter();
+        PipedReader unconnectedReader = new PipedReader();
+
         try {
-            CharStreams.copy(pipedReader0, writer0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedReader", e);
+            // Act: Attempt to copy from the unconnected reader.
+            CharStreams.copy(unconnectedReader, nullWriter);
+            fail("Expected an IOException to be thrown for an unconnected PipedReader.");
+        } catch (IOException expected) {
+            // Assert: Verify that the correct IOException was thrown.
+            assertEquals("Pipe not connected", expected.getMessage());
         }
     }
 }
