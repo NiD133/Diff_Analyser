@@ -1,26 +1,20 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FieldNamingPolicy_ESTestTest4 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Unit tests for the static helper methods in {@link FieldNamingPolicy}.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldNamingPolicy.separateCamelCase((String) null, 'I');
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.FieldNamingPolicy", e);
-        }
+    /**
+     * Verifies that the {@code separateCamelCase} method throws a
+     * {@code NullPointerException} when the input string is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void separateCamelCase_givenNullInput_throwsNullPointerException() {
+        // The method should reject null input before attempting any processing.
+        // The separator character ('_') is arbitrary and does not affect this test's outcome.
+        FieldNamingPolicy.separateCamelCase(null, '_');
     }
 }
