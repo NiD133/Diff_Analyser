@@ -1,35 +1,32 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest9 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LoopingListIterator} to verify its behavior
+ * regarding concurrent modifications.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LoopingListIterator<Object> loopingListIterator0 = new LoopingListIterator<Object>(linkedList0);
-        linkedList0.add((Object) loopingListIterator0);
-        // Undeclared exception!
-        try {
-            loopingListIterator0.previous();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+    /**
+     * Tests that a call to previous() throws a ConcurrentModificationException
+     * if the underlying list is modified externally after the iterator is created.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void previousShouldThrowConcurrentModificationExceptionWhenListIsModifiedExternally() {
+        // Arrange: Create an iterator for an empty list.
+        final List<Object> list = new LinkedList<>();
+        final LoopingListIterator<Object> iterator = new LoopingListIterator<>(list);
+
+        // Act: Modify the underlying list directly, not through the iterator.
+        // This invalidates the iterator's state.
+        list.add("an external modification");
+
+        // Assert: The next operation on the iterator is expected to fail.
+        iterator.previous();
     }
 }
