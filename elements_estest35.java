@@ -2,34 +2,24 @@ package org.jsoup.select;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest35 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#html(String)} method.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test034() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.html("");
-        assertEquals(0, elements1.size());
+    @Test
+    public void htmlSetterOnEmptyElementsDoesNothing() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act: Call the html() setter on the empty collection.
+        // This should not throw an exception and should return the same instance for chaining.
+        Elements result = emptyElements.html("<p>Some HTML</p>");
+
+        // Assert: The collection should remain empty, and the returned object should be the
+        // same instance as the original, confirming the chaining contract.
+        assertTrue("The collection should still be empty after the operation.", emptyElements.isEmpty());
+        assertSame("The method should return 'this' to allow for chaining.", emptyElements, result);
     }
 }
