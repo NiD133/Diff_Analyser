@@ -1,23 +1,32 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest1 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Unit tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1027);
-        boolean boolean0 = atomicDoubleArray0.compareAndSet(1025, 0.0, 1027);
-        assertEquals(1027, atomicDoubleArray0.length());
-        assertTrue(boolean0);
+    @Test
+    public void compareAndSet_succeedsWhenValueIsExpected() {
+        // Arrange
+        final int indexToUpdate = 5;
+        final double initialValue = 0.0; // All elements are initialized to 0.0 by default
+        final double newValue = 123.45;
+        AtomicDoubleArray array = new AtomicDoubleArray(10);
+
+        // Act
+        boolean wasSuccessful = array.compareAndSet(indexToUpdate, initialValue, newValue);
+
+        // Assert
+        assertTrue("compareAndSet should return true on a successful update.", wasSuccessful);
+        assertEquals(
+            "The value at the index should be updated to the new value.",
+            newValue,
+            array.get(indexToUpdate),
+            0.0); // The third argument is the tolerance for double comparison
     }
 }
