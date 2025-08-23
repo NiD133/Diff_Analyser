@@ -1,34 +1,31 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertThrows;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest22 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Instant instant0 = MockInstant.ofEpochMilli(9223372036854775807L);
-        FileTime fileTime0 = FileTime.from(instant0);
-        // Undeclared exception!
-        try {
-            FileTimes.toNtfsTime(fileTime0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Overflow
-            //
-            verifyException("java.math.BigDecimal", e);
-        }
+    /**
+     * Tests that {@link FileTimes#toNtfsTime(FileTime)} throws an
+     * {@link ArithmeticException} when the input {@link FileTime} is too large
+     * to be represented as an NTFS time. The NTFS time is a 64-bit (long) value,
+     * so a sufficiently large input will cause an overflow during conversion.
+     */
+    @Test
+    public void testToNtfsTimeThrowsArithmeticExceptionForLargeFileTime() {
+        // Arrange: Create a FileTime instance representing the maximum possible
+        // millisecond value from the epoch. This value is guaranteed to cause an
+        // overflow when converted to the 100-nanosecond intervals of NTFS time.
+        final FileTime largeFileTime = FileTime.from(Instant.ofEpochMilli(Long.MAX_VALUE));
+
+        // Act & Assert: Verify that calling toNtfsTime with this out-of-range value
+        // results in an ArithmeticException.
+        assertThrows(ArithmeticException.class, () -> FileTimes.toNtfsTime(largeFileTime));
     }
 }
