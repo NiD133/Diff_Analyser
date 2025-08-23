@@ -1,22 +1,32 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IslamicChronology_ESTestTest3 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link IslamicChronology}.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        long long0 = islamicChronology0.calculateFirstDayOfYearMillis((-292269337));
-        assertEquals((-8948534433609600000L), long0);
+    /**
+     * Verifies that calculateFirstDayOfYearMillis computes the correct millisecond value
+     * for the minimum supported year in the Islamic calendar.
+     */
+    @Test
+    public void calculateFirstDayOfYearMillis_forMinimumSupportedYear_returnsCorrectValue() {
+        // Arrange
+        // The input year is the minimum supported year, as defined by the private constant
+        // IslamicChronology.MIN_YEAR.
+        final int minSupportedYear = -292269337;
+        final long expectedMillis = -8948534433609600000L;
+        
+        IslamicChronology islamicChronology = IslamicChronology.getInstance();
+
+        // Act
+        long actualMillis = islamicChronology.calculateFirstDayOfYearMillis(minSupportedYear);
+
+        // Assert
+        assertEquals("Milliseconds for the first day of the minimum year should be correct",
+                expectedMillis, actualMillis);
     }
 }
