@@ -1,22 +1,31 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
+import static org.junit.Assert.assertNull;
+
 import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class TypeHandler_ESTestTest3 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link TypeHandler}.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Class<MockThrowable> class0 = MockThrowable.class;
-        MockThrowable mockThrowable0 = TypeHandler.createValue((String) null, class0);
-        assertNull(mockThrowable0);
+    /**
+     * Tests that {@link TypeHandler#createValue(String, Class)} returns null
+     * when the input string is null.
+     */
+    @Test
+    public void createValue_withNullString_shouldReturnNull() throws ParseException {
+        // Arrange: Define the input string as null and specify a target type.
+        // The specific target type (MockThrowable) does not matter for this test case,
+        // as the null check should happen before any type-specific conversion.
+        final String inputValue = null;
+        final Class<MockThrowable> targetType = MockThrowable.class;
+
+        // Act: Call the method under test with the null input.
+        final MockThrowable result = TypeHandler.createValue(inputValue, targetType);
+
+        // Assert: Verify that the result is null.
+        assertNull("The method should return null when the input string is null.", result);
     }
 }
