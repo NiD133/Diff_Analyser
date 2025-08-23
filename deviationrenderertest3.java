@@ -1,21 +1,37 @@
 package org.jfree.chart.renderer.xy;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.api.PublicCloneable;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class DeviationRendererTestTest3 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+/**
+ * Tests for the cloning functionality of the {@link DeviationRenderer} class.
+ */
+class DeviationRendererTest {
 
     /**
-     * Confirm that cloning works.
+     * Verifies that the clone() method creates a new instance that is an
+     * independent but equal copy of the original. This test checks the
+     * fundamental contract of the clone() method.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DeviationRenderer r1 = new DeviationRenderer();
-        DeviationRenderer r2 = (DeviationRenderer) r1.clone();
-        assertNotSame(r1, r2);
-        assertSame(r1.getClass(), r2.getClass());
-        assertEquals(r1, r2);
+    void cloningShouldProduceIndependentAndEqualInstance() throws CloneNotSupportedException {
+        // Arrange: Create an instance of the renderer.
+        DeviationRenderer original = new DeviationRenderer();
+
+        // Act: Clone the original instance.
+        DeviationRenderer clone = (DeviationRenderer) original.clone();
+
+        // Assert: Verify the properties of a valid clone.
+        // 1. The clone must be a different object in memory.
+        assertNotSame(original, clone);
+
+        // 2. The clone must be of the exact same class as the original.
+        assertSame(original.getClass(), clone.getClass());
+
+        // 3. The clone must be "equal" to the original, as defined by the equals() method.
+        assertEquals(original, clone);
     }
 }
