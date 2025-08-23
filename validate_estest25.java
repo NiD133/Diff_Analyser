@@ -1,32 +1,34 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest25 extends Validate_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
+
+    /**
+     * Verifies that calling {@link Validate#notEmpty(String)} with an empty string
+     * correctly throws an IllegalArgumentException.
+     */
+    @Test
+    public void notEmpty_withEmptyString_throwsIllegalArgumentException() {
+        // Arrange: Define the expected exception message.
+        String expectedMessage = "String must not be empty";
+
         try {
+            // Act: Call the method under test with an invalid argument.
             Validate.notEmpty("");
-            fail("Expecting exception: IllegalArgumentException");
+            
+            // Assert: If the method does not throw an exception, this line is reached,
+            // and the test should fail.
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify that the caught exception has the expected message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
