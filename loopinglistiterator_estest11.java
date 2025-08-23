@@ -1,35 +1,35 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest11 extends LoopingListIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LoopingListIterator<Object> loopingListIterator0 = new LoopingListIterator<Object>(linkedList0);
-        linkedList0.add((Object) loopingListIterator0);
-        // Undeclared exception!
-        try {
-            loopingListIterator0.next();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+/**
+ * Tests for {@link LoopingListIterator} focusing on concurrent modification scenarios.
+ */
+public class LoopingListIteratorTest {
+
+    /**
+     * Verifies that the iterator fails fast with a ConcurrentModificationException
+     * if the underlying list is structurally modified after the iterator is created.
+     */
+    @Test
+    public void nextShouldThrowConcurrentModificationExceptionWhenListIsModifiedExternally() {
+        // Arrange
+        List<String> underlyingList = new LinkedList<>();
+        underlyingList.add("A");
+        LoopingListIterator<String> loopingIterator = new LoopingListIterator<>(underlyingList);
+
+        // Act: Modify the underlying list directly, after the iterator has been created.
+        underlyingList.add("B");
+
+        // Assert: The next call to the iterator should throw an exception.
+        assertThrows(ConcurrentModificationException.class, () -> {
+            loopingIterator.next();
+        });
     }
 }
