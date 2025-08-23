@@ -1,37 +1,41 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest1 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SimpleBloomFilter#merge(IndexExtractor)} method.
+ */
+public class SimpleBloomFilterMergeTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Shape shape0 = Shape.fromKM(1, 1540);
-        int[] intArray0 = new int[8];
-        intArray0[0] = 5023;
-        IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
-        LayerManager<SparseBloomFilter> layerManager0 = (LayerManager<SparseBloomFilter>) mock(LayerManager.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(layerManager0).processBloomFilters(any(java.util.function.Predicate.class));
-        LayeredBloomFilter<SparseBloomFilter> layeredBloomFilter0 = new LayeredBloomFilter<SparseBloomFilter>(shape0, layerManager0);
-        SimpleBloomFilter simpleBloomFilter0 = layeredBloomFilter0.flatten();
-        // Undeclared exception!
+    /**
+     * Tests that merging an IndexExtractor with an index that is out of bounds
+     * for the filter's shape throws an IllegalArgumentException. The valid index
+     * range is [0, numberOfBits).
+     */
+    @Test
+    public void mergeWithIndexExtractorShouldThrowExceptionForIndexOutOfBounds() {
+        // Arrange
+        final int numberOfBits = 1540;
+        final int numberOfHashFunctions = 1;
+        final Shape shape = Shape.fromKM(numberOfHashFunctions, numberOfBits);
+        final SimpleBloomFilter bloomFilter = new SimpleBloomFilter(shape);
+
+        // Create an IndexExtractor that provides an index outside the valid range of [0, 1539].
+        final int outOfBoundsIndex = 5023;
+        final IndexExtractor invalidIndexExtractor = IndexExtractor.fromIndexArray(new int[]{outOfBoundsIndex});
+
+        // Act & Assert
         try {
-            simpleBloomFilter0.merge(indexExtractor0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // IndexExtractor should only send values in the range[0,1540)
-            //
-            verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+            bloomFilter.merge(invalidIndexExtractor);
+            fail("Expected an IllegalArgumentException to be thrown for an out-of-bounds index.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message is correct and informative.
+            final String expectedMessage = String.format(
+                "IndexExtractor should only send values in the range[0,%s)", numberOfBits);
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
