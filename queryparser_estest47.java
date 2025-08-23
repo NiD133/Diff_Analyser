@@ -1,25 +1,31 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class QueryParser_ESTestTest47 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link QueryParser} class, focusing on exception handling.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that the combinator() method throws an IllegalStateException
+     * when provided with an unrecognized combinator character.
+     */
+    @Test
+    public void combinatorWithUnknownCharacterShouldThrowIllegalStateException() {
+        char unknownCombinator = ']';
+
         try {
-            QueryParser.combinator((Evaluator) null, ']', (Evaluator) null);
-            fail("Expecting exception: IllegalStateException");
+            // Attempt to parse with an invalid combinator. The Evaluator arguments are not
+            // relevant for this test, so they can be null.
+            QueryParser.combinator(null, unknownCombinator, null);
+            fail("Expected an IllegalStateException to be thrown for an unknown combinator.");
         } catch (IllegalStateException e) {
-            //
-            // Unknown combinator ']'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Assert that the exception message is specific and helpful.
+            String expectedMessage = "Unknown combinator '" + unknownCombinator + "'";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
