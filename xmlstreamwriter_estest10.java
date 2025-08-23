@@ -1,37 +1,34 @@
 package org.apache.commons.io.output;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlStreamWriter_ESTestTest10 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link XmlStreamWriter}.
+ */
+public class XmlStreamWriterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        XmlStreamWriter xmlStreamWriter0 = null;
+    /**
+     * Tests that the {@link XmlStreamWriter} constructor throws an
+     * {@link UnsupportedCharsetException} when an invalid encoding name is provided.
+     */
+    @Test
+    public void constructorWithInvalidEncodingShouldThrowUnsupportedCharsetException() {
+        final String invalidEncoding = "wm";
+
         try {
-            xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null, "wm");
-            fail("Expecting exception: UnsupportedCharsetException");
-        } catch (UnsupportedCharsetException e) {
-            //
-            // wm
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // Attempt to create a writer with a null stream and an unsupported encoding.
+            // The exception is expected due to the invalid encoding.
+            new XmlStreamWriter((OutputStream) null, invalidEncoding);
+            fail("Expected UnsupportedCharsetException was not thrown for invalid encoding: " + invalidEncoding);
+        } catch (final UnsupportedCharsetException e) {
+            // The exception is expected.
+            // Verify that the exception message correctly identifies the invalid encoding.
+            assertEquals(invalidEncoding, e.getMessage());
         }
     }
 }
