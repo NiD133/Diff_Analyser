@@ -2,80 +2,64 @@ package org.apache.commons.io.output;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.DefaultLocale;
 
-public class XmlStreamWriterTestTest6 {
+/**
+ * Tests for {@link XmlStreamWriter}.
+ * <p>
+ * This class focuses on verifying that the writer correctly detects and uses the
+ * encoding specified in an XML declaration.
+ * </p>
+ */
+public class XmlStreamWriterTest {
 
     /**
-     * French
+     * A sample text containing a French character (é), representable in ISO-8859-1 (Latin-1).
      */
     private static final String TEXT_LATIN1 = "eacute: \u00E9";
 
     /**
-     * Greek
+     * Creates an XML document string with a specified encoding in its declaration.
+     *
+     * @param text The content for the {@code <text>} element.
+     * @param encodingName The encoding name to specify in the XML declaration.
+     * @return A string representing the XML document.
      */
-    private static final String TEXT_LATIN7 = "alpha: \u03B1";
-
-    /**
-     * Euro support
-     */
-    private static final String TEXT_LATIN15 = "euro: \u20AC";
-
-    /**
-     * Japanese
-     */
-    private static final String TEXT_EUC_JP = "hiragana A: \u3042";
-
-    /**
-     * Unicode: support everything
-     */
-    private static final String TEXT_UNICODE = TEXT_LATIN1 + ", " + TEXT_LATIN7 + ", " + TEXT_LATIN15 + ", " + TEXT_EUC_JP;
-
-    @SuppressWarnings("resource")
-    private static void checkXmlContent(final String xml, final String encodingName, final String defaultEncodingName) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final XmlStreamWriter writerCheck;
-        try (XmlStreamWriter writer = XmlStreamWriter.builder().setOutputStream(out).setCharset(defaultEncodingName).get()) {
-            writerCheck = writer;
-            writer.write(xml);
-        }
-        final byte[] xmlContent = out.toByteArray();
-        final Charset charset = Charset.forName(encodingName);
-        final Charset writerCharset = Charset.forName(writerCheck.getEncoding());
-        assertEquals(charset, writerCharset);
-        assertTrue(writerCharset.contains(charset), writerCharset.name());
-        assertArrayEquals(xml.getBytes(encodingName), xmlContent);
-    }
-
-    private static void checkXmlWriter(final String text, final String encoding) throws IOException {
-        checkXmlWriter(text, encoding, null);
-    }
-
-    private static void checkXmlWriter(final String text, final String encoding, final String defaultEncoding) throws IOException {
-        final String xml = createXmlContent(text, encoding);
-        String effectiveEncoding = encoding;
-        if (effectiveEncoding == null) {
-            effectiveEncoding = defaultEncoding == null ? StandardCharsets.UTF_8.name() : defaultEncoding;
-        }
-        checkXmlContent(xml, effectiveEncoding, defaultEncoding);
-    }
-
-    private static String createXmlContent(final String text, final String encoding) {
-        String xmlDecl = "<?xml version=\"1.0\"?>";
-        if (encoding != null) {
-            xmlDecl = "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>";
-        }
+    private static String createXmlWithEncoding(final String text, final String encodingName) {
+        final String xmlDecl = "<?xml version=\"1.0\" encoding=\"" + encodingName + "\"?>";
         return xmlDecl + "\n<text>" + text + "</text>";
     }
 
     @Test
-    void testLatin1Encoding() throws IOException {
-        checkXmlWriter(TEXT_LATIN1, StandardCharsets.ISO_8859_1.name());
+    void write_whenXmlDeclaresIso8859_1_usesDetectedEncoding() throws IOException {
+        // Arrange
+        final Charset declaredEncoding = StandardCharsets.ISO_8859_1;
+        final String xmlContent = createXmlWithEncoding(TEXT_LATIN1, declaredEncoding.name());
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // The XmlStreamWriter is created with its default encoding (UTF-8), but it should
+        // detect the encoding from the XML declaration and switch to it.
+        final XmlStreamWriter writer = XmlStreamWriter.builder()
+                .setOutputStream(outputStream)
+                .get(); // Uses UTF-8 as default unless specified otherwise.
+
+        // Act
+        try (writer) {
+            writer.write(xmlContent);
+        }
+
+        // Assert
+        // 1. Verify the writer detected the correct encoding from the declaration.
+        assertEquals(declaredEncoding.name(), writer.getEncoding());
+
+        // 2. Verify the output bytes are correct for the detected encoding.
+        final byte[] expectedBytes = xmlContent.getBytes(declaredEncoding);
+        final byte[] actualBytes = outputStream.toByteArray();
+        assertArrayEquals(expectedBytes, actualBytes);
     }
 }
