@@ -1,67 +1,105 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
 import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
 import org.jspecify.annotations.NullUnmarked;
 
-public class AtomicDoubleArrayTestTest1 extends JSR166TestCase {
+/**
+ * Tests for {@link AtomicDoubleArray}. This class includes tests for API contracts like null-safety
+ * and helpers for concurrency tests.
+ */
+@NullUnmarked
+public class AtomicDoubleArrayTest extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+    /** A collection of special double values for testing edge cases. */
+    private static final double[] SPECIAL_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
-    static final long COUNTDOWN = 100000;
+    /** A large number used as a countdown for concurrency tests. */
+    static final long CONCURRENCY_TEST_COUNTDOWN = 100000;
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * The notion of equality used by AtomicDoubleArray, which compares the raw bit representations.
      */
     static boolean bitEquals(double x, double y) {
         return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
     }
 
+    /** Asserts that two doubles are bit-wise equal, consistent with AtomicDoubleArray's logic. */
     static void assertBitEquals(double x, double y) {
         assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
     }
 
-    class Counter extends CheckedRunnable {
+    /**
+     * A worker for concurrency tests that repeatedly iterates over an {@link AtomicDoubleArray},
+     * decrementing each positive element by 1.0 until all elements are zero. It counts the number of
+     * successful decrements it performs.
+     */
+    static class ConcurrentDecrementer extends CheckedRunnable {
 
-        final AtomicDoubleArray aa;
+        private final AtomicDoubleArray atomicArray;
+        volatile long successfulDecrements;
 
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
+        ConcurrentDecrementer(AtomicDoubleArray array) {
+            this.atomicArray = array;
         }
 
         @Override
         public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
+            // Loop until all elements in the array have been successfully decremented to zero.
+            while (true) {
+                boolean allElementsAreZero = true;
+                // Iterate through the array, attempting to decrement each positive element.
+                for (int i = 0; i < atomicArray.length(); i++) {
+                    double currentValue = atomicArray.get(i);
+                    assertTrue("Array values should not be negative", currentValue >= 0);
+
+                    if (currentValue > 0) {
+                        allElementsAreZero = false;
+                        // Attempt to decrement the value atomically.
+                        if (atomicArray.compareAndSet(i, currentValue, currentValue - 1.0)) {
+                            successfulDecrements++;
                         }
                     }
                 }
-                if (done) {
+                // If a full pass over the array finds no positive values, the work is done.
+                if (allElementsAreZero) {
                     break;
                 }
             }
         }
     }
 
+    /**
+     * Verifies that all public APIs of AtomicDoubleArray correctly handle null arguments by throwing a
+     * NullPointerException.
+     */
     @J2ktIncompatible
-    // NullPointerTester
     @GwtIncompatible
-    public void testNulls() {
-        new NullPointerTester().testAllPublicStaticMethods(AtomicDoubleArray.class);
-        new NullPointerTester().testAllPublicConstructors(AtomicDoubleArray.class);
-        new NullPointerTester().testAllPublicInstanceMethods(new AtomicDoubleArray(1));
+    public void testPublicApi_nullArguments_throwsNpe() {
+        // NullPointerTester is a Guava utility that automatically checks for NPEs.
+        NullPointerTester tester = new NullPointerTester();
+        tester.testAllPublicStaticMethods(AtomicDoubleArray.class);
+        tester.testAllPublicConstructors(AtomicDoubleArray.class);
+        tester.testAllPublicInstanceMethods(new AtomicDoubleArray(1));
     }
 }
