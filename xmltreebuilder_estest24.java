@@ -1,41 +1,50 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
+import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 
-public class XmlTreeBuilder_ESTestTest24 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for {@link XmlTreeBuilder}, focusing on I/O error handling.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        PipedReader pipedReader0 = new PipedReader();
-        // Undeclared exception!
+    /**
+     * Verifies that when the underlying Reader throws an IOException during parsing,
+     * the XmlTreeBuilder wraps it in an UncheckedIOException.
+     */
+    @Test
+    public void parseWithFailingReaderShouldThrowUncheckedIOException() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        String expectedErrorMessage = "Simulated I/O error";
+        String baseUri = "http://example.com";
+
+        // Create a custom Reader that always throws an IOException to simulate a read failure.
+        Reader faultyReader = new Reader() {
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                throw new IOException(expectedErrorMessage);
+            }
+
+            @Override
+            public void close() {
+                // No-op
+            }
+        };
+
+        // Act & Assert
         try {
-            xmlTreeBuilder0.parse(pipedReader0, "kxrewut");
-            fail("Expecting exception: UncheckedIOException");
+            xmlTreeBuilder.parse(faultyReader, baseUri);
+            fail("An UncheckedIOException should have been thrown due to the reader's failure.");
         } catch (UncheckedIOException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("org.jsoup.parser.CharacterReader", e);
+            // Verify that the thrown exception is a wrapper around the original IOException.
+            Throwable cause = e.getCause();
+            assertNotNull("The UncheckedIOException should have a cause.", cause);
+            assertTrue("The cause should be an instance of IOException.", cause instanceof IOException);
+            assertEquals("The cause's message should match the original error.", expectedErrorMessage, cause.getMessage());
         }
     }
 }
