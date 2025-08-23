@@ -1,45 +1,9 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * --------------------------
- * QuarterDateFormatTest.java
- * --------------------------
- * (C) Copyright 2005-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.chart.axis;
-
-import java.util.TimeZone;
 
 import org.jfree.chart.TestUtils;
 import org.junit.jupiter.api.Test;
+
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,78 +12,112 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class QuarterDateFormatTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
+    // Common, descriptive constants to avoid duplication and magic values
+    private static final TimeZone TZ_GMT = TimeZone.getTimeZone("GMT");
+    private static final TimeZone TZ_PST = TimeZone.getTimeZone("PST");
+    private static final String[] QUARTERS_1234 = {"1", "2", "3", "4"};
+    private static final String[] QUARTERS_A234 = {"A", "2", "3", "4"};
+
+    // Helper factory methods make intent explicit at call sites
+    private static QuarterDateFormat qdf(TimeZone tz, String[] symbols) {
+        return new QuarterDateFormat(tz, symbols);
+    }
+
+    private static QuarterDateFormat qdf(TimeZone tz, String[] symbols, boolean quarterFirst) {
+        return new QuarterDateFormat(tz, symbols, quarterFirst);
+    }
+
     @Test
-    public void testEquals() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        assertEquals(qf1, qf2);
-        assertEquals(qf2, qf1);
+    public void equals_returnsTrueForSameValues() {
+        QuarterDateFormat a = qdf(TZ_GMT, QUARTERS_1234);
+        QuarterDateFormat b = qdf(TZ_GMT, QUARTERS_1234);
 
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"1", "2", "3", "4"});
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"1", "2", "3", "4"});
-        assertEquals(qf1, qf2);
+        assertEquals(a, b);
+        assertEquals(b, a); // symmetric
+    }
 
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"});
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"});
-        assertEquals(qf1, qf2);
+    @Test
+    public void equals_distinguishesDifferentTimeZone() {
+        QuarterDateFormat base = qdf(TZ_GMT, QUARTERS_1234);
+        QuarterDateFormat differentTz = qdf(TZ_PST, QUARTERS_1234);
 
-        qf1 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"}, true);
-        assertNotEquals(qf1, qf2);
-        qf2 = new QuarterDateFormat(TimeZone.getTimeZone("PST"),
-                new String[] {"A", "2", "3", "4"}, true);
-        assertEquals(qf1, qf2);
+        assertNotEquals(base, differentTz);
+
+        QuarterDateFormat sameAsDifferentTz = qdf(TZ_PST, QUARTERS_1234);
+        assertEquals(differentTz, sameAsDifferentTz);
+    }
+
+    @Test
+    public void equals_distinguishesDifferentQuarterSymbols() {
+        QuarterDateFormat base = qdf(TZ_PST, QUARTERS_1234);
+        QuarterDateFormat differentSymbols = qdf(TZ_PST, QUARTERS_A234);
+
+        assertNotEquals(base, differentSymbols);
+
+        QuarterDateFormat sameAsDifferentSymbols = qdf(TZ_PST, QUARTERS_A234);
+        assertEquals(differentSymbols, sameAsDifferentSymbols);
+    }
+
+    @Test
+    public void equals_distinguishesQuarterFirstFlag() {
+        QuarterDateFormat base = qdf(TZ_PST, QUARTERS_A234, false);
+        QuarterDateFormat differentFlag = qdf(TZ_PST, QUARTERS_A234, true);
+
+        assertNotEquals(base, differentFlag);
+
+        QuarterDateFormat sameAsDifferentFlag = qdf(TZ_PST, QUARTERS_A234, true);
+        assertEquals(differentFlag, sameAsDifferentFlag);
+    }
+
+    @Test
+    public void equals_contract_basicCases() {
+        QuarterDateFormat a = qdf(TZ_GMT, QUARTERS_1234);
+
+        // reflexive
+        assertEquals(a, a);
+
+        // null
+        assertNotEquals(a, null);
+
+        // different type
+        assertNotEquals(a, new Object());
     }
 
     /**
      * Two objects that are equal are required to return the same hashCode.
      */
     @Test
-    public void testHashCode() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        assertEquals(qf1, qf2);
-        int h1 = qf1.hashCode();
-        int h2 = qf2.hashCode();
-        assertEquals(h1, h2);
+    public void hashCode_equalObjectsProduceSameHash() {
+        QuarterDateFormat a = qdf(TZ_GMT, QUARTERS_1234);
+        QuarterDateFormat b = qdf(TZ_GMT, QUARTERS_1234);
+
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
     }
 
     /**
-     * Confirm that cloning works.
+     * Confirm that cloning creates an equal but distinct instance.
      */
     @Test
-    public void testCloning() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = null;
-        qf2 = (QuarterDateFormat) qf1.clone();
-        assertNotSame(qf1, qf2);
-        assertSame(qf1.getClass(), qf2.getClass());
-        assertEquals(qf1, qf2);
+    public void cloning_createsEqualButDistinctInstance() {
+        QuarterDateFormat original = qdf(TZ_GMT, QUARTERS_1234);
+
+        QuarterDateFormat clone = (QuarterDateFormat) original.clone();
+
+        assertNotSame(original, clone);
+        assertSame(original.getClass(), clone.getClass());
+        assertEquals(original, clone);
     }
 
     /**
      * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerialization() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone(
-                "GMT"), new String[] {"1", "2", "3", "4"});
-        QuarterDateFormat qf2 = TestUtils.serialised(qf1);
-        assertEquals(qf1, qf2);
-    }
+    public void serialization_roundTripPreservesEquality() {
+        QuarterDateFormat original = qdf(TZ_GMT, QUARTERS_1234);
 
+        QuarterDateFormat restored = TestUtils.serialised(original);
+
+        assertEquals(original, restored);
+    }
 }
