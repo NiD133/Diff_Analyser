@@ -1,25 +1,31 @@
 package org.apache.commons.collections4.collection;
 
-import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.collections4.Transformer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class IndexedCollectionTestTest2 extends AbstractCollectionTest<String> {
+/**
+ * Tests for IndexedCollection.
+ * <p>
+ * This class extends AbstractCollectionTest, which provides a comprehensive suite
+ * of tests for the Collection interface. The methods overridden here are hooks
+ * for that framework.
+ * </p>
+ */
+@DisplayName("IndexedCollection")
+public class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
-    protected Collection<String> decorateCollection(final Collection<String> collection) {
-        return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
-    }
-
-    protected IndexedCollection<Integer, String> decorateUniqueCollection(final Collection<String> collection) {
-        return IndexedCollection.uniqueIndexedCollection(collection, new IntegerTransformer());
-    }
+    // --- Test Fixture Setup for AbstractCollectionTest ---
 
     @Override
     public String[] getFullElements() {
@@ -29,6 +35,29 @@ public class IndexedCollectionTestTest2 extends AbstractCollectionTest<String> {
     @Override
     public String[] getOtherElements() {
         return new String[] { "9", "88", "678", "87", "98", "78", "99" };
+    }
+
+    /**
+     * The transformer used to extract keys (Integer) from values (String).
+     */
+    private static final class IntegerTransformer implements Transformer<String, Integer>, Serializable {
+        private static final long serialVersionUID = 809439581555072949L;
+
+        @Override
+        public Integer transform(final String input) {
+            return Integer.valueOf(input);
+        }
+    }
+
+    @Override
+    public Collection<String> makeObject() {
+        return IndexedCollection.nonUniqueIndexedCollection(new ArrayList<>(), new IntegerTransformer());
+    }
+
+    @Override
+    public Collection<String> makeFullCollection() {
+        final List<String> list = new ArrayList<>(Arrays.asList(getFullElements()));
+        return IndexedCollection.nonUniqueIndexedCollection(list, new IntegerTransformer());
     }
 
     @Override
@@ -42,45 +71,31 @@ public class IndexedCollectionTestTest2 extends AbstractCollectionTest<String> {
     }
 
     @Override
-    public Collection<String> makeFullCollection() {
-        return decorateCollection(new ArrayList<>(Arrays.asList(getFullElements())));
-    }
-
-    @Override
-    public Collection<String> makeObject() {
-        return decorateCollection(new ArrayList<>());
-    }
-
-    public Collection<String> makeTestCollection() {
-        return decorateCollection(new ArrayList<>());
-    }
-
-    public Collection<String> makeUniqueTestCollection() {
-        return decorateUniqueCollection(new ArrayList<>());
-    }
-
-    @Override
     protected boolean skipSerializedCanonicalTests() {
         // FIXME: support canonical tests
         return true;
     }
 
-    private static final class IntegerTransformer implements Transformer<String, Integer>, Serializable {
-
-        private static final long serialVersionUID = 809439581555072949L;
-
-        @Override
-        public Integer transform(final String input) {
-            return Integer.valueOf(input);
-        }
-    }
+    // --- Custom Tests for IndexedCollection ---
 
     @Test
-    void testDecoratedCollectionIsIndexedOnCreation() throws Exception {
-        final Collection<String> original = makeFullCollection();
-        final IndexedCollection<Integer, String> indexed = decorateUniqueCollection(original);
-        assertEquals("1", indexed.get(1));
-        assertEquals("2", indexed.get(2));
-        assertEquals("3", indexed.get(3));
+    @DisplayName("should be indexed immediately upon creation")
+    void uniqueIndexedCollectionIsIndexedOnCreation() {
+        // Arrange
+        final Collection<String> sourceCollection = makeConfirmedFullCollection();
+        final Transformer<String, Integer> keyTransformer = new IntegerTransformer();
+
+        // Act: Create a unique indexed collection from the source collection.
+        final IndexedCollection<Integer, String> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(sourceCollection, keyTransformer);
+
+        // Assert: Verify that elements are indexed and can be retrieved by their key.
+        // The key is the integer representation of the string element.
+        assertAll("Elements should be retrievable by key after creation",
+            () -> assertEquals("1", indexedCollection.get(1), "Should find element with key 1"),
+            () -> assertEquals("2", indexedCollection.get(2), "Should find element with key 2"),
+            () -> assertEquals("6", indexedCollection.get(6), "Should find element with key 6"),
+            () -> assertNull(indexedCollection.get(99), "Should return null for a non-existent key")
+        );
     }
 }
