@@ -1,21 +1,31 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class EthiopicChronology_ESTestTest18 extends EthiopicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
-        boolean boolean0 = ethiopicChronology0.isLeapDay((-2899));
-        assertFalse(boolean0);
+/**
+ * Unit tests for {@link EthiopicChronology}.
+ */
+public class EthiopicChronologyTest {
+
+    @Test
+    public void isLeapDay_shouldReturnFalse_forInstantInNonLeapYear() {
+        // Arrange
+        // The Ethiopic calendar rule for a leap year is (year + 1) % 4 == 0.
+        // For the year 1962, (1962 + 1) % 4 = 3, so it is not a leap year.
+        final EthiopicChronology ethiopicChronology = EthiopicChronology.getInstanceUTC();
+        
+        // Create an instant representing a date within the non-leap Ethiopic year 1962.
+        final DateTime dateInNonLeapYear = new DateTime(1962, 1, 1, 0, 0, ethiopicChronology);
+        final long instant = dateInNonLeapYear.getMillis();
+
+        // Act
+        final boolean isLeap = ethiopicChronology.isLeapDay(instant);
+
+        // Assert
+        assertFalse("An instant within a non-leap year should not be identified as a leap day.", isLeap);
     }
 }
