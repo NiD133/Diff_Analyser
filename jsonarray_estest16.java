@@ -1,24 +1,23 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest16 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Character character0 = Character.valueOf('6');
-        jsonArray0.add(character0);
-        double double0 = jsonArray0.getAsDouble();
-        assertEquals(6.0, double0, 0.01);
+    @Test
+    public void getAsDouble_whenArrayContainsSingleCharacterDigit_returnsDoubleValue() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add('6');
+
+        // Act
+        double result = jsonArray.getAsDouble();
+
+        // Assert
+        assertEquals(6.0, result, 0.01);
     }
 }
