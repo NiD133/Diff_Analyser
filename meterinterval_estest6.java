@@ -1,29 +1,38 @@
 package org.jfree.chart.plot;
 
+import org.jfree.data.Range;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
 
-public class MeterInterval_ESTestTest6 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Range range0 = Range.expandToInclude((Range) null, (-229.311906958652));
-        BasicStroke basicStroke0 = new BasicStroke();
-        MeterInterval meterInterval0 = new MeterInterval("", range0, (Paint) null, basicStroke0, (Paint) null);
-        Paint paint0 = meterInterval0.getOutlinePaint();
-        assertNull(paint0);
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that getOutlinePaint() returns null when the MeterInterval
+     * is constructed with a null outline paint.
+     */
+    @Test
+    public void getOutlinePaint_whenConstructedWithNull_returnsNull() {
+        // Arrange: Create a MeterInterval with a null outline paint.
+        String label = "Normal";
+        Range range = new Range(0.0, 50.0);
+        Stroke stroke = new BasicStroke(1.0f);
+        Paint backgroundPaint = null; // Not relevant to this test
+        
+        // The outlinePaint is explicitly set to null for this test case.
+        MeterInterval interval = new MeterInterval(label, range, null, stroke, backgroundPaint);
+
+        // Act: Retrieve the outline paint from the interval.
+        Paint actualOutlinePaint = interval.getOutlinePaint();
+
+        // Assert: The retrieved paint should be null.
+        assertNull("The outline paint should be null as provided in the constructor.", actualOutlinePaint);
     }
 }
