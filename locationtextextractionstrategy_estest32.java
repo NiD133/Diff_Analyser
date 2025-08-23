@@ -1,42 +1,67 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+
+// Note: The test class name and inheritance from a scaffolding class are preserved
+// to maintain consistency with the original test suite structure.
 public class LocationTextExtractionStrategy_ESTestTest32 extends LocationTextExtractionStrategy_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = graphicsState0.getCtm();
-        PdfOCProperties pdfOCProperties0 = new PdfOCProperties();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfOCProperties0);
-        LinkedList<MarkedContentInfo> linkedList0 = new LinkedList<MarkedContentInfo>();
-        graphicsState0.font = cMapAwareDocumentFont0;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedList0);
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        Matrix matrix1 = new Matrix(341.6828F, (-9.18953F), 5, 23, 6, 3);
-        TextRenderInfo textRenderInfo1 = new TextRenderInfo(pdfDate0, graphicsState0, matrix1, linkedList0);
-        locationTextExtractionStrategy0.renderText(textRenderInfo1);
-        String string0 = locationTextExtractionStrategy0.getResultantText();
-        assertEquals("\n", string0);
+    /**
+     * Tests that the strategy inserts a newline character between two text chunks
+     * that are determined to be on different lines based on their transformation matrices.
+     *
+     * This test simulates rendering two text chunks. Both have effectively empty text content,
+     * but they are given different transformation matrices. The second matrix is designed to
+     * alter the position and orientation of its text chunk enough for the strategy to
+     * classify it as starting on a new line relative to the first.
+     */
+    @Test
+    public void getResultantText_whenChunksAreOnDifferentLines_separatesWithNewline() {
+        // Arrange
+        LocationTextExtractionStrategy strategy = new LocationTextExtractionStrategy();
+
+        // Setup a minimal graphics state. The font is created from an empty dictionary,
+        // which results in any rendered text being empty. This is acceptable as this
+        // test focuses on the spatial separation logic, not the text content itself.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfDictionary());
+
+        // The first text chunk is positioned using the identity matrix.
+        // An empty PdfString makes it explicit that the text content is not relevant.
+        Matrix identityMatrix = new Matrix();
+        TextRenderInfo firstChunkInfo = new TextRenderInfo(
+                new PdfString(""),
+                graphicsState,
+                identityMatrix,
+                Collections.<MarkedContentInfo>emptyList()
+        );
+
+        // The second text chunk is positioned using a different matrix that alters its
+        // location and orientation, causing the strategy to place it on a new line.
+        Matrix transformedMatrix = new Matrix(341.6828F, -9.18953F, 5f, 23f, 6f, 3f);
+        TextRenderInfo secondChunkInfo = new TextRenderInfo(
+                new PdfString(""),
+                graphicsState,
+                transformedMatrix,
+                Collections.<MarkedContentInfo>emptyList()
+        );
+
+        // Act
+        strategy.renderText(firstChunkInfo);
+        strategy.renderText(secondChunkInfo);
+        String resultantText = strategy.getResultantText();
+
+        // Assert
+        // The strategy should detect that the two (empty) text chunks are on different
+        // lines and should separate them with a newline character. The final string
+        // contains only the newline because the text content of the chunks is empty.
+        assertEquals("\n", resultantText);
     }
 }
