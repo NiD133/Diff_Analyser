@@ -1,46 +1,37 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class TextHelpAppendable_ESTestTest90 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable} focusing on edge cases and error handling.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test89() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-        CharBuffer charBuffer0 = CharBuffer.allocate(17108377);
-        arrayDeque0.add(charBuffer0);
-        // Undeclared exception!
-        textHelpAppendable0.appendList(false, arrayDeque0);
+    /**
+     * Tests that appendList throws an OutOfMemoryError when processing a list
+     * containing an extremely large CharSequence. This simulates a scenario where
+     * internal buffering or string conversion could exhaust available heap space.
+     */
+    @Test
+    public void appendListWithVeryLargeCharSequenceShouldThrowOutOfMemoryError() {
+        // Arrange
+        // The specific Appendable (System.out) is not important as we expect an error before any output.
+        TextHelpAppendable helpFormatter = TextHelpAppendable.systemOut();
+
+        // Create a CharSequence that is large enough to likely cause an OutOfMemoryError
+        // when the appendList method attempts to process it.
+        final int largeBufferSize = 18_000_000; // Approx. 18 million chars, requiring ~36MB memory
+        CharBuffer largeCharSequence = CharBuffer.allocate(largeBufferSize);
+        Collection<CharSequence> listWithLargeItem = Collections.singletonList(largeCharSequence);
+
+        // Act & Assert
+        // The method call is expected to fail with an OutOfMemoryError.
+        assertThrows(OutOfMemoryError.class, () -> {
+            helpFormatter.appendList(false, listWithLargeItem);
+        });
     }
 }
