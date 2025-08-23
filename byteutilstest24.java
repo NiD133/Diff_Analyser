@@ -1,35 +1,41 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
 import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest24 {
+/**
+ * Tests for the DataOutput-related methods in {@link ByteUtils}.
+ */
+public class ByteUtilsTest {
 
     @Test
-    void testToLittleEndianToDataOutputUnsignedInt32() throws IOException {
-        final byte[] byteArray;
-        final byte[] expected = { 2, 3, 4, (byte) 128 };
+    @DisplayName("toLittleEndian should write a 4-byte unsigned integer correctly to a DataOutput")
+    void toLittleEndianWritesUnsignedInt32ToDataOutput() throws IOException {
+        // ARRANGE
+        // The value 2,147,746,562 (0x80040302L) represents an unsigned 32-bit integer.
+        // It exceeds Integer.MAX_VALUE, so it must be stored in a long.
+        final long valueToWrite = 0x80040302L;
+        final int length = 4;
+
+        // In little-endian byte order, this value is represented as {0x02, 0x03, 0x04, 0x80}.
+        final byte[] expectedBytes = { 2, 3, 4, (byte) 128 };
+
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             final DataOutput dos = new DataOutputStream(bos);
-            toLittleEndian(dos, 2 + 3 * 256 + 4 * 256 * 256 + 128L * 256 * 256 * 256, 4);
-            byteArray = bos.toByteArray();
-            assertArrayEquals(expected, byteArray);
+
+            // ACT
+            toLittleEndian(dos, valueToWrite, length);
+
+            // ASSERT
+            assertArrayEquals(expectedBytes, bos.toByteArray());
         }
-        assertArrayEquals(expected, byteArray);
     }
 }
