@@ -1,47 +1,45 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest11 extends W3CDom_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        // Undeclared exception!
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for {@link W3CDom}.
+ * This class focuses on verifying the behavior of XPath selection.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that calling {@link W3CDom#selectXpath(String, Node)} with a syntactically
+     * invalid XPath query throws an {@link IllegalStateException}.
+     */
+    @Test
+    public void selectXpathWithInvalidQueryThrowsIllegalStateException() {
+        // Arrange: Create a W3CDom instance and a context node.
+        W3CDom w3cDom = new W3CDom();
+        // A simple, concrete implementation of org.w3c.dom.Node to serve as a context.
+        Node contextNode = new IIOMetadataNode();
+        String invalidXPathQuery = "-"; // This is not a valid XPath expression.
+
+        // Act & Assert: Attempt to select with the invalid query and verify the exception.
         try {
-            w3CDom0.selectXpath("-", (Node) iIOMetadataNode0);
-            fail("Expecting exception: IllegalStateException");
+            w3cDom.selectXpath(invalidXPathQuery, contextNode);
+            fail("Expected an IllegalStateException to be thrown for an invalid XPath query.");
         } catch (IllegalStateException e) {
-            //
-            // Could not evaluate XPath query [-]: javax.xml.transform.TransformerException: A location path was expected, but the end of the XPath expression was found instead.
-            //
-            verifyException("org.jsoup.helper.W3CDom", e);
+            // The exception is expected. Now, verify its message is informative.
+            String expectedMessagePrefix = "Could not evaluate XPath query [-]:";
+            String actualMessage = e.getMessage();
+
+            assertTrue(
+                "Exception message should clearly indicate the failure and include the invalid query. " +
+                "Expected prefix: '" + expectedMessagePrefix + "', but got: '" + actualMessage + "'",
+                actualMessage.startsWith(expectedMessagePrefix)
+            );
         }
     }
 }
