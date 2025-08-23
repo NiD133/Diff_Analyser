@@ -1,23 +1,24 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest17 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}, focusing on its behavior with null values.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber((String) null);
-        LazilyParsedNumber lazilyParsedNumber1 = new LazilyParsedNumber("Deserialization is pnsuported");
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.equals(lazilyParsedNumber1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * The LazilyParsedNumber constructor accepts a null string, but the equals() method
+     * is expected to throw a NullPointerException when invoked on that instance.
+     * This test verifies that specific behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void equals_whenCalledOnInstanceWithNullValue_throwsNullPointerException() {
+        // Arrange: Create an instance with a null internal value and another for comparison.
+        LazilyParsedNumber numberWithNullValue = new LazilyParsedNumber(null);
+        LazilyParsedNumber otherNumber = new LazilyParsedNumber("123");
+
+        // Act & Assert: Calling equals() on the instance with the null value should throw.
+        numberWithNullValue.equals(otherNumber);
     }
 }
