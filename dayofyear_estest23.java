@@ -1,53 +1,29 @@
 package org.threeten.extra;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class DayOfYear_ESTestTest23 extends DayOfYear_ESTest_scaffolding {
+/**
+ * Tests for {@link DayOfYear}.
+ */
+public class DayOfYearTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that DayOfYear.now() throws a NullPointerException when the provided Clock is null.
+     * This is standard behavior for methods accepting objects that cannot be null.
+     */
+    @Test
+    public void now_withNullClock_throwsNullPointerException() {
+        // The method under test is expected to use Objects.requireNonNull,
+        // which throws an NPE with a specific message.
         try {
             DayOfYear.now((Clock) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // clock
-            //
-            verifyException("java.util.Objects", e);
+            fail("Expected a NullPointerException to be thrown for a null clock.");
+        } catch (NullPointerException ex) {
+            assertEquals("clock", ex.getMessage());
         }
     }
 }
