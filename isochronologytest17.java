@@ -1,96 +1,53 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
 import org.joda.time.YearMonthDay;
+import org.junit.Test;
 
-public class ISOChronologyTestTest17 extends TestCase {
+/**
+ * Tests the consistency of maximum field values in ISOChronology.
+ */
+public class ISOChronologyMaximumValueTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * This test verifies that the maximum values for year, month, and day fields
+     * are consistent between a full datetime object (DateMidnight) and a partial
+     * date object (YearMonthDay).
+     *
+     * It iterates over a date range (1570-1590) that specifically includes the
+     * standard Gregorian calendar cutover year of 1582 to ensure that the
+     * logic holds true across this historical calendar change.
+     */
+    @Test
+    public void maximumValues_areConsistentBetweenDateMidnightAndYearMonthDay_acrossGregorianCutover() {
+        final int startYear = 1570;
+        final int endYear = 1590;
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        // Start with a DateMidnight instance and iterate day by day
+        DateMidnight date = new DateMidnight(startYear, 1, 1);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        while (date.getYear() < endYear) {
+            date = date.plusDays(1);
+            YearMonthDay ymd = date.toYearMonthDay();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+            // For each day, assert that the maximum possible values for each field
+            // are identical between the two different time representations.
+            // A descriptive failure message helps pinpoint issues faster.
+            String failureMessage = "Mismatch on date: " + date;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+            assertEquals(failureMessage,
+                    date.year().getMaximumValue(),
+                    ymd.year().getMaximumValue());
 
-    private DateTimeZone originalDateTimeZone = null;
+            assertEquals(failureMessage,
+                    date.monthOfYear().getMaximumValue(),
+                    ymd.monthOfYear().getMaximumValue());
 
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    public void testMaximumValue() {
-        DateMidnight dt = new DateMidnight(1570, 1, 1);
-        while (dt.getYear() < 1590) {
-            dt = dt.plusDays(1);
-            YearMonthDay ymd = dt.toYearMonthDay();
-            assertEquals(dt.year().getMaximumValue(), ymd.year().getMaximumValue());
-            assertEquals(dt.monthOfYear().getMaximumValue(), ymd.monthOfYear().getMaximumValue());
-            assertEquals(dt.dayOfMonth().getMaximumValue(), ymd.dayOfMonth().getMaximumValue());
+            assertEquals(failureMessage,
+                    date.dayOfMonth().getMaximumValue(),
+                    ymd.dayOfMonth().getMaximumValue());
         }
     }
 }
