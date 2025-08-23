@@ -1,30 +1,31 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractStreamingHasher_ESTestTest9 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractStreamingHasher}, focusing on its behavior after finalization.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        crc32cHashFunction_Crc32cHasher0.hash();
-        // Undeclared exception!
-        try {
-            crc32cHashFunction_Crc32cHasher0.putChar('7');
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Verifies that attempting to add data to a hasher after the hash has been computed
+     * (by calling {@code hash()}) results in an exception. Once {@code hash()} is called,
+     * the hasher instance is considered finalized and cannot be reused.
+     *
+     * The expected exception is {@code BufferOverflowException} because the internal buffer
+     * has been flipped for final processing and has no remaining capacity for new data.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void putChar_afterCallingHash_throwsException() {
+        // Arrange: Create a hasher, using a concrete implementation of AbstractStreamingHasher.
+        Hasher hasher = new Crc32cHashFunction.Crc32cHasher();
+
+        // Finalize the hash calculation. After this point, the hasher should not accept more input.
+        hasher.hash();
+
+        // Act: Attempt to add more data to the finalized hasher.
+        // This action is expected to throw the BufferOverflowException declared in the @Test annotation.
+        hasher.putChar('7');
     }
 }
