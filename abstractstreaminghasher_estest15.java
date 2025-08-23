@@ -1,29 +1,21 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractStreamingHasher_ESTestTest15 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        // Undeclared exception!
-        try {
-            crc32cHashFunction_Crc32cHasher0.putBytes((ByteBuffer) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.hash.AbstractStreamingHasher", e);
-        }
+    @Test(expected = NullPointerException.class)
+    public void putBytes_withNullByteBuffer_throwsNullPointerException() {
+        // Arrange: Create a concrete instance of the abstract class under test.
+        // Crc32cHasher is a suitable implementation for this purpose.
+        Hasher hasher = new Crc32cHashFunction.Crc32cHasher();
+
+        // Act: Call the method under test with a null argument.
+        // The test framework will assert that a NullPointerException is thrown.
+        hasher.putBytes((ByteBuffer) null);
     }
 }
