@@ -1,29 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class PdfDictionary_ESTestTest8 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Test suite for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PdfName pdfName0 = PdfName.UF;
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.putEx(pdfName0, pdfName0);
-        PdfObject pdfObject0 = pdfResources0.getDirectObject(pdfName0);
-        assertTrue(pdfObject0.canBeInObjStm());
+    /**
+     * Tests that {@link PdfDictionary#getDirectObject(PdfName)} returns the original
+     * object instance when the stored value is a direct object (i.e., not a
+     * {@link PdfIndirectReference}).
+     */
+    @Test
+    public void getDirectObject_shouldReturnSameInstance_forDirectObjectValue() {
+        // Arrange: Create a dictionary and add a key-value pair where the value
+        // is a direct PdfObject (in this case, a PdfName).
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName key = PdfName.UF;
+        PdfName value = new PdfName("AcroForm");
+
+        dictionary.put(key, value);
+
+        // Act: Retrieve the object using the method under test.
+        PdfObject retrievedObject = dictionary.getDirectObject(key);
+
+        // Assert: The retrieved object should be the exact same instance as the
+        // value that was put into the dictionary, because no indirect reference
+        // resolution was needed.
+        assertSame("Expected the exact same object instance for a direct value.", value, retrievedObject);
     }
 }
