@@ -1,32 +1,42 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SpatialContextFactory_ESTestTest36 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.putIfAbsent("distCalculator", "distCalculator");
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        // Undeclared exception!
+    /**
+     * Tests that makeSpatialContext throws a RuntimeException when provided with an
+     * unknown distance calculator name in the configuration.
+     */
+    @Test
+    public void makeSpatialContext_withUnknownCalculator_shouldThrowRuntimeException() {
+        // --- Arrange ---
+        // Create configuration arguments for the SpatialContextFactory.
+        Map<String, String> args = new HashMap<>();
+
+        // Define an invalid value for the 'distCalculator' argument to trigger the error.
+        final String unknownCalculatorName = "invalidCalculatorName";
+        args.put("distCalculator", unknownCalculatorName);
+
+        // Use the current thread's context class loader, which is standard practice.
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        // --- Act & Assert ---
         try {
-            SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-            fail("Expecting exception: RuntimeException");
+            SpatialContextFactory.makeSpatialContext(args, classLoader);
+            // The test should fail if no exception is thrown as expected.
+            fail("Expected a RuntimeException for an unknown distance calculator, but none was thrown.");
         } catch (RuntimeException e) {
-            //
-            // Unknown calculator: distCalculator
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // Verify that the exception message is correct and informative.
+            String expectedMessage = "Unknown calculator: " + unknownCalculatorName;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
