@@ -1,100 +1,42 @@
 package com.google.common.math;
 
-import static com.google.common.math.StatsTesting.ALLOWED_ERROR;
-import static com.google.common.math.StatsTesting.ALL_MANY_VALUES;
-import static com.google.common.math.StatsTesting.EMPTY_STATS_ITERABLE;
-import static com.google.common.math.StatsTesting.MANY_VALUES;
-import static com.google.common.math.StatsTesting.MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.MANY_VALUES_STATS_ITERABLE;
-import static com.google.common.math.StatsTesting.MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
 import static com.google.common.math.StatsTesting.ONE_VALUE;
-import static com.google.common.math.StatsTesting.ONE_VALUE_STATS;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_STATS;
 import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE;
-import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE_STATS;
-import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES_STATS;
-import static com.google.common.math.StatsTesting.TWO_VALUES;
-import static com.google.common.math.StatsTesting.TWO_VALUES_STATS;
-import static com.google.common.math.StatsTesting.TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
-import static com.google.common.math.StatsTesting.assertDiagonalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertHorizontalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertLinearTransformationNaN;
-import static com.google.common.math.StatsTesting.assertStatsApproxEqual;
-import static com.google.common.math.StatsTesting.assertVerticalLinearTransformation;
-import static com.google.common.math.StatsTesting.createFilledPairedStatsAccumulator;
-import static com.google.common.math.StatsTesting.createPartitionedFilledPairedStatsAccumulator;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.Assert.assertThrows;
-import com.google.common.math.StatsTesting.ManyValues;
-import java.util.Collections;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class PairedStatsAccumulatorTestTest2 extends TestCase {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-    private PairedStatsAccumulator emptyAccumulator;
+/**
+ * Tests for {@link PairedStatsAccumulator} focusing on count overflow behavior.
+ */
+@RunWith(JUnit4.class)
+public class PairedStatsAccumulatorCountOverflowTest {
 
-    private PairedStatsAccumulator emptyAccumulatorByAddAllEmptyPairedStats;
+  @Test
+  public void count_overflowsGracefullyByWrapping() {
+    // ARRANGE: Create an accumulator and increase its internal count close to Long.MAX_VALUE.
+    // The count is a `long`. We want to test that it wraps around on overflow, as expected for
+    // standard integer arithmetic, rather than throwing an exception.
+    PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+    accumulator.add(ONE_VALUE, OTHER_ONE_VALUE); // Start with count = 1.
 
-    private PairedStatsAccumulator oneValueAccumulator;
-
-    private PairedStatsAccumulator oneValueAccumulatorByAddAllEmptyPairedStats;
-
-    private PairedStatsAccumulator twoValuesAccumulator;
-
-    private PairedStatsAccumulator twoValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator manyValuesAccumulator;
-
-    private PairedStatsAccumulator manyValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator horizontalValuesAccumulator;
-
-    private PairedStatsAccumulator horizontalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator verticalValuesAccumulator;
-
-    private PairedStatsAccumulator verticalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator constantValuesAccumulator;
-
-    private PairedStatsAccumulator constantValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        emptyAccumulator = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        oneValueAccumulator = new PairedStatsAccumulator();
-        oneValueAccumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        oneValueAccumulatorByAddAllEmptyPairedStats.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        twoValuesAccumulator = createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
-        twoValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
-        manyValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
-        manyValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
-        horizontalValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
-        verticalValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES);
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES, 2);
-        constantValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        constantValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
+    // By repeatedly adding the accumulator's snapshot to itself, we double the effective count
+    // in each iteration. We do this until the count is 2^62. For a 64-bit long, this is
+    // one doubling away from overflowing.
+    for (int i = 0; i < Long.SIZE - 2; i++) {
+      accumulator.addAll(accumulator.snapshot());
     }
+    // Sanity check that the count is 2^62 before the final doubling.
+    assertThat(accumulator.count()).isEqualTo(1L << (Long.SIZE - 2));
 
-    public void testCountOverflow_doesNotThrow() {
-        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
-        accumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
-        for (int power = 1; power < Long.SIZE - 1; power++) {
-            accumulator.addAll(accumulator.snapshot());
-        }
-        // Should overflow without throwing.
-        accumulator.addAll(accumulator.snapshot());
-        assertThat(accumulator.count()).isLessThan(0L);
-    }
+    // ACT: Double the count one last time to trigger an overflow.
+    // The count will become 2^63, which overflows a signed long to Long.MIN_VALUE.
+    accumulator.addAll(accumulator.snapshot());
+
+    // ASSERT: The count should wrap around to a negative number, not throw an exception.
+    // The specific value for a 2^63 overflow is Long.MIN_VALUE.
+    assertThat(accumulator.count()).isEqualTo(Long.MIN_VALUE);
+  }
 }
