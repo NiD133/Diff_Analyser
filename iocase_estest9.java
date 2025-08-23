@@ -1,18 +1,21 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest9 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        IOCase iOCase0 = IOCase.SENSITIVE;
-        boolean boolean0 = iOCase0.isCaseSensitive();
-        assertTrue(boolean0);
+    /**
+     * Tests that IOCase.SENSITIVE correctly identifies itself as case-sensitive.
+     */
+    @Test
+    public void isCaseSensitive_shouldReturnTrue_whenCaseIsSensitive() {
+        // The test verifies the fundamental property of the SENSITIVE enum constant.
+        // An explicit message is added to the assertion for better failure diagnosis.
+        assertTrue("IOCase.SENSITIVE is expected to be case-sensitive",
+                   IOCase.SENSITIVE.isCaseSensitive());
     }
 }
