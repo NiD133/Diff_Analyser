@@ -1,159 +1,72 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.base.AbstractPartial;
 import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.field.AbstractPartialFieldProperty;
+import org.junit.Test;
 
-public class AbstractPartialTestTest2 extends TestCase {
+import static org.junit.Assert.assertArrayEquals;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the functionality of the {@link AbstractPartial} base class.
+ *
+ * <p>This test suite uses a concrete mock implementation of {@link AbstractPartial}
+ * to verify the behavior of its implemented methods.
+ */
+public class AbstractPartialTest {
 
-    private long TEST_TIME_NOW = (31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * A concrete implementation of AbstractPartial for testing purposes.
+     *
+     * <p>It represents a partial date with two fields: {@code year} and {@code monthOfYear}.
+     * The chronology is fixed to Buddhist UTC, and the initial values are {1970, 1}.
+     */
+    private static class MockPartialForTest extends AbstractPartial {
 
-    private long TEST_TIME1 = (31L + 28L + 31L + 6L - 1L) * DateTimeConstants.MILLIS_PER_DAY + 12L * DateTimeConstants.MILLIS_PER_HOUR + 24L * DateTimeConstants.MILLIS_PER_MINUTE;
-
-    private long TEST_TIME2 = (365L + 31L + 28L + 31L + 30L + 7L - 1L) * DateTimeConstants.MILLIS_PER_DAY + 14L * DateTimeConstants.MILLIS_PER_HOUR + 28L * DateTimeConstants.MILLIS_PER_MINUTE;
-
-    private DateTimeZone zone = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestAbstractPartial.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        zone = DateTimeZone.getDefault();
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(zone);
-        zone = null;
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPartial extends AbstractPartial {
-
-        int[] val = new int[] { 1970, 1 };
-
-        MockPartial() {
-            super();
-        }
+        private final int[] values = new int[]{1970, 1};
 
         @Override
         protected DateTimeField getField(int index, Chronology chrono) {
-            switch(index) {
+            switch (index) {
                 case 0:
                     return chrono.year();
                 case 1:
                     return chrono.monthOfYear();
                 default:
-                    throw new IndexOutOfBoundsException();
+                    throw new IndexOutOfBoundsException("Invalid index: " + index);
             }
         }
 
+        @Override
         public int size() {
             return 2;
         }
 
+        @Override
         public int getValue(int index) {
-            return val[index];
+            return values[index];
         }
 
-        public void setValue(int index, int value) {
-            val[index] = value;
-        }
-
+        @Override
         public Chronology getChronology() {
+            // A specific, non-ISO chronology is used to ensure the SUT correctly
+            // uses the chronology provided by the subclass.
             return BuddhistChronology.getInstanceUTC();
         }
     }
 
-    static class MockProperty0 extends AbstractPartialFieldProperty {
+    //-----------------------------------------------------------------------
 
-        MockPartial partial = new MockPartial();
+    @Test
+    public void getValues_shouldReturnAnArrayOfAllFieldValues() {
+        // Arrange
+        ReadablePartial partial = new MockPartialForTest();
+        int[] expectedValues = {1970, 1};
 
-        @Override
-        public DateTimeField getField() {
-            return partial.getField(0);
-        }
+        // Act
+        int[] actualValues = partial.getValues();
 
-        @Override
-        public ReadablePartial getReadablePartial() {
-            return partial;
-        }
-
-        @Override
-        public int get() {
-            return partial.getValue(0);
-        }
-    }
-
-    static class MockProperty1 extends AbstractPartialFieldProperty {
-
-        MockPartial partial = new MockPartial();
-
-        @Override
-        public DateTimeField getField() {
-            return partial.getField(1);
-        }
-
-        @Override
-        public ReadablePartial getReadablePartial() {
-            return partial;
-        }
-
-        @Override
-        public int get() {
-            return partial.getValue(1);
-        }
-    }
-
-    static class MockProperty0Field extends MockProperty0 {
-
-        @Override
-        public DateTimeField getField() {
-            return BuddhistChronology.getInstanceUTC().hourOfDay();
-        }
-    }
-
-    static class MockProperty0Val extends MockProperty0 {
-
-        @Override
-        public int get() {
-            return 99;
-        }
-    }
-
-    static class MockProperty0Chrono extends MockProperty0 {
-
-        @Override
-        public ReadablePartial getReadablePartial() {
-            return new MockPartial() {
-
-                @Override
-                public Chronology getChronology() {
-                    return ISOChronology.getInstanceUTC();
-                }
-            };
-        }
-    }
-
-    public void testGetValues() throws Throwable {
-        MockPartial mock = new MockPartial();
-        int[] vals = mock.getValues();
-        assertEquals(2, vals.length);
-        assertEquals(1970, vals[0]);
-        assertEquals(1, vals[1]);
+        // Assert
+        assertArrayEquals("The returned array should contain the values of all fields",
+                expectedValues, actualValues);
     }
 }
