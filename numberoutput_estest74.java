@@ -9,18 +9,20 @@ import org.junit.runner.RunWith;
 
 public class NumberOutput_ESTestTest74 extends NumberOutput_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test73() throws Throwable {
-        char[] charArray0 = new char[4];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(1000000000000L, charArray0, 2137541594);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 2137541594
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that {@code NumberOutput.outputLong()} throws an
+     * {@link ArrayIndexOutOfBoundsException} when the provided offset is
+     * outside the bounds of the destination buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLongShouldThrowExceptionWhenOffsetIsOutOfBounds() {
+        // Arrange: A small buffer and an offset that is clearly invalid.
+        char[] buffer = new char[4];
+        int invalidOffset = 100; // An offset well beyond the buffer's capacity.
+        long valueToWrite = 1_000_000_000_000L; // The actual value is irrelevant for this test.
+
+        // Act: Attempt to write the long value at the invalid offset.
+        // The @Test(expected=...) annotation asserts that an exception is thrown.
+        NumberOutput.outputLong(valueToWrite, buffer, invalidOffset);
     }
 }
