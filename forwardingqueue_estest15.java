@@ -2,19 +2,29 @@ package com.google.common.collect;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Queue;
 
+/**
+ * This test class contains tests for ForwardingQueue.
+ * This specific test was improved for clarity.
+ */
 public class ForwardingQueue_ESTestTest15 extends ForwardingQueue_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        EvictingQueue<Locale.FilteringMode> evictingQueue0 = EvictingQueue.create(126);
-        evictingQueue0.poll();
+    /**
+     * Verifies that calling poll() on an empty queue returns null,
+     * as specified by the Queue interface contract.
+     */
+    @Test
+    public void poll_onEmptyQueue_shouldReturnNull() {
+        // Arrange: Create an empty EvictingQueue, which is a concrete
+        // implementation that uses ForwardingQueue. The capacity and element
+        // type are not important for this test.
+        Queue<String> emptyQueue = EvictingQueue.create(10);
+
+        // Act: Attempt to retrieve an element from the empty queue.
+        String result = emptyQueue.poll();
+
+        // Assert: The poll() method should return null when the queue is empty.
+        assertNull("Expected poll() on an empty queue to return null.", result);
     }
 }
