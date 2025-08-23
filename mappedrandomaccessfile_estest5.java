@@ -1,23 +1,54 @@
 package com.itextpdf.text.pdf;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.FileNotFoundException;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class MappedRandomAccessFile_ESTestTest5 extends MappedRandomAccessFile_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
-        mappedRandomAccessFile0.seek(686);
-        long long0 = mappedRandomAccessFile0.getFilePointer();
-        assertEquals(686L, long0);
+/**
+ * Test suite for the MappedRandomAccessFile class.
+ */
+public class MappedRandomAccessFileTest {
+
+    // Use a TemporaryFolder rule to create files that are automatically cleaned up.
+    // This makes the test self-contained and avoids side effects.
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    /**
+     * Verifies that getFilePointer() returns the correct file offset after
+     * the position is changed using seek().
+     */
+    @Test
+    public void getFilePointer_shouldReturnCorrectPosition_afterSeek() throws IOException {
+        // Arrange
+        File testFile = tempFolder.newFile("test.dat");
+        long targetPosition = 686L;
+        MappedRandomAccessFile mraf = null;
+
+        try {
+            // The file is opened in "rw" (read-write) mode.
+            mraf = new MappedRandomAccessFile(testFile.getAbsolutePath(), "rw");
+
+            // Act
+            // Move the file pointer to a specific position.
+            mraf.seek(targetPosition);
+
+            // Get the current position of the file pointer.
+            long actualPosition = mraf.getFilePointer();
+
+            // Assert
+            // The reported position should match the position we seeked to.
+            assertEquals("The file pointer should be at the seeked position.", targetPosition, actualPosition);
+        } finally {
+            // Cleanup: Ensure the file is closed to release resources.
+            if (mraf != null) {
+                mraf.close();
+            }
+        }
     }
 }
