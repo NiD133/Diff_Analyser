@@ -1,20 +1,27 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest70 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class, focusing on its initial state.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        JsonRecyclerPools.BoundedPool jsonRecyclerPools_BoundedPool0 = new JsonRecyclerPools.BoundedPool(0);
-        BufferRecycler bufferRecycler0 = jsonRecyclerPools_BoundedPool0.createPooled();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0);
-        int int0 = byteArrayBuilder0.getCurrentSegmentLength();
-        assertEquals(0, int0);
+    /**
+     * Verifies that a newly created ByteArrayBuilder has a current segment length of 0.
+     * This is the expected state before any data has been written to it.
+     */
+    @Test
+    public void newBuilderShouldHaveZeroCurrentSegmentLength() {
+        // Arrange: Create a new ByteArrayBuilder using its default constructor.
+        // This is the simplest way to get an instance for testing its initial state.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+
+        // Act: Get the length of the current, empty segment.
+        int currentSegmentLength = builder.getCurrentSegmentLength();
+
+        // Assert: The length should be 0 for a new builder.
+        assertEquals("Initial current segment length should be 0", 0, currentSegmentLength);
     }
 }
