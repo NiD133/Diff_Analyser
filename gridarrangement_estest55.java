@@ -1,60 +1,39 @@
 package org.jfree.chart.block;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest55 extends GridArrangement_ESTest_scaffolding {
+import static org.hamcrest.CoreMatchers.is;
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(65, 65);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrangeNF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Not implemented.
-            //
-            verifyException("org.jfree.chart.block.BorderArrangement", e);
-        }
+/**
+ * Tests for the {@link GridArrangement} class, focusing on exception handling for unimplemented methods.
+ */
+public class GridArrangementTest {
+
+    // A JUnit Rule for testing exceptions in a declarative way.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that the arrangeNF() method throws a RuntimeException because it is not implemented.
+     * The "NF" in the method name signifies arranging with No constraint on width and a Fixed height.
+     */
+    @Test
+    public void arrangeNF_shouldThrowRuntimeException_asItIsNotImplemented() {
+        // Arrange
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer container = new BlockContainer();
+        RectangleConstraint constraint = RectangleConstraint.NONE;
+        Graphics2D g2 = null; // The Graphics2D object is not used in this path
+
+        // Assert - Define expectations for the exception
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage(is("Not implemented."));
+
+        // Act - Call the method that is expected to throw the exception
+        arrangement.arrangeNF(container, g2, constraint);
     }
 }
