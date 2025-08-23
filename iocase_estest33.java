@@ -1,18 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest33 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = iOCase0.checkEquals("krmipp?jw", "1bq26gL^");
-        assertFalse(boolean0);
+    /**
+     * Tests that checkEquals() returns false for two completely different strings
+     * when using case-insensitive comparison.
+     */
+    @Test
+    public void checkEqualsWithInsensitiveShouldReturnFalseForDifferentStrings() {
+        // Arrange
+        final IOCase insensitiveComparison = IOCase.INSENSITIVE;
+        final String string1 = "Apple";
+        final String string2 = "Banana";
+
+        // Act
+        final boolean result = insensitiveComparison.checkEquals(string1, string2);
+
+        // Assert
+        assertFalse("Expected two different strings to not be equal, even with case-insensitivity.", result);
     }
 }
