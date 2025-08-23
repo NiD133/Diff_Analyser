@@ -1,17 +1,26 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LZMAUtils_ESTestTest3 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        boolean boolean0 = LZMAUtils.isCompressedFilename("$VALUES.lzma");
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link LZMAUtils#isCompressedFileName(String)} correctly identifies
+     * a filename with the ".lzma" extension as a compressed file.
+     */
+    @Test
+    public void isCompressedFileNameShouldReturnTrueForLzmaExtension() {
+        // Arrange: A filename with a standard .lzma extension.
+        final String lzmaFilename = "archive.lzma";
+
+        // Act: Check if the filename is identified as compressed.
+        final boolean isCompressed = LZMAUtils.isCompressedFileName(lzmaFilename);
+
+        // Assert: The result should be true.
+        assertTrue("Filename with .lzma extension should be identified as compressed.", isCompressed);
     }
 }
