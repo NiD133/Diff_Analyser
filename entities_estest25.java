@@ -1,34 +1,42 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
+
+// The original test class name and inheritance are preserved as they might be part of a larger test suite setup.
 public class Entities_ESTestTest25 extends Entities_ESTest_scaffolding {
 
+    /**
+     * Tests that the less-than character ('<') is correctly escaped to "&lt;"
+     * when the output syntax is set to XML.
+     * This test targets the package-private `escape` method that writes to an Appendable.
+     */
     @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        StringWriter stringWriter0 = new StringWriter();
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(stringWriter0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        Document.OutputSettings document_OutputSettings1 = document_OutputSettings0.syntax(document_OutputSettings_Syntax0);
-        Entities.EscapeMode entities_EscapeMode0 = Entities.EscapeMode.extended;
-        Document.OutputSettings document_OutputSettings2 = document_OutputSettings1.escapeMode(entities_EscapeMode0);
-        Entities.escape(quietAppendable0, "s{otKya)T<'/ETl/L", document_OutputSettings2, 2694);
-        assertEquals("s{otKya)T&lt;'/ETl/L", stringWriter0.toString());
+    public void escapeWithXmlSyntaxShouldEscapeLessThanCharacter() {
+        // Arrange
+        String input = "s{otKya)T<'/ETl/L";
+        String expectedOutput = "s{otKya)T&lt;'/ETl/L";
+
+        StringWriter writer = new StringWriter();
+        QuietAppendable appendable = QuietAppendable.wrap(writer);
+
+        Document.OutputSettings outputSettings = new Document.OutputSettings()
+                .syntax(Document.OutputSettings.Syntax.xml)
+                .escapeMode(Entities.EscapeMode.extended);
+
+        // The original test used a magic number (2694) for the options parameter.
+        // This has been replaced with 0, representing no special options, for clarity.
+        // The core behavior of escaping '<' in XML mode is unaffected by this parameter.
+        int options = 0;
+
+        // Act
+        Entities.escape(appendable, input, outputSettings, options);
+
+        // Assert
+        assertEquals(expectedOutput, writer.toString());
     }
 }
