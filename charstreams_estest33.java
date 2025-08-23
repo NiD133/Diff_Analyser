@@ -1,45 +1,38 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest33 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        CharBuffer charBuffer0 = CharStreams.createBuffer();
-        long long0 = CharStreams.exhaust(charBuffer0);
-        assertEquals(2048, charBuffer0.position());
-        assertEquals(2048L, long0);
+    // The default buffer size used by CharStreams.createBuffer() is 2048 (0x800).
+    private static final int DEFAULT_BUFFER_SIZE = 2048;
+
+    /**
+     * Tests that {@link CharStreams#exhaust(Readable)} fully consumes a {@link CharBuffer}
+     * and returns the total number of characters read.
+     */
+    @Test
+    public void exhaust_onFullBuffer_readsAllCharactersAndReturnsCount() {
+        // Arrange: Create a new buffer, which is full and ready for reading.
+        CharBuffer buffer = CharStreams.createBuffer();
+        assertEquals("Precondition: Buffer should be full upon creation.",
+                DEFAULT_BUFFER_SIZE, buffer.remaining());
+
+        // Act: Exhaust the buffer by reading all its characters.
+        long charsRead = CharStreams.exhaust(buffer);
+
+        // Assert: Verify that the correct number of characters was read and the buffer is now empty.
+        assertEquals("The number of characters read should match the buffer's capacity.",
+                DEFAULT_BUFFER_SIZE, charsRead);
+        assertEquals("The buffer's position should be at the end after being exhausted.",
+                DEFAULT_BUFFER_SIZE, buffer.position());
+        assertEquals("The buffer should have no characters remaining after being exhausted.",
+                0, buffer.remaining());
     }
 }
