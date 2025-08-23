@@ -1,17 +1,26 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest43 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        double double0 = IEEE754rUtils.max((-1.0), (-1.0), (-4660.4));
-        assertEquals((-1.0), double0, 0.01);
+    @Test
+    public void max_withThreeNegativeDoubles_shouldReturnLargestValue() {
+        // Arrange
+        final double value1 = -1.0;
+        final double value2 = -1.0;
+        final double value3 = -4660.4;
+        final double expectedMax = -1.0;
+
+        // Act
+        final double actualMax = IEEE754rUtils.max(value1, value2, value3);
+
+        // Assert
+        // The largest value among the inputs is -1.0.
+        assertEquals(expectedMax, actualMax, 0.0);
     }
 }
