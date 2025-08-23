@@ -1,28 +1,26 @@
 package org.apache.commons.collections4.comparators;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest23 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Tests for {@link FixedOrderComparator#equals(Object)}.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Class<Object> class0 = Object.class;
-        FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-        boolean boolean0 = fixedOrderComparator0.equals(class0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when comparing a FixedOrderComparator
+     * with an object of a completely different type.
+     */
+    @Test
+    public void testEqualsShouldReturnFalseForDifferentObjectType() {
+        // Arrange
+        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>();
+        final Object otherObject = new Object();
+
+        // Act & Assert
+        // The equals method should return false for any object that is not a FixedOrderComparator.
+        assertFalse(comparator.equals(otherObject));
     }
 }
