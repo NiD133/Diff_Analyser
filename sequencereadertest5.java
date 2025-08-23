@@ -2,77 +2,46 @@ package org.apache.commons.io.input;
 
 import static org.apache.commons.io.IOUtils.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest5 {
-
-    private static final char NUL = 0;
-
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
-
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
-
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
-
-    private static class CustomReader extends Reader {
-
-        boolean closed;
-
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
-        }
-    }
+/**
+ * Tests for {@link SequenceReader}.
+ */
+// Renamed for clarity and convention.
+public class SequenceReaderTest {
 
     @Test
-    void testRead() throws IOException {
-        try (Reader reader = new SequenceReader(new StringReader("Foo"), new StringReader("Bar"))) {
-            assertEquals('F', reader.read());
-            assertEquals('o', reader.read());
-            assertEquals('o', reader.read());
-            assertEquals('B', reader.read());
-            assertEquals('a', reader.read());
-            assertEquals('r', reader.read());
-            checkReadEof(reader);
+    // A descriptive name and display name clarify the test's purpose.
+    @DisplayName("SequenceReader should read all content from multiple readers in order")
+    void shouldReadSequentiallyFromMultipleReaders() throws IOException {
+        // --- Arrange ---
+        // Clearly define the input readers and the expected combined output.
+        // This makes the test's intent obvious at a glance.
+        final Reader reader1 = new StringReader("Foo");
+        final Reader reader2 = new StringReader("Bar");
+        final String expectedContent = "FooBar";
+
+        // --- Act ---
+        // Use a try-with-resources block for proper resource management.
+        try (Reader sequenceReader = new SequenceReader(reader1, reader2)) {
+            // Use a utility to read the entire stream. This is more concise
+            // and less error-prone than reading character by character.
+            final String actualContent = IOUtils.toString(sequenceReader);
+
+            // --- Assert ---
+            // A single, clear assertion on the final result is more readable
+            // than multiple assertions on individual characters.
+            assertEquals(expectedContent, actualContent);
+
+            // Verify that the end of the stream has been reached.
+            assertEquals(EOF, sequenceReader.read(), "Should be at the end of the stream after reading all content.");
         }
     }
 }
