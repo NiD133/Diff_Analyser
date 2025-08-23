@@ -1,31 +1,69 @@
 package org.apache.commons.compress.harmony.unpack200.bytecode;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PipedOutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
+import org.apache.commons.compress.harmony.unpack200.OperandManager;
 import org.apache.commons.compress.harmony.unpack200.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CodeAttribute_ESTestTest2 extends CodeAttribute_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        byte[] byteArray0 = new byte[7];
-        byteArray0[4] = (byte) (-60);
-        int[] intArray0 = new int[7];
-        OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-        LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-        CodeAttribute codeAttribute0 = new CodeAttribute(28, 17, byteArray0, (Segment) null, operandManager0, linkedList0);
-        assertEquals(17, codeAttribute0.maxLocals);
-        assertEquals(28, codeAttribute0.maxStack);
-        assertEquals(9, codeAttribute0.codeLength);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for {@link CodeAttribute}.
+ * This class replaces the original EvoSuite-generated test class.
+ */
+public class CodeAttributeTest {
+
+    /**
+     * Tests that the CodeAttribute constructor correctly calculates the total code length
+     * when the bytecode sequence includes a 'wide' instruction. The 'wide' instruction
+     * has a different length than standard opcodes and affects how the input bytes are processed.
+     */
+    @Test
+    public void constructorShouldCalculateCorrectCodeLengthWithWideOpcode() throws Pack200Exception {
+        // Arrange
+        final int maxStack = 28;
+        final int maxLocals = 17;
+        final byte OPCODE_WIDE = (byte) 0xC4;
+
+        // This represents a packed sequence of bytecodes. The 'wide' opcode (0xC4)
+        // is special: it has a length of 4 and causes the constructor to skip
+        // processing the immediately following byte in the input array.
+        final byte[] packedCode = {
+            0x00,        // nop instruction (length 1)
+            0x00,        // nop instruction (length 1)
+            0x00,        // nop instruction (length 1)
+            0x00,        // nop instruction (length 1)
+            OPCODE_WIDE, // wide instruction (length 4)
+            0x00,        // This byte is skipped due to the preceding 'wide' opcode
+            0x00         // nop instruction (length 1)
+        };
+
+        // The OperandManager provides operands for bytecodes. For this specific test,
+        // the actual operand values are not important, so we can use empty arrays.
+        final int[] emptyOperands = new int[0];
+        final OperandManager operandManager = new OperandManager(
+            emptyOperands, emptyOperands, emptyOperands, emptyOperands, emptyOperands,
+            emptyOperands, emptyOperands, emptyOperands, emptyOperands, emptyOperands,
+            emptyOperands, emptyOperands, emptyOperands, emptyOperands, emptyOperands,
+            emptyOperands, emptyOperands, emptyOperands, emptyOperands, emptyOperands,
+            emptyOperands
+        );
+
+        final List<ExceptionTableEntry> exceptionTable = new ArrayList<>();
+        final Segment segment = null; // Not used for this specific calculation.
+
+        // Act
+        final CodeAttribute codeAttribute = new CodeAttribute(maxStack, maxLocals, packedCode, segment, operandManager, exceptionTable);
+
+        // Assert
+        // The total code length is the sum of the lengths of the processed bytecodes:
+        // 1 (nop) + 1 (nop) + 1 (nop) + 1 (nop) + 4 (wide) + 1 (nop) = 9.
+        final int expectedCodeLength = 9;
+        assertEquals("The calculated code length should be correct.", expectedCodeLength, codeAttribute.codeLength);
+        assertEquals("Max locals should be set correctly.", maxLocals, codeAttribute.maxLocals);
+        assertEquals("Max stack should be set correctly.", maxStack, codeAttribute.maxStack);
     }
 }
