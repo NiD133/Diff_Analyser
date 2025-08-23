@@ -1,30 +1,27 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StandardXYBarPainter_ESTestTest10 extends StandardXYBarPainter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardXYBarPainter} class.
+ * This focuses on the behavior of the equals() method.
+ */
+public class StandardXYBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        StandardXYBarPainter standardXYBarPainter1 = new StandardXYBarPainter();
-        boolean boolean0 = standardXYBarPainter0.equals(standardXYBarPainter1);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two distinct instances of StandardXYBarPainter are considered equal.
+     * This is the expected behavior because the class is stateless.
+     */
+    @Test
+    public void equals_withTwoDefaultInstances_shouldReturnTrue() {
+        // Arrange: Create two separate instances of the painter.
+        StandardXYBarPainter painter1 = new StandardXYBarPainter();
+        StandardXYBarPainter painter2 = new StandardXYBarPainter();
+
+        // Act & Assert: The two instances should be equal to each other.
+        // The assertEquals method internally calls the .equals() method and provides
+        // a more informative failure message than assertTrue(painter1.equals(painter2)).
+        assertEquals(painter1, painter2);
     }
 }
