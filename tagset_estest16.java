@@ -1,29 +1,26 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TagSet_ESTestTest16 extends TagSet_ESTest_scaffolding {
+/**
+ * Tests for the {@link TagSet} class, focusing on input validation.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        TagSet tagSet0 = TagSet.initHtmlDefault();
-        // Undeclared exception!
-        try {
-            tagSet0.valueOf((String) null, (String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    /**
+     * Verifies that the valueOf(tagName, namespace) method throws an
+     * IllegalArgumentException when the tagName is null.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void valueOfWithNullTagNameThrowsIllegalArgumentException() {
+        // Arrange: Create a default HTML TagSet.
+        TagSet tagSet = TagSet.initHtmlDefault();
+        String aValidNamespace = "html";
+
+        // Act: Call the method with a null tagName, which is expected to throw.
+        tagSet.valueOf(null, aValidNamespace);
+
+        // Assert: The test passes if an IllegalArgumentException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
