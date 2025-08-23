@@ -1,17 +1,28 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest20 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        float float0 = IEEE754rUtils.max((-2157.9656F), (-2157.9656F));
-        assertEquals((-2157.9656F), float0, 0.01F);
+    /**
+     * Tests that IEEE754rUtils.max(float, float) returns the input value
+     * when both arguments are identical.
+     */
+    @Test
+    public void maxFloat_shouldReturnArgument_whenBothArgumentsAreEqual() {
+        // Arrange
+        final float identicalValue = -2157.9656F;
+
+        // Act
+        final float result = IEEE754rUtils.max(identicalValue, identicalValue);
+
+        // Assert
+        // The maximum of two identical numbers should be the number itself.
+        // A delta of 0.0f is used because the result should be exact.
+        assertEquals(identicalValue, result, 0.0f);
     }
 }
