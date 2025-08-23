@@ -1,34 +1,29 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MeterNeedle_ESTestTest3 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MeterNeedle} class, focusing on its properties.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        PlumNeedle plumNeedle0 = new PlumNeedle();
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        shipNeedle0.setSize(497);
-        shipNeedle0.equals(plumNeedle0);
-        assertEquals(497, shipNeedle0.getSize());
+    /**
+     * Verifies that the setSize() method correctly updates the size property,
+     * which can then be retrieved using getSize().
+     */
+    @Test
+    public void setSizeShouldUpdateTheSizeProperty() {
+        // Arrange: Create a concrete instance of MeterNeedle and define an expected size.
+        // ShipNeedle is used here as a representative concrete subclass.
+        ShipNeedle needle = new ShipNeedle();
+        int expectedSize = 10;
+
+        // Act: Set the size of the needle.
+        needle.setSize(expectedSize);
+
+        // Assert: Check if getSize() returns the value that was set.
+        int actualSize = needle.getSize();
+        assertEquals("The size should be updated after calling setSize.", expectedSize, actualSize);
     }
 }
