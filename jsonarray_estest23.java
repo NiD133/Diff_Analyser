@@ -1,24 +1,29 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest23 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Integer integer0 = Integer.valueOf(1);
-        jsonArray0.add((Number) integer0);
-        BigInteger bigInteger0 = jsonArray0.getAsBigInteger();
-        assertEquals((short) 1, bigInteger0.shortValue());
+    /**
+     * Tests that getAsBigInteger() correctly retrieves the value
+     * from a JsonArray containing a single integer element.
+     */
+    @Test
+    public void getAsBigInteger_whenArrayContainsSingleInteger_returnsCorrectBigInteger() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(1);
+        BigInteger expectedBigInteger = BigInteger.ONE;
+
+        // Act
+        BigInteger actualBigInteger = jsonArray.getAsBigInteger();
+
+        // Assert
+        assertEquals(expectedBigInteger, actualBigInteger);
     }
 }
