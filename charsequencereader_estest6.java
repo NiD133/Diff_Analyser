@@ -1,23 +1,29 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest6 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        char[] charArray0 = new char[6];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        int int0 = charSequenceReader0.read(charArray0, 0, 4);
-        assertEquals(4, int0);
+    @Test
+    public void read_intoCharArray_returnsCorrectCharacterCountWhenSourceHasEnoughChars() throws IOException {
+        // Arrange
+        String sourceText = "abcdef"; // Use a readable string for the source
+        CharSequenceReader reader = new CharSequenceReader(sourceText);
+        
+        char[] destinationBuffer = new char[sourceText.length()];
+        int offset = 0;
+        int charsToRead = 4;
+
+        // Act
+        int charsRead = reader.read(destinationBuffer, offset, charsToRead);
+
+        // Assert
+        assertEquals("Should report reading the requested number of characters.", charsToRead, charsRead);
     }
 }
