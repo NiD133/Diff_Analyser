@@ -1,80 +1,38 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import org.apache.commons.jxpath.AbstractJXPathTest;
-import org.apache.commons.jxpath.ClassFunctions;
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.FunctionLibrary;
 import org.apache.commons.jxpath.Functions;
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.NodeSet;
-import org.apache.commons.jxpath.PackageFunctions;
 import org.apache.commons.jxpath.Pointer;
-import org.apache.commons.jxpath.TestBean;
-import org.apache.commons.jxpath.Variables;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.util.JXPath11CompatibleTypeConverter;
-import org.apache.commons.jxpath.util.TypeConverter;
-import org.apache.commons.jxpath.util.TypeUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ExtensionFunctionTestTest10 extends AbstractJXPathTest {
+import java.util.List;
+import java.util.Locale;
 
-    private Functions functions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-    private JXPathContext context;
+/**
+ * Tests the method resolution capabilities of the {@link org.apache.commons.jxpath.ClassFunctions} class.
+ * This test focuses on verifying that methods can be correctly identified based on their argument types.
+ */
+class ClassFunctionsMethodLookupTest {
 
-    private TestBean testBean;
-
-    private TypeConverter typeConverter;
-
-    @Override
-    @BeforeEach
-    public void setUp() {
-        if (context == null) {
-            testBean = new TestBean();
-            context = JXPathContext.newContext(testBean);
-            final Variables vars = context.getVariables();
-            vars.declareVariable("test", new TestFunctions(4, "test"));
-            final FunctionLibrary lib = new FunctionLibrary();
-            lib.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
-            lib.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
-            lib.addFunctions(new PackageFunctions("", "call"));
-            lib.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
-            lib.addFunctions(new PackageFunctions("", null));
-            context.setFunctions(lib);
-            context.getVariables().declareVariable("List.class", List.class);
-            context.getVariables().declareVariable("NodeSet.class", NodeSet.class);
-        }
-        functions = new ClassFunctions(TestFunctions.class, "test");
-        typeConverter = TypeUtils.getTypeConverter();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        TypeUtils.setTypeConverter(typeConverter);
-    }
-
-    private static final class Context implements ExpressionContext {
-
+    /**
+     * A mock ExpressionContext needed to invoke a found Function.
+     * The actual context is not relevant to this test's objective.
+     */
+    private static class MockExpressionContext implements ExpressionContext {
         private final Object object;
 
-        public Context(final Object object) {
+        public MockExpressionContext(Object object) {
             this.object = object;
         }
 
         @Override
-        public List<Pointer> getContextNodeList() {
-            return null;
-        }
+        public JXPathContext getJXPathContext() { return null; }
 
         @Override
         public Pointer getContextNodePointer() {
@@ -82,20 +40,39 @@ public class ExtensionFunctionTestTest10 extends AbstractJXPathTest {
         }
 
         @Override
-        public JXPathContext getJXPathContext() {
-            return null;
-        }
+        public List<Pointer> getContextNodeList() { return null; }
 
         @Override
-        public int getPosition() {
-            return 0;
-        }
+        public int getPosition() { return 0; }
     }
 
+    /**
+     * This test verifies that {@link org.apache.commons.jxpath.ClassFunctions} can find a method
+     * when the argument is a custom object type. It specifically looks for a method
+     * with the signature `getFoo(TestFunctions arg)`.
+     */
     @Test
-    void testMethodLookup() {
-        final Object[] args = { new TestFunctions() };
-        final Function func = functions.getFunction("test", "getFoo", args);
-        assertEquals("0", func.invoke(new Context(null), args).toString(), "test:getFoo($test, 1, x)");
+    void shouldFindMethodWithObjectTypeArgument() {
+        // ARRANGE
+        // The ClassFunctions instance is configured to find public methods in TestFunctions.class
+        // under the "test" namespace.
+        Functions classFunctions = new ClassFunctions(TestFunctions.class, "test");
+
+        // The arguments array contains an instance of TestFunctions, which should match
+        // a method signature like `getFoo(TestFunctions)`.
+        Object[] arguments = {new TestFunctions()};
+
+        // ACT
+        // Attempt to find a function named "getFoo" in the "test" namespace
+        // that can accept the provided arguments.
+        Function foundFunction = classFunctions.getFunction("test", "getFoo", arguments);
+
+        // ASSERT
+        assertNotNull(foundFunction, "A function named 'getFoo' with a matching signature should have been found.");
+
+        // The TestFunctions class is expected to have a method:
+        // public String getFoo(TestFunctions arg) { return "0"; }
+        Object result = foundFunction.invoke(new MockExpressionContext(null), arguments);
+        assertEquals("0", result.toString(), "The result of invoking the found function should be '0'.");
     }
 }
