@@ -1,21 +1,29 @@
 package org.jfree.chart.labels;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class SymbolicXYItemLabelGeneratorTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    /**
-     * Simple check that hashCode is implemented.
-     */
+/**
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class, focusing on its
+ * general object contracts like equals() and hashCode().
+ */
+class SymbolicXYItemLabelGeneratorTest {
+
     @Test
-    public void testHashCode() {
-        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator g2 = new SymbolicXYItemLabelGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    @DisplayName("hashCode() is consistent with the equals() method")
+    void hashCode_shouldBeConsistentWithEquals() {
+        // Arrange: Create two separate instances that should be equal by default.
+        // The SymbolicXYItemLabelGenerator has no state, so any two new instances are equivalent.
+        SymbolicXYItemLabelGenerator generator1 = new SymbolicXYItemLabelGenerator();
+        SymbolicXYItemLabelGenerator generator2 = new SymbolicXYItemLabelGenerator();
+
+        // Assert: Verify the fundamental contract between equals() and hashCode().
+        // First, confirm that the two objects are indeed equal.
+        assertEquals(generator1, generator2, "Two default instances should be equal.");
+
+        // Then, confirm that their hash codes are also equal, as required by the contract.
+        assertEquals(generator1.hashCode(), generator2.hashCode(), "Equal objects must have equal hash codes.");
     }
 }
