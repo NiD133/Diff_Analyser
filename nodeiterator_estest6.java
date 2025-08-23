@@ -1,30 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class NodeIterator_ESTestTest6 extends NodeIterator_ESTest_scaffolding {
+/**
+ * Test suite for {@link NodeIterator}.
+ * This class focuses on edge cases and exception handling.
+ */
+public class NodeIteratorExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Document document0 = new Document("", (String) null);
-        Class<FormElement> class0 = FormElement.class;
-        document0.childNodes = null;
-        NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(document0, class0);
-        // Undeclared exception!
-        try {
-            nodeIterator0.next();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that the iterator throws a NullPointerException if it encounters a Node
+     * with a null childNodes list during traversal. This tests the iterator's robustness
+     * against unexpected or corrupt node structures.
+     */
+    @Test(expected = NullPointerException.class)
+    public void nextThrowsNullPointerExceptionWhenChildNodesListIsNull() {
+        // Arrange: Create a document and manually set its internal childNodes list to null
+        // to simulate a corrupt or invalid state.
+        Document document = new Document("");
+        document.childNodes = null; // This is the specific invalid state under test.
+
+        NodeIterator<Node> iterator = new NodeIterator<>(document, Node.class);
+
+        // Act: Attempting to advance the iterator should fail when it tries to access
+        // the null childNodes list.
+        iterator.next();
     }
 }
