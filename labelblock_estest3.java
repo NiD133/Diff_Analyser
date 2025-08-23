@@ -1,38 +1,29 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LabelBlock_ESTestTest3 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Tests for the {@link LabelBlock} class, focusing on its properties.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("/s");
-        labelBlock0.setToolTipText("mpAJ'YV3YX;OK");
-        String string0 = labelBlock0.getToolTipText();
-        assertEquals("mpAJ'YV3YX;OK", string0);
+    /**
+     * Verifies that the getToolTipText() method correctly returns the value
+     * set by setToolTipText().
+     */
+    @Test
+    public void getToolTipText_ShouldReturnTheSetText() {
+        // Arrange
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+        String expectedToolTip = "This is a sample tooltip.";
+
+        // Act
+        labelBlock.setToolTipText(expectedToolTip);
+        String actualToolTip = labelBlock.getToolTipText();
+
+        // Assert
+        assertEquals("The retrieved tooltip text should match the one that was set.",
+                expectedToolTip, actualToolTip);
     }
 }
