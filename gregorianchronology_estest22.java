@@ -2,24 +2,30 @@ package org.joda.time.chrono;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
 
-public class GregorianChronology_ESTestTest22 extends GregorianChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link GregorianChronology}.
+ */
+public class GregorianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        TimeZone timeZone0 = TimeZone.getTimeZone("tySc3*yvDsM");
-        DateTimeZone dateTimeZone0 = DateTimeZone.forTimeZone(timeZone0);
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstance(dateTimeZone0, 1);
-        int int0 = gregorianChronology0.getMinYear();
-        assertEquals((-292275054), int0);
+    /**
+     * Tests that getMinYear() returns the correct, hardcoded minimum year value.
+     */
+    @Test
+    public void getMinYear_shouldReturnConstantMinimumYearValue() {
+        // Arrange
+        // The getMinYear() method returns a constant value, so the time zone
+        // of the chronology instance does not affect the result.
+        // We use the UTC instance for simplicity.
+        GregorianChronology chronology = GregorianChronology.getInstanceUTC();
+        
+        // This is the value of the private static final constant MIN_YEAR in GregorianChronology.
+        final int expectedMinYear = -292275054;
+
+        // Act
+        int actualMinYear = chronology.getMinYear();
+
+        // Assert
+        assertEquals(expectedMinYear, actualMinYear);
     }
 }
