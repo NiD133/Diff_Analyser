@@ -1,25 +1,27 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Validate_ESTestTest40 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Object object0 = new Object();
-        Object object1 = Validate.ensureNotNull(object0);
-        assertSame(object1, object0);
+    /**
+     * Verifies that {@link Validate#ensureNotNull(Object)} returns the same object
+     * instance when the input is not null. This confirms the expected behavior for
+     * valid, non-null arguments.
+     */
+    @Test
+    public void ensureNotNull_whenObjectIsNotNull_shouldReturnSameObject() {
+        // Arrange: Create a non-null object.
+        Object inputObject = new Object();
+
+        // Act: Call the method under test.
+        Object resultObject = Validate.ensureNotNull(inputObject);
+
+        // Assert: The returned object should be the exact same instance as the input.
+        assertSame("The method should return the same object instance that was passed in.", inputObject, resultObject);
     }
 }
