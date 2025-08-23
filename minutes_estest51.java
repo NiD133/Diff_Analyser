@@ -1,18 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Minutes_ESTestTest51 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        Minutes minutes0 = Minutes.ZERO;
-        Minutes minutes1 = minutes0.dividedBy(1);
-        assertSame(minutes0, minutes1);
+    @Test
+    public void dividedBy_one_returnsSameInstance() {
+        // Arrange
+        Minutes zeroMinutes = Minutes.ZERO;
+
+        // Act
+        Minutes result = zeroMinutes.dividedBy(1);
+
+        // Assert
+        // For immutable objects, operations that result in no change (like dividing by 1)
+        // should return the same instance to save memory.
+        assertSame("Dividing by one should return the same immutable instance", zeroMinutes, result);
     }
 }
