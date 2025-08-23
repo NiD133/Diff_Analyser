@@ -1,28 +1,28 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest50 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        boolean boolean0 = StringUtil.isHexDigit('\u008F');
-        assertFalse(boolean0);
+    /**
+     * Verifies that isHexDigit() correctly returns false for a character
+     * that is not a hexadecimal digit. This test uses a non-ASCII control
+     * character to cover edge cases outside the typical '0'-'9', 'a'-'f' range.
+     */
+    @Test
+    public void isHexDigit_shouldReturnFalse_forNonHexCharacter() {
+        // Arrange: Define a character that is not a valid hexadecimal digit.
+        // U+008F is a C1 control character, which falls outside the valid hex character set.
+        char nonHexChar = '\u008F';
+
+        // Act: Call the method under test.
+        boolean result = StringUtil.isHexDigit(nonHexChar);
+
+        // Assert: Verify that the method returned false.
+        assertFalse("A non-hex character (U+008F) should not be identified as a hex digit.", result);
     }
 }
