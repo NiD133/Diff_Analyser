@@ -1,46 +1,121 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
+import org.joda.time.ReadablePartial;
 import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.ISOChronology;
+import org.junit.Before;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest26 extends TestCase {
+import java.util.Arrays;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for the set(ReadablePartial, ...) method in PreciseDurationDateTimeField.
+ * This test suite uses mock implementations to isolate the field's behavior.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    // The field under test, configured to behave like a "second of minute" field (0-59).
+    private BaseDateTimeField field;
+    
+    // A dummy ReadablePartial, as its state is not used in these tests.
+    private final ReadablePartial dummyPartial = new TimeOfDay();
+
+    @Before
+    public void setUp() {
+        // Initialize the mock field before each test.
+        field = new MockPreciseDurationDateTimeField();
+        
+        // Reset static counters in the mock duration field to ensure test isolation.
+        MockCountingDurationField.reset();
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
+    @Test
+    public void setInPartial_whenNewValueIsValid_updatesArray() {
+        // Arrange
+        int[] initialValues = {10, 20, 30, 40};
+        int[] expectedValues = {10, 20, 29, 40}; // Expect the third element to be updated
+
+        // Act
+        int[] result = field.set(dummyPartial, 2, initialValues, 29);
+
+        // Assert
+        assertArrayEquals(expectedValues, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void setInPartial_whenNewValueIsSameAsOld_returnsUnchangedArray() {
+        // Arrange
+        int[] initialValues = {10, 20, 30, 40};
+        int[] expectedValues = {10, 20, 30, 40}; // Expect no change
+
+        // Act
+        int[] result = field.set(dummyPartial, 2, initialValues, 30);
+
+        // Assert
+        assertArrayEquals(expectedValues, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void setInPartial_whenValueIsTooLarge_throwsIllegalArgumentException() {
+        // Arrange
+        int[] values = {10, 20, 30, 40};
+        int[] originalValues = values.clone(); // Keep a copy to verify non-mutation
+
+        // Act & Assert
+        try {
+            // The mock field's maximum value is 59.
+            field.set(dummyPartial, 2, values, 60);
+            fail("Expected an IllegalArgumentException for value exceeding maximum.");
+        } catch (IllegalArgumentException ex) {
+            // Expected exception
+        }
+
+        // Verify that the input array was not modified upon failure.
+        assertArrayEquals("Input array should not be modified on exception", originalValues, values);
     }
+
+    @Test
+    public void setInPartial_whenValueIsTooSmall_throwsIllegalArgumentException() {
+        // Arrange
+        int[] values = {10, 20, 30, 40};
+        int[] originalValues = values.clone(); // Keep a copy to verify non-mutation
+
+        // Act & Assert
+        try {
+            // The field's minimum value is 0.
+            field.set(dummyPartial, 2, values, -1);
+            fail("Expected an IllegalArgumentException for value below minimum.");
+        } catch (IllegalArgumentException ex) {
+            // Expected exception
+        }
+
+        // Verify that the input array was not modified upon failure.
+        assertArrayEquals("Input array should not be modified on exception", originalValues, values);
+    }
+
 
     //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
+    // Mock implementations used for testing PreciseDurationDateTimeField.
+    //-----------------------------------------------------------------------
 
+    /**
+     * A mock PreciseDurationDateTimeField that simulates a "second-of-minute" field.
+     * It has a fixed range of 0 to 59.
+     */
+    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
         protected MockPreciseDurationDateTimeField() {
             super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
         @Override
         public int get(long instant) {
+            // A simple implementation, not critical for the set() tests.
             return (int) (instant / 60L);
         }
 
@@ -53,36 +128,30 @@ public class PreciseDurationDateTimeFieldTestTest26 extends TestCase {
         public int getMaximumValue() {
             return 59;
         }
-    }
-
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
 
         @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
+        public int getMinimumValue() {
+            return 0;
         }
     }
 
-    //-----------------------------------------------------------------------
+    /**
+     * A mock DurationField that counts method invocations.
+     * Note: The counters are static and must be reset between tests to ensure isolation.
+     */
     static class MockCountingDurationField extends BaseDurationField {
-
         static int add_int = 0;
-
         static int add_long = 0;
-
         static int difference_long = 0;
 
         protected MockCountingDurationField(DurationFieldType type) {
             super(type);
+        }
+        
+        public static void reset() {
+            add_int = 0;
+            add_long = 0;
+            difference_long = 0;
         }
 
         @Override
@@ -93,21 +162,6 @@ public class PreciseDurationDateTimeFieldTestTest26 extends TestCase {
         @Override
         public long getUnitMillis() {
             return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
         }
 
         @Override
@@ -127,131 +181,13 @@ public class PreciseDurationDateTimeFieldTestTest26 extends TestCase {
             difference_long++;
             return 30;
         }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
+        
+        // Unused methods for this test
         @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
+        public long getValueAsLong(long duration, long instant) { return 0; }
         @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
+        public long getMillis(int value, long instant) { return 0; }
         @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_set_RP_int_intarray_int() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        int[] values = new int[] { 10, 20, 30, 40 };
-        int[] expected = new int[] { 10, 20, 30, 40 };
-        int[] result = field.set(new TimeOfDay(), 2, values, 30);
-        assertEquals(true, Arrays.equals(result, expected));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 29, 40 };
-        result = field.set(new TimeOfDay(), 2, values, 29);
-        assertEquals(true, Arrays.equals(result, expected));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 30, 40 };
-        try {
-            field.set(new TimeOfDay(), 2, values, 60);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        assertEquals(true, Arrays.equals(values, expected));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 30, 40 };
-        try {
-            field.set(new TimeOfDay(), 2, values, -1);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        assertEquals(true, Arrays.equals(values, expected));
+        public long getMillis(long value, long instant) { return 0; }
     }
 }
