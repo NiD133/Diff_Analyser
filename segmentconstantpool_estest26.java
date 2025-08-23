@@ -1,22 +1,34 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This class contains tests for the {@link SegmentConstantPool} class.
+ * This specific test focuses on the {@code matchSpecificPoolEntryIndex} method.
+ */
 public class SegmentConstantPool_ESTestTest26 extends SegmentConstantPool_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        String[] stringArray0 = new String[8];
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0[2], 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that matchSpecificPoolEntryIndex returns the index 0 when searching for a null value
+     * and the first element in the array is the first match.
+     */
+    @Test
+    public void matchSpecificPoolEntryIndexShouldReturnZeroForFirstMatchAtFirstPosition() {
+        // Arrange
+        // The method under test does not use any instance state, so passing null for CpBands is acceptable.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        String[] names = {null, "someString", "anotherString", null};
+        String valueToFind = null;
+        int desiredOccurrence = 0; // We are looking for the first occurrence (0-indexed).
+        int expectedIndex = 0;
+
+        // Act
+        int actualIndex = segmentConstantPool.matchSpecificPoolEntryIndex(names, valueToFind, desiredOccurrence);
+
+        // Assert
+        assertEquals("Should return the index of the first element (0) as it's the first match.",
+                     expectedIndex, actualIndex);
     }
 }
