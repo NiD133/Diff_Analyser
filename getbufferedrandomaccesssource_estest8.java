@@ -1,27 +1,28 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest8 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Unit tests for {@link GetBufferedRandomAccessSource}.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        byte[] byteArray0 = new byte[4];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        // Undeclared exception!
-        try {
-            getBufferedRandomAccessSource0.get((-1780L), (byte[]) null, (-213), (-213));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Verifies that the get(long, byte[], int, int) method throws a NullPointerException
+     * when the provided destination byte array is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getWithNullBufferThrowsNullPointerException() throws IOException {
+        // Arrange: Create a source and the buffered source wrapper to test.
+        byte[] sourceData = new byte[16];
+        RandomAccessSource source = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(source);
+
+        // Act & Assert: Call the get method with a null buffer.
+        // This is expected to throw a NullPointerException.
+        // Other arguments are set to valid values to isolate the null buffer as the cause.
+        bufferedSource.get(0L, null, 0, 0);
     }
 }
