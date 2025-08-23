@@ -1,31 +1,40 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest22 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test021() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Integer integer0 = new Integer(3);
-        Integer integer1 = xNode0.getIntAttribute("", integer0);
-        assertEquals(3, (int) integer1);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getIntAttribute() returns the provided default value
+     * when the requested attribute does not exist on the XML node.
+     */
+    @Test
+    public void getIntAttributeShouldReturnDefaultValueWhenAttributeIsMissing() {
+        // Arrange
+        // 1. Create a DOM node that has no attributes.
+        //    An XPathParser is not needed for attribute parsing, so it can be null.
+        Node nodeWithoutAttributes = new IIOMetadataNode("test-node");
+        XNode xNode = new XNode(null, nodeWithoutAttributes, new Properties());
+
+        // 2. Define a non-existent attribute name and a default value.
+        String nonExistentAttributeName = "port";
+        Integer defaultValue = 8080;
+
+        // Act
+        // Attempt to get an integer attribute that does not exist, providing the default.
+        Integer actualValue = xNode.getIntAttribute(nonExistentAttributeName, defaultValue);
+
+        // Assert
+        // The method should return the default value.
+        assertEquals(defaultValue, actualValue);
     }
 }
