@@ -1,33 +1,50 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.apache.ibatis.executor.result.ResultMapException;
+import org.junit.Test;
 
-public class BaseTypeHandler_ESTestTest19 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for the {@link BaseTypeHandler}.
+ */
+public class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        IntegerTypeHandler integerTypeHandler0 = IntegerTypeHandler.INSTANCE;
-        // Undeclared exception!
+    /**
+     * Tests that getResult(ResultSet, int) throws a descriptive exception
+     * when the provided ResultSet is null.
+     *
+     * The BaseTypeHandler is expected to catch the underlying NullPointerException
+     * and wrap it in a more informative RuntimeException, guiding the user
+     * to the source of the error.
+     */
+    @Test
+    public void getResultByColumnIndexShouldThrowExceptionWhenResultSetIsNull() {
+        // Arrange
+        // Use a concrete implementation (IntegerTypeHandler) to test the abstract BaseTypeHandler's logic.
+        BaseTypeHandler<Integer> typeHandler = IntegerTypeHandler.INSTANCE;
+        int columnIndex = 1;
+
+        // Act & Assert
         try {
-            integerTypeHandler0.getResult((ResultSet) null, 2558);
-            fail("Expecting exception: RuntimeException");
+            // Attempt to get a result from a null ResultSet.
+            typeHandler.getResult((ResultSet) null, columnIndex);
+            fail("Should have thrown a RuntimeException because the ResultSet is null.");
         } catch (RuntimeException e) {
-            //
-            // Error attempting to get column #2558 from result set.  Cause: java.lang.NullPointerException
-            //
-            verifyException("org.apache.ibatis.type.BaseTypeHandler", e);
+            // The actual exception thrown by MyBatis is ResultMapException, a subclass of RuntimeException.
+            // This check ensures the exception is the expected wrapper.
+            String expectedMessage = "Error attempting to get column #" + columnIndex + " from result set.  Cause: java.lang.NullPointerException";
+            assertEquals(expectedMessage, e.getMessage());
+
+            // Verify that the cause of the failure was the expected NullPointerException.
+            assertNotNull("Exception cause should not be null.", e.getCause());
+            assertTrue("Exception cause should be a NullPointerException.", e.getCause() instanceof NullPointerException);
+        } catch (Exception e) {
+            fail("Caught an unexpected exception type: " + e.getClass().getName());
         }
     }
 }
