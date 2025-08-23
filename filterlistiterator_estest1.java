@@ -1,83 +1,44 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
 import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FilterListIterator_ESTestTest1 extends FilterListIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link FilterListIterator}.
+ * This class contains a test case demonstrating iterator invalidation.
+ */
+public class FilterListIterator_ESTestTest1 { // Note: A more descriptive name like FilterListIteratorTest would be better.
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Predicate<Integer> predicate0 = NullPredicate.nullPredicate();
-        FilterListIterator<Integer> filterListIterator0 = new FilterListIterator<Integer>(predicate0);
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 8);
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        ExceptionPredicate.exceptionPredicate();
-        Predicate<Object> predicate1 = NullPredicate.nullPredicate();
-        predicateArray0[7] = predicate1;
-        predicate0.and(predicate0);
-        linkedList0.iterator();
-        Integer integer0 = new Integer(5795);
-        linkedList0.add((Integer) null);
-        linkedList0.add(integer0);
-        ListIterator<Integer> listIterator0 = linkedList0.listIterator(1);
-        filterListIterator0.setListIterator(listIterator0);
-        filterListIterator0.hasNext();
-        predicate0.negate();
-        linkedList0.add((Integer) null);
-        // Undeclared exception!
+    /**
+     * Tests that the iterator fails fast with a ConcurrentModificationException
+     * if the underlying collection is modified after the iterator is created.
+     */
+    @Test
+    public void hasPreviousShouldThrowConcurrentModificationExceptionWhenUnderlyingListIsModified() {
+        // Arrange: Set up a list and a FilterListIterator that wraps it.
+        final LinkedList<Integer> underlyingList = new LinkedList<>(Arrays.asList(10, 20));
+        final ListIterator<Integer> underlyingIterator = underlyingList.listIterator();
+
+        // The specific predicate is not important for this test, so we use one that accepts all elements for clarity.
+        final Predicate<Integer> anyPredicate = TruePredicate.truePredicate();
+        final FilterListIterator<Integer> filterIterator = new FilterListIterator<>(underlyingIterator, anyPredicate);
+
+        // Act: Modify the underlying list directly, which should invalidate the iterator.
+        underlyingList.add(30);
+
+        // Assert: Expect a ConcurrentModificationException when trying to use the iterator.
         try {
-            filterListIterator0.hasPrevious();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
+            filterIterator.hasPrevious();
+            fail("A ConcurrentModificationException should have been thrown due to list modification.");
+        } catch (final ConcurrentModificationException e) {
+            // This is the expected behavior. The test passes.
         }
     }
 }
