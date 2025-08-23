@@ -1,234 +1,60 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Before;
+import org.junit.Test;
 
-public class DateTimeComparatorTestTest25 extends TestCase {
+/**
+ * Tests for {@link DateTimeComparator} specifically for month-based comparisons.
+ */
+public class DateTimeComparatorMonthTest {
 
-    private static final Chronology ISO = ISOChronology.getInstance();
+    private Comparator<Object> monthOnlyComparator;
 
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime bDateTime = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
-     */
-    Comparator cMillis = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Before
+    public void setUp() {
+        // This comparator is configured to compare instants by the 'monthOfYear' field.
+        // The upper limit 'year' is exclusive, so the year field is ignored in comparisons.
+        monthOnlyComparator = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
+    @Test
+    public void compare_byMonth_shouldReturnNegativeWhenFirstMonthIsBeforeSecond() {
+        // Arrange
+        DateTime april2002 = new DateTime("2002-04-30T00:00:00Z");
+        DateTime may2002 = new DateTime("2002-05-01T00:00:00Z");
+
+        // Act & Assert
+        assertEquals("Comparison should be negative because April (4) is before May (5)",
+                -1, monthOnlyComparator.compare(april2002, may2002));
     }
 
-    /**
-     * Junit <code>setUp()</code> method.
-     */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
+    @Test
+    public void compare_byMonth_shouldReturnPositiveWhenFirstMonthIsAfterSecond() {
+        // Arrange
+        DateTime april2002 = new DateTime("2002-04-30T00:00:00Z");
+        DateTime may2002 = new DateTime("2002-05-01T00:00:00Z");
+
+        // Act & Assert
+        assertEquals("Comparison should be positive because May (5) is after April (4)",
+                1, monthOnlyComparator.compare(may2002, april2002));
     }
 
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
+    @Test
+    public void compare_byMonth_shouldIgnoreYearAndOnlyCompareMonthField() {
+        // Arrange
+        // The comparator only considers the month, so the year should not affect the result.
+        DateTime january1900 = new DateTime("1900-01-01T00:00:00Z");
+        DateTime december1899 = new DateTime("1899-12-31T00:00:00Z");
 
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
+        // Act & Assert
+        // The comparison is between January (1) and December (12).
+        assertEquals("Comparison should be negative because January (1) is before December (12), ignoring the year",
+                -1, monthOnlyComparator.compare(january1900, december1899));
 
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test unequal comparisons with month comparators.
-     */
-    public void testMonth() {
-        aDateTime = getADate("2002-04-30T00:00:00");
-        bDateTime = getADate("2002-05-01T00:00:00");
-        assertEquals("MONTHM1a", -1, cMonth.compare(aDateTime, bDateTime));
-        assertEquals("MONTHP1a", 1, cMonth.compare(bDateTime, aDateTime));
-        aDateTime = getADate("1900-01-01T00:00:00");
-        bDateTime = getADate("1899-12-31T00:00:00");
-        assertEquals("MONTHM1b", -1, cMonth.compare(aDateTime, bDateTime));
-        assertEquals("MONTHP1b", 1, cMonth.compare(bDateTime, aDateTime));
+        assertEquals("Comparison should be positive because December (12) is after January (1), ignoring the year",
+                1, monthOnlyComparator.compare(december1899, january1900));
     }
 }
