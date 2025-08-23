@@ -1,35 +1,49 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import com.itextpdf.text.io.RandomAccessSourceFactory;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest155 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test154() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.readUTF();
-        int int0 = randomAccessFileOrArray0.read(byteArray0);
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals((-1), int0);
+/**
+ * Tests the reading behavior of the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
+
+    /**
+     * Verifies that reading a zero-length UTF string consumes the two-byte length prefix
+     * and correctly positions the file pointer at the end of the stream. A subsequent
+     * read should then indicate that the end of the stream has been reached.
+     */
+    @Test
+    public void readUTF_withZeroLengthString_advancesPointerAndReachesEOF() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray with data representing a zero-length
+        // UTF string. In the modified UTF-8 format used by DataInput, this is encoded
+        // as a two-byte length prefix of 0.
+        byte[] inputData = new byte[]{0, 0};
+        RandomAccessSource source = new RandomAccessSourceFactory().createSource(inputData);
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(source);
+
+        // Act:
+        // 1. Read the UTF string. This is expected to read the 2-byte length and return an empty string.
+        String utfString = reader.readUTF();
+
+        // 2. Attempt to read from the stream again. Since the pointer should be at the end,
+        //    this read operation is expected to return -1.
+        byte[] bufferForNextRead = new byte[2];
+        int bytesRead = reader.read(bufferForNextRead);
+
+        // Assert:
+        // Verify that the correct (empty) string was read.
+        assertEquals("The decoded UTF string should be empty.", "", utfString);
+
+        // Verify that the file pointer has advanced by 2 bytes to the end of the stream.
+        assertEquals("File pointer should be at position 2 after reading the UTF length prefix.", 2L, reader.getFilePointer());
+
+        // Verify that the subsequent read attempt correctly indicated the end of the stream.
+        assertEquals("Reading after reaching the end of the stream should return -1.", -1, bytesRead);
     }
 }
