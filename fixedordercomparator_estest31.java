@@ -1,29 +1,40 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest31 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link FixedOrderComparator}.
+ * This improved test focuses on verifying the default behavior of the comparator
+ * when initialized with a list of items.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Object object0 = new Object();
-        linkedList0.add(object0);
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(linkedList0);
-        assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, fixedOrderComparator0.getUnknownObjectBehavior());
+    /**
+     * Tests that a FixedOrderComparator, when constructed with a list of items,
+     * defaults to the EXCEPTION behavior for handling unknown objects.
+     */
+    @Test
+    public void shouldDefaultToExceptionBehaviorForUnknownObjectsWhenCreatedWithList() {
+        // Arrange: Create a list of objects to define the comparison order.
+        // The specific content of the list is not important for this test,
+        // only that we use the list-based constructor.
+        List<Object> knownObjects = Collections.singletonList(new Object());
+
+        // Act: Instantiate the comparator with the list of known objects.
+        FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(knownObjects);
+
+        // Assert: Verify that the default behavior for handling unknown objects is EXCEPTION.
+        final FixedOrderComparator.UnknownObjectBehavior expectedBehavior =
+                FixedOrderComparator.UnknownObjectBehavior.EXCEPTION;
+        final FixedOrderComparator.UnknownObjectBehavior actualBehavior =
+                comparator.getUnknownObjectBehavior();
+        
+        assertEquals("The default unknown object behavior should be EXCEPTION",
+                     expectedBehavior,
+                     actualBehavior);
     }
 }
