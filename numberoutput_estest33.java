@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest33 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link NumberOutput} class, focusing on integer division helper methods.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        int int0 = NumberOutput.divBy1000('\u0000');
-        assertEquals(0, int0);
+    /**
+     * Tests that the {@code divBy1000} method correctly returns 0
+     * when the input number is 0.
+     */
+    @Test
+    public void divBy1000_shouldReturnZero_whenInputIsZero() {
+        // Arrange
+        int number = 0;
+        int expectedQuotient = 0;
+
+        // Act
+        int actualQuotient = NumberOutput.divBy1000(number);
+
+        // Assert
+        assertEquals(expectedQuotient, actualQuotient);
     }
 }
