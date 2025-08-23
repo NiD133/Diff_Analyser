@@ -1,31 +1,28 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest29 extends JsonArray_ESTest_scaffolding {
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Number) null);
-        // Undeclared exception!
+    @Test
+    public void getAsShort_onArrayWithSingleJsonNull_throwsUnsupportedOperationException() {
+        // Arrange: Create a JsonArray containing a single JsonNull element.
+        // The add(Number) method converts a null input into a JsonNull instance.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((Number) null);
+
+        // Act & Assert: Verify that calling getAsShort() throws the correct exception.
         try {
-            jsonArray0.getAsShort();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
+            // The getAsShort() method on a single-element array delegates to the element's
+            // own getAsShort() method. For a JsonNull element, this is an unsupported operation.
+            jsonArray.getAsShort();
+            fail("Expected an UnsupportedOperationException to be thrown.");
+        } catch (UnsupportedOperationException expected) {
+            // The exception message from JsonElement for this operation is the element's class name.
+            assertEquals("JsonNull", expected.getMessage());
         }
     }
 }
