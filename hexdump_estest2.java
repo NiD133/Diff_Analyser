@@ -1,35 +1,37 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest2 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} class.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        MockPrintStream mockPrintStream0 = new MockPrintStream("\n");
-        byte[] byteArray0 = new byte[7];
-        byteArray0[0] = (byte) (-1);
-        HexDump.dump(byteArray0, (Appendable) mockPrintStream0);
-        assertEquals(7, byteArray0.length);
+    /**
+     * Tests that the dump method correctly formats a byte array into a hexadecimal string representation.
+     * This test covers a partial line of output and includes non-printable characters.
+     */
+    @Test
+    public void testDumpByteArray() throws IOException {
+        // Arrange: Set up the input data and a writer to capture the output.
+        // The input is a 7-byte array. The first byte, 0xFF (decimal -1), is a non-printable character.
+        final byte[] dataToDump = {(byte) 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        final StringWriter outputWriter = new StringWriter();
+
+        // Arrange: Define the expected output string.
+        // The output should include the offset, the hex values padded to a full 16-byte line,
+        // and the ASCII representation (with '.' for non-printable characters), followed by a newline.
+        final String EOL = System.lineSeparator();
+        final String expectedOutput = "00000000  FF 00 00 00 00 00 00                                 ......." + EOL;
+
+        // Act: Call the method under test.
+        HexDump.dump(dataToDump, outputWriter);
+
+        // Assert: Verify that the captured output matches the expected format.
+        assertEquals(expectedOutput, outputWriter.toString());
     }
 }
