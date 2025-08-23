@@ -2,75 +2,62 @@ package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest2 {
+/**
+ * Tests for {@link Uncheck#accept(IOBiConsumer, Object, Object)}.
+ */
+class UncheckTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
+    private AtomicReference<String> sideEffectRef1;
+    private AtomicReference<String> sideEffectRef2;
 
     @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+    void setUp() {
+        sideEffectRef1 = new AtomicReference<>();
+        sideEffectRef2 = new AtomicReference<>();
     }
 
     @Test
-    void testAcceptIOBiConsumerOfTUTU() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept((t, u) -> {
-            throw new IOException();
-        }, null, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(TestConstants.THROWING_IO_BI_CONSUMER, null, null));
+    @DisplayName("accept(IOBiConsumer) should wrap a thrown IOException in an UncheckedIOException")
+    void testAcceptShouldWrapIOException() {
+        // Arrange: An IOBiConsumer that is guaranteed to throw an IOException.
+        final IOException cause = new IOException("test exception");
+        final IOBiConsumer<Object, Object> throwingConsumer = (t, u) -> {
+            throw cause;
+        };
+
+        // Act & Assert: Call the method and verify that it throws the expected wrapper exception.
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.accept(throwingConsumer, "any", "any");
+        });
+
+        // Assert: Verify that the original IOException is the cause of the thrown exception.
+        assertEquals(cause, thrown.getCause());
+    }
+
+    @Test
+    @DisplayName("accept(IOBiConsumer) should execute the consumer with the given arguments on success")
+    void testAcceptShouldExecuteConsumer() {
+        // Arrange: Define the arguments to be passed to the consumer.
+        final String arg1 = "Hello";
+        final String arg2 = "World";
+
+        // Act: Call Uncheck.accept with a consumer that captures its arguments.
         Uncheck.accept((t, u) -> {
-            TestUtils.compareAndSetThrowsIO(ref1, t);
-            TestUtils.compareAndSetThrowsIO(ref2, u);
-        }, "new1", "new2");
-        assertEquals("new1", ref1.get());
-        assertEquals("new2", ref2.get());
+            sideEffectRef1.set(t);
+            sideEffectRef2.set(u);
+        }, arg1, arg2);
+
+        // Assert: Verify that the consumer was called with the correct arguments.
+        assertEquals(arg1, sideEffectRef1.get());
+        assertEquals(arg2, sideEffectRef2.get());
     }
 }
