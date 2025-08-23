@@ -1,25 +1,25 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest3 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on edge cases and invalid inputs.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(99358116390671185L, (char[]) null, (-2869));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with a null buffer
+     * throws a {@link NullPointerException}. The method is optimized for performance
+     * and relies on the caller to provide a valid buffer.
+     */
+    @Test(expected = NullPointerException.class)
+    public void outputLong_withNullBuffer_shouldThrowNullPointerException() {
+        // The method is expected to fail fast when given a null buffer.
+        // The actual value and offset are irrelevant for this test, so we use simple placeholders.
+        long anyValue = 123L;
+        int anyOffset = 0;
+        char[] nullBuffer = null;
+
+        NumberOutput.outputLong(anyValue, nullBuffer, anyOffset);
     }
 }
