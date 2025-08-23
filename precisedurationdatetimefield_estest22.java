@@ -1,45 +1,43 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest22 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.clockhourOfDay();
-        DurationFieldType durationFieldType0 = DurationFieldType.centuries();
-        UnsupportedDurationField unsupportedDurationField0 = UnsupportedDurationField.getInstance(durationFieldType0);
-        PreciseDateTimeField preciseDateTimeField0 = null;
+/**
+ * Unit tests for {@link PreciseDurationDateTimeField}.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    /**
+     * Tests that the constructor throws an IllegalArgumentException if the provided
+     * unit duration field has a unit millisecond value less than 1.
+     */
+    @Test
+    public void constructor_shouldThrowException_whenUnitMillisIsZero() {
+        // Arrange
+        DateTimeFieldType fieldType = DateTimeFieldType.clockhourOfDay();
+
+        // An UnsupportedDurationField is used here because its getUnitMillis() method
+        // returns 0, which is an invalid value for the constructor.
+        DurationField unitFieldWithZeroMillis = UnsupportedDurationField.getInstance(DurationFieldType.centuries());
+        
+        // The range field is not relevant for this test, so we can reuse the same field.
+        DurationField dummyRangeField = unitFieldWithZeroMillis;
+
+        // Act & Assert
         try {
-            preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, unsupportedDurationField0, unsupportedDurationField0);
-            fail("Expecting exception: IllegalArgumentException");
+            // We instantiate a concrete subclass (PreciseDateTimeField) to test the 
+            // validation logic in the abstract PreciseDurationDateTimeField's constructor.
+            new PreciseDateTimeField(fieldType, unitFieldWithZeroMillis, dummyRangeField);
+            fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // The unit milliseconds must be at least 1
-            //
-            verifyException("org.joda.time.field.PreciseDurationDateTimeField", e);
+            // Verify that the exception message is correct.
+            assertEquals("The unit milliseconds must be at least 1", e.getMessage());
         }
     }
 }
