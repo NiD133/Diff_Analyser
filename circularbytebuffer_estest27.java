@@ -1,26 +1,29 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest27 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        // Undeclared exception!
+    @Test
+    public void readFromEmptyBufferShouldThrowIllegalStateException() {
+        // Arrange: Create a new, empty buffer.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        assertFalse("Precondition: The buffer should be empty.", buffer.hasBytes());
+
+        // Act & Assert: Attempting to read from the empty buffer should fail.
         try {
-            circularByteBuffer0.read();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // No bytes available.
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.read();
+            fail("Expected an IllegalStateException to be thrown when reading from an empty buffer.");
+        } catch (final IllegalStateException e) {
+            // Assert: Verify the exception message is correct.
+            assertEquals("The exception message does not match the expected value.", "No bytes available.", e.getMessage());
         }
     }
 }
