@@ -1,36 +1,27 @@
 package org.jfree.chart.plot.dial;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNotEquals;
 import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
 
-public class DialBackground_ESTestTest6 extends DialBackground_ESTest_scaffolding {
+/**
+ * Unit tests for the equals() method in the {@link DialBackground} class.
+ */
+public class DialBackgroundEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        Color color0 = (Color) PiePlot.DEFAULT_LABEL_BACKGROUND_PAINT;
-        DialBackground dialBackground1 = new DialBackground(color0);
-        boolean boolean0 = dialBackground0.equals(dialBackground1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that two DialBackground instances are not considered equal if they
+     * are created with different background paints.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenPaintsAreDifferent() {
+        // Arrange: Create two DialBackground instances with distinctly different paints.
+        // The default constructor uses Color.WHITE.
+        DialBackground backgroundWithDefaultPaint = new DialBackground();
+        DialBackground backgroundWithCustomPaint = new DialBackground(Color.BLACK);
+
+        // Act & Assert: The two instances should not be equal.
+        assertNotEquals(backgroundWithDefaultPaint, backgroundWithCustomPaint);
     }
 }
