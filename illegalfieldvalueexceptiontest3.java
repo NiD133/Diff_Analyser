@@ -1,101 +1,78 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.field.FieldUtils;
-import org.joda.time.field.SkipDateTimeField;
+import org.junit.jupiter.api.Test;
 
-public class IllegalFieldValueExceptionTestTest3 extends TestCase {
+import java.util.Locale;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * Tests for IllegalFieldValueException, focusing on exceptions thrown
+ * when setting a field with an invalid text value.
+ */
+public class IllegalFieldValueExceptionTest {
+
+    private static final Chronology UTC_CHRONOLOGY = ISOChronology.getInstanceUTC();
+    private static final long INSTANT = 0L; // A base instant for the 'set' method.
+
+    /**
+     * Verifies that setting a DateTimeField with an invalid text value throws
+     * an IllegalFieldValueException with the correct state.
+     */
+    private void assertExceptionOnInvalidText(
+            DateTimeField field,
+            String invalidText,
+            DateTimeFieldType expectedFieldType) {
+
+        // Act: Attempt to set the field with invalid text, and expect an exception.
+        IllegalFieldValueException exception = assertThrows(
+                IllegalFieldValueException.class,
+                () -> field.set(INSTANT, invalidText, Locale.US)
+        );
+
+        // Assert: Verify the state of the caught exception.
+        assertThat(exception.getDateTimeFieldType()).isEqualTo(expectedFieldType);
+        assertThat(exception.getDurationFieldType()).isNull();
+        assertThat(exception.getFieldName()).isEqualTo(expectedFieldType.getName());
+        assertThat(exception.getIllegalNumberValue()).isNull();
+        assertThat(exception.getIllegalStringValue()).isEqualTo(invalidText);
+        assertThat(exception.getLowerBound()).isNull();
+        assertThat(exception.getUpperBound()).isNull();
+
+        // The getIllegalValueAsString() method should return "null" for a null input string.
+        String expectedValueAsString = (invalidText == null) ? "null" : invalidText;
+        assertThat(exception.getIllegalValueAsString()).isEqualTo(expectedValueAsString);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestIllegalFieldValueException.class);
+    @Test
+    public void set_forYearWithNullText_throwsExceptionWithCorrectState() {
+        assertExceptionOnInvalidText(UTC_CHRONOLOGY.year(), null, DateTimeFieldType.year());
     }
 
-    public void testSetText() {
-        try {
-            ISOChronology.getInstanceUTC().year().set(0, null, java.util.Locale.US);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.year(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("year", e.getFieldName());
-            assertEquals(null, e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("null", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
-        try {
-            ISOChronology.getInstanceUTC().year().set(0, "nineteen seventy", java.util.Locale.US);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.year(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("year", e.getFieldName());
-            assertEquals(null, e.getIllegalNumberValue());
-            assertEquals("nineteen seventy", e.getIllegalStringValue());
-            assertEquals("nineteen seventy", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
-        try {
-            ISOChronology.getInstanceUTC().era().set(0, "long ago", java.util.Locale.US);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.era(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("era", e.getFieldName());
-            assertEquals(null, e.getIllegalNumberValue());
-            assertEquals("long ago", e.getIllegalStringValue());
-            assertEquals("long ago", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
-        try {
-            ISOChronology.getInstanceUTC().monthOfYear().set(0, "spring", java.util.Locale.US);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.monthOfYear(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("monthOfYear", e.getFieldName());
-            assertEquals(null, e.getIllegalNumberValue());
-            assertEquals("spring", e.getIllegalStringValue());
-            assertEquals("spring", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
-        try {
-            ISOChronology.getInstanceUTC().dayOfWeek().set(0, "yesterday", java.util.Locale.US);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.dayOfWeek(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("dayOfWeek", e.getFieldName());
-            assertEquals(null, e.getIllegalNumberValue());
-            assertEquals("yesterday", e.getIllegalStringValue());
-            assertEquals("yesterday", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
-        try {
-            ISOChronology.getInstanceUTC().halfdayOfDay().set(0, "morning", java.util.Locale.US);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.halfdayOfDay(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("halfdayOfDay", e.getFieldName());
-            assertEquals(null, e.getIllegalNumberValue());
-            assertEquals("morning", e.getIllegalStringValue());
-            assertEquals("morning", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
+    @Test
+    public void set_forYearWithUnparseableText_throwsExceptionWithCorrectState() {
+        assertExceptionOnInvalidText(UTC_CHRONOLOGY.year(), "nineteen seventy", DateTimeFieldType.year());
+    }
+
+    @Test
+    public void set_forEraWithUnparseableText_throwsExceptionWithCorrectState() {
+        assertExceptionOnInvalidText(UTC_CHRONOLOGY.era(), "long ago", DateTimeFieldType.era());
+    }
+
+    @Test
+    public void set_forMonthOfYearWithUnparseableText_throwsExceptionWithCorrectState() {
+        assertExceptionOnInvalidText(UTC_CHRONOLOGY.monthOfYear(), "spring", DateTimeFieldType.monthOfYear());
+    }
+
+    @Test
+    public void set_forDayOfWeekWithUnparseableText_throwsExceptionWithCorrectState() {
+        assertExceptionOnInvalidText(UTC_CHRONOLOGY.dayOfWeek(), "yesterday", DateTimeFieldType.dayOfWeek());
+    }
+
+    @Test
+    public void set_forHalfdayOfDayWithUnparseableText_throwsExceptionWithCorrectState() {
+        assertExceptionOnInvalidText(UTC_CHRONOLOGY.halfdayOfDay(), "morning", DateTimeFieldType.halfdayOfDay());
     }
 }
