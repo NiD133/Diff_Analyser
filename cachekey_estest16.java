@@ -1,18 +1,29 @@
 package org.apache.ibatis.cache;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CacheKey_ESTestTest16 extends CacheKey_ESTest_scaffolding {
+/**
+ * Test suite for the CacheKey class.
+ */
+public class CacheKeyTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        CacheKey cacheKey0 = new CacheKey();
-        String string0 = cacheKey0.toString();
-        assertEquals("17:0", string0);
+    /**
+     * Verifies that the toString() method of a newly created CacheKey
+     * returns a string representing its default initial state.
+     * The expected format is "hashcode:checksum", which for a new key
+     * defaults to "17:0".
+     */
+    @Test
+    public void toStringShouldReturnInitialStateForNewCacheKey() {
+        // Arrange: Create a new CacheKey without any updates.
+        CacheKey emptyCacheKey = new CacheKey();
+        String expectedRepresentation = "17:0";
+
+        // Act: Get the string representation of the new key.
+        String actualRepresentation = emptyCacheKey.toString();
+
+        // Assert: Verify the string matches the expected initial state.
+        assertEquals(expectedRepresentation, actualRepresentation);
     }
 }
