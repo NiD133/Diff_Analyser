@@ -1,30 +1,45 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
 import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest13 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        AtMost atMost0 = new AtMost(0);
-        Timer timer0 = new Timer(0);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(1444L, atMost0, true, timer0);
-        boolean boolean0 = verificationOverTimeImpl0.canRecoverFromFailure(atMost0);
-        assertEquals(1444L, verificationOverTimeImpl0.getPollingPeriodMillis());
-        assertFalse(boolean0);
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ *
+ * This test class focuses on the behavior of the canRecoverFromFailure method.
+ */
+public class VerificationOverTimeImplTest {
+
+    @Test
+    public void canRecoverFromFailureShouldReturnFalseForAtMostMode() {
+        // --- Arrange ---
+        // The AtMost verification mode is a "terminal" condition. Once the number of
+        // invocations exceeds the specified maximum, it's impossible to recover from
+        // that failure (i.e., you cannot "un-invoke" a method).
+        VerificationMode atMostMode = new AtMost(0);
+
+        // The following parameters are required to construct VerificationOverTimeImpl,
+        // but their specific values do not affect the outcome of this test.
+        long pollingPeriodMillis = 100L;
+        boolean returnOnSuccess = true;
+        Timer timer = new Timer(0L);
+
+        VerificationOverTimeImpl verificationOverTime = new VerificationOverTimeImpl(
+            pollingPeriodMillis,
+            atMostMode,
+            returnOnSuccess,
+            timer
+        );
+
+        // --- Act ---
+        // We check if the system correctly identifies that AtMost mode cannot recover from failure.
+        boolean canRecover = verificationOverTime.canRecoverFromFailure(atMostMode);
+
+        // --- Assert ---
+        // The result must be false, as a failure of AtMost is final.
+        assertFalse("An AtMost verification failure should not be recoverable", canRecover);
     }
 }
