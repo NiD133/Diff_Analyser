@@ -1,25 +1,39 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNull;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import org.junit.Test;
 
-public class Parameter_ESTestTest10 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Class<Object> class0 = Object.class;
-        TypeToken<Object> typeToken0 = TypeToken.of(class0);
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 2844, typeToken0, annotationArray0, (Object) null);
-        Class<Annotation> class1 = Annotation.class;
-        Annotation annotation0 = parameter0.getAnnotation(class1);
-        assertNull(annotation0);
+    /** A sample annotation used for testing purposes. */
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface TestAnnotation {}
+
+    /**
+     * Verifies that getAnnotation() returns null when the requested annotation type
+     * is not present on the parameter.
+     */
+    @Test
+    public void getAnnotation_whenAnnotationIsAbsent_returnsNull() {
+        // Arrange: Create a Parameter instance that has no annotations.
+        // Note: The Parameter constructor is package-private, so this test must reside
+        // in the same package. The invokable, position, and annotatedType are not
+        // relevant for this test and can be set to dummy values.
+        TypeToken<String> type = TypeToken.of(String.class);
+        Annotation[] noAnnotations = new Annotation[0];
+        Parameter parameter = new Parameter(/* declaration */ null, /* position */ 0, type, noAnnotations, /* annotatedType */ null);
+
+        // Act: Attempt to retrieve an annotation that does not exist.
+        TestAnnotation foundAnnotation = parameter.getAnnotation(TestAnnotation.class);
+
+        // Assert: Verify that the result is null.
+        assertNull("Expected getAnnotation() to return null for an absent annotation.", foundAnnotation);
     }
 }
