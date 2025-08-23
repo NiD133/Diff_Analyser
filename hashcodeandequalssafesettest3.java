@@ -1,46 +1,48 @@
 package org.mockito.internal.util.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
-import org.junit.Rule;
+
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
-public class HashCodeAndEqualsSafeSetTestTest3 {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Rule
-    public MockitoRule r = MockitoJUnit.rule();
-
-    @Mock
-    private UnmockableHashCodeAndEquals mock1;
-
-    private static class UnmockableHashCodeAndEquals {
-
+    /**
+     * A helper class that intentionally throws exceptions on {@code equals()} and {@code hashCode()}
+     * to simulate objects (like mocks) that cannot be safely stored in standard hash-based collections.
+     */
+    private static class ClassWithBrokenEqualsAndHashCode {
         @Override
         public final int hashCode() {
-            throw new NullPointerException("I'm failing on hashCode and I don't care");
+            throw new NullPointerException("This hashCode() method is intentionally broken.");
         }
 
         @Override
         public final boolean equals(Object obj) {
-            throw new NullPointerException("I'm failing on equals and I don't care");
+            throw new NullPointerException("This equals() method is intentionally broken.");
         }
     }
 
     @Test
-    public void mock_with_failing_equals_method_can_be_used() throws Exception {
-        HashCodeAndEqualsSafeSet mocks = new HashCodeAndEqualsSafeSet();
-        mocks.add(mock1);
-        assertThat(mocks.contains(mock1)).isTrue();
-        UnmockableHashCodeAndEquals mock2 = mock(UnmockableHashCodeAndEquals.class);
-        assertThat(mocks.contains(mock2)).isFalse();
+    public void shouldCorrectlyStoreMocksWithBrokenEqualsAndHashCode() {
+        // Arrange
+        // Create mocks of a class with failing equals() and hashCode() methods.
+        // A standard HashSet would throw an exception when adding these.
+        ClassWithBrokenEqualsAndHashCode mockToBeAdded = mock(ClassWithBrokenEqualsAndHashCode.class);
+        ClassWithBrokenEqualsAndHashCode anotherMock = mock(ClassWithBrokenEqualsAndHashCode.class);
+
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+
+        // Act
+        safeSet.add(mockToBeAdded);
+
+        // Assert
+        // The set should rely on identity rather than the broken equals()/hashCode() methods.
+        assertThat(safeSet).hasSize(1);
+        assertThat(safeSet).contains(mockToBeAdded);
+        assertThat(safeSet).doesNotContain(anotherMock);
     }
 }
