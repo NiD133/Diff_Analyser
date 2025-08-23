@@ -1,59 +1,33 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+/**
+ * Contains tests for the {@link FilterListIterator} class.
+ * This class was improved from an auto-generated test.
+ */
 public class FilterListIterator_ESTestTest56 extends FilterListIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        FilterListIterator<Integer> filterListIterator0 = new FilterListIterator<Integer>();
-        FilterListIterator<Object> filterListIterator1 = new FilterListIterator<Object>(filterListIterator0);
-        boolean boolean0 = filterListIterator1.hasPrevious();
-        assertFalse(boolean0);
+    /**
+     * Tests that hasPrevious() returns false when the underlying iterator is empty
+     * and positioned at the beginning.
+     */
+    @Test
+    public void hasPreviousShouldReturnFalseForEmptyWrappedIterator() {
+        // Arrange: Create a FilterListIterator that wraps an iterator from an empty list.
+        final List<Object> emptyList = new ArrayList<>();
+        final ListIterator<Object> emptyIterator = emptyList.listIterator();
+        final FilterListIterator<Object> filteredIterator = new FilterListIterator<>(emptyIterator);
+
+        // Act: Check if there is a previous element.
+        final boolean hasPrevious = filteredIterator.hasPrevious();
+
+        // Assert: The result should be false, as the underlying iterator has no elements.
+        assertFalse("hasPrevious() should return false for an empty iterator", hasPrevious);
     }
 }
