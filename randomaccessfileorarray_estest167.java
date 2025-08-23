@@ -1,34 +1,35 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest167 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray#readFloatLE()} method.
+ */
+public class RandomAccessFileOrArrayReadFloatLETest {
 
-    @Test(timeout = 4000)
-    public void test166() throws Throwable {
-        byte[] byteArray0 = new byte[4];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        float float0 = randomAccessFileOrArray0.readFloatLE();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(0.0F, float0, 0.01F);
+    /**
+     * Verifies that readFloatLE correctly decodes four zero-bytes into the float value 0.0f
+     * and advances the internal pointer by four bytes. This tests a fundamental case for
+     * reading little-endian float values.
+     */
+    @Test
+    public void readFloatLE_withAllZeroBytes_returnsZeroAndAdvancesPointer() throws IOException {
+        // Arrange: A byte array of four zero-bytes, which represents 0.0f in IEEE 754 format.
+        // A float is 4 bytes long.
+        byte[] inputBytes = new byte[4];
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputBytes);
+
+        // Act: Read a little-endian float from the byte array.
+        float actualFloat = reader.readFloatLE();
+
+        // Assert: The result should be 0.0f and the pointer should have moved forward by 4.
+        final float expectedFloat = 0.0f;
+        final long expectedPointerPosition = 4L;
+
+        assertEquals("The decoded float value should be 0.0.", expectedFloat, actualFloat, 0.0f);
+        assertEquals("The file pointer should advance by 4 bytes after reading a float.", expectedPointerPosition, reader.getFilePointer());
     }
 }
