@@ -1,33 +1,36 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest87 extends GridArrangement_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test86() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(2878, 2878);
-        Range range0 = new Range(2878, 2878);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        // Undeclared exception!
-        gridArrangement0.arrangeFR(blockContainer0, (Graphics2D) null, rectangleConstraint0);
+/**
+ * A test case for the arrangeFR() method in the GridArrangement class.
+ */
+public class GridArrangementArrangeFRTest {
+
+    /**
+     * Verifies that calling arrangeFR() with a null Graphics2D object
+     * results in a NullPointerException. The Graphics2D object is essential
+     * for layout calculations, and the method should not proceed without it.
+     */
+    @Test
+    public void arrangeFRShouldThrowNullPointerExceptionForNullGraphics2D() {
+        // Arrange: Create a grid arrangement and a container to be arranged.
+        GridArrangement arrangement = new GridArrangement(2, 2);
+        BlockContainer container = new BlockContainer();
+
+        // Arrange: Define a constraint with a fixed width and a ranged height,
+        // as expected by the arrangeFR method.
+        final double fixedWidth = 100.0;
+        final Range heightRange = new Range(50.0, 150.0);
+        RectangleConstraint constraint = new RectangleConstraint(fixedWidth, heightRange);
+
+        // Act & Assert: Expect a NullPointerException when arrangeFR is called
+        // with a null Graphics2D context.
+        assertThrows(NullPointerException.class, () -> {
+            arrangement.arrangeFR(container, null, constraint);
+        });
     }
 }
