@@ -1,72 +1,47 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
 
-public class GregorianChronologyTestTest14 extends TestCase {
+/**
+ * Tests the isLeap() behavior of the GregorianChronology for both leap and non-leap years.
+ */
+public class GregorianChronologyLeapYearTest extends TestCase {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    // Using UTC to ensure tests are independent of the default system time zone.
+    private static final Chronology GREGORIAN_UTC = GregorianChronology.getInstance(DateTimeZone.UTC);
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    /**
+     * Tests that for a date on a leap day (Feb 29) in a leap year,
+     * the various isLeap() methods correctly return true.
+     */
+    public void testIsLeap_whenDateIsInLeapYear_returnsTrue() {
+        // Arrange: 2012 is a known leap year (divisible by 4 but not by 100).
+        final int LEAP_YEAR = 2012;
+        DateTime leapDay = new DateTime(LEAP_YEAR, 2, 29, 10, 20, GREGORIAN_UTC);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert
+        assertTrue("Year property should report it is a leap year", leapDay.year().isLeap());
+        assertTrue("Month property should report it is a leap month", leapDay.monthOfYear().isLeap());
+        assertTrue("Day of month property should report it is a leap day", leapDay.dayOfMonth().isLeap());
+        assertTrue("Day of year property should report it is a leap day", leapDay.dayOfYear().isLeap());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
-    }
+    /**
+     * Tests that for a date in a non-leap year, the various isLeap() methods
+     * correctly return false.
+     */
+    public void testIsLeap_whenDateIsInNonLeapYear_returnsFalse() {
+        // Arrange: 2011 is a known non-leap year (not divisible by 4).
+        final int NON_LEAP_YEAR = 2011;
+        DateTime nonLeapDay = new DateTime(NON_LEAP_YEAR, 2, 28, 10, 20, GREGORIAN_UTC);
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testLeap_29feb() {
-        Chronology chrono = GregorianChronology.getInstance();
-        DateTime dt = new DateTime(2012, 2, 29, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(true, dt.dayOfMonth().isLeap());
-        assertEquals(true, dt.dayOfYear().isLeap());
+        // Assert
+        assertFalse("Year property should report it is not a leap year", nonLeapDay.year().isLeap());
+        assertFalse("Month property should report it is not a leap month", nonLeapDay.monthOfYear().isLeap());
+        assertFalse("Day of month property should report it is not a leap day", nonLeapDay.dayOfMonth().isLeap());
+        assertFalse("Day of year property should report it is not a leap day", nonLeapDay.dayOfYear().isLeap());
     }
 }
