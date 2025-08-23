@@ -1,39 +1,35 @@
 package org.apache.commons.lang3.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class BackgroundInitializer_ESTestTest18 extends BackgroundInitializer_ESTest_scaffolding {
+/**
+ * Test suite for {@link BackgroundInitializer}.
+ */
+public class BackgroundInitializerTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        BackgroundInitializer<Delayed> backgroundInitializer0 = new BackgroundInitializer<Delayed>();
-        // Undeclared exception!
+    /**
+     * Tests that calling get() before start() results in an IllegalStateException.
+     * The initializer must be started before its result can be retrieved.
+     */
+    @Test
+    public void getShouldThrowIllegalStateExceptionWhenCalledBeforeStart() {
+        // Arrange: Create an initializer but do not start it.
+        final BackgroundInitializer<Object> initializer = new BackgroundInitializer<>();
+
+        // Act & Assert: Expect an IllegalStateException when get() is called.
         try {
-            backgroundInitializer0.get();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // start() must be called first!
-            //
-            verifyException("org.apache.commons.lang3.concurrent.BackgroundInitializer", e);
+            initializer.get();
+            fail("Expected an IllegalStateException because start() was not called.");
+        } catch (final IllegalStateException e) {
+            // This is the expected outcome.
+            // Verify that the exception has the correct message.
+            assertEquals("start() must be called first!", e.getMessage());
+        } catch (final ConcurrentException e) {
+            // Fail the test if an unexpected checked exception is caught.
+            fail("Caught an unexpected ConcurrentException: " + e.getMessage());
         }
     }
 }
