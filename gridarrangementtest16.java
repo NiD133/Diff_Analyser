@@ -1,35 +1,56 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.data.Range;
+import org.jfree.ui.Size2D;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest16 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests for the {@link GridArrangement} class, focusing on its layout calculations.
+ */
+public class GridArrangementTest {
 
     private static final double EPSILON = 0.000000001;
 
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
-
     /**
-     * The arrangement should be able to handle less blocks than grid spaces.
+     * Verifies that arranging a partially filled grid with a fixed width constraint
+     * correctly calculates the total height.
+     * <p>
+     * This test case reveals a specific behavior: the total height appears to be
+     * calculated as the number of rows multiplied by the maximum height of any single
+     * block in the grid, even for rows that are empty.
      */
     @Test
-    public void testGridNotFull_FN() {
-        Block b1 = new EmptyBlock(5, 5);
-        BlockContainer c = new BlockContainer(new GridArrangement(2, 3));
-        c.add(b1);
-        Size2D s = c.arrange(null, RectangleConstraint.NONE.toFixedWidth(30.0));
-        assertEquals(30.0, s.getWidth(), EPSILON);
-        assertEquals(10.0, s.getHeight(), EPSILON);
+    public void arrangeWithFixedWithForPartiallyFilledGrid() {
+        // Arrange: Set up a 2x3 grid but add only one block to it.
+        final int gridRows = 2;
+        final int gridCols = 3;
+        final double blockHeight = 5.0;
+        final double blockWidth = 5.0;
+
+        Block singleBlock = new EmptyBlock(blockWidth, blockHeight);
+
+        GridArrangement arrangement = new GridArrangement(gridRows, gridCols);
+        BlockContainer container = new BlockContainer(arrangement);
+        container.add(singleBlock); // The grid is now 1/6 full.
+
+        final double containerFixedWidth = 30.0;
+        RectangleConstraint constraint = RectangleConstraint.NONE.toFixedWidth(containerFixedWidth);
+
+        // Act: Arrange the container.
+        Size2D arrangedSize = container.arrange(null, constraint);
+
+        // Assert: Verify the final dimensions of the container.
+        // The width should simply match the fixed width from the constraint.
+        assertEquals(containerFixedWidth, arrangedSize.getWidth(), EPSILON, "Width should match the fixed constraint.");
+
+        // The expected height calculation is the key part of this test.
+        // The grid has 2 rows and the tallest block has a height of 5.0.
+        // The resulting height of 10.0 implies that the height of *each* row
+        // is based on the tallest block in the entire grid.
+        // Calculation: 2 rows * 5.0 height = 10.0.
+        double expectedHeight = gridRows * blockHeight;
+        assertEquals(expectedHeight, arrangedSize.getHeight(), EPSILON,
+                "Total height should be (number of rows * max block height).");
     }
 }
