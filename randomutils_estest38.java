@@ -1,27 +1,33 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest38 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that nextDouble() throws an IllegalArgumentException when the start value
+     * is greater than the end value.
+     */
+    @Test
+    public void nextDoubleShouldThrowExceptionForInvalidRange() {
+        // Arrange: Define a start value that is larger than the end value.
+        final double startInclusive = Double.MAX_VALUE;
+        final double endExclusive = 2616.0;
+        final String expectedMessage = "Start value must be smaller or equal to end value.";
+
+        // Act & Assert: Call the method and verify that the correct exception is thrown.
         try {
-            RandomUtils.nextDouble(1.7976931348623157E308, (double) 2616);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Start value must be smaller or equal to end value.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
+            RandomUtils.nextDouble(startInclusive, endExclusive);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was thrown.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
