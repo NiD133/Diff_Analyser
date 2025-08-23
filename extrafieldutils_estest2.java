@@ -1,31 +1,30 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link ExtraFieldUtils}.
+ */
 public class ExtraFieldUtils_ESTestTest2 extends ExtraFieldUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-        byte[] byteArray0 = new byte[8];
-        ZipExtraField zipExtraField0 = extraFieldUtils_UnparseableExtraField0.onUnparseableExtraField(byteArray0, (byte) 0, (byte) 7, false, (byte) 7);
-        ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[2];
-        zipExtraFieldArray0[1] = zipExtraField0;
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.ExtraFieldUtils", e);
-        }
+    /**
+     * Verifies that mergeLocalFileDataData throws a NullPointerException
+     * when the input array contains a null element.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mergeLocalFileDataDataShouldThrowNullPointerExceptionForArrayWithNullElement() {
+        // Arrange: Create an array of extra fields where one element is null.
+        // The method under test is expected to fail when it tries to access this null element.
+        final ZipExtraField[] fieldsWithNull = new ZipExtraField[2];
+        fieldsWithNull[0] = new JarMarker(); // A valid, non-null extra field.
+        fieldsWithNull[1] = null;            // The null element that should trigger the exception.
+
+        // Act: Attempt to merge the fields.
+        // This call is expected to throw a NullPointerException.
+        ExtraFieldUtils.mergeLocalFileDataData(fieldsWithNull);
+
+        // Assert: The expected exception is declared in the @Test annotation,
+        // so no further assertion is needed. The test will fail if the
+        // expected exception is not thrown.
     }
 }
