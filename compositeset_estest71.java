@@ -1,56 +1,46 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CompositeSet_ESTestTest71 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CompositeSet}.
+ * This class focuses on a specific test case for the addComposited method.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        LinkedHashSet<Object> linkedHashSet0 = new LinkedHashSet<Object>();
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>(linkedHashSet0);
-        compositeSet0.addComposited((Set<Object>) linkedHashSet0);
-        assertEquals(0, linkedHashSet0.size());
+    /**
+     * Tests that adding the same empty set instance to a CompositeSet multiple times
+     * is a valid operation and does not trigger a collision exception.
+     *
+     * The addComposited method checks for intersections between the set being added
+     * and existing sets. An intersection with an empty set is always empty, so no
+     * collision should be detected.
+     */
+    @Test
+    public void testAddCompositedWithSameEmptySetDoesNotCauseCollision() {
+        // Arrange: Create an empty set and a CompositeSet containing it.
+        final Set<Object> emptySet = new LinkedHashSet<>();
+        final CompositeSet<Object> compositeSet = new CompositeSet<>(emptySet);
+
+        // Sanity check: The composite set initially contains one set and is empty.
+        assertEquals("The composite set should initially contain one set.", 1, compositeSet.getSets().size());
+        assertTrue("The composite set should initially be empty.", compositeSet.isEmpty());
+
+        // Act: Add the same empty set instance again.
+        compositeSet.addComposited(emptySet);
+
+        // Assert: Verify the state of the CompositeSet and the original set.
+        // The composite set should now contain two references to the same empty set.
+        assertEquals("The composite set should now contain two sets.", 2, compositeSet.getSets().size());
+
+        // The total size of the composite set should remain 0.
+        assertTrue("The composite set should still be empty after the operation.", compositeSet.isEmpty());
+
+        // The original set should, of course, remain unchanged.
+        assertTrue("The original set should not be modified.", emptySet.isEmpty());
     }
 }
