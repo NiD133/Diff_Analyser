@@ -1,41 +1,57 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest44 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test043() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        IIOMetadataNode iIOMetadataNode1 = new IIOMetadataNode();
-        Node node0 = iIOMetadataNode0.appendChild(iIOMetadataNode1);
-        XPathParser xPathParser0 = new XPathParser((Document) null);
-        Node node1 = iIOMetadataNode1.insertBefore(iIOMetadataNode0, node0);
-        XNode xNode0 = new XNode(xPathParser0, node1, properties0);
-        // Undeclared exception!
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link XNode} class, focusing on edge cases.
+ */
+public class XNodeTest {
+
+    /**
+     * Tests that XNode.toString() throws a NullPointerException when operating on a
+     * DOM node involved in a circular reference.
+     *
+     * This specific failure is triggered by a combination of two conditions:
+     * 1. A malformed DOM where a parent node is also a descendant of itself.
+     * 2. An XPathParser initialized with a null Document.
+     *
+     * While a circular reference would typically cause a StackOverflowError during
+     * recursion, the interaction with the parser's internal state leads to an NPE instead.
+     */
+    @Test
+    public void toStringShouldThrowNPEForNodeInACircularDomReference() {
+        // Arrange: Create a DOM structure with a circular reference.
+        // The structure will be: parentNode -> childNode -> parentNode
+        Node parentNode = new IIOMetadataNode();
+        Node childNode = new IIOMetadataNode();
+
+        // Establish the circular dependency.
+        // Note: IIOMetadataNode is a lenient DOM implementation that allows creating
+        // this invalid structure, which would throw a DOMException with a stricter DOM implementation.
+        parentNode.appendChild(childNode);
+        childNode.insertBefore(parentNode, childNode); // Makes parentNode a child of its own child.
+
+        // Arrange: Create an XPathParser with a null document. This is a key part of the setup
+        // required to trigger the NullPointerException instead of a StackOverflowError.
+        XPathParser parserWithNullDocument = new XPathParser((Document) null);
+        Properties emptyVariables = new Properties();
+
+        // The XNode instance wraps the parentNode, which is part of the cycle.
+        XNode xNode = new XNode(parserWithNullDocument, parentNode, emptyVariables);
+
+        // Act & Assert: Expect a NullPointerException when calling toString().
         try {
-            xNode0.toString();
-            fail("Expecting exception: NullPointerException");
+            xNode.toString();
+            fail("Expected a NullPointerException due to the circular DOM structure and null-document parser.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // This is the expected exception. The test passes.
         }
     }
 }
