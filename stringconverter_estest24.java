@@ -1,53 +1,37 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StringConverter_ESTestTest24 extends StringConverter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        MutableInterval mutableInterval0 = null;
+/**
+ * Unit tests for {@link StringConverter}.
+ * This test focuses on how the converter handles invalid string formats for intervals.
+ */
+public class StringConverterTest {
+
+    /**
+     * Tests that the converter, when used by {@link MutableInterval}'s constructor,
+     * throws an IllegalArgumentException for a string that does not represent a valid interval.
+     * The ISO8601 standard for an interval string is {@code <start>/<end>}.
+     */
+    @Test
+    public void setIntoInterval_withInvalidFormatString_shouldThrowIllegalArgumentException() {
+        // Arrange: An interval string with a clearly invalid format.
+        final String invalidIntervalString = "/UkrB+[Yx$";
+
+        // Act & Assert
         try {
-            mutableInterval0 = new MutableInterval("/UkrB+[Yx$");
-            fail("Expecting exception: IllegalArgumentException");
+            // The MutableInterval constructor uses the conversion framework, which delegates
+            // to StringConverter for string inputs.
+            new MutableInterval(invalidIntervalString);
+            fail("Expected an IllegalArgumentException for the invalid format.");
         } catch (IllegalArgumentException e) {
-            //
-            // Format invalid: /UkrB+[Yx$
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
+            // Verify that the exception message clearly states the format is invalid,
+            // and includes the problematic string.
+            assertEquals("Format invalid: " + invalidIntervalString, e.getMessage());
         }
     }
 }
