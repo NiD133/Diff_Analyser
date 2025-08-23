@@ -1,48 +1,29 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
 import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest23 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar();
-        MonthDay monthDay0 = MonthDay.fromCalendarFields(mockGregorianCalendar0);
-        Partial partial0 = new Partial(monthDay0);
-        int int0 = partial0.compareTo((ReadablePartial) monthDay0);
-        assertEquals(0, int0);
+/**
+ * Unit tests for the comparison logic in {@link AbstractPartial}.
+ */
+public class AbstractPartialTest {
+
+    @Test
+    public void compareTo_shouldReturnZero_whenPartialsAreEquivalent() {
+        // Arrange: Create two different but equivalent ReadablePartial instances.
+        // Both represent the same partial date: February 14th.
+        MonthDay originalMonthDay = new MonthDay(2, 14);
+        Partial partialFromMonthDay = new Partial(originalMonthDay);
+
+        // Act: Compare the Partial to the MonthDay it was created from.
+        // This tests the AbstractPartial's ability to compare itself against
+        // another ReadablePartial implementation.
+        int comparisonResult = partialFromMonthDay.compareTo(originalMonthDay);
+
+        // Assert: The result should be 0, indicating that the partials are equal.
+        assertEquals("Comparing two equivalent partials should result in 0.", 0, comparisonResult);
     }
 }
