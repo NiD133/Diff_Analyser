@@ -1,19 +1,25 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNotNull;
+
 import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest41 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        SecureRandom secureRandom0 = RandomUtils.secureRandom();
-        assertNotNull(secureRandom0);
+    /**
+     * Tests that the internal {@code secureRandom()} method successfully creates
+     * and returns a non-null {@link SecureRandom} instance.
+     */
+    @Test
+    public void secureRandomShouldReturnNonNullInstance() {
+        // Act: Call the static factory method to get a SecureRandom instance.
+        final SecureRandom secureRandom = RandomUtils.secureRandom();
+
+        // Assert: Verify that the returned instance is not null.
+        assertNotNull("The secureRandom() method should always return a valid instance.", secureRandom);
     }
 }
