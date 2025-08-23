@@ -1,26 +1,34 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
+import static org.junit.Assert.assertSame;
+
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest1 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginArray();
-        JsonWriter jsonWriter1 = jsonWriter0.beginObject();
-        JsonWriter jsonWriter2 = jsonWriter0.endObject();
-        assertSame(jsonWriter2, jsonWriter1);
+    @Test
+    public void fluentApiReturnsSameInstance() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act
+        // Build a simple JSON structure: an array containing an empty object.
+        // Each method call should return the original writer instance to allow chaining.
+        writer.beginArray();
+        JsonWriter writerAfterBeginObject = writer.beginObject();
+        JsonWriter writerAfterEndObject = writer.endObject();
+        writer.endArray();
+
+        // Assert
+        // Verify that the writer instance is returned after each call.
+        assertSame("beginObject() should return the same writer instance for chaining",
+                writer, writerAfterBeginObject);
+        assertSame("endObject() should return the same writer instance for chaining",
+                writer, writerAfterEndObject);
     }
 }
