@@ -1,19 +1,29 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest53 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer();
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuffer0, stringBuffer0, (-459));
-        assertEquals((-1), int0);
+    /**
+     * Tests that lastIndexOf returns -1 when the starting search index is negative.
+     * This behavior is consistent with the contract of similar methods in the Java standard library.
+     */
+    @Test
+    public void lastIndexOfWithNegativeStartIndexShouldReturnNotFound() {
+        // Arrange
+        final CharSequence text = new StringBuffer("abc");
+        final CharSequence searchString = new StringBuffer("a");
+        final int negativeStartIndex = -459;
+        final int expectedIndex = -1; // The expected result for a "not found" scenario.
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(text, searchString, negativeStartIndex);
+
+        // Assert
+        assertEquals("A negative start index should always result in -1.", expectedIndex, actualIndex);
     }
 }
