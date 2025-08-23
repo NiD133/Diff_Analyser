@@ -2,18 +2,25 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest40 extends Seconds_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Seconds} class.
+ * This test focuses on the isLessThan() method.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Seconds seconds0 = Seconds.seconds((-1300));
-        boolean boolean0 = seconds0.isLessThan((Seconds) null);
-        assertTrue(boolean0);
-        assertEquals((-1300), seconds0.getSeconds());
+    @Test
+    public void isLessThan_shouldReturnTrue_whenNegativeSecondsIsComparedToNull() {
+        // Arrange
+        // According to the Javadoc, comparing with a null Seconds object
+        // is equivalent to comparing with Seconds.ZERO.
+        Seconds negativeSeconds = Seconds.seconds(-1300);
+
+        // Act
+        // Perform the comparison against a null value.
+        boolean isLess = negativeSeconds.isLessThan(null);
+
+        // Assert
+        assertTrue("A negative Seconds value should be considered less than null (which is treated as zero).", isLess);
     }
 }
