@@ -1,24 +1,25 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
-import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class OptionFormatter_ESTestTest35 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter.Builder}.
+ */
+public class OptionFormatterBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Option option0 = new Option((String) null, "n> #GB(6W.[&nb>qttA");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
-        String string0 = optionFormatter_Builder0.toArgName("n6mk~");
-        assertEquals("<n6mk~>", string0);
+    @Test
+    public void toArgNameShouldWrapArgumentWithDefaultDelimiters() {
+        // Arrange: Create a builder, which uses default settings.
+        // The default argument name delimiters are '<' and '>'.
+        OptionFormatter.Builder builder = OptionFormatter.builder();
+        final String argName = "file";
+
+        // Act: Format the argument name.
+        String formattedArgName = builder.toArgName(argName);
+
+        // Assert: Verify the argument name is correctly wrapped.
+        assertEquals("The argument name should be enclosed in default angle brackets.",
+                "<file>", formattedArgName);
     }
 }
