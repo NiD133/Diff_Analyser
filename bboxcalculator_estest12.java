@@ -1,32 +1,26 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest12 extends BBoxCalculator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
-        // Undeclared exception!
-        try {
-            bBoxCalculator0.getBoundary();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
-        }
+    /**
+     * Tests that calling getBoundary() on a BBoxCalculator initialized with a null
+     * SpatialContext throws a NullPointerException. The context is required internally
+     * to construct the final Rectangle object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getBoundary_whenContextIsNull_throwsNullPointerException() {
+        // Arrange: Create a BBoxCalculator with a null SpatialContext.
+        BBoxCalculator calculator = new BBoxCalculator((SpatialContext) null);
+
+        // Act: Attempt to get the boundary. This is expected to fail.
+        calculator.getBoundary();
+
+        // Assert: The @Test(expected) annotation verifies that a NullPointerException was thrown.
     }
 }
