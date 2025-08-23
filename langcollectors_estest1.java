@@ -1,22 +1,35 @@
 package org.apache.commons.lang3.stream;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.function.Function;
+
 import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LangCollectors_ESTestTest1 extends LangCollectors_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        char[] charArray0 = new char[5];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) null, (CharSequence) null, (CharSequence) charBuffer0);
-        assertNotNull(collector0);
+/**
+ * Tests for {@link LangCollectors}.
+ */
+public class LangCollectorsTest {
+
+    /**
+     * Tests that {@code LangCollectors.joining(delimiter, prefix, suffix)}
+     * successfully creates a collector when the delimiter and prefix are null.
+     * This test verifies that the factory method is robust and does not throw
+     * a NullPointerException for these specific null inputs.
+     */
+    @Test
+    public void joiningWithNullDelimiterAndPrefixShouldReturnCollector() {
+        // Arrange: Define the arguments for the joining collector.
+        // The key part of this test is using null for the delimiter and prefix.
+        CharSequence delimiter = null;
+        CharSequence prefix = null;
+        CharSequence suffix = "]";
+
+        // Act: Call the factory method with the specified arguments.
+        Collector<Object, ?, String> collector = LangCollectors.joining(delimiter, prefix, suffix);
+
+        // Assert: The factory method should return a non-null Collector instance,
+        // confirming it handles null inputs without throwing an exception.
+        assertNotNull("The created collector should not be null.", collector);
     }
 }
