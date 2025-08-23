@@ -1,24 +1,26 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class JsonArray_ESTestTest3 extends JsonArray_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonArray}.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((JsonElement) jsonArray0);
-        boolean boolean0 = jsonArray0.remove((JsonElement) jsonArray0);
-        assertEquals(0, jsonArray0.size());
-        assertTrue(boolean0);
+    @Test
+    public void remove_whenElementExists_returnsTrueAndRemovesElement() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        // Add the array as an element to itself to test removal by object reference.
+        jsonArray.add(jsonArray);
+
+        // Act
+        boolean wasRemoved = jsonArray.remove(jsonArray);
+
+        // Assert
+        assertTrue("The remove operation should return true to indicate success.", wasRemoved);
+        assertEquals("The array should be empty after removing its only element.", 0, jsonArray.size());
     }
 }
