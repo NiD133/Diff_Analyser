@@ -1,34 +1,32 @@
 package org.jfree.data.general;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DefaultKeyedValueDataset_ESTestTest5 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultKeyedValueDataset} class.
+ */
+class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        Integer integer0 = JLayeredPane.PALETTE_LAYER;
-        // Undeclared exception!
-        try {
-            defaultKeyedValueDataset0.setValue((Comparable) null, integer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'key' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that calling setValue() with a null key throws an
+     * IllegalArgumentException, as this is a required argument.
+     */
+    @Test
+    void setValue_withNullKey_shouldThrowIllegalArgumentException() {
+        // Arrange: Create an empty dataset instance.
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset();
+        final Number anyValue = 100;
+        final String expectedErrorMessage = "Null 'key' argument.";
+
+        // Act & Assert: Call the method with a null key and verify the exception.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> dataset.setValue(null, anyValue)
+        );
+
+        // Verify that the exception message is correct.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
