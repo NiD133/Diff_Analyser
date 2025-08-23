@@ -10,86 +10,53 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LeafNodeTest {
 
     @Test
-    public void testAttributeHandlingInLeafNodes() {
-        // Test to ensure attributes are not prematurely set on nodes
+    public void doesNotGetAttributesTooEasily() {
+        // test to make sure we're not setting attributes on all nodes right away
+        String body = "<p>One <!-- Two --> Three<![CDATA[Four]]></p>";
+        Document doc = Jsoup.parse(body, "https://example.com/");
+        assertTrue(hasAnyAttributes(doc)); // should have one - the base uri on the doc
 
-        // Parse a document with a base URI
-        String htmlContent = "<p>One <!-- Two --> Three<![CDATA[Four]]></p>";
-        Document documentWithBaseUri = Jsoup.parse(htmlContent, "https://example.com/");
-        
-        // The document should have one attribute - the base URI
-        assertTrue(hasAnyAttributes(documentWithBaseUri));
+        assertFalse(hasAnyAttributes(Jsoup.parse("<div>None</div>"))); // no base uri
 
-        // Parse a document without a base URI
-        Document documentWithoutBaseUri = Jsoup.parse("<div>None</div>");
-        
-        // This document should not have any attributes
-        assertFalse(hasAnyAttributes(documentWithoutBaseUri));
+        Element html = doc.child(0);
+        assertFalse(hasAnyAttributes(html));
 
-        // Check the first child of the document (the <html> element)
-        Element htmlElement = documentWithBaseUri.child(0);
-        assertFalse(hasAnyAttributes(htmlElement));
+        String s = doc.outerHtml();
+        assertFalse(hasAnyAttributes(html));
 
-        // Generate the outer HTML of the document
-        String outerHtml = documentWithBaseUri.outerHtml();
-        
-        // Ensure no attributes were added to the <html> element
-        assertFalse(hasAnyAttributes(htmlElement));
+        Elements els = doc.select("p");
+        Element p = els.first();
+        assertEquals(1, els.size());
+        assertFalse(hasAnyAttributes(html));
 
-        // Select the <p> element from the document
-        Elements paragraphElements = documentWithBaseUri.select("p");
-        Element paragraphElement = paragraphElements.first();
-        
-        // Ensure there is only one <p> element
-        assertEquals(1, paragraphElements.size());
-        assertFalse(hasAnyAttributes(htmlElement));
+        els = doc.select("p.none");
+        assertFalse(hasAnyAttributes(html));
 
-        // Select elements with a non-existent class
-        Elements nonExistentClassElements = documentWithBaseUri.select("p.none");
-        assertFalse(hasAnyAttributes(htmlElement));
+        String id = p.id();
+        assertEquals("", id);
+        assertFalse(p.hasClass("Foobs"));
+        assertFalse(hasAnyAttributes(html));
 
-        // Check the ID of the <p> element, which should be empty
-        String paragraphId = paragraphElement.id();
-        assertEquals("", paragraphId);
-        
-        // Ensure the <p> element does not have a class "Foobs"
-        assertFalse(paragraphElement.hasClass("Foobs"));
-        assertFalse(hasAnyAttributes(htmlElement));
+        p.addClass("Foobs");
+        assertTrue(p.hasClass("Foobs"));
+        assertTrue(hasAnyAttributes(html));
+        assertTrue(hasAnyAttributes(p));
 
-        // Add a class to the <p> element
-        paragraphElement.addClass("Foobs");
-        
-        // Verify the class was added
-        assertTrue(paragraphElement.hasClass("Foobs"));
-        assertTrue(hasAnyAttributes(htmlElement));
-        assertTrue(hasAnyAttributes(paragraphElement));
-
-        // Check the attributes of the <p> element
-        Attributes paragraphAttributes = paragraphElement.attributes();
-        assertTrue(paragraphAttributes.hasKey("class"));
-
-        // Clear attributes from the <p> element
-        paragraphElement.clearAttributes();
-        
-        // Ensure attributes are cleared
-        assertFalse(hasAnyAttributes(paragraphElement));
-        assertFalse(hasAnyAttributes(htmlElement));
-        assertFalse(paragraphAttributes.hasKey("class"));
+        Attributes attributes = p.attributes();
+        assertTrue(attributes.hasKey("class"));
+        p.clearAttributes();
+        assertFalse(hasAnyAttributes(p));
+        assertFalse(hasAnyAttributes(html));
+        assertFalse(attributes.hasKey("class"));
     }
 
-    /**
-     * Helper method to determine if a node has any attributes.
-     *
-     * @param node the node to check
-     * @return true if the node has any attributes, false otherwise
-     */
     private boolean hasAnyAttributes(Node node) {
-        final boolean[] foundAttributes = new boolean[1];
+        final boolean[] found = new boolean[1];
         node.filter(new NodeFilter() {
             @Override
             public FilterResult head(Node node, int depth) {
                 if (node.hasAttributes()) {
-                    foundAttributes[0] = true;
+                    found[0] = true;
                     return FilterResult.STOP;
                 } else {
                     return FilterResult.CONTINUE;
@@ -101,6 +68,6 @@ public class LeafNodeTest {
                 return FilterResult.CONTINUE;
             }
         });
-        return foundAttributes[0];
+        return found[0];
     }
 }
