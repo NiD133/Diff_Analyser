@@ -2,32 +2,54 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest44 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Test suite focusing on the merging logic of {@link JsonIgnoreProperties.Value},
+ * specifically the {@code mergeAll} method.
+ */
+public class JsonIgnorePropertiesValueMergeTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        String[] stringArray0 = new String[1];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withoutMerge();
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[2];
-        jsonIgnoreProperties_ValueArray0[0] = jsonIgnoreProperties_Value1;
-        jsonIgnoreProperties_ValueArray0[1] = jsonIgnoreProperties_Value0;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = JsonIgnoreProperties.Value.mergeAll(jsonIgnoreProperties_ValueArray0);
-        assertNotNull(jsonIgnoreProperties_Value2);
-        assertFalse(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value0));
-        assertFalse(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value0);
+    /**
+     * This test verifies the behavior of the {@code mergeAll} method when combining
+     * two {@code JsonIgnoreProperties.Value} instances that are identical except
+     * for their 'merge' flag.
+     *
+     * The expected outcome is that if any of the values being merged has its 'merge'
+     * flag enabled, the resulting merged value will also have its 'merge' flag enabled.
+     */
+    @Test
+    public void mergeAll_whenCombiningValuesWithAndWithoutMerge_shouldProduceMergedValueWithMergeEnabled() {
+        // Arrange
+        // 1. Create a base Value object. By default, its 'merge' flag is enabled.
+        String[] ignoredProperties = { "internalId" };
+        JsonIgnoreProperties.Value valueWithMerge = JsonIgnoreProperties.Value.forIgnoredProperties(ignoredProperties);
+
+        // 2. Create a second Value object based on the first, but with the 'merge' flag disabled.
+        JsonIgnoreProperties.Value valueWithoutMerge = valueWithMerge.withoutMerge();
+
+        // Sanity-check our initial setup
+        assertTrue("Precondition: The first value should have merge enabled.", valueWithMerge.getMerge());
+        assertFalse("Precondition: The second value should have merge disabled.", valueWithoutMerge.getMerge());
+
+        // Act
+        // 3. Merge the two values. The 'merge' property is expected to be true in the result
+        //    because at least one of the source values had it enabled.
+        JsonIgnoreProperties.Value mergedValue = JsonIgnoreProperties.Value.mergeAll(valueWithMerge, valueWithoutMerge);
+
+        // Assert
+        // 4. The result should be a new instance, not a reference to either of the inputs.
+        assertNotSame("Merged value should be a new instance.", valueWithMerge, mergedValue);
+        assertNotSame("Merged value should be a new instance.", valueWithoutMerge, mergedValue);
+
+        // 5. The merged value should be logically equal to the input that had merge enabled,
+        //    as all other properties were identical. This is a concise way to check all fields.
+        assertEquals("Merged value should be equal to the value with merge enabled.", valueWithMerge, mergedValue);
+
+        // 6. For maximum clarity, we can also explicitly verify the key properties of the merged value.
+        assertTrue("The 'merge' flag should be true in the merged result.", mergedValue.getMerge());
+        assertEquals(valueWithMerge.getIgnored(), mergedValue.getIgnored());
+        assertFalse("The 'ignoreUnknown' flag should be false.", mergedValue.getIgnoreUnknown());
+        assertFalse("The 'allowGetters' flag should be false.", mergedValue.getAllowGetters());
+        assertFalse("The 'allowSetters' flag should be false.", mergedValue.getAllowSetters());
     }
 }
