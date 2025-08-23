@@ -1,53 +1,33 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest24 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        CharBuffer charBuffer0 = CharStreams.createBuffer();
-        CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-        // Undeclared exception!
-        try {
-            CharStreams.copy(charBuffer0, charBuffer1);
-            fail("Expecting exception: ReadOnlyBufferException");
-        } catch (ReadOnlyBufferException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that attempting to copy characters to a read-only CharBuffer
+     * correctly throws a ReadOnlyBufferException.
+     */
+    @Test(expected = ReadOnlyBufferException.class)
+    public void copy_toReadOnlyBuffer_throwsReadOnlyBufferException() throws IOException {
+        // Arrange: Create a source buffer with data and a read-only destination buffer.
+        CharBuffer source = CharStreams.createBuffer();
+        source.put("some data to copy");
+        source.flip(); // Prepare the buffer for reading.
+
+        // CharBuffer.wrap(CharSequence) creates a destination buffer that is a read-only view.
+        CharBuffer readOnlyDestination = CharBuffer.wrap(source);
+
+        // Act: Attempt to copy from the source to the read-only destination.
+        // This is expected to fail because the destination cannot be modified.
+        CharStreams.copy(source, readOnlyDestination);
+
+        // Assert: The expected ReadOnlyBufferException is handled by the @Test annotation.
     }
 }
