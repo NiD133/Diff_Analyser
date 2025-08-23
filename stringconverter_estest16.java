@@ -1,55 +1,33 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StringConverter_ESTestTest16 extends StringConverter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link StringConverter}.
+ */
+public class StringConverterTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        StringConverter stringConverter0 = new StringConverter();
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
-        // Undeclared exception!
-        try {
-            stringConverter0.getInstantMillis(ethiopicChronology0, ethiopicChronology0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // org.joda.time.chrono.EthiopicChronology cannot be cast to java.lang.String
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
-        }
+    /**
+     * Tests that getInstantMillis throws a ClassCastException if the input object
+     * is not a String. The converter is designed to only handle String objects.
+     */
+    @Test(expected = ClassCastException.class)
+    public void getInstantMillis_shouldThrowClassCastException_forNonStringInput() {
+        // Arrange
+        StringConverter converter = new StringConverter();
+        
+        // Use an arbitrary non-String object as the input to be converted.
+        // The StringConverter expects a String, so this should fail.
+        Object nonStringInput = new Object(); 
+        
+        // A dummy chronology is needed for the method signature, but its value is not relevant here.
+        Chronology chronology = ISOChronology.getInstanceUTC();
+
+        // Act & Assert
+        // This call should throw a ClassCastException because the first argument is not a String.
+        // The @Test(expected) annotation handles the assertion.
+        converter.getInstantMillis(nonStringInput, chronology);
     }
 }
