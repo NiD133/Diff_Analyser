@@ -1,18 +1,25 @@
 package org.apache.ibatis.cache;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CacheKey_ESTestTest10 extends CacheKey_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CacheKey} class.
+ */
+public class CacheKeyTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        CacheKey cacheKey0 = new CacheKey();
-        boolean boolean0 = cacheKey0.equals(cacheKey0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals method, ensuring that
+     * a CacheKey instance is always equal to itself.
+     */
+    @Test
+    public void shouldBeEqualToItself() {
+        // Arrange
+        CacheKey cacheKey = new CacheKey();
+
+        // Act & Assert
+        // According to the Java contract for Object.equals(), an object must be equal to itself.
+        // Using assertEquals is more idiomatic for this check than assertTrue(cacheKey.equals(cacheKey)).
+        assertEquals("A CacheKey instance should be equal to itself.", cacheKey, cacheKey);
     }
 }
