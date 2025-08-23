@@ -1,25 +1,21 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteOrderMark_ESTestTest8 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Tests for the {@link ByteOrderMark} class, focusing on constructor argument validation.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ByteOrderMark byteOrderMark0 = null;
-        try {
-            byteOrderMark0 = new ByteOrderMark("U", (int[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // bytes
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the ByteOrderMark constructor throws a NullPointerException
+     * when the 'bytes' array argument is null. The constructor's contract
+     * requires a non-null array of bytes.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionForNullBytes() {
+        // Attempt to create a ByteOrderMark with a null bytes array,
+        // which is expected to fail with a NullPointerException.
+        new ByteOrderMark("UTF-8", (int[]) null);
     }
 }
