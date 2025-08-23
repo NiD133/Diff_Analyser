@@ -1,18 +1,28 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest77 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test76() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("%>-8wJ/e4'{T9H");
-        String string0 = tokenQueue0.consumeTo("%>-8wJ/e4'{T9H");
-        assertEquals("", string0);
+    @Test
+    public void consumeToShouldReturnEmptyStringWhenDelimiterIsAtStartOfQueue() {
+        // Arrange
+        String contentAndDelimiter = "%>-8wJ/e4'{T9H";
+        TokenQueue queue = new TokenQueue(contentAndDelimiter);
+
+        // Act
+        // Attempt to consume all characters *up to* the delimiter.
+        String consumed = queue.consumeTo(contentAndDelimiter);
+
+        // Assert
+        // Since the delimiter is at the very beginning of the queue, nothing is consumed.
+        assertEquals("Should consume nothing if the delimiter is at the start", "", consumed);
+        
+        // The queue's state should remain unchanged because the delimiter was not consumed.
+        assertEquals("Queue should be unchanged", contentAndDelimiter, queue.remainder());
     }
 }
