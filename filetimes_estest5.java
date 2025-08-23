@@ -1,25 +1,30 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest5 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Date date0 = FileTimes.ntfsTimeToDate(0L);
-        long long0 = FileTimes.toNtfsTime(date0);
-        assertEquals(0L, long0);
+    /**
+     * Tests that converting an NTFS time to a Date and back again yields the original value.
+     * This confirms the round-trip integrity of the conversion methods.
+     */
+    @Test
+    public void testNtfsTimeConversionRoundTrip() {
+        // Arrange: Define the starting NTFS time.
+        // 0L represents the start of the NTFS epoch: 1601-01-01T00:00:00Z.
+        final long originalNtfsTime = 0L;
+
+        // Act: Convert the NTFS time to a Date and then back to an NTFS time.
+        final Date intermediateDate = FileTimes.ntfsTimeToDate(originalNtfsTime);
+        final long resultNtfsTime = FileTimes.toNtfsTime(intermediateDate);
+
+        // Assert: The final NTFS time should be identical to the original.
+        assertEquals(originalNtfsTime, resultNtfsTime);
     }
 }
