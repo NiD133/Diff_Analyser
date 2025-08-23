@@ -1,56 +1,33 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
+
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
-public class JulianChronology_ESTestTest40 extends JulianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        JulianEra julianEra0 = JulianEra.AD;
-        JulianDate julianDate0 = julianChronology0.dateYearDay((Era) julianEra0, 84, 84);
-        assertEquals(JulianEra.AD, julianDate0.getEra());
+/**
+ * Unit tests for the {@link JulianChronology} class.
+ */
+public class JulianChronologyTest {
+
+    /**
+     * Tests that {@link JulianChronology#dateYearDay(Era, int, int)}
+     * correctly creates a date for a given era, year, and day of the year.
+     */
+    @Test
+    public void dateYearDay_withValidAdEraYearAndDay_createsCorrectDate() {
+        // Arrange: Set up the input values for the test.
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        int yearOfEra = 84;
+        int dayOfYear = 84;
+
+        // Act: Call the method under test.
+        JulianDate resultDate = julianChronology.dateYearDay(JulianEra.AD, yearOfEra, dayOfYear);
+
+        // Assert: Verify that the created date has the correct properties.
+        assertEquals("The era should be AD.", JulianEra.AD, resultDate.getEra());
+        assertEquals("The year of era should match the input.", yearOfEra, resultDate.get(ChronoField.YEAR_OF_ERA));
+        assertEquals("The day of year should match the input.", dayOfYear, resultDate.get(ChronoField.DAY_OF_YEAR));
     }
 }
