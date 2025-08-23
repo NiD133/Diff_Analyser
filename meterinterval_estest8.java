@@ -1,31 +1,43 @@
 package org.jfree.chart.plot;
 
+import org.jfree.data.Range;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
 
-public class MeterInterval_ESTestTest8 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType> defaultBoxAndWhiskerCategoryDataset0 = new DefaultBoxAndWhiskerCategoryDataset<HistogramType, HistogramType>();
-        Range range0 = defaultBoxAndWhiskerCategoryDataset0.getRangeBounds(true);
-        Color color0 = Color.darkGray;
-        BasicStroke basicStroke0 = new BasicStroke(0.0F);
-        MeterInterval meterInterval0 = new MeterInterval("L5-", range0, color0, basicStroke0, color0);
-        Color color1 = (Color) meterInterval0.getBackgroundPaint();
-        assertEquals(64, color1.getBlue());
+/**
+ * A test suite for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that getBackgroundPaint() returns the same paint object
+     * that was provided in the constructor.
+     */
+    @Test
+    public void getBackgroundPaintShouldReturnPaintSetInConstructor() {
+        // Arrange: Define the parameters for creating a MeterInterval.
+        // We use Color.darkGray, which was used in the original test.
+        final Paint expectedBackgroundPaint = Color.darkGray;
+        final Range range = new Range(0.0, 50.0);
+        final String label = "Test Range";
+
+        // Act: Instantiate MeterInterval with a specific background paint.
+        final MeterInterval interval = new MeterInterval(label, range, Color.BLACK,
+                new BasicStroke(1.0f), expectedBackgroundPaint);
+        final Paint actualBackgroundPaint = interval.getBackgroundPaint();
+
+        // Assert: The getter should return the exact paint object we passed in.
+        assertSame("The returned background paint should be the same instance as the one provided to the constructor.",
+                expectedBackgroundPaint, actualBackgroundPaint);
+        
+        // For completeness, also check for equality.
+        assertEquals("The returned background paint should be equal to the one provided to the constructor.",
+                expectedBackgroundPaint, actualBackgroundPaint);
     }
 }
