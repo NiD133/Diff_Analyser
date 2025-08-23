@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.collections4.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,29 +31,20 @@ import org.apache.commons.collections4.functors.TruePredicate;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test suite for the {@link PredicatedMap} implementation.
- * This class tests the behavior of PredicatedMap, ensuring that
- * keys and values adhere to specified predicates.
+ * Extension of {@link AbstractMapTest} for exercising the
+ * {@link PredicatedMap} implementation.
  *
  * @param <K> the key type.
  * @param <V> the value type.
  */
 public class PredicatedMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
-    // Predicates for testing
-    protected static final Predicate<Object> TRUE_PREDICATE = TruePredicate.<Object>truePredicate();
-    protected static final Predicate<Object> STRING_INSTANCE_PREDICATE = String.class::isInstance;
+    protected static final Predicate<Object> truePredicate = TruePredicate.<Object>truePredicate();
 
-    /**
-     * Decorates a map with key and value predicates.
-     *
-     * @param map the map to decorate
-     * @param keyPredicate the predicate for keys
-     * @param valuePredicate the predicate for values
-     * @return a predicated map
-     */
+    protected static final Predicate<Object> testPredicate = String.class::isInstance;
+
     protected IterableMap<K, V> decorateMap(final Map<K, V> map, final Predicate<? super K> keyPredicate,
-                                            final Predicate<? super V> valuePredicate) {
+        final Predicate<? super V> valuePredicate) {
         return PredicatedMap.predicatedMap(map, keyPredicate, valuePredicate);
     }
 
@@ -48,78 +55,68 @@ public class PredicatedMapTest<K, V> extends AbstractIterableMapTest<K, V> {
 
     @Override
     public IterableMap<K, V> makeObject() {
-        return decorateMap(new HashMap<>(), TRUE_PREDICATE, TRUE_PREDICATE);
+        return decorateMap(new HashMap<>(), truePredicate, truePredicate);
     }
 
-    /**
-     * Creates a test map with string predicates for both keys and values.
-     *
-     * @return a predicated map
-     */
     public IterableMap<K, V> makeTestMap() {
-        return decorateMap(new HashMap<>(), STRING_INSTANCE_PREDICATE, STRING_INSTANCE_PREDICATE);
+        return decorateMap(new HashMap<>(), testPredicate, testPredicate);
     }
 
-    /**
-     * Tests that the entry set of a predicated map is not null and behaves as expected.
-     */
     @Test
     @SuppressWarnings("unchecked")
     void testEntrySet() {
         Map<K, V> map = makeTestMap();
-        assertNotNull(map.entrySet(), "Entry set should not be null");
-
+        assertNotNull(map.entrySet(), "returned entryset should not be null");
         map = decorateMap(new HashMap<>(), null, null);
         map.put((K) "oneKey", (V) "oneValue");
-        assertEquals(1, map.entrySet().size(), "Entry set should contain one entry");
+        assertEquals(1, map.entrySet().size(), "returned entryset should contain one entry");
+        map = decorateMap(map, null, null);
     }
 
-    /**
-     * Tests the put and putAll methods of a predicated map, ensuring that
-     * invalid keys and values throw IllegalArgumentException.
-     */
     @Test
     @SuppressWarnings("unchecked")
     void testPut() {
         final Map<K, V> map = makeTestMap();
-
-        // Test putting invalid value
         assertThrows(IllegalArgumentException.class, () -> map.put((K) "Hi", (V) Integer.valueOf(3)),
-                "Putting an invalid value should raise IllegalArgumentException");
+                "Illegal value should raise IllegalArgument");
 
-        // Test putting invalid key
         assertThrows(IllegalArgumentException.class, () -> map.put((K) Integer.valueOf(3), (V) "Hi"),
-                "Putting an invalid key should raise IllegalArgumentException");
+                "Illegal key should raise IllegalArgument");
 
-        // Ensure invalid key/value are not present
         assertFalse(map.containsKey(Integer.valueOf(3)));
         assertFalse(map.containsValue(Integer.valueOf(3)));
 
-        // Prepare another map with mixed valid and invalid entries
-        final Map<K, V> mixedMap = new HashMap<>();
-        mixedMap.put((K) "A", (V) "a");
-        mixedMap.put((K) "B", (V) "b");
-        mixedMap.put((K) "C", (V) "c");
-        mixedMap.put((K) "c", (V) Integer.valueOf(3));
+        final Map<K, V> map2 = new HashMap<>();
+        map2.put((K) "A", (V) "a");
+        map2.put((K) "B", (V) "b");
+        map2.put((K) "C", (V) "c");
+        map2.put((K) "c", (V) Integer.valueOf(3));
 
-        // Test putAll with invalid entries
-        assertThrows(IllegalArgumentException.class, () -> map.putAll(mixedMap),
-                "Putting invalid entries should raise IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () -> map.putAll(map2),
+                "Illegal value should raise IllegalArgument");
 
-        // Test setting a valid value
         map.put((K) "E", (V) "e");
-
-        // Test setting an invalid value via entry set
         Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
         Map.Entry<K, V> entry = iterator.next();
         final Map.Entry<K, V> finalEntry = entry;
         assertThrows(IllegalArgumentException.class, () -> finalEntry.setValue((V) Integer.valueOf(3)),
-                "Setting an invalid value should raise IllegalArgumentException");
+                "Illegal value should raise IllegalArgument");
 
-        // Test setting a valid value via entry set
         map.put((K) "F", (V) "f");
         iterator = map.entrySet().iterator();
         entry = iterator.next();
         entry.setValue((V) "x");
     }
+
+//    void testCreate() throws Exception {
+//        resetEmpty();
+//        writeExternalFormToDisk(
+//            (java.io.Serializable) map,
+//            "src/test/resources/data/test/PredicatedMap.emptyCollection.version4.obj");
+//        resetFull();
+//        writeExternalFormToDisk(
+//            (java.io.Serializable) map,
+//            "src/test/resources/data/test/PredicatedMap.fullCollection.version4.obj");
+//    }
+
 }
