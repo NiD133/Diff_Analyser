@@ -1,24 +1,38 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonSetter_ESTestTest2 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on its factory methods and equality contract.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Nulls nulls0 = Nulls.DEFAULT;
-        Nulls nulls1 = Nulls.FAIL;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.forContentNulls(nulls1);
-        JsonSetter.Value jsonSetter_Value1 = JsonSetter.Value.forValueNulls(nulls0, nulls1);
-        boolean boolean0 = jsonSetter_Value1.equals(jsonSetter_Value0);
-        assertEquals(Nulls.FAIL, jsonSetter_Value1.getContentNulls());
-        assertEquals(Nulls.DEFAULT, jsonSetter_Value1.getValueNulls());
-        assertTrue(boolean0);
+    /**
+     * This test verifies that two {@link JsonSetter.Value} instances are considered equal
+     * if they have the same internal properties, even if they are created using different
+     * factory methods.
+     */
+    @Test
+    public void shouldBeEqualWhenConstructedDifferentlyWithSameProperties() {
+        // Given: Two JsonSetter.Value objects are configured to have the same
+        // state (valueNulls=DEFAULT, contentNulls=FAIL), but are created
+        // using different factory methods.
+
+        // The forContentNulls() factory method sets valueNulls to DEFAULT implicitly.
+        JsonSetter.Value valueFromContentNullsFactory = JsonSetter.Value.forContentNulls(Nulls.FAIL);
+
+        // The forValueNulls() factory method sets both properties explicitly.
+        JsonSetter.Value valueFromFullFactory = JsonSetter.Value.forValueNulls(Nulls.DEFAULT, Nulls.FAIL);
+
+        // Then: The two objects should be considered equal, as their properties match.
+        assertEquals(valueFromContentNullsFactory, valueFromFullFactory);
+
+        // And: Their hash codes should also be equal, as per the equals/hashCode contract.
+        assertEquals(valueFromContentNullsFactory.hashCode(), valueFromFullFactory.hashCode());
+
+        // And: We can verify the state of one object to confirm our setup is correct.
+        assertEquals(Nulls.DEFAULT, valueFromFullFactory.getValueNulls());
+        assertEquals(Nulls.FAIL, valueFromFullFactory.getContentNulls());
     }
 }
