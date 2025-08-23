@@ -1,22 +1,37 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class NullReader_ESTestTest7 extends NullReader_ESTest_scaffolding {
+/**
+ * Contains improved, more understandable tests for the {@link NullReader} class.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        NullReader nullReader0 = new NullReader((-476L));
-        int int0 = nullReader0.processChar();
-        assertEquals(0, int0);
-        assertEquals((-476L), nullReader0.getSize());
-        assertTrue(nullReader0.markSupported());
+    /**
+     * Tests that a NullReader initialized with a negative size correctly stores that size
+     * and maintains the default behaviors for mark support and character processing.
+     */
+    @Test
+    public void readerCreatedWithNegativeSizeShouldReportCorrectSizeAndDefaults() {
+        // Arrange: Create a NullReader with a negative size.
+        final long negativeSize = -476L;
+        final NullReader reader = new NullReader(negativeSize);
+
+        // Act: Call the protected processChar() method to check its default return value.
+        // This action is independent of the reader's configured size.
+        final int processedChar = reader.processChar();
+
+        // Assert: Verify the reader's state and behavior.
+        // 1. The size, even if negative, should be stored as provided.
+        assertEquals("The reader's size should match the negative value from the constructor.",
+                negativeSize, reader.getSize());
+
+        // 2. The NullReader(long) constructor should enable mark support by default.
+        assertTrue("Mark support should be enabled by default.", reader.markSupported());
+
+        // 3. The processChar() method should return 0 by default, as per its documentation.
+        assertEquals("processChar() should return 0 by default.", 0, processedChar);
     }
 }
