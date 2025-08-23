@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest56 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        Weeks weeks0 = Weeks.weeks(2);
-        Weeks weeks1 = weeks0.plus(2);
-        assertEquals(4, weeks1.getWeeks());
+    /**
+     * Tests that the plus(int) method correctly adds a given number of weeks
+     * to an existing Weeks object.
+     */
+    @Test
+    public void plus_whenAddingWeeks_shouldReturnNewInstanceWithCorrectSum() {
+        // Arrange: Set up the initial state and expectations.
+        final Weeks initialWeeks = Weeks.weeks(2);
+        final int weeksToAdd = 2;
+        final int expectedTotalWeeks = 4;
+
+        // Act: Call the method under test.
+        final Weeks result = initialWeeks.plus(weeksToAdd);
+
+        // Assert: Verify the outcome.
+        assertEquals(expectedTotalWeeks, result.getWeeks());
     }
 }
