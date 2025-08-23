@@ -1,21 +1,41 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class CircularByteBuffer_ESTestTest41 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        byte[] byteArray0 = new byte[22];
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer(2);
-        circularByteBuffer0.add(byteArray0, 2, 2);
-        assertFalse(circularByteBuffer0.hasSpace());
-        circularByteBuffer0.read(byteArray0, 2, 2);
-        assertEquals(0, circularByteBuffer0.getCurrentNumberOfBytes());
+    /**
+     * Tests that the buffer's state (current size and available space) is correctly
+     * updated after being completely filled and then completely emptied.
+     */
+    @Test
+    public void addThenRead_whenBufferIsCompletelyFilledAndEmptied_updatesStateCorrectly() {
+        // Arrange: Create a small buffer and a data array for transfers.
+        final int bufferSize = 2;
+        final int dataOffset = 2; // Arbitrary offset into the data array.
+        final int length = 2;     // Number of bytes to transfer, same as buffer size.
+
+        final CircularByteBuffer buffer = new CircularByteBuffer(bufferSize);
+        final byte[] data = new byte[10]; // A source/destination array for the data.
+
+        // Act 1: Fill the buffer completely.
+        buffer.add(data, dataOffset, length);
+
+        // Assert 1: Verify the buffer is full.
+        assertEquals("Buffer should contain the number of bytes added.", bufferSize, buffer.getCurrentNumberOfBytes());
+        assertFalse("A full buffer should not have space.", buffer.hasSpace());
+
+        // Act 2: Empty the buffer completely.
+        buffer.read(data, dataOffset, length);
+
+        // Assert 2: Verify the buffer is empty.
+        assertEquals("Buffer should be empty after reading all bytes.", 0, buffer.getCurrentNumberOfBytes());
+        assertTrue("An empty buffer should have space.", buffer.hasSpace());
     }
 }
