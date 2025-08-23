@@ -1,54 +1,33 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class CollectionSortedBag_ESTestTest14 extends CollectionSortedBag_ESTest_scaffolding {
+/**
+ * Tests for the factory method of {@link CollectionSortedBag}.
+ */
+public class CollectionSortedBagTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        // Undeclared exception!
-        try {
-            CollectionSortedBag.collectionSortedBag((SortedBag<ComparatorPredicate.Criterion>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // collection
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that the factory method collectionSortedBag() throws a NullPointerException
+     * when the bag to be decorated is null.
+     */
+    @Test
+    public void collectionSortedBagFactoryShouldThrowNullPointerExceptionForNullInput() {
+        // Arrange: Define the expected exception and its message.
+        // The decorator's constructor is expected to throw this exception.
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("bag");
+
+        // Act: Call the factory method with a null argument.
+        // The cast to a specific SortedBag type is necessary for type inference.
+        CollectionSortedBag.collectionSortedBag((SortedBag<Object>) null);
+
+        // Assert: The ExpectedException rule handles the assertion.
     }
 }
