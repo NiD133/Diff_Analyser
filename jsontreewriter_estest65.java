@@ -1,32 +1,26 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest65 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.jsonValue("");
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that calling jsonValue() is not supported and throws an exception.
+     * <p>
+     * The {@link JsonTreeWriter} builds a {@link com.google.gson.JsonElement} model in memory
+     * and does not support parsing and embedding a raw JSON string directly.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void jsonValue_shouldThrowUnsupportedOperationException() {
+        // Arrange
+        JsonTreeWriter jsonTreeWriter = new JsonTreeWriter();
+
+        // Act
+        jsonTreeWriter.jsonValue("{\"key\":\"value\"}");
+
+        // Assert is handled by the 'expected' attribute of the @Test annotation
     }
 }
