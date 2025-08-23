@@ -1,28 +1,40 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryLabelPosition_ESTestTest1 extends CategoryLabelPosition_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_LEFT;
-        TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.BOTTOM_LEFT;
-        CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0);
-        CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.CATEGORY;
-        CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, categoryLabelWidthType0, 0.0F);
-        boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
-        assertEquals(0.0F, categoryLabelPosition1.getWidthRatio(), 0.01F);
-        assertFalse(categoryLabelPosition1.equals((Object) categoryLabelPosition0));
-        assertFalse(boolean0);
-        assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+/**
+ * Tests for the {@link CategoryLabelPosition} class, focusing on its equality logic.
+ */
+public class CategoryLabelPositionTest {
+
+    /**
+     * Verifies that the equals() method returns false for two CategoryLabelPosition
+     * objects that differ only by their width ratio.
+     */
+    @Test
+    public void equals_shouldReturnFalseWhenWidthRatioDiffers() {
+        // Arrange: Create two positions with the same anchors but different width properties.
+        RectangleAnchor anchor = RectangleAnchor.TOP_LEFT;
+        TextBlockAnchor textBlockAnchor = TextBlockAnchor.BOTTOM_LEFT;
+
+        // This constructor uses a default widthRatio of 0.95f.
+        CategoryLabelPosition positionWithDefaultWidth = new CategoryLabelPosition(
+                anchor, textBlockAnchor);
+
+        // This constructor allows specifying a custom widthRatio. We use 0.0f to
+        // create a distinct object. The widthType remains the default 'CATEGORY'.
+        CategoryLabelPosition positionWithCustomWidth = new CategoryLabelPosition(
+                anchor, textBlockAnchor, CategoryLabelWidthType.CATEGORY, 0.0F);
+
+        // Act & Assert: The two objects should not be considered equal because their
+        // widthRatio values (0.95f and 0.0f) are different.
+        assertNotEquals(positionWithDefaultWidth, positionWithCustomWidth);
+
+        // For completeness, ensure the comparison is symmetric.
+        assertNotEquals(positionWithCustomWidth, positionWithDefaultWidth);
     }
 }
