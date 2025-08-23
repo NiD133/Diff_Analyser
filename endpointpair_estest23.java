@@ -1,21 +1,27 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest23 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.ordered(locale_Category0, locale_Category0);
-        boolean boolean0 = endpointPair0.equals(endpointPair0);
-        assertTrue(boolean0);
+    /**
+     * Tests the reflexive property of the equals() method for an ordered pair.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void orderedPair_equals_isReflexive() {
+        // Arrange: Create an ordered EndpointPair instance.
+        // Using a simple String makes the test's intent clear.
+        String node = "A";
+        EndpointPair<String> pair = EndpointPair.ordered(node, node);
+
+        // Act & Assert: The pair must be equal to itself.
+        // This confirms that the equals() method correctly handles identity.
+        assertTrue("An EndpointPair instance should always be equal to itself.", pair.equals(pair));
     }
 }
