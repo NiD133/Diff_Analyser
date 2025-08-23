@@ -1,30 +1,30 @@
 package com.google.common.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest2 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add((-1672.7733723256124), (-1672.7733723256124));
-        pairedStatsAccumulator0.add((-1672.7733723256124), (-1672.7733723256124));
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Tests that pearsonsCorrelationCoefficient() throws an IllegalStateException when the
+     * population variance of the data is zero.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void pearsonsCorrelationCoefficient_throwsIllegalStateException_whenVarianceIsZero() {
+        // Arrange: Create an accumulator and add data points that result in zero variance.
+        // By adding the same (x, y) pair multiple times, the population variance for both
+        // x and y datasets will be zero.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(10.0, 20.0);
+        accumulator.add(10.0, 20.0);
+
+        // Act: Attempt to calculate the Pearson's correlation coefficient.
+        // This is expected to throw an exception because the calculation is undefined
+        // when either dataset has zero variance.
+        accumulator.pearsonsCorrelationCoefficient();
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
