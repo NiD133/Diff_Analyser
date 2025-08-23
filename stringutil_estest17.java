@@ -1,30 +1,28 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest17 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringBuilder pooling mechanism in {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder(3);
-        stringBuilder0.append((long) 3);
-        StringUtil.releaseBuilder(stringBuilder0);
-        assertEquals("", stringBuilder0.toString());
+    /**
+     * Verifies that {@link StringUtil#releaseBuilder(StringBuilder)} clears the
+     * contents of a StringBuilder after its use. This is crucial for ensuring
+     * that reused builders from the pool do not contain stale data from previous operations.
+     */
+    @Test
+    public void releaseBuilderShouldClearTheBuilder() {
+        // Arrange: Borrow a builder from the pool and add some content.
+        StringBuilder builder = StringUtil.borrowBuilder();
+        builder.append("some test content");
+
+        // Act: Release the builder back to the pool.
+        StringUtil.releaseBuilder(builder);
+
+        // Assert: The builder's content should be cleared after being released.
+        assertEquals("The StringBuilder should be empty after being released.", 0, builder.length());
     }
 }
