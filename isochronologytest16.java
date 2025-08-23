@@ -1,92 +1,62 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
 import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class ISOChronologyTestTest16 extends TestCase {
+/**
+ * Tests additions to a {@link Partial} object, specifically focusing on how the
+ * dayOfYear field wraps across year boundaries, including leap years, using the ISOChronology.
+ */
+@RunWith(JUnit4.class)
+public class PartialDayOfYearAdditionTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    // By explicitly using the UTC chronology, we make the test self-contained, deterministic,
+    // and easier to understand, removing the need for complex setUp/tearDown methods.
+    private static final Chronology UTC_CHRONOLOGY = ISOChronology.getInstanceUTC();
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    /**
+     * This test verifies that adding a large number of days to a Partial,
+     * which consists of a year and a dayOfYear, correctly wraps across multiple
+     * years, including a leap year.
+     */
+    @Test
+    public void addDaysToPartialWithDayOfYear_shouldWrapAcrossMultipleYears() {
+        // GIVEN: A partial date representing the last day of a leap year (2000-12-31).
+        // A Partial is an immutable partial date-time, here composed of (year, dayOfYear).
+        DateTimeFieldType[] types = {DateTimeFieldType.year(), DateTimeFieldType.dayOfYear()};
+        int[] startValues = {2000, 366}; // Year 2000 was a leap year.
+        Partial startPartial = new Partial(types, startValues, UTC_CHRONOLOGY);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        // AND: A target partial date representing the last day of a future leap year (2004-12-31).
+        int[] endValues = {2004, 366}; // Year 2004 was a leap year.
+        Partial expectedEndPartial = new Partial(types, endValues, UTC_CHRONOLOGY);
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+        // AND: The total number of days spanning the years 2001, 2002, 2003, and 2004.
+        final int daysIn2001 = 365;
+        final int daysIn2002 = 365;
+        final int daysIn2003 = 365;
+        final int daysIn2004 = 366; // Leap year
+        final int totalDaysToAdd = daysIn2001 + daysIn2002 + daysIn2003 + daysIn2004;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+        // WHEN: We add the total number of days to the start partial.
+        Partial actualEndPartial = startPartial.withFieldAdded(DurationFieldType.days(), totalDaysToAdd);
 
-    private DateTimeZone originalDateTimeZone = null;
+        // THEN: The result should match the target partial date.
+        assertEquals(expectedEndPartial, actualEndPartial);
 
-    private TimeZone originalTimeZone = null;
+        // --- Verification of the inverse operation ---
 
-    private Locale originalLocale = null;
+        // WHEN: We subtract the same number of days from the end partial.
+        Partial actualStartPartial = expectedEndPartial.withFieldAdded(DurationFieldType.days(), -totalDaysToAdd);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    public void testPartialDayOfYearAdd() {
-        Partial start = new Partial().with(DateTimeFieldType.year(), 2000).with(DateTimeFieldType.dayOfYear(), 366);
-        Partial end = new Partial().with(DateTimeFieldType.year(), 2004).with(DateTimeFieldType.dayOfYear(), 366);
-        assertEquals(end, start.withFieldAdded(DurationFieldType.days(), 365 + 365 + 365 + 366));
-        assertEquals(start, end.withFieldAdded(DurationFieldType.days(), -(365 + 365 + 365 + 366)));
+        // THEN: The result should match the original start partial.
+        assertEquals(startPartial, actualStartPartial);
     }
 }
