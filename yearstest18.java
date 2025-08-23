@@ -1,45 +1,71 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class YearsTestTest18 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the multipliedBy(int) method of the Years class.
+ */
+public class YearsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void multipliedBy_withPositiveScalar_returnsCorrectlyScaledYears() {
+        // Arrange
+        Years twoYears = Years.years(2);
+        
+        // Act
+        Years sixYears = twoYears.multipliedBy(3);
+        
+        // Assert
+        assertEquals(6, sixYears.getYears());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void multipliedBy_withNegativeScalar_returnsCorrectlyScaledYears() {
+        // Arrange
+        Years twoYears = Years.years(2);
+        
+        // Act
+        Years negativeSixYears = twoYears.multipliedBy(-3);
+        
+        // Assert
+        assertEquals(-6, negativeSixYears.getYears());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void multipliedBy_one_returnsSameInstance() {
+        // Arrange
+        Years twoYears = Years.years(2);
+        
+        // Act
+        Years result = twoYears.multipliedBy(1);
+        
+        // Assert
+        assertSame("Multiplying by 1 should return the same instance", twoYears, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void multipliedBy_doesNotChangeOriginalInstance() {
+        // Arrange
+        Years twoYears = Years.years(2);
+        
+        // Act
+        twoYears.multipliedBy(3); // The result of the multiplication is ignored
+        
+        // Assert
+        assertEquals("Original Years instance should be immutable", 2, twoYears.getYears());
     }
 
-    public void testMultipliedBy_int() {
-        Years test = Years.years(2);
-        assertEquals(6, test.multipliedBy(3).getYears());
-        assertEquals(2, test.getYears());
-        assertEquals(-6, test.multipliedBy(-3).getYears());
-        assertSame(test, test.multipliedBy(1));
-        Years halfMax = Years.years(Integer.MAX_VALUE / 2 + 1);
-        try {
-            halfMax.multipliedBy(2);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void multipliedBy_whenResultOverflows_throwsArithmeticException() {
+        // Arrange
+        Years largeYears = Years.years(Integer.MAX_VALUE / 2 + 1);
+        
+        // Act
+        largeYears.multipliedBy(2); // This should throw an exception
+        
+        // Assert (handled by the @Test(expected=...) annotation)
     }
 }
