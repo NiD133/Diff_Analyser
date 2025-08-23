@@ -2,22 +2,27 @@ package org.joda.time.chrono;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.joda.time.chrono.IslamicChronology.LeapYearPatternType;
 
-public class IslamicChronology_ESTestTest1 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the inner classes and methods of {@link IslamicChronology}.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = IslamicChronology.LEAP_YEAR_15_BASED;
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        boolean boolean0 = islamicChronology0.LEAP_YEAR_HABASH_AL_HASIB.equals(islamicChronology_LeapYearPatternType0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method of the LeapYearPatternType inner class
+     * correctly returns false when comparing two different pattern constants.
+     */
+    @Test
+    public void leapYearPatternType_equals_shouldReturnFalseForDifferentPatterns() {
+        // Arrange: Define two different leap year patterns to compare.
+        LeapYearPatternType pattern15Based = IslamicChronology.LEAP_YEAR_15_BASED;
+        LeapYearPatternType habashAlHasibPattern = IslamicChronology.LEAP_YEAR_HABASH_AL_HASIB;
+
+        // Act: Call the equals() method to compare the two patterns.
+        boolean areEqual = habashAlHasibPattern.equals(pattern15Based);
+
+        // Assert: Verify that the result is false, as the patterns are different.
+        assertFalse("Different LeapYearPatternType instances should not be equal.", areEqual);
     }
 }
