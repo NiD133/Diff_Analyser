@@ -1,27 +1,34 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest18 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        double double0 = BufferedLine.expandBufForLongitudeSkew(pointImpl0, pointImpl0, 0.0);
-        assertEquals(0.0, double0, 0.01);
+/**
+ * Test suite for the static utility methods in {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    /**
+     * Verifies that expanding a zero-sized buffer results in a zero-sized buffer,
+     * regardless of the line's position.
+     */
+    @Test
+    public void expandBufForLongitudeSkew_withZeroBuffer_shouldReturnZero() {
+        // Arrange
+        // A zero-length line at the equator is used as a simple test case.
+        final SpatialContext geoContext = SpatialContext.GEO;
+        final Point point = new PointImpl(0.0, 0.0, geoContext);
+        final double initialBuffer = 0.0;
+
+        // Act
+        final double expandedBuffer = BufferedLine.expandBufForLongitudeSkew(point, point, initialBuffer);
+
+        // Assert
+        final double expectedBuffer = 0.0;
+        assertEquals("Expanding a zero buffer should always result in a zero buffer.",
+                expectedBuffer, expandedBuffer, 0.0);
     }
 }
