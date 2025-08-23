@@ -1,30 +1,31 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest48 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.html;
-        String string0 = Attribute.getValidKey("4c]oHqR=I", document_OutputSettings_Syntax0);
-        assertNotNull(string0);
-        assertEquals("4c]oHqR_I", string0);
+/**
+ * Tests for the {@link Attribute} class, focusing on key validation.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that getValidKey() correctly sanitizes an attribute key for HTML syntax
+     * by replacing invalid characters. According to the HTML specification, characters
+     * like '=', '"', "'", '/', and spaces are not permitted in unquoted attribute names.
+     */
+    @Test
+    public void getValidKeyForHtmlReplacesInvalidCharacter() {
+        // Arrange: Define the input key with an invalid character ('=') for HTML syntax.
+        String invalidKey = "invalid-key=";
+        String expectedKey = "invalid-key_";
+        Syntax syntax = Syntax.html;
+
+        // Act: Sanitize the key using the method under test.
+        String actualKey = Attribute.getValidKey(invalidKey, syntax);
+
+        // Assert: Confirm that the invalid character was replaced with an underscore.
+        assertEquals(expectedKey, actualKey);
     }
 }
