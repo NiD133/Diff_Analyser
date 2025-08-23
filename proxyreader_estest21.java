@@ -1,33 +1,38 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.io.Reader;
 
-public class ProxyReader_ESTestTest21 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for {@link ProxyReader}.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
-        TaggedReader taggedReader0 = new TaggedReader(closeShieldReader0);
+    /**
+     * Tests that an IOException thrown by the underlying reader's read(char[], int, int)
+     * method is correctly propagated by the ProxyReader.
+     */
+    @Test
+    public void readWithBuffer_whenUnderlyingReaderThrowsIOException_propagatesException() {
+        // Arrange: Create a ProxyReader wrapping a reader that is guaranteed to throw an
+        // IOException on read. An unconnected PipedReader serves this purpose well.
+        Reader underlyingReader = new PipedReader();
+        // We use TaggedReader as a concrete implementation of the abstract ProxyReader.
+        ProxyReader proxyReader = new TaggedReader(underlyingReader);
+        char[] buffer = new char[10];
+
+        // Act & Assert
         try {
-            taggedReader0.read((char[]) null, 477, 477);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
+            proxyReader.read(buffer, 0, buffer.length);
+            fail("Expected an IOException to be thrown because the underlying PipedReader is not connected.");
+        } catch (final IOException e) {
+            // Verify that the specific exception from the underlying reader was propagated.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
