@@ -1,25 +1,36 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class TagSet_ESTestTest3 extends TagSet_ESTest_scaffolding {
+/**
+ * Improved test for {@link TagSet}, focusing on its caching behavior.
+ */
+public class TagSetImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        TagSet tagSet0 = new TagSet();
-        Tag.Block = 7;
-        Tag tag0 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|");
-        tag0.set((-296));
-        ParseSettings parseSettings0 = ParseSettings.preserveCase;
-        Tag tag1 = tagSet0.valueOf("tt=`d4!p|", "tt=`d4!p|", parseSettings0);
-        assertTrue(tag1.isFormSubmittable());
+    /**
+     * Verifies that calling {@link TagSet#valueOf(String, String, ParseSettings)} multiple times
+     * with the same arguments returns the identical {@link Tag} instance. This confirms the
+     * caching behavior of the TagSet, ensuring that it doesn't create duplicate objects for
+     * the same tag.
+     */
+    @Test
+    public void valueOf_whenTagExists_returnsCachedInstance() {
+        // Arrange: Create a new TagSet and define the properties for a custom tag.
+        TagSet tagSet = new TagSet();
+        String tagName = "my-custom-tag";
+        String namespace = "http://www.w3.org/1999/xhtml";
+        ParseSettings settings = ParseSettings.preserveCase;
+
+        // Act: Request the same tag from the TagSet twice.
+        Tag firstInstance = tagSet.valueOf(tagName, namespace, settings);
+        Tag secondInstance = tagSet.valueOf(tagName, namespace, settings);
+
+        // Assert: Verify that both variables point to the exact same object instance.
+        assertSame(
+            "Expected the same Tag instance to be returned for subsequent calls with the same arguments.",
+            firstInstance,
+            secondInstance
+        );
     }
 }
