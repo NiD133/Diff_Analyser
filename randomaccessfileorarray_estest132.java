@@ -1,35 +1,35 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest132 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on specific edge cases.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test131() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) 13);
-        assertEquals((-1L), randomAccessFileOrArray0.getFilePointer());
-        String string0 = randomAccessFileOrArray0.readLine();
-        assertEquals("", string0);
+    /**
+     * Verifies that readLine() returns an empty string if a carriage return ('\r')
+     * is pushed back before the read operation.
+     *
+     * The readLine() method should treat the pushed-back line terminator as the end of an
+     * empty line and stop reading immediately.
+     */
+    @Test
+    public void readLine_whenCarriageReturnIsPushedBack_returnsEmptyString() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance. The initial data is irrelevant
+        // as the pushed-back character will be read first.
+        byte[] irrelevantData = new byte[0];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(irrelevantData);
+
+        // Push back a carriage return character, which acts as a line terminator.
+        fileOrArray.pushBack((byte) '\r');
+
+        // Act: Read the next line from the source.
+        String result = fileOrArray.readLine();
+
+        // Assert: The line should be empty because the first character encountered was a line terminator.
+        assertEquals("Expected an empty string when a line terminator is pushed back.", "", result);
     }
 }
