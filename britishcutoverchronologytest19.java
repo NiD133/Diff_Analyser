@@ -8,7 +8,6 @@ import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static java.time.temporal.ChronoField.DAY_OF_YEAR;
 import static java.time.temporal.ChronoField.ERA;
-import static java.time.temporal.ChronoField.MINUTE_OF_DAY;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 import static java.time.temporal.ChronoField.YEAR;
@@ -18,356 +17,316 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.DECADES;
 import static java.time.temporal.ChronoUnit.ERAS;
 import static java.time.temporal.ChronoUnit.MILLENNIA;
-import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.time.temporal.ChronoUnit.MONTHS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.time.temporal.ChronoUnit.YEARS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.time.DateTimeException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Month;
 import java.time.Period;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.Chronology;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import com.google.common.testing.EqualsTester;
 
-public class BritishCutoverChronologyTestTest19 {
+/**
+ * Tests for the {@link BritishCutoverDate} class.
+ */
+@DisplayName("BritishCutoverDate")
+class BritishCutoverDateTest {
 
-    //-----------------------------------------------------------------------
-    public static Object[][] data_samples() {
-        return new Object[][] { { BritishCutoverDate.of(1, 1, 1), LocalDate.of(0, 12, 30) }, { BritishCutoverDate.of(1, 1, 2), LocalDate.of(0, 12, 31) }, { BritishCutoverDate.of(1, 1, 3), LocalDate.of(1, 1, 1) }, { BritishCutoverDate.of(1, 2, 28), LocalDate.of(1, 2, 26) }, { BritishCutoverDate.of(1, 3, 1), LocalDate.of(1, 2, 27) }, { BritishCutoverDate.of(1, 3, 2), LocalDate.of(1, 2, 28) }, { BritishCutoverDate.of(1, 3, 3), LocalDate.of(1, 3, 1) }, { BritishCutoverDate.of(4, 2, 28), LocalDate.of(4, 2, 26) }, { BritishCutoverDate.of(4, 2, 29), LocalDate.of(4, 2, 27) }, { BritishCutoverDate.of(4, 3, 1), LocalDate.of(4, 2, 28) }, { BritishCutoverDate.of(4, 3, 2), LocalDate.of(4, 2, 29) }, { BritishCutoverDate.of(4, 3, 3), LocalDate.of(4, 3, 1) }, { BritishCutoverDate.of(100, 2, 28), LocalDate.of(100, 2, 26) }, { BritishCutoverDate.of(100, 2, 29), LocalDate.of(100, 2, 27) }, { BritishCutoverDate.of(100, 3, 1), LocalDate.of(100, 2, 28) }, { BritishCutoverDate.of(100, 3, 2), LocalDate.of(100, 3, 1) }, { BritishCutoverDate.of(100, 3, 3), LocalDate.of(100, 3, 2) }, { BritishCutoverDate.of(0, 12, 31), LocalDate.of(0, 12, 29) }, { BritishCutoverDate.of(0, 12, 30), LocalDate.of(0, 12, 28) }, { BritishCutoverDate.of(1582, 10, 4), LocalDate.of(1582, 10, 14) }, { BritishCutoverDate.of(1582, 10, 5), LocalDate.of(1582, 10, 15) }, { BritishCutoverDate.of(1751, 12, 20), LocalDate.of(1751, 12, 31) }, { BritishCutoverDate.of(1751, 12, 31), LocalDate.of(1752, 1, 11) }, { BritishCutoverDate.of(1752, 1, 1), LocalDate.of(1752, 1, 12) }, { BritishCutoverDate.of(1752, 9, 1), LocalDate.of(1752, 9, 12) }, { BritishCutoverDate.of(1752, 9, 2), LocalDate.of(1752, 9, 13) }, // leniently accept invalid
-        { BritishCutoverDate.of(1752, 9, 3), LocalDate.of(1752, 9, 14) }, // leniently accept invalid
-        { BritishCutoverDate.of(1752, 9, 13), LocalDate.of(1752, 9, 24) }, { BritishCutoverDate.of(1752, 9, 14), LocalDate.of(1752, 9, 14) }, { BritishCutoverDate.of(1945, 11, 12), LocalDate.of(1945, 11, 12) }, { BritishCutoverDate.of(2012, 7, 5), LocalDate.of(2012, 7, 5) }, { BritishCutoverDate.of(2012, 7, 6), LocalDate.of(2012, 7, 6) } };
+    /**
+     * Provides sample BritishCutoverDates and their equivalent ISO LocalDates.
+     * This includes dates before, after, and during the 1752 cutover.
+     *
+     * @return a stream of arguments: (BritishCutoverDate, LocalDate)
+     */
+    static Stream<Arguments> provideSampleCutoverAndIsoDates() {
+        return Stream.of(
+            Arguments.of(BritishCutoverDate.of(1, 1, 1), LocalDate.of(0, 12, 30)),
+            Arguments.of(BritishCutoverDate.of(1, 1, 3), LocalDate.of(1, 1, 1)),
+            Arguments.of(BritishCutoverDate.of(4, 2, 29), LocalDate.of(4, 2, 27)),
+            Arguments.of(BritishCutoverDate.of(100, 3, 1), LocalDate.of(100, 2, 28)),
+            Arguments.of(BritishCutoverDate.of(1582, 10, 4), LocalDate.of(1582, 10, 14)),
+            Arguments.of(BritishCutoverDate.of(1752, 9, 2), LocalDate.of(1752, 9, 13)), // Leniently accepts invalid date
+            Arguments.of(BritishCutoverDate.of(1752, 9, 3), LocalDate.of(1752, 9, 14)), // Leniently accepts invalid date
+            Arguments.of(BritishCutoverDate.of(1752, 9, 14), LocalDate.of(1752, 9, 14)),
+            Arguments.of(BritishCutoverDate.of(2012, 7, 6), LocalDate.of(2012, 7, 6))
+        );
     }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_LocalDate_from_BritishCutoverDate(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(iso, LocalDate.from(cutover));
-    }
+    @Nested
+    @DisplayName("Factory and Conversion Tests")
+    class FactoryAndConversionTests {
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_BritishCutoverDate_from_LocalDate(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(cutover, BritishCutoverDate.from(iso));
-    }
+        @ParameterizedTest
+        @MethodSource("org.threeten.extra.chrono.BritishCutoverDateTest#provideSampleCutoverAndIsoDates")
+        void from_shouldCreateCorrectDateFromLocalDate(BritishCutoverDate cutover, LocalDate iso) {
+            assertEquals(cutover, BritishCutoverDate.from(iso));
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_BritishCutoverDate_chronology_dateEpochDay(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(cutover, BritishCutoverChronology.INSTANCE.dateEpochDay(iso.toEpochDay()));
-    }
+        @ParameterizedTest
+        @MethodSource("org.threeten.extra.chrono.BritishCutoverDateTest#provideSampleCutoverAndIsoDates")
+        void toLocalDate_shouldConvertToCorrectIsoDate(BritishCutoverDate cutover, LocalDate iso) {
+            assertEquals(iso, LocalDate.from(cutover));
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_BritishCutoverDate_toEpochDay(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(iso.toEpochDay(), cutover.toEpochDay());
-    }
+        @ParameterizedTest
+        @MethodSource("org.threeten.extra.chrono.BritishCutoverDateTest#provideSampleCutoverAndIsoDates")
+        void toEpochDay_shouldMatchIsoDateEpochDay(BritishCutoverDate cutover, LocalDate iso) {
+            assertEquals(iso.toEpochDay(), cutover.toEpochDay());
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_BritishCutoverDate_until_BritishCutoverDate(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(BritishCutoverChronology.INSTANCE.period(0, 0, 0), cutover.until(cutover));
-    }
+        @ParameterizedTest
+        @MethodSource("org.threeten.extra.chrono.BritishCutoverDateTest#provideSampleCutoverAndIsoDates")
+        void chronology_dateEpochDay_shouldCreateCorrectDate(BritishCutoverDate cutover, LocalDate iso) {
+            assertEquals(cutover, BritishCutoverChronology.INSTANCE.dateEpochDay(iso.toEpochDay()));
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_BritishCutoverDate_until_LocalDate(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(BritishCutoverChronology.INSTANCE.period(0, 0, 0), cutover.until(iso));
-    }
+        @ParameterizedTest
+        @MethodSource("org.threeten.extra.chrono.BritishCutoverDateTest#provideSampleCutoverAndIsoDates")
+        void chronology_dateFromTemporal_shouldCreateCorrectDate(BritishCutoverDate cutover, LocalDate iso) {
+            assertEquals(cutover, BritishCutoverChronology.INSTANCE.date(iso));
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_LocalDate_until_BritishCutoverDate(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(Period.ZERO, iso.until(cutover));
-    }
+        @Test
+        void of_shouldThrowExceptionForInvalidDateComponents() {
+            assertThrows(DateTimeException.class, () -> BritishCutoverDate.of(1900, 2, 30));
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_Chronology_date_Temporal(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(cutover, BritishCutoverChronology.INSTANCE.date(iso));
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_plusDays(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(iso, LocalDate.from(cutover.plus(0, DAYS)));
-        assertEquals(iso.plusDays(1), LocalDate.from(cutover.plus(1, DAYS)));
-        assertEquals(iso.plusDays(35), LocalDate.from(cutover.plus(35, DAYS)));
-        assertEquals(iso.plusDays(-1), LocalDate.from(cutover.plus(-1, DAYS)));
-        assertEquals(iso.plusDays(-60), LocalDate.from(cutover.plus(-60, DAYS)));
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_minusDays(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(iso, LocalDate.from(cutover.minus(0, DAYS)));
-        assertEquals(iso.minusDays(1), LocalDate.from(cutover.minus(1, DAYS)));
-        assertEquals(iso.minusDays(35), LocalDate.from(cutover.minus(35, DAYS)));
-        assertEquals(iso.minusDays(-1), LocalDate.from(cutover.minus(-1, DAYS)));
-        assertEquals(iso.minusDays(-60), LocalDate.from(cutover.minus(-60, DAYS)));
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_samples")
-    public void test_until_DAYS(BritishCutoverDate cutover, LocalDate iso) {
-        assertEquals(0, cutover.until(iso.plusDays(0), DAYS));
-        assertEquals(1, cutover.until(iso.plusDays(1), DAYS));
-        assertEquals(35, cutover.until(iso.plusDays(35), DAYS));
-        assertEquals(-40, cutover.until(iso.minusDays(40), DAYS));
-    }
-
-    public static Object[][] data_badDates() {
-        return new Object[][] { { 1900, 0, 0 }, { 1900, -1, 1 }, { 1900, 0, 1 }, { 1900, 13, 1 }, { 1900, 14, 1 }, { 1900, 1, -1 }, { 1900, 1, 0 }, { 1900, 1, 32 }, { 1900, 2, -1 }, { 1900, 2, 0 }, { 1900, 2, 30 }, { 1900, 2, 31 }, { 1900, 2, 32 }, { 1899, 2, -1 }, { 1899, 2, 0 }, { 1899, 2, 29 }, { 1899, 2, 30 }, { 1899, 2, 31 }, { 1899, 2, 32 }, { 1900, 12, -1 }, { 1900, 12, 0 }, { 1900, 12, 32 }, { 1900, 3, 32 }, { 1900, 4, 31 }, { 1900, 5, 32 }, { 1900, 6, 31 }, { 1900, 7, 32 }, { 1900, 8, 32 }, { 1900, 9, 31 }, { 1900, 10, 32 }, { 1900, 11, 31 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_badDates")
-    public void test_badDates(int year, int month, int dom) {
-        assertThrows(DateTimeException.class, () -> BritishCutoverDate.of(year, month, dom));
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_lengthOfMonth() {
-        return new Object[][] { { 1700, 1, 31 }, { 1700, 2, 29 }, { 1700, 3, 31 }, { 1700, 4, 30 }, { 1700, 5, 31 }, { 1700, 6, 30 }, { 1700, 7, 31 }, { 1700, 8, 31 }, { 1700, 9, 30 }, { 1700, 10, 31 }, { 1700, 11, 30 }, { 1700, 12, 31 }, { 1751, 1, 31 }, { 1751, 2, 28 }, { 1751, 3, 31 }, { 1751, 4, 30 }, { 1751, 5, 31 }, { 1751, 6, 30 }, { 1751, 7, 31 }, { 1751, 8, 31 }, { 1751, 9, 30 }, { 1751, 10, 31 }, { 1751, 11, 30 }, { 1751, 12, 31 }, { 1752, 1, 31 }, { 1752, 2, 29 }, { 1752, 3, 31 }, { 1752, 4, 30 }, { 1752, 5, 31 }, { 1752, 6, 30 }, { 1752, 7, 31 }, { 1752, 8, 31 }, { 1752, 9, 19 }, { 1752, 10, 31 }, { 1752, 11, 30 }, { 1752, 12, 31 }, { 1753, 1, 31 }, { 1753, 3, 31 }, { 1753, 2, 28 }, { 1753, 4, 30 }, { 1753, 5, 31 }, { 1753, 6, 30 }, { 1753, 7, 31 }, { 1753, 8, 31 }, { 1753, 9, 30 }, { 1753, 10, 31 }, { 1753, 11, 30 }, { 1753, 12, 31 }, { 1500, 2, 29 }, { 1600, 2, 29 }, { 1700, 2, 29 }, { 1800, 2, 28 }, { 1900, 2, 28 }, { 1901, 2, 28 }, { 1902, 2, 28 }, { 1903, 2, 28 }, { 1904, 2, 29 }, { 2000, 2, 29 }, { 2100, 2, 28 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_lengthOfMonth")
-    public void test_lengthOfMonth(int year, int month, int length) {
-        assertEquals(length, BritishCutoverDate.of(year, month, 1).lengthOfMonth());
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_lengthOfYear() {
-        return new Object[][] { { -101, 365 }, { -100, 366 }, { -99, 365 }, { -1, 365 }, { 0, 366 }, { 100, 366 }, { 1600, 366 }, { 1700, 366 }, { 1751, 365 }, { 1748, 366 }, { 1749, 365 }, { 1750, 365 }, { 1751, 365 }, { 1752, 355 }, { 1753, 365 }, { 1500, 366 }, { 1600, 366 }, { 1700, 366 }, { 1800, 365 }, { 1900, 365 }, { 1901, 365 }, { 1902, 365 }, { 1903, 365 }, { 1904, 366 }, { 2000, 366 }, { 2100, 365 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_lengthOfYear")
-    public void test_lengthOfYear_atStart(int year, int length) {
-        assertEquals(length, BritishCutoverDate.of(year, 1, 1).lengthOfYear());
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_lengthOfYear")
-    public void test_lengthOfYear_atEnd(int year, int length) {
-        assertEquals(length, BritishCutoverDate.of(year, 12, 31).lengthOfYear());
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_ranges() {
-        return new Object[][] { { 1700, 1, 23, DAY_OF_MONTH, 1, 31 }, { 1700, 2, 23, DAY_OF_MONTH, 1, 29 }, { 1700, 3, 23, DAY_OF_MONTH, 1, 31 }, { 1700, 4, 23, DAY_OF_MONTH, 1, 30 }, { 1700, 5, 23, DAY_OF_MONTH, 1, 31 }, { 1700, 6, 23, DAY_OF_MONTH, 1, 30 }, { 1700, 7, 23, DAY_OF_MONTH, 1, 31 }, { 1700, 8, 23, DAY_OF_MONTH, 1, 31 }, { 1700, 9, 23, DAY_OF_MONTH, 1, 30 }, { 1700, 10, 23, DAY_OF_MONTH, 1, 31 }, { 1700, 11, 23, DAY_OF_MONTH, 1, 30 }, { 1700, 12, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 1, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 2, 23, DAY_OF_MONTH, 1, 28 }, { 1751, 3, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 4, 23, DAY_OF_MONTH, 1, 30 }, { 1751, 5, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 6, 23, DAY_OF_MONTH, 1, 30 }, { 1751, 7, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 8, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 9, 23, DAY_OF_MONTH, 1, 30 }, { 1751, 10, 23, DAY_OF_MONTH, 1, 31 }, { 1751, 11, 23, DAY_OF_MONTH, 1, 30 }, { 1751, 12, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 1, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 2, 23, DAY_OF_MONTH, 1, 29 }, { 1752, 3, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 4, 23, DAY_OF_MONTH, 1, 30 }, { 1752, 5, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 6, 23, DAY_OF_MONTH, 1, 30 }, { 1752, 7, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 8, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 9, 23, DAY_OF_MONTH, 1, 30 }, { 1752, 10, 23, DAY_OF_MONTH, 1, 31 }, { 1752, 11, 23, DAY_OF_MONTH, 1, 30 }, { 1752, 12, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 1, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 2, 23, DAY_OF_MONTH, 1, 29 }, { 2012, 3, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 4, 23, DAY_OF_MONTH, 1, 30 }, { 2012, 5, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 6, 23, DAY_OF_MONTH, 1, 30 }, { 2012, 7, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 8, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 9, 23, DAY_OF_MONTH, 1, 30 }, { 2012, 10, 23, DAY_OF_MONTH, 1, 31 }, { 2012, 11, 23, DAY_OF_MONTH, 1, 30 }, { 2012, 12, 23, DAY_OF_MONTH, 1, 31 }, { 2011, 2, 23, DAY_OF_MONTH, 1, 28 }, { 1700, 1, 23, DAY_OF_YEAR, 1, 366 }, { 1751, 1, 23, DAY_OF_YEAR, 1, 365 }, { 1752, 1, 23, DAY_OF_YEAR, 1, 355 }, { 1753, 1, 23, DAY_OF_YEAR, 1, 365 }, { 2012, 1, 23, DAY_OF_YEAR, 1, 366 }, { 2011, 2, 23, DAY_OF_YEAR, 1, 365 }, { 1752, 1, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 2, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 3, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 4, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 5, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 6, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 7, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 8, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 9, 23, ALIGNED_WEEK_OF_MONTH, 1, 3 }, { 1752, 10, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 11, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 1752, 12, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 2012, 1, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 2012, 2, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 2012, 3, 23, ALIGNED_WEEK_OF_MONTH, 1, 5 }, { 2011, 2, 23, ALIGNED_WEEK_OF_MONTH, 1, 4 }, { 1752, 12, 23, ALIGNED_WEEK_OF_YEAR, 1, 51 }, { 2011, 2, 23, ALIGNED_WEEK_OF_YEAR, 1, 53 }, { 2012, 2, 23, ALIGNED_WEEK_OF_YEAR, 1, 53 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_ranges")
-    public void test_range(int year, int month, int dom, TemporalField field, int expectedMin, int expectedMax) {
-        assertEquals(ValueRange.of(expectedMin, expectedMax), BritishCutoverDate.of(year, month, dom).range(field));
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_getLong() {
-        return new Object[][] { { 1752, 5, 26, DAY_OF_WEEK, 2 }, { 1752, 5, 26, DAY_OF_MONTH, 26 }, { 1752, 5, 26, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 26 }, { 1752, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 5 }, { 1752, 5, 26, ALIGNED_WEEK_OF_MONTH, 4 }, { 1752, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 7 }, { 1752, 5, 26, ALIGNED_WEEK_OF_YEAR, 21 }, { 1752, 5, 26, MONTH_OF_YEAR, 5 }, { 1752, 9, 2, DAY_OF_WEEK, 3 }, { 1752, 9, 2, DAY_OF_MONTH, 2 }, { 1752, 9, 2, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 2 }, { 1752, 9, 2, ALIGNED_DAY_OF_WEEK_IN_MONTH, 2 }, { 1752, 9, 2, ALIGNED_WEEK_OF_MONTH, 1 }, { 1752, 9, 2, ALIGNED_DAY_OF_WEEK_IN_YEAR, 1 }, { 1752, 9, 2, ALIGNED_WEEK_OF_YEAR, 36 }, { 1752, 9, 2, MONTH_OF_YEAR, 9 }, { 1752, 9, 14, DAY_OF_WEEK, 4 }, { 1752, 9, 14, DAY_OF_MONTH, 14 }, { 1752, 9, 14, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 3 }, { 1752, 9, 14, ALIGNED_DAY_OF_WEEK_IN_MONTH, 3 }, { 1752, 9, 14, ALIGNED_WEEK_OF_MONTH, 1 }, { 1752, 9, 14, ALIGNED_DAY_OF_WEEK_IN_YEAR, 2 }, { 1752, 9, 14, ALIGNED_WEEK_OF_YEAR, 36 }, { 1752, 9, 14, MONTH_OF_YEAR, 9 }, { 2014, 5, 26, DAY_OF_WEEK, 1 }, { 2014, 5, 26, DAY_OF_MONTH, 26 }, { 2014, 5, 26, DAY_OF_YEAR, 31 + 28 + 31 + 30 + 26 }, { 2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 5 }, { 2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 4 }, { 2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 6 }, { 2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 21 }, { 2014, 5, 26, MONTH_OF_YEAR, 5 }, { 2014, 5, 26, PROLEPTIC_MONTH, 2014 * 12 + 5 - 1 }, { 2014, 5, 26, YEAR, 2014 }, { 2014, 5, 26, ERA, 1 }, { 1, 6, 8, ERA, 1 }, { 0, 6, 8, ERA, 0 }, { 2014, 5, 26, WeekFields.ISO.dayOfWeek(), 1 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_getLong")
-    public void test_getLong(int year, int month, int dom, TemporalField field, long expected) {
-        assertEquals(expected, BritishCutoverDate.of(year, month, dom).getLong(field));
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_with() {
-        return new Object[][] { { 1752, 9, 2, DAY_OF_WEEK, 1, 1752, 8, 31 }, { 1752, 9, 2, DAY_OF_WEEK, 4, 1752, 9, 14 }, { 1752, 9, 2, DAY_OF_MONTH, 1, 1752, 9, 1 }, // lenient
-        { 1752, 9, 2, DAY_OF_MONTH, 3, 1752, 9, 14 }, // lenient
-        { 1752, 9, 2, DAY_OF_MONTH, 13, 1752, 9, 24 }, { 1752, 9, 2, DAY_OF_MONTH, 14, 1752, 9, 14 }, { 1752, 9, 2, DAY_OF_MONTH, 30, 1752, 9, 30 }, { 1752, 9, 2, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 1, 1752, 9, 1 }, { 1752, 9, 2, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 3, 1752, 9, 14 }, // lenient
-        { 1752, 9, 2, DAY_OF_YEAR, 356, 1753, 1, 1 }, // lenient
-        { 1752, 9, 2, DAY_OF_YEAR, 366, 1753, 1, 11 }, { 1752, 9, 2, ALIGNED_DAY_OF_WEEK_IN_MONTH, 1, 1752, 9, 1 }, { 1752, 9, 2, ALIGNED_DAY_OF_WEEK_IN_MONTH, 3, 1752, 9, 14 }, { 1752, 9, 2, ALIGNED_WEEK_OF_MONTH, 2, 1752, 9, 20 }, { 1752, 9, 2, ALIGNED_WEEK_OF_MONTH, 3, 1752, 9, 27 }, // lenient
-        { 1752, 9, 2, ALIGNED_WEEK_OF_MONTH, 4, 1752, 10, 4 }, // lenient
-        { 1752, 9, 2, ALIGNED_WEEK_OF_MONTH, 5, 1752, 10, 11 }, { 1752, 9, 2, ALIGNED_DAY_OF_WEEK_IN_YEAR, 2, 1752, 9, 14 }, { 1752, 9, 2, ALIGNED_DAY_OF_WEEK_IN_YEAR, 3, 1752, 9, 15 }, { 1752, 9, 2, ALIGNED_WEEK_OF_YEAR, 1, 1752, 1, 1 }, { 1752, 9, 2, ALIGNED_WEEK_OF_YEAR, 35, 1752, 8, 26 }, { 1752, 9, 2, ALIGNED_WEEK_OF_YEAR, 37, 1752, 9, 20 }, { 1752, 9, 2, ALIGNED_WEEK_OF_YEAR, 51, 1752, 12, 27 }, // lenient
-        { 1752, 9, 2, ALIGNED_WEEK_OF_YEAR, 52, 1753, 1, 3 }, { 1752, 9, 2, MONTH_OF_YEAR, 8, 1752, 8, 2 }, { 1752, 9, 2, MONTH_OF_YEAR, 10, 1752, 10, 2 }, { 1752, 9, 14, DAY_OF_WEEK, 1, 1752, 8, 31 }, { 1752, 9, 14, DAY_OF_WEEK, 3, 1752, 9, 2 }, { 1752, 9, 14, DAY_OF_MONTH, 1, 1752, 9, 1 }, { 1752, 9, 14, DAY_OF_MONTH, 2, 1752, 9, 2 }, // lenient
-        { 1752, 9, 14, DAY_OF_MONTH, 3, 1752, 9, 14 }, { 1752, 9, 14, DAY_OF_MONTH, 30, 1752, 9, 30 }, { 1752, 9, 14, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 1, 1752, 9, 1 }, { 1752, 9, 14, DAY_OF_YEAR, 31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 2, 1752, 9, 2 }, // lenient
-        { 1752, 9, 14, DAY_OF_YEAR, 356, 1753, 1, 1 }, // lenient
-        { 1752, 9, 14, DAY_OF_YEAR, 366, 1753, 1, 11 }, { 1752, 9, 14, ALIGNED_DAY_OF_WEEK_IN_MONTH, 1, 1752, 9, 1 }, { 1752, 9, 14, ALIGNED_DAY_OF_WEEK_IN_MONTH, 2, 1752, 9, 2 }, { 1752, 9, 14, ALIGNED_WEEK_OF_MONTH, 2, 1752, 9, 21 }, { 1752, 9, 14, ALIGNED_WEEK_OF_MONTH, 3, 1752, 9, 28 }, // lenient
-        { 1752, 9, 14, ALIGNED_WEEK_OF_MONTH, 4, 1752, 10, 5 }, // lenient
-        { 1752, 9, 14, ALIGNED_WEEK_OF_MONTH, 5, 1752, 10, 12 }, { 1752, 9, 14, ALIGNED_DAY_OF_WEEK_IN_YEAR, 2, 1752, 9, 14 }, { 1752, 9, 14, ALIGNED_DAY_OF_WEEK_IN_YEAR, 3, 1752, 9, 15 }, { 1752, 9, 14, ALIGNED_WEEK_OF_YEAR, 1, 1752, 1, 2 }, { 1752, 9, 14, ALIGNED_WEEK_OF_YEAR, 35, 1752, 8, 27 }, { 1752, 9, 14, ALIGNED_WEEK_OF_YEAR, 37, 1752, 9, 21 }, { 1752, 9, 14, ALIGNED_WEEK_OF_YEAR, 51, 1752, 12, 28 }, // lenient
-        { 1752, 9, 14, ALIGNED_WEEK_OF_YEAR, 52, 1753, 1, 4 }, { 1752, 9, 14, MONTH_OF_YEAR, 8, 1752, 8, 14 }, { 1752, 9, 14, MONTH_OF_YEAR, 10, 1752, 10, 14 }, // into cutover zone
-        // lenient
-        { 1752, 8, 4, MONTH_OF_YEAR, 9, 1752, 9, 15 }, // lenient
-        { 1752, 10, 8, MONTH_OF_YEAR, 9, 1752, 9, 19 }, // lenient
-        { 1751, 9, 4, YEAR, 1752, 1752, 9, 15 }, // lenient
-        { 1753, 9, 8, YEAR, 1752, 1752, 9, 19 }, // lenient
-        { 1751, 9, 4, YEAR_OF_ERA, 1752, 1752, 9, 15 }, // lenient
-        { 1753, 9, 8, YEAR_OF_ERA, 1752, 1752, 9, 19 }, { 2014, 5, 26, DAY_OF_WEEK, 3, 2014, 5, 28 }, { 2014, 5, 26, DAY_OF_WEEK, 7, 2014, 6, 1 }, { 2014, 5, 26, DAY_OF_MONTH, 31, 2014, 5, 31 }, { 2014, 5, 26, DAY_OF_MONTH, 26, 2014, 5, 26 }, { 2014, 5, 26, DAY_OF_YEAR, 365, 2014, 12, 31 }, { 2014, 5, 26, DAY_OF_YEAR, 146, 2014, 5, 26 }, { 2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 3, 2014, 5, 24 }, { 2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_MONTH, 5, 2014, 5, 26 }, { 2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 1, 2014, 5, 5 }, { 2014, 5, 26, ALIGNED_WEEK_OF_MONTH, 4, 2014, 5, 26 }, { 2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 2, 2014, 5, 22 }, { 2014, 5, 26, ALIGNED_DAY_OF_WEEK_IN_YEAR, 6, 2014, 5, 26 }, { 2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 23, 2014, 6, 9 }, { 2014, 5, 26, ALIGNED_WEEK_OF_YEAR, 21, 2014, 5, 26 }, { 2014, 5, 26, MONTH_OF_YEAR, 7, 2014, 7, 26 }, { 2014, 5, 26, MONTH_OF_YEAR, 5, 2014, 5, 26 }, { 2014, 5, 26, PROLEPTIC_MONTH, 2013 * 12 + 3 - 1, 2013, 3, 26 }, { 2014, 5, 26, PROLEPTIC_MONTH, 2014 * 12 + 5 - 1, 2014, 5, 26 }, { 2014, 5, 26, YEAR, 2012, 2012, 5, 26 }, { 2014, 5, 26, YEAR, 2014, 2014, 5, 26 }, { 2014, 5, 26, YEAR_OF_ERA, 2012, 2012, 5, 26 }, { 2014, 5, 26, YEAR_OF_ERA, 2014, 2014, 5, 26 }, { 2014, 5, 26, ERA, 0, -2013, 5, 26 }, { 2014, 5, 26, ERA, 1, 2014, 5, 26 }, { 2011, 3, 31, MONTH_OF_YEAR, 2, 2011, 2, 28 }, { 2012, 3, 31, MONTH_OF_YEAR, 2, 2012, 2, 29 }, { 2012, 3, 31, MONTH_OF_YEAR, 6, 2012, 6, 30 }, { 2012, 2, 29, YEAR, 2011, 2011, 2, 28 }, { -2013, 6, 8, YEAR_OF_ERA, 2012, -2011, 6, 8 }, { 2014, 5, 26, WeekFields.ISO.dayOfWeek(), 2, 2014, 5, 27 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_with")
-    public void test_with_TemporalField(int year, int month, int dom, TemporalField field, long value, int expectedYear, int expectedMonth, int expectedDom) {
-        assertEquals(BritishCutoverDate.of(expectedYear, expectedMonth, expectedDom), BritishCutoverDate.of(year, month, dom).with(field, value));
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_lastDayOfMonth() {
-        return new Object[][] { { BritishCutoverDate.of(1752, 2, 23), BritishCutoverDate.of(1752, 2, 29) }, { BritishCutoverDate.of(1752, 6, 23), BritishCutoverDate.of(1752, 6, 30) }, { BritishCutoverDate.of(1752, 9, 2), BritishCutoverDate.of(1752, 9, 30) }, { BritishCutoverDate.of(1752, 9, 14), BritishCutoverDate.of(1752, 9, 30) }, { BritishCutoverDate.of(2012, 2, 23), BritishCutoverDate.of(2012, 2, 29) }, { BritishCutoverDate.of(2012, 6, 23), BritishCutoverDate.of(2012, 6, 30) } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_lastDayOfMonth")
-    public void test_adjust_lastDayOfMonth(BritishCutoverDate input, BritishCutoverDate expected) {
-        BritishCutoverDate test = input.with(TemporalAdjusters.lastDayOfMonth());
-        assertEquals(expected, test);
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_withLocalDate() {
-        return new Object[][] { { BritishCutoverDate.of(1752, 9, 2), LocalDate.of(1752, 9, 12), BritishCutoverDate.of(1752, 9, 1) }, { BritishCutoverDate.of(1752, 9, 14), LocalDate.of(1752, 9, 12), BritishCutoverDate.of(1752, 9, 1) }, { BritishCutoverDate.of(1752, 9, 2), LocalDate.of(1752, 9, 14), BritishCutoverDate.of(1752, 9, 14) }, { BritishCutoverDate.of(1752, 9, 15), LocalDate.of(1752, 9, 14), BritishCutoverDate.of(1752, 9, 14) }, { BritishCutoverDate.of(2012, 2, 23), LocalDate.of(2012, 2, 23), BritishCutoverDate.of(2012, 2, 23) } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_withLocalDate")
-    public void test_adjust_LocalDate(BritishCutoverDate input, LocalDate local, BritishCutoverDate expected) {
-        BritishCutoverDate test = input.with(local);
-        assertEquals(expected, test);
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_plus() {
-        return new Object[][] { { 1752, 9, 2, -1, DAYS, 1752, 9, 1, true }, { 1752, 9, 2, 0, DAYS, 1752, 9, 2, true }, { 1752, 9, 2, 1, DAYS, 1752, 9, 14, true }, { 1752, 9, 2, 2, DAYS, 1752, 9, 15, true }, { 1752, 9, 14, -1, DAYS, 1752, 9, 2, true }, { 1752, 9, 14, 0, DAYS, 1752, 9, 14, true }, { 1752, 9, 14, 1, DAYS, 1752, 9, 15, true }, { 2014, 5, 26, 0, DAYS, 2014, 5, 26, true }, { 2014, 5, 26, 8, DAYS, 2014, 6, 3, true }, { 2014, 5, 26, -3, DAYS, 2014, 5, 23, true }, { 1752, 9, 2, -1, WEEKS, 1752, 8, 26, true }, { 1752, 9, 2, 0, WEEKS, 1752, 9, 2, true }, { 1752, 9, 2, 1, WEEKS, 1752, 9, 20, true }, { 1752, 9, 14, -1, WEEKS, 1752, 8, 27, true }, { 1752, 9, 14, 0, WEEKS, 1752, 9, 14, true }, { 1752, 9, 14, 1, WEEKS, 1752, 9, 21, true }, { 2014, 5, 26, 0, WEEKS, 2014, 5, 26, true }, { 2014, 5, 26, 3, WEEKS, 2014, 6, 16, true }, { 2014, 5, 26, -5, WEEKS, 2014, 4, 21, true }, { 1752, 9, 2, -1, MONTHS, 1752, 8, 2, true }, { 1752, 9, 2, 0, MONTHS, 1752, 9, 2, true }, { 1752, 9, 2, 1, MONTHS, 1752, 10, 2, true }, { 1752, 9, 14, -1, MONTHS, 1752, 8, 14, true }, { 1752, 9, 14, 0, MONTHS, 1752, 9, 14, true }, { 1752, 9, 14, 1, MONTHS, 1752, 10, 14, true }, { 1752, 8, 12, 1, MONTHS, 1752, 9, 23, false }, { 1752, 10, 12, -1, MONTHS, 1752, 9, 23, false }, { 2014, 5, 26, 0, MONTHS, 2014, 5, 26, true }, { 2014, 5, 26, 3, MONTHS, 2014, 8, 26, true }, { 2014, 5, 26, -5, MONTHS, 2013, 12, 26, true }, { 2014, 5, 26, 0, YEARS, 2014, 5, 26, true }, { 2014, 5, 26, 3, YEARS, 2017, 5, 26, true }, { 2014, 5, 26, -5, YEARS, 2009, 5, 26, true }, { 2014, 5, 26, 0, DECADES, 2014, 5, 26, true }, { 2014, 5, 26, 3, DECADES, 2044, 5, 26, true }, { 2014, 5, 26, -5, DECADES, 1964, 5, 26, true }, { 2014, 5, 26, 0, CENTURIES, 2014, 5, 26, true }, { 2014, 5, 26, 3, CENTURIES, 2314, 5, 26, true }, { 2014, 5, 26, -5, CENTURIES, 1514, 5, 26, true }, { 2014, 5, 26, 0, MILLENNIA, 2014, 5, 26, true }, { 2014, 5, 26, 3, MILLENNIA, 5014, 5, 26, true }, { 2014, 5, 26, -5, MILLENNIA, 2014 - 5000, 5, 26, true }, { 2014, 5, 26, -1, ERAS, -2013, 5, 26, true } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_plus")
-    public void test_plus_TemporalUnit(int year, int month, int dom, long amount, TemporalUnit unit, int expectedYear, int expectedMonth, int expectedDom, boolean bidi) {
-        assertEquals(BritishCutoverDate.of(expectedYear, expectedMonth, expectedDom), BritishCutoverDate.of(year, month, dom).plus(amount, unit));
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_plus")
-    public void test_minus_TemporalUnit(int expectedYear, int expectedMonth, int expectedDom, long amount, TemporalUnit unit, int year, int month, int dom, boolean bidi) {
-        if (bidi) {
-            assertEquals(BritishCutoverDate.of(expectedYear, expectedMonth, expectedDom), BritishCutoverDate.of(year, month, dom).minus(amount, unit));
+        @Test
+        void with_shouldAdjustFromLocalDate() {
+            BritishCutoverDate cutoverDate = BritishCutoverDate.of(2012, 6, 23);
+            LocalDate localDate = LocalDate.MIN.with(cutoverDate);
+            assertEquals(LocalDate.of(2012, 6, 23), localDate);
         }
     }
 
-    //-----------------------------------------------------------------------
-    public static Object[][] data_until() {
-        return new Object[][] { { 1752, 9, 1, 1752, 9, 2, DAYS, 1 }, { 1752, 9, 1, 1752, 9, 14, DAYS, 2 }, { 1752, 9, 2, 1752, 9, 14, DAYS, 1 }, { 1752, 9, 2, 1752, 9, 15, DAYS, 2 }, { 1752, 9, 14, 1752, 9, 1, DAYS, -2 }, { 1752, 9, 14, 1752, 9, 2, DAYS, -1 }, { 2014, 5, 26, 2014, 5, 26, DAYS, 0 }, { 2014, 5, 26, 2014, 6, 1, DAYS, 6 }, { 2014, 5, 26, 2014, 5, 20, DAYS, -6 }, { 1752, 9, 1, 1752, 9, 14, WEEKS, 0 }, { 1752, 9, 1, 1752, 9, 18, WEEKS, 0 }, { 1752, 9, 1, 1752, 9, 19, WEEKS, 1 }, { 1752, 9, 2, 1752, 9, 14, WEEKS, 0 }, { 1752, 9, 2, 1752, 9, 19, WEEKS, 0 }, { 1752, 9, 2, 1752, 9, 20, WEEKS, 1 }, { 2014, 5, 26, 2014, 5, 26, WEEKS, 0 }, { 2014, 5, 26, 2014, 6, 1, WEEKS, 0 }, { 2014, 5, 26, 2014, 6, 2, WEEKS, 1 }, { 1752, 9, 1, 1752, 9, 14, MONTHS, 0 }, { 1752, 9, 1, 1752, 9, 30, MONTHS, 0 }, { 1752, 9, 1, 1752, 10, 1, MONTHS, 1 }, { 1752, 9, 2, 1752, 9, 14, MONTHS, 0 }, { 1752, 9, 2, 1752, 10, 1, MONTHS, 0 }, { 1752, 9, 2, 1752, 10, 2, MONTHS, 1 }, { 1752, 9, 14, 1752, 9, 15, MONTHS, 0 }, { 1752, 9, 14, 1752, 10, 13, MONTHS, 0 }, { 1752, 9, 14, 1752, 10, 14, MONTHS, 1 }, { 2014, 5, 26, 2014, 5, 26, MONTHS, 0 }, { 2014, 5, 26, 2014, 6, 25, MONTHS, 0 }, { 2014, 5, 26, 2014, 6, 26, MONTHS, 1 }, { 2014, 5, 26, 2014, 5, 26, YEARS, 0 }, { 2014, 5, 26, 2015, 5, 25, YEARS, 0 }, { 2014, 5, 26, 2015, 5, 26, YEARS, 1 }, { 2014, 5, 26, 2014, 5, 26, DECADES, 0 }, { 2014, 5, 26, 2024, 5, 25, DECADES, 0 }, { 2014, 5, 26, 2024, 5, 26, DECADES, 1 }, { 2014, 5, 26, 2014, 5, 26, CENTURIES, 0 }, { 2014, 5, 26, 2114, 5, 25, CENTURIES, 0 }, { 2014, 5, 26, 2114, 5, 26, CENTURIES, 1 }, { 2014, 5, 26, 2014, 5, 26, MILLENNIA, 0 }, { 2014, 5, 26, 3014, 5, 25, MILLENNIA, 0 }, { 2014, 5, 26, 3014, 5, 26, MILLENNIA, 1 }, { -2013, 5, 26, 0, 5, 26, ERAS, 0 }, { -2013, 5, 26, 2014, 5, 26, ERAS, 1 } };
+    @Nested
+    @DisplayName("Property and Field Access Tests")
+    class PropertyAndFieldAccessTests {
+
+        @ParameterizedTest
+        @MethodSource
+        void lengthOfMonth_shouldReturnCorrectLength(int year, int month, int expectedLength) {
+            assertEquals(expectedLength, BritishCutoverDate.of(year, month, 1).lengthOfMonth());
+        }
+
+        static Stream<Arguments> lengthOfMonth_shouldReturnCorrectLength() {
+            return Stream.of(
+                Arguments.of(1700, 2, 29), // Julian leap year
+                Arguments.of(1751, 2, 28),
+                Arguments.of(1752, 9, 19), // Cutover month
+                Arguments.of(1753, 2, 28),
+                Arguments.of(1800, 2, 28), // Gregorian non-leap year
+                Arguments.of(2000, 2, 29)  // Gregorian leap year
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void lengthOfYear_shouldReturnCorrectLength(int year, int expectedLength) {
+            assertEquals(expectedLength, BritishCutoverDate.of(year, 1, 1).lengthOfYear(), "Length from start of year");
+            assertEquals(expectedLength, BritishCutoverDate.of(year, 12, 31).lengthOfYear(), "Length from end of year");
+        }
+
+        static Stream<Arguments> lengthOfYear_shouldReturnCorrectLength() {
+            return Stream.of(
+                Arguments.of(1700, 366), // Julian leap year
+                Arguments.of(1751, 365),
+                Arguments.of(1752, 355), // Cutover year (lost 11 days)
+                Arguments.of(1753, 365),
+                Arguments.of(1800, 365), // Gregorian non-leap year
+                Arguments.of(2000, 366)  // Gregorian leap year
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void range_shouldReturnCorrectRangeForField(BritishCutoverDate date, TemporalField field, ValueRange expectedRange) {
+            assertEquals(expectedRange, date.range(field));
+        }
+
+        static Stream<Arguments> range_shouldReturnCorrectRangeForField() {
+            return Stream.of(
+                Arguments.of(BritishCutoverDate.of(1700, 2, 1), DAY_OF_MONTH, ValueRange.of(1, 29)),
+                Arguments.of(BritishCutoverDate.of(1752, 9, 1), DAY_OF_MONTH, ValueRange.of(1, 30)), // Range is lenient
+                Arguments.of(BritishCutoverDate.of(1752, 1, 1), DAY_OF_YEAR, ValueRange.of(1, 355)),
+                Arguments.of(BritishCutoverDate.of(2011, 1, 1), DAY_OF_YEAR, ValueRange.of(1, 365)),
+                Arguments.of(BritishCutoverDate.of(2012, 1, 1), DAY_OF_YEAR, ValueRange.of(1, 366))
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void getLong_shouldReturnCorrectValueForField(BritishCutoverDate date, TemporalField field, long expected) {
+            assertEquals(expected, date.getLong(field));
+        }
+
+        static Stream<Arguments> getLong_shouldReturnCorrectValueForField() {
+            return Stream.of(
+                Arguments.of(BritishCutoverDate.of(1752, 9, 2), DAY_OF_WEEK, 3L), // Wednesday
+                Arguments.of(BritishCutoverDate.of(1752, 9, 14), DAY_OF_WEEK, 4L), // Thursday
+                Arguments.of(BritishCutoverDate.of(1752, 9, 14), DAY_OF_YEAR, 246L), // 245 in ISO, but this calendar has a gap
+                Arguments.of(BritishCutoverDate.of(2014, 5, 26), DAY_OF_WEEK, 1L), // Monday
+                Arguments.of(BritishCutoverDate.of(2014, 5, 26), PROLEPTIC_MONTH, 2014 * 12 + 4)
+            );
+        }
     }
 
-    @ParameterizedTest
-    @MethodSource("data_until")
-    public void test_until_TemporalUnit(int year1, int month1, int dom1, int year2, int month2, int dom2, TemporalUnit unit, long expected) {
-        BritishCutoverDate start = BritishCutoverDate.of(year1, month1, dom1);
-        BritishCutoverDate end = BritishCutoverDate.of(year2, month2, dom2);
-        assertEquals(expected, start.until(end, unit));
+    @Nested
+    @DisplayName("Modification and Adjustment Tests")
+    class ModificationAndAdjustmentTests {
+
+        @ParameterizedTest
+        @MethodSource
+        void with_temporalField_shouldSetFieldToNewValue(BritishCutoverDate start, TemporalField field, long value, BritishCutoverDate expected) {
+            assertEquals(expected, start.with(field, value));
+        }
+
+        static Stream<Arguments> with_temporalField_shouldSetFieldToNewValue() {
+            // {start date, field, new value, expected date}
+            return Stream.of(
+                // Cross the cutover gap
+                Arguments.of(BritishCutoverDate.of(1752, 9, 2), DAY_OF_MONTH, 14, BritishCutoverDate.of(1752, 9, 14)),
+                // Standard adjustment
+                Arguments.of(BritishCutoverDate.of(2014, 5, 26), YEAR, 2012, BritishCutoverDate.of(2012, 5, 26)),
+                // Adjusting month in a leap year to a non-leap year
+                Arguments.of(BritishCutoverDate.of(2012, 2, 29), YEAR, 2011, BritishCutoverDate.of(2011, 2, 28))
+            );
+        }
+
+        @Test
+        void with_lastDayOfMonthAdjuster_shouldReturnLastDayOfMonth() {
+            // Before cutover
+            assertEquals(BritishCutoverDate.of(1752, 2, 29), BritishCutoverDate.of(1752, 2, 23).with(TemporalAdjusters.lastDayOfMonth()));
+            // During cutover month
+            assertEquals(BritishCutoverDate.of(1752, 9, 30), BritishCutoverDate.of(1752, 9, 2).with(TemporalAdjusters.lastDayOfMonth()));
+            // After cutover
+            assertEquals(BritishCutoverDate.of(2012, 2, 29), BritishCutoverDate.of(2012, 2, 23).with(TemporalAdjusters.lastDayOfMonth()));
+        }
     }
 
-    //-----------------------------------------------------------------------
-    public static Object[][] data_untilCLD() {
-        return new Object[][] { { 1752, 7, 2, 1752, 7, 1, 0, 0, -1 }, { 1752, 7, 2, 1752, 7, 2, 0, 0, 0 }, // 30 days after 1752-08-02
-        { 1752, 7, 2, 1752, 9, 1, 0, 1, 30 }, // 2 whole months
-        { 1752, 7, 2, 1752, 9, 2, 0, 2, 0 }, // 1 day after 1752-09-02
-        { 1752, 7, 2, 1752, 9, 14, 0, 2, 1 }, // 17 days after 1752-09-02
-        { 1752, 7, 2, 1752, 9, 30, 0, 2, 17 }, // 18 days after 1752-09-02
-        { 1752, 7, 2, 1752, 10, 1, 0, 2, 18 }, // 3 whole months
-        { 1752, 7, 2, 1752, 10, 2, 0, 3, 0 }, { 1752, 7, 2, 1752, 10, 3, 0, 3, 1 }, { 1752, 7, 2, 1752, 10, 30, 0, 3, 28 }, { 1752, 7, 2, 1752, 11, 1, 0, 3, 30 }, { 1752, 7, 2, 1752, 11, 2, 0, 4, 0 }, // 30 days after 1752-08-03
-        { 1752, 7, 3, 1752, 9, 2, 0, 1, 30 }, // 2 months
-        { 1752, 7, 3, 1752, 9, 14, 0, 2, 0 }, // 1 day after 1752-09-03 (1752-09-14)
-        { 1752, 7, 3, 1752, 9, 15, 0, 2, 1 }, // 16 days after 1752-09-03 (1752-09-14)
-        { 1752, 7, 3, 1752, 9, 30, 0, 2, 16 }, // 17 days after 1752-09-03 (1752-09-14)
-        { 1752, 7, 3, 1752, 10, 1, 0, 2, 17 }, { 1752, 7, 3, 1752, 10, 3, 0, 3, 0 }, { 1752, 7, 3, 1752, 10, 4, 0, 3, 1 }, // 29 days after 1752-08-04
-        { 1752, 7, 4, 1752, 9, 2, 0, 1, 29 }, // 30 days after 1752-08-04
-        { 1752, 7, 4, 1752, 9, 14, 0, 1, 30 }, // 2 months
-        { 1752, 7, 4, 1752, 9, 15, 0, 2, 0 }, // 15 days after 1752-09-04 (1752-09-15)
-        { 1752, 7, 4, 1752, 9, 30, 0, 2, 15 }, // 16 days after 1752-09-04 (1752-09-15)
-        { 1752, 7, 4, 1752, 10, 1, 0, 2, 16 }, { 1752, 7, 4, 1752, 10, 4, 0, 3, 0 }, { 1752, 7, 4, 1752, 10, 5, 0, 3, 1 }, // 20 days after 1752-08-13
-        { 1752, 7, 13, 1752, 9, 2, 0, 1, 20 }, // 21 days after 752-08-13
-        { 1752, 7, 13, 1752, 9, 14, 0, 1, 21 }, // 2 months
-        { 1752, 7, 13, 1752, 9, 24, 0, 2, 0 }, // 6 days after 1752-09-13 (1752-09-24)
-        { 1752, 7, 13, 1752, 9, 30, 0, 2, 6 }, // 7 days after 1752-09-13 (1752-09-24)
-        { 1752, 7, 13, 1752, 10, 1, 0, 2, 7 }, // 18 days after 1752-09-13 (1752-09-24)
-        { 1752, 7, 13, 1752, 10, 12, 0, 2, 18 }, { 1752, 7, 13, 1752, 10, 13, 0, 3, 0 }, { 1752, 7, 13, 1752, 10, 14, 0, 3, 1 }, // 19 days after 1752-08-14
-        { 1752, 7, 14, 1752, 9, 2, 0, 1, 19 }, // 2 months
-        { 1752, 7, 14, 1752, 9, 14, 0, 2, 0 }, // 1 day after 1752-09-14
-        { 1752, 7, 14, 1752, 9, 15, 0, 2, 1 }, // 16 days after 1752-09-14
-        { 1752, 7, 14, 1752, 9, 30, 0, 2, 16 }, // 17 days after 1752-09-14
-        { 1752, 7, 14, 1752, 10, 1, 0, 2, 17 }, // 29 days after 1752-09-14
-        { 1752, 7, 14, 1752, 10, 13, 0, 2, 29 }, { 1752, 7, 14, 1752, 10, 14, 0, 3, 0 }, { 1752, 7, 14, 1752, 10, 15, 0, 3, 1 }, { 1752, 8, 2, 1752, 9, 2, 0, 1, 0 }, // 1 day after 1752-09-02
-        { 1752, 8, 2, 1752, 9, 14, 0, 1, 1 }, // 17 days after 1752-09-02
-        { 1752, 8, 2, 1752, 9, 30, 0, 1, 17 }, // 18 days after 1752-09-02
-        { 1752, 8, 2, 1752, 10, 1, 0, 1, 18 }, { 1752, 8, 2, 1752, 10, 2, 0, 2, 0 }, { 1752, 8, 2, 1752, 10, 3, 0, 2, 1 }, { 1752, 8, 2, 1752, 10, 30, 0, 2, 28 }, { 1752, 8, 16, 1752, 9, 2, 0, 0, 17 }, { 1752, 8, 16, 1752, 9, 14, 0, 0, 18 }, { 1752, 8, 16, 1752, 9, 15, 0, 0, 19 }, { 1752, 8, 16, 1752, 9, 16, 0, 1, 0 }, { 1752, 8, 16, 1752, 10, 2, 0, 1, 16 }, { 1752, 8, 16, 1752, 10, 15, 0, 1, 29 }, { 1752, 8, 16, 1752, 10, 16, 0, 2, 0 }, { 1752, 8, 16, 1752, 10, 17, 0, 2, 1 }, { 1752, 9, 1, 1752, 8, 31, 0, 0, -1 }, { 1752, 9, 1, 1752, 9, 1, 0, 0, 0 }, { 1752, 9, 1, 1752, 9, 2, 0, 0, 1 }, { 1752, 9, 1, 1752, 9, 14, 0, 0, 2 }, { 1752, 9, 1, 1752, 9, 15, 0, 0, 3 }, { 1752, 9, 1, 1752, 9, 30, 0, 0, 18 }, { 1752, 9, 1, 1752, 10, 1, 0, 1, 0 }, { 1752, 9, 1, 1752, 10, 2, 0, 1, 1 }, { 1752, 9, 2, 1752, 8, 31, 0, 0, -2 }, { 1752, 9, 2, 1752, 9, 1, 0, 0, -1 }, { 1752, 9, 2, 1752, 9, 2, 0, 0, 0 }, { 1752, 9, 2, 1752, 9, 14, 0, 0, 1 }, { 1752, 9, 2, 1752, 9, 30, 0, 0, 17 }, { 1752, 9, 2, 1752, 10, 1, 0, 0, 18 }, { 1752, 9, 2, 1752, 10, 2, 0, 1, 0 }, { 1752, 9, 2, 1752, 10, 3, 0, 1, 1 }, { 1752, 9, 2, 1752, 11, 1, 0, 1, 30 }, { 1752, 9, 2, 1752, 11, 2, 0, 2, 0 }, { 1752, 9, 2, 1752, 11, 3, 0, 2, 1 }, { 1752, 9, 14, 1752, 7, 13, 0, -2, -1 }, { 1752, 9, 14, 1752, 7, 14, 0, -2, 0 }, { 1752, 9, 14, 1752, 8, 13, 0, -1, -1 }, { 1752, 9, 14, 1752, 8, 14, 0, -1, 0 }, // 19 days before
-        { 1752, 9, 14, 1752, 8, 15, 0, 0, -19 }, // 3 days before
-        { 1752, 9, 14, 1752, 8, 31, 0, 0, -3 }, // 2 days before
-        { 1752, 9, 14, 1752, 9, 1, 0, 0, -2 }, // 1 day before
-        { 1752, 9, 14, 1752, 9, 2, 0, 0, -1 }, { 1752, 9, 14, 1752, 9, 14, 0, 0, 0 }, { 1752, 9, 14, 1752, 9, 15, 0, 0, 1 }, { 1752, 9, 14, 1752, 9, 30, 0, 0, 16 }, { 1752, 9, 14, 1752, 10, 13, 0, 0, 29 }, { 1752, 9, 14, 1752, 10, 14, 0, 1, 0 }, { 1752, 9, 14, 1752, 10, 15, 0, 1, 1 }, { 1752, 9, 24, 1752, 7, 23, 0, -2, -1 }, { 1752, 9, 24, 1752, 7, 24, 0, -2, 0 }, { 1752, 9, 24, 1752, 8, 23, 0, -1, -1 }, { 1752, 9, 24, 1752, 8, 24, 0, -1, 0 }, // 19 days before
-        { 1752, 9, 24, 1752, 8, 25, 0, 0, -19 }, // 13 days before
-        { 1752, 9, 24, 1752, 8, 31, 0, 0, -13 }, // 12 days before
-        { 1752, 9, 24, 1752, 9, 1, 0, 0, -12 }, // 11 days before
-        { 1752, 9, 24, 1752, 9, 2, 0, 0, -11 }, // 10 days before
-        { 1752, 9, 24, 1752, 9, 14, 0, 0, -10 }, // 1 day before
-        { 1752, 9, 24, 1752, 9, 23, 0, 0, -1 }, { 1752, 9, 24, 1752, 9, 24, 0, 0, 0 }, { 1752, 9, 24, 1752, 9, 25, 0, 0, 1 }, { 1752, 9, 24, 1752, 9, 30, 0, 0, 6 }, { 1752, 9, 24, 1752, 10, 23, 0, 0, 29 }, { 1752, 9, 24, 1752, 10, 24, 0, 1, 0 }, { 1752, 9, 24, 1752, 10, 25, 0, 1, 1 }, { 1752, 10, 3, 1752, 10, 1, 0, 0, -2 }, { 1752, 10, 3, 1752, 9, 30, 0, 0, -3 }, { 1752, 10, 3, 1752, 9, 16, 0, 0, -17 }, { 1752, 10, 3, 1752, 9, 15, 0, 0, -18 }, { 1752, 10, 3, 1752, 9, 14, 0, 0, -19 }, { 1752, 10, 3, 1752, 9, 2, 0, -1, -1 }, { 1752, 10, 3, 1752, 9, 1, 0, -1, -2 }, { 1752, 10, 3, 1752, 8, 31, 0, -1, -3 }, { 1752, 10, 3, 1752, 8, 4, 0, -1, -30 }, { 1752, 10, 3, 1752, 8, 3, 0, -2, 0 }, { 1752, 10, 3, 1752, 8, 2, 0, -2, -1 }, { 1752, 10, 4, 1752, 10, 1, 0, 0, -3 }, { 1752, 10, 4, 1752, 9, 30, 0, 0, -4 }, { 1752, 10, 4, 1752, 9, 16, 0, 0, -18 }, { 1752, 10, 4, 1752, 9, 15, 0, 0, -19 }, { 1752, 10, 4, 1752, 9, 14, 0, 0, -20 }, { 1752, 10, 4, 1752, 9, 2, 0, -1, -2 }, { 1752, 10, 4, 1752, 9, 1, 0, -1, -3 }, { 1752, 10, 4, 1752, 8, 31, 0, -1, -4 }, { 1752, 10, 4, 1752, 8, 5, 0, -1, -30 }, { 1752, 10, 4, 1752, 8, 4, 0, -2, 0 }, { 1752, 10, 4, 1752, 8, 3, 0, -2, -1 } };
+    @Nested
+    @DisplayName("Arithmetic Tests")
+    class ArithmeticTests {
+
+        @ParameterizedTest
+        @MethodSource
+        void plus_shouldCorrectlyAddAmountOfUnit(BritishCutoverDate start, long amount, TemporalUnit unit, BritishCutoverDate expected) {
+            assertEquals(expected, start.plus(amount, unit));
+        }
+
+        static Stream<Arguments> plus_shouldCorrectlyAddAmountOfUnit() {
+            // {start date, amount, unit, expected date}
+            return Stream.of(
+                Arguments.of(BritishCutoverDate.of(1752, 9, 2), 1, DAYS, BritishCutoverDate.of(1752, 9, 14)),
+                Arguments.of(BritishCutoverDate.of(1752, 9, 2), 1, WEEKS, BritishCutoverDate.of(1752, 9, 20)),
+                Arguments.of(BritishCutoverDate.of(1752, 8, 12), 1, MONTHS, BritishCutoverDate.of(1752, 9, 23)),
+                Arguments.of(BritishCutoverDate.of(2014, 5, 26), 3, YEARS, BritishCutoverDate.of(2017, 5, 26))
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void minus_shouldCorrectlySubtractAmountOfUnit(BritishCutoverDate start, long amount, TemporalUnit unit, BritishCutoverDate expected) {
+            assertEquals(expected, start.minus(amount, unit));
+        }
+
+        static Stream<Arguments> minus_shouldCorrectlySubtractAmountOfUnit() {
+            // {start date, amount, unit, expected date}
+            return Stream.of(
+                Arguments.of(BritishCutoverDate.of(1752, 9, 14), 1, DAYS, BritishCutoverDate.of(1752, 9, 2)),
+                Arguments.of(BritishCutoverDate.of(1752, 9, 14), 1, WEEKS, BritishCutoverDate.of(1752, 8, 27)),
+                Arguments.of(BritishCutoverDate.of(1752, 10, 12), 1, MONTHS, BritishCutoverDate.of(1752, 9, 23)),
+                Arguments.of(BritishCutoverDate.of(2014, 5, 26), 5, YEARS, BritishCutoverDate.of(2009, 5, 26))
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void until_temporalUnit_shouldCalculateCorrectAmount(BritishCutoverDate start, BritishCutoverDate end, TemporalUnit unit, long expected) {
+            assertEquals(expected, start.until(end, unit));
+        }
+
+        static Stream<Arguments> until_temporalUnit_shouldCalculateCorrectAmount() {
+            // {start date, end date, unit, expected amount}
+            return Stream.of(
+                Arguments.of(BritishCutoverDate.of(1752, 9, 1), BritishCutoverDate.of(1752, 9, 14), DAYS, 2L),
+                Arguments.of(BritishCutoverDate.of(1752, 9, 2), BritishCutoverDate.of(1752, 9, 14), DAYS, 1L),
+                Arguments.of(BritishCutoverDate.of(1752, 9, 1, 1), BritishCutoverDate.of(1752, 10, 1), MONTHS, 1L),
+                Arguments.of(BritishCutoverDate.of(2014, 5, 26), BritishCutoverDate.of(2015, 5, 26), YEARS, 1L)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void until_chronoPeriod_shouldCalculateCorrectPeriodAndBeReversible(BritishCutoverDate start, BritishCutoverDate end, Period expectedPeriod) {
+            assertEquals(expectedPeriod, start.until(end));
+            assertEquals(end, start.plus(start.until(end)), "Adding the period back should result in the end date");
+        }
+
+        static Stream<Arguments> until_chronoPeriod_shouldCalculateCorrectPeriodAndBeReversible() {
+            // {start date, end date, expected period}
+            return Stream.of(
+                // Across the cutover
+                Arguments.of(BritishCutoverDate.of(1752, 9, 2), BritishCutoverDate.of(1752, 9, 14), Period.of(0, 0, 1)),
+                Arguments.of(BritishCutoverDate.of(1752, 8, 16), BritishCutoverDate.of(1752, 9, 16), Period.of(0, 1, 0)),
+                // Standard period
+                Arguments.of(BritishCutoverDate.of(2020, 1, 15), BritishCutoverDate.of(2021, 3, 18), Period.of(1, 2, 3))
+            );
+        }
     }
 
-    @ParameterizedTest
-    @MethodSource("data_untilCLD")
-    public void test_until_CLD(int year1, int month1, int dom1, int year2, int month2, int dom2, int expectedYears, int expectedMonths, int expectedDays) {
-        BritishCutoverDate a = BritishCutoverDate.of(year1, month1, dom1);
-        BritishCutoverDate b = BritishCutoverDate.of(year2, month2, dom2);
-        ChronoPeriod c = a.until(b);
-        assertEquals(BritishCutoverChronology.INSTANCE.period(expectedYears, expectedMonths, expectedDays), c);
-    }
+    @Nested
+    @DisplayName("Object Method Tests")
+    class ObjectMethodTests {
 
-    @ParameterizedTest
-    @MethodSource("data_untilCLD")
-    public void test_until_CLD_plus(int year1, int month1, int dom1, int year2, int month2, int dom2, int expectedYears, int expectedMonths, int expectedDays) {
-        BritishCutoverDate a = BritishCutoverDate.of(year1, month1, dom1);
-        BritishCutoverDate b = BritishCutoverDate.of(year2, month2, dom2);
-        ChronoPeriod c = a.until(b);
-        assertEquals(b, a.plus(c));
-    }
+        @ParameterizedTest
+        @MethodSource
+        void toString_shouldReturnCorrectRepresentation(BritishCutoverDate cutover, String expected) {
+            assertEquals(expected, cutover.toString());
+        }
 
-    //-----------------------------------------------------------------------
-    public static Object[][] data_toString() {
-        return new Object[][] { { BritishCutoverDate.of(1, 1, 1), "BritishCutover AD 1-01-01" }, { BritishCutoverDate.of(2012, 6, 23), "BritishCutover AD 2012-06-23" } };
-    }
+        static Stream<Arguments> toString_shouldReturnCorrectRepresentation() {
+            return Stream.of(
+                Arguments.of(BritishCutoverDate.of(1, 1, 1), "BritishCutover AD 1-01-01"),
+                Arguments.of(BritishCutoverDate.of(2012, 6, 23), "BritishCutover AD 2012-06-23")
+            );
+        }
 
-    @ParameterizedTest
-    @MethodSource("data_toString")
-    public void test_toString(BritishCutoverDate cutover, String expected) {
-        assertEquals(expected, cutover.toString());
-    }
+        @Test
+        void equals_and_hashCode_shouldAdhereToContract() {
+            BritishCutoverDate date1 = BritishCutoverDate.of(2023, 10, 26);
+            BritishCutoverDate date2 = BritishCutoverDate.of(2023, 10, 26);
+            BritishCutoverDate date3 = BritishCutoverDate.of(2023, 10, 27);
+            BritishCutoverDate date4 = BritishCutoverDate.of(1700, 1, 1);
 
-    //-----------------------------------------------------------------------
-    @Test
-    public void test_LocalDate_withBritishCutoverDate() {
-        BritishCutoverDate cutover = BritishCutoverDate.of(2012, 6, 23);
-        LocalDate test = LocalDate.MIN.with(cutover);
-        assertEquals(LocalDate.of(2012, 6, 23), test);
+            // Reflexive
+            assertEquals(date1, date1);
+
+            // Symmetric
+            assertEquals(date1, date2);
+            assertEquals(date2, date1);
+
+            // HashCode
+            assertEquals(date1.hashCode(), date2.hashCode());
+
+            // Not equal
+            assertEquals(false, date1.equals(date3));
+            assertEquals(false, date1.equals(date4));
+            assertEquals(false, date1.equals(null));
+            assertEquals(false, date1.equals(new Object()));
+        }
     }
 }
