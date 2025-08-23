@@ -1,21 +1,30 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonSetter_ESTestTest9 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on its factory methods.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Nulls nulls0 = Nulls.AS_EMPTY;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.forValueNulls(nulls0, nulls0);
-        jsonSetter_Value0.nonDefaultValueNulls();
-        assertEquals(Nulls.AS_EMPTY, jsonSetter_Value0.getContentNulls());
-        assertEquals(Nulls.AS_EMPTY, jsonSetter_Value0.getValueNulls());
+    /**
+     * Verifies that the factory method {@link JsonSetter.Value#forValueNulls(Nulls, Nulls)}
+     * correctly constructs an instance with the specified null-handling strategies
+     * for both the main value and its content.
+     */
+    @Test
+    public void shouldCreateValueWithSpecificValueAndContentNulls() {
+        // Arrange: Define the desired null-handling strategy.
+        final Nulls nullsStrategy = Nulls.AS_EMPTY;
+
+        // Act: Create a JsonSetter.Value instance using the factory method.
+        JsonSetter.Value setterValue = JsonSetter.Value.forValueNulls(nullsStrategy, nullsStrategy);
+
+        // Assert: Verify that both value and content null-handling strategies are set as expected.
+        assertEquals("The value nulls strategy should match the constructor argument.",
+                nullsStrategy, setterValue.getValueNulls());
+        assertEquals("The content nulls strategy should match the constructor argument.",
+                nullsStrategy, setterValue.getContentNulls());
     }
 }
