@@ -1,19 +1,35 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest20 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Test class for {@link SignedBytes}.
+ * The original test class name "SignedBytes_ESTestTest20" and its scaffolding
+ * are artifacts of a test generation tool. A more descriptive name like
+ * "SignedBytesTest" is better for a human-written test suite.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        String string0 = SignedBytes.join("&#GMks!-I`k", byteArray0);
-        assertEquals("0&#GMks!-I`k0&#GMks!-I`k0", string0);
+    /**
+     * Tests that the join method correctly concatenates an array of zero-valued bytes
+     * with a given separator.
+     */
+    @Test
+    public void join_withArrayOfZeros_shouldReturnZerosSeparatedByDelimiter() {
+        // Arrange
+        // Using an explicit array initialization is clearer than `new byte[3]`,
+        // which relies on the reader knowing the default value for a byte is 0.
+        byte[] bytes = {0, 0, 0};
+        String separator = ",";
+        String expected = "0,0,0";
+
+        // Act
+        String actual = SignedBytes.join(separator, bytes);
+
+        // Assert
+        // The assertion is now much easier to read and verify at a glance
+        // due to the simpler separator and explicit expected value.
+        assertEquals(expected, actual);
     }
 }
