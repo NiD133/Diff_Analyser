@@ -1,32 +1,43 @@
 package org.jfree.chart.renderer.category;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardBarPainter_ESTestTest8 extends StandardBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        BufferedImage bufferedImage0 = new BufferedImage(1, 599, 1);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        StackedBarRenderer stackedBarRenderer0 = new StackedBarRenderer();
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double(1, (double) stackedBarRenderer0.ZERO, 0.0, 0.0);
-        RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
-        standardBarPainter0.paintBarShadow(graphics2D0, stackedBarRenderer0, 1, 255, rectangle2D_Double0, rectangleEdge0, true);
-        assertTrue(stackedBarRenderer0.getShadowsVisible());
+/**
+ * Tests for the {@link StandardBarPainter} class, focusing on the paintBarShadow method.
+ */
+public class StandardBarPainterTest {
+
+    /**
+     * Verifies that paintBarShadow executes without throwing an exception when given a bar
+     * with zero width and height. This is a regression test to ensure robustness with
+     * edge-case geometric shapes.
+     */
+    @Test
+    public void paintBarShadow_withZeroAreaBar_shouldNotThrowException() {
+        // Arrange
+        StandardBarPainter painter = new StandardBarPainter();
+        BarRenderer renderer = new StackedBarRenderer();
+
+        // Create a dummy graphics context for the painter to draw on.
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+
+        // Define a bar with zero area, which is an edge case for painting.
+        Rectangle2D bar = new Rectangle2D.Double(10.0, 20.0, 0.0, 0.0);
+        RectangleEdge baseEdge = RectangleEdge.TOP;
+        int row = 0;
+        int column = 0;
+        boolean pegShadow = true;
+
+        // Act & Assert
+        // The test's purpose is to ensure that the method call completes without error.
+        // The original test had a misleading assertion. A successful execution (no exception thrown)
+        // is the validation criteria here.
+        painter.paintBarShadow(g2, renderer, row, column, bar, baseEdge, pegShadow);
     }
 }
