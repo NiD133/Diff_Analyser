@@ -1,20 +1,35 @@
 package org.jsoup.nodes;
 
-import org.jsoup.Jsoup;
-import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
-import static org.jsoup.nodes.Document.OutputSettings;
-import static org.jsoup.nodes.Entities.EscapeMode.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EntitiesTestTest9 {
+/**
+ * Tests for {@link Entities} unescaping.
+ */
+public class EntitiesTest {
 
+    /**
+     * Tests that the unescape method correctly handles supplementary Unicode characters.
+     * Supplementary characters are those outside the Basic Multilingual Plane (BMP),
+     * often represented as surrogate pairs in UTF-16.
+     */
     @Test
-    public void notMissingSupplementals() {
-        String text = "&npolint; &qfr;";
-        // 𝔮
-        String un = "⨔ \uD835\uDD2E";
-        assertEquals(un, Entities.unescape(text));
+    public void unescapesSupplementaryCharacters() {
+        // Arrange
+        String htmlWithEntities = "&npolint; &qfr;";
+
+        // Define the expected characters by their Unicode code points for clarity.
+        // &npolint; -> U+2A14 (N-ARY LINE INTEGRATION)
+        // &qfr;     -> U+1D52E (MATHEMATICAL FRAKTUR SMALL Q)
+        String expectedText = new String(Character.toChars(0x2A14)) +
+                              " " +
+                              new String(Character.toChars(0x1D52E));
+
+        // Act
+        String actualText = Entities.unescape(htmlWithEntities);
+
+        // Assert
+        assertEquals(expectedText, actualText);
     }
 }
