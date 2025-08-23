@@ -1,45 +1,30 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+
+/**
+ * This test focuses on the behavior of the {@link ClusteredXYBarRenderer#findDomainBounds(XYDataset)} method.
+ * Note: The class name and its parent are preserved from the original auto-generated test suite.
+ */
 public class ClusteredXYBarRenderer_ESTestTest24 extends ClusteredXYBarRenderer_ESTest_scaffolding {
 
+    /**
+     * Verifies that findDomainBounds() returns null when provided with a null dataset.
+     * This is the expected behavior, as domain bounds cannot be determined without data.
+     */
     @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        Range range0 = clusteredXYBarRenderer0.findDomainBounds((XYDataset) null);
-        assertNull(range0);
+    public void findDomainBounds_shouldReturnNull_whenDatasetIsNull() {
+        // Arrange: Create an instance of the renderer.
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+
+        // Act: Call the method under test with a null dataset.
+        Range domainBounds = renderer.findDomainBounds(null);
+
+        // Assert: The method should return null, indicating no bounds could be found.
+        assertNull("The domain bounds should be null for a null dataset.", domainBounds);
     }
 }
