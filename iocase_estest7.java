@@ -1,17 +1,28 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest7 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        IOCase iOCase0 = IOCase.valueOf("INSENSITIVE");
-        assertEquals("Insensitive", iOCase0.getName());
+    /**
+     * Tests that IOCase.valueOf("INSENSITIVE") correctly resolves to the
+     * INSENSITIVE enum and that its getName() method returns "Insensitive".
+     */
+    @Test
+    public void testValueOfInsensitiveReturnsCorrectName() {
+        // Arrange
+        final String enumString = "INSENSITIVE";
+        final String expectedName = "Insensitive";
+
+        // Act
+        final IOCase insensitiveCase = IOCase.valueOf(enumString);
+        final String actualName = insensitiveCase.getName();
+
+        // Assert
+        assertEquals(expectedName, actualName);
     }
 }
