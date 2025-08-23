@@ -1,23 +1,30 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class OptionFormatter_ESTestTest30 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Option option0 = new Option("?Wf", "?Wf", true, "");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getBothOpt();
-        assertEquals("-?Wf, --?Wf", string0);
+    /**
+     * Tests that getBothOpt() correctly formats an option that has both a short
+     * and a long name, using the default prefixes and separator.
+     */
+    @Test
+    public void getBothOptShouldFormatShortAndLongOptionsWithDefaultSettings() {
+        // Arrange: Create an option with both a short and a long name.
+        // The OptionFormatter will be created with default settings.
+        Option option = new Option("v", "verbose", false, "Enable verbose mode.");
+        OptionFormatter formatter = OptionFormatter.from(option);
+        String expectedFormattedString = "-v, --verbose";
+
+        // Act: Get the formatted string for both option names.
+        String actualFormattedString = formatter.getBothOpt();
+
+        // Assert: Verify that the output matches the expected format.
+        assertEquals(expectedFormattedString, actualFormattedString);
     }
 }
