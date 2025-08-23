@@ -1,48 +1,27 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest27 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ObservableInputStream} class.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        ObservableInputStream observableInputStream0 = new ObservableInputStream((InputStream) null);
-        // Undeclared exception!
-        try {
-            observableInputStream0.consume();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.ProxyInputStream", e);
-        }
+    /**
+     * Verifies that attempting to consume an ObservableInputStream that was
+     * constructed with a null underlying stream results in a NullPointerException.
+     * This is the expected behavior as the operation is delegated to the null stream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void consumeWithNullInputStreamThrowsNullPointerException() throws IOException {
+        // Arrange: Create an ObservableInputStream with a null delegate stream.
+        // The cast to InputStream is necessary to resolve constructor ambiguity.
+        final ObservableInputStream stream = new ObservableInputStream((InputStream) null);
+
+        // Act: Attempt to consume the stream. This action is expected to throw the exception.
+        stream.consume();
     }
 }
