@@ -1,52 +1,56 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Properties;
-import org.junit.jupiter.api.BeforeEach;
+
+import java.util.Collection;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class OptionGroupTestTest1 {
+/**
+ * Tests for the {@link OptionGroup#getNames()} method.
+ */
+@DisplayName("OptionGroup Test")
+class OptionGroupTest {
 
-    private Options options;
+    @Nested
+    @DisplayName("getNames method")
+    class GetNamesTest {
 
-    private final Parser parser = new PosixParser();
+        @Test
+        @DisplayName("should return an empty collection when the group is empty")
+        void shouldReturnEmptyCollectionForEmptyGroup() {
+            // Arrange
+            final OptionGroup group = new OptionGroup();
 
-    @BeforeEach
-    public void setUp() {
-        final Option file = new Option("f", "file", false, "file to process");
-        final Option dir = new Option("d", "directory", false, "directory to process");
-        final OptionGroup optionGroup1 = new OptionGroup();
-        optionGroup1.addOption(file);
-        optionGroup1.addOption(dir);
-        options = new Options().addOptionGroup(optionGroup1);
-        final Option section = new Option("s", "section", false, "section to process");
-        final Option chapter = new Option("c", "chapter", false, "chapter to process");
-        final OptionGroup optionGroup2 = new OptionGroup();
-        optionGroup2.addOption(section);
-        optionGroup2.addOption(chapter);
-        options.addOptionGroup(optionGroup2);
-        final Option importOpt = new Option(null, "import", false, "section to process");
-        final Option exportOpt = new Option(null, "export", false, "chapter to process");
-        final OptionGroup optionGroup3 = new OptionGroup();
-        optionGroup3.addOption(importOpt);
-        optionGroup3.addOption(exportOpt);
-        options.addOptionGroup(optionGroup3);
-        options.addOption("r", "revision", false, "revision number");
-    }
+            // Act
+            final Collection<String> names = group.getNames();
 
-    @Test
-    void testGetNames() {
-        final OptionGroup optionGroup = new OptionGroup();
-        assertFalse(optionGroup.isSelected());
-        optionGroup.addOption(OptionBuilder.create('a'));
-        optionGroup.addOption(OptionBuilder.create('b'));
-        assertNotNull(optionGroup.getNames(), "null names");
-        assertEquals(2, optionGroup.getNames().size());
-        assertTrue(optionGroup.getNames().contains("a"));
-        assertTrue(optionGroup.getNames().contains("b"));
+            // Assert
+            assertNotNull(names, "The names collection should not be null.");
+            assertTrue(names.isEmpty(), "The names collection should be empty for a new group.");
+        }
+
+        @Test
+        @DisplayName("should return all option names in insertion order")
+        void shouldReturnAllOptionNamesInOrder() {
+            // Arrange
+            final OptionGroup group = new OptionGroup();
+            group.addOption(new Option("a", "alpha", false, "First option"));
+            group.addOption(new Option("b", "beta", false, "Second option"));
+
+            final List<String> expectedNames = List.of("a", "b");
+
+            // Act
+            final Collection<String> actualNames = group.getNames();
+
+            // Assert
+            // The internal implementation uses a LinkedHashMap, so insertion order is preserved.
+            // assertIterableEquals checks for content, size, and order in a single call.
+            assertIterableEquals(expectedNames, actualNames);
+        }
     }
 }
