@@ -1,30 +1,42 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
+import java.lang.reflect.InvocationTargetException;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest16 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        // Undeclared exception!
+    /**
+     * Verifies that calling makeShapeFactory with a null SpatialContext
+     * results in a RuntimeException caused by a NullPointerException.
+     * This happens because the underlying ShapeFactory implementation
+     * (ShapeFactoryImpl) attempts to dereference the null context during its construction.
+     */
+    @Test
+    public void makeShapeFactory_whenContextIsNull_throwsRuntimeException() {
+        // Arrange: Create an instance of the factory to be tested.
+        SpatialContextFactory factory = new SpatialContextFactory();
+
+        // Act & Assert: Expect a RuntimeException when the method is called with a null argument.
         try {
-            spatialContextFactory0.makeShapeFactory((SpatialContext) null);
-            fail("Expecting exception: RuntimeException");
+            factory.makeShapeFactory(null);
+            fail("Expected a RuntimeException to be thrown for a null context.");
         } catch (RuntimeException e) {
-            //
-            // java.lang.NullPointerException
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // Assert on the exception chain to ensure the failure is for the correct reason.
+            // The factory's reflection-based instantiation wraps the constructor's
+            // exception in an InvocationTargetException, which is then wrapped in a RuntimeException.
+            Throwable cause = e.getCause();
+            assertNotNull("The RuntimeException should have a cause.", cause);
+            assertTrue("The cause should be an InvocationTargetException.",
+                    cause instanceof InvocationTargetException);
+
+            Throwable rootCause = cause.getCause();
+            assertNotNull("The InvocationTargetException should have a cause.", rootCause);
+            assertTrue("The root cause should be a NullPointerException.",
+                    rootCause instanceof NullPointerException);
         }
     }
 }
