@@ -11,7 +11,7 @@ public class TokenQueue_ESTestTest71 extends TokenQueue_ESTest_scaffolding {
 
     @Test(timeout = 4000)
     public void test70() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("k\"YT-6Ih:G~3zAw");
+        TokenQueue tokenQueue0 = new TokenQueue("k\"YT -6Ih:G~3zAw");
         // Undeclared exception!
         try {
             tokenQueue0.consume("Must Lbe false");
