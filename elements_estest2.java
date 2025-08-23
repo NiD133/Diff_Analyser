@@ -1,44 +1,36 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest2 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test001() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements} class, focusing on exception-throwing scenarios.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that expectFirst() throws an IllegalArgumentException when the CSS query
+     * does not match any element in the collection.
+     */
+    @Test
+    public void expectFirstThrowsExceptionWhenNoElementMatches() {
+        // Arrange: Create a simple document and select an element.
+        Document doc = Jsoup.parse("<div><p>Some text</p></div>");
+        Elements elements = doc.select("div"); // The collection contains one <div> element.
+        String nonExistentSelector = "span";    // This selector will not match anything within the div.
+
+        // Act & Assert: Attempt to find a non-existent element and verify the exception.
         try {
-            elements0.expectFirst("BogusComment");
-            fail("Expecting exception: IllegalArgumentException");
+            elements.expectFirst(nonExistentSelector);
+            fail("An IllegalArgumentException should have been thrown, as no element matches the selector.");
         } catch (IllegalArgumentException e) {
-            //
-            // No elements matched the query 'BogusComment' in the elements.
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is helpful and accurate.
+            String expectedMessage = "No elements matched the query 'span' in the elements.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
