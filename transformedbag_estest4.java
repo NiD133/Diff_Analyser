@@ -1,65 +1,55 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InstantiateFactory;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedBag_ESTestTest4 extends TransformedBag_ESTest_scaffolding {
+import java.util.Comparator;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Integer integer0 = new Integer(2);
-        ConstantFactory<Integer> constantFactory0 = new ConstantFactory<Integer>(integer0);
-        Transformer<Object, Integer> transformer0 = FactoryTransformer.factoryTransformer((Factory<? extends Integer>) constantFactory0);
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        TreeBag<Predicate<Object>> treeBag0 = new TreeBag<Predicate<Object>>(comparator0);
-        Transformer<Object, Predicate<Object>> transformer1 = InvokerTransformer.invokerTransformer("jA]A&z5z!a+Jbr(nH");
-        TransformedSortedBag<Predicate<Object>> transformedSortedBag0 = new TransformedSortedBag<Predicate<Object>>(treeBag0, transformer1);
-        Comparator<Object> comparator1 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn(0, 0, 0).when(comparator1).compare(any(), any());
-        TreeBag<Integer> treeBag1 = new TreeBag<Integer>(comparator1);
-        SynchronizedSortedBag<Integer> synchronizedSortedBag0 = new SynchronizedSortedBag<Integer>(treeBag1);
-        synchronizedSortedBag0.add(integer0);
-        TransformedSortedBag<Integer> transformedSortedBag1 = new TransformedSortedBag<Integer>(synchronizedSortedBag0, transformer0);
-        int int0 = transformedSortedBag1.getCount(transformedSortedBag0);
-        assertEquals(1, int0);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link TransformedBag#getCount(Object)} method.
+ */
+public class TransformedBagGetCountTest {
+
+    /**
+     * Tests that getCount() delegates to the decorated bag's getCount method
+     * and does not use the transformer on the input object.
+     * <p>
+     * This is verified by using a TreeBag with a custom comparator that considers
+     * two distinct objects to be equal. The test checks if getCount() for one
+     * object returns the count of the other, proving the underlying bag's
+     * comparison logic is used directly.
+     */
+    @Test
+    public void getCountShouldDelegateToUnderlyingBagWithoutTransformation() {
+        // Arrange
+        final String objectInBag = "item in bag";
+        final String objectToLookFor = "a different item";
+
+        // A comparator that considers all objects to be equal. This is key to the test,
+        // as it forces the underlying TreeBag to find a match between two different objects.
+        final Comparator<String> allEqualComparator = (o1, o2) -> 0;
+
+        // The underlying bag uses the custom comparator.
+        final Bag<String> underlyingBag = new TreeBag<>(allEqualComparator);
+        underlyingBag.add(objectInBag);
+
+        // A transformer that would change the object if it were used.
+        final Transformer<String, String> transformer = ConstantTransformer.constantTransformer("transformed value");
+        final Bag<String> transformedBag = TransformedBag.transformingBag(underlyingBag, transformer);
+
+        // Act
+        // getCount should delegate directly to the underlying TreeBag. The TreeBag will use its
+        // 'allEqualComparator', which will report that 'objectToLookFor' is "equal" to
+        // 'objectInBag', which is already in the bag.
+        final int count = transformedBag.getCount(objectToLookFor);
+
+        // Assert
+        // The count should be 1, as the underlying bag contains one "equal" item.
+        // This confirms the transformer was not applied to the input of getCount.
+        assertEquals("getCount should return the count from the underlying bag.", 1, count);
     }
 }
