@@ -1,23 +1,34 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest45 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link AtomicDoubleArray#set(int, double)} method.
+ */
+public class AtomicDoubleArraySetTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        double[] doubleArray0 = new double[8];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        atomicDoubleArray0.set(2, 2358.26006);
-        assertEquals(8, atomicDoubleArray0.length());
+    @Test
+    public void set_updatesValueAtGivenIndex_andLengthIsUnchanged() {
+        // Arrange: Create an AtomicDoubleArray and define the update parameters.
+        double[] sourceArray = {0.0, 0.0, 0.0, 0.0, 0.0};
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(sourceArray);
+
+        int indexToSet = 2;
+        double newValue = 123.45;
+        final double delta = 0.0; // Use a delta of 0.0 for exact double comparisons.
+
+        // Act: Set a new value at the specified index.
+        atomicArray.set(indexToSet, newValue);
+
+        // Assert: Verify the value was updated and the array length is preserved.
+        // 1. The most important check: The value at the index was correctly updated.
+        assertEquals("The value at the specified index should be updated.",
+                newValue, atomicArray.get(indexToSet), delta);
+
+        // 2. The original test's check: The length of the array remains unchanged.
+        assertEquals("The array length should not change after a set operation.",
+                sourceArray.length, atomicArray.length());
     }
 }
