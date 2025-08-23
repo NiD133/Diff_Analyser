@@ -1,19 +1,30 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ExtraFieldUtils_ESTestTest39 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class, focusing on the
+ * {@link ExtraFieldUtils.UnparseableExtraField} inner class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.THROW;
-        int int0 = extraFieldUtils_UnparseableExtraField0.getKey();
-        assertEquals(0, int0);
+    /**
+     * Verifies that the THROW constant of the UnparseableExtraField "enum"
+     * returns the correct key value from its getKey() method.
+     */
+    @Test
+    public void unparseableExtraFieldThrowShouldHaveCorrectKey() {
+        // Arrange
+        // The expected key for the THROW action is defined by the public THROW_KEY constant.
+        final int expectedKey = ExtraFieldUtils.UnparseableExtraField.THROW_KEY;
+        final ExtraFieldUtils.UnparseableExtraField throwBehavior = ExtraFieldUtils.UnparseableExtraField.THROW;
+
+        // Act
+        final int actualKey = throwBehavior.getKey();
+
+        // Assert
+        // The key from the THROW instance should match the public constant.
+        assertEquals("The key for THROW should match its constant.", expectedKey, actualKey);
     }
 }
