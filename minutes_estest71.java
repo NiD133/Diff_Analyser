@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest71 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        Minutes minutes0 = Minutes.MAX_VALUE;
-        PeriodType periodType0 = minutes0.getPeriodType();
-        assertEquals(1, periodType0.size());
+    @Test
+    public void getPeriodType_shouldReturnPeriodTypeWithOnlyMinutesField() {
+        // Arrange
+        // The specific value of Minutes does not affect the PeriodType.
+        // We use a simple, representative instance.
+        Minutes testMinutes = Minutes.ONE;
+
+        // Act
+        PeriodType periodType = testMinutes.getPeriodType();
+
+        // Assert
+        // The PeriodType for a Minutes object should contain exactly one field.
+        assertEquals("PeriodType should have one field", 1, periodType.size());
+        
+        // That single field must be of type 'minutes'.
+        assertEquals("Field type should be 'minutes'", DurationFieldType.minutes(), periodType.getFieldType(0));
     }
 }
