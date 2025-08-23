@@ -1,91 +1,47 @@
 package org.joda.time.format;
 
-import java.io.CharArrayWriter;
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
 
-public class PeriodFormatterTestTest9 extends TestCase {
+/**
+ * Contains tests for parsing strings into MutablePeriod objects using PeriodFormatter.
+ * This class focuses on the parseMutablePeriod method.
+ */
+public class PeriodFormatterParseTest extends TestCase {
 
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
+    /**
+     * Tests that a valid ISO 8601 period string is parsed into the correct MutablePeriod.
+     */
+    public void testParseMutablePeriod_withValidISOString_parsesCorrectly() {
+        // Arrange
+        PeriodFormatter formatter = ISOPeriodFormat.standard();
+        String isoPeriodString = "P1Y2M3W4DT5H6M7.008S";
+        
+        // The expected period is 1 year, 2 months, 3 weeks, 4 days, 
+        // 5 hours, 6 minutes, 7 seconds, and 8 milliseconds.
+        MutablePeriod expectedPeriod = new MutablePeriod(1, 2, 3, 4, 5, 6, 7, 8);
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Act
+        MutablePeriod actualPeriod = formatter.parseMutablePeriod(isoPeriodString);
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final DateTimeZone NEWYORK = DateTimeZone.forID("America/New_York");
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology BUDDHIST_PARIS = BuddhistChronology.getInstance(PARIS);
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    private PeriodFormatter f = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert
+        assertEquals(expectedPeriod, actualPeriod);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPeriodFormatter.class);
-    }
+    /**
+     * Tests that parsing an invalid, non-period string throws an IllegalArgumentException.
+     */
+    public void testParseMutablePeriod_withInvalidString_throwsException() {
+        // Arrange
+        PeriodFormatter formatter = ISOPeriodFormat.standard();
+        String invalidString = "This is not a period";
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-        f = ISOPeriodFormat.standard();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-        f = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testParseMutablePeriod_simple() {
-        MutablePeriod expect = new MutablePeriod(1, 2, 3, 4, 5, 6, 7, 8);
-        assertEquals(expect, f.parseMutablePeriod("P1Y2M3W4DT5H6M7.008S"));
+        // Act & Assert
         try {
-            f.parseMutablePeriod("ABC");
-            fail();
+            formatter.parseMutablePeriod(invalidString);
+            fail("Expected an IllegalArgumentException for an invalid format");
         } catch (IllegalArgumentException ex) {
+            // This is the expected behavior.
         }
     }
 }
