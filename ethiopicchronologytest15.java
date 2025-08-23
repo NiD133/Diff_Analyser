@@ -1,90 +1,55 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Test;
 
-public class EthiopicChronologyTestTest15 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+/**
+ * Tests the conversion of a DateTime from the ISO chronology to the Ethiopic chronology,
+ * particularly when time zones are involved.
+ */
+public class EthiopicChronologyTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
     private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+    @Test
+    public void withChronology_shouldConvertFromISOToEthiopicAndAdjustForTimeZone() {
+        // This test verifies that converting a DateTime from ISO to Ethiopic chronology
+        // correctly handles both the calendar date conversion and time zone adjustment.
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+        // ARRANGE:
+        // Create a DateTime in the ISO calendar and a non-UTC time zone (Paris).
+        // In June 2004, Paris was in Daylight Saving Time (UTC+2).
+        DateTime isoDateTimeInParis = new DateTime(2004, 6, 9, 12, 0, 0, 0, PARIS);
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+        // Define the expected outcome after converting to Ethiopic calendar in UTC.
+        // The absolute instant in time (UTC millis) must be preserved.
+        // - Date: ISO 2004-06-09 converts to Ethiopic 1996-10-02.
+        // - Time: 12:00 in Paris (UTC+2) is 10:00 in UTC.
+        final int expectedEthiopicYear = 1996;
+        final int expectedEthiopicMonth = 10; // Corresponds to the Ethiopic month 'Sene'
+        final int expectedEthiopicDay = 2;
+        final int expectedHourInUTC = 10;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
+        // ACT:
+        // Convert the DateTime to the Ethiopic chronology, with the time zone set to UTC.
+        DateTime ethiopicDateTimeUTC = isoDateTimeInParis.withChronology(ETHIOPIC_UTC);
 
-    private DateTimeZone originalDateTimeZone = null;
+        // ASSERT:
+        // Verify that all fields of the new DateTime match the expected Ethiopic values.
+        assertEquals("Era", EthiopicChronology.EE, ethiopicDateTimeUTC.getEra());
+        assertEquals("Year", expectedEthiopicYear, ethiopicDateTimeUTC.getYear());
+        assertEquals("Year of Era", expectedEthiopicYear, ethiopicDateTimeUTC.getYearOfEra());
+        assertEquals("Month of Year", expectedEthiopicMonth, ethiopicDateTimeUTC.getMonthOfYear());
+        assertEquals("Day of Month", expectedEthiopicDay, ethiopicDateTimeUTC.getDayOfMonth());
 
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testSampleDateWithZone() {
-        DateTime dt = new DateTime(2004, 6, 9, 12, 0, 0, 0, PARIS).withChronology(ETHIOPIC_UTC);
-        assertEquals(EthiopicChronology.EE, dt.getEra());
-        assertEquals(1996, dt.getYear());
-        assertEquals(1996, dt.getYearOfEra());
-        assertEquals(10, dt.getMonthOfYear());
-        assertEquals(2, dt.getDayOfMonth());
-        // PARIS is UTC+2 in summer (12-2=10)
-        assertEquals(10, dt.getHourOfDay());
-        assertEquals(0, dt.getMinuteOfHour());
-        assertEquals(0, dt.getSecondOfMinute());
-        assertEquals(0, dt.getMillisOfSecond());
+        assertEquals("Hour of Day (adjusted to UTC)", expectedHourInUTC, ethiopicDateTimeUTC.getHourOfDay());
+        assertEquals("Minute of Hour", 0, ethiopicDateTimeUTC.getMinuteOfHour());
+        assertEquals("Second of Minute", 0, ethiopicDateTimeUTC.getSecondOfMinute());
+        assertEquals("Millis of Second", 0, ethiopicDateTimeUTC.getMillisOfSecond());
     }
 }
