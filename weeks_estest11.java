@@ -1,20 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest11 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Weeks weeks0 = Weeks.ZERO;
-        Weeks weeks1 = Weeks.THREE;
-        Weeks weeks2 = weeks0.minus(weeks1);
-        Hours hours0 = weeks2.toStandardHours();
-        assertEquals((-504), hours0.getHours());
+    @Test
+    public void toStandardHours_forNegativeWeeks_calculatesCorrectly() {
+        // Arrange
+        Weeks zeroWeeks = Weeks.ZERO;
+        Weeks threeWeeks = Weeks.THREE;
+        final int expectedWeeks = -3;
+        final int expectedHours = -3 * 7 * 24; // -504 hours
+
+        // Act
+        // Subtract three weeks from zero to get a negative duration
+        Weeks negativeThreeWeeks = zeroWeeks.minus(threeWeeks);
+        Hours resultInHours = negativeThreeWeeks.toStandardHours();
+
+        // Assert
+        assertEquals("The result of 0 - 3 weeks should be -3 weeks.",
+                expectedWeeks, negativeThreeWeeks.getWeeks());
+        assertEquals("-3 weeks should convert to -504 hours.",
+                expectedHours, resultInHours.getHours());
     }
 }
