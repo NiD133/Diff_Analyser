@@ -1,23 +1,23 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IslamicChronology_ESTestTest55 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in {@link IslamicChronology}.
+ */
+public class IslamicChronology_ESTestTest55 {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        Object object0 = new Object();
-        boolean boolean0 = islamicChronology0.equals(object0);
-        assertFalse(boolean0);
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange
+        IslamicChronology islamicChronology = IslamicChronology.getInstanceUTC();
+        Object otherObject = new Object();
+
+        // Act
+        boolean isEqual = islamicChronology.equals(otherObject);
+
+        // Assert
+        assertFalse(isEqual);
     }
 }
