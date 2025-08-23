@@ -1,22 +1,29 @@
 package org.jfree.data;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class ComparableObjectItem_ESTestTest15 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Comparable<ComparableObjectItem> comparable0 = (Comparable<ComparableObjectItem>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        Object object0 = new Object();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, object0);
-        boolean boolean0 = comparableObjectItem0.equals(comparableObjectItem0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_whenComparedToItself_shouldReturnTrue() {
+        // Arrange: Create an instance of the class under test.
+        // Using simple, concrete values makes the setup clear and avoids
+        // the complexity of mocks.
+        ComparableObjectItem item = new ComparableObjectItem("X-Value", new Object());
+
+        // Act: Compare the object to itself.
+        boolean result = item.equals(item);
+
+        // Assert: The result should be true, fulfilling the reflexive
+        // property of the equals() contract.
+        assertTrue("An object must be equal to itself.", result);
     }
 }
