@@ -1,32 +1,33 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest33 extends Validate_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
+
+    /**
+     * Verifies that calling {@code Validate.isTrue(false, ...)} throws an
+     * {@link IllegalArgumentException}. The test also confirms that the
+     * exception message matches the string provided to the method.
+     */
+    @Test
+    public void isTrue_shouldThrowException_whenConditionIsFalse() {
+        // Arrange
+        // The original test used an empty string for the message.
+        String expectedMessage = "";
+
+        // Act & Assert
         try {
-            Validate.isTrue(false, "");
-            fail("Expecting exception: IllegalArgumentException");
+            Validate.isTrue(false, expectedMessage);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            //
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
