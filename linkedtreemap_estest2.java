@@ -2,26 +2,26 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
+
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+// Note: The original class name and inheritance are preserved as per the problem context.
 public class LinkedTreeMap_ESTestTest2 extends LinkedTreeMap_ESTest_scaffolding {
 
+    /**
+     * Verifies that the entry set of a newly created, empty LinkedTreeMap is empty.
+     */
     @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Comparator<Integer> comparator0 = (Comparator<Integer>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>(comparator0, false);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        linkedTreeMap_EntrySet0.iterator();
-        assertEquals(0, linkedTreeMap_EntrySet0.size());
+    public void entrySetOfEmptyMapShouldBeEmpty() {
+        // Arrange
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+
+        // Act
+        Set<Map.Entry<String, Integer>> entrySet = map.entrySet();
+
+        // Assert
+        assertTrue("The entry set of an empty map should be empty.", entrySet.isEmpty());
+        assertEquals("The size of the entry set from an empty map should be 0.", 0, entrySet.size());
     }
 }
