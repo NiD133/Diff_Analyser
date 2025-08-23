@@ -1,44 +1,34 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Symmetry010Chronology_ESTestTest33 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Symmetry010Chronology}.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        boolean boolean0 = symmetry010Chronology0.isLeapYear(32L);
-        assertFalse(boolean0);
+    /**
+     * Tests that isLeapYear() correctly identifies a non-leap year.
+     *
+     * <p>The Symmetry010 calendar determines leap years based on the formula:
+     * {@code (52 > ((52 * year + 146) % 293))}.
+     *
+     * <p>For the year 32, the calculation is:
+     * {@code (52 * 32 + 146) % 293 = 1810 % 293 = 52}.
+     * The condition {@code 52 > 52} evaluates to false, meaning year 32 is not a leap year.
+     * This test verifies this specific case.
+     */
+    @Test
+    public void isLeapYear_whenYearIsNotLeap_returnsFalse() {
+        // Arrange: Set up the test subject and input data.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        long nonLeapYear = 32L;
+
+        // Act: Call the method under test.
+        boolean isLeap = chronology.isLeapYear(nonLeapYear);
+
+        // Assert: Verify the result.
+        assertFalse("Year 32 should not be a leap year according to the Symmetry010 rules.", isLeap);
     }
 }
