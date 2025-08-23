@@ -1,20 +1,40 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtils_ESTestTest12 extends StringUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtils} class.
+ */
+public class StringUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        byte[] byteArray0 = new byte[4];
-        byteArray0[1] = (byte) 9;
-        ByteBuffer byteBuffer0 = new ByteBuffer(71);
-        StringUtils.escapeString(byteArray0, byteBuffer0);
-        assertEquals(7, byteBuffer0.size());
+    /**
+     * Tests that escapeString correctly escapes special characters like tab
+     * and also wraps the resulting byte sequence in parentheses. This behavior
+     * was inferred from the original auto-generated test's assertions.
+     */
+    @Test
+    public void escapeString_withTabAndNulls_shouldEscapeAndWrapInParentheses() {
+        // Arrange: Create an input byte array containing a tab character and null bytes.
+        byte[] inputBytes = {0, '\t', 0, 0};
+        ByteBuffer outputBuffer = new ByteBuffer();
+
+        // Define the expected output. The logic is that the input is escaped and then
+        // wrapped in parentheses.
+        // Input:    { 0x00, \t, 0x00, 0x00 }
+        // Escaped:  { 0x00,  \,  t, 0x00, 0x00 }
+        // Wrapped:  {  ( , 0x00,  \,  t, 0x00, 0x00,  ) }
+        byte[] expectedBytes = {'(', 0, '\\', 't', 0, 0, ')'};
+
+        // Act: Call the method under test to populate the output buffer.
+        StringUtils.escapeString(inputBytes, outputBuffer);
+
+        // Assert: Verify that the output buffer contains the exact expected byte sequence.
+        // We check both the content and the size for a comprehensive test.
+        assertArrayEquals("The output buffer's content should be correctly escaped and wrapped.",
+                expectedBytes, outputBuffer.toByteArray());
+        assertEquals("The output buffer should have the correct size.",
+                expectedBytes.length, outputBuffer.size());
     }
 }
