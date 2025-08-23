@@ -1,33 +1,39 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Lister_ESTestTest11 extends Lister_ESTest_scaffolding {
+/**
+ * Tests for the {@link Lister} class.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        String[] stringArray0 = new String[2];
-        stringArray0[0] = "";
-        stringArray0[1] = "tar";
-        Lister lister0 = new Lister(false, stringArray0);
-        // Undeclared exception!
+    /**
+     * Tests that Lister.go() correctly propagates a NoClassDefFoundError if a
+     * dependency of the specified archiver (e.g., TarFile) fails to initialize.
+     *
+     * This is an edge-case test that simulates a problematic runtime environment
+     * where a required class cannot be loaded, ensuring the application fails fast.
+     */
+    @Test
+    public void goWithTarFormatShouldPropagateClassInitializationError() {
+        // Arrange: Prepare command-line arguments to list a "tar" archive.
+        // The file path is intentionally empty to trigger the archive handling logic.
+        String[] commandLineArgs = {"", "tar"};
+        Lister lister = new Lister(false, commandLineArgs);
+
+        // Act & Assert
         try {
-            lister0.go();
-            fail("Expecting exception: NoClassDefFoundError");
+            lister.go();
+            fail("Expected a NoClassDefFoundError to be thrown due to a class initialization failure.");
         } catch (NoClassDefFoundError e) {
-            //
-            // Could not initialize class org.apache.commons.compress.archivers.zip.ZipEncodingHelper
-            //
-            verifyException("org.apache.commons.compress.archivers.tar.TarFile", e);
+            // This error is expected in a specific test setup where a dependency of
+            // TarFile (org.apache.commons.compress.archivers.zip.ZipEncodingHelper)
+            // is configured to fail during its static initialization.
+            // We verify the error message to confirm the cause of the failure.
+            String expectedMessage = "Could not initialize class org.apache.commons.compress.archivers.zip.ZipEncodingHelper";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
