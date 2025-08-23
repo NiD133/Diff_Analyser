@@ -1,23 +1,36 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest4 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(true);
-        Object object0 = quotedPrintableCodec0.decode((Object) "Invalid URL encoding: not a valid digit (radix 16):=20");
-        assertEquals("Invalid URL encoding: not a valid digit (radix 16): ", object0);
+/**
+ * Tests for the {@link QuotedPrintableCodec} class, focusing on decoding functionality.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that the decode(Object) method correctly decodes a string
+     * containing a Quoted-Printable encoded space character ('=20').
+     */
+    @Test
+    public void decodeObjectShouldCorrectlyDecodeEncodedSpace() throws DecoderException {
+        // Arrange
+        // The input string contains "=20", which is the Quoted-Printable representation of a space.
+        final String encodedString = "Invalid URL encoding: not a valid digit (radix 16):=20";
+        final String expectedDecodedString = "Invalid URL encoding: not a valid digit (radix 16): ";
+        
+        // The 'strict' parameter does not affect this specific decoding case,
+        // but we use it to match the original test's setup.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(true);
+
+        // Act
+        // The test targets the generic decode(Object) method overload.
+        final Object result = codec.decode((Object) encodedString);
+
+        // Assert
+        assertEquals("The decoded string should have the encoded space converted back to a space character.",
+                expectedDecodedString, result);
     }
 }
