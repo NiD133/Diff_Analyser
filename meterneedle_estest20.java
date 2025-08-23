@@ -1,34 +1,31 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class MeterNeedle_ESTestTest20 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class, using {@link PlumNeedle} as a concrete implementation.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        PlumNeedle plumNeedle0 = new PlumNeedle();
-        plumNeedle0.getHighlightPaint();
-        assertEquals(5, plumNeedle0.getSize());
-        assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
-        assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+    /**
+     * Verifies that the default constructor of a MeterNeedle (via PlumNeedle)
+     * initializes its properties to the expected default values.
+     */
+    @Test
+    public void testDefaultConstructorInitializesProperties() {
+        // Arrange: Create a new PlumNeedle instance. PlumNeedle is a concrete
+        // subclass of the abstract MeterNeedle.
+        PlumNeedle needle = new PlumNeedle();
+
+        // Act: No action is needed as we are testing the state immediately
+        // after construction.
+
+        // Assert: Check that the needle's properties match the documented defaults.
+        assertNull("Default highlight paint should be null.", needle.getHighlightPaint());
+        assertEquals("Default size should be 5.", 5, needle.getSize());
+        assertEquals("Default rotation X-coordinate should be 0.5.", 0.5, needle.getRotateX(), 0.01);
+        assertEquals("Default rotation Y-coordinate should be 0.5.", 0.5, needle.getRotateY(), 0.01);
     }
 }
