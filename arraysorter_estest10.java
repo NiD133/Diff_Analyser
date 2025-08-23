@@ -1,29 +1,25 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class ArraySorter_ESTestTest10 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Integer[] integerArray0 = new Integer[3];
-        // Undeclared exception!
-        try {
-            ArraySorter.sort(integerArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ComparableTimSort", e);
-        }
+    /**
+     * Tests that {@code ArraySorter.sort(T[])} throws a {@code NullPointerException}
+     * when the input array contains a null element. This is the expected behavior
+     * because the method delegates to {@code java.util.Arrays.sort(Object[])}, which
+     * does not permit null elements when using natural ordering.
+     */
+    @Test
+    public void sortObjectArrayContainingNullShouldThrowNullPointerException() {
+        // Arrange: Create an array of a comparable type that includes a null element.
+        final Integer[] arrayWithNull = {42, 1, null, 7};
+
+        // Act & Assert: Verify that sorting this array throws a NullPointerException.
+        assertThrows(NullPointerException.class, () -> ArraySorter.sort(arrayWithNull));
     }
 }
