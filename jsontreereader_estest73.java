@@ -1,36 +1,36 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest73 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test072() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        // Undeclared exception!
+/**
+ * Test suite for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling nextInt() when the reader is positioned at the beginning of a JSON array
+     * throws an IllegalStateException, as a number is expected instead.
+     */
+    @Test
+    public void nextInt_whenTokenIsBeginArray_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a JsonTreeReader for an empty JSON array.
+        // The reader's initial state will be at the BEGIN_ARRAY token.
+        JsonArray emptyArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyArray);
+
+        // Act & Assert: Attempting to read an integer should fail with a specific message.
         try {
-            jsonTreeReader0.nextInt();
-            fail("Expecting exception: IllegalStateException");
+            reader.nextInt();
+            fail("Expected an IllegalStateException to be thrown, but no exception occurred.");
         } catch (IllegalStateException e) {
-            //
-            // Expected NUMBER but was BEGIN_ARRAY at path $
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            // Verify that the exception message is correct and informative.
+            assertEquals("Expected NUMBER but was BEGIN_ARRAY at path $", e.getMessage());
         }
     }
 }
