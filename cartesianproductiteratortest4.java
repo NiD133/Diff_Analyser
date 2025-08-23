@@ -1,26 +1,25 @@
 package org.apache.commons.collections4.iterators;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CartesianProductIteratorTestTest4 extends AbstractIteratorTest<List<Character>> {
+/**
+ * Tests for {@link CartesianProductIterator}.
+ * This class focuses on edge cases like empty input iterables.
+ */
+public class CartesianProductIteratorTest extends AbstractIteratorTest<List<Character>> {
 
     private List<Character> letters;
-
     private List<Character> numbers;
-
     private List<Character> symbols;
-
     private List<Character> emptyList;
 
     @Override
@@ -47,17 +46,21 @@ public class CartesianProductIteratorTestTest4 extends AbstractIteratorTest<List
     }
 
     /**
-     * test checking that no tuples are returned when first of the lists is empty
+     * The original test was specific to the first list being empty.
+     * This improved test directly and clearly verifies the iterator's state.
      */
     @Test
-    void testExhaustivityWithEmptyFirstList() {
-        final List<Character[]> resultsList = new ArrayList<>();
-        final CartesianProductIterator<Character> it = new CartesianProductIterator<>(emptyList, numbers, symbols);
-        while (it.hasNext()) {
-            final List<Character> tuple = it.next();
-            resultsList.add(tuple.toArray(new Character[0]));
-        }
-        assertThrows(NoSuchElementException.class, it::next);
-        assertEquals(0, resultsList.size());
+    void shouldBeEmptyWhenFirstIterableIsEmpty() {
+        // Arrange: Create an iterator where the first input iterable is empty.
+        // The cartesian product should be empty if any of its components are empty.
+        final CartesianProductIterator<Character> iterator =
+            new CartesianProductIterator<>(emptyList, numbers, symbols);
+
+        // Assert: The iterator should report that it has no elements.
+        assertFalse(iterator.hasNext(), "Iterator should be empty if the first iterable is empty");
+
+        // Assert: Calling next() on an empty iterator must throw an exception.
+        assertThrows(NoSuchElementException.class, iterator::next,
+            "Calling next() on an exhausted iterator should throw an exception");
     }
 }
