@@ -1,18 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest68 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        Seconds seconds0 = Seconds.ONE;
-        PeriodType periodType0 = seconds0.getPeriodType();
-        assertEquals(1, periodType0.size());
+    @Test
+    public void getPeriodType_shouldReturnSecondsPeriodType() {
+        // Arrange: Create an instance of the Seconds class.
+        Seconds seconds = Seconds.ONE;
+        PeriodType expectedPeriodType = PeriodType.seconds();
+
+        // Act: Call the method under test.
+        PeriodType actualPeriodType = seconds.getPeriodType();
+
+        // Assert: Verify that the returned PeriodType is specifically for seconds.
+        assertEquals("A Seconds object must have a PeriodType of 'seconds'.", expectedPeriodType, actualPeriodType);
     }
 }
