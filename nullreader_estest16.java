@@ -1,21 +1,30 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NullReader_ESTestTest16 extends NullReader_ESTest_scaffolding {
+/**
+ * Tests for {@link NullReader}.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        NullReader nullReader0 = new NullReader(959L, true, true);
-        long long0 = nullReader0.skip(0L);
-        assertTrue(nullReader0.markSupported());
-        assertEquals(0L, long0);
+    /**
+     * Tests that calling skip() with a value of 0 returns 0 and does not
+     * change the reader's position.
+     */
+    @Test
+    public void skipZeroShouldReturnZeroAndNotAdvancePosition() throws IOException {
+        // Arrange: Create a reader with a non-zero size.
+        final NullReader reader = new NullReader(100L);
+        assertEquals("Initial position should be 0.", 0L, reader.getPosition());
+
+        // Act: Attempt to skip zero characters.
+        final long skippedCount = reader.skip(0L);
+
+        // Assert: Verify that zero characters were skipped and the position is unchanged.
+        assertEquals("Skipping zero characters should return 0.", 0L, skippedCount);
+        assertEquals("Position should not change after skipping zero.", 0L, reader.getPosition());
     }
 }
