@@ -1,33 +1,35 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest16 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext(dupDetector0);
-        DupDetector dupDetector1 = jsonWriteContext0.getDupDetector();
-        assertEquals("ROOT", jsonWriteContext0.getTypeDesc());
-        assertNotNull(dupDetector1);
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
-        assertEquals(0, jsonWriteContext0.getEntryCount());
+    /**
+     * Verifies that a newly created root context is initialized correctly and that
+     * getDupDetector() returns the same instance used for its creation.
+     */
+    @Test
+    public void shouldReturnSameDupDetectorWhenRootContextIsCreated() {
+        // Arrange: Create a root-level duplicate detector and use it to create a root context.
+        // A null generator is acceptable for creating a root detector.
+        DupDetector expectedDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(expectedDetector);
+
+        // Act: Retrieve the duplicate detector from the newly created context.
+        DupDetector actualDetector = rootContext.getDupDetector();
+
+        // Assert: Check that the retrieved detector is the exact same instance
+        // and that other properties of the root context are set as expected.
+        assertSame("The retrieved DupDetector should be the same instance provided during creation.",
+                expectedDetector, actualDetector);
+
+        assertEquals("A root context's type description should be 'ROOT'.", "ROOT", rootContext.getTypeDesc());
+        assertEquals("A root context should have a nesting depth of 0.", 0, rootContext.getNestingDepth());
+        assertEquals("A new context should have an entry count of 0.", 0, rootContext.getEntryCount());
     }
 }
