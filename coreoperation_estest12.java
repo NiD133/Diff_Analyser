@@ -1,31 +1,37 @@
 package org.apache.commons.jxpath.ri.compiler;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.ParentContext;
-import org.apache.commons.jxpath.ri.axes.PrecedingOrFollowingContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.axes.SelfContext;
-import org.apache.commons.jxpath.ri.axes.UnionContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CoreOperation_ESTestTest12 extends CoreOperation_ESTest_scaffolding {
+/**
+ * Tests for the {@link CoreOperation} class, focusing on its string representation.
+ */
+public class CoreOperationTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        NameAttributeTest nameAttributeTest0 = new NameAttributeTest((Expression) null, (Expression) null);
-        NameAttributeTest nameAttributeTest1 = new NameAttributeTest(nameAttributeTest0, nameAttributeTest0);
-        String string0 = nameAttributeTest1.toString();
-        assertNotNull(string0);
+    /**
+     * Tests the toString() method for a nested CoreOperation.
+     *
+     * <p>This test verifies that when a symmetric operation (like '=') contains
+     * another operation of the same precedence, unnecessary parentheses are not added
+     * to the string output.</p>
+     */
+    @Test
+    public void toStringForNestedSymmetricOperationShouldGenerateCorrectString() {
+        // Arrange: Create a nested operation structure.
+        // The NameAttributeTest class represents the '=' operation, which is a
+        // symmetric CoreOperation.
+        // The inner operation will represent "null = null".
+        CoreOperation innerOperation = new NameAttributeTest(null, null);
+
+        // The outer operation nests the inner one, representing "(null = null) = (null = null)".
+        CoreOperation outerOperation = new NameAttributeTest(innerOperation, innerOperation);
+
+        // Act: Generate the string representation of the entire nested operation.
+        String stringRepresentation = outerOperation.toString();
+
+        // Assert: Verify the string is formatted as expected. Because the '=' operation
+        // is symmetric and has the same precedence at both levels, no parentheses
+        // should be added.
+        assertEquals("null = null = null = null", stringRepresentation);
     }
 }
