@@ -1,17 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest58 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        Minutes minutes0 = Minutes.minutes(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, minutes0.getMinutes());
+    /**
+     * Tests that the factory method `minutes(int)` correctly creates an instance
+     * when provided with the maximum possible integer value.
+     */
+    @Test
+    public void shouldCreateMinutesWithMaxValue() {
+        // Arrange
+        final int maxIntValue = Integer.MAX_VALUE;
+
+        // Act
+        Minutes maxMinutes = Minutes.minutes(maxIntValue);
+
+        // Assert
+        assertEquals("The value retrieved from getMinutes() should match the value used for creation.",
+                maxIntValue, maxMinutes.getMinutes());
     }
 }
