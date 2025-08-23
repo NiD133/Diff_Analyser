@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest19 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class, focusing on the dividedBy method.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Years years0 = Years.MAX_VALUE;
-        Years years1 = years0.dividedBy((-592));
-        assertEquals((-3627506), years1.getYears());
+    /**
+     * Tests that dividing the maximum possible Years value by a negative number
+     * results in the correctly calculated negative value, respecting integer division rules.
+     */
+    @Test
+    public void dividedBy_whenDividingMaxValueByNegativeDivisor_returnsCorrectlyTruncatedResult() {
+        // Arrange
+        Years maxYears = Years.MAX_VALUE;
+        int divisor = -592;
+        // The expected result is based on standard integer division.
+        // Calculating it here makes the test's logic transparent.
+        int expectedYears = Integer.MAX_VALUE / divisor;
+
+        // Act
+        Years result = maxYears.dividedBy(divisor);
+
+        // Assert
+        assertEquals(expectedYears, result.getYears());
     }
 }
