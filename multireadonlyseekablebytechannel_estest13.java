@@ -1,38 +1,31 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest13 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that the forSeekableByteChannels() factory method throws a NullPointerException
+     * when the input array of channels is null, as specified by its contract.
+     */
+    @Test
+    public void forSeekableByteChannelsShouldThrowNullPointerExceptionForNullInput() {
         try {
+            // The cast to SeekableByteChannel[] is necessary to resolve ambiguity
+            // for the varargs method call with a null argument.
             MultiReadOnlySeekableByteChannel.forSeekableByteChannels((SeekableByteChannel[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // channels
-            //
-            verifyException("java.util.Objects", e);
+            fail("Expected a NullPointerException to be thrown for a null channels array.");
+        } catch (final NullPointerException e) {
+            // The underlying implementation uses Objects.requireNonNull(channels, "channels"),
+            // so we can assert the specific message for a more robust test.
+            assertEquals("channels", e.getMessage());
         }
     }
 }
