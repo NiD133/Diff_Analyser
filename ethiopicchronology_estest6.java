@@ -1,29 +1,39 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class EthiopicChronology_ESTestTest6 extends EthiopicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * This class contains tests for EthiopicChronology, focusing on edge cases.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
+public class EthiopicChronologyTest {
+
+    /**
+     * Tests that isLeapDay throws an ArithmeticException when the instant is Long.MIN_VALUE
+     * and the time zone has a negative offset. This combination causes an integer overflow
+     * during the internal UTC-to-local time conversion.
+     */
     @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-4246));
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
-        // Undeclared exception!
+    public void isLeapDay_throwsArithmeticException_onOverflowWithMinInstantAndNegativeOffset() {
+        // Arrange: Create a chronology with a time zone that has a negative offset.
+        // The isLeapDay method needs to convert the UTC instant to a local instant.
+        // This conversion (localMillis = utcMillis + offset) will cause an arithmetic overflow
+        // when the instant is Long.MIN_VALUE and the offset is negative.
+        final DateTimeZone negativeOffsetZone = DateTimeZone.forOffsetMillis(-4246);
+        final EthiopicChronology ethiopicChronology = EthiopicChronology.getInstance(negativeOffsetZone);
+        final long minInstant = Long.MIN_VALUE;
+
+        // Act & Assert
         try {
-            ethiopicChronology0.isLeapDay((-9223372036854775808L));
-            fail("Expecting exception: ArithmeticException");
+            ethiopicChronology.isLeapDay(minInstant);
+            fail("Expected an ArithmeticException due to an overflow when applying the time zone offset.");
         } catch (ArithmeticException e) {
-            //
-            // Adding time zone offset caused overflow
-            //
-            verifyException("org.joda.time.DateTimeZone", e);
+            // Verify that the expected exception was thrown with the correct message from the underlying DateTimeZone class.
+            assertEquals("Adding time zone offset caused overflow", e.getMessage());
         }
     }
 }
