@@ -1,19 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest57 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CharSequenceUtils} class.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("', is neither of type Map.Entry nor an Array");
-        int int0 = CharSequenceUtils.lastIndexOf((CharSequence) null, stringBuilder0, 1245);
-        assertEquals((-1), int0);
+    /**
+     * Tests that lastIndexOf returns -1 when the CharSequence to be searched is null.
+     * This confirms the null-safe behavior of the method.
+     */
+    @Test
+    public void lastIndexOf_withNullCharSequence_shouldReturnNegativeOne() {
+        // Arrange
+        final CharSequence searchSequence = "any sequence";
+        final int startPosition = 0; // The start position is irrelevant when the input is null.
+        final int expectedIndex = -1;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(null, searchSequence, startPosition);
+
+        // Assert
+        assertEquals("The method should return -1 for a null CharSequence.", expectedIndex, actualIndex);
     }
 }
