@@ -1,58 +1,42 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class MetaphoneTestTest26 extends AbstractStringEncoderTest<Metaphone> {
-
-    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
-        // match source to all matches
-        for (final String matche : matches) {
-            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
-        }
-        // match to each other
-        for (final String matche : matches) {
-            for (final String matche2 : matches) {
-                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
-            }
-        }
-    }
-
-    public void assertMetaphoneEqual(final String[][] pairs) {
-        validateFixture(pairs);
-        for (final String[] pair : pairs) {
-            final String name0 = pair[0];
-            final String name1 = pair[1];
-            final String failMsg = "Expected match between " + name0 + " and " + name1;
-            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
-            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
-        }
-    }
+/**
+ * Tests the Metaphone algorithm, focusing on specific phonetic rules for "CH" and "SCH".
+ *
+ * <p>This class verifies the encoding of words where "CH" and "SCH" combinations
+ * are translated into different phonetic codes (e.g., 'SK', 'K', 'X') based on their
+ * context within the word.</p>
+ */
+public class MetaphoneTest extends AbstractStringEncoderTest<Metaphone> {
 
     @Override
     protected Metaphone createStringEncoder() {
         return new Metaphone();
     }
 
-    public void validateFixture(final String[][] pairs) {
-        if (pairs.length == 0) {
-            fail("Test fixture is empty");
-        }
-        for (int i = 0; i < pairs.length; i++) {
-            if (pairs[i].length != 2) {
-                fail("Error in test fixture in the data array at index " + i);
-            }
-        }
-    }
+    /**
+     * The Metaphone algorithm has distinct rules for handling 'CH' and 'SCH' character combinations.
+     * This parameterized test verifies the correct phonetic code is generated for various inputs.
+     */
+    @ParameterizedTest(name = "metaphone(\"{0}\") should be \"{1}\"")
+    @CsvSource({
+        // 'SCH' is pronounced 'SK'
+        "SCHEDULE,  SKTL",
+        "SCHEMATIC, SKMT",
 
-    @Test
-    void testTranslateOfSCHAndCH() {
-        assertEquals("SKTL", getStringEncoder().metaphone("SCHEDULE"));
-        assertEquals("SKMT", getStringEncoder().metaphone("SCHEMATIC"));
-        assertEquals("KRKT", getStringEncoder().metaphone("CHARACTER"));
-        assertEquals("TX", getStringEncoder().metaphone("TEACH"));
+        // 'CH' can be pronounced 'K' (e.g., in words of Greek origin)
+        "CHARACTER, KRKT",
+
+        // 'CH' at the end of a word can be pronounced 'X'
+        "TEACH,     TX"
+    })
+    void shouldEncodeSchAndChCombinationsCorrectly(final String input, final String expectedMetaphone) {
+        assertEquals(expectedMetaphone, getStringEncoder().metaphone(input));
     }
 }
