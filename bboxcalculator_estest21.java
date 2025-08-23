@@ -1,26 +1,42 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest21 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.doesXWorldWrap();
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * This test verifies the initial state of a newly created BBoxCalculator.
+     * A new calculator should have its bounding box extents initialized to inverted
+     * infinities, signifying that it is empty and has not yet processed any shapes.
+     */
+    @Test
+    public void newBBoxCalculatorShouldHaveDefaultInfiniteBounds() {
+        // --- ARRANGE ---
+        // A BBoxCalculator requires a SpatialContext. We use the standard geodetic context.
+        final SpatialContext geoContext = SpatialContext.GEO;
+        final BBoxCalculator bboxCalculator = new BBoxCalculator(geoContext);
+
+        // --- ACT ---
+        // No action is performed. We are testing the state immediately after construction.
+
+        // --- ASSERT ---
+        // Verify that the initial Y boundaries are inverted infinities,
+        // indicating that no vertical range has been defined yet.
+        assertEquals("Initial minY should be positive infinity",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinY(), 0.0);
+        assertEquals("Initial maxY should be negative infinity",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxY(), 0.0);
+
+        // For completeness, also verify the initial X boundaries, which follow the same pattern.
+        assertEquals("Initial minX should be positive infinity",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinX(), 0.0);
+        assertEquals("Initial maxX should be negative infinity",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxX(), 0.0);
     }
 }
