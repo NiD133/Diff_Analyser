@@ -1,22 +1,32 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IslamicChronology_ESTestTest5 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        int int0 = islamicChronology0.getDaysInMonthMax((-238));
-        assertEquals(29, int0);
+    /**
+     * This test verifies the behavior of getDaysInMonthMax() when provided with an
+     * invalid, negative month number.
+     *
+     * <p>The current implementation does not validate the month input. For an even
+     * number (like -238), the internal calculation results in the length of a short
+     * Islamic month, which is 29 days. This test documents that specific behavior.
+     */
+    @Test
+    public void getDaysInMonthMax_shouldReturn29_forInvalidEvenMonth() {
+        // Arrange
+        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
+        int invalidEvenMonth = -238;
+        final int ISLAMIC_SHORT_MONTH_LENGTH = 29;
+
+        // Act
+        int actualMaxDays = chronology.getDaysInMonthMax(invalidEvenMonth);
+
+        // Assert
+        assertEquals(ISLAMIC_SHORT_MONTH_LENGTH, actualMaxDays);
     }
 }
