@@ -1,26 +1,35 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class NumericEntityUnescaper_ESTestTest13 extends NumericEntityUnescaper_ESTest_scaffolding {
+/**
+ * Tests for {@link NumericEntityUnescaper}.
+ */
+public class NumericEntityUnescaperTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        NumericEntityUnescaper.OPTION[] numericEntityUnescaper_OPTIONArray0 = new NumericEntityUnescaper.OPTION[0];
-        StringWriter stringWriter0 = new StringWriter();
-        NumericEntityUnescaper numericEntityUnescaper0 = new NumericEntityUnescaper(numericEntityUnescaper_OPTIONArray0);
-        char[] charArray0 = new char[6];
-        charArray0[0] = '&';
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        numericEntityUnescaper0.translate((CharSequence) charBuffer0, (Writer) stringWriter0);
-        assertTrue(charBuffer0.hasArray());
+    /**
+     * Tests that the translator correctly handles an ampersand that is not
+     * part of a valid numeric entity. It should be treated as literal text
+     * and passed through to the output unchanged.
+     */
+    @Test
+    public void translateShouldPassThroughAmpersandThatIsNotANumericEntity() throws IOException {
+        // Arrange
+        // The unescaper is created with default options (semicolon required for entities).
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        final StringWriter writer = new StringWriter();
+        final String input = "&test";
+
+        // Act
+        unescaper.translate(input, writer);
+
+        // Assert
+        // The input string should be written to the writer without any changes,
+        // as '&t' is not a valid start to a numeric entity.
+        assertEquals("The ampersand should be treated as a literal character", "&test", writer.toString());
     }
 }
