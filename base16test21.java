@@ -1,57 +1,35 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertFalse;
+import org.junit.Test;
 
-public class Base16TestTest21 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+/**
+ * This test suite evaluates the Base16 class, focusing on its ability to correctly
+ * identify characters that are not part of the Base16 alphabet.
+ */
+public class Base16Test {
 
     /**
-     * @return the random.
+     * Tests that the {@code containsAlphabetOrPad} method returns {@code false}
+     * when the input byte array contains characters that are not valid in the
+     * Base16 alphabet. The Base16 specification does not include a padding character.
      */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
     @Test
-    void testObjectDecodeWithInvalidParameter() {
-        assertThrows(DecoderException.class, () -> new Base16().decode(Integer.valueOf(5)));
+    public void containsAlphabetOrPadShouldReturnFalseForNonAlphabetCharacters() {
+        // Arrange: Set up the test by creating a Base16 codec and providing an
+        // input that is known to be outside the Base16 alphabet.
+        // The CHUNK_SEPARATOR (\r\n) is used here as it contains control characters
+        // which are not hexadecimal digits (0-9, A-F). [11, 12]
+        final Base16 base16 = new Base16();
+        final byte[] nonAlphabetData = BaseNCodec.CHUNK_SEPARATOR;
+
+        // Act: Execute the method under test to check if the input contains any
+        // alphabet characters.
+        final boolean result = base16.containsAlphabetOrPad(nonAlphabetData);
+
+        // Assert: Verify that the result is false, confirming that the method
+        // correctly identified that no characters in the input belong to the
+        // Base16 alphabet.
+        assertFalse("The CHUNK_SEPARATOR should not contain any Base16 alphabet characters.", result);
     }
 }
