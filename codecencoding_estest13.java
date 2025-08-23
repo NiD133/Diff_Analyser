@@ -1,38 +1,34 @@
 package org.apache.commons.compress.harmony.pack200;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import static org.junit.Assert.assertThrows;
+
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CodecEncoding_ESTestTest13 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link CodecEncoding#getCodec(int, InputStream, Codec)} method.
+ * This improved test focuses on clarity and maintainability.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BHSDCodec bHSDCodec0 = Codec.BYTE1;
-        // Undeclared exception!
-        try {
-            CodecEncoding.getCodec(128, (InputStream) null, bHSDCodec0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.pack200.CodecEncoding", e);
-        }
+    /**
+     * Tests that getCodec() throws a NullPointerException when the input stream is null
+     * but the encoding value requires data to be read from it.
+     */
+    @Test
+    public void getCodecShouldThrowNullPointerExceptionWhenInputStreamIsRequiredAndNull() {
+        // Arrange
+        // According to the Pack200 specification, a value >= 116 requires reading
+        // from the input stream to determine the full codec definition. We use 128 as a representative value.
+        final int valueRequiringInputStream = 128;
+        final InputStream nullInputStream = null;
+        final Codec defaultCodec = Codec.BYTE1;
+
+        // Act & Assert
+        // The call should fail with a NullPointerException because the stream is null,
+        // but the method attempts to read from it based on the provided value.
+        assertThrows(NullPointerException.class, () -> {
+            CodecEncoding.getCodec(valueRequiringInputStream, nullInputStream, defaultCodec);
+        });
     }
 }
