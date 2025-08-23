@@ -1,43 +1,66 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
 import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import javax.swing.text.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+
+// Note: Other imports from the original test may be required depending on the full class structure.
+// This example includes only those directly used in the refactored test.
 
 public class SimpleTextExtractionStrategy_ESTestTest9 extends SimpleTextExtractionStrategy_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = graphicsState0.ctm;
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        PdfAction pdfAction0 = new PdfAction();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
-        SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
-        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
-        StringBuffer stringBuffer0 = new StringBuffer("Inserting row at position ");
-        simpleTextExtractionStrategy0.appendTextChunk(stringBuffer0);
-        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
-        assertEquals("Inserting row at position ", simpleTextExtractionStrategy0.getResultantText());
+    /**
+     * Creates a TextRenderInfo object configured with an invalid font.
+     * <p>
+     * A {@link PdfAction} is used as a font dictionary, which is not a valid
+     * font structure. This causes the font's internal decode method to return
+     * an empty string, effectively making any {@code renderText} call using
+     * this object a no-op in terms of text extraction.
+     *
+     * @return A {@link TextRenderInfo} instance that will not produce any text.
+     */
+    private TextRenderInfo createRenderInfoWithInvalidFont() {
+        // A PdfAction is a dictionary, but not a valid font dictionary.
+        PdfDictionary nonFontDictionary = new PdfAction();
+        CMapAwareDocumentFont invalidFont = new CMapAwareDocumentFont(nonFontDictionary);
+
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = invalidFont;
+
+        // The text content and other parameters are arbitrary since the invalid font
+        // will prevent any text from being decoded and extracted.
+        PdfString dummyText = new PdfString("some text");
+        Matrix dummyMatrix = new Matrix();
+
+        return new TextRenderInfo(dummyText, graphicsState, dummyMatrix, Collections.emptyList());
+    }
+
+    @Test
+    public void appendTextChunk_shouldAddTextToResult_whileRenderTextWithInvalidFontAddsNothing() {
+        // Arrange
+        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+        TextRenderInfo renderInfoWithInvalidFont = createRenderInfoWithInvalidFont();
+        String textToAppend = "This text should be appended directly.";
+
+        // Act
+        // This call should not add any text because the font in renderInfo is invalid.
+        strategy.renderText(renderInfoWithInvalidFont);
+
+        // This call should add the specified text to the internal buffer.
+        strategy.appendTextChunk(textToAppend);
+
+        // This second call should also add no text, confirming the behavior is consistent.
+        strategy.renderText(renderInfoWithInvalidFont);
+
+        // Assert
+        // The final result should contain only the text from the appendTextChunk call.
+        String actualText = strategy.getResultantText();
+        assertEquals(textToAppend, actualText);
     }
 }
