@@ -1,39 +1,48 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class CodecEncoding_ESTestTest31 extends CodecEncoding_ESTest_scaffolding {
+import org.apache.commons.compress.harmony.pack200.BHSDCodec;
+import org.apache.commons.compress.harmony.pack200.Codec;
+import org.apache.commons.compress.harmony.pack200.CodecEncoding;
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        BHSDCodec bHSDCodec0 = Codec.MDELTA5;
-        try {
-            CodecEncoding.getCodec((byte) 116, byteArrayInputStream0, bHSDCodec0);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // End of buffer read whilst trying to decode codec
-            //
-            verifyException("org.apache.commons.compress.harmony.pack200.CodecEncoding", e);
-        }
+/**
+ * This test class is not part of the original submission.
+ * It is a container for the improved test method.
+ * The original test extended a scaffolding class, which is omitted here for brevity.
+ */
+public class CodecEncodingImprovedTest {
+
+    /**
+     * Tests that getCodec() throws an EOFException when the input stream
+     * is exhausted while parsing a custom codec definition.
+     */
+    @Test(timeout = 4000, expected = EOFException.class)
+    public void getCodecWithCustomEncodingShouldThrowEOFExceptionIfStreamIsExhausted() throws IOException, Pack200Exception {
+        // Arrange
+        // The Pack200 specification states that for a codec specifier value >= 116,
+        // additional bytes are read from the input stream to define the codec.
+        final int customCodecSpecifier = 116;
+
+        // We provide a stream with only one byte, which is insufficient to define
+        // the custom codec, thus forcing an End-Of-File (EOF) condition.
+        final byte[] insufficientData = { 0x00 };
+        final InputStream inputStream = new ByteArrayInputStream(insufficientData);
+        final BHSDCodec defaultCodec = Codec.MDELTA5;
+
+        // Act
+        // This call is expected to throw an EOFException because the stream
+        // will run out of data while trying to read the codec's parameters.
+        CodecEncoding.getCodec(customCodecSpecifier, inputStream, defaultCodec);
+
+        // Assert
+        // The 'expected = EOFException.class' annotation on the @Test method
+        // handles the assertion, failing the test if this exception is not thrown.
     }
 }
