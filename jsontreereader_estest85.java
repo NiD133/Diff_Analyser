@@ -1,36 +1,33 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest85 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test084() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextString();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Expected STRING but was BEGIN_ARRAY at path $
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
-        }
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling nextString() when the current token is the beginning of an array
+     * results in an IllegalStateException.
+     */
+    @Test
+    public void nextString_whenTokenIsBeginArray_throwsIllegalStateException() {
+        // Arrange: Create a reader for an empty JSON array.
+        // The first token to be read will be BEGIN_ARRAY.
+        JsonTreeReader reader = new JsonTreeReader(new JsonArray());
+
+        // Act & Assert: Verify that calling nextString() throws the expected exception.
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            reader::nextString
+        );
+
+        // Assert: Check the exception message for correctness.
+        assertEquals("Expected STRING but was BEGIN_ARRAY at path $", exception.getMessage());
     }
 }
