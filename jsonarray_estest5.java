@@ -1,22 +1,26 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonArray_ESTestTest5 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Iterator<JsonElement> iterator0 = jsonArray0.iterator();
-        assertNotNull(iterator0);
+    @Test
+    public void iterator_onEmptyArray_returnsNonNullAndEmptyIterator() {
+        // Arrange: Create an empty JsonArray instance.
+        JsonArray emptyArray = new JsonArray();
+
+        // Act: Get the iterator from the empty array.
+        Iterator<JsonElement> iterator = emptyArray.iterator();
+
+        // Assert: Verify that the iterator is not null and has no elements.
+        assertNotNull("The iterator for an empty array should never be null.", iterator);
+        assertFalse("The iterator for an empty array should not have any elements.", iterator.hasNext());
     }
 }
