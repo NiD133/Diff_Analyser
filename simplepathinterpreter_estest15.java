@@ -1,75 +1,52 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
+import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
 import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import java.util.Locale;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SimplePathInterpreter_ESTestTest15 extends SimplePathInterpreter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        QName qName0 = new QName("#{WI2%=9byI>t{^<");
-        Locale locale0 = Locale.JAPAN;
-        NodePointer nodePointer0 = NodePointer.newNodePointer(qName0, locale0, locale0);
-        Step[] stepArray0 = new Step[1];
-        Expression[] expressionArray0 = new Expression[1];
-        CoreFunction coreFunction0 = new CoreFunction(Integer.MIN_VALUE, expressionArray0);
-        CoreOperationLessThanOrEqual coreOperationLessThanOrEqual0 = new CoreOperationLessThanOrEqual(coreFunction0, coreFunction0);
-        CoreOperationMod coreOperationMod0 = new CoreOperationMod(coreOperationLessThanOrEqual0, coreOperationLessThanOrEqual0);
-        CoreOperationEqual coreOperationEqual0 = new CoreOperationEqual(coreOperationMod0, coreFunction0);
-        expressionArray0[0] = (Expression) coreOperationEqual0;
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(Integer.MIN_VALUE).when(step0).getAxis();
-        doReturn((Object) expressionArray0, (Object) expressionArray0).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        // Undeclared exception!
-        try {
-            SimplePathInterpreter.interpretSimpleLocationPath((EvalContext) null, nodePointer0, stepArray0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // / by zero
-            //
-            verifyException("org.apache.commons.jxpath.ri.compiler.CoreOperationMod", e);
-        }
+    /**
+     * Tests that an ArithmeticException thrown during predicate evaluation
+     * is propagated up from the interpretSimpleLocationPath method.
+     */
+    @Test(timeout = 4000, expected = ArithmeticException.class)
+    public void interpretSimpleLocationPathWithModuloByZeroPredicateThrowsArithmeticException() {
+        // Arrange: Create a step with a predicate that will cause a "division by zero" error.
+        // The predicate is equivalent to an XPath expression like "[1 mod 0]".
+        Expression dividend = new Constant(1);
+        Expression divisor = new Constant(0);
+        Expression modByZeroPredicate = new CoreOperationMod(dividend, divisor);
+        Expression[] predicates = {modByZeroPredicate};
+
+        // Mock a path step that uses this problematic predicate.
+        // The axis must be CHILD or SELF for the simple path interpreter to proceed to predicate evaluation.
+        Step mockStep = mock(Step.class);
+        when(mockStep.getAxis()).thenReturn(Compiler.AXIS_CHILD);
+        when(mockStep.getPredicates()).thenReturn(predicates);
+        Step[] steps = {mockStep};
+
+        // A simple root node pointer to start the path evaluation.
+        QName rootName = new QName("root");
+        Object rootObject = new Object();
+        NodePointer rootPointer = NodePointer.newNodePointer(rootName, rootObject, Locale.getDefault());
+
+        // Act: Interpret the path. This should trigger the evaluation of the
+        // predicate, resulting in an ArithmeticException.
+        // The EvalContext can be null for this evaluation path.
+        SimplePathInterpreter.interpretSimpleLocationPath(null, rootPointer, steps);
+
+        // Assert: The test succeeds if an ArithmeticException is thrown, as declared
+        // in the @Test annotation. It will fail otherwise.
     }
 }
