@@ -1,39 +1,46 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.CDataNode;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest21 {
-
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Test suite for the XML Tree Builder's handling of CDATA sections.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    public void roundTripsCdata() {
-        String xml = "<div id=1><![CDATA[\n<html>\n <foo><&amp;]]></div>";
-        Document doc = Jsoup.parse(xml, "", Parser.xmlParser());
+    @DisplayName("A CDATA block should be parsed and serialized correctly, preserving its content.")
+    public void cdataBlockIsCorrectlyParsedAndSerialized() {
+        // Arrange
+        final String cdataContent = "\n<html>\n <foo><&amp;";
+        final String xmlInput = "<div id=1><![CDATA[" + cdataContent + "]]></div>";
+        final String expectedHtmlOutput = "<div id=\"1\"><![CDATA[" + cdataContent + "]]></div>";
+
+        // Act
+        Document doc = Jsoup.parse(xmlInput, "", Parser.xmlParser());
         Element div = doc.getElementById("1");
-        assertEquals("<html>\n <foo><&amp;", div.text());
-        assertEquals(0, div.children().size());
-        // no elements, one text node
-        assertEquals(1, div.childNodeSize());
-        assertEquals("<div id=\"1\"><![CDATA[\n<html>\n <foo><&amp;]]></div>", div.outerHtml());
-        CDataNode cdata = (CDataNode) div.textNodes().get(0);
-        assertEquals("\n<html>\n <foo><&amp;", cdata.text());
+
+        assertNotNull(div, "The 'div' element should be found in the parsed document.");
+        Node cdataNode = div.childNode(0);
+
+        // Assert
+        // 1. Verify the structure of the parsed element
+        assertEquals(1, div.childNodeSize(), "The div element should contain exactly one child node.");
+        assertEquals(0, div.children().size(), "The CDATA content should not be parsed into child elements.");
+        assertTrue(cdataNode instanceof CDataNode, "The child node should be an instance of CDataNode.");
+
+        // 2. Verify the content of the CDATA node
+        assertEquals(cdataContent, ((CDataNode) cdataNode).text(), "The text content of the CDataNode should be preserved exactly.");
+        assertEquals(cdataContent, div.text(), "The text of the parent element should match the CDATA content.");
+
+        // 3. Verify the round-trip serialization
+        assertEquals(expectedHtmlOutput, div.outerHtml(), "The serialized output should correctly represent the original CDATA block.");
     }
 }
