@@ -1,31 +1,30 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest59 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test for {@link JsonArray#getAsNumber()}.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((JsonElement) null);
-        // Undeclared exception!
+    @Test
+    public void getAsNumber_whenArrayContainsSingleJsonNull_throwsUnsupportedOperationException() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(JsonNull.INSTANCE); // Create an array with a single JsonNull element.
+
+        // Act & Assert
         try {
-            jsonArray0.getAsNumber();
-            fail("Expecting exception: UnsupportedOperationException");
+            // getAsNumber() on a single-element array delegates to the element's getAsNumber() method.
+            // For a JsonNull element, this is an unsupported operation.
+            jsonArray.getAsNumber();
+            fail("Expected an UnsupportedOperationException to be thrown.");
         } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
+            // The exception message from JsonElement is expected to be the simple name of the class.
+            assertEquals("JsonNull", e.getMessage());
         }
     }
 }
