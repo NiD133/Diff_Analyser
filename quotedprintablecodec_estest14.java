@@ -1,23 +1,33 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QuotedPrintableCodec_ESTestTest14 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(false);
-        String string0 = quotedPrintableCodec0.encode("HKPw\"0YG.> 2u");
-        assertEquals("HKPw\"0YG.> 2u", string0);
+    /**
+     * Tests that encoding a string containing only printable ASCII characters
+     * in non-strict mode results in the original, unchanged string.
+     *
+     * <p>In non-strict mode, Quoted-Printable encoding should not modify
+     * characters that are considered printable (most ASCII symbols and alphanumerics),
+     * as they do not require escaping.</p>
+     */
+    @Test
+    public void testEncodeWithPrintableCharsInNonStrictModeReturnsUnchangedString() throws EncoderException {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(false); // Use non-strict mode
+        final String originalString = "HKPw\"0YG.> 2u"; // This string contains only printable characters
+
+        // Act
+        final String encodedString = codec.encode(originalString);
+
+        // Assert
+        assertEquals("Encoding a string of printable characters in non-strict mode should not change the string.",
+                originalString, encodedString);
     }
 }
