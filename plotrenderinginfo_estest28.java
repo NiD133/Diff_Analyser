@@ -1,28 +1,31 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.geom.Rectangle2D;
+import static org.junit.Assert.assertNull;
 
+/**
+ * A test case for the PlotRenderingInfo class, focusing on its initial state.
+ * This is an improved version of an auto-generated test.
+ */
 public class PlotRenderingInfo_ESTestTest28 extends PlotRenderingInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        Rectangle2D rectangle2D0 = plotRenderingInfo0.getPlotArea();
-        assertNull(rectangle2D0);
+    /**
+     * Verifies that the plot area is null for a newly created PlotRenderingInfo instance.
+     * The plot area is expected to be set later during the chart drawing process.
+     */
+    @Test
+    public void getPlotArea_shouldReturnNull_whenNewlyConstructed() {
+        // Arrange: Create a new PlotRenderingInfo instance, which requires a
+        // ChartRenderingInfo owner.
+        ChartRenderingInfo ownerInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(ownerInfo);
+
+        // Act: Retrieve the plot area from the newly created instance.
+        Rectangle2D plotArea = plotInfo.getPlotArea();
+
+        // Assert: The plot area should be null by default, as it has not been set yet.
+        assertNull("The plot area should be null upon initialization.", plotArea);
     }
 }
