@@ -1,17 +1,28 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest34 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":matchText");
-        assertEquals(":matchText", evaluator0.toString());
+    /**
+     * Tests that the {@code :matchText} pseudo-selector is parsed correctly,
+     * and the resulting Evaluator's string representation matches the original query.
+     * This pseudo-selector is a Jsoup-specific extension.
+     */
+    @Test
+    public void parseShouldCorrectlyHandleMatchTextPseudoSelector() {
+        // Arrange
+        String query = ":matchText";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert
+        assertEquals("The evaluator's string representation should match the original query.",
+                query, evaluator.toString());
     }
 }
