@@ -1,34 +1,31 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest144 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomAccessFileOrArray} class, focusing on data reading methods.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test143() throws Throwable {
-        byte[] byteArray0 = new byte[7];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        int int0 = randomAccessFileOrArray0.readUnsignedShortLE();
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(0, int0);
+    /**
+     * Verifies that readUnsignedShortLE() correctly reads a 16-bit unsigned integer
+     * in little-endian byte order and advances the internal pointer by two bytes.
+     */
+    @Test
+    public void readUnsignedShortLE_readsLittleEndianValueAndAdvancesPointer() throws IOException {
+        // Arrange: Create a byte array representing the number 0x1234 (4660) in little-endian format.
+        // The bytes are [0x34, 0x12]. An extra byte is added to ensure only two are read.
+        byte[] inputBytes = new byte[] { 0x34, 0x12, 0x56 };
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputBytes);
+        int expectedValue = 0x1234; // 4660 in decimal
+
+        // Act: Read an unsigned short in little-endian format.
+        int actualValue = reader.readUnsignedShortLE();
+
+        // Assert: Verify that the correct value was read and the file pointer advanced appropriately.
+        assertEquals("The unsigned short value should be read correctly in little-endian format.", expectedValue, actualValue);
+        assertEquals("The file pointer should advance by 2 bytes after reading a short.", 2L, reader.getFilePointer());
     }
 }
