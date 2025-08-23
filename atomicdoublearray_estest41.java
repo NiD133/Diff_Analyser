@@ -1,23 +1,27 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest41 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Unit tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        double[] doubleArray0 = new double[0];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        String string0 = atomicDoubleArray0.toString();
-        assertEquals("[]", string0);
+    /**
+     * Verifies that toString() on an array created from an empty source
+     * returns the string representation of an empty list, "[]".
+     */
+    @Test
+    public void toString_withEmptyArray_returnsEmptyBrackets() {
+        // Arrange
+        AtomicDoubleArray emptyArray = new AtomicDoubleArray(new double[0]);
+
+        // Act
+        String result = emptyArray.toString();
+
+        // Assert
+        assertEquals("[]", result);
     }
 }
