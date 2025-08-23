@@ -1,44 +1,31 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DayOfMonth_ESTestTest45 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for {@link DayOfMonth}.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        Clock clock0 = MockClock.systemDefaultZone();
-        DayOfMonth dayOfMonth0 = DayOfMonth.now(clock0);
-        int int0 = dayOfMonth0.getValue();
-        assertEquals(14, int0);
+    /**
+     * Tests that DayOfMonth.now(clock) correctly captures the day of the month
+     * from a fixed clock, and that getValue() returns it.
+     */
+    @Test
+    public void now_withFixedClock_returnsCorrectDayOfMonth() {
+        // Arrange: Create a fixed clock for a predictable date (e.g., July 15th, 2023).
+        Instant fixedInstant = Instant.parse("2023-07-15T10:30:00Z");
+        Clock clock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
+        int expectedDay = 15;
+
+        // Act: Create a DayOfMonth instance using the fixed clock.
+        DayOfMonth dayOfMonth = DayOfMonth.now(clock);
+
+        // Assert: The value of the created DayOfMonth should match the day from the clock.
+        assertEquals(expectedDay, dayOfMonth.getValue());
     }
 }
