@@ -1,20 +1,31 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LocaleUtils_ESTestTest15 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale("");
-        assertEquals("", locale0.getLanguage());
+    /**
+     * Tests that calling toLocale() with an empty string returns a Locale
+     * object representing the empty locale (empty language, country, and variant).
+     */
+    @Test
+    public void toLocale_withEmptyString_shouldReturnEmptyLocale() {
+        // Arrange
+        final String emptyLocaleString = "";
+        final Locale expectedLocale = new Locale("", "");
+
+        // Act
+        final Locale actualLocale = LocaleUtils.toLocale(emptyLocaleString);
+
+        // Assert
+        // The original test only verified the language. This is more thorough,
+        // ensuring the entire Locale object matches the expected empty state.
+        assertEquals(expectedLocale, actualLocale);
     }
 }
