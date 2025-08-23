@@ -1,40 +1,39 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.filefilter.PathFilter;
+import org.junit.Test;
 
-public class CountingPathVisitor_ESTestTest7 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for the constructors of {@link CountingPathVisitor}.
+ */
+public class CountingPathVisitor_ESTestTest7 {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        IOFileFilter iOFileFilter0 = CountingPathVisitor.defaultFileFilter();
-        NotFileFilter notFileFilter0 = (NotFileFilter) CanWriteFileFilter.CANNOT_WRITE;
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
-        CountingPathVisitor countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, notFileFilter0, iOFileFilter0);
+    /**
+     * Tests that the CountingPathVisitor can be successfully instantiated
+     * using the constructor that accepts custom file and directory filters.
+     */
+    @Test
+    public void constructorWithCustomFiltersShouldCreateInstance() {
+        // Arrange: Define custom filters and counters for the visitor.
+        // Using long counters, which is the default for the builder.
+        final Counters.PathCounters pathCounters = Counters.longCounters();
+        
+        // A filter that accepts files that cannot be written to.
+        final PathFilter fileFilter = CanWriteFileFilter.CANNOT_WRITE;
+        
+        // A filter that accepts any directory (the default behavior).
+        final PathFilter directoryFilter = CountingPathVisitor.defaultDirectoryFilter();
+
+        // Act: Instantiate the CountingPathVisitor with the prepared components.
+        final CountingPathVisitor visitor = new CountingPathVisitor(pathCounters, fileFilter, directoryFilter);
+
+        // Assert: Verify that the visitor was created and configured correctly.
+        assertNotNull("The visitor instance should not be null.", visitor);
+        assertSame("The path counters should be the same instance passed to the constructor.",
+                pathCounters, visitor.getPathCounters());
     }
 }
