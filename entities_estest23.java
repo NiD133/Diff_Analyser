@@ -1,29 +1,27 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Entities_ESTestTest23 extends Entities_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        document_OutputSettings0.charset("US-ASCII");
-        String string0 = Entities.escape("US-ASCII", document_OutputSettings0);
-        assertEquals("US-ASCII", string0);
+/**
+ * Tests for the static {@link Entities#escape(String, Document.OutputSettings)} method.
+ */
+public class EntitiesTest {
+
+    @Test
+    public void escapeWithAsciiCharsetDoesNotAlterAsciiString() {
+        // Arrange: Create output settings with an ASCII charset and define an ASCII input string.
+        String input = "A simple string with numbers 123 and symbols !@#$.";
+        OutputSettings outputSettings = new OutputSettings();
+        outputSettings.charset("US-ASCII");
+
+        // Act: Call the escape method.
+        String escapedString = Entities.escape(input, outputSettings);
+
+        // Assert: The escaped string should be identical to the input because all characters
+        // are valid in the US-ASCII charset and are not special HTML characters.
+        assertEquals(input, escapedString);
     }
 }
