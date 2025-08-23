@@ -1,37 +1,42 @@
 package org.jsoup.select;
 
-import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
-import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class ElementsTestTest44 {
+/**
+ * This test suite focuses on the behavior of the Elements class.
+ */
+public class ElementsTest {
 
-    @Test
-    public void removeAll() {
-        Document doc = Jsoup.parse("<p>One<p>Two<p>Three<p>Four</p><div>Div");
-        Elements ps = doc.select("p");
-        assertEquals(4, ps.size());
-        //Two and Three
-        Elements midPs = doc.select("p:gt(0):lt(3)");
-        assertEquals(2, midPs.size());
-        boolean removed = ps.removeAll(midPs);
-        assertEquals(2, ps.size());
-        assertTrue(removed);
-        assertEquals(2, midPs.size());
-        Elements divs = doc.select("div");
-        assertEquals(1, divs.size());
-        assertFalse(ps.removeAll(divs));
-        assertEquals(2, ps.size());
-        assertEquals("<p>One</p>\n<p>Four</p>\n<div>Div</div>", doc.body().html());
+    /**
+     * Tests that the deselect(Object) method successfully removes an element
+     * from the Elements list and returns true.
+     *
+     * The `deselect` method is designed to remove an element from the list
+     * without affecting the underlying DOM, unlike the `remove` method.
+     */
+    @Test(timeout = 4000)
+    public void deselectRemovesElementFromListAndReturnsTrue() {
+        // Arrange: Create a document and get its elements.
+        // A new Document object automatically contains a root structure (<html>, <head>, <body>).
+        // The getAllElements() method includes the Document node itself in the returned list.
+        Document document = new Document("");
+        Elements allElements = document.getAllElements();
+        int initialSize = allElements.size();
+
+        // Pre-condition check: ensure the document element is in the list before removal.
+        assertTrue("The list should initially contain the document element.", allElements.contains(document));
+
+        // Act: Deselect (remove) the document element from the list.
+        boolean wasRemoved = allElements.deselect(document);
+
+        // Assert: Verify the element was removed and the list is in the correct state.
+        assertTrue("deselect() should return true when an element is successfully removed.", wasRemoved);
+        assertEquals("The size of the list should decrease by one.", initialSize - 1, allElements.size());
+        assertFalse("The list should no longer contain the document element after deselecting it.", allElements.contains(document));
     }
 }
