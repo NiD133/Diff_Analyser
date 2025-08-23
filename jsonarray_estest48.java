@@ -1,30 +1,24 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest48 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
-        try {
-            jsonArray0.addAll((JsonArray) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.JsonArray", e);
-        }
+    /**
+     * Verifies that calling {@link JsonArray#addAll(JsonArray)} with a null argument
+     * throws a {@link NullPointerException}. This is the expected behavior for
+     * collection-like methods that do not explicitly handle null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void addAll_withNullArgument_shouldThrowNullPointerException() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+
+        // Act
+        // The @Test annotation asserts that a NullPointerException is thrown by this call.
+        jsonArray.addAll(null);
     }
 }
