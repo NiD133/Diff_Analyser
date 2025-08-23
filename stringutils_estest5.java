@@ -1,25 +1,21 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class StringUtils_ESTestTest5 extends StringUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StringUtils} class.
+ */
+public class StringUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        // Undeclared exception!
-        try {
-            StringUtils.escapeString((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.StringUtils", e);
-        }
+    /**
+     * Verifies that the escapeString method throws a NullPointerException
+     * when the input byte array is null. This ensures the method correctly
+     * handles invalid null input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void escapeString_withNullInput_shouldThrowNullPointerException() {
+        // When the escapeString method is called with a null argument,
+        // a NullPointerException is expected.
+        StringUtils.escapeString(null);
     }
 }
