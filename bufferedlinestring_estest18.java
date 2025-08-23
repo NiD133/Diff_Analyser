@@ -1,41 +1,48 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest18 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+/**
+ * Test suite for {@link BufferedLineString}.
+ */
+public class BufferedLineStringTest {
+
+    private static final double COORD_AND_BUFFER = 16.128532143886176;
 
     @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(16.128532143886176, 16.128532143886176, spatialContext0);
-        linkedList0.add((Point) pointImpl0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 16.128532143886176, spatialContext0);
-        Shape shape0 = bufferedLineString0.getBuffered(16.128532143886176, spatialContext0);
-        // Undeclared exception!
+    public void relateOnBufferedShapeThrowsUnsupportedOperationException() {
+        // ARRANGE
+        final SpatialContext spatialContext = SpatialContext.GEO;
+
+        // A BufferedLineString from a single point contains one BufferedLine segment
+        // where the start and end points are the same.
+        Point singlePoint = new PointImpl(COORD_AND_BUFFER, COORD_AND_BUFFER, spatialContext);
+        List<Point> points = Collections.singletonList(singlePoint);
+        BufferedLineString originalLineString = new BufferedLineString(points, COORD_AND_BUFFER, spatialContext);
+
+        // Create a new shape by applying another buffer. The resulting shape is
+        // still composed of BufferedLine segments.
+        Shape bufferedShape = originalLineString.getBuffered(COORD_AND_BUFFER, spatialContext);
+
+        // ACT & ASSERT
+        // The relate() method is not implemented for the underlying BufferedLine segments.
+        // Therefore, an UnsupportedOperationException is expected.
         try {
-            shape0.relate(bufferedLineString0);
-            fail("Expecting exception: UnsupportedOperationException");
+            bufferedShape.relate(originalLineString);
+            fail("Expected an UnsupportedOperationException to be thrown, but it wasn't.");
         } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BufferedLine", e);
+            // This is the expected outcome.
+            // The original auto-generated test verified that the exception message is null.
+            assertNull("The exception message was expected to be null.", e.getMessage());
         }
     }
 }
