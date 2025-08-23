@@ -1,25 +1,22 @@
 package org.apache.ibatis.builder;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ParameterExpression_ESTestTest5 extends ParameterExpression_ESTest_scaffolding {
+/**
+ * Tests for the {@link ParameterExpression} class.
+ */
+public class ParameterExpressionTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ParameterExpression parameterExpression0 = null;
-        try {
-            parameterExpression0 = new ParameterExpression((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.builder.ParameterExpression", e);
-        }
+    /**
+     * Verifies that the constructor throws a NullPointerException
+     * when the input expression string is null. This is expected behavior
+     * as the parser requires a non-null string to operate on.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionForNullExpression() {
+        // Attempt to create a ParameterExpression with a null string.
+        // The @Test(expected = ...) annotation asserts that this action
+        // must throw a NullPointerException for the test to pass.
+        new ParameterExpression(null);
     }
 }
