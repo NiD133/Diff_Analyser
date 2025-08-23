@@ -1,33 +1,31 @@
 package com.google.gson.internal.bind;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest38 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.value((Number) null);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that attempting to write a value directly into a JSON object,
+     * without first specifying a name for it, results in an IllegalStateException.
+     * According to the JSON specification, all values within an object must be
+     * part of a name/value pair.
+     */
+    @Test
+    public void writingValueInsideObjectWithoutNameThrowsException() {
+        // Arrange: Create a writer and start a JSON object.
+        JsonTreeWriter jsonWriter = new JsonTreeWriter();
+        jsonWriter.beginObject();
+
+        // Act & Assert: Attempting to write a value without a preceding name should fail.
+        assertThrows(IllegalStateException.class, () -> {
+            // The specific value type (e.g., a null Number) is not important;
+            // any `value()` call would be invalid at this point.
+            jsonWriter.value((Number) null);
+        });
     }
 }
