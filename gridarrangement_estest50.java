@@ -1,53 +1,30 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest50 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(11, 11);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrangeNN(blockContainer0, (Graphics2D) null);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that arrangeNN throws a StackOverflowError when attempting to arrange
+     * a BlockContainer that contains itself. This recursive structure should lead
+     * to an infinite loop, which is correctly handled by the JVM throwing this error.
+     */
+    @Test(expected = StackOverflowError.class)
+    public void arrangeNNShouldThrowStackOverflowErrorForRecursiveContainer() {
+        // Arrange: Create a grid arrangement and a block container.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer recursiveContainer = new BlockContainer();
+
+        // Create a recursive structure by adding the container to its own list of blocks.
+        recursiveContainer.add(recursiveContainer);
+
+        // Act & Assert: Attempt to arrange the recursive container.
+        // The @Test(expected) annotation asserts that a StackOverflowError is thrown.
+        // The Graphics2D context can be null as it is not relevant to this error.
+        arrangement.arrangeNN(recursiveContainer, (Graphics2D) null);
     }
 }
