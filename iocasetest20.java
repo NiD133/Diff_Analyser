@@ -1,49 +1,51 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class IOCaseTestTest20 {
+/**
+ * Tests the static {@link IOCase#isCaseSensitive(IOCase)} method.
+ */
+class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
-
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
+    @Test
+    @DisplayName("isCaseSensitive should return true for SENSITIVE")
+    void isCaseSensitive_whenSensitive_shouldReturnTrue() {
+        assertTrue(IOCase.isCaseSensitive(IOCase.SENSITIVE));
     }
 
     @Test
-    void test_isCaseSensitive_static() {
-        assertTrue(IOCase.isCaseSensitive(IOCase.SENSITIVE));
+    @DisplayName("isCaseSensitive should return false for INSENSITIVE")
+    void isCaseSensitive_whenInsensitive_shouldReturnFalse() {
         assertFalse(IOCase.isCaseSensitive(IOCase.INSENSITIVE));
-        assertEquals(!WINDOWS, IOCase.isCaseSensitive(IOCase.SYSTEM));
+    }
+
+    @Test
+    @DisplayName("isCaseSensitive should return false for null input")
+    void isCaseSensitive_whenNull_shouldReturnFalse() {
+        // The method is documented as being null-safe and should return false for null.
+        assertFalse(IOCase.isCaseSensitive(null));
+    }
+
+    @Test
+    @DisplayName("isCaseSensitive for SYSTEM should match the underlying OS sensitivity")
+    void isCaseSensitive_whenSystem_shouldDependOnOperatingSystem() {
+        // The behavior of IOCase.SYSTEM depends on the operating system.
+        final boolean isWindows = File.separatorChar == '\\';
+
+        if (isWindows) {
+            // On Windows, file systems are typically case-insensitive.
+            assertFalse(IOCase.isCaseSensitive(IOCase.SYSTEM),
+                "IOCase.SYSTEM should be case-insensitive on Windows.");
+        } else {
+            // On other systems (like Unix), file systems are typically case-sensitive.
+            assertTrue(IOCase.isCaseSensitive(IOCase.SYSTEM),
+                "IOCase.SYSTEM should be case-sensitive on non-Windows systems.");
+        }
     }
 }
