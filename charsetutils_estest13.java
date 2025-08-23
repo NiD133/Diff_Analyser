@@ -1,17 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class CharSetUtils_ESTestTest13 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * This test class contains improved tests for the {@link CharSetUtils} class.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+public class CharSetUtils_ESTestTest13 {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        String[] stringArray0 = new String[5];
-        String string0 = CharSetUtils.keep((String) null, stringArray0);
-        assertNull(string0);
+    /**
+     * Tests that CharSetUtils.keep() returns null when the input string is null,
+     * regardless of the character set provided. This behavior is documented in the
+     * method's Javadoc.
+     */
+    @Test
+    public void testKeepWithNullStringShouldReturnNull() {
+        // Arrange: Define a character set. Its content is irrelevant for this test
+        // because the method should return null for any null input string.
+        final String[] characterSet = {"a", "b", "c"};
+
+        // Act: Call the keep method with a null input string.
+        final String result = CharSetUtils.keep(null, characterSet);
+
+        // Assert: Verify that the result is null.
+        assertNull("keep(null, ...) should return null.", result);
     }
 }
