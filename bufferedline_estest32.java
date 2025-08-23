@@ -1,30 +1,38 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest32 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        bufferedLine0.hashCode();
-        assertEquals(0.0, bufferedLine0.getBuf(), 0.01);
+/**
+ * Contains tests for the {@link BufferedLine} class, focusing on edge cases.
+ */
+public class BufferedLineTest {
+
+    // Using a standard, readily available SpatialContext is cleaner than building one from scratch.
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * Tests that hashCode() can be called on a degenerate BufferedLine
+     * (a zero-length line with a zero buffer) without throwing an exception.
+     * This edge case is equivalent to a point.
+     */
+    @Test
+    public void hashCodeShouldNotFailForDegenerateLine() {
+        // Arrange: Create a degenerate line from a point to itself with a zero buffer.
+        // This is an important edge case where the line is effectively just a point.
+        Point point = spatialContext.makePoint(0.0, 0.0);
+        double buffer = 0.0;
+        BufferedLine degenerateLine = new BufferedLine(point, point, buffer, spatialContext);
+
+        // Act: Call hashCode(). The primary goal is to ensure this does not throw an exception.
+        // No assertion is needed on the return value itself, as it's implementation-dependent.
+        degenerateLine.hashCode();
+
+        // Assert: Verify the state of the created object to confirm it was constructed as expected.
+        assertEquals("The buffer distance should be correctly initialized.",
+                buffer, degenerateLine.getBuf(), 0.0);
     }
 }
