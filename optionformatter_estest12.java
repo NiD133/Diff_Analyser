@@ -1,30 +1,24 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest12 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionFormatter} class, focusing on edge cases.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
-        // Undeclared exception!
-        try {
-            optionFormatter0.isRequired();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.OptionFormatter", e);
-        }
+    /**
+     * Verifies that calling isRequired() on an OptionFormatter created with a null Option
+     * results in a NullPointerException. This is expected because the formatter
+     * attempts to delegate the call to the null Option object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isRequiredShouldThrowNullPointerExceptionWhenCreatedWithNullOption() {
+        // Given an OptionFormatter created with a null Option
+        OptionFormatter formatter = OptionFormatter.from(null);
+
+        // When isRequired() is called, a NullPointerException is expected.
+        formatter.isRequired();
     }
 }
