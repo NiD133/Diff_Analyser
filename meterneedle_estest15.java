@@ -1,36 +1,30 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class MeterNeedle_ESTestTest15 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * A test suite for the {@link MeterNeedle} class, focusing on the equals() method.
+ */
+public class MeterNeedle_ESTestTest15 {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        WindNeedle windNeedle0 = new WindNeedle();
-        PlumNeedle plumNeedle0 = new PlumNeedle();
-        windNeedle0.equals(plumNeedle0);
-        assertEquals(0.5, plumNeedle0.getRotateY(), 0.01);
-        assertEquals(5, plumNeedle0.getSize());
-        assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
-        assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
+    /**
+     * Verifies that the equals() method returns false when comparing instances
+     * of two different MeterNeedle subclasses.
+     */
+    @Test
+    public void equals_whenComparingDifferentNeedleTypes_shouldReturnFalse() {
+        // Arrange: Create two different types of MeterNeedle.
+        // WindNeedle and PlumNeedle are concrete subclasses of MeterNeedle.
+        // By default, they share the same initial property values.
+        MeterNeedle windNeedle = new WindNeedle();
+        MeterNeedle plumNeedle = new PlumNeedle();
+
+        // Act: Compare the two different needle objects for equality.
+        boolean areEqual = windNeedle.equals(plumNeedle);
+
+        // Assert: The result should be false because the objects are of
+        // different classes, even if their internal states are identical.
+        assertFalse("Instances of different MeterNeedle subclasses should not be equal.", areEqual);
     }
 }
