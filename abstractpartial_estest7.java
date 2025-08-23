@@ -1,48 +1,54 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
 import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest7 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        MonthDay monthDay0 = new MonthDay();
-        CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-        DateTime dateTime0 = new DateTime((-1448L), (Chronology) copticChronology0);
-        DateTime dateTime1 = monthDay0.toDateTime(dateTime0);
-        assertEquals((-5875201448L), dateTime1.getMillis());
+/**
+ * Contains an improved test for the toDateTime(ReadableInstant) method
+ * in the {@link AbstractPartial} class.
+ */
+public class AbstractPartial_ESTestTest7 {
+
+    /**
+     * Tests that toDateTime(ReadableInstant) correctly combines the partial's fields
+     * with a base instant, preserving the base instant's chronology and its other fields.
+     */
+    @Test
+    public void toDateTime_shouldCombinePartialWithBaseInstantUsingBaseChronology() {
+        // Arrange
+        // A partial date (June 21st) in the default ISO chronology.
+        MonthDay partialDate = new MonthDay(6, 21);
+
+        // A full base instant in a different chronology (Coptic) and a specific time.
+        // Coptic date: Year 1700, Month 5, Day 10, at 12:30:40.
+        Chronology copticChronology = CopticChronology.getInstanceUTC();
+        DateTime baseInstant = new DateTime(1700, 5, 10, 12, 30, 40, 0, copticChronology);
+
+        // Act
+        // Combine the partial (month and day) with the base instant.
+        DateTime result = partialDate.toDateTime(baseInstant);
+
+        // Assert
+        // The resulting DateTime should have the month and day from the partial,
+        // but the year, time, and chronology from the base instant.
+
+        // 1. Chronology should be taken from the base instant.
+        assertEquals("Chronology should be preserved from the base instant",
+                copticChronology, result.getChronology());
+
+        // 2. Fields from the partial (MonthDay) should be applied.
+        assertEquals("Month should be taken from the partial", 6, result.getMonthOfYear());
+        assertEquals("Day should be taken from the partial", 21, result.getDayOfMonth());
+
+        // 3. Fields not in the partial should be preserved from the base instant.
+        assertEquals("Year should be preserved from the base instant", 1700, result.getYear());
+        assertEquals("Hour should be preserved from the base instant", 12, result.getHourOfDay());
+        assertEquals("Minute should be preserved from the base instant", 30, result.getMinuteOfHour());
+        assertEquals("Second should be preserved from the base instant", 40, result.getSecondOfMinute());
     }
 }
