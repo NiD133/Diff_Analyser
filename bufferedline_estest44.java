@@ -1,30 +1,47 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest44 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(19.95949838725778, 19.95949838725778, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 19.95949838725778, spatialContext0);
-        RectangleImpl rectangleImpl0 = new RectangleImpl(314.0527, 648.9138053, 19.95949838725778, 314.0527, spatialContext0);
-        SpatialRelation spatialRelation0 = bufferedLine0.relate((Rectangle) rectangleImpl0);
-        assertEquals(SpatialRelation.DISJOINT, spatialRelation0);
-        assertEquals(19.95949838725778, bufferedLine0.getBuf(), 0.01);
+/**
+ * Unit tests for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    private static final SpatialContext GEO_CONTEXT = SpatialContext.GEO;
+
+    /**
+     * Tests that a BufferedLine correctly reports a DISJOINT relationship
+     * with a rectangle that is clearly outside of its bounds.
+     *
+     * This test case uses a BufferedLine with identical start and end points,
+     * which effectively behaves like a buffered point (a circle).
+     */
+    @Test
+    public void relateWithDisjointRectangleShouldReturnDisjoint() {
+        // Arrange
+        double bufferDistance = 10.0;
+        Point centerPoint = GEO_CONTEXT.makePoint(20, 20);
+
+        // A BufferedLine with the same start and end point is effectively a circle.
+        // Its bounding box will be approximately (10, 30, 10, 30).
+        BufferedLine bufferedPoint = new BufferedLine(centerPoint, centerPoint, bufferDistance, GEO_CONTEXT);
+
+        // Create a rectangle that is far away and does not intersect the buffered point.
+        Rectangle disjointRectangle = GEO_CONTEXT.makeRectangle(100, 110, 100, 110);
+
+        // Act
+        SpatialRelation relation = bufferedPoint.relate(disjointRectangle);
+
+        // Assert
+        assertEquals("The relation should be DISJOINT as the shapes do not overlap.",
+                SpatialRelation.DISJOINT, relation);
+        assertEquals("The buffer size should be correctly stored.",
+                bufferDistance, bufferedPoint.getBuf(), 0.0);
     }
 }
