@@ -1,42 +1,41 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class MinutesTestTest18 extends TestCase {
+/**
+ * Unit tests for the toStandardSeconds() method in the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final int SECONDS_IN_A_MINUTE = 60;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Tests that a standard conversion from minutes to seconds is calculated correctly.
+     */
+    @Test
+    public void toStandardSeconds_shouldConvertMinutesToSeconds() {
+        // Arrange
+        Minutes threeMinutes = Minutes.minutes(3);
+        Seconds expectedSeconds = Seconds.seconds(3 * SECONDS_IN_A_MINUTE);
+
+        // Act
+        Seconds actualSeconds = threeMinutes.toStandardSeconds();
+
+        // Assert
+        assertEquals(expectedSeconds, actualSeconds);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardSeconds() {
-        Minutes test = Minutes.minutes(3);
-        Seconds expected = Seconds.seconds(3 * 60);
-        assertEquals(expected, test.toStandardSeconds());
-        try {
-            Minutes.MAX_VALUE.toStandardSeconds();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    /**
+     * Tests that converting a value that would cause an integer overflow
+     * throws an ArithmeticException.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void toStandardSeconds_whenResultOverflows_shouldThrowArithmeticException() {
+        // Act: This conversion will overflow the integer capacity for seconds.
+        // For example, Integer.MAX_VALUE minutes * 60 > Integer.MAX_VALUE seconds.
+        Minutes.MAX_VALUE.toStandardSeconds();
+        
+        // Assert: The test expects an ArithmeticException to be thrown.
     }
 }
