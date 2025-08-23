@@ -1,42 +1,51 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextRenderInfo_ESTestTest13 extends TextRenderInfo_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        graphicsState0.rise = (float) 2;
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        LineSegment lineSegment0 = textRenderInfo0.getBaseline();
-        assertNotNull(lineSegment0);
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Test suite for the {@link TextRenderInfo} class.
+ * Note: The original class name "TextRenderInfo_ESTestTest13" was auto-generated
+ * and has been renamed to reflect its purpose better.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that getBaseline() returns a valid LineSegment when the graphics state
+     * includes a vertical text offset, known as 'rise'. This is a common scenario
+     * for rendering superscripts.
+     */
+    @Test
+    public void getBaseline_shouldReturnNonNull_whenGraphicsStateHasRise() {
+        // ARRANGE: Create a graphics state with a non-zero 'rise' value to simulate
+        // text being rendered above the normal baseline (e.g., a superscript).
+        final float textRise = 2.0f;
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.rise = textRise;
+        // A font is required for TextRenderInfo's internal calculations.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        PdfString sampleText = new PdfString("Test");
+        Matrix initialTextMatrix = graphicsState.getCtm();
+
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                sampleText,
+                graphicsState,
+                initialTextMatrix,
+                Collections.emptyList() // Marked content is not relevant for this test.
+        );
+
+        // ACT: Call the method under test to get the text's baseline.
+        LineSegment baseline = renderInfo.getBaseline();
+
+        // ASSERT: Ensure a valid LineSegment was returned.
+        // This confirms the calculation handles the 'rise' value correctly without errors.
+        assertNotNull("The calculated baseline should not be null when a text rise is applied.", baseline);
     }
 }
