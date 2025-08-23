@@ -1,27 +1,39 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest62 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
-        jsonWriter0.setSerializeNulls(false);
-        jsonTreeWriter0.name("");
-        JsonWriter jsonWriter1 = jsonTreeWriter0.nullValue();
-        assertSame(jsonTreeWriter0, jsonWriter1);
+/**
+ * Test suite for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    /**
+     * Verifies that when `setSerializeNulls(false)` is configured, calling `nullValue()`
+     * for an object property does not add the property to the resulting JsonObject.
+     */
+    @Test
+    public void nullValue_whenSerializeNullsIsFalse_skipsAddingPropertyToObject() throws Exception {
+        // Arrange: Create a writer and configure it to not serialize nulls.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.setSerializeNulls(false);
+
+        writer.beginObject();
+        writer.name("propertyToSkip");
+
+        // Act: Attempt to write a null value for the property.
+        writer.nullValue();
+        writer.endObject();
+
+        // Assert: The final JSON object should be empty because the null property was skipped.
+        JsonElement result = writer.get();
+        assertTrue("The result should be a JsonObject", result.isJsonObject());
+
+        JsonObject expected = new JsonObject(); // An empty object is expected.
+        assertEquals(expected, result);
     }
 }
