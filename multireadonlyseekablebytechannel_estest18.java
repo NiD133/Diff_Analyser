@@ -1,38 +1,34 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest18 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = null;
-        try {
-            multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel((List<SeekableByteChannel>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // channels
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Verifies that the constructor throws a NullPointerException when the provided
+     * list of channels is null, as this is a contract violation.
+     */
+    @Test
+    public void constructorShouldThrowNullPointerExceptionForNullChannelList() {
+        // The constructor is expected to reject a null list of channels.
+        // We use assertThrows to verify that the correct exception is thrown
+        // and to inspect its properties, such as the message.
+        final NullPointerException exception = assertThrows(
+            NullPointerException.class,
+            () -> new MultiReadOnlySeekableByteChannel((List<SeekableByteChannel>) null)
+        );
+
+        // The source class uses Objects.requireNonNull(channels, "channels"),
+        // so we can assert that the exception message is "channels".
+        // This makes the test more precise.
+        assertEquals("channels", exception.getMessage());
     }
 }
