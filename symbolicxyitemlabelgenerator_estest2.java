@@ -1,33 +1,37 @@
 package org.jfree.chart.labels;
 
+import org.jfree.data.xy.DefaultXYDataset;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest2 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        MockDate mockDate0 = new MockDate(102L);
-        SerialDate serialDate0 = SerialDate.createInstance((Date) mockDate0);
-        Date[] dateArray0 = new Date[3];
-        dateArray0[0] = (Date) mockDate0;
-        double[] doubleArray0 = new double[1];
-        DefaultHighLowDataset defaultHighLowDataset0 = new DefaultHighLowDataset(serialDate0, dateArray0, doubleArray0, doubleArray0, doubleArray0, doubleArray0, doubleArray0);
-        String string0 = symbolicXYItemLabelGenerator0.generateToolTip(defaultHighLowDataset0, 0, 0);
-        assertEquals("X: 102.0, Y: 0.0", string0);
+    /**
+     * Verifies that the generateToolTip method produces the default "X: {x}, Y: {y}"
+     * format for a standard XYDataset.
+     */
+    @Test
+    public void generateToolTip_shouldReturnDefaultFormattedString() {
+        // Arrange
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+
+        // Create a simple dataset with a single data point (102.0, 0.0)
+        DefaultXYDataset dataset = new DefaultXYDataset();
+        double[][] data = {{102.0}, {0.0}};
+        dataset.addSeries("Series 1", data);
+
+        int seriesIndex = 0;
+        int itemIndex = 0;
+
+        String expectedToolTip = "X: 102.0, Y: 0.0";
+
+        // Act
+        String actualToolTip = generator.generateToolTip(dataset, seriesIndex, itemIndex);
+
+        // Assert
+        assertEquals(expectedToolTip, actualToolTip);
     }
 }
