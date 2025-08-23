@@ -1,27 +1,36 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest12 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CircularByteBuffer} class.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
+    /**
+     * Tests that calling the add() method with a zero length and an offset of 0
+     * on an empty byte array throws an IllegalArgumentException. This test
+     * verifies a specific input validation edge case.
+     */
+    @Test
+    public void addWithZeroLengthFromEmptyArrayShouldThrowIllegalArgumentException() {
+        // Arrange: Create a buffer and define the parameters for the add operation.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] emptyArray = new byte[0];
+        final int offset = 0;
+        final int length = 0;
+
+        // Act & Assert: Attempt the 'add' operation and verify the expected exception.
         try {
-            circularByteBuffer0.add(byteArray0, 0, 0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: 0
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.add(emptyArray, offset, length);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was caught.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            final String expectedMessage = "Illegal offset: 0";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
