@@ -1,48 +1,30 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest11 extends CollectionBag_ESTest_scaffolding {
+/**
+ * Tests for {@link CollectionBag}.
+ */
+public class CollectionBagTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        // Undeclared exception!
-        try {
-            collectionBag0.remove((Object) treeBag0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that remove() throws a ClassCastException when an object of an
+     * incompatible type is passed to a CollectionBag that decorates a sorted bag.
+     * The exception originates from the decorated bag (TreeBag), which cannot
+     * compare the incompatible object with its existing elements.
+     */
+    @Test(expected = ClassCastException.class)
+    public void testRemoveWithIncompatibleTypeFromDecoratedSortedBagThrowsException() {
+        // Arrange: Create a CollectionBag decorating a TreeBag, which is sorted
+        // and expects elements of type Integer.
+        final Bag<Integer> decoratedBag = new TreeBag<>();
+        final Bag<Integer> collectionBag = new CollectionBag<>(decoratedBag);
+        final Object incompatibleObject = new Object();
+
+        // Act & Assert: Attempting to remove an object of an incompatible type.
+        // This should throw a ClassCastException because the underlying TreeBag
+        // cannot cast the object to a Comparable type (like Integer) for comparison.
+        collectionBag.remove(incompatibleObject);
     }
 }
