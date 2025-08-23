@@ -1,33 +1,45 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest42 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("readers", ",");
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        spatialContextFactory0.args = (Map<String, String>) hashMap0;
-        // Undeclared exception!
+/**
+ * Test suite for the {@link SpatialContextFactory} class.
+ */
+public class SpatialContextFactoryTest {
+
+    /**
+     * Tests that the generic {@code initField} method throws an Error when attempting to
+     * initialize a field of an unsupported type, such as a List.
+     * <p>
+     * The {@code initField} method uses reflection to set simple field types from a String map.
+     * It is not designed to parse and populate complex types like the {@code readers} List,
+     * which has its own dedicated initialization logic in {@code initFormats}.
+     */
+    @Test
+    public void initField_whenFieldIsUnsupportedListType_throwsError() {
+        // Arrange
+        final String unsupportedFieldName = "readers";
+        Map<String, String> configArgs = new HashMap<>();
+        // The value is irrelevant; the test triggers on the field's type (List).
+        configArgs.put(unsupportedFieldName, "some.ReaderClass");
+
+        SpatialContextFactory factory = new SpatialContextFactory();
+        factory.args = configArgs;
+
+        // Act & Assert
         try {
-            spatialContextFactory0.initField("readers");
-            fail("Expecting exception: Error");
+            factory.initField(unsupportedFieldName);
+            fail("Expected an Error because 'initField' does not support List types.");
         } catch (Error e) {
-            //
-            // unsupported field type: interface java.util.List
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // This is the expected outcome.
+            String expectedMessage = "unsupported field type: interface java.util.List";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
