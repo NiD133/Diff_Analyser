@@ -2,22 +2,32 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest16 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode class.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode(">eaHxh");
-        Document document0 = new Document("/4k>HzZAM{i:j+  b");
-        LeafNode leafNode0 = cDataNode0.doClone(document0);
-        Node node0 = leafNode0.removeAttr("/4k>HzZAM{i:j+  b");
-        assertTrue(node0.hasParent());
+    /**
+     * Verifies that calling removeAttr on a LeafNode that has a parent
+     * returns the node itself and does not detach it from its parent.
+     */
+    @Test
+    public void removeAttrOnNodeWithParentShouldReturnNodeAndRetainParent() {
+        // Arrange: Create a LeafNode (a CDataNode) and a parent Document.
+        CDataNode originalNode = new CDataNode("cdata content");
+        Document parentDocument = new Document("http://example.com/");
+
+        // Clone the node and assign the parent. The doClone method handles this.
+        LeafNode nodeWithParent = originalNode.doClone(parentDocument);
+        assertTrue("Pre-condition failed: Node should have a parent after cloning.", nodeWithParent.hasParent());
+
+        // Act: Attempt to remove an attribute that does not exist.
+        Node resultNode = nodeWithParent.removeAttr("nonExistentAttribute");
+
+        // Assert: The method should return the same node instance, and it must still have its parent.
+        assertSame("removeAttr should return the same node instance.", nodeWithParent, resultNode);
+        assertTrue("Node should still have a parent after removeAttr is called.", resultNode.hasParent());
+        assertSame("The node's parent should be unchanged.", parentDocument, resultNode.parent());
     }
 }
