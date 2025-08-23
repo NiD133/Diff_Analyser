@@ -1,31 +1,36 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest39 extends XNode_ESTest_scaffolding {
+/**
+ * Contains improved, understandable tests for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test038() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Boolean boolean0 = Boolean.valueOf("org.apache.ibatis.parsing.GenericTokenParser");
-        Boolean boolean1 = xNode0.getBooleanBody(boolean0);
-        assertFalse(boolean1);
+    /**
+     * Verifies that getBooleanBody() returns the provided default value
+     * when the XNode is created from a node with no text content (i.e., a null body).
+     */
+    @Test
+    public void getBooleanBodyShouldReturnDefaultValueWhenBodyIsNull() {
+        // Arrange
+        // An empty DOM node will result in the XNode having a null body.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        Boolean defaultValue = false;
+
+        // Act
+        Boolean result = xNode.getBooleanBody(defaultValue);
+
+        // Assert
+        // The result should be the default value because the node's body is null.
+        assertFalse("The result should be false as per the default value.", result);
+        assertEquals(defaultValue, result);
     }
 }
