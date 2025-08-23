@@ -1,26 +1,26 @@
 package org.apache.ibatis.cache;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CacheKey_ESTestTest3 extends CacheKey_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CacheKey} class.
+ */
+public class CacheKeyTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CacheKey cacheKey0 = new CacheKey();
-        // Undeclared exception!
-        try {
-            cacheKey0.updateAll((Object[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.CacheKey", e);
-        }
+    /**
+     * Verifies that calling updateAll() with a null array argument
+     * results in a NullPointerException. This is the expected behavior
+     * as the method iterates over the input array without a preceding null check.
+     */
+    @Test(expected = NullPointerException.class)
+    public void updateAllShouldThrowNullPointerExceptionWhenArrayIsNull() {
+        // Arrange: Create a new CacheKey instance.
+        CacheKey cacheKey = new CacheKey();
+
+        // Act: Call the method under test with a null argument.
+        // The test will pass only if this line throws a NullPointerException.
+        cacheKey.updateAll(null);
+
+        // Assert: The assertion is handled by the @Test(expected) annotation.
     }
 }
