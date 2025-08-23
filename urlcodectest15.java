@@ -1,41 +1,40 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest15 {
-
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
-    }
+/**
+ * Tests for the {@link URLCodec} class, focusing on encoding and decoding behavior.
+ */
+class URLCodecTest {
 
     @Test
-    void testUnsafeEncodeDecode() throws Exception {
+    @DisplayName("URLCodec should correctly encode and decode a string containing unsafe characters")
+    void shouldCorrectlyEncodeAndDecodeUnsafeCharacters() throws EncoderException, DecoderException {
+        // Arrange
         final URLCodec urlCodec = new URLCodec();
-        final String plain = "~!@#$%^&()+{}\"\\;:`,/[]";
-        final String encoded = urlCodec.encode(plain);
-        assertEquals("%7E%21%40%23%24%25%5E%26%28%29%2B%7B%7D%22%5C%3B%3A%60%2C%2F%5B%5D", encoded, "Unsafe chars URL encoding test");
-        assertEquals(plain, urlCodec.decode(encoded), "Unsafe chars URL decoding test");
-        validateState(urlCodec);
+
+        // A string containing characters that are not part of the 'www-form-urlencoded' safe set.
+        // These characters are expected to be percent-encoded.
+        final String originalString = "~!@#$%^&()+{}\"\\;:`,/[]";
+        final String expectedEncodedString = "%7E%21%40%23%24%25%5E%26%28%29%2B%7B%7D%22%5C%3B%3A%60%2C%2F%5B%5D";
+
+        // Act: Encode the original string
+        final String actualEncodedString = urlCodec.encode(originalString);
+
+        // Assert: The encoded string must match the expected format
+        assertEquals(expectedEncodedString, actualEncodedString,
+            "Encoding of unsafe characters did not produce the expected result.");
+
+        // Act: Decode the resulting string
+        final String decodedString = urlCodec.decode(actualEncodedString);
+
+        // Assert: The decoded string must match the original string (round-trip test)
+        assertEquals(originalString, decodedString,
+            "Decoding the encoded string should restore the original string.");
     }
 }
