@@ -1,48 +1,42 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collections;
+
+/**
+ * This test was part of an auto-generated suite.
+ * The original class name (TextRenderInfo_ESTestTest45) and scaffolding are preserved
+ * for context, but a more conventional name would be TextRenderInfoTest.
+ */
 public class TextRenderInfo_ESTestTest45 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = new Matrix();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo((PdfString) null, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
-        try {
-            textRenderInfo0.getCharacterRenderInfos();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.TextRenderInfo", e);
-        }
+    /**
+     * Verifies that getCharacterRenderInfos() throws a NullPointerException
+     * when the TextRenderInfo object was initialized with a null PdfString.
+     * The method requires a non-null string to split into individual characters.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getCharacterRenderInfos_whenPdfStringIsNull_throwsNullPointerException() {
+        // Arrange: Create a TextRenderInfo instance with a null PdfString.
+        // The constructor requires a valid GraphicsState with a font.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+        Matrix textMatrix = new Matrix();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                null, // The null PdfString that is expected to cause the exception
+                graphicsState,
+                textMatrix,
+                Collections.emptyList()
+        );
+
+        // Act: Call the method under test.
+        textRenderInfo.getCharacterRenderInfos();
+
+        // Assert: A NullPointerException is expected, as specified by the @Test annotation.
     }
 }
