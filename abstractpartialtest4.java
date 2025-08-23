@@ -1,167 +1,75 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.base.AbstractPartial;
 import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.field.AbstractPartialFieldProperty;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class AbstractPartialTestTest4 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the AbstractPartial class, focusing on the getFieldType() method.
+ */
+class AbstractPartialTest {
 
-    private long TEST_TIME_NOW = (31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * A concrete mock implementation of AbstractPartial for testing.
+     * It represents a partial date with two fields: year and monthOfYear.
+     * The chronology is fixed to BuddhistChronology in UTC.
+     */
+    private static class YearMonthPartial extends AbstractPartial {
 
-    private long TEST_TIME1 = (31L + 28L + 31L + 6L - 1L) * DateTimeConstants.MILLIS_PER_DAY + 12L * DateTimeConstants.MILLIS_PER_HOUR + 24L * DateTimeConstants.MILLIS_PER_MINUTE;
-
-    private long TEST_TIME2 = (365L + 31L + 28L + 31L + 30L + 7L - 1L) * DateTimeConstants.MILLIS_PER_DAY + 14L * DateTimeConstants.MILLIS_PER_HOUR + 28L * DateTimeConstants.MILLIS_PER_MINUTE;
-
-    private DateTimeZone zone = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestAbstractPartial.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        zone = DateTimeZone.getDefault();
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(zone);
-        zone = null;
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPartial extends AbstractPartial {
-
-        int[] val = new int[] { 1970, 1 };
-
-        MockPartial() {
-            super();
-        }
+        private final int[] values = new int[]{2513, 1}; // Buddhist year 2513 is 1970 AD
 
         @Override
         protected DateTimeField getField(int index, Chronology chrono) {
-            switch(index) {
+            switch (index) {
                 case 0:
                     return chrono.year();
                 case 1:
                     return chrono.monthOfYear();
                 default:
-                    throw new IndexOutOfBoundsException();
+                    throw new IndexOutOfBoundsException("Invalid index: " + index);
             }
         }
 
+        @Override
         public int size() {
             return 2;
         }
 
+        @Override
         public int getValue(int index) {
-            return val[index];
+            return values[index];
         }
 
-        public void setValue(int index, int value) {
-            val[index] = value;
-        }
-
+        @Override
         public Chronology getChronology() {
+            // Using a non-ISO chronology to ensure the test correctly uses the partial's chronology.
             return BuddhistChronology.getInstanceUTC();
         }
     }
 
-    static class MockProperty0 extends AbstractPartialFieldProperty {
+    @Test
+    void getFieldType_shouldReturnCorrectTypeForValidIndex() {
+        // Arrange
+        ReadablePartial partial = new YearMonthPartial();
 
-        MockPartial partial = new MockPartial();
-
-        @Override
-        public DateTimeField getField() {
-            return partial.getField(0);
-        }
-
-        @Override
-        public ReadablePartial getReadablePartial() {
-            return partial;
-        }
-
-        @Override
-        public int get() {
-            return partial.getValue(0);
-        }
+        // Act & Assert
+        assertEquals(DateTimeFieldType.year(), partial.getFieldType(0));
+        assertEquals(DateTimeFieldType.monthOfYear(), partial.getFieldType(1));
     }
 
-    static class MockProperty1 extends AbstractPartialFieldProperty {
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 2})
+    void getFieldType_shouldThrowExceptionForInvalidIndex(int invalidIndex) {
+        // Arrange
+        ReadablePartial partial = new YearMonthPartial();
 
-        MockPartial partial = new MockPartial();
-
-        @Override
-        public DateTimeField getField() {
-            return partial.getField(1);
-        }
-
-        @Override
-        public ReadablePartial getReadablePartial() {
-            return partial;
-        }
-
-        @Override
-        public int get() {
-            return partial.getValue(1);
-        }
-    }
-
-    static class MockProperty0Field extends MockProperty0 {
-
-        @Override
-        public DateTimeField getField() {
-            return BuddhistChronology.getInstanceUTC().hourOfDay();
-        }
-    }
-
-    static class MockProperty0Val extends MockProperty0 {
-
-        @Override
-        public int get() {
-            return 99;
-        }
-    }
-
-    static class MockProperty0Chrono extends MockProperty0 {
-
-        @Override
-        public ReadablePartial getReadablePartial() {
-            return new MockPartial() {
-
-                @Override
-                public Chronology getChronology() {
-                    return ISOChronology.getInstanceUTC();
-                }
-            };
-        }
-    }
-
-    public void testGetFieldType() throws Throwable {
-        MockPartial mock = new MockPartial();
-        assertEquals(DateTimeFieldType.year(), mock.getFieldType(0));
-        assertEquals(DateTimeFieldType.monthOfYear(), mock.getFieldType(1));
-        try {
-            mock.getFieldType(-1);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {
-        }
-        try {
-            mock.getFieldType(2);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {
-        }
+        // Act & Assert
+        assertThrows(IndexOutOfBoundsException.class, () -> partial.getFieldType(invalidIndex));
     }
 }
