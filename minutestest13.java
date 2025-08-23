@@ -1,38 +1,36 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest13 extends TestCase {
+/**
+ * Unit tests for the {@link Minutes#toString()} method.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void toString_shouldReturnCorrectFormat_forPositiveValue() {
+        // Arrange
+        Minutes twentyMinutes = Minutes.minutes(20);
+        String expectedFormat = "PT20M";
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        String actualFormat = twentyMinutes.toString();
+
+        // Assert
+        assertEquals(expectedFormat, actualFormat);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
+    @Test
+    public void toString_shouldReturnCorrectFormat_forNegativeValue() {
+        // Arrange
+        Minutes negativeTwentyMinutes = Minutes.minutes(-20);
+        String expectedFormat = "PT-20M";
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        String actualFormat = negativeTwentyMinutes.toString();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToString() {
-        Minutes test = Minutes.minutes(20);
-        assertEquals("PT20M", test.toString());
-        test = Minutes.minutes(-20);
-        assertEquals("PT-20M", test.toString());
+        // Assert
+        assertEquals(expectedFormat, actualFormat);
     }
 }
