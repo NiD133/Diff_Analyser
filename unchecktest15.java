@@ -2,80 +2,72 @@ package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link Uncheck#getAsInt(IOIntSupplier, Supplier)}.
+ */
 public class UncheckTestTest15 {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-
     private static final String CAUSE_MESSAGE = "CauseMessage";
-
     private static final String CUSTOM_MESSAGE = "Custom message";
 
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
+    /**
+     * A helper assertion to verify the properties of the thrown UncheckedIOException.
+     * It checks the custom message and the details of the wrapped IOException cause.
+     */
+    private void assertUncheckedIOException(final IOException expectedCause, final UncheckedIOException actualException) {
+        assertEquals(CUSTOM_MESSAGE, actualException.getMessage(), "The custom message should match.");
+        final IOException actualCause = actualException.getCause();
+        assertEquals(expectedCause.getClass(), actualCause.getClass(), "The cause's type should match the original IOException.");
+        assertEquals(CAUSE_MESSAGE, actualCause.getMessage(), "The cause's message should match.");
     }
 
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
-    }
-
+    /**
+     * Tests that when the IOIntSupplier executes successfully,
+     * {@code Uncheck.getAsInt()} returns the expected integer value.
+     */
     @Test
-    void testGetAsIntMessage() {
-        // No exception
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsInt(() -> {
-            throw new IOException();
-        }, () -> CUSTOM_MESSAGE));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.getAsInt(TestConstants.THROWING_IO_INT_SUPPLIER, () -> CUSTOM_MESSAGE));
-        assertEquals(1, Uncheck.getAsInt(() -> TestUtils.compareAndSetThrowsIO(atomicInt, 1), () -> CUSTOM_MESSAGE));
-        assertEquals(1, atomicInt.get());
-        // exception
-        final IOException expected = new IOException(CAUSE_MESSAGE);
-        try {
-            Uncheck.getAsInt(() -> new BrokenInputStream(expected).read(), () -> CUSTOM_MESSAGE);
-            fail();
-        } catch (final UncheckedIOException e) {
-            assertUncheckedIOException(expected, e);
-        }
+    void getAsIntWithMessage_whenSupplierSucceeds_returnsValue() {
+        // Arrange
+        final AtomicInteger sideEffectCheck = new AtomicInteger(0);
+        final IOIntSupplier successfulSupplier = () -> {
+            sideEffectCheck.set(1);
+            return 1;
+        };
+
+        // Act
+        final int result = Uncheck.getAsInt(successfulSupplier, () -> CUSTOM_MESSAGE);
+
+        // Assert
+        assertEquals(1, result, "Should return the value from the supplier.");
+        assertEquals(1, sideEffectCheck.get(), "The supplier's side effect should be observable.");
+    }
+
+    /**
+     * Tests that when the IOIntSupplier throws an IOException,
+     * {@code Uncheck.getAsInt()} wraps it in an UncheckedIOException with the custom message.
+     */
+    @Test
+    void getAsIntWithMessage_whenSupplierFails_throwsUncheckedIOException() {
+        // Arrange
+        final IOException ioException = new IOException(CAUSE_MESSAGE);
+        final IOIntSupplier failingSupplier = () -> {
+            throw ioException;
+        };
+
+        // Act & Assert
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.getAsInt(failingSupplier, () -> CUSTOM_MESSAGE);
+        }, "An UncheckedIOException should be thrown when the supplier fails.");
+
+        // Verify the details of the thrown exception
+        assertUncheckedIOException(ioException, thrown);
     }
 }
