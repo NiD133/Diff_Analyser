@@ -1,25 +1,28 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest7 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharBuffer charBuffer1 = CharBuffer.wrap(charArray0);
-        CharBuffer charBuffer2 = charBuffer0.append('2');
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer1);
-        int int0 = charSequenceReader0.read(charBuffer2);
-        assertEquals(0, int0);
+    @Test
+    public void readIntoCharBuffer_shouldReturnZero_whenTargetBufferHasNoRemainingSpace() throws IOException {
+        // Arrange: Create a reader and a target buffer that is already full.
+        CharSequenceReader reader = new CharSequenceReader("source data");
+
+        CharBuffer fullTargetBuffer = CharBuffer.allocate(10);
+        fullTargetBuffer.position(fullTargetBuffer.limit()); // Advance position to the end, leaving 0 remaining space.
+
+        // Act: Attempt to read from the source into the full buffer.
+        int charsRead = reader.read(fullTargetBuffer);
+
+        // Assert: Verify that no characters were read, as expected.
+        assertEquals("Should read 0 chars into a buffer with no remaining space", 0, charsRead);
     }
 }
