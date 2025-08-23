@@ -1,21 +1,37 @@
 package org.jfree.data.xy;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XYInterval_ESTestTest12 extends XYInterval_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval(2850.5914155, 2850.5914155, 2850.5914155, 2850.5914155, (-1461.548));
-        double double0 = xYInterval0.getXLow();
-        assertEquals(2850.5914155, xYInterval0.getYLow(), 0.01);
-        assertEquals(2850.5914155, xYInterval0.getY(), 0.01);
-        assertEquals(2850.5914155, double0, 0.01);
-        assertEquals((-1461.548), xYInterval0.getYHigh(), 0.01);
-        assertEquals(2850.5914155, xYInterval0.getXHigh(), 0.01);
+    /**
+     * A small tolerance for floating-point comparisons.
+     */
+    private static final double DELTA = 1e-9;
+
+    /**
+     * Verifies that the getXLow() method returns the value
+     * provided to the constructor.
+     */
+    @Test
+    public void getXLow_ShouldReturnTheValueFromConstructor() {
+        // Arrange: Define distinct values for the interval properties.
+        final double expectedXLow = 10.0;
+        final double xHigh = 20.0;
+        final double y = 15.0;
+        final double yLow = 12.0;
+        final double yHigh = 18.0;
+
+        XYInterval interval = new XYInterval(expectedXLow, xHigh, y, yLow, yHigh);
+
+        // Act: Call the method under test.
+        double actualXLow = interval.getXLow();
+
+        // Assert: Check that the returned value is correct.
+        assertEquals(expectedXLow, actualXLow, DELTA);
     }
 }
