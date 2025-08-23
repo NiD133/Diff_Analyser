@@ -1,83 +1,41 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.Test;
 
-public class StringConverterTestTest35 extends TestCase {
+/**
+ * Unit tests for {@link StringConverter}.
+ * This class focuses on the setInto(ReadWritableInterval, Object, Chronology) method.
+ */
+public class StringConverterTest {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+    /**
+     * Tests that setInto correctly parses an ISO8601 interval string (start/end)
+     * and updates a MutableInterval using a specific chronology.
+     */
+    @Test
+    public void setInto_updatesIntervalFromString_usingProvidedChronology() {
+        // Arrange
+        final String intervalString = "2003-08-09/2004-06-09";
+        final Chronology buddhistChronology = BuddhistChronology.getInstance();
+        
+        // The initial state of the interval is irrelevant, as setInto should overwrite it completely.
+        MutableInterval interval = new MutableInterval(0L, 0L);
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+        // Act
+        StringConverter.INSTANCE.setInto(interval, intervalString, buddhistChronology);
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // Assert
+        final DateTime expectedStart = new DateTime(2003, 8, 9, 0, 0, 0, 0, buddhistChronology);
+        final DateTime expectedEnd = new DateTime(2004, 6, 9, 0, 0, 0, 0, buddhistChronology);
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoInterval_Object_Chronology7() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(m, "2003-08-09/2004-06-09", BuddhistChronology.getInstance());
-        assertEquals(new DateTime(2003, 8, 9, 0, 0, 0, 0, BuddhistChronology.getInstance()), m.getStart());
-        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0, BuddhistChronology.getInstance()), m.getEnd());
-        assertEquals(BuddhistChronology.getInstance(), m.getChronology());
+        assertEquals("The start of the interval should match the parsed string.", expectedStart, interval.getStart());
+        assertEquals("The end of the interval should match the parsed string.", expectedEnd, interval.getEnd());
+        assertEquals("The chronology of the interval should be set to the provided chronology.", buddhistChronology, interval.getChronology());
     }
 }
