@@ -1,18 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest58 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        Seconds seconds0 = Seconds.MIN_VALUE;
-        String string0 = seconds0.toString();
-        assertEquals("PT-2147483648S", string0);
+    @Test
+    public void toString_forMinValue_returnsCorrectISOFormat() {
+        // Arrange
+        Seconds minSeconds = Seconds.MIN_VALUE;
+        String expectedString = "PT" + Integer.MIN_VALUE + "S";
+
+        // Act
+        String actualString = minSeconds.toString();
+
+        // Assert
+        // The toString() method should return the value in the ISO8601 period format (e.g., PTnS).
+        assertEquals(expectedString, actualString);
     }
 }
