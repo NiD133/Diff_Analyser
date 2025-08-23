@@ -1,18 +1,39 @@
 package com.fasterxml.jackson.core.format;
 
-import java.io.IOException;
-import java.io.InputStream;
-import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonFactory;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class DataFormatMatcherTestTest3 extends com.fasterxml.jackson.core.JUnit5TestBase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private final JsonFactory JSON_F = new JsonFactory();
+/**
+ * Unit tests for the {@link DataFormatMatcher} class.
+ */
+// Renamed class from "DataFormatMatcherTestTest3" to the more standard "DataFormatMatcherTest".
+class DataFormatMatcherTest extends com.fasterxml.jackson.core.JUnit5TestBase {
+
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     @Test
-    void getMatchedFormatNameReturnsNameWhenMatches() {
-        DataFormatMatcher dataFormatMatcher = new DataFormatMatcher(null, new byte[2], 1, 0, JSON_F, MatchStrength.SOLID_MATCH);
-        assertEquals(JsonFactory.FORMAT_NAME_JSON, dataFormatMatcher.getMatchedFormatName());
+    @DisplayName("getMatchedFormatName() should return the correct format name when a match is found")
+    void shouldReturnFormatNameForSuccessfulMatch() {
+        // Arrange: Create a DataFormatMatcher representing a successful, solid match.
+        // The input stream and buffer details are not relevant for this test, so we use
+        // minimal values to satisfy the constructor's requirements. The key inputs are
+        // the non-null JsonFactory and a positive MatchStrength.
+        DataFormatMatcher matcher = new DataFormatMatcher(
+                null, // InputStream is not used in this test's logic
+                new byte[0], // Buffer content is irrelevant
+                0, // bufferStart
+                0, // bufferLength
+                JSON_FACTORY, // The factory that "matched" the format
+                MatchStrength.SOLID_MATCH);
+
+        // Act: Call the method under test.
+        String actualFormatName = matcher.getMatchedFormatName();
+
+        // Assert: Verify that the format name from the provided factory is returned.
+        assertEquals(JsonFactory.FORMAT_NAME_JSON, actualFormatName,
+                "A successful match should return the name of the matched format.");
     }
 }
