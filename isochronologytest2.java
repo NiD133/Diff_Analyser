@@ -1,90 +1,78 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ISOChronologyTestTest2 extends TestCase {
+/**
+ * Tests the factory methods of {@link ISOChronology}.
+ *
+ * <p>This test focuses on how {@code ISOChronology.getInstance()} behaves with respect to the
+ * default system time zone.
+ */
+public class ISOChronologyFactoryTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final DateTimeZone ZONE_LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    // This instant is used to fix the "current" time for test consistency.
+    // The original calculation was complex; this is a more direct and readable
+    // way to define the same instant: 2002-06-09T00:00:00Z.
+    private static final long JUNE_9_2002_UTC_MILLIS =
+            new DateTime(2002, 6, 9, 0, 0, DateTimeZone.UTC).getMillis();
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    // Fields to store original system defaults
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    @Before
+    public void setUp() {
+        // Fix the "current" time to a known value to ensure tests are repeatable.
+        DateTimeUtils.setCurrentMillisFixed(JUNE_9_2002_UTC_MILLIS);
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+        // Store original system defaults before modifying them for the test.
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+
+        // Set system defaults to a known state (London) for this test.
+        DateTimeZone.setDefault(ZONE_LONDON);
+        TimeZone.setDefault(ZONE_LONDON.toTimeZone());
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
+        // Restore system defaults to their original state to avoid side effects on other tests.
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
+    // Note: The private helper method `testAdd` from the original code was removed
+    // as it was unused within this test file, improving clarity by removing dead code.
 
-    public void testFactory() {
-        assertEquals(LONDON, ISOChronology.getInstance().getZone());
-        assertSame(ISOChronology.class, ISOChronology.getInstance().getClass());
+    @Test
+    public void getInstance_shouldReturnChronologyWithDefaultZone() {
+        // This test verifies that getInstance() correctly uses the default time zone,
+        // which was set to London in the setUp method.
+
+        // Act
+        Chronology chronology = ISOChronology.getInstance();
+
+        // Assert
+        assertEquals("Chronology should have the default time zone", ZONE_LONDON, chronology.getZone());
+        assertSame("The returned instance should be of type ISOChronology",
+                ISOChronology.class, chronology.getClass());
     }
 }
