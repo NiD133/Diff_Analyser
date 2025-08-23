@@ -1,31 +1,35 @@
 package org.apache.ibatis.mapping;
 
+import org.apache.ibatis.cache.CacheException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Properties;
-import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.decorators.BlockingCache;
-import org.apache.ibatis.cache.decorators.SynchronizedCache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CacheBuilder_ESTestTest3 extends CacheBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CacheBuilder cacheBuilder0 = new CacheBuilder((String) null);
-        // Undeclared exception!
+/**
+ * Test suite for {@link CacheBuilder}.
+ */
+public class CacheBuilderTest {
+
+    @Test
+    public void buildShouldThrowCacheExceptionWhenIdIsNull() {
+        // Arrange: Create a CacheBuilder with a null ID.
+        // The ID is required by standard decorators, like LoggingCache,
+        // to instantiate their dependencies (e.g., a logger).
+        CacheBuilder cacheBuilder = new CacheBuilder(null);
+
+        // Act & Assert
         try {
-            cacheBuilder0.build();
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error building standard cache decorators.  Cause: org.evosuite.runtime.mock.java.lang.MockThrowable: Error creating logger for logger null.  Cause: java.lang.reflect.InvocationTargetException
-            //
-            verifyException("org.apache.ibatis.mapping.CacheBuilder", e);
+            cacheBuilder.build();
+            fail("Should have thrown CacheException because the cache ID is null.");
+        } catch (CacheException e) {
+            // The build fails because a decorator (LoggingCache) cannot be created
+            // without an ID to associate with its logger.
+            String expectedMessageFragment = "Error building standard cache decorators";
+            assertTrue(
+                "Exception message should indicate an error during decorator creation. Got: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
