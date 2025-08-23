@@ -1,21 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest18 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmlDeclaration} class, focusing on its behavior as a LeafNode.
+ */
+public class XmlDeclarationTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        XmlDeclaration xmlDeclaration0 = new XmlDeclaration("", false);
-        String string0 = xmlDeclaration0.coreValue();
-        assertEquals("", string0);
+    /**
+     * Verifies that the coreValue() method returns the name of the XML declaration.
+     * This test specifically checks the case where the name is an empty string.
+     */
+    @Test
+    public void coreValueShouldReturnDeclarationName() {
+        // Arrange: The "core value" of an XmlDeclaration is its name.
+        // We create a declaration with an empty name to test this behavior.
+        XmlDeclaration declaration = new XmlDeclaration("", false);
+
+        // Act: Retrieve the core value.
+        String coreValue = declaration.coreValue();
+
+        // Assert: The returned value should be the same empty string used for the name.
+        assertEquals("The core value should match the name provided at construction.", "", coreValue);
     }
 }
