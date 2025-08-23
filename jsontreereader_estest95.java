@@ -1,29 +1,47 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
 
 public class JsonTreeReader_ESTestTest95 extends JsonTreeReader_ESTest_scaffolding {
 
+    /**
+     * Tests the behavior of {@link JsonTreeReader#skipValue()} when called
+     * immediately after {@link JsonTreeReader#beginArray()} on an empty array.
+     *
+     * <p>The expected behavior for reading an array is to call {@code endArray()}
+     * when {@code hasNext()} is false. This test verifies the unconventional
+     * behavior of calling {@code skipValue()} instead, which results in the
+     * reader's position being reset to the start of the array.
+     */
     @Test(timeout = 4000)
-    public void test094() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        jsonTreeReader0.skipValue();
-        assertFalse(jsonTreeReader0.isLenient());
+    public void skipValue_whenAtEndOfEmptyArray_resetsReaderToBeginningOfArray() throws IOException {
+        // Arrange
+        JsonArray emptyArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyArray);
+
+        // Position the reader inside the empty array.
+        // The next token for an empty array is END_ARRAY.
+        reader.beginArray();
+        assertEquals("Precondition: Reader should be at the end of the array",
+                JsonToken.END_ARRAY, reader.peek());
+
+        // Act
+        // Instead of calling the expected endArray(), we call skipValue().
+        // The implementation of skipValue() consumes the END_ARRAY token by
+        // popping the array's internal iterator, but not the array itself.
+        reader.skipValue();
+
+        // Assert
+        // Because only the iterator was popped, the reader's state is effectively
+        // reset. Peeking again shows the reader is positioned at the beginning
+        // of the array once more.
+        assertEquals("Reader should be reset to the beginning of the array",
+                JsonToken.BEGIN_ARRAY, reader.peek());
     }
 }
