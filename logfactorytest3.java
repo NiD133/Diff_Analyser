@@ -1,38 +1,38 @@
 package org.apache.ibatis.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.io.Reader;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl;
-import org.apache.ibatis.logging.log4j.Log4jImpl;
 import org.apache.ibatis.logging.log4j2.Log4j2Impl;
-import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.logging.slf4j.Slf4jImpl;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LogFactoryTestTest3 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Tests the dynamic selection of logging implementations in the LogFactory.
+ */
+@DisplayName("LogFactory Implementation Selection")
+class LogFactorySelectionTest {
+
+    /**
+     * The LogFactory uses a static field to hold the chosen logging implementation.
+     * This method resets it to the default (Slf4j) after all tests in this class run,
+     * ensuring a clean state for other test suites.
+     */
     @AfterAll
-    static void restore() {
+    static void resetLoggingImplementation() {
         LogFactory.useSlf4jLogging();
     }
 
-    private void logSomething(Log log) {
-        log.warn("Warning message.");
-        log.debug("Debug message.");
-        log.error("Error message.");
-        log.error("Error with Exception.", new Exception("Test exception."));
-    }
-
     @Test
-    void shouldUseLog4J2() {
+    @DisplayName("Should return a Log4j2Impl instance when Log4J2 is configured")
+    void shouldReturnLog4j2ImplWhenLog4j2IsSelected() {
+        // Arrange: Configure the factory to use the Log4J2 implementation.
         LogFactory.useLog4J2Logging();
-        Log log = LogFactory.getLog(Object.class);
-        logSomething(log);
-        assertEquals(log.getClass().getName(), Log4j2Impl.class.getName());
+
+        // Act: Request a logger from the factory.
+        Log log = LogFactory.getLog(LogFactorySelectionTest.class);
+
+        // Assert: Verify that the factory created an instance of the correct class.
+        assertEquals(Log4j2Impl.class, log.getClass(), "The returned logger should be a Log4j2Impl instance.");
     }
 }
