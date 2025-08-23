@@ -1,40 +1,41 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Path;
+import org.apache.commons.io.file.Counters.PathCounters;
+import org.evosuite.runtime.mock.java.io.MockFile;
+import org.junit.Test;
+
+/**
+ * Tests for {@link CountingPathVisitor}.
+ * This test focuses on the behavior of the updateDirCounter method.
+ */
 public class CountingPathVisitor_ESTestTest17 extends CountingPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        CountingPathVisitor countingPathVisitor0 = countingPathVisitor_Builder0.getUnchecked();
-        MockFile mockFile0 = new MockFile("pathCounters", "pathCounters");
-        Path path0 = mockFile0.toPath();
-        countingPathVisitor0.updateDirCounter(path0, (IOException) null);
+    /**
+     * Tests that calling updateDirCounter with a null IOException correctly increments the directory count.
+     * This simulates a successful directory visit.
+     */
+    @Test
+    public void updateDirCounterWithNullIOExceptionIncrementsDirectoryCount() {
+        // Arrange
+        // Create a visitor with standard long counters.
+        final CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
+        final PathCounters counters = visitor.getPathCounters();
+        final Path directoryPath = new MockFile("test-directory").toPath();
+
+        // Verify the initial state before the action.
+        assertEquals("Directory count should be zero initially.", 0, counters.getDirectoryCounter());
+
+        // Act
+        // Call the method under test, simulating a successful post-visit of a directory.
+        visitor.updateDirCounter(directoryPath, null);
+
+        // Assert
+        // Verify that the directory counter was incremented and other counters remain unchanged.
+        assertEquals("Directory count should be incremented after a successful visit.", 1, counters.getDirectoryCounter());
+        assertEquals("File count should remain unchanged.", 0, counters.getFileCounter());
+        assertEquals("Byte count should remain unchanged.", 0, counters.getByteCounter().longValue());
     }
 }
