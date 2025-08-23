@@ -1,114 +1,106 @@
 package com.fasterxml.jackson.annotation;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonTypeInfoTest
-{
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, visible=true,
+public class JsonTypeInfoTest {
+
+    // Test classes with different JsonTypeInfo configurations
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, visible = true,
             defaultImpl = JsonTypeInfo.class, requireTypeIdForSubtypes = OptBoolean.TRUE)
-    private final static class Anno1 { }
+    private static final class ClassTypeInfo { }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXTERNAL_PROPERTY,
-            property = "ext",
-            defaultImpl = Void.class, requireTypeIdForSubtypes = OptBoolean.FALSE)
-    private final static class Anno2 { }
+            property = "ext", defaultImpl = Void.class, requireTypeIdForSubtypes = OptBoolean.FALSE)
+    private static final class NameTypeInfo { }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.EXTERNAL_PROPERTY,
-            property = "ext",
-            defaultImpl = Void.class)
-    private final static class Anno3 { }
+            property = "ext", defaultImpl = Void.class)
+    private static final class DefaultNameTypeInfo { }
 
     @Test
-    public void testEmpty() {
-        // 07-Mar-2017, tatu: Important to distinguish "none" from 'empty' value...
+    public void testNullJsonTypeInfoValue() {
+        // Ensure that a null input returns a null JsonTypeInfo.Value
         assertNull(JsonTypeInfo.Value.from(null));
     }
 
     @Test
-    public void testFromAnnotation() throws Exception
-    {
-        JsonTypeInfo.Value v1 = JsonTypeInfo.Value.from(Anno1.class.getAnnotation(JsonTypeInfo.class));
-        assertEquals(JsonTypeInfo.Id.CLASS, v1.getIdType());
-        // default from annotation definition
-        assertEquals(JsonTypeInfo.As.PROPERTY, v1.getInclusionType());
-        // default from annotation definition
-        assertEquals("@class", v1.getPropertyName());
-        assertTrue(v1.getIdVisible());
-        assertNull(v1.getDefaultImpl());
-        assertTrue(v1.getRequireTypeIdForSubtypes());
+    public void testJsonTypeInfoFromAnnotations() throws Exception {
+        // Test JsonTypeInfo.Value creation from ClassTypeInfo annotation
+        JsonTypeInfo.Value classTypeInfoValue = JsonTypeInfo.Value.from(ClassTypeInfo.class.getAnnotation(JsonTypeInfo.class));
+        assertClassTypeInfo(classTypeInfoValue);
 
-        JsonTypeInfo.Value v2 = JsonTypeInfo.Value.from(Anno2.class.getAnnotation(JsonTypeInfo.class));
-        assertEquals(JsonTypeInfo.Id.NAME, v2.getIdType());
-        assertEquals(JsonTypeInfo.As.EXTERNAL_PROPERTY, v2.getInclusionType());
-        assertEquals("ext", v2.getPropertyName());
-        assertFalse(v2.getIdVisible());
-        assertEquals(Void.class, v2.getDefaultImpl());
-        assertFalse(v2.getRequireTypeIdForSubtypes());
+        // Test JsonTypeInfo.Value creation from NameTypeInfo annotation
+        JsonTypeInfo.Value nameTypeInfoValue = JsonTypeInfo.Value.from(NameTypeInfo.class.getAnnotation(JsonTypeInfo.class));
+        assertNameTypeInfo(nameTypeInfoValue);
 
-        assertTrue(v1.equals(v1));
-        assertTrue(v2.equals(v2));
-
-        assertFalse(v1.equals(v2));
-        assertFalse(v2.equals(v1));
-
-        assertEquals("JsonTypeInfo.Value(idType=CLASS,includeAs=PROPERTY,propertyName=@class,defaultImpl=NULL,idVisible=true,requireTypeIdForSubtypes=true)", v1.toString());
-        assertEquals("JsonTypeInfo.Value(idType=NAME,includeAs=EXTERNAL_PROPERTY,propertyName=ext,defaultImpl=java.lang.Void,idVisible=false,requireTypeIdForSubtypes=false)", v2.toString());
+        // Validate equality and toString representations
+        assertNotEquals(classTypeInfoValue, nameTypeInfoValue);
+        assertEquals("JsonTypeInfo.Value(idType=CLASS,includeAs=PROPERTY,propertyName=@class,defaultImpl=NULL,idVisible=true,requireTypeIdForSubtypes=true)", classTypeInfoValue.toString());
+        assertEquals("JsonTypeInfo.Value(idType=NAME,includeAs=EXTERNAL_PROPERTY,propertyName=ext,defaultImpl=java.lang.Void,idVisible=false,requireTypeIdForSubtypes=false)", nameTypeInfoValue.toString());
     }
 
     @Test
-    public void testMutators() throws Exception
-    {
-        JsonTypeInfo.Value v = JsonTypeInfo.Value.from(Anno1.class.getAnnotation(JsonTypeInfo.class));
-        assertEquals(JsonTypeInfo.Id.CLASS, v.getIdType());
+    public void testJsonTypeInfoMutators() throws Exception {
+        JsonTypeInfo.Value value = JsonTypeInfo.Value.from(ClassTypeInfo.class.getAnnotation(JsonTypeInfo.class));
 
-        assertSame(v, v.withIdType(JsonTypeInfo.Id.CLASS));
-        JsonTypeInfo.Value v2 = v.withIdType(JsonTypeInfo.Id.MINIMAL_CLASS);
-        assertEquals(JsonTypeInfo.Id.MINIMAL_CLASS, v2.getIdType());
-        JsonTypeInfo.Value v3 = v.withIdType(JsonTypeInfo.Id.SIMPLE_NAME);
-        assertEquals(JsonTypeInfo.Id.SIMPLE_NAME, v3.getIdType());
+        // Test mutator methods for JsonTypeInfo.Value
+        assertSame(value, value.withIdType(JsonTypeInfo.Id.CLASS));
+        assertEquals(JsonTypeInfo.Id.MINIMAL_CLASS, value.withIdType(JsonTypeInfo.Id.MINIMAL_CLASS).getIdType());
+        assertEquals(JsonTypeInfo.Id.SIMPLE_NAME, value.withIdType(JsonTypeInfo.Id.SIMPLE_NAME).getIdType());
 
-        assertEquals(JsonTypeInfo.As.PROPERTY, v.getInclusionType());
-        assertSame(v, v.withInclusionType(JsonTypeInfo.As.PROPERTY));
-        v2 = v.withInclusionType(JsonTypeInfo.As.EXTERNAL_PROPERTY);
-        assertEquals(JsonTypeInfo.As.EXTERNAL_PROPERTY, v2.getInclusionType());
+        assertSame(value, value.withInclusionType(JsonTypeInfo.As.PROPERTY));
+        assertEquals(JsonTypeInfo.As.EXTERNAL_PROPERTY, value.withInclusionType(JsonTypeInfo.As.EXTERNAL_PROPERTY).getInclusionType());
 
-        assertSame(v, v.withDefaultImpl(null));
-        v2 = v.withDefaultImpl(String.class);
-        assertEquals(String.class, v2.getDefaultImpl());
+        assertSame(value, value.withDefaultImpl(null));
+        assertEquals(String.class, value.withDefaultImpl(String.class).getDefaultImpl());
 
-        assertSame(v, v.withIdVisible(true));
-        assertFalse(v.withIdVisible(false).getIdVisible());
+        assertSame(value, value.withIdVisible(true));
+        assertFalse(value.withIdVisible(false).getIdVisible());
 
-        assertEquals("foobar", v.withPropertyName("foobar").getPropertyName());
+        assertEquals("foobar", value.withPropertyName("foobar").getPropertyName());
     }
 
     @Test
-    public void testWithRequireTypeIdForSubtypes() {
-        JsonTypeInfo.Value empty = JsonTypeInfo.Value.EMPTY;
-        assertNull(empty.getRequireTypeIdForSubtypes());
+    public void testRequireTypeIdForSubtypes() {
+        JsonTypeInfo.Value emptyValue = JsonTypeInfo.Value.EMPTY;
+        assertNull(emptyValue.getRequireTypeIdForSubtypes());
 
-        JsonTypeInfo.Value requireTypeIdTrue = empty.withRequireTypeIdForSubtypes(Boolean.TRUE);
+        JsonTypeInfo.Value requireTypeIdTrue = emptyValue.withRequireTypeIdForSubtypes(Boolean.TRUE);
         assertEquals(Boolean.TRUE, requireTypeIdTrue.getRequireTypeIdForSubtypes());
 
-        JsonTypeInfo.Value requireTypeIdFalse = empty.withRequireTypeIdForSubtypes(Boolean.FALSE);
+        JsonTypeInfo.Value requireTypeIdFalse = emptyValue.withRequireTypeIdForSubtypes(Boolean.FALSE);
         assertEquals(Boolean.FALSE, requireTypeIdFalse.getRequireTypeIdForSubtypes());
 
-        JsonTypeInfo.Value requireTypeIdDefault = empty.withRequireTypeIdForSubtypes(null);
+        JsonTypeInfo.Value requireTypeIdDefault = emptyValue.withRequireTypeIdForSubtypes(null);
         assertNull(requireTypeIdDefault.getRequireTypeIdForSubtypes());
     }
 
     @Test
     public void testDefaultValueForRequireTypeIdForSubtypes() {
-        // default value
-        JsonTypeInfo.Value v3 = JsonTypeInfo.Value.from(Anno3.class.getAnnotation(JsonTypeInfo.class));
-        assertNull(v3.getRequireTypeIdForSubtypes());
+        JsonTypeInfo.Value defaultNameTypeInfoValue = JsonTypeInfo.Value.from(DefaultNameTypeInfo.class.getAnnotation(JsonTypeInfo.class));
+        assertNull(defaultNameTypeInfoValue.getRequireTypeIdForSubtypes());
         
-        // toString()
         assertEquals("JsonTypeInfo.Value(idType=NAME,includeAs=EXTERNAL_PROPERTY,propertyName=ext," 
-                + "defaultImpl=java.lang.Void,idVisible=false,requireTypeIdForSubtypes=null)", v3.toString());
+                + "defaultImpl=java.lang.Void,idVisible=false,requireTypeIdForSubtypes=null)", defaultNameTypeInfoValue.toString());
+    }
+
+    private void assertClassTypeInfo(JsonTypeInfo.Value value) {
+        assertEquals(JsonTypeInfo.Id.CLASS, value.getIdType());
+        assertEquals(JsonTypeInfo.As.PROPERTY, value.getInclusionType());
+        assertEquals("@class", value.getPropertyName());
+        assertTrue(value.getIdVisible());
+        assertNull(value.getDefaultImpl());
+        assertTrue(value.getRequireTypeIdForSubtypes());
+    }
+
+    private void assertNameTypeInfo(JsonTypeInfo.Value value) {
+        assertEquals(JsonTypeInfo.Id.NAME, value.getIdType());
+        assertEquals(JsonTypeInfo.As.EXTERNAL_PROPERTY, value.getInclusionType());
+        assertEquals("ext", value.getPropertyName());
+        assertFalse(value.getIdVisible());
+        assertEquals(Void.class, value.getDefaultImpl());
+        assertFalse(value.getRequireTypeIdForSubtypes());
     }
 }
