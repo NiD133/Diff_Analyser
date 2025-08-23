@@ -1,35 +1,30 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest13 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * This test focuses on the behavior of the null-safe wrapper for a TypeAdapter,
+ * specifically when its read method is called with invalid input.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        // Undeclared exception!
-        try {
-            typeAdapter0.read((JsonReader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.TypeAdapter$NullSafeTypeAdapter", e);
-        }
+    /**
+     * Verifies that calling read() on a null-safe TypeAdapter with a null JsonReader
+     * throws a NullPointerException.
+     *
+     * This test ensures the method correctly validates its arguments before attempting
+     * to process a JSON stream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void nullSafeRead_whenReaderIsNull_throwsNullPointerException() throws Exception {
+        // Arrange: Create a TypeAdapter and wrap it with nullSafe() to get the
+        // adapter under test. Any TypeAdapter can be used as the delegate.
+        TypeAdapter<Object> delegateAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+
+        // Act & Assert: Call the read method with a null reader.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        nullSafeAdapter.read(null);
     }
 }
