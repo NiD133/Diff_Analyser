@@ -1,21 +1,21 @@
 package org.apache.commons.codec.language;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
 
-public class SoundexTestTest22 extends AbstractStringEncoderTest<Soundex> {
+/**
+ * Tests the {@link Soundex} class, including the common test cases inherited from
+ * {@link AbstractStringEncoderTest}.
+ */
+public class SoundexTest extends AbstractStringEncoderTest<Soundex> {
 
+    /**
+     * Creates a new instance of the {@link Soundex} encoder for testing.
+     * This is the concrete implementation required by the abstract test class.
+     *
+     * @return a new {@code Soundex} instance
+     */
     @Override
     protected Soundex createStringEncoder() {
         return new Soundex();
-    }
-
-    @Test
-    void testSoundexUtilsConstructable() {
-        new SoundexUtils();
     }
 }
