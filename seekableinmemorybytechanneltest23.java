@@ -19,7 +19,7 @@ public class SeekableInMemoryByteChannelTestTest23 {
 
     /*
      * <q>Setting the position to a value that is greater than the current size is legal but does not change the size of the entity. A later attempt to write
-     * bytes at such a position will cause the entity to grow to accommodate the new bytes; the values of any bytes between the previous end-of-file and the
+     * bytes at such a a position will cause the entity to grow to accommodate the new bytes; the values of any bytes between the previous end-of-file and the
      * newly-written bytes are unspecified.</q>
      */
     public void writingToAPositionAfterEndGrowsChannel() throws Exception {
