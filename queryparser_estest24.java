@@ -1,25 +1,34 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest24 extends QueryParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test cases for the Jsoup {@link QueryParser}.
+ * This class focuses on ensuring the parser correctly handles invalid CSS selector syntax.
+ */
+public class QueryParserTest {
+
+    /**
+     * Tests that the parser throws an exception when encountering a malformed attribute selector.
+     * The query "[^-...]" is invalid because an attribute name cannot start with the '^' character.
+     * The '^' is a prefix match operator and must follow an attribute name (e.g., [attr^=val]).
+     */
+    @Test
+    public void parseThrowsExceptionForMalformedAttributeSelector() {
+        // Arrange: Define an invalid CSS query.
+        String malformedQuery = "[^-a-zA-Z0-9_:.]+";
+
         try {
-            QueryParser.parse("[^-a-zA-Z0-9_:.]+");
-            fail("Expecting exception: IllegalStateException");
+            // Act: Attempt to parse the invalid query.
+            QueryParser.parse(malformedQuery);
+            fail("Expected an IllegalStateException to be thrown due to the malformed attribute selector.");
         } catch (IllegalStateException e) {
-            //
-            // Could not parse query '[^-a-zA-Z0-9_:.]+': unexpected token at ''
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Assert: Verify that the exception message is correct and informative.
+            String expectedMessage = "Could not parse query '[^-a-zA-Z0-9_:.]+': unexpected token at ''";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
