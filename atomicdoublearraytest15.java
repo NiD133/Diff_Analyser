@@ -1,73 +1,81 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertEquals;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
 
-public class AtomicDoubleArrayTestTest15 extends JSR166TestCase {
-
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+/**
+ * Tests for {@link AtomicDoubleArray#addAndGet(int, double)}.
+ */
+@GwtIncompatible
+@J2ktIncompatible
+public class AtomicDoubleArrayTest extends JSR166TestCase {
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * A comprehensive set of double values for testing, including infinities, max/min values,
+     * zero, NaN, and other edge cases.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
+    private static final double[] SPECIAL_DOUBLE_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE // Included to test precision across types
+    };
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+    /**
+     * Asserts that two double values are bit-wise equal, which is the notion of equality used by
+     * {@link AtomicDoubleArray}.
+     */
+    private static void assertBitEquals(double expected, double actual) {
+        assertEquals(
+            "Expected bit representation " + Double.doubleToRawLongBits(expected)
+                + " but got " + Double.doubleToRawLongBits(actual),
+            Double.doubleToRawLongBits(expected),
+            Double.doubleToRawLongBits(actual));
     }
 
     /**
-     * addAndGet adds given value to current, and returns current value
+     * Verifies that addAndGet correctly updates an element and returns the new value. This test is
+     * exhaustive, checking all combinations of special double values for both the initial value and
+     * the delta, and testing at boundary indices of the array.
      */
-    public void testAddAndGet() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.addAndGet(i, y);
-                    assertBitEquals(x + y, z);
-                    assertBitEquals(x + y, aa.get(i));
+    public void testAddAndGet_withSpecialValues_updatesArrayAndReturnsNewValue() {
+        AtomicDoubleArray array = new AtomicDoubleArray(SIZE);
+        // Test the first and last elements to check for boundary-related issues.
+        int[] indicesToTest = {0, SIZE - 1};
+
+        for (int index : indicesToTest) {
+            for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+                for (double delta : SPECIAL_DOUBLE_VALUES) {
+                    // Arrange: Set the initial value in the array.
+                    array.set(index, initialValue);
+                    double expectedSum = initialValue + delta;
+
+                    // Act: Add the delta and capture the returned value.
+                    double returnedValue = array.addAndGet(index, delta);
+
+                    // Assert: Verify both the returned value and the stored value in the array.
+                    // 1. The method must return the new, updated value.
+                    assertBitEquals(expectedSum, returnedValue);
+
+                    // 2. The element in the array must be updated to the new value.
+                    double valueInArray = array.get(index);
+                    assertBitEquals(expectedSum, valueInArray);
                 }
             }
         }
