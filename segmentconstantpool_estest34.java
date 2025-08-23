@@ -1,23 +1,35 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This test class focuses on the SegmentConstantPool. The original test name
+ * "SegmentConstantPool_ESTestTest34" suggests it was auto-generated. For clarity,
+ * a manually written test class would typically be named "SegmentConstantPoolTest".
+ */
 public class SegmentConstantPool_ESTestTest34 extends SegmentConstantPool_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        String[] stringArray0 = new String[8];
-        stringArray0[1] = "^<init>.*";
-        int int0 = segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, "^<init>.*", 0);
-        assertEquals(1, int0);
+    /**
+     * Verifies that matchSpecificPoolEntryIndex correctly returns the index
+     * of the first occurrence of a matching string in an array.
+     */
+    @Test
+    public void matchSpecificPoolEntryIndexShouldReturnIndexOfFirstMatch() {
+        // Arrange
+        // The method under test does not use any instance fields, so passing null
+        // for the CpBands dependency is acceptable for this test.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        final String stringToFind = "^<init>.*";
+        final String[] names = {"someMethod()V", stringToFind, "anotherMethod()I", stringToFind};
+        final int desiredOccurrence = 0; // We are looking for the first (0-indexed) occurrence.
+        final int expectedIndex = 1;
+
+        // Act
+        final int actualIndex = segmentConstantPool.matchSpecificPoolEntryIndex(names, stringToFind, desiredOccurrence);
+
+        // Assert
+        assertEquals("The method should find the index of the first matching string.", expectedIndex, actualIndex);
     }
 }
