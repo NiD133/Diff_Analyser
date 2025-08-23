@@ -1,103 +1,79 @@
 package org.apache.commons.compress.archivers.zip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ExtraFieldUtilsTestTest4 implements UnixStat {
+/**
+ * Tests parsing of a byte array into multiple {@link ZipExtraField} instances
+ * for a ZIP central directory.
+ *
+ * @see ExtraFieldUtils#parse(byte[], boolean)
+ */
+public class ExtraFieldUtilsParseTest implements UnixStat {
 
     /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress.
-     *
-     * <p>
-     * Used to be ZipShort(1) but this is the ID of the Zip64 extra field.
-     * </p>
+     * Header-ID for a ZipExtraField not natively supported by Commons Compress,
+     * used to test the handling of unrecognized fields.
      */
-    static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
+    private static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
 
-    /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress used for the ArrayIndexOutOfBoundsTest.
-     */
-    static final ZipShort AIOB_HEADER = new ZipShort(0x1000);
-
-    private AsiExtraField a;
-
-    private UnrecognizedExtraField dummy;
-
-    private byte[] data;
-
-    private byte[] aLocal;
+    private byte[] extraFieldData;
 
     @BeforeEach
-    public void setUp() {
-        a = new AsiExtraField();
-        a.setMode(0755);
-        a.setDirectory(true);
-        dummy = new UnrecognizedExtraField();
-        dummy.setHeaderId(UNRECOGNIZED_HEADER);
-        dummy.setLocalFileDataData(new byte[] { 0 });
-        dummy.setCentralDirectoryData(new byte[] { 0 });
-        aLocal = a.getLocalFileDataData();
-        final byte[] dummyLocal = dummy.getLocalFileDataData();
-        data = new byte[4 + aLocal.length + 4 + dummyLocal.length];
-        System.arraycopy(a.getHeaderId().getBytes(), 0, data, 0, 2);
-        System.arraycopy(a.getLocalFileDataLength().getBytes(), 0, data, 2, 2);
-        System.arraycopy(aLocal, 0, data, 4, aLocal.length);
-        System.arraycopy(dummy.getHeaderId().getBytes(), 0, data, 4 + aLocal.length, 2);
-        System.arraycopy(dummy.getLocalFileDataLength().getBytes(), 0, data, 4 + aLocal.length + 2, 2);
-        System.arraycopy(dummyLocal, 0, data, 4 + aLocal.length + 4, dummyLocal.length);
-    }
+    public void setUp() throws IOException {
+        // Arrange: Create two extra fields and serialize them into a single byte array,
+        // simulating the raw extra field data from a ZIP file.
 
-    public static class AiobThrowingExtraField implements ZipExtraField {
+        // 1. A standard AsiExtraField for Unix permissions.
+        final AsiExtraField asiExtraField = new AsiExtraField();
+        asiExtraField.setMode(0755);
+        asiExtraField.setDirectory(true);
 
-        static final int LENGTH = 4;
+        // 2. A dummy UnrecognizedExtraField.
+        final UnrecognizedExtraField unrecognizedExtraField = new UnrecognizedExtraField();
+        unrecognizedExtraField.setHeaderId(UNRECOGNIZED_HEADER);
+        unrecognizedExtraField.setLocalFileDataData(new byte[] { 0 }); // 1 byte of data
 
-        @Override
-        public byte[] getCentralDirectoryData() {
-            return getLocalFileDataData();
-        }
+        // 3. Concatenate the raw data of the two fields into a single byte stream.
+        // The format for each field is: [HeaderID (2 bytes)][DataLength (2 bytes)][Data]
+        // We use a ByteArrayOutputStream to avoid manual and error-prone byte array copying.
+        try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            bos.write(asiExtraField.getHeaderId().getBytes());
+            bos.write(asiExtraField.getLocalFileDataLength().getBytes());
+            bos.write(asiExtraField.getLocalFileDataData());
 
-        @Override
-        public ZipShort getCentralDirectoryLength() {
-            return getLocalFileDataLength();
-        }
+            bos.write(unrecognizedExtraField.getHeaderId().getBytes());
+            bos.write(unrecognizedExtraField.getLocalFileDataLength().getBytes());
+            bos.write(unrecognizedExtraField.getLocalFileDataData());
 
-        @Override
-        public ZipShort getHeaderId() {
-            return AIOB_HEADER;
-        }
-
-        @Override
-        public byte[] getLocalFileDataData() {
-            return new byte[LENGTH];
-        }
-
-        @Override
-        public ZipShort getLocalFileDataLength() {
-            return new ZipShort(LENGTH);
-        }
-
-        @Override
-        public void parseFromCentralDirectoryData(final byte[] buffer, final int offset, final int length) {
-            parseFromLocalFileData(buffer, offset, length);
-        }
-
-        @Override
-        public void parseFromLocalFileData(final byte[] buffer, final int offset, final int length) {
-            throw new ArrayIndexOutOfBoundsException();
+            extraFieldData = bos.toByteArray();
         }
     }
 
     @Test
-    void testParseCentral() throws Exception {
-        final ZipExtraField[] ze = ExtraFieldUtils.parse(data, false);
-        assertEquals(2, ze.length, "number of fields");
-        assertTrue(ze[0] instanceof AsiExtraField, "type field 1");
-        assertEquals(040755, ((AsiExtraField) ze[0]).getMode(), "mode field 1");
-        assertTrue(ze[1] instanceof UnrecognizedExtraField, "type field 2");
-        assertEquals(1, ze[1].getCentralDirectoryLength().getValue(), "data length field 2");
+    void shouldCorrectlyParseMultipleFieldsFromCentralDirectoryData() throws ZipException {
+        // Act: Parse the raw byte data, treating it as central directory extra fields (local=false).
+        final ZipExtraField[] parsedFields = ExtraFieldUtils.parse(extraFieldData, false);
+
+        // Assert
+        assertEquals(2, parsedFields.length, "Should parse two extra fields from the data");
+
+        // Assert properties of the first field (AsiExtraField)
+        final AsiExtraField parsedAsiField = assertInstanceOf(AsiExtraField.class, parsedFields[0],
+                "First field should be parsed as AsiExtraField");
+        final int expectedMode = S_IFDIR | 0755; // Combine directory flag and permissions
+        assertEquals(expectedMode, parsedAsiField.getMode(), "AsiExtraField mode should be correctly parsed");
+
+        // Assert properties of the second field (UnrecognizedExtraField)
+        final UnrecognizedExtraField parsedUnrecognizedField = assertInstanceOf(UnrecognizedExtraField.class, parsedFields[1],
+                "Second field should be parsed as UnrecognizedExtraField");
+        assertEquals(1, parsedUnrecognizedField.getCentralDirectoryLength().getValue(),
+                "UnrecognizedExtraField data length should match the parsed length");
     }
 }
