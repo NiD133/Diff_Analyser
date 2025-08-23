@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest48 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        Seconds seconds0 = Seconds.ONE;
-        Seconds seconds1 = seconds0.plus((Seconds) null);
-        assertEquals(1, seconds1.getSeconds());
+    /**
+     * Tests that adding a null Seconds object to an existing instance
+     * has no effect, as per the method's contract where null is treated as zero.
+     */
+    @Test
+    public void plus_addingNull_shouldHaveNoEffect() {
+        // Arrange: Start with a known Seconds value.
+        Seconds initialSeconds = Seconds.ONE;
+
+        // Act: Add a null Seconds object. The Javadoc states that a null
+        // input should be treated as a zero-value period.
+        Seconds result = initialSeconds.plus((Seconds) null);
+
+        // Assert: The result should be equal to the initial value.
+        assertEquals(initialSeconds, result);
     }
 }
