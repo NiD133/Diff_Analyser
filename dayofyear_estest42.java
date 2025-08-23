@@ -1,46 +1,30 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This test class contains improved tests for the DayOfYear class.
+ * Note: The original class name and inheritance are preserved to match the input structure.
+ * In a typical project, this would be named DayOfYearTest.
+ */
 public class DayOfYear_ESTestTest42 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.of(1);
-        dayOfYear0.hashCode();
-        assertEquals(1, dayOfYear0.getValue());
+    /**
+     * Tests that the hashCode() method returns the integer value of the day-of-year.
+     * This aligns with the behavior of a value-based class where the hash code
+     * is derived directly from its primary value.
+     */
+    @Test
+    public void hashCode_shouldReturnTheDayValue() {
+        // Arrange: Create a DayOfYear instance for a specific day.
+        DayOfYear dayOfYear = DayOfYear.of(1);
+        int expectedHashCode = 1;
+
+        // Act: Calculate the hash code.
+        int actualHashCode = dayOfYear.hashCode();
+
+        // Assert: Verify that the hash code is equal to the day's integer value.
+        assertEquals(expectedHashCode, actualHashCode);
     }
 }
