@@ -1,17 +1,28 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest54 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the static utility methods in {@link TokenQueue}.
+ */
+public class TokenQueueUtilTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        String string0 = TokenQueue.escapeCssIdentifier("4O*!*d1^m3R|W");
-        assertEquals("\\34 O\\*\\!\\*d1\\^m3R\\|W", string0);
+    @Test
+    public void shouldEscapeCssIdentifierWithLeadingDigitAndSpecialChars() {
+        // Arrange
+        // An identifier starting with a digit and containing various special characters.
+        String identifier = "4O*!*d1^m3R|W";
+
+        // According to the CSSOM spec, an identifier cannot start with a digit.
+        // It must be escaped as a hex code (e.g., '4' becomes '\34 ').
+        // Other non-alphanumeric characters must also be backslash-escaped.
+        String expectedEscapedIdentifier = "\\34 O\\*\\!\\*d1\\^m3R\\|W";
+
+        // Act
+        String actualEscapedIdentifier = TokenQueue.escapeCssIdentifier(identifier);
+
+        // Assert
+        assertEquals(expectedEscapedIdentifier, actualEscapedIdentifier);
     }
 }
