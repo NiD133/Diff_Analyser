@@ -2,29 +2,35 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
 public class LinkedTreeMap_ESTestTest45 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        LinkedTreeMap<Integer, Object> linkedTreeMap0 = new LinkedTreeMap<Integer, Object>();
-        Integer integer0 = new Integer((-2139));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap1 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap1.putIfAbsent(integer0, integer0);
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap1.findByObject(integer0);
-        boolean boolean0 = linkedTreeMap_Node0.equals(linkedTreeMap0);
-        assertEquals(1, linkedTreeMap1.size());
-        assertFalse(boolean0);
+    /**
+     * Tests that a LinkedTreeMap.Node's equals() method returns false
+     * when compared with an object of a completely different type (e.g., a LinkedTreeMap).
+     */
+    @Test
+    public void nodeEquals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange
+        // 1. Create a map and add an entry to obtain a Node instance.
+        LinkedTreeMap<Integer, String> mapWithNode = new LinkedTreeMap<>();
+        Integer key = 1;
+        mapWithNode.put(key, "value");
+
+        // 2. Retrieve the internal Node object we want to test.
+        LinkedTreeMap.Node<Integer, String> node = mapWithNode.findByObject(key);
+        assertNotNull("Setup failed: Node should not be null", node);
+
+        // 3. Create an object of a different type to compare against.
+        LinkedTreeMap<Integer, Object> anotherMap = new LinkedTreeMap<>();
+
+        // Act
+        // 4. Call the equals() method on the Node, passing the other map instance.
+        boolean areEqual = node.equals(anotherMap);
+
+        // Assert
+        // 5. The result must be false, as the Node.equals() implementation checks
+        //    if the other object is an instance of Map.Entry.
+        assertFalse("A Node should not be equal to a LinkedTreeMap instance.", areEqual);
     }
 }
