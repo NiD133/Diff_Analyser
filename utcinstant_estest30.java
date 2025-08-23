@@ -1,32 +1,35 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class UtcInstant_ESTestTest30 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link UtcInstant}.
+ * This class focuses on improving a specific test case for understandability.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(73281320003633L, 73281320003633L);
-        // Undeclared exception!
+    /**
+     * Tests that converting a {@code UtcInstant} to a {@code java.time.Instant}
+     * throws an exception if the value is too large to be represented.
+     */
+    @Test
+    public void toInstant_whenUtcInstantExceedsMaxInstant_throwsDateTimeException() {
+        // Arrange: Create a UtcInstant representing a point in time far beyond
+        // the maximum value supported by java.time.Instant. The Modified Julian Day
+        // value is intentionally chosen to be extremely large to trigger the exception.
+        long farFutureModifiedJulianDay = 73281320003633L;
+        UtcInstant utcInstantFarInFuture = UtcInstant.ofModifiedJulianDay(farFutureModifiedJulianDay, 0L);
+
+        // Act & Assert
         try {
-            utcInstant0.toInstant();
-            fail("Expecting exception: DateTimeException");
+            utcInstantFarInFuture.toInstant();
+            fail("Expected DateTimeException was not thrown for an out-of-range instant.");
         } catch (DateTimeException e) {
-            //
-            // Instant exceeds minimum or maximum instant
-            //
-            verifyException("java.time.Instant", e);
+            // Verify that the exception message clearly indicates the cause of the error.
+            assertEquals("Instant exceeds minimum or maximum instant", e.getMessage());
         }
     }
 }
