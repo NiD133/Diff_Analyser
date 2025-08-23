@@ -1,18 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest66 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        Weeks weeks0 = Weeks.standardWeeksIn((ReadablePeriod) null);
-        Seconds seconds0 = weeks0.toStandardSeconds();
-        assertEquals(0, seconds0.getSeconds());
+    /**
+     * Tests that calling {@code standardWeeksIn} with a null {@code ReadablePeriod}
+     * results in a zero-week period, as specified by the method's contract.
+     */
+    @Test
+    public void standardWeeksIn_withNullPeriod_returnsZeroWeeks() {
+        // Arrange: According to the Javadoc, a null input period should be treated as zero.
+        ReadablePeriod nullPeriod = null;
+
+        // Act: Create a Weeks instance from the null period.
+        Weeks result = Weeks.standardWeeksIn(nullPeriod);
+
+        // Assert: The resulting period should be equivalent to the constant Weeks.ZERO.
+        assertEquals(Weeks.ZERO, result);
     }
 }
