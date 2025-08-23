@@ -1,22 +1,31 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest2 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ThresholdingOutputStream}.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream(0);
-        thresholdingOutputStream0.write((byte[]) null, 0, 0);
-        assertEquals(0, thresholdingOutputStream0.getThreshold());
-        assertEquals(0L, thresholdingOutputStream0.getByteCount());
+    /**
+     * Tests that writing a zero-length byte array is a no-op and does not
+     * affect the stream's byte count.
+     */
+    @Test
+    public void writeWithZeroLengthShouldNotChangeByteCount() throws IOException {
+        // Arrange: Create a stream with a threshold of 0.
+        final int threshold = 0;
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(threshold);
+
+        // Act: Attempt to write zero bytes. Per the OutputStream contract,
+        // this should do nothing. A null buffer is acceptable for a zero-length write.
+        stream.write(null, 0, 0);
+
+        // Assert: Verify that the stream's state is unchanged.
+        assertEquals("The threshold should remain the same.", threshold, stream.getThreshold());
+        assertEquals("The byte count should remain zero after a zero-length write.", 0L, stream.getByteCount());
     }
 }
