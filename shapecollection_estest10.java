@@ -1,33 +1,46 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest10 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        arrayList0.add((JtsPoint) null);
-        List<JtsPoint> list0 = shapeCollection0.getShapes();
-        assertFalse(list0.isEmpty());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Test suite for {@link ShapeCollection}.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Tests that the ShapeCollection reflects modifications made to the
+     * original list of shapes provided in its constructor.
+     * This behavior is expected because the constructor is documented to
+     * store the provided list by reference, not by making a defensive copy.
+     */
+    @Test
+    public void getShapesShouldReflectChangesInOriginalList() {
+        // Arrange
+        // Create an empty list that will be passed to the ShapeCollection.
+        List<JtsPoint> originalShapesList = new ArrayList<>();
+        SpatialContext spatialContext = SpatialContext.GEO;
+
+        // Create the ShapeCollection.
+        ShapeCollection<JtsPoint> shapeCollection = new ShapeCollection<>(originalShapesList, spatialContext);
+
+        // Act
+        // Modify the original list *after* the ShapeCollection has been created.
+        originalShapesList.add(null);
+
+        // Retrieve the list of shapes from the collection.
+        List<JtsPoint> shapesFromCollection = shapeCollection.getShapes();
+
+        // Assert
+        // The change to the original list should be visible through the ShapeCollection.
+        assertFalse("Collection should not be empty after the original list was modified.", shapesFromCollection.isEmpty());
+        assertEquals("Collection size should reflect the added element.", 1, shapesFromCollection.size());
     }
 }
