@@ -1,18 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class CharSetUtils_ESTestTest20 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSetUtils}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        String[] stringArray0 = new String[7];
-        stringArray0[0] = "Xii8KJ";
-        boolean boolean0 = CharSetUtils.containsAny("A-Za-z", stringArray0);
-        assertFalse(boolean0);
+    /**
+     * Tests that containsAny() returns false when the string to be searched
+     * contains no characters from the provided set.
+     * This test also ensures that null elements within the set array are handled gracefully.
+     */
+    @Test
+    public void containsAnyShouldReturnFalseForNonMatchingSetContainingNulls() {
+        // Arrange: The string to search does not contain any characters from the valid set entries.
+        final String stringToSearch = "A-Za-z";
+        // The set array contains a non-matching set and a null, which should be ignored.
+        final String[] searchSet = {"Xii8KJ", null};
+
+        // Act: Check if the string contains any character from the set.
+        final boolean result = CharSetUtils.containsAny(stringToSearch, searchSet);
+
+        // Assert: The result should be false as there are no matching characters.
+        assertFalse("Expected false because no characters match, and nulls in the set should be ignored.", result);
     }
 }
