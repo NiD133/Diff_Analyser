@@ -1,29 +1,35 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CleaningPathVisitor_ESTestTest17 extends CleaningPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link CleaningPathVisitor}.
+ */
+public class CleaningPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        CountingPathVisitor countingPathVisitor0 = CleaningPathVisitor.withBigIntegerCounters();
-        FileVisitResult fileVisitResult0 = countingPathVisitor0.preVisitDirectory((Path) null, (BasicFileAttributes) null);
-        assertEquals(FileVisitResult.CONTINUE, fileVisitResult0);
+    /**
+     * Tests that preVisitDirectory returns CONTINUE even when given null inputs.
+     * This ensures the visitor is robust and does not throw a NullPointerException
+     * for these edge cases, allowing the file walk to proceed as expected.
+     */
+    @Test
+    public void preVisitDirectoryWithNullInputsShouldReturnContinue() throws IOException {
+        // Arrange: Create a visitor instance. The specific counter type is not
+        // relevant for this test's logic.
+        final CountingPathVisitor visitor = CleaningPathVisitor.withBigIntegerCounters();
+        final Path nullDirectory = null;
+        final BasicFileAttributes nullAttributes = null;
+
+        // Act: Call the method under test with null arguments.
+        final FileVisitResult result = visitor.preVisitDirectory(nullDirectory, nullAttributes);
+
+        // Assert: Verify that the visitor signals to continue the file walk.
+        assertEquals(FileVisitResult.CONTINUE, result);
     }
 }
