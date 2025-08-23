@@ -1,43 +1,53 @@
 package org.apache.commons.compress.utils;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest27 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        File[] fileArray0 = new File[2];
-        MockFile mockFile0 = new MockFile("");
-        fileArray0[0] = (File) mockFile0;
-        fileArray0[1] = (File) mockFile0;
-        SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).close();
+/**
+ * Contains tests for the {@link MultiReadOnlySeekableByteChannel} class.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
+
+    // Rule to create and manage temporary files, ensuring they are cleaned up after tests.
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    /**
+     * Verifies that invoking size() on a channel that has already been closed
+     * throws a ClosedChannelException.
+     */
+    @Test
+    public void sizeShouldThrowExceptionWhenCalledOnClosedChannel() throws IOException {
+        // Arrange: Create a multi-file channel from two temporary files with content.
+        File file1 = tempFolder.newFile("test1.txt");
+        Files.write(file1.toPath(), "content".getBytes(StandardCharsets.UTF_8));
+
+        File file2 = tempFolder.newFile("test2.txt");
+        Files.write(file2.toPath(), "more content".getBytes(StandardCharsets.UTF_8));
+
+        SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forFiles(file1, file2);
+        assertNotNull("Channel should be created successfully", channel);
+
+        // Act: Close the channel before attempting to access its properties.
+        channel.close();
+
+        // Assert: Expect a ClosedChannelException when trying to get the size.
         try {
-            seekableByteChannel0.size();
-            fail("Expecting exception: ClosedChannelException");
-        } catch (ClosedChannelException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
+            channel.size();
+            fail("Expected a ClosedChannelException to be thrown after the channel was closed.");
+        } catch (final ClosedChannelException e) {
+            // This is the expected behavior. The test passes.
         }
     }
 }
