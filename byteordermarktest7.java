@@ -1,31 +1,32 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ByteOrderMarkTestTest7 {
+/**
+ * Tests for {@link ByteOrderMark#hashCode()}.
+ */
+@DisplayName("ByteOrderMark hashCode()")
+public class ByteOrderMarkHashCodeTest {
 
-    private static final ByteOrderMark TEST_BOM_1 = new ByteOrderMark("test1", 1);
-
-    private static final ByteOrderMark TEST_BOM_2 = new ByteOrderMark("test2", 1, 2);
-
-    private static final ByteOrderMark TEST_BOM_3 = new ByteOrderMark("test3", 1, 2, 3);
-
-    /**
-     * Tests {@link ByteOrderMark#hashCode()}
-     */
     @Test
-    void testHashCode() {
-        final int bomClassHash = ByteOrderMark.class.hashCode();
-        assertEquals(bomClassHash + 1, TEST_BOM_1.hashCode(), "hash test1 ");
-        assertEquals(bomClassHash + 3, TEST_BOM_2.hashCode(), "hash test2 ");
-        assertEquals(bomClassHash + 6, TEST_BOM_3.hashCode(), "hash test3 ");
+    @DisplayName("should be calculated as the class hash code plus the sum of its byte values")
+    void hashCodeIsCalculatedFromClassHashAndSumOfBytes() {
+        // This is a white-box test that verifies the specific, non-standard hashCode() implementation.
+        // The implementation calculates the hash code as: ByteOrderMark.class.hashCode() + sum of bytes.
+
+        // Arrange
+        final ByteOrderMark bomWithOneByte = new ByteOrderMark("test1", 1);
+        final ByteOrderMark bomWithTwoBytes = new ByteOrderMark("test2", 1, 2);
+        final ByteOrderMark bomWithThreeBytes = new ByteOrderMark("test3", 1, 2, 3);
+
+        final int classHashCode = ByteOrderMark.class.hashCode();
+
+        // Act & Assert
+        assertEquals(classHashCode + 1, bomWithOneByte.hashCode());
+        assertEquals(classHashCode + (1 + 2), bomWithTwoBytes.hashCode());
+        assertEquals(classHashCode + (1 + 2 + 3), bomWithThreeBytes.hashCode());
     }
 }
