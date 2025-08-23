@@ -1,57 +1,46 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
+
+/**
+ * Tests for {@link TextHelpAppendable}.
+ * This test class focuses on edge cases related to table rendering.
+ */
 public class TextHelpAppendable_ESTestTest89 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test88() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        arrayList0.add(textStyle0);
-        ArrayList<String> arrayList1 = new ArrayList<String>();
-        PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-        TableDefinition tableDefinition0 = TableDefinition.from("", arrayList0, arrayList1, priorityQueue0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendTable(tableDefinition0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 0, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+    /**
+     * Tests that {@link TextHelpAppendable#appendTable(TableDefinition)} throws
+     * an {@link IndexOutOfBoundsException} when the {@link TableDefinition}
+     * specifies more column styles than it has headers. This indicates an
+     * inconsistent table structure that the method should not handle.
+     */
+    @Test(timeout = 4000, expected = IndexOutOfBoundsException.class)
+    public void testAppendTableWithMismatchedStylesAndHeadersThrowsException() throws IOException {
+        // Arrange: Create a TextHelpAppendable that writes to a buffer instead of System.out
+        // to avoid polluting console output during tests.
+        final StringWriter writer = new StringWriter();
+        final TextHelpAppendable helpAppendable = new TextHelpAppendable(writer);
+
+        // Arrange: Define a table with one column style but zero headers. This mismatch
+        // is the condition under test.
+        final List<TextStyle> columnStyles = Collections.singletonList(TextStyle.DEFAULT);
+        final List<String> headers = Collections.emptyList();
+        final Collection<List<String>> tableRows = new PriorityQueue<>();
+        final TableDefinition tableDefinition = TableDefinition.from("Mismatched Table", columnStyles, headers, tableRows);
+
+        // Act: Attempt to append the malformed table. This call is expected to throw
+        // an IndexOutOfBoundsException because the implementation will try to access
+        // headers.get(0) when the headers list is empty.
+        helpAppendable.appendTable(tableDefinition);
+
+        // Assert: The exception is verified by the @Test(expected=...) annotation,
+        // so no explicit assertion is needed here.
     }
 }
