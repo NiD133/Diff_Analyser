@@ -2,40 +2,40 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class DefaultPieDataset_ESTestTest16 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultPieDataset} class, focusing on edge cases of the insertValue method.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DefaultKeyedValuesDataset<Integer> defaultKeyedValuesDataset0 = new DefaultKeyedValuesDataset<Integer>();
-        Integer integer0 = JLayeredPane.DEFAULT_LAYER;
-        defaultKeyedValuesDataset0.setValue(integer0, (Number) integer0);
-        // Undeclared exception!
+    /**
+     * Verifies that insertValue() throws an IndexOutOfBoundsException when trying to
+     * move an existing key to a position that is out of bounds *after* the key has been
+     * internally removed.
+     */
+    @Test
+    public void insertValue_forExistingKeyAtInvalidPosition_throwsIndexOutOfBoundsException() {
+        // Arrange: Create a dataset and add one entry, making its size 1.
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+        final String KEY = "Category A";
+        dataset.setValue(KEY, 100.0);
+        assertEquals("Dataset should have one item after setup", 1, dataset.getItemCount());
+
+        // Act & Assert:
+        // Attempt to "move" the existing key to position 1. The implementation of
+        // insertValue() first removes the existing entry for the key, which reduces
+        // the dataset's size to 0. Then, it tries to add the new entry at the
+        // requested position 1, which is now invalid for an empty dataset.
         try {
-            defaultKeyedValuesDataset0.insertValue(1, integer0, (Number) integer0);
-            fail("Expecting exception: IndexOutOfBoundsException");
+            dataset.insertValue(1, KEY, 200.0);
+            fail("Expected an IndexOutOfBoundsException but none was thrown.");
         } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 1, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
+            // Verify the exception message to confirm it's the expected error.
+            // The message "Index: 1, Size: 0" is characteristic of the underlying ArrayList.
+            String message = e.getMessage();
+            assertNotNull("Exception message should not be null", message);
+            assertTrue("Exception message should contain 'Index: 1'", message.contains("Index: 1"));
+            assertTrue("Exception message should contain 'Size: 0'", message.contains("Size: 0"));
         }
     }
 }
