@@ -1,20 +1,28 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonSetter_ESTestTest27 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Nulls nulls0 = Nulls.DEFAULT;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.construct(nulls0, nulls0);
-        String string0 = jsonSetter_Value0.toString();
-        assertEquals("JsonSetter.Value(valueNulls=DEFAULT,contentNulls=DEFAULT)", string0);
+    /**
+     * Verifies that the toString() method on a JsonSetter.Value instance
+     * returns a clear and accurate string representation of its state.
+     */
+    @Test
+    public void toStringShouldReturnCorrectStringRepresentation() {
+        // Arrange
+        // Create an instance with default values for both valueNulls and contentNulls.
+        JsonSetter.Value jsonSetterValue = JsonSetter.Value.construct(Nulls.DEFAULT, Nulls.DEFAULT);
+        String expectedString = "JsonSetter.Value(valueNulls=DEFAULT,contentNulls=DEFAULT)";
+
+        // Act
+        String actualString = jsonSetterValue.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
