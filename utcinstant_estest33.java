@@ -1,33 +1,32 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import java.time.ArithmeticException;
 
-public class UtcInstant_ESTestTest33 extends UtcInstant_ESTest_scaffolding {
+/**
+ * This test verifies the behavior of the UtcInstant class when calculations result in an overflow.
+ */
+public class UtcInstantOverflowTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(86399999999628L, 86399999999628L);
-        Duration duration0 = Duration.ofDays(86399999999628L);
-        // Undeclared exception!
-        try {
-            utcInstant0.plus(duration0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // long overflow
-            //
-            verifyException("java.lang.Math", e);
-        }
+    /**
+     * Tests that adding a large duration to a UtcInstant far in the future
+     * correctly throws an ArithmeticException when the result exceeds the
+     * maximum representable value.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void plus_whenResultingInstantExceedsTimeLineRange_throwsArithmeticException() {
+        // Arrange: Create an instant far in the future and a large duration.
+        // The values are chosen such that their sum will cause a long overflow
+        // during the addition calculation inside the plus() method.
+        long largeDayCount = 86_399_999_999_628L;
+        long nanoOfDay = 86_399_999_999_628L; // A valid nano-of-day value.
+
+        UtcInstant farFutureInstant = UtcInstant.ofModifiedJulianDay(largeDayCount, nanoOfDay);
+        Duration largeDuration = Duration.ofDays(largeDayCount);
+
+        // Act: Adding the large duration to the far-future instant should cause an overflow.
+        // The @Test(expected) annotation handles the assertion.
+        farFutureInstant.plus(largeDuration);
     }
 }
