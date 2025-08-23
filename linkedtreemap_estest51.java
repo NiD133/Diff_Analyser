@@ -1,33 +1,42 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LinkedTreeMap_ESTestTest51 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link LinkedTreeMap} class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
+public class LinkedTreeMap_ESTestTest51 {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        Integer integer0 = new Integer((-2139));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        Integer integer1 = new Integer((-1109));
-        Integer integer2 = new Integer((-36));
-        linkedTreeMap0.putIfAbsent(integer2, (Integer) null);
-        linkedTreeMap0.find(integer1, true);
-        Integer integer3 = new Integer(1);
-        linkedTreeMap0.putIfAbsent(integer3, integer0);
-        linkedTreeMap0.remove((Object) integer0);
-        assertEquals(3, linkedTreeMap0.size());
+    /**
+     * Tests that the map's size is correctly updated after a series of insertions
+     * and a subsequent removal. This sequence of operations is designed to trigger
+     * the tree's internal rebalancing logic.
+     */
+    @Test
+    public void sizeIsCorrectAfterAddingAndRemovingElements() {
+        // Arrange: Create a map and populate it with a specific sequence of keys
+        // that will cause several internal tree rotations (rebalancing).
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+        Integer keyToRemove = -2139;
+
+        map.putIfAbsent(keyToRemove, -2139);
+        map.putIfAbsent(-36, null);
+
+        // Add an element by calling the internal `find(key, create=true)` method.
+        // This is equivalent to adding a key with a null value if it doesn't exist.
+        map.find(-1109, true);
+
+        map.putIfAbsent(1, -2139);
+
+        // Pre-condition check: The map should have 4 elements before the removal.
+        assertEquals("Map should contain 4 elements before removal", 4, map.size());
+
+        // Act: Remove an element, which will also trigger rebalancing.
+        map.remove(keyToRemove);
+
+        // Assert: Verify that the size is correctly reported as 3 after the removal.
+        assertEquals("Map size should be 3 after removing one element", 3, map.size());
     }
 }
