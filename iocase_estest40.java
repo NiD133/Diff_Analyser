@@ -1,18 +1,27 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest40 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum, focusing on its comparison logic.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        int int0 = iOCase0.checkCompareTo("1bq26gL^", "1bq26gL^");
-        assertEquals(0, int0);
+    /**
+     * Verifies that {@code checkCompareTo()} returns 0 when comparing a string
+     * to itself using case-insensitive rules, indicating equality.
+     */
+    @Test
+    public void checkCompareTo_insensitiveWithIdenticalStrings_shouldReturnZero() {
+        // Arrange
+        final IOCase caseInsensitive = IOCase.INSENSITIVE;
+        final String filename = "MyTestFile.txt";
+
+        // Act
+        final int comparisonResult = caseInsensitive.checkCompareTo(filename, filename);
+
+        // Assert
+        assertEquals("Comparing a string to itself should always result in 0.", 0, comparisonResult);
     }
 }
