@@ -1,20 +1,26 @@
 package com.google.gson.internal;
 
 import static com.google.common.truth.Truth.assertThat;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.math.BigDecimal;
+
 import org.junit.Test;
 
-public class LazilyParsedNumberTestTest1 {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test
-    public void testHashCode() {
-        LazilyParsedNumber n1 = new LazilyParsedNumber("1");
-        LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
-        assertThat(n1Another.hashCode()).isEqualTo(n1.hashCode());
-    }
+  @Test
+  public void hashCode_forEqualObjects_isSame() {
+    // Arrange: Create two LazilyParsedNumber instances with the same underlying string value.
+    // These objects are expected to be equal.
+    LazilyParsedNumber number1 = new LazilyParsedNumber("123");
+    LazilyParsedNumber number2 = new LazilyParsedNumber("123");
+
+    // Act & Assert:
+    // First, confirm that the objects are indeed equal. This makes the hashCode test meaningful.
+    assertThat(number2).isEqualTo(number1);
+
+    // Then, assert that their hash codes are identical, fulfilling the Object.hashCode() contract.
+    assertThat(number2.hashCode()).isEqualTo(number1.hashCode());
+  }
 }
