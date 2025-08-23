@@ -1,27 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.StringReader;
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest13 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for the {@link ProxyReader} class.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        char[] charArray0 = new char[4];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        int int0 = taggedReader0.read(charBuffer0);
-        assertEquals((-1), int0);
+    /**
+     * Tests that reading from an empty underlying reader into a CharBuffer
+     * correctly returns EOF (-1), indicating the end of the stream.
+     */
+    @Test
+    public void readIntoCharBufferShouldReturnEofForEmptyReader() throws IOException {
+        // Arrange
+        // Use TaggedReader as a concrete implementation of the abstract ProxyReader
+        final StringReader emptySourceReader = new StringReader("");
+        final TaggedReader proxyReader = new TaggedReader(emptySourceReader);
+        final CharBuffer destinationBuffer = CharBuffer.allocate(4);
+
+        // Act
+        final int charsRead = proxyReader.read(destinationBuffer);
+
+        // Assert
+        assertEquals("Reading from an empty reader should return EOF", IOUtils.EOF, charsRead);
     }
 }
