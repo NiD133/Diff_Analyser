@@ -1,18 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Minutes_ESTestTest50 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        Minutes minutes0 = Minutes.ONE;
-        boolean boolean0 = minutes0.isGreaterThan(minutes0);
-        assertFalse(boolean0);
+    /**
+     * Tests that isGreaterThan() returns false when a Minutes instance is compared to itself.
+     * A value cannot be greater than itself.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingAnInstanceToItself() {
+        // Arrange
+        Minutes oneMinute = Minutes.ONE;
+
+        // Act & Assert
+        assertFalse("A Minutes instance should not be greater than itself.", oneMinute.isGreaterThan(oneMinute));
     }
 }
