@@ -1,24 +1,38 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest9 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
-        seekableInMemoryByteChannel0.close();
-        seekableInMemoryByteChannel0.truncate(6051L);
-        assertFalse(seekableInMemoryByteChannel0.isOpen());
+/**
+ * Contains tests for the SeekableInMemoryByteChannel class.
+ */
+public class SeekableInMemoryByteChannelTest {
+
+    @Test
+    public void truncateOnClosedChannelShouldBeANoOpAndNotThrowException() throws IOException {
+        // Arrange
+        // The Javadoc for SeekableInMemoryByteChannel.truncate() states it intentionally
+        // violates the SeekableByteChannel contract by NOT throwing an exception on a
+        // closed channel. This test verifies this specific behavior.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(); // Starts with size 0
+        channel.close();
+
+        // Pre-conditions to ensure our initial state is correct
+        assertFalse("Precondition: channel should be closed", channel.isOpen());
+        assertEquals("Precondition: channel size should be 0", 0, channel.size());
+
+        // Act
+        // The core of the test: calling truncate on a closed channel.
+        // This line will cause the test to fail if any exception is thrown.
+        channel.truncate(100L);
+
+        // Assert
+        // Verify that the channel's state remains completely unchanged.
+        assertFalse("Channel should remain closed after calling truncate", channel.isOpen());
+        assertEquals("Size should not change after calling truncate on a closed channel", 0, channel.size());
     }
 }
