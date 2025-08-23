@@ -1,33 +1,36 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
 import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest47 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for the {@link Validate} utility class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        // Undeclared exception!
+    /**
+     * Verifies that Validate.fail() throws a MissingFormatArgumentException
+     * when the format string expects an argument but none is provided.
+     * This behavior is inherited from the underlying String.format() method.
+     */
+    @Test
+    public void failWithMismatchedArgumentsThrowsMissingFormatArgumentException() {
+        // Arrange: A message template that requires one argument.
+        String messageWithSpecifier = "The parameter '%s' must not be null.";
+        Object[] noArguments = new Object[0];
+
         try {
-            Validate.fail("The parameter '%s' must not be null.", objectArray0);
-            fail("Expecting exception: MissingFormatArgumentException");
+            // Act: Call the method with a mismatched number of arguments.
+            Validate.fail(messageWithSpecifier, noArguments);
+            
+            // If this line is reached, the test has failed because no exception was thrown.
+            fail("A MissingFormatArgumentException should have been thrown.");
         } catch (MissingFormatArgumentException e) {
-            //
-            // Format specifier '%s'
-            //
-            verifyException("java.util.Formatter", e);
+            // Assert: Verify the exception is the one we expect.
+            // The message should identify the problematic format specifier.
+            assertEquals("Format specifier '%s'", e.getMessage());
         }
     }
 }
