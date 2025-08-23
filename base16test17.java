@@ -1,62 +1,55 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class Base16TestTest17 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+/**
+ * Tests for the {@link Base16} class, focusing on decoding known Base16 (hex) strings.
+ */
+public class Base16Test {
 
     /**
-     * @return the random.
+     * Provides a stream of arguments for the parameterized test.
+     * Each argument consists of a Base16 encoded string and its expected decoded plain text representation.
+     *
+     * @return A stream of {@link Arguments} for the test.
      */
-    public Random getRandom() {
-        return this.random;
+    private static Stream<Arguments> knownDecodings() {
+        return Stream.of(
+            Arguments.of("54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e", "The quick brown fox jumped over the lazy dogs."),
+            Arguments.of("497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e", "It was the best of times, it was the worst of times."),
+            Arguments.of("687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73", "http://jakarta.apache.org/commmons"),
+            Arguments.of("4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a", "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"),
+            Arguments.of("7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d", "{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }"),
+            Arguments.of("78797a7a7921", "xyzzy!")
+        );
     }
 
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
+    /**
+     * Tests that decoding a Base16 (hex) encoded string produces the correct original string.
+     * This test is parameterized to run for a set of well-known encoded/decoded string pairs.
+     *
+     * @param encodedString       The Base16 encoded input string (uppercase hex).
+     * @param expectedDecodedString The expected plain text string after decoding.
+     */
+    @ParameterizedTest(name = "decoding \"{1}\"")
+    @MethodSource("knownDecodings")
+    void testDecodeWithKnownHexStrings(final String encodedString, final String expectedDecodedString) {
+        // Arrange
+        // Use the default Base16 constructor, which expects an uppercase alphabet, matching our test data.
+        final Base16 base16 = new Base16();
+        final byte[] encodedBytes = encodedString.getBytes(StandardCharsets.UTF_8);
 
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
+        // Act
+        final byte[] decodedBytes = base16.decode(encodedBytes);
+        final String actualDecodedString = new String(decodedBytes, StandardCharsets.UTF_8);
 
-    @Test
-    void testKnownDecodings() {
-        assertEquals("The quick brown fox jumped over the lazy dogs.", new String(new Base16(true).decode("54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e".getBytes(CHARSET_UTF8))));
-        assertEquals("It was the best of times, it was the worst of times.", new String(new Base16(true).decode("497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e".getBytes(CHARSET_UTF8))));
-        assertEquals("http://jakarta.apache.org/commmons", new String(new Base16(true).decode("687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73".getBytes(CHARSET_UTF8))));
-        assertEquals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz", new String(new Base16(true).decode("4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a".getBytes(CHARSET_UTF8))));
-        assertEquals("{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }", new String(new Base16(true).decode("7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d".getBytes(CHARSET_UTF8))));
-        assertEquals("xyzzy!", new String(new Base16(true).decode("78797a7a7921".getBytes(CHARSET_UTF8))));
+        // Assert
+        assertEquals(expectedDecodedString, actualDecodedString);
     }
 }
