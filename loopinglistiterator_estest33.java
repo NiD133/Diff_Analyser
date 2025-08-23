@@ -1,34 +1,29 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link LoopingListIterator}.
+ * This test focuses on the behavior of the remove() method.
+ */
 public class LoopingListIterator_ESTestTest33 extends LoopingListIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LoopingListIterator<Object> loopingListIterator0 = new LoopingListIterator<Object>(linkedList0);
-        // Undeclared exception!
-        try {
-            loopingListIterator0.remove();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+    /**
+     * Tests that calling remove() before a call to next() or previous()
+     * results in an IllegalStateException, as per the ListIterator contract.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionOnRemoveBeforeNextOrPrevious() {
+        // Arrange: Create an iterator over an empty list. The state is "before the first element".
+        final List<Object> emptyList = new LinkedList<>();
+        final LoopingListIterator<Object> iterator = new LoopingListIterator<>(emptyList);
+
+        // Act: Attempt to remove an element without having called next() or previous().
+        iterator.remove();
+
+        // Assert: The @Test(expected) annotation verifies that an IllegalStateException is thrown.
     }
 }
