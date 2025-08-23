@@ -1,24 +1,27 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest31 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        Integer integer0 = new Integer(9);
-        EndpointPair<Object> endpointPair0 = EndpointPair.unordered((Object) locale_Category0, (Object) integer0);
-        Locale.Category locale_Category1 = Locale.Category.DISPLAY;
-        EndpointPair<Object> endpointPair1 = EndpointPair.unordered((Object) integer0, (Object) locale_Category1);
-        boolean boolean0 = endpointPair1.equals(endpointPair0);
-        assertTrue(boolean0);
+    @Test
+    public void unordered_equals_isOrderIndependent() {
+        // Arrange: Define two distinct nodes for the endpoint pair.
+        String nodeU = "U";
+        String nodeV = "V";
+
+        // Act: Create two unordered EndpointPairs with the same nodes but in opposite order.
+        EndpointPair<String> pair1 = EndpointPair.unordered(nodeU, nodeV);
+        EndpointPair<String> pair2 = EndpointPair.unordered(nodeV, nodeU);
+
+        // Assert: The two pairs should be considered equal, as node order doesn't matter
+        // for unordered pairs. The hashCode must also be consistent with equals.
+        assertEquals(pair1, pair2);
+        assertEquals("Hash codes must be equal for equal objects.", pair1.hashCode(), pair2.hashCode());
     }
 }
