@@ -1,25 +1,27 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueueInputStream_ESTestTest4 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link QueueInputStream}.
+ */
+public class QueueInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        QueueInputStream queueInputStream0 = new QueueInputStream();
-        byte[] byteArray0 = new byte[4];
-        int int0 = queueInputStream0.read(byteArray0, 1, 1);
-        assertEquals((-1), int0);
+    /**
+     * Tests that attempting to read from an empty QueueInputStream into a byte array
+     * immediately returns -1, indicating the end of the stream.
+     */
+    @Test
+    public void readIntoByteArrayFromEmptyStreamShouldReturnEOF() {
+        // Arrange: Create an empty input stream and a buffer to read into.
+        final QueueInputStream inputStream = new QueueInputStream();
+        final byte[] buffer = new byte[10];
+
+        // Act: Attempt to read from the empty stream.
+        final int bytesRead = inputStream.read(buffer, 0, buffer.length);
+
+        // Assert: Verify that the read operation returns -1 (EOF).
+        assertEquals("Reading from an empty stream should return -1.", -1, bytesRead);
     }
 }
