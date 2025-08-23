@@ -1,52 +1,43 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
 import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Symmetry454Chronology_ESTestTest24 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Test for {@link Symmetry454Chronology} focusing on invalid era handling.
+ */
+public class Symmetry454ChronologyInvalidEraTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        JapaneseEra japaneseEra0 = JapaneseEra.SHOWA;
-        // Undeclared exception!
+    /**
+     * Verifies that dateYearDay() throws a ClassCastException when provided with an era
+     * from a different calendar system. The Symmetry454Chronology is designed to work
+     * only with the ISO calendar's eras (CE and BCE).
+     */
+    @Test
+    public void dateYearDay_withNonIsoEra_throwsClassCastException() {
+        // Arrange: Set up the chronology and an era that is incompatible with it.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        Era invalidEra = JapaneseEra.SHOWA;
+        int yearOfEra = 10; // An arbitrary, valid year for the test.
+        int dayOfYear = 100; // An arbitrary, valid day of the year.
+
+        // Act & Assert: Attempting to create a date should fail with a ClassCastException.
         try {
-            symmetry454Chronology0.dateYearDay((Era) japaneseEra0, (-2315), (-2315));
-            fail("Expecting exception: ClassCastException");
+            chronology.dateYearDay(invalidEra, yearOfEra, dayOfYear);
+            fail("Expected a ClassCastException to be thrown for an incompatible era type.");
         } catch (ClassCastException e) {
-            //
-            // Invalid era: Showa
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry454Chronology", e);
+            // This is the expected outcome.
+            // For a more robust test, we can verify that the exception message
+            // correctly identifies the invalid era that was used.
+            String expectedMessageContent = invalidEra.toString();
+            assertTrue(
+                "The exception message should contain the name of the invalid era.",
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
