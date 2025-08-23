@@ -1,40 +1,33 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
+import static org.junit.Assert.assertFalse;
+
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+// The test class structure is kept from the original to show the context.
 public class CountingPathVisitor_ESTestTest9 extends CountingPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters();
-        MockFile mockFile0 = new MockFile("96UM\"T>:Dps");
-        Path path0 = mockFile0.toPath();
-        boolean boolean0 = accumulatorPathVisitor0.accept(path0, (BasicFileAttributes) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that the accept method returns false when passed null BasicFileAttributes.
+     * This is an edge case, as a standard file system walk would always provide
+     * non-null attributes for this method call.
+     */
+    @Test
+    public void acceptShouldReturnFalseWhenAttributesAreNull() {
+        // Arrange
+        // Create a visitor with default (accept-all) filters. The method under test,
+        // accept(), is defined in CountingPathVisitor.
+        final CountingPathVisitor visitor = CountingPathVisitor.withBigIntegerCounters();
+        final Path nonExistentPath = new MockFile("any-file-or-directory").toPath();
+
+        // Act
+        // Call the protected 'accept' method directly with null attributes.
+        final boolean isAccepted = visitor.accept(nonExistentPath, null);
+
+        // Assert
+        assertFalse("The path should not be accepted when BasicFileAttributes are null.", isAccepted);
     }
 }
