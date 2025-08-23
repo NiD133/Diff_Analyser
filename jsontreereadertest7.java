@@ -1,28 +1,26 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+
 import com.google.gson.JsonObject;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeReaderTestTest7 {
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test
-    public void testHasNext_endOfDocument() throws IOException {
-        JsonTreeReader reader = new JsonTreeReader(new JsonObject());
-        reader.beginObject();
-        reader.endObject();
-        assertThat(reader.hasNext()).isFalse();
-    }
+  @Test
+  public void hasNext_shouldReturnFalse_afterConsumingRootElement() throws IOException {
+    // Arrange: Create a reader for an empty JSON object, which is our root element.
+    JsonTreeReader reader = new JsonTreeReader(new JsonObject());
+
+    // Act: Consume the entire root element by reading its beginning and end.
+    reader.beginObject();
+    reader.endObject();
+
+    // Assert: hasNext() should now return false, as there are no more elements to read.
+    assertThat(reader.hasNext()).isFalse();
+  }
 }
