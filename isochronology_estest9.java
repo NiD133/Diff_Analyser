@@ -1,20 +1,46 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ISOChronology_ESTestTest9 extends ISOChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-84));
-        ISOChronology iSOChronology0 = ISOChronology.getInstance(dateTimeZone0);
-        iSOChronology0.hashCode();
+/**
+ * Unit tests for the hashCode() method of {@link ISOChronology}.
+ */
+public class ISOChronologyHashCodeTest {
+
+    @Test
+    public void hashCode_shouldBeBasedOnTimeZone() {
+        // The hashCode() of an ISOChronology instance is determined by its time zone.
+        // This test verifies that two instances with the same time zone have the same
+        // hash code, and two instances with different time zones have different hash codes.
+
+        // Arrange: Create chronologies with specific time zones.
+        DateTimeZone londonZone = DateTimeZone.forID("Europe/London");
+        ISOChronology chronologyInLondon1 = ISOChronology.getInstance(londonZone);
+        ISOChronology chronologyInLondon2 = ISOChronology.getInstance(londonZone);
+
+        DateTimeZone parisZone = DateTimeZone.forID("Europe/Paris");
+        ISOChronology chronologyInParis = ISOChronology.getInstance(parisZone);
+
+        // Act & Assert
+
+        // 1. Test for consistency:
+        // Chronologies for the same time zone are equal and must have the same hash code.
+        assertEquals(
+            "Hash code should be consistent for the same time zone",
+            chronologyInLondon1.hashCode(),
+            chronologyInLondon2.hashCode()
+        );
+
+        // 2. Test for variance:
+        // Chronologies for different time zones are not equal and should have different hash codes.
+        assertNotEquals(
+            "Hash code should be different for different time zones",
+            chronologyInLondon1.hashCode(),
+            chronologyInParis.hashCode()
+        );
     }
 }
