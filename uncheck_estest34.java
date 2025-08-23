@@ -1,37 +1,26 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest34 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        // Undeclared exception!
-        try {
-            Uncheck.apply((IOBiFunction<String, String, String>) null, "", "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.function.Uncheck", e);
-        }
+    /**
+     * Tests that {@link Uncheck#apply(IOBiFunction, Object, Object)} throws a
+     * {@link NullPointerException} when the function argument is null.
+     */
+    @Test
+    public void applyWithNullBiFunctionShouldThrowNullPointerException() {
+        // The Uncheck.apply method is expected to delegate to the provided function.
+        // If the function itself is null, a NullPointerException should be thrown
+        // before any I/O operation can be attempted.
+        assertThrows(NullPointerException.class, () -> {
+            // The arguments "input1" and "input2" are placeholders; their values do not affect this test.
+            Uncheck.apply((IOBiFunction<String, String, String>) null, "input1", "input2");
+        });
     }
 }
