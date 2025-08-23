@@ -1,36 +1,41 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest16 extends ShapeCollection_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        GeodesicSphereDistCalc.LawOfCosines geodesicSphereDistCalc_LawOfCosines0 = new GeodesicSphereDistCalc.LawOfCosines();
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        Rectangle rectangle0 = shapeCollection0.getBoundingBox();
-        geodesicSphereDistCalc_LawOfCosines0.calcBoxByDistFromPt(pointImpl0, 0.0, spatialContext0, rectangle0);
-        Rectangle rectangle1 = shapeCollection0.getBoundingBox();
-        assertEquals(0.0, rectangle1.getMaxX(), 0.01);
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test suite contains tests for the {@link ShapeCollection} class.
+ * The original test was auto-generated and tested an implementation side-effect.
+ * This version has been refactored for clarity and to test the class's public contract.
+ */
+public class ShapeCollection_ESTestTest16 {
+
+    /**
+     * Verifies that the bounding box of an empty ShapeCollection is an "empty" rectangle.
+     * An empty rectangle is defined as one with no area, represented by NaN coordinates.
+     */
+    @Test
+    public void getBoundingBoxForEmptyCollectionShouldReturnEmptyRectangle() {
+        // Arrange
+        SpatialContext geoContext = SpatialContext.GEO;
+        List<Shape> emptyShapeList = Collections.emptyList();
+        ShapeCollection<Shape> emptyCollection = new ShapeCollection<>(emptyShapeList, geoContext);
+
+        // Act
+        Rectangle boundingBox = emptyCollection.getBoundingBox();
+
+        // Assert
+        // The bounding box of an empty collection should have no area and its coordinates should be NaN.
+        assertFalse("Bounding box of an empty collection should not have area", boundingBox.hasArea());
+        assertTrue("MinX should be NaN for an empty bounding box", Double.isNaN(boundingBox.getMinX()));
+        assertTrue("MaxX should be NaN for an empty bounding box", Double.isNaN(boundingBox.getMaxX()));
+        assertTrue("MinY should be NaN for an empty bounding box", Double.isNaN(boundingBox.getMinY()));
+        assertTrue("MaxY should be NaN for an empty bounding box", Double.isNaN(boundingBox.getMaxY()));
     }
 }
