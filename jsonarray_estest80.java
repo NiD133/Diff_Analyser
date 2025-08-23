@@ -1,22 +1,20 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest80 extends JsonArray_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonArray}.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test79() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        int int0 = jsonArray0.size();
-        assertEquals(0, int0);
+    @Test
+    public void size_shouldReturnZero_forNewJsonArray() {
+        // Arrange
+        JsonArray emptyArray = new JsonArray();
+
+        // Act & Assert
+        assertEquals(0, emptyArray.size());
     }
 }
