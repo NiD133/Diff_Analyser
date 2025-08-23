@@ -1,34 +1,40 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
 import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
 import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link ByteUtils#toLittleEndian(ByteUtils.ByteConsumer, long, int)}.
+ */
 public class ByteUtilsTestTest21 {
 
     @Test
-    void testToLittleEndianToConsumer() throws IOException {
-        final byte[] byteArray;
-        final byte[] expected = { 2, 3, 4 };
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            toLittleEndian(new OutputStreamByteConsumer(bos), 2 + 3 * 256 + 4 * 256 * 256, 3);
-            byteArray = bos.toByteArray();
-            assertArrayEquals(expected, byteArray);
+    @DisplayName("toLittleEndian with an OutputStreamByteConsumer should write the correct little-endian byte sequence")
+    void toLittleEndianWithConsumerWritesCorrectBytes() throws IOException {
+        // Arrange
+        // The number 262914 is 0x040302 in hexadecimal.
+        final long valueToConvert = 0x040302L;
+        final int numberOfBytes = 3;
+
+        // In little-endian format, the least significant byte (0x02) comes first.
+        final byte[] expectedBytes = { 0x02, 0x03, 0x04 };
+
+        // Act
+        final byte[] actualBytes;
+        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            final OutputStreamByteConsumer consumer = new OutputStreamByteConsumer(outputStream);
+            toLittleEndian(consumer, valueToConvert, numberOfBytes);
+            actualBytes = outputStream.toByteArray();
         }
-        assertArrayEquals(expected, byteArray);
+
+        // Assert
+        assertArrayEquals(expectedBytes, actualBytes,
+            "The byte sequence should be in little-endian order.");
     }
 }
