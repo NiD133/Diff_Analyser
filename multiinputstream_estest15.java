@@ -1,31 +1,31 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest15 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        LinkedList<ByteSource> linkedList0 = new LinkedList<ByteSource>();
-        byte[] byteArray0 = new byte[8];
-        ByteSource byteSource0 = ByteSource.wrap(byteArray0);
-        linkedList0.add(byteSource0);
-        Iterator<ByteSource> iterator0 = linkedList0.descendingIterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        long long0 = multiInputStream0.skip((-896L));
-        assertEquals(0L, long0);
+    @Test
+    public void skip_withNegativeArgument_returnsZero() throws IOException {
+        // Arrange: According to the InputStream.skip() contract, a negative argument
+        // should result in 0 bytes being skipped.
+        byte[] data = new byte[10];
+        ByteSource byteSource = ByteSource.wrap(data);
+        Iterator<ByteSource> iterator = Collections.singletonList(byteSource).iterator();
+        
+        MultiInputStream multiInputStream = new MultiInputStream(iterator);
+
+        // Act
+        long bytesSkipped = multiInputStream.skip(-500L);
+
+        // Assert
+        assertEquals("Calling skip() with a negative number should not skip any bytes.", 0L, bytesSkipped);
     }
 }
