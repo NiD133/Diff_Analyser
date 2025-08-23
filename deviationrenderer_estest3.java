@@ -1,36 +1,40 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Contains tests for the property accessors of the {@link DeviationRenderer} class.
+ *
+ * Note: The original test class name 'DeviationRenderer_ESTestTest3' and its
+ * scaffolding are preserved as they might be part of a larger, automatically
+ * generated test suite.
+ */
 public class DeviationRenderer_ESTestTest3 extends DeviationRenderer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        DeviationStepRenderer deviationStepRenderer0 = new DeviationStepRenderer(false, false);
-        assertEquals(0.5F, deviationStepRenderer0.getAlpha(), 0.01F);
-        deviationStepRenderer0.setAlpha(0.0F);
-        assertEquals(0.0F, deviationStepRenderer0.getAlpha(), 0.01F);
+    /**
+     * Verifies that the getAlpha() and setAlpha() methods for the renderer's
+     * transparency level function correctly.
+     * <p>
+     * This test first checks the default alpha value of a newly instantiated renderer.
+     * It then sets a new value and confirms that the getter returns the updated value.
+     */
+    @Test
+    public void testAlphaPropertyGetterAndSetter() {
+        // Arrange: Create an instance of a DeviationRenderer subclass.
+        // The original test uses DeviationStepRenderer, which is a valid way
+        // to test the inherited functionality from the DeviationRenderer base class.
+        DeviationRenderer renderer = new DeviationStepRenderer(false, false);
+
+        // Assert: Check that the default alpha value is 0.5F.
+        assertEquals("The default alpha value should be 0.5F.",
+                0.5F, renderer.getAlpha(), 0.01F);
+
+        // Act: Set a new alpha value.
+        renderer.setAlpha(0.0F);
+
+        // Assert: Verify that the alpha value was updated correctly.
+        assertEquals("The alpha value should have been updated to 0.0F.",
+                0.0F, renderer.getAlpha(), 0.01F);
     }
 }
