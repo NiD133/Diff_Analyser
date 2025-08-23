@@ -1,44 +1,62 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SecondsTestTest22 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds#minus(int)} method.
+ */
+class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    void minus_shouldSubtractValueAndReturnNewInstance() {
+        // Arrange
+        final Seconds twoSeconds = Seconds.seconds(2);
+        final int valueToSubtract = 3;
+        final int expectedSeconds = -1;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        final Seconds result = twoSeconds.minus(valueToSubtract);
+
+        // Assert
+        assertEquals(expectedSeconds, result.getSeconds(), "2 seconds - 3 should be -1 seconds");
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
+    @Test
+    void minus_shouldNotChangeOriginalInstance() {
+        // Arrange
+        final Seconds twoSeconds = Seconds.seconds(2);
+        final int originalValue = twoSeconds.getSeconds();
+
+        // Act
+        // The result of the operation is intentionally ignored to test immutability.
+        twoSeconds.minus(3);
+
+        // Assert
+        assertEquals(originalValue, twoSeconds.getSeconds(), "Original Seconds instance must be immutable");
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    void minus_whenSubtractingZero_shouldReturnEqualInstance() {
+        // Arrange
+        final Seconds oneSecond = Seconds.ONE;
+
+        // Act
+        final Seconds result = oneSecond.minus(0);
+
+        // Assert
+        assertEquals(oneSecond.getSeconds(), result.getSeconds(), "Subtracting zero should not change the value");
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test
+    void minus_whenResultUnderflows_shouldThrowArithmeticException() {
+        // Arrange
+        final Seconds minSeconds = Seconds.MIN_VALUE;
 
-    public void testMinus_int() {
-        Seconds test2 = Seconds.seconds(2);
-        Seconds result = test2.minus(3);
-        assertEquals(2, test2.getSeconds());
-        assertEquals(-1, result.getSeconds());
-        assertEquals(1, Seconds.ONE.minus(0).getSeconds());
-        try {
-            Seconds.MIN_VALUE.minus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act & Assert
+        assertThrows(ArithmeticException.class, () -> {
+            minSeconds.minus(1);
+        }, "Subtracting 1 from MIN_VALUE should cause an integer underflow");
     }
 }
