@@ -1,18 +1,31 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest26 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Weeks weeks0 = Weeks.MAX_VALUE;
-        Weeks weeks1 = weeks0.dividedBy(888);
-        assertEquals(2418337, weeks1.getWeeks());
+    @Test
+    public void dividedBy_whenDividingMaxValueByPositiveInteger_returnsCorrectlyTruncatedResult() {
+        // Arrange
+        final Weeks maxWeeks = Weeks.MAX_VALUE; // Represents Integer.MAX_VALUE (2,147,483,647) weeks
+        final int divisor = 888;
+
+        // The expected result is based on integer division, where the fractional part is discarded.
+        // 2,147,483,647 / 888 = 2,418,337.43... which truncates to 2,418,337
+        final int expectedWeeks = 2418337;
+
+        // Act
+        final Weeks result = maxWeeks.dividedBy(divisor);
+
+        // Assert
+        assertEquals(
+            "Division of MAX_VALUE weeks should be correctly truncated",
+            expectedWeeks,
+            result.getWeeks()
+        );
     }
 }
