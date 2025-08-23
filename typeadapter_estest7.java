@@ -1,34 +1,36 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest7 extends TypeAdapter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        // Undeclared exception!
+/**
+ * Tests for the inner class {@link Gson.FutureTypeAdapter}.
+ */
+public class GsonFutureTypeAdapterTest {
+
+    /**
+     * Verifies that calling {@code write} on a {@link Gson.FutureTypeAdapter} before its
+     * delegate has been set results in an {@link IllegalStateException}. This is a key
+     * mechanism for detecting and handling cyclic dependencies during type adapter creation.
+     */
+    @Test
+    public void writeOnUnresolvedAdapterShouldThrowIllegalStateException() {
+        // Arrange: Create a FutureTypeAdapter that has not been resolved (i.e., no delegate is set).
+        Gson.FutureTypeAdapter<Object> futureAdapter = new Gson.FutureTypeAdapter<>();
+
         try {
-            gson_FutureTypeAdapter0.write((JsonWriter) null, (Object) null);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Adapter for type with cyclic dependency has been used before dependency has been resolved
-            //
-            verifyException("com.google.gson.Gson$FutureTypeAdapter", e);
+            // Act: Attempt to use the adapter for writing. Since the delegate is not set,
+            // this is expected to fail.
+            futureAdapter.write(null, null);
+            fail("Expected an IllegalStateException to be thrown, but the method completed successfully.");
+        } catch (IllegalStateException expected) {
+            // Assert: Verify that the exception has the expected message.
+            String expectedMessage = "Adapter for type with cyclic dependency has been used "
+                                   + "before dependency has been resolved";
+            assertEquals(expectedMessage, expected.getMessage());
         }
     }
 }
