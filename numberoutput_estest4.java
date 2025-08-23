@@ -1,26 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest4 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on edge cases and invalid inputs.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        char[] charArray0 = new char[8];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(9007199254740992000L, charArray0, (-2118));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -2118
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with a negative offset
+     * correctly throws an {@link ArrayIndexOutOfBoundsException}.
+     * The method must validate the offset parameter before attempting to write to the buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLong_shouldThrowException_whenOffsetIsNegative() {
+        // Arrange: Define the conditions for the test.
+        // A buffer of any reasonable size is sufficient.
+        char[] buffer = new char[20];
+        // The specific long value is irrelevant for this boundary check.
+        long anyValue = 123L;
+        // Use the simplest invalid case for a negative offset.
+        int negativeOffset = -1;
+
+        // Act: Call the method under test with invalid input.
+        // The @Test(expected=...) annotation will automatically handle the assertion.
+        NumberOutput.outputLong(anyValue, buffer, negativeOffset);
     }
 }
