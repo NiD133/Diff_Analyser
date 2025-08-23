@@ -1,26 +1,24 @@
 package org.jfree.chart.labels;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IntervalCategoryToolTipGenerator_ESTestTest8 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IntervalCategoryToolTipGenerator} class.
+ */
+public class IntervalCategoryToolTipGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
-        boolean boolean0 = intervalCategoryToolTipGenerator0.equals(intervalCategoryToolTipGenerator0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_withSameInstance_shouldReturnTrue() {
+        // Arrange
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+
+        // Act & Assert
+        // According to the Java contract for equals(), an object must be equal to itself.
+        assertTrue("An object should be equal to itself.", generator.equals(generator));
     }
 }
