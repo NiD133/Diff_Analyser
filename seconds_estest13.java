@@ -2,22 +2,41 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest13 extends Seconds_ESTest_scaffolding {
+/**
+ * Test suite for arithmetic operations in the {@link Seconds} class.
+ */
+public class SecondsArithmeticTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Weeks weeks0 = Weeks.TWO;
-        Days days0 = weeks0.toStandardDays();
-        Seconds seconds0 = days0.toStandardSeconds();
-        Seconds seconds1 = seconds0.plus((-2147138048));
-        Days days1 = seconds1.toStandardDays();
-        assertEquals(1209600, seconds0.getSeconds());
-        assertEquals((-2145928448), seconds1.getSeconds());
-        assertEquals((-24837), days1.getDays());
+    /**
+     * Tests that adding a large negative number of seconds to an initial value,
+     * and then converting the result to standard days, produces the correct outcome.
+     * This verifies the chain of operations: plus() -> toStandardDays().
+     */
+    @Test
+    public void testPlusWithLargeNegativeValueThenConvertToDays() {
+        // Arrange
+        // Start with the number of seconds in two standard weeks.
+        Seconds twoWeeksInSeconds = Seconds.standardSecondsIn(Weeks.TWO);
+        // Sanity check the initial value: 2 weeks * 7 days/week * 24 hours/day * 3600 sec/hour = 1,209,600
+        assertEquals(1_209_600, twoWeeksInSeconds.getSeconds());
+
+        // Define a large negative value to add.
+        int secondsToAdd = -2147138048;
+
+        // Calculate the expected results to avoid magic numbers in assertions.
+        int expectedSecondsAfterAddition = 1_209_600 + secondsToAdd; // -2145928448
+        final int SECONDS_PER_STANDARD_DAY = 86400; // 24 * 60 * 60
+        int expectedDaysAfterConversion = expectedSecondsAfterAddition / SECONDS_PER_STANDARD_DAY; // -24837
+
+        // Act
+        Seconds resultAfterAddition = twoWeeksInSeconds.plus(secondsToAdd);
+        Days finalResultInDays = resultAfterAddition.toStandardDays();
+
+        // Assert
+        assertEquals("The result of adding the negative value should be correct",
+                expectedSecondsAfterAddition, resultAfterAddition.getSeconds());
+        assertEquals("The final conversion to days should be correct",
+                expectedDaysAfterConversion, finalResultInDays.getDays());
     }
 }
