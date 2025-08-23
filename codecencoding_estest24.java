@@ -1,37 +1,34 @@
 package org.apache.commons.compress.harmony.pack200;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CodecEncoding_ESTestTest24 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * Test suite for the {@link CodecEncoding} class, focusing on its exception handling.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        // Undeclared exception!
-        try {
-            CodecEncoding.getCodec(181, (InputStream) null, (Codec) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.pack200.CodecEncoding", e);
-        }
+    /**
+     * Verifies that {@code CodecEncoding.getCodec()} throws a {@code NullPointerException}
+     * when a null {@code InputStream} is provided for an encoding that requires reading
+     * from the stream.
+     *
+     * <p>The encoding value 181 is chosen because it falls into a range (148-188) that
+     * mandates reading additional data from the input stream to define the codec.
+     * Passing a null stream under these conditions should result in an immediate
+     * {@code NullPointerException}.</p>
+     *
+     * @throws Exception to allow checked exceptions from the method under test to propagate,
+     *                   which is standard practice in test methods.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getCodecShouldThrowNullPointerExceptionForNullStreamWhenRequired() throws Exception {
+        // Arrange: Define an encoding value that requires stream access.
+        final int encodingThatRequiresStream = 181;
+        final InputStream nullInputStream = null;
+        final Codec defaultCodec = null; // This argument is not relevant for this specific failure path.
+
+        // Act & Assert: This call is expected to throw a NullPointerException.
+        CodecEncoding.getCodec(encodingThatRequiresStream, nullInputStream, defaultCodec);
     }
 }
