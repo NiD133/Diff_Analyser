@@ -1,49 +1,45 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
+import static org.junit.Assert.fail;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedSortedMap_ESTestTest14 extends TransformedSortedMap_ESTest_scaffolding {
+/**
+ * Tests for edge cases in {@link TransformedSortedMap}.
+ */
+public class TransformedSortedMapTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        TreeMap<Object, Predicate<Integer>> treeMap0 = new TreeMap<Object, Predicate<Integer>>();
-        TransformedSortedMap<Object, Predicate<Integer>> transformedSortedMap0 = TransformedSortedMap.transformingSortedMap((SortedMap<Object, Predicate<Integer>>) treeMap0, (Transformer<? super Object, ?>) null, (Transformer<? super Predicate<Integer>, ? extends Predicate<Integer>>) null);
-        transformedSortedMap0.map = (Map<Object, Predicate<Integer>>) transformedSortedMap0;
-        // Undeclared exception!
+    /**
+     * Tests that creating a TransformedSortedMap from another one that has a circular
+     * reference to itself results in a StackOverflowError.
+     *
+     * This scenario can occur if the protected 'map' field is manually manipulated.
+     * The factory method {@code transformingSortedMap} internally calls methods on the
+     * map being decorated, leading to infinite recursion if the map decorates itself.
+     */
+    @Test
+    public void testDecoratingMapWithCircularReferenceThrowsStackOverflowError() {
+        // Arrange
+        // 1. Create a base map to initialize the TransformedSortedMap.
+        final SortedMap<String, String> baseMap = new TreeMap<>();
+        final TransformedSortedMap<String, String> circularMap =
+            TransformedSortedMap.transformingSortedMap(baseMap, null, null);
+
+        // 2. Create a circular reference by making the decorated map point to the decorator itself.
+        // This is a non-standard setup for testing purposes, requiring access to the protected 'map' field.
+        circularMap.map = circularMap;
+
+        // Act & Assert
+        // 3. Attempting to decorate the map that now contains a circular reference.
+        // This should cause infinite recursion and result in a StackOverflowError.
         try {
-            TransformedSortedMap.transformedSortedMap((SortedMap<Object, Predicate<Integer>>) transformedSortedMap0, (Transformer<? super Object, ?>) null, (Transformer<? super Predicate<Integer>, ? extends Predicate<Integer>>) null);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            TransformedSortedMap.transformingSortedMap(circularMap, (Transformer<String, String>) null, (Transformer<String, String>) null);
+            fail("A StackOverflowError was expected but not thrown.");
+        } catch (final StackOverflowError e) {
+            // This is the expected outcome, so the test passes.
         }
     }
 }
