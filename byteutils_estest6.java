@@ -1,35 +1,35 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class ByteUtils_ESTestTest6 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        ByteUtils.toLittleEndian(byteArray0, (long) (byte) (-10), 8, (-2448));
-        assertEquals(2, byteArray0.length);
+    /**
+     * Tests that toLittleEndian does not write to the buffer when the provided length is negative.
+     * The internal loop for writing bytes should not execute, leaving the buffer unmodified.
+     */
+    @Test
+    public void toLittleEndianWithNegativeLengthShouldNotModifyBuffer() {
+        // Arrange
+        // A buffer initialized with default zero values.
+        byte[] buffer = new byte[4];
+        // An identical buffer to verify that the original is not modified.
+        byte[] expectedBuffer = new byte[4];
+
+        final long valueToWrite = 0xDEADBEEFL; // An arbitrary non-zero value.
+        final int offset = 0;                  // A valid offset.
+        final int negativeLength = -1;         // The key condition being tested.
+
+        // Act
+        // Attempt to write to the buffer with a negative length.
+        ByteUtils.toLittleEndian(buffer, valueToWrite, offset, negativeLength);
+
+        // Assert
+        // The buffer should remain unchanged because the negative length prevents any write operations.
+        assertArrayEquals("Buffer should not be modified for a negative length", expectedBuffer, buffer);
     }
 }
