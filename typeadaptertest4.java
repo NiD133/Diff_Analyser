@@ -2,67 +2,60 @@ package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
+
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import org.junit.Test;
 
-public class TypeAdapterTestTest4 {
+/**
+ * Tests for exception handling in {@link TypeAdapter} convenience methods.
+ */
+public class TypeAdapterWriteExceptionTest {
 
-    private static final TypeAdapter<String> assertionErrorAdapter = new TypeAdapter<>() {
+  // A specific exception instance to be thrown and then verified in assertions.
+  private static final IOException CAUSE_EXCEPTION = new IOException("test exception");
 
+  /**
+   * A test-only TypeAdapter that unconditionally throws an {@link IOException} during serialization.
+   * The read method is designed to fail loudly if it is ever called.
+   */
+  private static final TypeAdapter<Integer> THROWING_ADAPTER =
+      new TypeAdapter<>() {
         @Override
-        public void write(JsonWriter out, String value) {
-            throw new AssertionError("unexpected call");
+        public void write(JsonWriter out, Integer value) throws IOException {
+          throw CAUSE_EXCEPTION;
         }
 
         @Override
-        public String read(JsonReader in) {
-            throw new AssertionError("unexpected call");
+        public Integer read(JsonReader in) {
+          throw new AssertionError("read should not be called by this test");
         }
+      };
 
-        @Override
-        public String toString() {
-            return "assertionErrorAdapter";
-        }
-    };
+  /**
+   * Verifies that {@link TypeAdapter#toJson(Object)} wraps an {@link IOException} from the underlying
+   * {@link TypeAdapter#write(JsonWriter, Object)} method in a {@link JsonIOException}.
+   */
+  @Test
+  public void toJson_whenWriteThrowsIOException_wrapsInJsonIOException() {
+    // The value '1' is arbitrary and does not affect the test outcome
+    JsonIOException actualException =
+        assertThrows(JsonIOException.class, () -> THROWING_ADAPTER.toJson(1));
 
-    private static final TypeAdapter<String> adapter = new TypeAdapter<>() {
+    assertThat(actualException).hasCauseThat().isSameInstanceAs(CAUSE_EXCEPTION);
+  }
 
-        @Override
-        public void write(JsonWriter out, String value) throws IOException {
-            out.value(value);
-        }
+  /**
+   * Verifies that {@link TypeAdapter#toJsonTree(Object)} wraps an {@link IOException} from the
+   * underlying {@link TypeAdapter#write(JsonWriter, Object)} method in a {@link JsonIOException}.
+   */
+  @Test
+  public void toJsonTree_whenWriteThrowsIOException_wrapsInJsonIOException() {
+    // The value '1' is arbitrary and does not affect the test outcome
+    JsonIOException actualException =
+        assertThrows(JsonIOException.class, () -> THROWING_ADAPTER.toJsonTree(1));
 
-        @Override
-        public String read(JsonReader in) throws IOException {
-            return in.nextString();
-        }
-    };
-
-    /**
-     * Tests behavior when {@link TypeAdapter#write(JsonWriter, Object)} manually throws {@link
-     * IOException} which is not caused by writer usage.
-     */
-    @Test
-    public void testToJson_ThrowingIOException() {
-        IOException exception = new IOException("test");
-        TypeAdapter<Integer> adapter = new TypeAdapter<>() {
-
-            @Override
-            public void write(JsonWriter out, Integer value) throws IOException {
-                throw exception;
-            }
-
-            @Override
-            public Integer read(JsonReader in) {
-                throw new AssertionError("not needed by this test");
-            }
-        };
-        JsonIOException e = assertThrows(JsonIOException.class, () -> adapter.toJson(1));
-        assertThat(e).hasCauseThat().isEqualTo(exception);
-        e = assertThrows(JsonIOException.class, () -> adapter.toJsonTree(1));
-        assertThat(e).hasCauseThat().isEqualTo(exception);
-    }
+    assertThat(actualException).hasCauseThat().isSameInstanceAs(CAUSE_EXCEPTION);
+  }
 }
