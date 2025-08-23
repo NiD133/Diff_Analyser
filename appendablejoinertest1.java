@@ -1,60 +1,70 @@
 package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import java.io.IOException;
+
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Objects;
-import org.apache.commons.lang3.AppendableJoiner.Builder;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.text.TextStringBuilder;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class AppendableJoinerTestTest1 {
+@DisplayName("AppendableJoiner Tests")
+public class AppendableJoinerTest {
 
-    // Test own StrBuilder
-    @SuppressWarnings("deprecation")
-    @ParameterizedTest
-    @ValueSource(classes = { StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class })
-    void testDelimiterAppendable(final Class<? extends Appendable> clazz) throws Exception {
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
-        final Appendable sbuilder = clazz.newInstance();
-        sbuilder.append("A");
-        // throws IOException
-        assertEquals("AB.C", joiner.joinA(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        // throws IOException
-        assertEquals("AB.C1D.E", joiner.joinA(sbuilder, Arrays.asList("D", "E")).toString());
-    }
+    private static final String INITIAL_VALUE = "A";
+    private static final String SEPARATOR = ".";
 
-    static class Fixture {
+    @DisplayName("Should join elements to various Appendable implementations")
+    @ParameterizedTest(name = "with {0}")
+    @ValueSource(classes = {StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class})
+    @SuppressWarnings("deprecation") // For StrBuilder
+    void shouldJoinElementsToVariousAppendables(final Class<? extends Appendable> clazz) throws Exception {
+        // Arrange
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(SEPARATOR).get();
+        final Appendable appendable = clazz.newInstance();
+        appendable.append(INITIAL_VALUE);
 
-        private final String name;
+        // Act 1: Join a varargs array
+        joiner.joinA(appendable, "B", "C");
 
-        Fixture(final String name) {
-            this.name = name;
-        }
+        // Assert 1
+        assertEquals("A.B.C", appendable.toString(), "Should correctly join varargs to existing content.");
 
-        /**
-         * Renders myself onto an Appendable to avoid creating intermediary strings.
-         */
-        void render(final Appendable appendable) throws IOException {
-            appendable.append(name);
-            appendable.append('!');
-        }
+        // Act 2: Append a value and then join an Iterable
+        appendable.append("1");
+        joiner.joinA(appendable, Arrays.asList("D", "E"));
+
+        // Assert 2
+        assertEquals("A.B.C1.D.E", appendable.toString(), "Should correctly join an iterable after another operation.");
     }
 
     @Test
-    void testAllBuilderPropertiesStringBuilder() {
-        // @formatter:off
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setPrefix("<").setDelimiter(".").setSuffix(">").setElementAppender((a, e) -> a.append(String.valueOf(e))).get();
-        // @formatter:on
-        final StringBuilder sbuilder = new StringBuilder("A");
-        assertEquals("A<B.C>", joiner.join(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        assertEquals("A<B.C>1<D.E>", joiner.join(sbuilder, Arrays.asList("D", "E")).toString());
+    @DisplayName("Should join elements to a StringBuilder using all builder properties")
+    void shouldJoinElementsToStringBuilderWithAllProperties() {
+        // Arrange: Create a joiner with a prefix, suffix, delimiter, and the default element appender.
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder()
+            .setPrefix("<")
+            .setDelimiter(SEPARATOR)
+            .setSuffix(">")
+            .setElementAppender((a, e) -> a.append(String.valueOf(e)))
+            .get();
+        
+        final StringBuilder builder = new StringBuilder(INITIAL_VALUE);
+
+        // Act 1: Join a varargs array
+        joiner.join(builder, "B", "C");
+
+        // Assert 1
+        assertEquals("A<B.C>", builder.toString(), "Should correctly join varargs with all properties set.");
+
+        // Act 2: Append a value and then join an Iterable
+        builder.append("1");
+        joiner.join(builder, Arrays.asList("D", "E"));
+
+        // Assert 2
+        assertEquals("A<B.C>1<D.E>", builder.toString(), "Should correctly join an iterable with all properties set after another operation.");
     }
 }
