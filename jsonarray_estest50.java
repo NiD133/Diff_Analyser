@@ -1,22 +1,23 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest50 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class, focusing on the equals method.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        boolean boolean0 = jsonArray0.equals((Object) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that a JsonArray instance is not equal to null,
+     * which is a standard contract for the Object.equals() method.
+     */
+    @Test
+    public void equals_whenComparedWithNull_shouldReturnFalse() {
+        // Arrange: Create an empty JsonArray instance.
+        JsonArray jsonArray = new JsonArray();
+
+        // Act & Assert: Verify that comparing the array to null returns false.
+        assertFalse("A JsonArray instance should not be equal to null.", jsonArray.equals(null));
     }
 }
