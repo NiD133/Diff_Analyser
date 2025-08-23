@@ -1,44 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
 import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class AppendableJoiner_ESTestTest11 extends AppendableJoiner_ESTest_scaffolding {
+/**
+ * Tests for {@link AppendableJoiner}.
+ */
+public class AppendableJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder(2);
-        AppendableJoiner.Builder<Appendable> appendableJoiner_Builder0 = AppendableJoiner.builder();
-        AppendableJoiner<Appendable> appendableJoiner0 = appendableJoiner_Builder0.get();
-        CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) stringBuilder0);
-        ArrayDeque<StringBuilder> arrayDeque0 = new ArrayDeque<StringBuilder>();
-        LinkedHashSet<Appendable> linkedHashSet0 = new LinkedHashSet<Appendable>(arrayDeque0);
-        // Undeclared exception!
-        try {
-            appendableJoiner0.joinA((Appendable) charBuffer0, (Iterable<Appendable>) linkedHashSet0);
-            fail("Expecting exception: ReadOnlyBufferException");
-        } catch (ReadOnlyBufferException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    @Test(expected = ReadOnlyBufferException.class)
+    public void joinToReadOnlyBufferShouldThrowException() throws IOException {
+        // Arrange: Create a joiner and a read-only buffer as the target.
+        final AppendableJoiner<String> joiner = AppendableJoiner.builder().get();
+        final CharBuffer readOnlyBuffer = CharBuffer.wrap("cannot-be-modified");
+        final Iterable<String> elements = Collections.emptyList();
+
+        // Act: Attempt to join elements into the read-only buffer.
+        // The joiner will first attempt to append its prefix, which triggers the exception.
+        joiner.joinA(readOnlyBuffer, elements);
+
+        // Assert: The @Test(expected) annotation verifies that a ReadOnlyBufferException is thrown.
     }
 }
