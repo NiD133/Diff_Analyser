@@ -2,18 +2,29 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest19 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(1810);
-        Seconds seconds1 = seconds0.multipliedBy(0);
-        assertEquals(1810, seconds0.getSeconds());
-        assertEquals(0, seconds1.getSeconds());
+    /**
+     * Tests that multiplying a Seconds instance by zero results in Seconds.ZERO
+     * and does not modify the original instance.
+     */
+    @Test
+    public void multipliedBy_zero_shouldReturnZeroSeconds() {
+        // Arrange
+        final Seconds initialSeconds = Seconds.seconds(1810);
+        final Seconds expectedResult = Seconds.ZERO;
+
+        // Act
+        final Seconds actualResult = initialSeconds.multipliedBy(0);
+
+        // Assert
+        assertEquals("The result of multiplying by zero should be zero seconds.",
+                     expectedResult, actualResult);
+        assertEquals("The original Seconds object should remain unchanged (be immutable).",
+                     1810, initialSeconds.getSeconds());
     }
 }
