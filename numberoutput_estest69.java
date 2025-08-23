@@ -1,26 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest69 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on error handling with invalid arguments.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        char[] charArray0 = new char[7];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputInt(1000, charArray0, 2084322301);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 2084322301
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that {@link NumberOutput#outputInt(int, char[], int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} when the provided offset is far beyond
+     * the bounds of the output buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputIntShouldThrowExceptionForOffsetBeyondBufferLength() {
+        // Arrange: A buffer that is much smaller than the offset we'll use.
+        char[] buffer = new char[16];
+        int valueToWrite = 1000;
+        // An offset deliberately chosen to be extremely large and invalid.
+        int invalidOffset = 2084322301;
+
+        // Act & Assert: This call is expected to fail with an ArrayIndexOutOfBoundsException
+        // because the offset is far greater than the buffer's capacity.
+        NumberOutput.outputInt(valueToWrite, buffer, invalidOffset);
     }
 }
