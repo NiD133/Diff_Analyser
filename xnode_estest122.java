@@ -1,31 +1,41 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest122 extends XNode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XNode} class, focusing on body parsing methods.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test121() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Long long0 = xNode0.getLongBody();
-        assertNull(long0);
+    /**
+     * Verifies that getLongBody() returns null when the underlying XML node
+     * has no text content or body.
+     */
+    @Test
+    public void shouldReturnNullForLongBodyWhenNodeHasNoContent() {
+        // Arrange
+        // 1. Create an empty DOM node. IIOMetadataNode is a convenient, standard implementation.
+        Node emptyNode = new IIOMetadataNode();
+
+        // 2. Instantiate an XNode wrapping the empty node.
+        // The XPathParser and variables are required for the constructor but are not
+        // directly relevant to this specific test's logic.
+        XPathParser xPathParser = new XPathParser((Document) null, false);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(xPathParser, emptyNode, variables);
+
+        // Act
+        // Attempt to parse the node's body as a Long.
+        Long result = xNode.getLongBody();
+
+        // Assert
+        // The result should be null, as there is no body content to parse.
+        assertNull(result);
     }
 }
