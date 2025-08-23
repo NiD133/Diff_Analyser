@@ -1,33 +1,29 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueueInputStream_ESTestTest10 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link QueueInputStream} focusing on invalid arguments for the read method.
+ */
+public class QueueInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        QueueInputStream queueInputStream0 = new QueueInputStream();
-        byte[] byteArray0 = new byte[19];
-        // Undeclared exception!
-        try {
-            queueInputStream0.read(byteArray0, 1557, (-1357));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Range [1557, 1557 + -1357) out of bounds for length 19
-            //
-            verifyException("org.apache.commons.io.input.QueueInputStream", e);
-        }
+    /**
+     * Tests that calling the read(byte[], int, int) method with a negative length
+     * throws an IndexOutOfBoundsException, as specified by the InputStream contract.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void readWithNegativeLengthShouldThrowIndexOutOfBoundsException() {
+        // Arrange
+        final QueueInputStream inputStream = new QueueInputStream();
+        final byte[] buffer = new byte[10];
+        final int validOffset = 0;
+        final int negativeLength = -1;
+
+        // Act
+        // This call is expected to fail because the length parameter is negative.
+        inputStream.read(buffer, validOffset, negativeLength);
+
+        // Assert: The test passes if the expected IndexOutOfBoundsException is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
