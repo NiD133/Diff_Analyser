@@ -1,30 +1,23 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest33 extends CachedDateTimeZone_ESTest_scaffolding {
+/**
+ * Test suite for the {@link CachedDateTimeZone} class.
+ */
+public class CachedDateTimeZoneTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        // Undeclared exception!
-        try {
-            CachedDateTimeZone.forZone((DateTimeZone) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.tz.CachedDateTimeZone", e);
-        }
+    /**
+     * Tests that the forZone() factory method throws a NullPointerException
+     * when passed a null DateTimeZone, as it's an invalid argument.
+     */
+    @Test(expected = NullPointerException.class)
+    public void forZone_whenZoneIsNull_throwsNullPointerException() {
+        // Act: Attempt to create a CachedDateTimeZone with a null delegate.
+        CachedDateTimeZone.forZone(null);
+
+        // Assert: Handled by the 'expected' attribute of the @Test annotation.
+        // The test will pass only if a NullPointerException is thrown.
     }
 }
