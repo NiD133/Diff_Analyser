@@ -1,40 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
-public class XmlTreeBuilder_ESTestTest25 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmlTreeBuilder} class, focusing on its behavior
+ * when handling specific token types.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        // Undeclared exception!
-        try {
-            xmlTreeBuilder0.insertXmlDeclarationFor((Token.XmlDecl) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.XmlTreeBuilder", e);
-        }
+    /**
+     * Verifies that calling insertXmlDeclarationFor with a null token
+     * correctly throws a NullPointerException. This test ensures the method
+     * is robust against invalid null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void insertXmlDeclarationForWithNullTokenThrowsNullPointerException() {
+        // Arrange: Create an instance of the tree builder.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+
+        // Act & Assert: Calling the method with a null argument should throw.
+        xmlTreeBuilder.insertXmlDeclarationFor(null);
     }
 }
