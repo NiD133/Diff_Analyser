@@ -1,27 +1,50 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class JsonIgnoreProperties_ESTestTest37 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class.
+ */
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
-        Object object0 = new Object();
-        boolean boolean0 = jsonIgnoreProperties_Value0.equals(object0);
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowSetters());
-        assertFalse(boolean0);
+    /**
+     * Verifies that the {@code forIgnoreUnknown(true)} factory method correctly initializes
+     * a {@link JsonIgnoreProperties.Value} instance. It should set {@code ignoreUnknown} to true
+     * and retain the default values for all other properties.
+     */
+    @Test
+    public void forIgnoreUnknownShouldCreateValueWithCorrectProperties() {
+        // Arrange & Act
+        // Create an instance using the factory method under test.
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
+
+        // Assert
+        // The primary property should be set to the specified value.
+        assertTrue("ignoreUnknown should be true", value.getIgnoreUnknown());
+
+        // Other properties should retain their default values.
+        assertFalse("allowGetters should default to false", value.getAllowGetters());
+        assertFalse("allowSetters should default to false", value.getAllowSetters());
+        assertTrue("merge should default to true", value.getMerge());
+        assertTrue("The set of ignored properties should be empty", value.getIgnored().isEmpty());
+    }
+
+    /**
+     * Verifies that the {@code equals} method returns false when a {@link JsonIgnoreProperties.Value}
+     * instance is compared with an object of a different, unrelated type.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenComparedWithDifferentType() {
+        // Arrange
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
+        Object otherObject = new Object();
+
+        // Act
+        boolean result = value.equals(otherObject);
+
+        // Assert
+        assertFalse("equals() should return false for an object of a different type", result);
     }
 }
