@@ -1,59 +1,35 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for the {@link GridArrangement} class, focusing on exception handling.
+ */
 public class GridArrangement_ESTestTest41 extends GridArrangement_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(2852, 2852);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range(2852, 2852);
-        assertEquals("Range[2852.0,2852.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(2852.0, range0.getLowerBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(2852.0, range0.getCentralValue(), 0.01);
-        assertEquals(2852.0, range0.getUpperBound(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals("Range[2852.0,2852.0]", range0.toString());
-        assertFalse(range0.isNaNRange());
-        assertEquals(2852.0, range0.getLowerBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(2852.0, range0.getCentralValue(), 0.01);
-        assertEquals(2852.0, range0.getUpperBound(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        // Undeclared exception!
-        gridArrangement0.arrangeRF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
+    /**
+     * Verifies that the arrange() method throws a NullPointerException when a null
+     * Graphics2D object is provided. This is crucial because rendering operations
+     * cannot proceed without a valid graphics context.
+     */
+    @Test(expected = NullPointerException.class)
+    public void arrangeShouldThrowNPEForNullGraphics2D() {
+        // Arrange: Create a grid arrangement, a container, and a constraint.
+        // The specific dimensions are not critical for this test.
+        GridArrangement arrangement = new GridArrangement(2, 2);
+        BlockContainer container = new BlockContainer();
+
+        // A constraint with a ranged width and a fixed height is used to ensure
+        // the correct internal arrange method (arrangeRF) is dispatched.
+        RectangleConstraint constraint = new RectangleConstraint(new Range(0, 100), 50.0);
+
+        // Act: Call the arrange method with a null Graphics2D context.
+        // The test expects a NullPointerException to be thrown here.
+        arrangement.arrange(container, (Graphics2D) null, constraint);
+
+        // Assert: The assertion is handled by the 'expected' attribute of the @Test annotation.
+        // If a NullPointerException is not thrown, the test will fail.
     }
 }
