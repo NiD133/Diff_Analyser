@@ -1,63 +1,37 @@
 package com.google.common.util.concurrent;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.util.concurrent.ClassPathUtil.parseJavaClassPath;
 import static com.google.common.util.concurrent.Futures.getChecked;
-import static com.google.common.util.concurrent.Futures.immediateFuture;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.CHECKED_EXCEPTION;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.ERROR;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.ERROR_FUTURE;
 import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_CHECKED_EXCEPTION;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_ERROR;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_OTHER_THROWABLE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_UNCHECKED_EXCEPTION;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.OTHER_THROWABLE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.RUNTIME_EXCEPTION;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.RUNTIME_EXCEPTION_FUTURE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.UNCHECKED_EXCEPTION;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.assertThrows;
-import com.google.common.testing.GcFinalization;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithBadConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithGoodAndBadConstructor;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithManyConstructors;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithManyConstructorsButOnlyOneThrowable;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithPrivateConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithSomePrivateConstructors;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithWrongTypesConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithoutThrowableConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.TwoArgConstructorException;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.TwoArgConstructorRuntimeException;
-import java.lang.ref.WeakReference;
-import java.net.URLClassLoader;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.jupiter.api.Test;
 
-public class FuturesGetCheckedTestTest30 extends TestCase {
+/**
+ * Tests for {@link Futures#getChecked(java.util.concurrent.Future, Class)}.
+ */
+class FuturesGetCheckedTest {
 
-    /**
-     * Loads {@link WillBeUnloadedException} in a separate {@code ClassLoader}, calls {@code
-     * getChecked(future, WillBeUnloadedException.class)}, and returns the loader. The caller can then
-     * test that the {@code ClassLoader} can still be GCed. The test amounts to a test that {@code
-     * getChecked} holds no strong references to the class.
-     */
-    private WeakReference<?> doTestClassUnloading() throws Exception {
-        URLClassLoader shadowLoader = new URLClassLoader(parseJavaClassPath(), null);
-        @SuppressWarnings("unchecked")
-        Class<WillBeUnloadedException> shadowClass = (Class<WillBeUnloadedException>) Class.forName(WillBeUnloadedException.class.getName(), false, shadowLoader);
-        assertNotSame(shadowClass, WillBeUnloadedException.class);
-        getChecked(immediateFuture("foo"), shadowClass);
-        return new WeakReference<>(shadowLoader);
-    }
+  /**
+   * Tests that {@code getChecked} correctly wraps a future's cause in a new exception.
+   * Specifically, it verifies that when the target exception class has multiple constructors,
+   * {@code getChecked} prefers the constructor that accepts both a {@code String} message and a
+   * {@code Throwable} cause. This ensures the resulting exception is as informative as possible.
+   */
+  @Test
+  void getChecked_whenWrappingException_prefersConstructorWithBothStringAndCause() {
+    // Arrange: The ExceptionWithManyConstructors class is designed so that only its
+    // constructor with (String, Throwable) parameters sets the `usedExpectedConstructor` flag.
+    // The input future has already failed with a checked exception.
 
-    public static final class WillBeUnloadedException extends Exception {
-    }
+    // Act: Call getChecked, which should catch the future's exception and wrap it.
+    ExceptionWithManyConstructors thrown =
+        assertThrows(
+            ExceptionWithManyConstructors.class,
+            () -> getChecked(FAILED_FUTURE_CHECKED_EXCEPTION, ExceptionWithManyConstructors.class));
 
-    public void testGetCheckedUntimed_exceptionClassPrefersStringConstructor() {
-        ExceptionWithManyConstructors expected = assertThrows(ExceptionWithManyConstructors.class, () -> getChecked(FAILED_FUTURE_CHECKED_EXCEPTION, ExceptionWithManyConstructors.class));
-        assertTrue(expected.usedExpectedConstructor);
-    }
+    // Assert: Verify that the most specific constructor (String, Throwable) was used.
+    assertThat(thrown.usedExpectedConstructor).isTrue();
+  }
 }
