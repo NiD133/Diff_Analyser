@@ -1,17 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class CharSequenceUtils_ESTestTest73 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        CharSequenceUtils charSequenceUtils0 = new CharSequenceUtils();
+    /**
+     * Tests the public, deprecated constructor.
+     *
+     * <p>The {@link CharSequenceUtils} class is a utility class not meant for instantiation.
+     * However, its constructor is public to support tools that require a JavaBean instance.
+     * This test ensures the constructor can be called without errors, fulfilling this
+     * compatibility requirement.
+     * </p>
+     */
+    @Test
+    public void testConstructor_shouldCreateInstanceForJavaBeanCompatibility() {
+        // Instantiate the class to cover the public constructor.
+        final CharSequenceUtils instance = new CharSequenceUtils();
+
+        // Assert that an instance was successfully created.
+        assertNotNull("The instance should not be null.", instance);
     }
 }
