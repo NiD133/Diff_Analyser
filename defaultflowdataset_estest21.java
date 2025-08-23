@@ -1,24 +1,27 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultFlowDataset_ESTestTest21 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultFlowDataset} class, focusing on its initial state.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        int int0 = defaultFlowDataset0.getStageCount();
-        assertEquals(1, int0);
+    /**
+     * Verifies that a newly instantiated DefaultFlowDataset has a stage count of 1.
+     * The class contract specifies that a dataset, even when empty, must have at
+     * least one stage.
+     */
+    @Test
+    public void newDatasetShouldHaveOneStage() {
+        // Arrange: Create a new, empty dataset.
+        DefaultFlowDataset<String> dataset = new DefaultFlowDataset<>();
+
+        // Act: Retrieve the stage count from the new dataset.
+        int stageCount = dataset.getStageCount();
+
+        // Assert: The stage count should be 1 by default.
+        assertEquals("A new, empty dataset must have one stage by default.", 1, stageCount);
     }
 }
