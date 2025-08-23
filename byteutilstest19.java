@@ -1,29 +1,35 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
 import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest19 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+class ByteUtilsTest {
 
     @Test
-    void testToLittleEndianToByteArray() {
-        final byte[] b = new byte[4];
-        toLittleEndian(b, 2 + 3 * 256 + 4 * 256 * 256, 1, 3);
-        assertArrayEquals(new byte[] { 2, 3, 4 }, Arrays.copyOfRange(b, 1, 4));
+    void toLittleEndianShouldWriteValueToByteArraySlice() {
+        // Arrange
+        // The value 262914 requires 3 bytes and is represented in little-endian
+        // format as {2, 3, 4}.
+        // Calculation: 262914 = 2 * (256^0) + 3 * (256^1) + 4 * (256^2)
+        final long valueToWrite = 262914L;
+        final int offset = 1;
+        final int length = 3;
+
+        // The target buffer is larger than the written part to ensure the offset is respected
+        // and that bytes outside the target range are not modified.
+        final byte[] actualBuffer = new byte[4];
+        final byte[] expectedBuffer = {0, 2, 3, 4};
+
+        // Act
+        toLittleEndian(actualBuffer, valueToWrite, offset, length);
+
+        // Assert
+        assertArrayEquals(expectedBuffer, actualBuffer,
+            "The little-endian value should be written correctly at the specified offset.");
     }
 }
