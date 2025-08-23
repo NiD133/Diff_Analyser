@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest9 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on its number-to-string conversion methods.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        String string0 = NumberOutput.toString((long) (byte) (-11));
-        assertEquals("-11", string0);
+    /**
+     * Tests that {@link NumberOutput#toString(long)} correctly converts a small negative long value
+     * into its string representation.
+     */
+    @Test
+    public void toString_withNegativeLong_shouldReturnCorrectStringRepresentation() {
+        // Arrange: Define the input value and the expected result.
+        long negativeValue = -11L;
+        String expectedString = "-11";
+
+        // Act: Call the method under test.
+        String actualString = NumberOutput.toString(negativeValue);
+
+        // Assert: Verify that the actual result matches the expected result.
+        assertEquals(expectedString, actualString);
     }
 }
