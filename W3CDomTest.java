@@ -38,20 +38,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class W3CDomTest {
 
-    /**
-     * Parses an XML string into a W3C Document.
-     * 
-     * @param xml The XML content as a string.
-     * @param nameSpaceAware Whether the parser should be namespace-aware.
-     * @return The parsed W3C Document.
-     */
     private static Document parseXml(String xml, boolean nameSpaceAware) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(nameSpaceAware);
             DocumentBuilder builder = factory.newDocumentBuilder();
             builder.setEntityResolver((publicId, systemId) -> {
-                if (systemId.contains("about:legacy-compat")) {
+                if (systemId.contains("about:legacy-compat")) { // <!doctype html>
                     return new InputSource(new StringReader(""));
                 } else {
                     return null;
@@ -66,148 +59,172 @@ public class W3CDomTest {
     }
 
     @Test
-    public void testSimpleHtmlToW3cDomConversion() {
+    public void simpleConversion() {
         String html = "<html><head><title>W3c</title></head><body><p class='one' id=12>Text</p><!-- comment --><invalid>What<script>alert('!')";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        org.jsoup.nodes.Document doc = Jsoup.parse(html);
 
-        W3CDom w3cDom = new W3CDom();
-        Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
-        NodeList metaTags = w3cDoc.getElementsByTagName("META");
-        assertEquals(0, metaTags.getLength());
+        W3CDom w3c = new W3CDom();
+        Document wDoc = w3c.fromJsoup(doc);
+        NodeList meta = wDoc.getElementsByTagName("META");
+        assertEquals(0, meta.getLength());
 
-        String outputXml = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>W3c</title></head><body><p class=\"one\" id=\"12\">Text</p><!-- comment --><invalid>What<script>alert('!')</script></invalid></body></html>";
-        assertEquals(expectedXml, TextUtil.stripNewlines(outputXml));
+        String out = W3CDom.asString(wDoc, W3CDom.OutputXml());
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>W3c</title></head><body><p class=\"one\" id=\"12\">Text</p><!-- comment --><invalid>What<script>alert('!')</script></invalid></body></html>";
+        assertEquals(expected, TextUtil.stripNewlines(out));
 
-        Document roundTripDoc = parseXml(outputXml, true);
-        assertEquals("Text", roundTripDoc.getElementsByTagName("p").item(0).getTextContent());
+        Document roundTrip = parseXml(out, true);
+        assertEquals("Text", roundTrip.getElementsByTagName("p").item(0).getTextContent());
 
-        // Check that properties can be set
+        // check we can set properties
         Map<String, String> properties = W3CDom.OutputXml();
         properties.put(OutputKeys.INDENT, "yes");
-        String formattedOutput = W3CDom.asString(w3cDoc, properties);
-        assertTrue(formattedOutput.length() > outputXml.length());
-        String formattedExpectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>W3c</title></head><body><p class=\"one\" id=\"12\">Text</p><!-- comment --><invalid>What<script>alert('!')</script></invalid></body></html>";
-        assertEquals(formattedExpectedXml, TextUtil.stripNewlines(formattedOutput));
+        String furtherOut = W3CDom.asString(wDoc, properties);
+        assertTrue(furtherOut.length() > out.length()); // wanted to assert formatting, but actual indentation is platform specific so breaks in CI
+        String furtherExpected =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>W3c</title></head><body><p class=\"one\" id=\"12\">Text</p><!-- comment --><invalid>What<script>alert('!')</script></invalid></body></html>";
+        assertEquals(furtherExpected, TextUtil.stripNewlines(furtherOut)); // on windows, DOM will write newlines as \r\n
     }
 
     @Test
-    public void testNamespacePreservation() throws IOException {
-        File inputFile = ParseTest.getFile("/htmltests/namespaces.xhtml");
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(inputFile, "UTF-8", "", Parser.xmlParser());
+    public void namespacePreservation() throws IOException {
+        File in = ParseTest.getFile("/htmltests/namespaces.xhtml");
+        org.jsoup.nodes.Document jsoupDoc;
+        jsoupDoc = Jsoup.parse(in, "UTF-8", "", Parser.xmlParser());
 
-        W3CDom w3cDom = new W3CDom();
-        Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+        Document doc;
+        org.jsoup.helper.W3CDom jDom = new org.jsoup.helper.W3CDom();
+        doc = jDom.fromJsoup(jsoupDoc);
 
-        Node htmlElement = w3cDoc.getChildNodes().item(0);
-        assertEquals("http://www.w3.org/1999/xhtml", htmlElement.getNamespaceURI());
-        assertEquals("html", htmlElement.getLocalName());
+        Node htmlEl = doc.getChildNodes().item(0);
+        assertEquals("http://www.w3.org/1999/xhtml", htmlEl.getNamespaceURI());
+        assertEquals("html", htmlEl.getLocalName());
+        assertEquals("html", htmlEl.getNodeName());
 
-        Node headElement = htmlElement.getFirstChild().getNextSibling();
-        assertEquals("http://www.w3.org/1999/xhtml", headElement.getNamespaceURI());
-        assertEquals("head", headElement.getLocalName());
+        // inherits default namespace
+        Node head = htmlEl.getFirstChild().getNextSibling();
+        assertEquals("http://www.w3.org/1999/xhtml", head.getNamespaceURI());
+        assertEquals("head", head.getLocalName());
+        assertEquals("head", head.getNodeName());
 
-        Node epubTitleElement = htmlElement.getChildNodes().item(3).getChildNodes().item(3);
-        assertEquals("Check", epubTitleElement.getTextContent());
-        assertEquals("http://www.idpf.org/2007/ops", epubTitleElement.getNamespaceURI());
-        assertEquals("title", epubTitleElement.getLocalName());
+        Node epubTitle = htmlEl.getChildNodes().item(3).getChildNodes().item(3);
+        assertEquals("Check", epubTitle.getTextContent());
+        assertEquals("http://www.idpf.org/2007/ops", epubTitle.getNamespaceURI());
+        assertEquals("title", epubTitle.getLocalName());
+        assertEquals("epub:title", epubTitle.getNodeName());
 
-        Node xSectionElement = epubTitleElement.getNextSibling().getNextSibling();
-        assertEquals("urn:test", xSectionElement.getNamespaceURI());
-        assertEquals("section", xSectionElement.getLocalName());
+        Node xSection = epubTitle.getNextSibling().getNextSibling();
+        assertEquals("urn:test", xSection.getNamespaceURI());
+        assertEquals("section", xSection.getLocalName());
+        assertEquals("x:section", xSection.getNodeName());
 
-        Node svgElement = xSectionElement.getNextSibling().getNextSibling();
-        assertEquals("http://www.w3.org/2000/svg", svgElement.getNamespaceURI());
-        assertEquals("svg", svgElement.getLocalName());
+        // https://github.com/jhy/jsoup/issues/977
+        // does not keep last set namespace
+        Node svg = xSection.getNextSibling().getNextSibling();
+        assertEquals("http://www.w3.org/2000/svg", svg.getNamespaceURI());
+        assertEquals("svg", svg.getLocalName());
+        assertEquals("svg", svg.getNodeName());
 
-        Node pathElement = svgElement.getChildNodes().item(1);
-        assertEquals("http://www.w3.org/2000/svg", pathElement.getNamespaceURI());
-        assertEquals("path", pathElement.getLocalName());
+        Node path = svg.getChildNodes().item(1);
+        assertEquals("http://www.w3.org/2000/svg", path.getNamespaceURI());
+        assertEquals("path", path.getLocalName());
+        assertEquals("path", path.getNodeName());
 
-        Node clipElement = pathElement.getChildNodes().item(1);
-        assertEquals("http://example.com/clip", clipElement.getNamespaceURI());
-        assertEquals("clip", clipElement.getLocalName());
-        assertEquals("456", clipElement.getTextContent());
+        Node clip = path.getChildNodes().item(1);
+        assertEquals("http://example.com/clip", clip.getNamespaceURI());
+        assertEquals("clip", clip.getLocalName());
+        assertEquals("clip", clip.getNodeName());
+        assertEquals("456", clip.getTextContent());
 
-        Node pictureElement = svgElement.getNextSibling().getNextSibling();
-        assertEquals("http://www.w3.org/1999/xhtml", pictureElement.getNamespaceURI());
-        assertEquals("picture", pictureElement.getLocalName());
+        Node picture = svg.getNextSibling().getNextSibling();
+        assertEquals("http://www.w3.org/1999/xhtml", picture.getNamespaceURI());
+        assertEquals("picture", picture.getLocalName());
+        assertEquals("picture", picture.getNodeName());
 
-        Node imgElement = pictureElement.getFirstChild();
-        assertEquals("http://www.w3.org/1999/xhtml", imgElement.getNamespaceURI());
-        assertEquals("img", imgElement.getLocalName());
+        Node img = picture.getFirstChild();
+        assertEquals("http://www.w3.org/1999/xhtml", img.getNamespaceURI());
+        assertEquals("img", img.getLocalName());
+        assertEquals("img", img.getNodeName());
     }
 
     @Test
-    public void testHandlesInvalidAttributeNames() {
+    public void handlesInvalidAttributeNames() {
         String html = "<html><head></head><body style=\"color: red\" \" name\"></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        Element bodyElement = jsoupDoc.select("body").first();
-        assertTrue(bodyElement.hasAttr("\""));
-        assertTrue(bodyElement.hasAttr("name\""));
+        org.jsoup.nodes.Document jsoupDoc;
+        jsoupDoc = Jsoup.parse(html);
+        Element body = jsoupDoc.select("body").first();
+        assertTrue(body.hasAttr("\"")); // actually an attribute with key '"'. Correct per HTML5 spec, but w3c xml dom doesn't dig it
+        assertTrue(body.hasAttr("name\""));
 
-        Document w3cDoc = W3CDom.convert(jsoupDoc);
-        String xmlOutput = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body _=\"\" name_=\"\" style=\"color: red\"/></html>", xmlOutput);
+        Document w3Doc = W3CDom.convert(jsoupDoc);
+        String xml = W3CDom.asString(w3Doc, W3CDom.OutputXml());
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body _=\"\" name_=\"\" style=\"color: red\"/></html>", xml);
     }
 
     @Test
-    public void testHtmlInputDocMaintainsHtmlAttributeNames() {
+    public void htmlInputDocMaintainsHtmlAttributeNames() {
         String html = "<!DOCTYPE html><html><head></head><body><p hành=\"1\" hình=\"2\">unicode attr names</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        org.jsoup.nodes.Document jsoupDoc;
+        jsoupDoc = Jsoup.parse(html);
 
-        Document w3cDoc = W3CDom.convert(jsoupDoc);
-        String htmlOutput = W3CDom.asString(w3cDoc, W3CDom.OutputHtml());
-        String expectedHtml = "<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p hành=\"1\" hình=\"2\">unicode attr names</p></body></html>";
-        assertEquals(expectedHtml, TextUtil.stripNewlines(htmlOutput));
+        Document w3Doc = W3CDom.convert(jsoupDoc);
+        String out = W3CDom.asString(w3Doc, W3CDom.OutputHtml());
+        String expected = "<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p hành=\"1\" hình=\"2\">unicode attr names</p></body></html>";
+        assertEquals(expected, TextUtil.stripNewlines(out));
     }
 
     @Test
-    public void testXmlInputDocMaintainsHtmlAttributeNames() {
+    public void xmlInputDocMaintainsHtmlAttributeNames() {
         String html = "<!DOCTYPE html><html><head></head><body><p hành=\"1\" hình=\"2\">unicode attr names coerced</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        org.jsoup.nodes.Document jsoupDoc;
+        jsoupDoc = Jsoup.parse(html);
         jsoupDoc.outputSettings().syntax(xml);
 
-        Document w3cDoc = W3CDom.convert(jsoupDoc);
-        String htmlOutput = W3CDom.asString(w3cDoc, W3CDom.OutputHtml());
-        String expectedHtml = "<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p h_nh=\"2\">unicode attr names coerced</p></body></html>";
-        assertEquals(expectedHtml, TextUtil.stripNewlines(htmlOutput));
+        Document w3Doc = W3CDom.convert(jsoupDoc);
+        String out = W3CDom.asString(w3Doc, W3CDom.OutputHtml());
+        String expected = "<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p h_nh=\"2\">unicode attr names coerced</p></body></html>";
+        assertEquals(expected, TextUtil.stripNewlines(out));
     }
 
     @Test
-    public void testHandlesInvalidTagAsText() {
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse("<インセンティブで高収入！>Text <p>More</p>");
+    public void handlesInvalidTagAsText() {
+        org.jsoup.nodes.Document jsoup = Jsoup.parse("<インセンティブで高収入！>Text <p>More</p>");
 
-        Document w3cDoc = W3CDom.convert(jsoupDoc);
-        String xmlOutput = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>&lt;インセンティブで高収入！&gt;Text <p>More</p></body></html>", xmlOutput);
+        Document w3Doc = W3CDom.convert(jsoup);
+        String xml = W3CDom.asString(w3Doc, W3CDom.OutputXml());
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>&lt;インセンティブで高収入！&gt;Text <p>More</p></body></html>", xml);
     }
 
-    @Test
-    public void testHandlesHtmlElementsWithLt() {
+    @Test void handlesHtmlElsWithLt() {
+        // In HTML, elements can be named "foo<bar" (<foo<bar>). Test that we can convert to W3C, that we can HTML parse our HTML serial, XML parse our XML serial, and W3C XML parse the XML serial and the W3C serial
+        // And similarly attributes may have "<" in their name
+        // https://github.com/jhy/jsoup/issues/2259
         String input = "<foo<bar attr<name=\"123\"><b>Text</b></foo<bar>";
-        String expectedXml = "<foo_bar attr_name=\"123\"><b>Text</b></foo_bar>";
+        String xmlExpect = "<foo_bar attr_name=\"123\"><b>Text</b></foo_bar>"; // rewrites < to _ in el and attr
 
+        // html round trips
         org.jsoup.nodes.Document htmlDoc = Jsoup.parse(input);
-        String htmlSerialized = htmlDoc.body().html();
-        assertEquals(input, normalizeSpaces(htmlSerialized));
-        Element htmlRoundTrip = Jsoup.parse(htmlSerialized).body();
-        assertTrue(htmlDoc.body().hasSameValue(htmlRoundTrip));
+        String htmlSerial = htmlDoc.body().html();
+        assertEquals(input, normalizeSpaces(htmlSerial)); // same as input
+        Element htmlRound = Jsoup.parse(htmlSerial).body();
+        assertTrue(htmlDoc.body().hasSameValue(htmlRound));
 
+        // xml round trips
         htmlDoc.outputSettings().syntax(xml);
-        String xmlSerialized = htmlDoc.body().html();
-        assertEquals(expectedXml, normalizeSpaces(xmlSerialized));
-        org.jsoup.nodes.Document xmlDoc = Jsoup.parse(xmlSerialized);
-        String xmlRoundTripSerialized = xmlDoc.body().html();
-        assertEquals(expectedXml, normalizeSpaces(xmlRoundTripSerialized));
-        Element xmlRoundTrip = Jsoup.parse(xmlRoundTripSerialized).body();
-        assertTrue(xmlDoc.body().hasSameValue(xmlRoundTrip));
+        String asXml = htmlDoc.body().html();
+        assertEquals(xmlExpect, normalizeSpaces(asXml)); // <foo<bar> -> <foo_bar>
+        org.jsoup.nodes.Document xmlDoc = Jsoup.parse(asXml);
+        String xmlSerial = xmlDoc.body().html();
+        assertEquals(xmlExpect, normalizeSpaces(xmlSerial)); // same as xmlExpect
+        Element xmlRound = Jsoup.parse(xmlSerial).body();
+        assertTrue(xmlDoc.body().hasSameValue(xmlRound));
 
-        Document w3cXmlDoc = parseXml(xmlSerialized, true);
-        NodeList w3cXmlNodes = w3cXmlDoc.getElementsByTagName("foo_bar");
+        // Can W3C parse that XML
+        Document w3cXml = parseXml(asXml, true);
+        NodeList w3cXmlNodes = w3cXml.getElementsByTagName("foo_bar");
         assertEquals(1, w3cXmlNodes.getLength());
         assertEquals("123", w3cXmlNodes.item(0).getAttributes().getNamedItem("attr_name").getTextContent());
 
+        // Can convert to W3C
         Document w3cDoc = W3CDom.convert(htmlDoc);
         NodeList w3cNodes = w3cDoc.getElementsByTagName("foo_bar");
         assertEquals(1, w3cNodes.getLength());
@@ -215,221 +232,238 @@ public class W3CDomTest {
     }
 
     @Test
-    public void testConvertToCustomDocument() throws ParserConfigurationException {
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse("<html><div></div></html>");
+    public void canConvertToCustomDocument() throws ParserConfigurationException {
+        org.jsoup.nodes.Document document = Jsoup.parse("<html><div></div></html>");
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document customDoc = factory.newDocumentBuilder().newDocument();
+        DocumentBuilderFactory localDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
+        Document customDocumentResult = localDocumentBuilderFactory.newDocumentBuilder().newDocument();
 
         W3CDom w3cDom = new W3CDom();
-        w3cDom.convert(jsoupDoc, customDoc);
+        w3cDom.convert(document, customDocumentResult);
 
-        String htmlOutput = W3CDom.asString(customDoc, W3CDom.OutputHtml());
-        assertEquals("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><div></div></body></html>", htmlOutput);
+        String html = W3CDom.asString(customDocumentResult, W3CDom.OutputHtml());
+        assertEquals("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><div></div></body></html>", html);
     }
 
     @Test
-    public void testTreatsUndeclaredNamespaceAsLocalName() {
+    public void treatsUndeclaredNamespaceAsLocalName() {
         String html = "<fb:like>One</fb:like>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        org.jsoup.nodes.Document doc = Jsoup.parse(html);
 
-        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
-        Node htmlElement = w3cDoc.getFirstChild();
+        Document w3Doc = new W3CDom().fromJsoup(doc);
+        Node htmlEl = w3Doc.getFirstChild();
 
-        assertEquals("http://www.w3.org/1999/xhtml", htmlElement.getNamespaceURI());
-        assertEquals("html", htmlElement.getLocalName());
+        assertEquals("http://www.w3.org/1999/xhtml", htmlEl.getNamespaceURI());
+        assertEquals("html", htmlEl.getLocalName());
+        assertEquals("html", htmlEl.getNodeName());
 
-        Node fbElement = htmlElement.getFirstChild().getNextSibling().getFirstChild();
-        assertEquals("http://www.w3.org/1999/xhtml", fbElement.getNamespaceURI());
-        assertEquals("like", fbElement.getLocalName());
-        assertEquals("fb:like", fbElement.getNodeName());
+        Node fb = htmlEl.getFirstChild().getNextSibling().getFirstChild();
+        assertEquals("http://www.w3.org/1999/xhtml", fb.getNamespaceURI());
+        assertEquals("like", fb.getLocalName());
+        assertEquals("fb:like", fb.getNodeName());
     }
 
     @Test
-    public void testXmlnsXpath() throws XPathExpressionException {
-        W3CDom w3cDom = new W3CDom();
+    public void xmlnsXpathTest() throws XPathExpressionException {
+        W3CDom w3c = new W3CDom();
         String html = "<html><body><div>hello</div></body></html>";
-        Document dom = w3cDom.fromJsoup(Jsoup.parse(html));
-        NodeList nodeList = evaluateXpath(dom, "//*[local-name()=\"body\"]");
+        Document dom = w3c.fromJsoup(Jsoup.parse(html));
+        NodeList nodeList = xpath(dom, "//*[local-name()=\"body\"]");// namespace aware; HTML namespace is default
         assertEquals("div", nodeList.item(0).getLocalName());
 
+        // default output is namespace aware, so query needs to be as well
         html = "<html xmlns='http://www.w3.org/1999/xhtml'><body id='One'><div>hello</div></body></html>";
-        dom = w3cDom.fromJsoup(Jsoup.parse(html));
-        nodeList = evaluateXpath(dom, "//body");
-        assertNull(nodeList);
+        dom = w3c.fromJsoup(Jsoup.parse(html));
+        nodeList = xpath(dom, "//body");
+        assertNull(nodeList); // no matches
 
-        dom = w3cDom.fromJsoup(Jsoup.parse(html));
-        nodeList = evaluateXpath(dom, "//*[local-name()=\"body\"]");
+        dom = w3c.fromJsoup(Jsoup.parse(html));
+        nodeList = xpath(dom, "//*[local-name()=\"body\"]");
         assertNotNull(nodeList);
         assertEquals(1, nodeList.getLength());
         assertEquals("div", nodeList.item(0).getLocalName());
         assertEquals("http://www.w3.org/1999/xhtml", nodeList.item(0).getNamespaceURI());
+        assertNull(nodeList.item(0).getPrefix());
 
-        String xml = w3cDom.asString(dom);
+        // get rid of the name space awareness
+        String xml = w3c.asString(dom);
         dom = parseXml(xml, false);
-        Node item = (Node) evaluateXpath(dom, "//body");
+        Node item = (Node) xpath(dom, "//body");
         assertEquals("body", item.getNodeName());
         assertNull(item.getNamespaceURI());
+        assertNull(item.getPrefix());
 
+        // put back, will get zero
         dom = parseXml(xml, true);
-        nodeList = evaluateXpath(dom, "//body");
+        nodeList = xpath(dom, "//body");
         assertNull(nodeList);
     }
 
     @Test
-    public void testXhtmlNoNamespace() throws XPathExpressionException {
-        W3CDom w3cDom = new W3CDom();
+    public void xhtmlNoNamespace() throws XPathExpressionException {
+        W3CDom w3c = new W3CDom();
         String html = "<html><body><div>hello</div></body></html>";
-        w3cDom.namespaceAware(false);
-        Document dom = w3cDom.fromJsoup(Jsoup.parse(html));
-        NodeList nodeList = evaluateXpath(dom, "//body");
+        w3c.namespaceAware(false);
+        Document dom = w3c.fromJsoup(Jsoup.parse(html));
+        NodeList nodeList = xpath(dom, "//body");// no namespace
         assertEquals(1, nodeList.getLength());
         assertEquals("div", nodeList.item(0).getLocalName());
     }
 
     @Test
-    public void testCanDisableNamespaces() throws XPathExpressionException {
-        W3CDom w3cDom = new W3CDom();
-        assertTrue(w3cDom.namespaceAware());
+    void canDisableNamespaces() throws XPathExpressionException {
+        W3CDom w3c = new W3CDom();
+        assertTrue(w3c.namespaceAware());
 
-        w3cDom.namespaceAware(false);
-        assertFalse(w3cDom.namespaceAware());
+        w3c.namespaceAware(false);
+        assertFalse(w3c.namespaceAware());
 
         String html = "<html xmlns='http://www.w3.org/1999/xhtml'><body id='One'><div>hello</div></body></html>";
-        Document dom = w3cDom.fromJsoup(Jsoup.parse(html));
-        NodeList nodeList = evaluateXpath(dom, "//body");
+        Document dom = w3c.fromJsoup(Jsoup.parse(html));
+        NodeList nodeList = xpath(dom, "//body");// no ns, so needs no prefix
         assertEquals("div", nodeList.item(0).getLocalName());
     }
 
-    private NodeList evaluateXpath(Document doc, String query) throws XPathExpressionException {
+    private NodeList xpath(Document w3cDoc, String query) throws XPathExpressionException {
         XPathExpression xpath = XPathFactory.newInstance().newXPath().compile(query);
-        return (NodeList) xpath.evaluate(doc, XPathConstants.NODE);
+        return ((NodeList) xpath.evaluate(w3cDoc, XPathConstants.NODE));
     }
 
     @Test
     public void testRoundTripDoctype() {
-        String baseHtml = "<!DOCTYPE html><p>One</p>";
-        assertEqualsIgnoreCase("<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p>One</p></body></html>", convertAndOutput(baseHtml, true));
-        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><p>One</p></body></html>", convertAndOutput(baseHtml, false));
+        // because we have Saxon on the test classpath, the transformer will change to that, and so case may change (e.g. Java base is META, Saxon is meta for HTML)
+        String base = "<!DOCTYPE html><p>One</p>";
+        assertEqualsIgnoreCase("<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p>One</p></body></html>", output(base, true));
+        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><p>One</p></body></html>", output(base, false));
 
         String publicDoc = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">";
-        assertEqualsIgnoreCase("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body></body></html>", convertAndOutput(publicDoc, true));
-        assertTrue(convertAndOutput(publicDoc, false).startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html PUBLIC"));
+        assertEqualsIgnoreCase("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body></body></html>", output(publicDoc, true));
+        // different impls will have different XML formatting. OpenJDK 13 default gives this: <body /> but others have <body/>, so just check start
+        assertTrue(output(publicDoc, false).startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html PUBLIC"));
 
         String systemDoc = "<!DOCTYPE html SYSTEM \"exampledtdfile.dtd\">";
-        assertEqualsIgnoreCase("<!DOCTYPE html SYSTEM \"exampledtdfile.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body></body></html>", convertAndOutput(systemDoc, true));
-        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html SYSTEM \"exampledtdfile.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body/></html>", convertAndOutput(systemDoc, false));
+        assertEqualsIgnoreCase("<!DOCTYPE html SYSTEM \"exampledtdfile.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body></body></html>", output(systemDoc, true));
+        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html SYSTEM \"exampledtdfile.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body/></html>", output(systemDoc, false));
 
         String legacyDoc = "<!DOCTYPE html SYSTEM \"about:legacy-compat\">";
-        assertEqualsIgnoreCase("<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body></body></html>", convertAndOutput(legacyDoc, true));
-        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body/></html>", convertAndOutput(legacyDoc, false));
+        assertEqualsIgnoreCase("<!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body></body></html>", output(legacyDoc, true));
+        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html SYSTEM \"about:legacy-compat\"><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body/></html>", output(legacyDoc, false));
 
         String noDoctype = "<p>One</p>";
-        assertEqualsIgnoreCase("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p>One</p></body></html>", convertAndOutput(noDoctype, true));
-        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><p>One</p></body></html>", convertAndOutput(noDoctype, false));
+        assertEqualsIgnoreCase("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body><p>One</p></body></html>", output(noDoctype, true));
+        assertEqualsIgnoreCase("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><p>One</p></body></html>", output(noDoctype, false));
     }
 
-    private String convertAndOutput(String input, boolean modeHtml) {
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(input);
-        Document w3cDoc = W3CDom.convert(jsoupDoc);
+    private String output(String in, boolean modeHtml) {
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(in);
+        Document w3c = W3CDom.convert(jdoc);
 
         Map<String, String> properties = modeHtml ? W3CDom.OutputHtml() : W3CDom.OutputXml();
-        return normalizeSpaces(W3CDom.asString(w3cDoc, properties));
+        return normalizeSpaces(W3CDom.asString(w3c, properties));
     }
 
-    private void assertEqualsIgnoreCase(String expected, String actual) {
-        assertEquals(expected.toLowerCase(Locale.ROOT), actual.toLowerCase(Locale.ROOT));
+    private void assertEqualsIgnoreCase(String want, String have) {
+        assertEquals(want.toLowerCase(Locale.ROOT), have.toLowerCase(Locale.ROOT));
     }
+
 
     @Test
-    public void testCanOutputHtmlWithoutNamespace() {
+    public void canOutputHtmlWithoutNamespace() {
         String html = "<p>One</p>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        W3CDom w3cDom = new W3CDom();
-        w3cDom.namespaceAware(false);
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(html);
+        W3CDom w3c = new W3CDom();
+        w3c.namespaceAware(false);
 
-        String htmlOutput = W3CDom.asString(w3cDom.fromJsoup(jsoupDoc), W3CDom.OutputHtml());
-        String xmlOutput = W3CDom.asString(w3cDom.fromJsoup(jsoupDoc), W3CDom.OutputXml());
+        String asHtml = W3CDom.asString(w3c.fromJsoup(jdoc), W3CDom.OutputHtml());
+        String asXtml = W3CDom.asString(w3c.fromJsoup(jdoc), W3CDom.OutputXml());
         assertEqualsIgnoreCase(
             "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"></head><body><p>one</p></body></html>",
-            htmlOutput);
+            asHtml);
         assertEqualsIgnoreCase(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html><head/><body><p>One</p></body></html>",
-            xmlOutput);
+            asXtml);
     }
 
-    @Test
-    public void testConvertsElementsAndMaintainsSource() {
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse("<body><div><p>One</div><div><p>Two");
-        W3CDom w3cDom = new W3CDom();
-        Element jsoupDiv = jsoupDoc.selectFirst("div");
-        assertNotNull(jsoupDiv);
-        Document w3cDoc = w3cDom.fromJsoup(jsoupDiv);
-        Node w3cDiv = w3cDom.contextNode(w3cDoc);
+    @Test public void convertsElementsAndMaintainsSource() {
+        org.jsoup.nodes.Document jdoc = Jsoup.parse("<body><div><p>One</div><div><p>Two");
+        W3CDom w3CDom = new W3CDom();
+        Element jDiv = jdoc.selectFirst("div");
+        assertNotNull(jDiv);
+        Document doc = w3CDom.fromJsoup(jDiv);
+        Node div = w3CDom.contextNode(doc);
 
-        assertEquals("div", w3cDiv.getLocalName());
-        assertEquals(jsoupDiv, w3cDiv.getUserData(W3CDom.SourceProperty));
+        assertEquals("div", div.getLocalName());
+        assertEquals(jDiv, div.getUserData(W3CDom.SourceProperty));
 
-        Node textNode = w3cDiv.getFirstChild().getFirstChild();
+        Node textNode = div.getFirstChild().getFirstChild();
         assertEquals("One", textNode.getTextContent());
         assertEquals(Node.TEXT_NODE, textNode.getNodeType());
 
-        org.jsoup.nodes.TextNode jsoupTextNode = (TextNode) jsoupDiv.childNode(0).childNode(0);
-        assertEquals(jsoupTextNode, textNode.getUserData(W3CDom.SourceProperty));
+        org.jsoup.nodes.TextNode jText = (TextNode) jDiv.childNode(0).childNode(0);
+        assertEquals(jText, textNode.getUserData(W3CDom.SourceProperty));
     }
-
-    @Test
-    public void testCanXmlParseCdataNodes() throws XPathExpressionException {
+    
+    @Test public void canXmlParseCdataNodes() throws XPathExpressionException {
         String html = "<p><script>1 && 2</script><style>3 && 4</style> 5 &amp;&amp; 6</p>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        jsoupDoc.outputSettings().syntax(xml);
-        String xml = jsoupDoc.body().html();
-        assertTrue(xml.contains("<script>//<![CDATA[\n1 && 2\n//]]></script>"));
-        Document w3cDoc = parseXml(xml, false);
-        NodeList nodeList = evaluateXpath(w3cDoc, "//script");
-        assertEquals(2, nodeList.getLength());
-        Node scriptComment = nodeList.item(0);
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(html);
+        jdoc.outputSettings().syntax(xml);
+        String xml = jdoc.body().html();
+        assertTrue(xml.contains("<script>//<![CDATA[\n1 && 2\n//]]></script>")); // as asserted in ElementTest
+        Document doc = parseXml(xml, false);
+        NodeList list = xpath(doc, "//script");
+        assertEquals(2, list.getLength());
+        Node scriptComment = list.item(0); // will be the cdata node
         assertEquals("//", scriptComment.getTextContent());
-        Node script = nodeList.item(1);
-        assertEquals("\n1 && 2\n//", script.getTextContent());
+        Node script = list.item(1);
+        assertEquals("\n" +
+            "1 && 2\n" +
+            "//", script.getTextContent());
+
     }
 
-    @Test
-    public void testHandlesEmptyDoctype() {
+    @Test public void handlesEmptyDoctype() {
         String html = "<!doctype>Foo";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
-        assertNull(w3cDoc.getDoctype());
-        assertEquals("Foo", w3cDoc.getFirstChild().getTextContent());
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(html);
+        Document doc = (new W3CDom()).fromJsoup(jdoc);
+        assertNull(doc.getDoctype());
+        assertEquals("Foo", doc.getFirstChild().getTextContent());
     }
 
-    @Test
-    public void testHtmlParseAttributesAreCaseInsensitive() throws IOException {
+    @Test void testHtmlParseAttributesAreCaseInsensitive() throws IOException {
+        // https://github.com/jhy/jsoup/issues/981
         String html = "<html lang=en>\n" +
             "<body>\n" +
             "<img src=\"firstImage.jpg\" alt=\"Alt one\" />\n" +
             "<IMG SRC=\"secondImage.jpg\" AlT=\"Alt two\" />\n" +
             "</body>\n" +
             "</html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        W3CDom w3cDom = new W3CDom();
-        Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
-        org.w3c.dom.Element bodyElement = (org.w3c.dom.Element) w3cDoc.getDocumentElement().getElementsByTagName("body").item(0);
-        NodeList imgElements = bodyElement.getElementsByTagName("img");
-        assertEquals(2, imgElements.getLength());
-        org.w3c.dom.Element firstImg = (org.w3c.dom.Element) imgElements.item(0);
-        assertEquals(2, firstImg.getAttributes().getLength());
-        assertEquals("firstImage.jpg", firstImg.getAttribute("src"));
-        assertEquals("Alt one", firstImg.getAttribute("alt"));
-        org.w3c.dom.Element secondImg = (org.w3c.dom.Element) imgElements.item(1);
-        assertEquals(2, secondImg.getAttributes().getLength());
-        assertEquals("secondImage.jpg", secondImg.getAttribute("src"));
-        assertEquals("Alt two", secondImg.getAttribute("alt"));
+        org.jsoup.nodes.Document jsoupDoc;
+        jsoupDoc = Jsoup.parse(html);
+        org.jsoup.helper.W3CDom jDom = new org.jsoup.helper.W3CDom();
+        Document doc = jDom.fromJsoup(jsoupDoc);
+        org.w3c.dom.Element body = (org.w3c.dom.Element) doc.getDocumentElement().getElementsByTagName("body").item(0);
+        NodeList imgs = body.getElementsByTagName("img");
+        assertEquals(2, imgs.getLength());
+        org.w3c.dom.Element first = (org.w3c.dom.Element) imgs.item(0);
+        assertEquals(first.getAttributes().getLength(), 2);
+        String img1 = first.getAttribute("src");
+        assertEquals("firstImage.jpg", img1);
+        String alt1 = first.getAttribute("alt");
+        assertEquals("Alt one", alt1);
+        org.w3c.dom.Element second = (org.w3c.dom.Element) imgs.item(1);
+        assertEquals(second.getAttributes().getLength(), 2);
+        String img2 = second.getAttribute("src");
+        assertEquals("secondImage.jpg", img2);
+        String alt2 = second.getAttribute("alt");
+        assertEquals("Alt two", alt2);
     }
 
     @ParameterizedTest
     @MethodSource("parserProvider")
-    public void testDoesNotExpandEntities(Parser parser) {
+    void doesNotExpandEntities(Parser parser) {
+        // Tests that the billion laughs attack doesn't expand entities; also for XXE
+        // Not impacted because jsoup doesn't parse the entities within the doctype, and so won't get to the w3c.
+        // Added to confirm, and catch if that ever changes
         String billionLaughs = "<?xml version=\"1.0\"?>\n" +
             "<!DOCTYPE lolz [\n" +
             " <!ENTITY lol \"lol\">\n" +
@@ -442,46 +476,46 @@ public class W3CDomTest {
 
         org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
         assertNotNull(w3cDoc);
-        NodeList pElements = w3cDoc.getElementsByTagName("p");
-        assertEquals(1, pElements.getLength());
-        assertEquals("&lol1;", pElements.item(0).getTextContent());
+        // select the p and make sure it's unexpanded
+        NodeList p = w3cDoc.getElementsByTagName("p");
+        assertEquals(1, p.getLength());
+        assertEquals("&lol1;", p.item(0).getTextContent());
 
-        String xmlOutput = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertFalse(xmlOutput.contains("lololol"));
-        assertTrue(xmlOutput.contains("&amp;lol1;"));
+        // Check the string
+        String string = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
+        assertFalse(string.contains("lololol"));
+        assertTrue(string.contains("&amp;lol1;"));
     }
 
-    @Test
-    public void testUndeclaredAttrNamespaceAsString() {
-        W3CDom w3cDom = new W3CDom();
+    @Test void undeclaredAttrNamespaceAsString() {
+        // https://github.com/jhy/jsoup/issues/2087
+        W3CDom w3CDom = new W3CDom();
         String html = "<html><body><div v-bind:class='test'></div></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(html);
+        org.w3c.dom.Document w3CDoc = w3CDom.fromJsoup(jdoc);
 
-        String xmlOutput = w3cDom.asString(w3cDoc);
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><div xmlns:v-bind=\"undefined\" v-bind:class=\"test\"/></body></html>", xmlOutput);
+        String xml = w3CDom.asString(w3CDoc);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><div xmlns:v-bind=\"undefined\" v-bind:class=\"test\"/></body></html>", xml);
     }
 
-    @Test
-    public void testDeclaredNamespaceIsUsed() {
-        W3CDom w3cDom = new W3CDom();
+    @Test void declaredNamespaceIsUsed() {
+        W3CDom w3CDom = new W3CDom();
         String html = "<html xmlns:v-bind=\"http://example.com\"><body><div v-bind:class='test'></div></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(html);
+        org.w3c.dom.Document w3CDoc = w3CDom.fromJsoup(jdoc);
 
-        String xmlOutput = w3cDom.asString(w3cDoc);
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v-bind=\"http://example.com\"><head/><body><div v-bind:class=\"test\"/></body></html>", xmlOutput);
+        String xml = w3CDom.asString(w3CDoc);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v-bind=\"http://example.com\"><head/><body><div v-bind:class=\"test\"/></body></html>", xml);
     }
 
-    @Test
-    public void testNestedElementsWithUndeclaredNamespace() {
-        W3CDom w3cDom = new W3CDom();
+    @Test void nestedElementsWithUndeclaredNamespace() {
+        W3CDom w3CDom = new W3CDom();
         String html = "<html><body><div v-bind:class='test'><span v-bind:style='color:red'></span></div></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+        org.jsoup.nodes.Document jdoc = Jsoup.parse(html);
+        org.w3c.dom.Document w3CDoc = w3CDom.fromJsoup(jdoc);
 
-        String xmlOutput = w3cDom.asString(w3cDoc);
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><div xmlns:v-bind=\"undefined\" v-bind:class=\"test\"><span v-bind:style=\"color:red\"/></div></body></html>", xmlOutput);
+        String xml = w3CDom.asString(w3CDoc);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body><div xmlns:v-bind=\"undefined\" v-bind:class=\"test\"><span v-bind:style=\"color:red\"/></div></body></html>", xml);
     }
 
     private static Stream<Arguments> parserProvider() {
@@ -490,4 +524,5 @@ public class W3CDomTest {
             Arguments.of(Parser.xmlParser())
         );
     }
+
 }
