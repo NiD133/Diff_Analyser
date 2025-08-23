@@ -1,23 +1,31 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest22 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Option option0 = new Option("o", "o");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getLongOpt();
-        assertEquals("", string0);
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
+
+    /**
+     * Verifies that getLongOpt() returns an empty string for an Option
+     * that was constructed without a long option name.
+     */
+    @Test
+    public void getLongOptShouldReturnEmptyStringWhenOptionHasNoLongName() {
+        // Arrange: Create an option that only has a short name ("o") and a description.
+        // This specific constructor does not set a long option name.
+        Option optionWithOnlyShortName = new Option("o", "A description for the option.");
+        OptionFormatter formatter = OptionFormatter.from(optionWithOnlyShortName);
+
+        // Act: Get the formatted long option string.
+        String longOptString = formatter.getLongOpt();
+
+        // Assert: The result should be an empty string, as no long option was defined.
+        // The formatter should not return null or a prefix-only string (e.g., "--").
+        assertEquals("The long option string should be empty", "", longOptString);
     }
 }
