@@ -1,33 +1,38 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileMode_ESTestTest26 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileMode} enum.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        StandardOpenOption standardOpenOption0 = StandardOpenOption.SYNC;
-        OpenOption[] openOptionArray0 = new OpenOption[5];
-        openOptionArray0[1] = (OpenOption) standardOpenOption0;
-        openOptionArray0[2] = (OpenOption) standardOpenOption0;
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOf(openOptionArray0);
-        assertEquals(RandomAccessFileMode.READ_WRITE_SYNC_ALL, randomAccessFileMode0);
+    /**
+     * Tests that {@link RandomAccessFileMode#valueOf(OpenOption...)} correctly identifies
+     * the {@code READ_WRITE_SYNC_ALL} mode when {@code StandardOpenOption.SYNC} is present,
+     * even if the input array also contains nulls and duplicates.
+     */
+    @Test
+    public void valueOfOpenOptionsWithSyncReturnsReadWriteSyncAll() {
+        // Arrange: Create an array of OpenOptions that includes nulls and duplicates
+        // to ensure the valueOf method is robust.
+        final OpenOption[] openOptions = {
+            null,
+            StandardOpenOption.SYNC,
+            StandardOpenOption.SYNC, // A duplicate to test robustness
+            null
+        };
+        final RandomAccessFileMode expectedMode = RandomAccessFileMode.READ_WRITE_SYNC_ALL;
+
+        // Act: Determine the RandomAccessFileMode from the given options.
+        final RandomAccessFileMode actualMode = RandomAccessFileMode.valueOf(openOptions);
+
+        // Assert: The presence of SYNC should result in the READ_WRITE_SYNC_ALL mode.
+        assertEquals("The mode should be READ_WRITE_SYNC_ALL for options containing SYNC.",
+                expectedMode, actualMode);
     }
 }
