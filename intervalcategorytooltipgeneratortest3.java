@@ -1,25 +1,27 @@
 package org.jfree.chart.labels;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IntervalCategoryToolTipGeneratorTestTest3 {
+/**
+ * Tests for the {@link IntervalCategoryToolTipGenerator} class, focusing on the
+ * equals() and hashCode() contract.
+ */
+class IntervalCategoryToolTipGeneratorTest {
 
-    /**
-     * Simple check that hashCode is implemented.
-     */
     @Test
-    public void testHashCode() {
-        IntervalCategoryToolTipGenerator g1 = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2 = new IntervalCategoryToolTipGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    @DisplayName("Two equal objects must have the same hash code")
+    void hashCode_shouldBeConsistentForEqualObjects() {
+        // Arrange: Create two identical IntervalCategoryToolTipGenerator instances.
+        // The default constructor creates objects that should be considered equal.
+        var generator1 = new IntervalCategoryToolTipGenerator();
+        var generator2 = new IntervalCategoryToolTipGenerator();
+
+        // Assert: Verify that the objects are equal and that their hash codes match,
+        // which is required by the Java Object.hashCode() contract.
+        assertTrue(generator1.equals(generator2), "Two default generators should be equal.");
+        assertEquals(generator1.hashCode(), generator2.hashCode(), "Hash codes of equal objects must be equal.");
     }
 }
