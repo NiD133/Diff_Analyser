@@ -1,47 +1,27 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DayOfYear_ESTestTest20 extends DayOfYear_ESTest_scaffolding {
+/**
+ * Tests for {@link DayOfYear}.
+ */
+public class DayOfYearTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        ChronoField chronoField0 = ChronoField.DAY_OF_YEAR;
-        long long0 = dayOfYear0.getLong(chronoField0);
-        assertEquals(45L, long0);
+    /**
+     * Tests that getLong() returns the correct value when queried with the DAY_OF_YEAR field.
+     */
+    @Test
+    public void getLong_withDayOfYearField_returnsTheDayOfYearValue() {
+        // Arrange: Create a DayOfYear instance for a specific day.
+        int expectedDay = 45;
+        DayOfYear dayOfYear = DayOfYear.of(expectedDay);
+
+        // Act: Retrieve the value using the getLong() method.
+        long actualDay = dayOfYear.getLong(ChronoField.DAY_OF_YEAR);
+
+        // Assert: Verify that the returned value matches the original.
+        assertEquals(expectedDay, actualDay);
     }
 }
