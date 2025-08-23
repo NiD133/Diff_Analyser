@@ -1,26 +1,31 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest22 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for the {@link UtcInstant} class, focusing on conversions.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-127L), 41317L);
-        Instant instant0 = utcInstant0.toInstant();
-        UtcInstant utcInstant1 = UtcInstant.of(instant0);
-        assertTrue(utcInstant1.equals((Object) utcInstant0));
-        assertEquals((-127L), utcInstant1.getModifiedJulianDay());
+    /**
+     * Tests that converting a UtcInstant to a java.time.Instant and back
+     * results in an equivalent UtcInstant. This verifies that the conversion
+     * process is lossless under normal conditions.
+     */
+    @Test
+    public void roundTripConversion_fromUtcInstant_toInstant_andBack_isLossless() {
+        // Arrange: Create an initial UtcInstant from a Modified Julian Day and nano-of-day.
+        long modifiedJulianDay = -127L;
+        long nanoOfDay = 41317L;
+        UtcInstant originalUtcInstant = UtcInstant.ofModifiedJulianDay(modifiedJulianDay, nanoOfDay);
+
+        // Act: Convert the UtcInstant to a standard java.time.Instant and then convert it back.
+        Instant javaInstant = originalUtcInstant.toInstant();
+        UtcInstant roundTrippedUtcInstant = UtcInstant.of(javaInstant);
+
+        // Assert: The round-tripped instant should be equal to the original.
+        assertEquals(originalUtcInstant, roundTrippedUtcInstant);
     }
 }
