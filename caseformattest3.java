@@ -1,24 +1,26 @@
 package com.google.common.base;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
+import junit.framework.TestCase;
+
+/**
+ * Tests for {@link CaseFormat}, focusing on identity conversions.
+ */
 public class CaseFormatTestTest3 extends TestCase {
 
-    public void testLowerHyphenToLowerHyphen() {
-        assertThat(LOWER_HYPHEN.to(LOWER_HYPHEN, "foo")).isEqualTo("foo");
-        assertThat(LOWER_HYPHEN.to(LOWER_HYPHEN, "foo-bar")).isEqualTo("foo-bar");
-    }
+  /**
+   * Verifies that converting a string from a format to itself results in the original, unchanged
+   * string. This is known as an identity conversion.
+   */
+  public void testConvertToSameFormat_lowerHyphen_returnsUnchangedString() {
+    // Arrange: Define test cases for single and multiple words.
+    String singleWord = "foo";
+    String multipleWords = "foo-bar";
+
+    // Act & Assert: The conversion from a format to itself should be a no-op.
+    assertThat(LOWER_HYPHEN.to(LOWER_HYPHEN, singleWord)).isEqualTo(singleWord);
+    assertThat(LOWER_HYPHEN.to(LOWER_HYPHEN, multipleWords)).isEqualTo(multipleWords);
+  }
 }
