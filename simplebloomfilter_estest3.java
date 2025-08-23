@@ -1,26 +1,37 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class SimpleBloomFilter_ESTestTest3 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SimpleBloomFilter#merge(Hasher)} and {@link SimpleBloomFilter#merge(BitMapExtractor)} methods.
+ */
+public class SimpleBloomFilterMergeTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Shape shape0 = Shape.fromNMK(78, 78, 2);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(1L, (-9223372036854775808L));
-        boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-        assertTrue(boolean0);
-        boolean boolean1 = simpleBloomFilter0.merge((BitMapExtractor) simpleBloomFilter0);
-        assertTrue(boolean1 == boolean0);
+    /**
+     * Tests that the merge methods correctly report whether the Bloom filter was modified.
+     * - Merging a hasher into an empty filter should modify it and return true.
+     * - Merging a filter with itself should not modify it and should return false.
+     */
+    @Test
+    public void mergeShouldReturnTrueOnModificationAndFalseOnNoOp() {
+        // Arrange: Create an empty Bloom filter and a hasher to populate it.
+        Shape shape = Shape.fromNMK(78, 78, 2);
+        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+        Hasher hasher = new EnhancedDoubleHasher(1L, -9223372036854775808L);
+
+        // Act 1: Merge the hasher into the empty filter.
+        boolean wasModifiedByHasher = filter.merge(hasher);
+
+        // Assert 1: The filter should have been modified.
+        assertTrue("Merging a hasher into an empty filter should modify it and return true.", wasModifiedByHasher);
+
+        // Act 2: Merge the filter with itself. Since all bits are already present,
+        // this operation should not change the filter's state.
+        boolean wasModifiedBySelfMerge = filter.merge((BitMapExtractor) filter);
+
+        // Assert 2: The filter should not have been modified.
+        assertFalse("Merging a filter with itself should not modify it and should return false.", wasModifiedBySelfMerge);
     }
 }
