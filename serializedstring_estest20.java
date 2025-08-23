@@ -1,35 +1,37 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest20 extends SerializedString_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
+/**
+ * Contains tests for the {@link SerializedString} class, focusing on its interaction
+ * with output streams.
+ */
+public class SerializedStringTest {
+
+    /**
+     * Verifies that writeQuotedUTF8 correctly propagates an IOException when the
+     * underlying OutputStream fails. This is tested using a PipedOutputStream
+     * that has not been connected to a PipedInputStream.
+     */
+    @Test
+    public void writeQuotedUTF8_shouldThrowIOException_whenWritingToUnconnectedPipe() {
+        // Arrange: Create a SerializedString and an unconnected PipedOutputStream.
+        // An unconnected pipe will throw an IOException upon any write attempt.
+        SerializedString serializedString = new SerializedString("any string");
+        PipedOutputStream unconnectedPipe = new PipedOutputStream();
+
+        // Act & Assert: Attempting to write should fail and throw an IOException.
         try {
-            serializedString0.writeQuotedUTF8(pipedOutputStream0);
-            fail("Expecting exception: IOException");
+            serializedString.writeQuotedUTF8(unconnectedPipe);
+            fail("Expected an IOException because the pipe is not connected.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
+            // Verify that the caught exception is the one expected from the stream.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
