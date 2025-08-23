@@ -1,39 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the constructors of the {@link RandomAccessFileOrArray} class.
+ */
+// The original class name and scaffolding are kept to match the provided context.
 public class RandomAccessFileOrArray_ESTestTest160 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test159() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray("", true, true);
-            fail("Expecting exception: FileNotFoundException");
-        } catch (Throwable e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockFileInputStream", e);
-        }
+    /**
+     * Verifies that the constructor throws a FileNotFoundException when attempting
+     * to open a file with an empty string as its path. An empty string is an
+     * invalid file path, and the operation is expected to fail.
+     */
+    @Test(timeout = 4000, expected = FileNotFoundException.class)
+    public void constructorWithEmptyFileName_throwsFileNotFoundException() throws IOException {
+        // Arrange: An empty string representing an invalid file path.
+        String invalidFileName = "";
+        boolean forceRead = true;
+        boolean plainRandomAccess = true;
+
+        // Act & Assert: Attempting to create a RandomAccessFileOrArray with this path
+        // should throw a FileNotFoundException. The @Test(expected=...) annotation handles the assertion.
+        new RandomAccessFileOrArray(invalidFileName, forceRead, plainRandomAccess);
     }
 }
