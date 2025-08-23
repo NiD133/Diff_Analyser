@@ -1,26 +1,33 @@
 package org.apache.ibatis.logging;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LogFactory_ESTestTest8 extends LogFactory_ESTest_scaffolding {
+/**
+ * Test suite for {@link LogFactory}.
+ * This class focuses on the factory's behavior when specific logging
+ * provider libraries are not available in the runtime environment.
+ */
+public class LogFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        // Undeclared exception!
-        try {
-            LogFactory.useCommonsLogging();
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error setting Log implementation.  Cause: java.lang.reflect.InvocationTargetException
-            //
-            verifyException("org.apache.ibatis.logging.LogFactory", e);
-        }
+    /**
+     * Verifies that LogFactory.useCommonsLogging() throws a RuntimeException
+     * when the Jakarta Commons Logging library is not available on the classpath.
+     *
+     * This test ensures that the factory correctly handles the absence of a required
+     * logging dependency by failing fast with a clear exception.
+     */
+    @Test(expected = RuntimeException.class)
+    public void shouldUseRuntimeExceptionWhenCommonsLoggingIsUnavailable() {
+        // Arrange
+        // The test environment is pre-configured without the Jakarta Commons Logging JAR.
+        // This will cause the reflective instantiation within LogFactory to fail.
+
+        // Act
+        // Attempt to configure MyBatis to use Jakarta Commons Logging.
+        LogFactory.useCommonsLogging();
+
+        // Assert
+        // The test passes if a RuntimeException is thrown, as declared by the
+        // @Test(expected = ...) annotation. If no exception is thrown, the test will fail.
     }
 }
