@@ -1,48 +1,38 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest28 extends ModuloAxis_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        ModuloAxis moduloAxis0 = new ModuloAxis("HL/Z&k~q6y%", (Range) null);
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
+
+    /**
+     * Verifies that calling resizeRange() with a zero percent value throws an
+     * exception if the axis was constructed with a null fixed range.
+     * <p>
+     * According to the NumberAxis implementation, a resize operation with zero
+     * percent triggers an auto-range adjustment. For ModuloAxis, this
+     * adjustment attempts to use its configured fixed range. This test ensures
+     * that if the fixed range is null, the operation fails with a clear error,
+     * as expected.
+     */
+    @Test
+    public void resizeRangeWithZeroPercentShouldThrowExceptionWhenFixedRangeIsNull() {
+        // Arrange: Create a ModuloAxis with a null fixed range.
+        ModuloAxis axis = new ModuloAxis("Test Axis", null);
+
+        // Act & Assert: Expect an IllegalArgumentException when resizing with 0%.
         try {
-            moduloAxis0.resizeRange((double) 0.0F, (double) 0.0F);
-            fail("Expecting exception: IllegalArgumentException");
+            axis.resizeRange(0.0, 0.0);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception occurred.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'range' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is correct.
+            assertEquals("Null 'range' argument.", e.getMessage());
         }
     }
 }
