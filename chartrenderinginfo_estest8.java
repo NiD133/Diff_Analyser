@@ -1,30 +1,31 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
+import static org.junit.Assert.assertEquals;
+
 import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
-public class ChartRenderingInfo_ESTestTest8 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        Rectangle rectangle0 = new Rectangle((-1), (-1), 1, 7);
-        chartRenderingInfo0.setChartArea(rectangle0);
-        Rectangle2D rectangle2D0 = chartRenderingInfo0.getChartArea();
-        assertEquals(0.0, rectangle2D0.getMaxX(), 0.01);
+    /**
+     * Verifies that the chart area set on a ChartRenderingInfo instance
+     * can be retrieved correctly.
+     */
+    @Test
+    public void getChartArea_shouldReturnAreaSetBySetter() {
+        // Arrange: Create a ChartRenderingInfo instance and define the expected chart area.
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo();
+        Rectangle2D expectedArea = new Rectangle2D.Double(-1.0, -1.0, 1.0, 7.0);
+
+        // Act: Set the chart area and then retrieve it.
+        renderingInfo.setChartArea(expectedArea);
+        Rectangle2D actualArea = renderingInfo.getChartArea();
+
+        // Assert: Verify that the retrieved area is identical to the one that was set.
+        assertEquals("The retrieved chart area should be equal to the one that was set.",
+                expectedArea, actualArea);
     }
 }
