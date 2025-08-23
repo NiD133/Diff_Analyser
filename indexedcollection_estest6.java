@@ -1,60 +1,46 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest6 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Integer integer0 = new Integer(3);
-        boolean boolean0 = linkedList0.add(integer0);
-        Predicate<Integer> predicate0 = NotNullPredicate.notNullPredicate();
-        ConstantTransformer<Integer, Predicate<Integer>> constantTransformer0 = new ConstantTransformer<Integer, Predicate<Integer>>(predicate0);
-        IndexedCollection<Predicate<Integer>, Integer> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Integer>) linkedList0, (Transformer<Integer, Predicate<Integer>>) constantTransformer0);
-        boolean boolean1 = indexedCollection0.contains(integer0);
-        assertTrue(boolean1 == boolean0);
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for {@link IndexedCollection}.
+ * This test focuses on the contains() method.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that an element present in the original collection is correctly
+     * found using the contains() method after the IndexedCollection is created.
+     */
+    @Test
+    public void containsShouldReturnTrueForExistingElement() {
+        // Arrange
+        // 1. Create a source collection and add an element to it.
+        Collection<Integer> sourceCollection = new LinkedList<>();
+        Integer elementToFind = 3;
+        sourceCollection.add(elementToFind);
+
+        // 2. Define a simple transformer. All elements will be mapped to the same key.
+        final String key = "CONSTANT_KEY";
+        Transformer<Integer, String> keyTransformer = new ConstantTransformer<>(key);
+
+        // 3. Create the IndexedCollection, which will index the elements from the source.
+        IndexedCollection<String, Integer> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(sourceCollection, keyTransformer);
+
+        // Act
+        // Check if the collection contains the element that was added.
+        boolean found = indexedCollection.contains(elementToFind);
+
+        // Assert
+        // The element should be found in the indexed collection.
+        assertTrue("IndexedCollection should contain the element from the initial source collection", found);
     }
 }
