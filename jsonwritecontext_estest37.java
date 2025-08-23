@@ -1,32 +1,37 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class JsonWriteContext_ESTestTest37 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Contains tests for the state management of {@link JsonWriteContext}.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext();
-        jsonWriteContext1.writeFieldName("NRN=M&Q");
-        int int0 = jsonWriteContext1.writeFieldName("):<z");
-        assertTrue(jsonWriteContext1.hasCurrentName());
-        assertEquals(4, int0);
+    /**
+     * Verifies that calling writeFieldName() when a value is expected (i.e., immediately
+     * after another writeFieldName() call) returns the STATUS_EXPECT_VALUE status code.
+     * This tests the context's state machine for handling invalid sequences.
+     */
+    @Test
+    public void writeFieldName_WhenCalledConsecutively_ReturnsStatusExpectValue() throws JsonProcessingException {
+        // Arrange: Create a child object context and write the first field name.
+        // After writing a name, the context's internal state expects a value to be written next.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+        JsonWriteContext objectContext = rootContext.createChildObjectContext();
+        objectContext.writeFieldName("first-name");
+
+        // Act: Attempt to write a second field name immediately, without an intervening value.
+        int status = objectContext.writeFieldName("second-name");
+
+        // Assert: The context should return the status indicating that a value was expected.
+        assertEquals("Should return STATUS_EXPECT_VALUE when a name is written while a value is expected",
+                JsonWriteContext.STATUS_EXPECT_VALUE, status);
+
+        // Further assert that the context's current name was updated to the most recent one.
+        assertTrue("Context should have a current name after the second call", objectContext.hasCurrentName());
+        assertEquals("Current name should be updated to the second name", "second-name", objectContext.getCurrentName());
     }
 }
