@@ -1,21 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TypeHandler_ESTestTest7 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TypeHandler} class.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Class<?> class0 = TypeHandler.createClass("org.apache.commons.cli.ParseException");
-        assertFalse(class0.isArray());
+    /**
+     * Verifies that createClass successfully returns the correct Class object
+     * for a valid, fully qualified class name.
+     */
+    @Test
+    public void createClass_shouldReturnCorrectClass_whenGivenValidClassName() throws ParseException {
+        // Arrange
+        String validClassName = "org.apache.commons.cli.ParseException";
+        Class<ParseException> expectedClass = ParseException.class;
+
+        // Act
+        Class<?> actualClass = TypeHandler.createClass(validClassName);
+
+        // Assert
+        assertEquals("The returned class should match the expected class.", expectedClass, actualClass);
     }
 }
