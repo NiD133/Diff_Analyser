@@ -1,42 +1,50 @@
 package com.fasterxml.jackson.core.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import java.io.ByteArrayInputStream;
-import java.io.CharConversionException;
+import org.evosuite.runtime.mock.java.io.MockFileInputStream;
+import org.junit.Test;
+
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
+import static org.evosuite.runtime.EvoAssertions.verifyException;
+import static org.junit.Assert.fail;
+
+/**
+ * This test suite for {@link DataFormatMatcher} was improved for understandability.
+ * It focuses on the behavior of the class when handling I/O errors.
+ */
 public class DataFormatMatcher_ESTestTest3 extends DataFormatMatcher_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        JsonFactory jsonFactory0 = new JsonFactory();
-        FileDescriptor fileDescriptor0 = new FileDescriptor();
-        MockFileInputStream mockFileInputStream0 = new MockFileInputStream(fileDescriptor0);
-        InputAccessor.Std inputAccessor_Std0 = new InputAccessor.Std(mockFileInputStream0, byteArray0);
-        MatchStrength matchStrength0 = MatchStrength.FULL_MATCH;
-        DataFormatMatcher dataFormatMatcher0 = inputAccessor_Std0.createMatcher(jsonFactory0, matchStrength0);
+    /**
+     * Verifies that {@link DataFormatMatcher#createParserWithMatch()} propagates an {@link IOException}
+     * when the underlying {@link InputStream} is faulty and throws an error upon access.
+     */
+    @Test
+    public void createParserWithMatchShouldPropagateIOExceptionFromFaultyStream() {
+        // ARRANGE: Create a DataFormatMatcher with an InputStream that is designed to fail.
+        byte[] bufferedData = new byte[3];
+        JsonFactory jsonFactory = new JsonFactory();
+        MatchStrength matchStrength = MatchStrength.FULL_MATCH;
+
+        // A MockFileInputStream from EvoSuite's framework, when created with a new (and thus invalid)
+        // FileDescriptor, will throw an IOException on any read attempt. This simulates a faulty stream.
+        FileDescriptor invalidFileDescriptor = new FileDescriptor();
+        InputStream faultyInputStream = new MockFileInputStream(invalidFileDescriptor);
+
+        InputAccessor.Std inputAccessor = new InputAccessor.Std(faultyInputStream, bufferedData);
+        DataFormatMatcher dataFormatMatcher = inputAccessor.createMatcher(jsonFactory, matchStrength);
+
+        // ACT & ASSERT: Attempting to create a parser should fail because it will try to
+        // read from the faulty stream, which is expected to throw an IOException.
         try {
-            dataFormatMatcher0.createParserWithMatch();
-            fail("Expecting exception: IOException");
+            dataFormatMatcher.createParserWithMatch();
+            fail("Expected an IOException to be thrown because the underlying stream is invalid.");
         } catch (IOException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // SUCCESS: The expected exception was caught.
+            // The original test verified the specific type of the mock-related exception.
+            // This verification is preserved to maintain the test's original intent.
             verifyException("org.evosuite.runtime.mock.java.io.NativeMockedIO", e);
         }
     }
