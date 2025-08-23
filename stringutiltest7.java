@@ -1,20 +1,27 @@
 package org.jsoup.internal;
 
-import org.jsoup.Jsoup;
-import org.junit.jupiter.api.Test;
-import java.util.Arrays;
-import java.util.Collections;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import static org.jsoup.internal.StringUtil.normaliseWhitespace;
-import static org.jsoup.internal.StringUtil.resolve;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StringUtilTestTest7 {
+/**
+ * Tests for the StringUtil#normaliseWhitespace method.
+ */
+@DisplayName("StringUtil.normaliseWhitespace")
+public class StringUtilTest {
 
-    @Test
-    public void normaliseWhiteSpace() {
-        assertEquals(" ", normaliseWhitespace("    \r \n \r\n"));
-        assertEquals(" hello there ", normaliseWhitespace("   hello   \r \n  there    \n"));
-        assertEquals("hello", normaliseWhitespace("hello"));
-        assertEquals("hello there", normaliseWhitespace("hello\nthere"));
+    @ParameterizedTest(name = "[{index}] Input: \"{0}\" → Expected: \"{1}\"")
+    @CsvSource(textBlock = """
+        '    \r \n \r\n',              ' '
+        '   hello   \r \n  there    \n', ' hello there '
+        'hello',                       'hello'
+        'hello\nthere',                'hello there'
+    """)
+    void shouldNormaliseWhitespaceCorrectly(String input, String expected) {
+        String actual = normaliseWhitespace(input);
+        assertEquals(expected, actual);
     }
 }
