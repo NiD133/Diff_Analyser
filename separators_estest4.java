@@ -2,26 +2,51 @@ package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Separators_ESTestTest4 extends Separators_ESTest_scaffolding {
+/**
+ * Tests for the {@link Separators} class, focusing on its immutability
+ * and "wither" methods.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Separators separators0 = new Separators('z', 'b', 'z');
-        Separators separators1 = separators0.withRootSeparator("");
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.AFTER;
-        Separators separators2 = separators1.withObjectEntrySpacing(separators_Spacing0);
-        assertEquals(Separators.Spacing.AFTER, separators2.getObjectEntrySpacing());
-        assertEquals(" ", separators2.getArrayEmptySeparator());
-        assertEquals(" ", separators2.getObjectEmptySeparator());
-        assertEquals(Separators.Spacing.BOTH, separators2.getObjectFieldValueSpacing());
-        assertEquals(Separators.Spacing.NONE, separators2.getArrayValueSpacing());
-        assertEquals('z', separators2.getObjectFieldValueSeparator());
-        assertEquals("", separators2.getRootSeparator());
-        assertEquals('z', separators2.getArrayValueSeparator());
-        assertEquals('b', separators2.getObjectEntrySeparator());
+    /**
+     * Verifies that "wither" methods, like {@code withObjectEntrySpacing},
+     * create a new Separators instance with the specified property updated,
+     * while leaving other properties unchanged.
+     */
+    @Test
+    public void witherMethodsShouldCreateNewInstanceWithModifiedProperties() {
+        // Arrange: Create an initial Separators instance with non-default values.
+        Separators initialSeparators = new Separators(':', ',', ',');
+        
+        // Define the modifications to be applied.
+        final String newRootSeparator = "";
+        final Separators.Spacing newObjectEntrySpacing = Separators.Spacing.AFTER;
+
+        // Act: Apply modifications using the chainable "wither" methods.
+        // This should produce a new, distinct instance.
+        Separators modifiedSeparators = initialSeparators
+                .withRootSeparator(newRootSeparator)
+                .withObjectEntrySpacing(newObjectEntrySpacing);
+
+        // Assert: Verify the properties of the new, modified instance.
+        assertNotSame("Wither methods should produce a new instance", initialSeparators, modifiedSeparators);
+
+        // 1. Check the properties that were explicitly changed.
+        assertEquals("The root separator should be updated",
+                newRootSeparator, modifiedSeparators.getRootSeparator());
+        assertEquals("The object entry spacing should be updated",
+                newObjectEntrySpacing, modifiedSeparators.getObjectEntrySpacing());
+
+        // 2. Check properties that were inherited from the initial instance.
+        assertEquals(':', modifiedSeparators.getObjectFieldValueSeparator());
+        assertEquals(',', modifiedSeparators.getObjectEntrySeparator());
+        assertEquals(',', modifiedSeparators.getArrayValueSeparator());
+
+        // 3. Check properties that retain their default values from the constructor.
+        assertEquals(Separators.Spacing.BOTH, modifiedSeparators.getObjectFieldValueSpacing());
+        assertEquals(Separators.Spacing.NONE, modifiedSeparators.getArrayValueSpacing());
+        assertEquals(" ", modifiedSeparators.getObjectEmptySeparator());
+        assertEquals(" ", modifiedSeparators.getArrayEmptySeparator());
     }
 }
