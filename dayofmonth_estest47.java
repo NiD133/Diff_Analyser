@@ -1,44 +1,27 @@
 package org.threeten.extra;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
-public class DayOfMonth_ESTestTest47 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DayOfMonth} class.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        int int0 = dayOfMonth0.compareTo(dayOfMonth0);
-        assertEquals(0, int0);
-        assertEquals(14, dayOfMonth0.getValue());
+    /**
+     * Tests that a DayOfMonth instance is equal to itself, as required by the
+     * Comparable contract (x.compareTo(x) == 0).
+     */
+    @Test
+    public void compareTo_whenComparedToSelf_returnsZero() {
+        // Arrange: Create a specific DayOfMonth instance.
+        // Using DayOfMonth.of() makes the test deterministic and independent of the system clock.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+
+        // Act: Compare the instance to itself.
+        int comparisonResult = dayOfMonth.compareTo(dayOfMonth);
+
+        // Assert: The result should be 0, indicating equality.
+        assertEquals("A DayOfMonth instance compared to itself should return 0.", 0, comparisonResult);
     }
 }
