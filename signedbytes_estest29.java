@@ -1,26 +1,27 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest29 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        // Undeclared exception!
-        try {
-            SignedBytes.checkedCast((-1826L));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Out of range: java.lang.Long@0000000001
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    @Test
+    public void checkedCast_whenValueIsBelowMinByte_throwsIllegalArgumentException() {
+        // Arrange: A long value that is just outside the lower bound of the byte range.
+        long valueTooSmall = (long) Byte.MIN_VALUE - 1; // -129L
+
+        // Act & Assert: Call checkedCast and verify the correct exception is thrown.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> SignedBytes.checkedCast(valueTooSmall)
+        );
+
+        // Assert: Verify the exception message is informative.
+        assertEquals("Out of range: " + valueTooSmall, thrown.getMessage());
     }
 }
