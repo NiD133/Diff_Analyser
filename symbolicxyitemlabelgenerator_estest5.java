@@ -1,36 +1,38 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
 import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest5 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SymbolicXYItemLabelGenerator} class, focusing on its interaction
+ * with datasets that have out-of-bounds indices.
+ */
+// The original class name from the test suite is retained.
+// A more conventional name would be SymbolicXYItemLabelGeneratorTest.
+public class SymbolicXYItemLabelGenerator_ESTestTest5 {
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        DynamicTimeSeriesCollection dynamicTimeSeriesCollection0 = new DynamicTimeSeriesCollection(1970, 1970);
-        // Undeclared exception!
-        try {
-            symbolicXYItemLabelGenerator0.generateToolTip(dynamicTimeSeriesCollection0, 1970, 2);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // Index 1970 out of bounds for length 1970
-            //
-            verifyException("org.jfree.data.time.DynamicTimeSeriesCollection", e);
-        }
+    /**
+     * Verifies that generateToolTip propagates an ArrayIndexOutOfBoundsException when the
+     * provided series index is out of bounds for the dataset.
+     *
+     * This test ensures that the generator does not suppress exceptions from the underlying
+     * dataset, which is the expected behavior.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void generateToolTip_whenSeriesIndexIsOutOfBounds_shouldThrowException() {
+        // Arrange: Create a generator and a dataset with a known size.
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+
+        int seriesCount = 10;
+        int itemCountPerSeries = 50;
+        XYDataset dataset = new DynamicTimeSeriesCollection(seriesCount, itemCountPerSeries);
+
+        // An index equal to the series count is always out of bounds (valid indices are 0 to 9).
+        int invalidSeriesIndex = seriesCount;
+        int validItemIndex = 0;
+
+        // Act & Assert: Call the method with the invalid index and expect an exception.
+        generator.generateToolTip(dataset, invalidSeriesIndex, validItemIndex);
     }
 }
