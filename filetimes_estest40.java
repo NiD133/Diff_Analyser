@@ -1,24 +1,29 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertTrue;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest40 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        boolean boolean0 = FileTimes.isUnixTime((FileTime) null);
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link FileTimes#isUnixTime(FileTime)} returns true for a null input,
+     * as specified in the method's documentation.
+     */
+    @Test
+    public void isUnixTimeShouldReturnTrueForNullInput() {
+        // Arrange: The input is a null FileTime. The explicit cast clarifies which
+        // method overload is being tested.
+        final FileTime nullFileTime = null;
+
+        // Act: Call the method under test.
+        final boolean result = FileTimes.isUnixTime(nullFileTime);
+
+        // Assert: Verify that the result is true, as per the contract.
+        assertTrue("A null FileTime should be considered a valid Unix time.", result);
     }
 }
