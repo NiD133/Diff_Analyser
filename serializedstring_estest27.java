@@ -1,28 +1,32 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class SerializedString_ESTestTest27 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its equality logic.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        SerializedString serializedString1 = new SerializedString("");
-        boolean boolean0 = serializedString0.equals(serializedString1);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two distinct {@link SerializedString} instances created with the
+     * same underlying string value are considered equal by the {@code equals} method.
+     */
+    @Test
+    public void equals_shouldReturnTrue_whenInstancesHaveSameValue() {
+        // Arrange
+        String sharedValue = "";
+        SerializedString instance1 = new SerializedString(sharedValue);
+        SerializedString instance2 = new SerializedString(sharedValue);
+
+        // Assert that we are comparing two different objects
+        assertNotSame("Precondition failed: instances should be different objects.", instance1, instance2);
+
+        // Act & Assert
+        // The assertEquals method uses the .equals() implementation for comparison.
+        // This assertion verifies that two distinct instances with identical
+        // content are correctly evaluated as equal.
+        assertEquals(instance1, instance2);
     }
 }
