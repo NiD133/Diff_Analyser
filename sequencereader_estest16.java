@@ -1,30 +1,38 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collection;
+import org.junit.Test;
 
-public class SequenceReader_ESTestTest16 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link SequenceReader}.
+ * This class contains an improved version of a test originally from SequenceReader_ESTestTest16.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        StringReader stringReader0 = new StringReader("directoryFilter");
-        arrayDeque0.add(stringReader0);
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        int int0 = sequenceReader0.read();
-        assertEquals(100, int0);
+    /**
+     * Tests that the read() method correctly returns the first character 
+     * from a sequence containing a single reader.
+     */
+    @Test
+    public void readShouldReturnFirstCharacterFromSingleReader() throws IOException {
+        // Arrange
+        final String inputData = "directoryFilter";
+        final StringReader singleReader = new StringReader(inputData);
+
+        final Collection<StringReader> readers = new ArrayDeque<>();
+        readers.add(singleReader);
+
+        final SequenceReader sequenceReader = new SequenceReader(readers);
+
+        // Act
+        final int firstCharRead = sequenceReader.read();
+
+        // Assert
+        assertEquals("The first character should be 'd'", 'd', firstCharRead);
     }
 }
