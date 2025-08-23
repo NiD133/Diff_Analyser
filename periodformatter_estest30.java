@@ -1,44 +1,34 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class PeriodFormatter_ESTestTest30 extends PeriodFormatter_ESTest_scaffolding {
+/**
+ * Contains tests for the PeriodFormatter class, focusing on parsing behavior.
+ */
+public class PeriodFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to parse a non-empty string using a formatter
+     * that is configured to expect an empty string results in an IllegalArgumentException.
+     */
+    @Test
+    public void parseMutablePeriod_withEmptyFormatter_throwsExceptionForNonEmptyInput() {
+        // Arrange: Create a formatter that only accepts an empty string for parsing.
+        // PeriodFormatterBuilder.Literal.EMPTY serves as a parser that expects no text.
+        PeriodParser emptyParser = PeriodFormatterBuilder.Literal.EMPTY;
+        PeriodFormatter emptyFormatter = new PeriodFormatter(null, emptyParser);
+        final String invalidInput = "MIT";
+
+        // Act & Assert
         try {
-            periodFormatter0.parseMutablePeriod("MIT");
-            fail("Expecting exception: IllegalArgumentException");
+            emptyFormatter.parseMutablePeriod(invalidInput);
+            fail("Expected an IllegalArgumentException because the input string is not empty.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \"MIT\"
-            //
-            verifyException("org.joda.time.format.PeriodFormatter", e);
+            // Verify that the exception message correctly identifies the invalid format.
+            String expectedMessage = "Invalid format: \"" + invalidInput + "\"";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
