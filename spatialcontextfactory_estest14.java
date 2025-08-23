@@ -1,30 +1,34 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
+
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest14 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ * This class focuses on testing the factory's handling of various input arguments.
+ */
+// Note: The original class name "SpatialContextFactory_ESTestTest14" was preserved,
+// but a more conventional name would be "SpatialContextFactoryTest".
+public class SpatialContextFactory_ESTestTest14 {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        // Undeclared exception!
-        try {
-            SpatialContextFactory.makeSpatialContext((Map<String, String>) null, classLoader0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
-        }
+    /**
+     * Verifies that makeSpatialContext throws a NullPointerException
+     * when the arguments map is null. This is a critical contract test
+     * to ensure the method handles invalid input gracefully.
+     */
+    @Test(expected = NullPointerException.class)
+    public void makeSpatialContext_withNullArgs_throwsNullPointerException() {
+        // Arrange
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Map<String, String> nullArgs = null;
+
+        // Act
+        // This call is expected to throw a NullPointerException.
+        SpatialContextFactory.makeSpatialContext(nullArgs, classLoader);
+
+        // Assert
+        // The test will pass if the expected NullPointerException is thrown.
+        // The assertion is handled by the @Test(expected=...) annotation.
     }
 }
