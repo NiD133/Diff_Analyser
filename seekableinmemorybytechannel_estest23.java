@@ -1,22 +1,23 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SeekableInMemoryByteChannel_ESTestTest23 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Tests for the {@link SeekableInMemoryByteChannel} class, focusing on the truncate functionality.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
-        seekableInMemoryByteChannel0.truncate((byte) 0);
-        assertEquals(0L, seekableInMemoryByteChannel0.size());
+    @Test
+    public void truncateToZeroShouldSetSizeToZero() {
+        // Arrange: Create a channel with a non-zero initial size.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
+
+        // Act: Truncate the channel to a size of 0.
+        // The 'L' suffix clarifies that the argument is a long, matching the method signature.
+        channel.truncate(0L);
+
+        // Assert: The channel's size should be updated to 0.
+        assertEquals("The channel size should be 0 after being truncated to zero.", 0L, channel.size());
     }
 }
