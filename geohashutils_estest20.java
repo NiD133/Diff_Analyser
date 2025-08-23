@@ -1,31 +1,32 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class GeohashUtils_ESTestTest20 extends GeohashUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link GeohashUtils}.
+ */
+public class GeohashUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        // Undeclared exception!
-        try {
-            GeohashUtils.decodeBoundary("J-", spatialContext0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -3
-            //
-            verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-        }
+    /**
+     * Verifies that decodeBoundary() throws an exception when the geohash string
+     * contains a character that is not part of the valid base-32 alphabet.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void decodeBoundary_withInvalidCharacter_throwsException() {
+        // Arrange
+        // The geohash "J-" is invalid because the hyphen '-' is not a valid character
+        // in the geohash base-32 alphabet.
+        String invalidGeohash = "J-";
+        SpatialContext context = SpatialContext.GEO;
+
+        // Act
+        // This call is expected to throw an ArrayIndexOutOfBoundsException. The internal
+        // character lookup attempts to access an array with a negative index derived
+        // from the invalid character.
+        GeohashUtils.decodeBoundary(invalidGeohash, context);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // This is handled declaratively by the @Test(expected=...) annotation.
     }
 }
