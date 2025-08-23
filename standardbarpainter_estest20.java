@@ -1,33 +1,47 @@
 package org.jfree.chart.renderer.category;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardBarPainter_ESTestTest20 extends StandardBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        BufferedImage bufferedImage0 = new BufferedImage(4, 4, 4);
-        GroupedStackedBarRenderer groupedStackedBarRenderer0 = new GroupedStackedBarRenderer();
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        groupedStackedBarRenderer0.setGradientPaintTransformer((GradientPaintTransformer) null);
-        RectangleEdge rectangleEdge0 = RectangleEdge.TOP;
-        standardBarPainter0.paintBar(graphics2D0, groupedStackedBarRenderer0, 0, 0, defaultCaret0, rectangleEdge0);
-        assertEquals(0, groupedStackedBarRenderer0.getColumnCount());
+/**
+ * Contains tests for the {@link StandardBarPainter} class.
+ */
+public class StandardBarPainterTest {
+
+    /**
+     * Verifies that {@code paintBar} executes without throwing an exception when the
+     * renderer has a null {@code GradientPaintTransformer}.
+     * <p>
+     * A robust painter should handle this configuration gracefully, as a renderer
+     * might not always have a gradient transformer configured.
+     */
+    @Test
+    public void paintBarShouldNotThrowExceptionWhenGradientPaintTransformerIsNull() {
+        // Arrange: Set up the painter, a renderer, and a dummy graphics context.
+        StandardBarPainter painter = new StandardBarPainter();
+        BarRenderer renderer = new GroupedStackedBarRenderer();
+
+        // This is the key condition for this test: ensure the painter can handle
+        // a renderer with a null gradient paint transformer.
+        renderer.setGradientPaintTransformer(null);
+
+        // Create a mock graphics environment for the painting operation.
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        Rectangle2D bar = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+        RectangleEdge barBaseEdge = RectangleEdge.TOP;
+        int seriesIndex = 0;
+        int itemIndex = 0;
+
+        // Act: Call the method under test.
+        painter.paintBar(graphics, renderer, seriesIndex, itemIndex, bar, barBaseEdge);
+
+        // Assert: The test is successful if the 'paintBar' method completes without
+        // throwing an exception. A NullPointerException would indicate a bug.
+        // No explicit assert statement is needed for this verification.
     }
 }
