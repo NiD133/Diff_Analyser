@@ -1,24 +1,32 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest24 extends URLCodec_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link URLCodec} class, focusing on its behavior
+ * when constructed with specific charsets.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec((String) null);
-        // Undeclared exception!
-        try {
-            uRLCodec0.encode((Object) "4r9MeMtOx{]6dKda");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Verifies that calling encode() on a URLCodec instance initialized with a null
+     * charset throws a NullPointerException.
+     * <p>
+     * The encoding process internally requires a charset to convert the input string
+     * to bytes. When this charset is null, the underlying call to
+     * {@code String.getBytes(charsetName)} results in an NPE, which is the expected
+     * behavior being tested here.
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeObjectWithNullCharsetShouldThrowNullPointerException() {
+        // Arrange: Create a URLCodec with a null charset.
+        URLCodec urlCodec = new URLCodec(null);
+        Object objectToEncode = "any string";
+
+        // Act: Attempt to encode an object. This should trigger the exception.
+        urlCodec.encode(objectToEncode);
+
+        // Assert: The @Test(expected) annotation handles the assertion that a
+        // NullPointerException was thrown.
     }
 }
