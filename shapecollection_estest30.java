@@ -1,35 +1,45 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest30 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        Stack<ShapeCollection<JtsPoint>> stack0 = new Stack<ShapeCollection<JtsPoint>>();
-        stack0.add(shapeCollection0);
-        ShapeCollection<ShapeCollection<JtsPoint>> shapeCollection1 = new ShapeCollection<ShapeCollection<JtsPoint>>(stack0, spatialContext0);
-        double double0 = shapeCollection1.getArea(spatialContext0);
-        assertEquals(0.0, double0, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link ShapeCollection} class.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Tests that the area of a ShapeCollection is zero if it contains another
+     * ShapeCollection that is itself empty. The total area of a collection
+     * should be the sum of the areas of its member shapes.
+     */
+    @Test
+    public void getArea_shouldReturnZero_whenCollectionContainsAnEmptyCollection() {
+        // Arrange
+        SpatialContext geoContext = SpatialContext.GEO;
+
+        // Create an empty inner collection of shapes.
+        ShapeCollection<JtsPoint> emptyInnerCollection = new ShapeCollection<>(new ArrayList<>(), geoContext);
+
+        // Create a list containing only the empty inner collection.
+        // Note: ShapeCollection requires a list that implements RandomAccess, like ArrayList.
+        List<Shape> shapes = new ArrayList<>();
+        shapes.add(emptyInnerCollection);
+
+        // Create the outer collection to be tested.
+        ShapeCollection<Shape> collectionOfCollections = new ShapeCollection<>(shapes, geoContext);
+
+        // Act
+        double actualArea = collectionOfCollections.getArea(geoContext);
+
+        // Assert
+        double expectedArea = 0.0;
+        assertEquals(expectedArea, actualArea, 0.01);
     }
 }
