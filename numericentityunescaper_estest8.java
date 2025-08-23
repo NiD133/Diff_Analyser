@@ -1,32 +1,38 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumericEntityUnescaper_ESTestTest8 extends NumericEntityUnescaper_ESTest_scaffolding {
+/**
+ * Tests for {@link NumericEntityUnescaper}.
+ */
+public class NumericEntityUnescaperTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        NumericEntityUnescaper.OPTION[] numericEntityUnescaper_OPTIONArray0 = new NumericEntityUnescaper.OPTION[0];
-        NumericEntityUnescaper numericEntityUnescaper0 = new NumericEntityUnescaper(numericEntityUnescaper_OPTIONArray0);
-        CharBuffer charBuffer0 = CharBuffer.allocate(2261);
-        StringWriter stringWriter0 = new StringWriter();
-        // Undeclared exception!
-        try {
-            numericEntityUnescaper0.translate((CharSequence) charBuffer0, 2261, (Writer) stringWriter0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Tests that the translate method throws an IndexOutOfBoundsException when the
+     * starting index is outside the bounds of the input CharSequence.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void translateShouldThrowIndexOutOfBoundsExceptionWhenIndexIsOutOfBounds() throws IOException {
+        // Arrange
+        // An unescaper with default options is sufficient for this test.
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        final String input = "test input";
+        final Writer writer = new StringWriter();
+
+        // An index equal to the string's length is, by definition, out of bounds.
+        // Valid indices for "test input" (length 10) are 0 through 9.
+        final int outOfBoundsIndex = input.length();
+
+        // Act
+        // This call should trigger the exception because the index is invalid.
+        unescaper.translate(input, outOfBoundsIndex, writer);
+
+        // Assert
+        // The test framework asserts that an IndexOutOfBoundsException is thrown via
+        // the @Test(expected=...) annotation.
     }
 }
