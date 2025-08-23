@@ -1,21 +1,28 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest38 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the LeafNode abstract class, focusing on attribute handling.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("Gyb$AWbT${");
-        String string0 = cDataNode0.attr("Gyb$AWbT${");
-        assertEquals("", string0);
+    /**
+     * Verifies that attempting to retrieve a non-existent attribute from a LeafNode
+     * returns an empty string, as LeafNodes do not have attributes by default.
+     */
+    @Test
+    public void attrShouldReturnEmptyStringForNonExistentAttribute() {
+        // Arrange: Create a CDataNode, which is a concrete implementation of LeafNode.
+        // By default, it has no attributes.
+        LeafNode node = new CDataNode("This is some CData content.");
+        String nonExistentAttributeKey = "id";
+
+        // Act: Attempt to get the value of an attribute that has not been set.
+        String attributeValue = node.attr(nonExistentAttributeKey);
+
+        // Assert: The result should be an empty string, not null, as per Jsoup's API contract.
+        assertEquals("", attributeValue);
     }
 }
