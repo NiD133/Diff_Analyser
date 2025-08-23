@@ -1,20 +1,31 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonSetter_ESTestTest31 extends JsonSetter_ESTest_scaffolding {
+/**
+ * This test suite focuses on the {@link JsonSetter.Value} class,
+ * verifying the behavior of its constructor and getter methods.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Nulls nulls0 = Nulls.FAIL;
-        JsonSetter.Value jsonSetter_Value0 = new JsonSetter.Value(nulls0, nulls0);
-        Nulls nulls1 = jsonSetter_Value0.getValueNulls();
-        assertEquals(Nulls.FAIL, nulls1);
+    /**
+     * Verifies that the getValueNulls() method correctly returns the
+     * {@link Nulls} value that was provided during the construction of a
+     * {@link JsonSetter.Value} instance.
+     */
+    @Test
+    public void getValueNulls_shouldReturnTheValueProvidedInConstructor() {
+        // Arrange: Create a JsonSetter.Value instance with a specific setting for valueNulls.
+        Nulls expectedValueNulls = Nulls.FAIL;
+        // The contentNulls parameter is also required by the constructor, but not under test here.
+        Nulls anyContentNulls = Nulls.SKIP;
+        JsonSetter.Value setterValue = new JsonSetter.Value(expectedValueNulls, anyContentNulls);
+
+        // Act: Retrieve the valueNulls setting from the instance.
+        Nulls actualValueNulls = setterValue.getValueNulls();
+
+        // Assert: The retrieved value should match the one provided during construction.
+        assertEquals(expectedValueNulls, actualValueNulls);
     }
 }
