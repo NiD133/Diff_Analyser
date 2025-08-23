@@ -2,21 +2,26 @@ package org.jfree.data;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparableObjectItem_ESTestTest16 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Comparable<ComparableObjectItem> comparable0 = (Comparable<ComparableObjectItem>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        Object object0 = new Object();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, object0);
-        boolean boolean0 = comparableObjectItem0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a ComparableObjectItem
+     * is compared with an object of a different, unrelated type.
+     */
+    @Test
+    public void equals_whenComparedWithDifferentType_shouldReturnFalse() {
+        // Arrange: Create an instance of ComparableObjectItem and an instance of a different class.
+        ComparableObjectItem item = new ComparableObjectItem("Key", "Value");
+        Object otherObject = new Object();
+
+        // Act: Compare the two objects.
+        boolean isEqual = item.equals(otherObject);
+
+        // Assert: The result should be false, as per the equals() contract.
+        assertFalse(isEqual);
     }
 }
