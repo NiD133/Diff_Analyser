@@ -1,33 +1,40 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest16 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ProxyReader} class.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
-        // Undeclared exception!
+    /**
+     * Tests that the skip() method throws an IllegalArgumentException when called with a negative
+     * value, which is the expected behavior inherited from {@link java.io.Reader}.
+     */
+    @Test
+    public void skip_shouldThrowIllegalArgumentException_whenArgumentIsNegative() {
+        // Arrange: Since ProxyReader is abstract, we use a concrete subclass (TaggedReader)
+        // for testing. The underlying reader's content is irrelevant for this test.
+        final Reader proxyReader = new TaggedReader(new StringReader("test-data"));
+        final long negativeSkipValue = -1L;
+
+        // Act & Assert
         try {
-            taggedReader0.skip((-1L));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // skip value is negative
-            //
-            verifyException("java.io.Reader", e);
+            proxyReader.skip(negativeSkipValue);
+            fail("Expected an IllegalArgumentException to be thrown for a negative skip value.");
+        } catch (final IllegalArgumentException e) {
+            // This is the expected outcome.
+            // We verify the message to ensure it's the specific exception we expect from Reader.skip().
+            assertEquals("skip value is negative", e.getMessage());
+        } catch (final IOException e) {
+            // An IOException is a possible but unexpected failure path for this test case.
+            fail("An unexpected IOException was thrown: " + e.getMessage());
         }
     }
 }
