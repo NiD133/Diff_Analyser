@@ -1,29 +1,38 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.geom.Rectangle2D;
 
-public class PlotRenderingInfo_ESTestTest18 extends PlotRenderingInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        plotRenderingInfo0.setDataArea((Rectangle2D) null);
-        Object object0 = plotRenderingInfo0.clone();
-        assertNotSame(object0, plotRenderingInfo0);
+/**
+ * This test class is a refactoring of an auto-generated test for PlotRenderingInfo.
+ * The original class name was PlotRenderingInfo_ESTestTest18.
+ */
+public class PlotRenderingInfoTest {
+
+    /**
+     * Verifies that cloning a PlotRenderingInfo object with a null data area
+     * results in a new, independent, but equal object.
+     */
+    @Test
+    public void clone_shouldCreateIndependentCopy_whenDataAreaIsNull() throws CloneNotSupportedException {
+        // Arrange: Create a PlotRenderingInfo instance and set its data area to null.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo originalInfo = new PlotRenderingInfo(chartInfo);
+        originalInfo.setDataArea(null);
+
+        // Act: Clone the PlotRenderingInfo object.
+        PlotRenderingInfo clonedInfo = (PlotRenderingInfo) originalInfo.clone();
+
+        // Assert: The cloned object should be a new instance, but equal to the original.
+        assertNotSame("The cloned object must be a different instance.", originalInfo, clonedInfo);
+        assertEquals("The cloned object's state should be equal to the original's.", originalInfo, clonedInfo);
+        
+        // Also, explicitly verify that the null data area was correctly handled.
+        assertNull("The data area of the cloned object should also be null.", clonedInfo.getDataArea());
     }
 }
