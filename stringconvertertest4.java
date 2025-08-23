@@ -1,86 +1,100 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class StringConverterTestTest4 extends TestCase {
-
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
-
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
+/**
+ * Tests for {@link StringConverter}, focusing on the getInstantMillis(Object, Chronology) method.
+ *
+ * <p>These tests verify that the converter correctly parses ISO 8601 formatted strings
+ * into milliseconds, considering both the timezone offset within the string and the
+ * timezone provided by the Chronology.
+ */
+public class StringConverterTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
     private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
     private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
 
-    private static Chronology ISO;
+    private DateTimeZone originalDefaultZone;
+    private Locale originalDefaultLocale;
 
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
+    /**
+     * Stores the original default timezone and locale, and sets them to a fixed value
+     * for test consistency. This ensures tests are not affected by the environment they run in.
+     */
+    @Before
+    public void setUp() {
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultLocale = Locale.getDefault();
         DateTimeZone.setDefault(LONDON);
         Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
+    /**
+     * Restores the original default timezone and locale after each test.
+     */
+    @After
+    public void tearDown() {
+        DateTimeZone.setDefault(originalDefaultZone);
+        Locale.setDefault(originalDefaultLocale);
     }
 
-    public void testGetInstantMillis_Object_Zone() throws Exception {
-        DateTime dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+02:00", ISO_PARIS));
-        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO_PARIS));
-        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, LONDON);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+01:00", ISO_LONDON));
-        dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, LONDON);
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501", ISO_LONDON));
+    @Test
+    public void getInstantMillis_shouldParseStringWithOffset_usingParisChronology() {
+        // The input string has a timezone offset (+02:00) which corresponds to the Paris timezone.
+        // The converter should correctly parse this into the corresponding instant.
+        String inputWithOffset = "2004-06-09T12:24:48.501+02:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(inputWithOffset, ISO_PARIS);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_shouldParseStringWithoutOffset_usingParisChronologyZone() {
+        // The input string has no timezone. The converter should use the timezone
+        // from the provided chronology (ISO_PARIS) to interpret the local time.
+        String inputWithoutOffset = "2004-06-09T12:24:48.501";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, PARIS);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(inputWithoutOffset, ISO_PARIS);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_shouldParseStringWithOffset_usingLondonChronology() {
+        // The input string has a timezone offset (+01:00) which corresponds to the London timezone.
+        // The converter should correctly parse this into the corresponding instant.
+        String inputWithOffset = "2004-06-09T12:24:48.501+01:00";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, LONDON);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(inputWithOffset, ISO_LONDON);
+
+        assertEquals(expected.getMillis(), actualMillis);
+    }
+
+    @Test
+    public void getInstantMillis_shouldParseStringWithoutOffset_usingLondonChronologyZone() {
+        // The input string has no timezone. The converter should use the timezone
+        // from the provided chronology (ISO_LONDON) to interpret the local time.
+        String inputWithoutOffset = "2004-06-09T12:24:48.501";
+        DateTime expected = new DateTime(2004, 6, 9, 12, 24, 48, 501, LONDON);
+
+        long actualMillis = StringConverter.INSTANCE.getInstantMillis(inputWithoutOffset, ISO_LONDON);
+
+        assertEquals(expected.getMillis(), actualMillis);
     }
 }
