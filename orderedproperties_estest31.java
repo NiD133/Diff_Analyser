@@ -1,53 +1,37 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class OrderedProperties_ESTestTest31 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests for the {@link OrderedProperties#computeIfAbsent(Object, java.util.function.Function)} method.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Predicate<Integer> predicate0 = NotNullPredicate.notNullPredicate();
-        Transformer<Object, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        Object object0 = orderedProperties0.computeIfAbsent(predicate0, transformer0);
-        assertNull(object0);
+    /**
+     * Tests that computeIfAbsent returns null and does not add an entry
+     * when the key is absent and the mapping function computes a null value.
+     *
+     * According to the Map#computeIfAbsent Javadoc, if the mapping function
+     * returns null, no mapping is recorded.
+     */
+    @Test
+    public void computeIfAbsent_whenKeyIsAbsentAndMappingFunctionReturnsNull_shouldReturnNullAndNotAddEntry() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final String key = "non.existent.key";
+
+        // Act: Call computeIfAbsent with a function that always returns null.
+        final Object result = properties.computeIfAbsent(key, k -> null);
+
+        // Assert
+        // 1. The method should return the computed value, which is null.
+        assertNull("The result of computeIfAbsent should be null", result);
+
+        // 2. The properties map should not be modified.
+        assertTrue("The properties map should remain empty", properties.isEmpty());
+        assertFalse("The key should not have been added to the properties", properties.containsKey(key));
     }
 }
