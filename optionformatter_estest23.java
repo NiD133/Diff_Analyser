@@ -1,23 +1,31 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest23 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Option option0 = new Option((String) null, (String) null, true, "");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getArgName();
-        assertEquals("<arg>", string0);
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
+
+    @Test
+    public void getArgNameShouldReturnDefaultFormattedNameWhenArgumentNameIsNotSet() {
+        // Arrange: Create an option that requires an argument but does not have a specific name for it.
+        // The 'true' flag indicates that the option has an argument.
+        final Option optionWithUnnamedArg = new Option("f", "file", true, "File to process");
+        final OptionFormatter formatter = OptionFormatter.from(optionWithUnnamedArg);
+
+        // The expected format is the default argument name ("arg") enclosed
+        // in the default delimiters ("<" and ">").
+        final String expectedArgName = "<arg>";
+
+        // Act
+        final String actualArgName = formatter.getArgName();
+
+        // Assert
+        assertEquals("Formatter should use the default argument name when none is provided for an option that has an argument.",
+                expectedArgName, actualArgName);
     }
 }
