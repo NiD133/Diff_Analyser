@@ -1,41 +1,81 @@
 package com.fasterxml.jackson.annotation;
 
-import java.util.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonIgnorePropertiesTestTest6 {
+/**
+ * Unit tests for the merging and overriding logic of {@link JsonIgnoreProperties.Value}.
+ * This suite focuses on how different configurations of {@code JsonIgnoreProperties.Value}
+ * are combined using the {@code withOverrides} method.
+ */
+class JsonIgnorePropertiesValueMergeTest {
 
-    private final JsonIgnoreProperties.Value EMPTY = JsonIgnoreProperties.Value.empty();
+    private static final JsonIgnoreProperties.Value EMPTY = JsonIgnoreProperties.Value.empty();
 
-    private Set<String> _set(String... args) {
-        return new LinkedHashSet<String>(Arrays.asList(args));
-    }
+    @Test
+    void mergeWithMergeEnabledShouldCombineProperties() {
+        // Arrange: Create a base config and an override that allows merging.
+        JsonIgnoreProperties.Value baseConfig = EMPTY
+                .withIgnoreUnknown()
+                .withAllowGetters();
+        JsonIgnoreProperties.Value mergingOverrides = EMPTY
+                .withMerge()
+                .withIgnored("a");
 
-    @JsonIgnoreProperties(value = { "foo", "bar" }, ignoreUnknown = true)
-    private final static class Bogus {
+        // Act: Apply the overrides to the base configuration.
+        JsonIgnoreProperties.Value result = baseConfig.withOverrides(mergingOverrides);
+
+        // Assert: The result should be a union of the properties.
+        // Property from 'mergingOverrides' is applied.
+        assertEquals(Collections.singleton("a"), result.getIgnored());
+        // Properties from 'baseConfig' are retained.
+        assertTrue(result.getIgnoreUnknown());
+        assertTrue(result.getAllowGetters());
+        // Default properties remain unchanged.
+        assertFalse(result.getAllowSetters());
     }
 
     @Test
-    public void testSimpleMerge() {
-        JsonIgnoreProperties.Value v1 = EMPTY.withIgnoreUnknown().withAllowGetters();
-        JsonIgnoreProperties.Value v2a = EMPTY.withMerge().withIgnored("a");
-        JsonIgnoreProperties.Value v2b = EMPTY.withoutMerge();
-        // when merging, should just have union of things
-        JsonIgnoreProperties.Value v3a = v1.withOverrides(v2a);
-        assertEquals(Collections.singleton("a"), v3a.getIgnored());
-        assertTrue(v3a.getIgnoreUnknown());
-        assertTrue(v3a.getAllowGetters());
-        assertFalse(v3a.getAllowSetters());
-        // when NOT merging, simply replacing values
-        JsonIgnoreProperties.Value v3b = JsonIgnoreProperties.Value.merge(v1, v2b);
-        assertEquals(Collections.emptySet(), v3b.getIgnored());
-        assertFalse(v3b.getIgnoreUnknown());
-        assertFalse(v3b.getAllowGetters());
-        assertFalse(v3b.getAllowSetters());
-        // and effectively really just uses overrides as is
-        assertEquals(v2b, v3b);
-        assertSame(v2b, v2b.withOverrides(null));
-        assertSame(v2b, v2b.withOverrides(EMPTY));
+    void mergeWithMergeDisabledShouldReplaceProperties() {
+        // Arrange: Create a base config and an override that disables merging.
+        JsonIgnoreProperties.Value baseConfig = EMPTY
+                .withIgnoreUnknown()
+                .withAllowGetters();
+        JsonIgnoreProperties.Value replacingOverrides = EMPTY.withoutMerge();
+
+        // Act: Apply the overrides to the base configuration.
+        JsonIgnoreProperties.Value result = baseConfig.withOverrides(replacingOverrides);
+
+        // Assert: The result should be identical to the override, as merging is disabled.
+        assertEquals(replacingOverrides, result);
+
+        // Explicitly verify the properties of the result match 'replacingOverrides'.
+        assertEquals(Collections.emptySet(), result.getIgnored());
+        assertFalse(result.getIgnoreUnknown());
+        assertFalse(result.getAllowGetters());
+        assertFalse(result.getAllowSetters());
+    }
+
+    @Test
+    void withOverridesShouldReturnSameInstanceForNullOverride() {
+        // Arrange
+        JsonIgnoreProperties.Value config = EMPTY.withIgnored("a");
+
+        // Act & Assert
+        assertSame(config, config.withOverrides(null),
+            "Applying a null override should not change the original instance.");
+    }
+
+    @Test
+    void withOverridesShouldReturnSameInstanceForEmptyOverride() {
+        // Arrange
+        JsonIgnoreProperties.Value config = EMPTY.withIgnored("a");
+
+        // Act & Assert
+        assertSame(config, config.withOverrides(EMPTY),
+            "Applying an empty override should not change the original instance.");
     }
 }
