@@ -1,25 +1,36 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest23 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.value(495.5255);
-        JsonPrimitive jsonPrimitive0 = (JsonPrimitive) jsonTreeWriter0.get();
-        assertFalse(jsonPrimitive0.isBoolean());
+/**
+ * This test class is a cleaned-up, human-readable version of an auto-generated test.
+ * The original class was `JsonTreeWriter_ESTestTest23`.
+ */
+public class JsonTreeWriterTest {
+
+    @Test
+    public void value_withDouble_createsNumberPrimitive() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        double expectedValue = 495.5255;
+
+        // Act
+        writer.value(expectedValue);
+        JsonElement result = writer.get();
+
+        // Assert
+        assertTrue("The resulting element should be a JsonPrimitive", result.isJsonPrimitive());
+
+        JsonPrimitive resultPrimitive = result.getAsJsonPrimitive();
+        assertTrue("The primitive should represent a number", resultPrimitive.isNumber());
+        assertEquals("The primitive's double value should match the input",
+                expectedValue, resultPrimitive.getAsDouble(), 0.0);
     }
 }
