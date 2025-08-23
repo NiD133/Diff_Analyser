@@ -1,38 +1,49 @@
 package org.apache.ibatis.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.io.Reader;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl;
-import org.apache.ibatis.logging.log4j.Log4jImpl;
-import org.apache.ibatis.logging.log4j2.Log4j2Impl;
 import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.logging.slf4j.Slf4jImpl;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LogFactoryTestTest7 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-    @AfterAll
-    static void restore() {
-        LogFactory.useSlf4jLogging();
-    }
+/**
+ * Tests for the {@link LogFactory} to verify its dynamic logging implementation selection.
+ */
+@DisplayName("LogFactory Configuration")
+class LogFactoryTest {
 
-    private void logSomething(Log log) {
-        log.warn("Warning message.");
-        log.debug("Debug message.");
-        log.error("Error message.");
-        log.error("Error with Exception.", new Exception("Test exception."));
-    }
+  /**
+   * Restores the default logging implementation after all tests in this class have run.
+   * This prevents side effects on other test classes.
+   */
+  @AfterAll
+  static void restoreDefaultLogging() {
+    LogFactory.useSlf4jLogging();
+  }
 
-    @Test
-    void shouldUseNoLogging() {
-        LogFactory.useNoLogging();
-        Log log = LogFactory.getLog(Object.class);
-        logSomething(log);
-        assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
-    }
+  @Test
+  @DisplayName("Should return NoLoggingImpl when no-logging mode is enabled")
+  void getLog_shouldReturnNoLoggingImpl_whenNoLoggingIsSelected() {
+    // Arrange: Explicitly select the 'no logging' implementation.
+    LogFactory.useNoLogging();
+
+    // Act: Request a logger instance from the factory.
+    Log log = LogFactory.getLog(LogFactoryTest.class);
+
+    // Assert:
+    // 1. The factory should return an instance of the correct logger implementation.
+    assertEquals(NoLoggingImpl.class, log.getClass(),
+        "LogFactory should provide a NoLoggingImpl instance.");
+
+    // 2. The NoLoggingImpl instance should be a functioning no-op logger.
+    //    Verify that calling its methods does not throw any exceptions.
+    assertDoesNotThrow(() -> {
+      log.warn("This is a warning.");
+      log.debug("This is a debug message.");
+      log.error("This is an error.");
+      log.error("This is an error with an exception.", new Exception("Test exception"));
+    }, "NoLoggingImpl methods should not throw exceptions.");
+  }
 }
