@@ -1,35 +1,46 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest29 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TypeAdapter} class, focusing on specific internal behaviors.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        StringWriter stringWriter0 = new StringWriter();
-        // Undeclared exception!
+    /**
+     * Tests that calling toJson() on a FutureTypeAdapter before its delegate
+     * has been set throws an IllegalStateException.
+     *
+     * <p>A {@code FutureTypeAdapter} is an internal Gson mechanism for handling
+     * cyclic dependencies. It acts as a placeholder for a TypeAdapter that is
+     * still being created. Using this placeholder before it is resolved (i.e.,
+     * before its delegate is set) is an illegal state and should fail fast.
+     */
+    @Test
+    public void toJsonOnUnresolvedFutureAdapterThrowsIllegalStateException() {
+        // Arrange: Create an unresolved FutureTypeAdapter.
+        // This adapter is not yet linked to a real TypeAdapter.
+        Gson.FutureTypeAdapter<Object> futureAdapter = new Gson.FutureTypeAdapter<>();
+        StringWriter writer = new StringWriter();
+
+        // Act & Assert
         try {
-            gson_FutureTypeAdapter0.toJson((Writer) stringWriter0, (Object) null);
-            fail("Expecting exception: IllegalStateException");
+            // Attempt to use the adapter, which should throw an exception.
+            futureAdapter.toJson(writer, null);
+            fail("Expected an IllegalStateException to be thrown, but no exception occurred.");
         } catch (IllegalStateException e) {
-            //
-            // Adapter for type with cyclic dependency has been used before dependency has been resolved
-            //
-            verifyException("com.google.gson.Gson$FutureTypeAdapter", e);
+            // Verify that the exception has the expected, informative message.
+            String expectedMessage = "Adapter for type with cyclic dependency has been used before dependency has been resolved";
+            assertEquals(expectedMessage, e.getMessage());
+        } catch (IOException e) {
+            // The toJson method signature allows for IOException, but it's not
+            // expected in this specific scenario.
+            fail("Expected an IllegalStateException, but caught an unexpected IOException: " + e.getMessage());
         }
     }
 }
