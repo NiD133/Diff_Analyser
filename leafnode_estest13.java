@@ -2,22 +2,31 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest13 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode class, focusing on cloning behavior.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        DataNode dataNode0 = new DataNode("org.jsoup.select.Evaluator$IndexGreaterThan");
-        dataNode0.siblingIndex = 74;
-        CDataNode cDataNode0 = new CDataNode("'mMH");
-        LeafNode leafNode0 = dataNode0.doClone(cDataNode0);
-        assertTrue(leafNode0.hasParent());
+    /**
+     * Verifies that the doClone(parent) method correctly assigns the specified
+     * parent to the newly created clone.
+     */
+    @Test
+    public void doCloneShouldSetParentOnClonedNode() {
+        // Arrange: Create an original node and a new parent for the clone.
+        // DataNode is a concrete implementation of the abstract LeafNode.
+        DataNode originalNode = new DataNode("Original data content");
+        
+        // Any Node can be a parent. Using a Comment node as an example.
+        Comment newParent = new Comment("This is the parent node");
+
+        // Act: Clone the original node, assigning the new parent during the process.
+        // The doClone method is protected, so this test must be in the same package.
+        LeafNode clonedNode = originalNode.doClone(newParent);
+
+        // Assert: The cloned node should have the new parent assigned to it.
+        assertTrue("The cloned node should have a parent.", clonedNode.hasParent());
+        assertSame("The cloned node's parent should be the exact instance we provided.", newParent, clonedNode.parent());
     }
 }
