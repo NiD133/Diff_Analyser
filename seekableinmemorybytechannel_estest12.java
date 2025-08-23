@@ -1,23 +1,29 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class SeekableInMemoryByteChannel_ESTestTest12 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Tests for {@link SeekableInMemoryByteChannel}.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
-        byte[] byteArray1 = seekableInMemoryByteChannel0.array();
-        assertArrayEquals(new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 }, byteArray1);
+    /**
+     * Verifies that the array() method returns the exact same byte array instance
+     * that was provided to the constructor.
+     */
+    @Test
+    public void arrayShouldReturnTheSameInstanceProvidedInConstructor() {
+        // Arrange: Create a distinct byte array and use it to initialize the channel.
+        // Using non-zero, distinct values makes the test more robust than using an all-zero array.
+        final byte[] inputData = { 10, 20, 30, 40, 50 };
+        final SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(inputData);
+
+        // Act: Retrieve the backing array from the channel.
+        final byte[] resultData = channel.array();
+
+        // Assert: The returned array should be the same instance as the one passed to the constructor,
+        // not just an array with equal content.
+        assertSame("The array() method should return the original backing array instance.", inputData, resultData);
     }
 }
