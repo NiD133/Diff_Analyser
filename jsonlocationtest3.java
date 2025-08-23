@@ -1,67 +1,74 @@
 package com.fasterxml.jackson.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.io.ContentReference;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class JsonLocationTestTest3 extends JUnit5TestBase {
+/**
+ * Unit tests for the source description functionality of {@link JsonLocation},
+ * focusing on how it handles and displays truncated content.
+ */
+public class JsonLocationSourceDescriptionTest {
 
-    private void _verifyContentDisabled(JsonParseException e) {
-        verifyException(e, "unrecognized token");
-        JsonLocation loc = e.getLocation();
-        assertNull(loc.contentReference().getRawContent());
-        assertThat(loc.sourceDescription()).startsWith("REDACTED");
+    /**
+     * Provides test cases for content that exceeds the maximum displayable length,
+     * covering both String and byte array sources.
+     *
+     * @return A stream of arguments for the parameterized test.
+     */
+    private static Stream<Arguments> longContentSourceProvider() {
+        // Arrange
+        final int maxLength = ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH;
+        final String contentUpToLimit = "x".repeat(maxLength);
+        final String extraContent = "yyy";
+        final String fullContentString = contentUpToLimit + extraContent;
+        final byte[] fullContentBytes = fullContentString.getBytes(StandardCharsets.UTF_8);
+
+        // Create a ContentReference for a String source
+        ContentReference stringContentRef = ContentReference.construct(
+                true, fullContentString, 0, fullContentString.length(), ErrorReportConfiguration.defaults());
+
+        // Create a ContentReference for a byte[] source
+        ContentReference byteContentRef = ContentReference.construct(
+                true, fullContentBytes, 0, fullContentBytes.length, ErrorReportConfiguration.defaults());
+
+        return Stream.of(
+                arguments(stringContentRef, "String", "chars", extraContent.length()),
+                arguments(byteContentRef, "byte[]", "bytes", extraContent.length())
+        );
     }
 
-    private ContentReference _sourceRef(String rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length(), ErrorReportConfiguration.defaults());
-    }
+    /**
+     * Verifies that {@link JsonLocation#sourceDescription()} correctly truncates the description
+     * when the source content is longer than the configured maximum length. The test is
+     * parameterized to run for both String and byte[] sources.
+     */
+    @ParameterizedTest(name = "for source type {1}")
+    @MethodSource("longContentSourceProvider")
+    void shouldTruncateSourceDescriptionWhenContentExceedsMaxLength(
+            ContentReference contentRef, String expectedTypeName, String expectedUnit, int expectedTruncatedCount) {
+        // Arrange
+        final int maxLength = ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH;
+        final String contentUpToLimit = "x".repeat(maxLength);
 
-    private ContentReference _sourceRef(char[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
+        // A dummy location, as its specific coordinates are not relevant for this test.
+        JsonLocation location = new JsonLocation(contentRef, 0L, 0L, 1, 1);
 
-    private ContentReference _sourceRef(byte[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
+        String expectedDescription = String.format("(%s)\"%s\"[truncated %d %s]",
+                expectedTypeName, contentUpToLimit, expectedTruncatedCount, expectedUnit);
 
-    private ContentReference _sourceRef(byte[] rawSrc, int offset, int length) {
-        return ContentReference.construct(true, rawSrc, offset, length, ErrorReportConfiguration.defaults());
-    }
+        // Act
+        String actualDescription = location.sourceDescription();
 
-    private ContentReference _sourceRef(InputStream rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(File rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _rawSourceRef(boolean textual, Object rawSrc) {
-        return ContentReference.rawReference(textual, rawSrc);
-    }
-
-    static class Foobar {
-    }
-
-    @Test
-    void truncatedSource() throws Exception {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ErrorReportConfiguration.DEFAULT_MAX_RAW_CONTENT_LENGTH; ++i) {
-            sb.append("x");
-        }
-        String main = sb.toString();
-        String json = main + "yyy";
-        JsonLocation loc = new JsonLocation(_sourceRef(json), 0L, 0L, 1, 1);
-        String desc = loc.sourceDescription();
-        assertEquals(String.format("(String)\"%s\"[truncated 3 chars]", main), desc);
-        // and same with bytes
-        loc = new JsonLocation(_sourceRef(json.getBytes("UTF-8")), 0L, 0L, 1, 1);
-        desc = loc.sourceDescription();
-        assertEquals(String.format("(byte[])\"%s\"[truncated 3 bytes]", main), desc);
+        // Assert
+        assertThat(actualDescription).isEqualTo(expectedDescription);
     }
 }
