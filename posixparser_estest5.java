@@ -1,22 +1,39 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PosixParser_ESTestTest5 extends PosixParser_ESTest_scaffolding {
+/**
+ * Tests for the flatten method in {@link PosixParser}.
+ */
+public class PosixParserTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Options options0 = new Options();
-        PosixParser posixParser0 = new PosixParser();
-        String[] stringArray0 = new String[5];
-        stringArray0[1] = "-j";
-        String[] stringArray1 = posixParser0.flatten(options0, stringArray0, true);
-        assertEquals(4, stringArray1.length);
+    /**
+     * Tests that the flatten method stops processing arguments when it encounters an
+     * unrecognized option, if the 'stopAtNonOption' flag is true.
+     *
+     * The parser should treat the unrecognized option and all subsequent arguments
+     * as non-option arguments, returning them as-is.
+     */
+    @Test
+    public void flattenShouldStopAtUnrecognizedOptionWhenStopAtNonOptionIsTrue() throws Exception {
+        // Arrange
+        PosixParser parser = new PosixParser();
+        Options options = new Options(); // No options are defined.
+        boolean stopAtNonOption = true;
+
+        // Input arguments where "-j" is an unrecognized option.
+        // The initial null should be skipped, but subsequent nulls are preserved.
+        String[] arguments = { null, "-j", "arg1", null };
+
+        // Act
+        String[] flattenedArguments = parser.flatten(options, arguments, stopAtNonOption);
+
+        // Assert
+        // The parser should skip the initial null, then stop at "-j" because it's
+        // not a defined option. It should then return "-j" and all subsequent
+        // tokens without further processing.
+        String[] expected = { "-j", "arg1", null };
+        assertArrayEquals(expected, flattenedArguments);
     }
 }
