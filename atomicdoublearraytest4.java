@@ -1,34 +1,61 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertEquals;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
 import org.jspecify.annotations.NullUnmarked;
 
+/**
+ * Note: The original test class contains unused members (e.g., Counter)
+ * that seem related to concurrency tests, which are not present here.
+ * The class name "AtomicDoubleArrayTestTest4" is also unconventional.
+ * This refactoring focuses on improving the provided test case's clarity.
+ */
+@NullUnmarked
+@GwtIncompatible
+@J2ktIncompatible
 public class AtomicDoubleArrayTestTest4 extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+    // A comprehensive set of double values for testing, including edge cases.
+    private static final double[] TEST_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
+    // Unused in the provided test, likely intended for other concurrency tests.
     static final long COUNTDOWN = 100000;
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Asserts that two double values are bit-wise equal. This is the equality
+     * contract used by AtomicDoubleArray's atomic operations.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
+    static void assertBitEquals(double expected, double actual) {
+        assertEquals(
+            "Expected bit-wise equality, but values differed.",
+            Double.doubleToRawLongBits(expected),
+            Double.doubleToRawLongBits(actual));
     }
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
+    // Unused in the provided test, likely intended for other concurrency tests.
     class Counter extends CheckedRunnable {
-
         final AtomicDoubleArray aa;
-
         volatile long counts;
 
         Counter(AtomicDoubleArray a) {
@@ -57,13 +84,27 @@ public class AtomicDoubleArrayTestTest4 extends JSR166TestCase {
     }
 
     /**
-     * constructor with array is of same size and has all elements
+     * Verifies that the constructor that accepts a double[] creates an
+     * AtomicDoubleArray with the same length and a bit-for-bit copy of the
+     * source array's elements.
      */
-    public void testConstructor2() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(VALUES);
-        assertEquals(VALUES.length, aa.length());
-        for (int i = 0; i < VALUES.length; i++) {
-            assertBitEquals(VALUES[i], aa.get(i));
+    public void testConstructor_withArrayArgument_createsExactCopy() {
+        // Arrange: Use a comprehensive set of double values as the source.
+        double[] sourceArray = TEST_VALUES;
+
+        // Act: Create the AtomicDoubleArray using the constructor under test.
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(sourceArray);
+
+        // Assert: The new array should have the same length and content.
+        assertEquals(
+            "Array length should match source array length.",
+            sourceArray.length,
+            atomicArray.length());
+
+        for (int i = 0; i < sourceArray.length; i++) {
+            // We use assertBitEquals because AtomicDoubleArray uses bit-wise
+            // comparison for its atomic operations, not standard '==' or .equals().
+            assertBitEquals(sourceArray[i], atomicArray.get(i));
         }
     }
 }
