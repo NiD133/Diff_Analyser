@@ -1,30 +1,25 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest27 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add((-1672.7733723256124), (-1672.7733723256124));
-        pairedStatsAccumulator0.add((-1672.7733723256124), (-1672.7733723256124));
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.leastSquaresFit();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    @Test
+    public void leastSquaresFit_throwsIllegalStateException_whenBothXAndYHaveZeroVariance() {
+        // Arrange: Create an accumulator and add two identical points.
+        // According to the Javadoc, leastSquaresFit() requires at least one of the
+        // x or y datasets to have a non-zero population variance. Adding identical
+        // points ensures both have zero variance.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(10.0, 20.0);
+        accumulator.add(10.0, 20.0);
+
+        // Act & Assert: Verify that calling leastSquaresFit() throws an IllegalStateException.
+        assertThrows(IllegalStateException.class, accumulator::leastSquaresFit);
     }
 }
