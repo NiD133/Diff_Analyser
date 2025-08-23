@@ -1,43 +1,31 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link ComparatorChain} class, focusing on exception handling.
+ */
 public class ComparatorChain_ESTestTest16 extends ComparatorChain_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>((Comparator<Object>) null, false);
-        Object object0 = new Object();
-        ComparatorChain<ComparatorChain<Integer>> comparatorChain1 = new ComparatorChain<ComparatorChain<Integer>>();
-        // Undeclared exception!
-        try {
-            comparatorChain0.compare(object0, comparatorChain1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.comparators.ComparatorChain", e);
-        }
+    /**
+     * Tests that a NullPointerException is thrown when compare() is called on a
+     * ComparatorChain that was initialized with a null Comparator.
+     */
+    @Test(expected = NullPointerException.class)
+    public void compareShouldThrowNullPointerExceptionWhenChainContainsNullComparator() {
+        // Arrange: Create a ComparatorChain with a single, null comparator.
+        final Comparator<Object> nullComparator = null;
+        final ComparatorChain<Object> chainWithNullComparator = new ComparatorChain<>(nullComparator);
+
+        final Object object1 = new Object();
+        final Object object2 = new Object();
+
+        // Act: Attempt to compare two objects. This should throw a NullPointerException
+        // because the chain will try to delegate the comparison to the null comparator.
+        chainWithNullComparator.compare(object1, object2);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // as specified by the @Test(expected) annotation.
     }
 }
