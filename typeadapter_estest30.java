@@ -1,27 +1,32 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest30 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TypeAdapter} class.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        Object object0 = typeAdapter0.fromJson("null");
-        assertNull(object0);
+    /**
+     * Verifies that a null-safe adapter, when deserializing the JSON string "null",
+     * correctly returns a Java null object.
+     */
+    @Test
+    public void nullSafeFromJsonString_withNullInput_shouldReturnNull() throws IOException {
+        // Arrange: Create a null-safe TypeAdapter.
+        // We use Gson.FutureTypeAdapter as a convenient, concrete implementation of TypeAdapter
+        // for this test, but any TypeAdapter would exhibit the same null-safe behavior.
+        TypeAdapter<Object> originalAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Object> nullSafeAdapter = originalAdapter.nullSafe();
+        String jsonNull = "null";
+
+        // Act: Deserialize the JSON "null" string.
+        Object result = nullSafeAdapter.fromJson(jsonNull);
+
+        // Assert: The resulting object should be null.
+        assertNull("Deserializing 'null' should result in a null object.", result);
     }
 }
