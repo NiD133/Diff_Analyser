@@ -1,32 +1,28 @@
 package org.jsoup.internal;
 
-import org.jsoup.Jsoup;
-import org.junit.jupiter.api.Test;
-import java.util.Arrays;
-import java.util.Collections;
-import static org.jsoup.internal.StringUtil.normaliseWhitespace;
-import static org.jsoup.internal.StringUtil.resolve;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class StringUtilTestTest14 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Test
-    void isDigit() {
-        assertTrue(StringUtil.isDigit('0'));
-        assertTrue(StringUtil.isDigit('1'));
-        assertTrue(StringUtil.isDigit('2'));
-        assertTrue(StringUtil.isDigit('3'));
-        assertTrue(StringUtil.isDigit('4'));
-        assertTrue(StringUtil.isDigit('5'));
-        assertTrue(StringUtil.isDigit('6'));
-        assertTrue(StringUtil.isDigit('7'));
-        assertTrue(StringUtil.isDigit('8'));
-        assertTrue(StringUtil.isDigit('9'));
-        assertFalse(StringUtil.isDigit('a'));
-        assertFalse(StringUtil.isDigit('A'));
-        assertFalse(StringUtil.isDigit('ä'));
-        assertFalse(StringUtil.isDigit('Ä'));
-        assertFalse(StringUtil.isDigit('١'));
-        assertFalse(StringUtil.isDigit('୳'));
+/**
+ * Tests for {@link StringUtil#isDigit(char)}.
+ */
+class StringUtilTest {
+
+    @DisplayName("isDigit should return true for ASCII digits '0' through '9'")
+    @ParameterizedTest(name = "for character ''{0}''")
+    @ValueSource(chars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'})
+    void isDigit_returnsTrue_forAsciiDigits(char digit) {
+        assertTrue(StringUtil.isDigit(digit));
+    }
+
+    @DisplayName("isDigit should return false for non-digit characters")
+    @ParameterizedTest(name = "for character ''{0}''")
+    @ValueSource(chars = {'a', 'A', 'ä', 'Ä', '١', '୳', ' ', '#', '.'})
+    void isDigit_returnsFalse_forNonDigitCharacters(char nonDigit) {
+        assertFalse(StringUtil.isDigit(nonDigit));
     }
 }
