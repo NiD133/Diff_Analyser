@@ -1,19 +1,32 @@
 package org.jsoup.select;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.jsoup.select.EvaluatorDebug.asElement;
-import static org.jsoup.select.EvaluatorDebug.sexpr;
-import static org.jsoup.select.Selector.SelectorParseException;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class QueryParserTestTest8 {
+import static org.jsoup.select.Selector.SelectorParseException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * Tests for {@link QueryParser}.
+ */
+class QueryParserTest {
 
     @Test
-    public void exceptOnEmptySelector() {
-        SelectorParseException exception = assertThrows(SelectorParseException.class, () -> QueryParser.parse(""));
-        assertEquals("String must not be empty", exception.getMessage());
+    @DisplayName("parse() should throw a SelectorParseException for an empty query")
+    void parse_withEmptyQuery_throwsException() {
+        // Arrange
+        String emptyQuery = "";
+        String expectedErrorMessage = "String must not be empty";
+
+        // Act & Assert
+        // Verify that parsing an empty string throws the expected exception.
+        SelectorParseException thrown = assertThrows(
+            SelectorParseException.class,
+            () -> QueryParser.parse(emptyQuery)
+        );
+
+        // Verify that the exception message is correct.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
