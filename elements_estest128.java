@@ -1,35 +1,28 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
+/**
+ * This test class contains tests for the {@link Elements} class.
+ * The original test was auto-generated and has been improved for clarity.
+ */
 public class Elements_ESTestTest128 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test127() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.tagName("");
-        assertSame(elements0, elements1);
+    /**
+     * Verifies that calling the tagName() method on an empty Elements collection
+     * returns the same instance. This ensures that method chaining is preserved
+     * even when there are no elements to modify.
+     */
+    @Test
+    public void tagNameOnEmptyElementsReturnsSameInstanceForChaining() {
+        // Arrange: Create an empty collection of elements.
+        Elements emptyElements = new Elements();
+
+        // Act: Attempt to change the tag name of the elements in the empty collection.
+        Elements result = emptyElements.tagName("p");
+
+        // Assert: The method should return the original instance to allow for fluent chaining.
+        assertSame("Expected the same Elements instance to be returned for chaining.", emptyElements, result);
     }
 }
