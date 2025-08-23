@@ -1,38 +1,50 @@
 package org.apache.ibatis.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.io.Reader;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
 import org.apache.ibatis.logging.log4j.Log4jImpl;
-import org.apache.ibatis.logging.log4j2.Log4j2Impl;
-import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.logging.slf4j.Slf4jImpl;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LogFactoryTestTest2 {
+@DisplayName("LogFactory Tests")
+class LogFactoryTest {
 
-    @AfterAll
-    static void restore() {
-        LogFactory.useSlf4jLogging();
-    }
+  /**
+   * After all tests in this class, restore the default logging implementation.
+   * This prevents side effects on other tests that might run in the same suite.
+   */
+  @AfterAll
+  static void restoreDefaultLogging() {
+    LogFactory.useSlf4jLogging();
+  }
 
-    private void logSomething(Log log) {
-        log.warn("Warning message.");
-        log.debug("Debug message.");
-        log.error("Error message.");
-        log.error("Error with Exception.", new Exception("Test exception."));
-    }
+  /**
+   * A simple smoke test to ensure the created logger can be used without throwing exceptions.
+   *
+   * @param log The logger instance to exercise.
+   */
+  private void exerciseLogger(Log log) {
+    log.warn("Warning message.");
+    log.debug("Debug message.");
+    log.error("Error message.");
+    log.error("Error with Exception.", new Exception("Test exception."));
+  }
 
-    @Test
-    void shouldUseLog4J() {
-        LogFactory.useLog4JLogging();
-        Log log = LogFactory.getLog(Object.class);
-        logSomething(log);
-        assertEquals(log.getClass().getName(), Log4jImpl.class.getName());
-    }
+  @Test
+  @DisplayName("should return a Log4jImpl when Log4J logging is selected")
+  void shouldSelectLog4jImplementation() {
+    // Arrange: Explicitly select the Log4J logging implementation.
+    LogFactory.useLog4JLogging();
+
+    // Act: Request a logger from the factory.
+    Log log = LogFactory.getLog(LogFactoryTest.class);
+
+    // Assert: The factory should return an instance of the correct logger implementation.
+    assertInstanceOf(Log4jImpl.class, log, "LogFactory should have returned a Log4jImpl instance.");
+
+    // Verify: Ensure the logger is functional by calling its methods.
+    // This confirms that the logger not only has the correct type but also works as expected.
+    exerciseLogger(log);
+  }
 }
