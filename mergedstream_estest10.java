@@ -1,54 +1,73 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest10 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.REDACTED_CONTENT;
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        byte[] byteArray0 = new byte[0];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        PushbackInputStream pushbackInputStream0 = new PushbackInputStream(byteArrayInputStream0);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, pushbackInputStream0, byteArray0, 1000, 200);
-        // Undeclared exception!
+/**
+ * This test suite contains tests for the {@link MergedStream} class.
+ * This particular test was improved for clarity from an auto-generated test case.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Tests that calling skip() with a negative value causes a NullPointerException
+     * when the MergedStream is in a specific state.
+     * <p>
+     * This behavior is likely a bug, as skip() should ideally return 0 for negative
+     * values. The exception occurs because the method proceeds to free an internal
+     * buffer. The test sets up a state where this buffer was not allocated via the
+     * IOContext, causing a NullPointerException within the IOContext when it
+     * attempts to release a buffer it doesn't "own".
+     */
+    @Test
+    public void skipWithNegativeValueShouldThrowNPEWhenReleasingUnmanagedBuffer() {
+        // Arrange
+
+        // 1. Set up an IOContext that does not manage the buffer resource. This is key
+        // to the failure, as its internal reference to the read buffer will be null.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.REDACTED_CONTENT,
+                false // `isResourceManaged` is false
+        );
+
+        // 2. Create a MergedStream with an invalid buffer state where the start offset
+        // is greater than the end offset. This setup is necessary to bypass the
+        // initial conditional check in the skip() method, forcing it to execute
+        // the buffer-freeing logic.
+        byte[] preReadBuffer = new byte[0];
+        InputStream underlyingStream = new ByteArrayInputStream(preReadBuffer);
+        int invalidStartOffset = 1000;
+        int invalidEndOffset = 200; // Note: end < start
+        MergedStream mergedStream = new MergedStream(ioContext, underlyingStream, preReadBuffer, invalidStartOffset, invalidEndOffset);
+
+        long negativeBytesToSkip = -240L;
+
+        // Act & Assert
         try {
-            mergedStream0.skip((-240L));
-            fail("Expecting exception: NullPointerException");
+            mergedStream.skip(negativeBytesToSkip);
+            fail("Expected a NullPointerException to be thrown due to incorrect buffer handling.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.IOContext", e);
+            // The NPE is expected. It originates from IOContext when it tries to verify
+            // the release of a buffer it never allocated, leading to a null access.
+            // We can confirm the source of the exception to ensure the test is failing for the right reason.
+            StackTraceElement topOfStack = e.getStackTrace()[0];
+            assertEquals("Exception should originate from the IOContext class",
+                    IOContext.class.getName(), topOfStack.getClassName());
+        } catch (IOException e) {
+            fail("Caught an unexpected IOException, but a NullPointerException was expected. Details: " + e.getMessage());
         }
     }
 }
