@@ -1,24 +1,27 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class SeekableInMemoryByteChannel_ESTestTest19 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
-        seekableInMemoryByteChannel0.close();
-        boolean boolean0 = seekableInMemoryByteChannel0.isOpen();
-        assertFalse(boolean0);
+    /**
+     * Verifies that isOpen() returns false after the channel has been explicitly closed.
+     */
+    @Test
+    public void isOpenShouldReturnFalseAfterChannelIsClosed() {
+        // Arrange: Create a new channel, which should be open by default.
+        final SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+        assertTrue("A new channel should be open upon creation.", channel.isOpen());
+
+        // Act: Close the channel.
+        channel.close();
+
+        // Assert: Verify the channel is now reported as closed.
+        assertFalse("isOpen() should return false after close() has been called.", channel.isOpen());
     }
 }
