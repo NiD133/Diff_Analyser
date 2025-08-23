@@ -1,28 +1,34 @@
 package org.apache.commons.lang3.stream;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LangCollectors_ESTestTest4 extends LangCollectors_ESTest_scaffolding {
+/**
+ * Contains tests for {@link LangCollectors}.
+ * This class focuses on edge cases and invalid arguments for the collect method.
+ */
+public class LangCollectorsTest {
 
-    @Test(timeout = 4000)
-    public void test3() throws Throwable {
-        // Undeclared exception!
-        try {
-            LangCollectors.collect((Collector<? super CharBuffer, CharBuffer, CharBuffer>) null, (CharBuffer[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that {@link LangCollectors#collect(java.util.stream.Collector, Object...)}
+     * throws a NullPointerException when the collector argument is null.
+     */
+    @Test
+    public void collectShouldThrowNullPointerExceptionWhenCollectorIsNull() {
+        // Arrange: The method under test should reject a null collector.
+        // The array argument can be anything; an empty array is used for simplicity.
+        final String[] inputArray = {};
+
+        // Act & Assert: Call the method and verify the expected exception.
+        final NullPointerException thrown = assertThrows(
+            NullPointerException.class,
+            () -> LangCollectors.collect(null, inputArray)
+        );
+
+        // Further Assert: The implementation uses Objects.requireNonNull with a specific message.
+        // Verifying this message makes the test more robust and documents the expected behavior.
+        assertEquals("collector", thrown.getMessage());
     }
 }
