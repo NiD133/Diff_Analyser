@@ -1,57 +1,39 @@
 package org.jfree.chart.annotations;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.Drawable;
 import org.jfree.chart.api.PublicCloneable;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XYDrawableAnnotationTestTest4 {
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 
-    static class TestDrawable implements Drawable, Cloneable, Serializable {
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-        /**
-         * Default constructor.
-         */
-        public TestDrawable() {
-        }
+/**
+ * Tests for the {@link XYDrawableAnnotation} class.
+ */
+class XYDrawableAnnotationTest {
 
-        /**
-         * Draws something.
-         * @param g2  the graphics device.
-         * @param area  the area in which to draw.
-         */
+    /**
+     * A mock {@link Drawable} for testing purposes. It is cloneable and serializable
+     * to satisfy the requirements of annotations that might be cloned or serialized.
+     */
+    private static class MockDrawable implements Drawable, Cloneable, Serializable {
+
         @Override
         public void draw(Graphics2D g2, Rectangle2D area) {
-            // do nothing
+            // This mock implementation does nothing, as drawing is not relevant for these tests.
         }
 
-        /**
-         * Tests this object for equality with an arbitrary object.
-         * @param obj  the object to test against ({@code null} permitted).
-         * @return A boolean.
-         */
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) {
+            if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof TestDrawable)) {
-                return false;
-            }
-            return true;
+            return obj instanceof MockDrawable;
         }
 
-        /**
-         * Returns a clone.
-         *
-         * @return A clone.
-         *
-         * @throws CloneNotSupportedException if there is a problem cloning.
-         */
         @Override
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
@@ -59,11 +41,20 @@ public class XYDrawableAnnotationTestTest4 {
     }
 
     /**
-     * Checks that this class implements PublicCloneable.
+     * Verifies that XYDrawableAnnotation implements the PublicCloneable interface.
+     * This test serves as a regression check to ensure the public cloneability
+     * contract is maintained.
      */
     @Test
-    public void testPublicCloneable() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, new TestDrawable());
-        assertTrue(a1 instanceof PublicCloneable);
+    void verifyImplementsPublicCloneable() {
+        // Arrange: Create an instance of the annotation with a mock drawable.
+        // The specific constructor arguments are arbitrary and do not affect this test.
+        XYDrawableAnnotation annotation = new XYDrawableAnnotation(
+                10.0, 20.0, 100.0, 200.0, new MockDrawable()
+        );
+
+        // Act & Assert: Check if the created instance is of type PublicCloneable.
+        assertTrue(annotation instanceof PublicCloneable,
+                "XYDrawableAnnotation must implement the PublicCloneable interface.");
     }
 }
