@@ -12,6 +12,6 @@ public class IllegalFieldValueException_ESTestTest20 extends IllegalFieldValueEx
     @Test(timeout = 4000)
     public void test19() throws Throwable {
         DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.clockhourOfDay();
-        IllegalFieldValueException illegalFieldValueException0 = new IllegalFieldValueException(dateTimeFieldType0, (Number) null, ".#Q:=KY]1ld]Nf>u");
+        IllegalFieldValueException illegalFieldValueException0 = new IllegalFieldValueException(dateTimeFieldType0, (Number) null, ".#Q: =KY]1ld]Nf>u");
     }
 }
