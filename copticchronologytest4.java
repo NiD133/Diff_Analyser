@@ -1,85 +1,80 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
 import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 
-public class CopticChronologyTestTest4 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+/**
+ * Tests the caching and singleton-like behavior of the CopticChronology factory methods.
+ *
+ * <p>The {@link CopticChronology#getInstance(DateTimeZone)} factory method is expected to return
+ * the same cached instance for the same time zone, ensuring efficiency and object identity.
+ */
+public class CopticChronologyGetInstanceTest extends TestCase {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
+    private DateTimeZone originalDefaultZone = null;
+    private TimeZone originalDefaultTimeZone = null;
 
     @Override
     protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
+        // Store the original default zones to restore them after the test.
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultTimeZone = TimeZone.getDefault();
+
+        // Set a predictable default zone for tests that depend on it.
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
+        TimeZone.setDefault(LONDON.toTimeZone());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+        // Restore the original default zones.
+        DateTimeZone.setDefault(originalDefaultZone);
+        TimeZone.setDefault(originalDefaultTimeZone);
     }
 
     //-----------------------------------------------------------------------
-    public void testEquality() {
-        assertSame(CopticChronology.getInstance(TOKYO), CopticChronology.getInstance(TOKYO));
-        assertSame(CopticChronology.getInstance(LONDON), CopticChronology.getInstance(LONDON));
-        assertSame(CopticChronology.getInstance(PARIS), CopticChronology.getInstance(PARIS));
-        assertSame(CopticChronology.getInstanceUTC(), CopticChronology.getInstanceUTC());
-        assertSame(CopticChronology.getInstance(), CopticChronology.getInstance(LONDON));
+
+    public void testGetInstance_withZone_returnsCachedInstance() {
+        // Act: Request the chronology for the same zone multiple times.
+        CopticChronology chrono1 = CopticChronology.getInstance(TOKYO);
+        CopticChronology chrono2 = CopticChronology.getInstance(TOKYO);
+
+        // Assert: The same instance should be returned, confirming it's cached.
+        assertSame("getInstance(DateTimeZone) should be cached", chrono1, chrono2);
+    }
+
+    public void testGetInstance_utc_returnsCachedInstance() {
+        // Act: Request the UTC chronology multiple times.
+        CopticChronology chrono1 = CopticChronology.getInstanceUTC();
+        CopticChronology chrono2 = CopticChronology.getInstanceUTC();
+
+        // Assert: The same instance should be returned.
+        assertSame("getInstanceUTC() should be cached", chrono1, chrono2);
+    }
+
+    public void testGetInstance_withDefaultZone_usesDefaultZone() {
+        // The setUp method sets the default zone to LONDON.
+        // This test verifies that getInstance() respects that default.
+
+        // Act: Get an instance using the default zone and one explicitly for London.
+        CopticChronology chronoDefault = CopticChronology.getInstance();
+        CopticChronology chronoLondon = CopticChronology.getInstance(LONDON);
+
+        // Assert: Both methods should return the same London-based instance.
+        assertSame("getInstance() should use the default time zone", chronoDefault, chronoLondon);
+    }
+
+    public void testGetInstance_withDifferentZones_returnsDifferentInstances() {
+        // Act: Request chronologies for two different time zones.
+        CopticChronology chronoLondon = CopticChronology.getInstance(LONDON);
+        CopticChronology chronoParis = CopticChronology.getInstance(PARIS);
+
+        // Assert: Instances for different zones should be different objects.
+        assertNotSame("Instances for different time zones should be different", chronoLondon, chronoParis);
     }
 }
