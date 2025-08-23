@@ -1,27 +1,30 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest58 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link TaiInstant}.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        Instant instant0 = taiInstant0.toInstant();
-        TaiInstant taiInstant1 = TaiInstant.of(instant0);
-        assertEquals(0, taiInstant1.getNano());
+    /**
+     * Tests that converting a TaiInstant to a java.time.Instant and back
+     * results in the original TaiInstant. This verifies the round-trip
+     * conversion for a non-leap-second instant.
+     */
+    @Test
+    public void testRoundTripConversionToInstantAndBack() {
+        // Arrange: Create a TaiInstant at its epoch (0 seconds, 0 nanoseconds).
+        TaiInstant originalTaiInstant = TaiInstant.ofTaiSeconds(0L, 0L);
+
+        // Act: Convert to a standard Instant and then back to a TaiInstant.
+        Instant convertedInstant = originalTaiInstant.toInstant();
+        TaiInstant resultTaiInstant = TaiInstant.of(convertedInstant);
+
+        // Assert: The TaiInstant after the round-trip conversion should be
+        // equal to the original.
+        assertEquals(originalTaiInstant, resultTaiInstant);
     }
 }
