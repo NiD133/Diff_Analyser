@@ -1,21 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest68 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * This class contains improved tests for the {@link CharSequenceUtils} class.
+ */
+public class CharSequenceUtilsImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("', is neither of type Map.Entry nor an Array");
-        char[] charArray0 = new char[5];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        int int0 = CharSequenceUtils.indexOf(charBuffer0, stringBuilder0, (-1231));
-        assertEquals((-1), int0);
+    /**
+     * Tests that CharSequenceUtils.indexOf returns -1 when the search sequence
+     * is longer than the source sequence, even with a negative start index.
+     * A negative start index is treated as 0 by the method.
+     */
+    @Test
+    public void indexOfShouldReturnNotFoundWhenSearchSequenceIsLongerThanSource() {
+        // Arrange
+        CharSequence sourceText = CharBuffer.wrap(new char[]{'a', 'b', 'c'});
+        CharSequence searchText = "abcde"; // This is longer than sourceText
+        int invalidStartIndex = -1;
+
+        // Act
+        int result = CharSequenceUtils.indexOf(sourceText, searchText, invalidStartIndex);
+
+        // Assert
+        final int NOT_FOUND = -1;
+        assertEquals("Expected -1 (not found) because the search text is longer than the source text.", NOT_FOUND, result);
     }
 }
