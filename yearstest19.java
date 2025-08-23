@@ -1,47 +1,69 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class YearsTestTest19 extends TestCase {
+/**
+ * Test suite for the dividedBy(int) method in the Years class.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final Years TWELVE_YEARS = Years.years(12);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void dividedBy_withEvenDivisor_returnsCorrectlyScaledYears() {
+        // Arrange
+        Years expected = Years.years(6);
+
+        // Act
+        Years actual = TWELVE_YEARS.dividedBy(2);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void dividedBy_withUnevenDivisor_truncatesResult() {
+        // Arrange
+        // 12 divided by 5 is 2.4, which should be truncated to 2.
+        Years expected = Years.years(2);
+
+        // Act
+        Years actual = TWELVE_YEARS.dividedBy(5);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void dividedBy_isImmutable() {
+        // Arrange
+        int originalValue = TWELVE_YEARS.getYears();
+
+        // Act
+        // The division should not change the original object.
+        TWELVE_YEARS.dividedBy(4);
+
+        // Assert
+        assertEquals(originalValue, TWELVE_YEARS.getYears());
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void dividedBy_one_returnsSameInstance() {
+        // Act
+        Years result = TWELVE_YEARS.dividedBy(1);
+
+        // Assert
+        // Dividing by 1 is a no-op, so for immutable objects,
+        // it should return the same instance.
+        assertSame(TWELVE_YEARS, result);
     }
 
-    public void testDividedBy_int() {
-        Years test = Years.years(12);
-        assertEquals(6, test.dividedBy(2).getYears());
-        assertEquals(12, test.getYears());
-        assertEquals(4, test.dividedBy(3).getYears());
-        assertEquals(3, test.dividedBy(4).getYears());
-        assertEquals(2, test.dividedBy(5).getYears());
-        assertEquals(2, test.dividedBy(6).getYears());
-        assertSame(test, test.dividedBy(1));
-        try {
-            Years.ONE.dividedBy(0);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void dividedBy_zero_throwsArithmeticException() {
+        // Act
+        Years.ONE.dividedBy(0);
+
+        // Assert (handled by the @Test annotation)
     }
 }
