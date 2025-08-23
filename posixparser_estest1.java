@@ -1,18 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PosixParser_ESTestTest1 extends PosixParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link PosixParser} class, specifically focusing on edge cases
+ * for the {@code burstToken} method.
+ */
+public class PosixParserTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        PosixParser posixParser0 = new PosixParser();
-        posixParser0.burstToken("", true);
+    /**
+     * Verifies that calling {@code burstToken} with an empty string does not cause an error.
+     * The method should handle this input gracefully and complete without throwing an exception.
+     */
+    @Test
+    public void burstTokenWithEmptyStringShouldNotThrowException() {
+        // Arrange
+        PosixParser parser = new PosixParser();
+
+        // Act
+        // The test's success is confirmed by the absence of an exception.
+        parser.burstToken("", true);
+
+        // Assert (Implicit)
+        // No exception was thrown, so the test passes.
     }
 }
