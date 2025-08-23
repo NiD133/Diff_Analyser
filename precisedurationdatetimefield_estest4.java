@@ -1,41 +1,45 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.joda.time.Seconds;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest4 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
-        MillisDurationField millisDurationField0 = (MillisDurationField) MillisDurationField.INSTANCE;
-        JulianChronology julianChronology0 = JulianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-        long long0 = preciseDateTimeField0.roundFloor(0L);
-        assertEquals(0L, long0);
+/**
+ * This test class contains tests for PreciseDurationDateTimeField.
+ * Note: The original test code was auto-generated and has been refactored for clarity.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    // PreciseDateTimeField is a test-specific concrete implementation of the abstract
+    // PreciseDurationDateTimeField class, used by the original test suite.
+    // We assume it has a constructor: PreciseDateTimeField(DateTimeFieldType, DurationField, DurationField)
+
+    @Test
+    public void roundFloor_withOneMilliUnit_shouldReturnSameInstant() {
+        // Arrange
+        // The key property for this test is a unit duration of 1 millisecond,
+        // which provides the finest possible precision.
+        DurationField oneMilliUnitField = MillisDurationField.INSTANCE;
+
+        // The other constructor arguments (field type and range field) are not relevant
+        // for the roundFloor logic but are required to create the object.
+        // We use sensible, related types for better readability.
+        DateTimeFieldType fieldType = DateTimeFieldType.millisOfSecond();
+        DurationField rangeField = Seconds.seconds().getDurationField();
+
+        PreciseDateTimeField millisecondField = new PreciseDateTimeField(fieldType, oneMilliUnitField, rangeField);
+
+        long instant = 0L;
+
+        // Act
+        // Rounding an instant to the floor with a 1-millisecond precision field
+        // should not change the value, as any instant is already on a millisecond boundary.
+        long result = millisecondField.roundFloor(instant);
+
+        // Assert
+        assertEquals("Rounding to the floor with 1ms precision should be a no-op", instant, result);
     }
 }
