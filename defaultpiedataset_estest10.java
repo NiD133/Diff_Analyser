@@ -1,33 +1,30 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultPieDataset_ESTestTest10 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * A test suite for the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultPieDataset0.setValue(integer0, (Number) null);
-        int int0 = defaultPieDataset0.getIndex(integer0);
-        assertEquals(0, int0);
+    /**
+     * Verifies that getIndex() returns 0 for the first item added to the dataset.
+     * This test also confirms the behavior when the value for the item is null,
+     * which is a valid use case.
+     */
+    @Test
+    public void getIndex_shouldReturnZero_forFirstItemAdded() {
+        // Arrange: Create an empty dataset and define a key for the new item.
+        DefaultPieDataset<Integer> dataset = new DefaultPieDataset<>();
+        final Integer itemKey = 1;
+
+        // Act: Add a single item with a null value and then retrieve its index.
+        dataset.setValue(itemKey, null);
+        int actualIndex = dataset.getIndex(itemKey);
+
+        // Assert: The index of the first and only item should be 0.
+        final int expectedIndex = 0;
+        assertEquals("The index of the first item added should be 0", expectedIndex, actualIndex);
     }
 }
