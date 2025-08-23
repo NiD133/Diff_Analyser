@@ -1,43 +1,53 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfGState;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import static org.junit.Assert.assertNull;
+
+/**
+ * Contains tests for the {@link TextRenderInfo} class, focusing on Marked Content identification.
+ */
+// The original class name and extension are preserved to maintain compatibility
+// with the existing test suite structure, which may rely on scaffolding.
 public class TextRenderInfo_ESTestTest57 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = new Matrix(2, 4);
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        MarkedContentInfo markedContentInfo0 = new MarkedContentInfo(pdfGState0.BM_SCREEN, pdfGState0);
-        linkedHashSet0.add(markedContentInfo0);
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
-        Integer integer0 = textRenderInfo0.getMcid();
-        assertNull(integer0);
+    /**
+     * Verifies that {@link TextRenderInfo#getMcid()} returns null when the associated
+     * marked content exists but does not have a specific Marked Content ID (MCID) property.
+     */
+    @Test
+    public void getMcid_shouldReturnNull_whenMarkedContentHasNoMcidProperty() {
+        // Arrange: Set up the necessary objects to create a TextRenderInfo instance.
+        
+        // A GraphicsState with a font is required for TextRenderInfo instantiation.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfDictionary());
+
+        // Create a MarkedContentInfo with a properties dictionary that intentionally
+        // lacks the MCID (Marked Content ID) key. This is the specific condition under test.
+        PdfDictionary propertiesWithoutMcid = new PdfDictionary();
+        MarkedContentInfo markedContentInfo = new MarkedContentInfo(new PdfName("Tag"), propertiesWithoutMcid);
+        Collection<MarkedContentInfo> markedContentInfos = Collections.singleton(markedContentInfo);
+
+        // Create the TextRenderInfo instance to be tested.
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                new PdfString("test text"),
+                graphicsState,
+                new Matrix(),
+                markedContentInfos
+        );
+
+        // Act: Call the method under test.
+        Integer mcid = renderInfo.getMcid();
+
+        // Assert: Verify that the result is null, as expected.
+        assertNull("The MCID should be null when the marked content properties do not define an MCID.", mcid);
     }
 }
