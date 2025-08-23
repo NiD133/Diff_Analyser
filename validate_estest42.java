@@ -1,24 +1,24 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest42 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} utility class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Object object0 = new Object();
-        Validate.notNull(object0, "#");
+    /**
+     * Verifies that {@link Validate#notNull(Object, String)} does not throw an exception
+     * when provided with a non-null object. This tests the "happy path" scenario.
+     */
+    @Test
+    public void notNullWithMessage_shouldNotThrowException_whenObjectIsNotNull() {
+        // Arrange: Create a non-null object to be validated.
+        Object nonNullObject = new Object();
+        String errorMessage = "The object should not be null, but it was.";
+
+        // Act & Assert: The test will pass if no exception is thrown.
+        // An exception would indicate a failure in the validation logic.
+        Validate.notNull(nonNullObject, errorMessage);
     }
 }
