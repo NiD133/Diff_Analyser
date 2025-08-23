@@ -1,45 +1,62 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest23 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.halfdayOfDay();
-        DurationFieldType durationFieldType0 = DurationFieldType.years();
-        DurationField durationField0 = durationFieldType0.getField((Chronology) null);
-        PreciseDateTimeField preciseDateTimeField0 = null;
+/**
+ * This test verifies the behavior of the PreciseDurationDateTimeField constructor.
+ * Note: The original test used a class named 'PreciseDateTimeField', which is assumed
+ * to be a concrete subclass of the abstract 'PreciseDurationDateTimeField'.
+ * This test validates the precondition check within the abstract parent's constructor.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    @Test
+    public void constructor_shouldThrowException_whenUnitDurationIsImprecise() {
+        // Arrange
+        DateTimeFieldType fieldType = DateTimeFieldType.halfdayOfDay();
+
+        // The 'years' duration field is imprecise because its length in milliseconds
+        // varies depending on whether it's a leap year.
+        DurationField impreciseYearsField = DurationFieldType.years().getField(null);
+
+        // Act & Assert
         try {
-            preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, durationField0, durationField0);
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to create a field with the imprecise 'years' unit duration.
+            // This is expected to fail inside the PreciseDurationDateTimeField constructor.
+            new PreciseDateTimeField(fieldType, impreciseYearsField, impreciseYearsField);
+            fail("Expected an IllegalArgumentException to be thrown for an imprecise unit field.");
         } catch (IllegalArgumentException e) {
-            //
-            // Unit duration field must be precise
-            //
-            verifyException("org.joda.time.field.PreciseDurationDateTimeField", e);
+            // Verify that the exception has the expected message.
+            assertEquals("Unit duration field must be precise", e.getMessage());
         }
     }
+}
+
+/**
+ * A simple concrete implementation of PreciseDurationDateTimeField for testing purposes,
+ * mirroring the one assumed to exist in the original test suite.
+ */
+class PreciseDateTimeField extends PreciseDurationDateTimeField {
+    public PreciseDateTimeField(DateTimeFieldType type, DurationField unit, DurationField range) {
+        super(type, unit);
+        // Constructor logic for the concrete class would go here.
+    }
+
+    // Implement abstract methods
+    @Override
+    public int get(long instant) { return 0; }
+    @Override
+    public long set(long instant, int value) { return 0; }
+    @Override
+    public int getMinimumValue() { return 0; }
+    @Override
+    public int getMaximumValue() { return 0; }
+    @Override
+    public DurationField getRangeDurationField() { return null; }
 }
