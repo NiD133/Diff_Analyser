@@ -1,235 +1,74 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class DateTimeComparatorTestTest23 extends TestCase {
+/**
+ * Unit tests for {@link DateTimeComparator} focused on comparing by week of weekyear.
+ */
+public class DateTimeComparatorWeekOfWeekyearTest {
 
-    private static final Chronology ISO = ISOChronology.getInstance();
+    // A comparator that only considers the 'week of weekyear' field.
+    // The lower limit is inclusive, and the upper limit is exclusive.
+    // This setup isolates the comparison to just the weekOfWeekyear field.
+    private static final Comparator<Object> WEEK_OF_WEEKYEAR_COMPARATOR =
+        DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
 
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
+    @Test
+    public void compareShouldReturnZeroForDatesInSameWeek() {
+        // Both dates are in week 1 of 2000.
+        DateTime date1 = new DateTime("2000-01-04T10:00:00Z"); // Tuesday
+        DateTime date2 = new DateTime("2000-01-05T20:00:00Z"); // Wednesday
 
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime bDateTime = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
-     */
-    Comparator cMillis = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        assertEquals("Dates within the same week should be considered equal",
+            0, WEEK_OF_WEEKYEAR_COMPARATOR.compare(date1, date2));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
+    @Test
+    public void compareShouldReturnNegativeWhenFirstDateIsInEarlierWeek() {
+        // dateInWeek1 is in week 1 of 2000.
+        DateTime dateInWeek1 = new DateTime("2000-01-04T00:00:00Z");
+        // dateInWeek2 is in week 2 of 2000.
+        DateTime dateInWeek2 = new DateTime("2000-01-11T00:00:00Z");
+
+        assertTrue("Comparing an earlier week to a later week should return a negative number",
+            WEEK_OF_WEEKYEAR_COMPARATOR.compare(dateInWeek1, dateInWeek2) < 0);
     }
 
-    /**
-     * Junit <code>setUp()</code> method.
-     */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
+    @Test
+    public void compareShouldReturnPositiveWhenFirstDateIsInLaterWeek() {
+        // dateInWeek2 is in week 2 of 2000.
+        DateTime dateInWeek2 = new DateTime("2000-01-11T00:00:00Z");
+        // dateInWeek1 is in week 1 of 2000.
+        DateTime dateInWeek1 = new DateTime("2000-01-04T00:00:00Z");
+
+        assertTrue("Comparing a later week to an earlier week should return a positive number",
+            WEEK_OF_WEEKYEAR_COMPARATOR.compare(dateInWeek2, dateInWeek1) > 0);
     }
 
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
+    @Test
+    public void compareShouldOnlyConsiderWeekNumberAcrossYearBoundaries() {
+        // dateInWeek1 is in week 1 of weekyear 2000.
+        DateTime dateInWeek1 = new DateTime("2000-01-04T00:00:00Z");
+        // dateInWeek52 is in week 52 of weekyear 1999.
+        DateTime dateInWeek52 = new DateTime("1999-12-31T00:00:00Z");
+
+        // The comparator only checks the week number (1 vs 52), ignoring the year.
+        assertTrue("Comparing week 1 to week 52 should return a negative number",
+            WEEK_OF_WEEKYEAR_COMPARATOR.compare(dateInWeek1, dateInWeek52) < 0);
+
+        assertTrue("Comparing week 52 to week 1 should return a positive number",
+            WEEK_OF_WEEKYEAR_COMPARATOR.compare(dateInWeek52, dateInWeek1) > 0);
     }
 
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
-
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test unequal comparisons with week of weekyear comparators.
-     */
-    public void testWOW() {
-        // 1st week of year contains Jan 04.
-        aDateTime = getADate("2000-01-04T00:00:00");
-        bDateTime = getADate("2000-01-11T00:00:00");
-        assertEquals("WOWM1a", -1, cWeekOfWeekyear.compare(aDateTime, bDateTime));
-        assertEquals("WOWP1a", 1, cWeekOfWeekyear.compare(bDateTime, aDateTime));
-        aDateTime = getADate("2000-01-04T00:00:00");
-        bDateTime = getADate("1999-12-31T00:00:00");
-        assertEquals("WOWM1b", -1, cWeekOfWeekyear.compare(aDateTime, bDateTime));
-        assertEquals("WOWP1b", 1, cWeekOfWeekyear.compare(bDateTime, aDateTime));
+    @Test
+    public void testToString() {
+        assertEquals(
+            "DateTimeComparator[weekOfWeekyear-weekyear]",
+            WEEK_OF_WEEKYEAR_COMPARATOR.toString()
+        );
     }
 }
