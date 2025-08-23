@@ -1,66 +1,33 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class FilterListIterator_ESTestTest40 extends FilterListIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link FilterListIterator}.
+ */
+public class FilterListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        FilterListIterator<Object> filterListIterator0 = new FilterListIterator<Object>();
-        // Undeclared exception!
-        try {
-            filterListIterator0.set(filterListIterator0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // FilterListIterator.set(Object) is not supported.
-            //
-            verifyException("org.apache.commons.collections4.iterators.FilterListIterator", e);
-        }
+    /**
+     * Tests that the set() method is not supported and throws an exception.
+     * The set() operation is explicitly unsupported because filtering makes it
+     * complex to determine the correct underlying element to modify.
+     */
+    @Test
+    public void setShouldThrowUnsupportedOperationException() {
+        // Arrange: Create a FilterListIterator.
+        // No underlying iterator or predicate is needed as set() should fail immediately.
+        final FilterListIterator<Object> iterator = new FilterListIterator<>();
+        final Object newElement = "some-new-element";
+
+        // Act & Assert: Verify that calling set() throws UnsupportedOperationException.
+        final UnsupportedOperationException thrown = assertThrows(
+            UnsupportedOperationException.class,
+            () -> iterator.set(newElement)
+        );
+
+        // Assert: Check if the exception message is as expected.
+        assertEquals("FilterListIterator.set(Object) is not supported.", thrown.getMessage());
     }
 }
