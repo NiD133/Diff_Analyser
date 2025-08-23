@@ -1,27 +1,29 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest32 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        byte[] byteArray0 = new byte[7];
-        // Undeclared exception!
+    @Test
+    public void peekShouldThrowIllegalArgumentExceptionForNegativeLength() {
+        // Arrange
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] destinationBuffer = new byte[8];
+        final int negativeLength = -1;
+        final String expectedMessage = "Illegal length: " + negativeLength;
+
+        // Act & Assert
         try {
-            circularByteBuffer0.peek(byteArray0, (byte) 0, (-2328));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal length: -2328
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.peek(destinationBuffer, 0, negativeLength);
+            fail("Expected an IllegalArgumentException to be thrown due to negative length.");
+        } catch (final IllegalArgumentException e) {
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
