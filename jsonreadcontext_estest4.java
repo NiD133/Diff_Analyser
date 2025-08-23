@@ -1,31 +1,40 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonReadContext_ESTestTest4 extends JsonReadContext_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonReadContext} class.
+ */
+public class JsonReadContextTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext((DupDetector) null);
-        JsonReadContext jsonReadContext1 = new JsonReadContext(jsonReadContext0, (DupDetector) null, 2, 2, 1);
-        JsonReadContext jsonReadContext2 = jsonReadContext1.withDupDetector((DupDetector) null);
-        assertEquals(0, jsonReadContext0.getEntryCount());
-        assertEquals("OBJECT", jsonReadContext2.getTypeDesc());
-        assertTrue(jsonReadContext0.inRoot());
-        assertEquals(0, jsonReadContext2.getEntryCount());
-        assertEquals(1, jsonReadContext2.getNestingDepth());
+    /**
+     * Tests that `withDupDetector()` creates a new context instance
+     * while preserving the state of the original context.
+     */
+    @Test
+    public void withDupDetectorShouldCreateNewContextWithSameState() {
+        // Arrange: Create a root context and a child object context.
+        JsonReadContext rootContext = JsonReadContext.createRootContext(null);
+        JsonReadContext originalContext = new JsonReadContext(rootContext, 1, null,
+                JsonStreamContext.TYPE_OBJECT, 2, 1);
+
+        // Act: Create a new context by calling withDupDetector.
+        // In this scenario, we are "replacing" a null detector with another null detector.
+        JsonReadContext newContext = originalContext.withDupDetector(null);
+
+        // Assert: Verify the new context is a distinct instance but has the same state.
+        assertNotSame("withDupDetector should create a new instance.", originalContext, newContext);
+
+        // Check that core properties are preserved from the original context.
+        assertEquals("Type should be preserved", "OBJECT", newContext.getTypeDesc());
+        assertEquals("Entry count should be preserved", 0, newContext.getEntryCount());
+        assertEquals("Nesting depth should be preserved", 1, newContext.getNestingDepth());
+        assertSame("Parent context should be the same", rootContext, newContext.getParent());
+
+        // Verify the new DupDetector is set correctly.
+        assertNull("The new DupDetector should be null as specified", newContext.getDupDetector());
     }
 }
