@@ -1,25 +1,57 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+import static org.junit.Assert.assertArrayEquals;
+
+import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.apache.commons.codec.DecoderException;
 
-public class URLCodec_ESTestTest47 extends URLCodec_ESTest_scaffolding {
+/**
+ * Contains tests for the static utility methods in {@link URLCodec}.
+ */
+public class URLCodecStaticTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[0] = (byte) 43;
-        byte[] byteArray1 = URLCodec.decodeUrl(byteArray0);
-        BitSet bitSet0 = URLCodec.WWW_FORM_URL;
-        byte[] byteArray2 = URLCodec.encodeUrl(bitSet0, byteArray1);
-        assertArrayEquals(new byte[] { (byte) 32, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 }, byteArray1);
-        assertEquals(22, byteArray2.length);
-        assertNotNull(byteArray2);
+    /**
+     * Tests that decoding a byte array containing a plus sign correctly converts it to a space.
+     * It then tests that re-encoding this result (a space and several null bytes) correctly
+     * converts the space back to a plus sign and percent-encodes the null bytes.
+     * This verifies the round-trip behavior for special WWW-Form-URL characters.
+     */
+    @Test
+    public void testDecodePlusAndEncodeSpaceWithNullBytes() throws DecoderException {
+        //
+        // Part 1: Test decoding of '+' to space
+        //
+
+        // Arrange: Create a byte array representing "+", followed by 7 null bytes.
+        byte[] urlEncodedBytes = new byte[] {
+            (byte) '+', 0, 0, 0, 0, 0, 0, 0
+        };
+        // The expected result is a space character followed by the same null bytes.
+        byte[] expectedDecodedBytes = new byte[] {
+            (byte) ' ', 0, 0, 0, 0, 0, 0, 0
+        };
+
+        // Act: Decode the URL-encoded byte array.
+        byte[] actualDecodedBytes = URLCodec.decodeUrl(urlEncodedBytes);
+
+        // Assert: Verify that the '+' was correctly decoded to a space.
+        assertArrayEquals(expectedDecodedBytes, actualDecodedBytes);
+
+        //
+        // Part 2: Test re-encoding of the decoded result
+        //
+
+        // Arrange: The space should be encoded back to '+', and each null byte (0x00)
+        // should be percent-encoded as "%00".
+        byte[] expectedReEncodedBytes = "+%00%00%00%00%00%00%00".getBytes(StandardCharsets.US_ASCII);
+
+        // Act: Re-encode the decoded bytes using the standard WWW-FORM-URL safe characters.
+        BitSet wwwFormUrlSafe = URLCodec.WWW_FORM_URL;
+        byte[] actualReEncodedBytes = URLCodec.encodeUrl(wwwFormUrlSafe, actualDecodedBytes);
+
+        // Assert: Verify the re-encoded result matches the expected byte array.
+        assertArrayEquals(expectedReEncodedBytes, actualReEncodedBytes);
     }
 }
