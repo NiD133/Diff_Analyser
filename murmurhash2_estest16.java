@@ -1,25 +1,21 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest16 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash32((byte[]) null, 32);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that hash32 throws a NullPointerException when the input data array is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void hash32ShouldThrowNullPointerExceptionForNullInput() {
+        // The length parameter is arbitrary, as the method should fail on the null array before using it.
+        final int length = 32;
+        
+        // The cast to (byte[]) is necessary to resolve ambiguity between overloaded hash32 methods.
+        MurmurHash2.hash32((byte[]) null, length);
     }
 }
