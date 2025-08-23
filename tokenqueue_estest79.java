@@ -1,19 +1,27 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TokenQueue_ESTestTest79 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test78() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("Z<}0z:#; O.[w{T3D");
-        char[] charArray0 = new char[8];
-        boolean boolean0 = tokenQueue0.matchesAny(charArray0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that matchesAny() returns false when the character at the front of the queue
+     * is not present in the provided array of characters.
+     */
+    @Test
+    public void matchesAnyShouldReturnFalseForNonMatchingCharacter() {
+        // Arrange: Create a queue and a set of characters that does not include the queue's first character.
+        TokenQueue queue = new TokenQueue("Zebra");
+        char[] nonMatchingChars = {'a', 'b', 'c'};
+
+        // Act: Check if the start of the queue matches any of the provided characters.
+        boolean result = queue.matchesAny(nonMatchingChars);
+
+        // Assert: The result must be false because the queue's first character 'Z' is not in the search set.
+        assertFalse("matchesAny should return false when the queue's first character is not in the search array.", result);
     }
 }
