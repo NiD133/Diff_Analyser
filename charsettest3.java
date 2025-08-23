@@ -1,49 +1,126 @@
 package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.lang.reflect.Modifier;
+
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
-public class CharSetTestTest3 extends AbstractLangTest {
+/**
+ * Tests for {@link CharSet#getInstance(String...)} focusing on parsing strings
+ * that contain the negation character {@code '^'}.
+ *
+ * <p>These tests verify that the parser correctly interprets negated characters,
+ * negated ranges, and combinations thereof by inspecting the internal
+ * {@link CharRange} objects created by the factory method.</p>
+ */
+class CharSetGetInstanceWithNegationTest extends AbstractLangTest {
 
+    /**
+     * Tests that a negation character at the beginning of the string
+     * only negates the character immediately following it.
+     */
     @Test
-    void testConstructor_String_comboNegated() {
-        CharSet set;
-        CharRange[] array;
-        set = CharSet.getInstance("^abc");
-        array = set.getCharRanges();
-        assertEquals(3, array.length);
-        assertTrue(ArrayUtils.contains(array, CharRange.isNot('a')));
-        assertTrue(ArrayUtils.contains(array, CharRange.is('b')));
-        assertTrue(ArrayUtils.contains(array, CharRange.is('c')));
-        set = CharSet.getInstance("b^ac");
-        array = set.getCharRanges();
-        assertEquals(3, array.length);
-        assertTrue(ArrayUtils.contains(array, CharRange.is('b')));
-        assertTrue(ArrayUtils.contains(array, CharRange.isNot('a')));
-        assertTrue(ArrayUtils.contains(array, CharRange.is('c')));
-        set = CharSet.getInstance("db^ac");
-        array = set.getCharRanges();
-        assertEquals(4, array.length);
-        assertTrue(ArrayUtils.contains(array, CharRange.is('d')));
-        assertTrue(ArrayUtils.contains(array, CharRange.is('b')));
-        assertTrue(ArrayUtils.contains(array, CharRange.isNot('a')));
-        assertTrue(ArrayUtils.contains(array, CharRange.is('c')));
-        set = CharSet.getInstance("^b^a");
-        array = set.getCharRanges();
-        assertEquals(2, array.length);
-        assertTrue(ArrayUtils.contains(array, CharRange.isNot('b')));
-        assertTrue(ArrayUtils.contains(array, CharRange.isNot('a')));
-        set = CharSet.getInstance("b^a-c^z");
-        array = set.getCharRanges();
-        assertEquals(3, array.length);
-        assertTrue(ArrayUtils.contains(array, CharRange.isNotIn('a', 'c')));
-        assertTrue(ArrayUtils.contains(array, CharRange.isNot('z')));
-        assertTrue(ArrayUtils.contains(array, CharRange.is('b')));
+    void shouldParseNegationAtStartOfSetDefinition() {
+        // Arrange: A set definition where '^' negates 'a', but not 'b' or 'c'.
+        final String setDefinition = "^abc";
+        final Set<CharRange> expectedRanges = Set.of(
+            CharRange.isNot('a'),
+            CharRange.is('b'),
+            CharRange.is('c')
+        );
+
+        // Act
+        final CharSet charSet = CharSet.getInstance(setDefinition);
+        final Set<CharRange> actualRanges = Set.of(charSet.getCharRanges());
+
+        // Assert
+        assertEquals(expectedRanges, actualRanges);
+    }
+
+    /**
+     * Tests that a negation character in the middle of the string
+     * only negates the character immediately following it.
+     */
+    @Test
+    void shouldParseNegationInMiddleOfSetDefinition() {
+        // Arrange: A set definition where '^' negates 'a', but not 'b' or 'c'.
+        final String setDefinition = "b^ac";
+        final Set<CharRange> expectedRanges = Set.of(
+            CharRange.is('b'),
+            CharRange.isNot('a'),
+            CharRange.is('c')
+        );
+
+        // Act
+        final CharSet charSet = CharSet.getInstance(setDefinition);
+        final Set<CharRange> actualRanges = Set.of(charSet.getCharRanges());
+
+        // Assert
+        assertEquals(expectedRanges, actualRanges);
+    }
+
+    /**
+     * Tests a more complex case with a negation character in the middle of the string.
+     */
+    @Test
+    void shouldParseComplexDefinitionWithNegationInMiddle() {
+        // Arrange: A set definition with multiple leading characters before a negated character.
+        final String setDefinition = "db^ac";
+        final Set<CharRange> expectedRanges = Set.of(
+            CharRange.is('d'),
+            CharRange.is('b'),
+            CharRange.isNot('a'),
+            CharRange.is('c')
+        );
+
+        // Act
+        final CharSet charSet = CharSet.getInstance(setDefinition);
+        final Set<CharRange> actualRanges = Set.of(charSet.getCharRanges());
+
+        // Assert
+        assertEquals(expectedRanges, actualRanges);
+    }
+
+    /**
+     * Tests that multiple negation characters are handled correctly, each
+     * applying to its subsequent character.
+     */
+    @Test
+    void shouldParseMultipleNegationsInSetDefinition() {
+        // Arrange: A set definition where '^' negates 'b' and a separate '^' negates 'a'.
+        final String setDefinition = "^b^a";
+        final Set<CharRange> expectedRanges = Set.of(
+            CharRange.isNot('b'),
+            CharRange.isNot('a')
+        );
+
+        // Act
+        final CharSet charSet = CharSet.getInstance(setDefinition);
+        final Set<CharRange> actualRanges = Set.of(charSet.getCharRanges());
+
+        // Assert
+        assertEquals(expectedRanges, actualRanges);
+    }
+
+    /**
+     * Tests a combination of a normal character, a negated range, and a negated character.
+     */
+    @Test
+    void shouldParseCombinationOfNormalCharAndNegatedRanges() {
+        // Arrange: A set definition with a normal char 'b', a negated range '^a-c',
+        // and a negated char '^z'.
+        final String setDefinition = "b^a-c^z";
+        final Set<CharRange> expectedRanges = Set.of(
+            CharRange.is('b'),
+            CharRange.isNotIn('a', 'c'),
+            CharRange.isNot('z')
+        );
+
+        // Act
+        final CharSet charSet = CharSet.getInstance(setDefinition);
+        final Set<CharRange> actualRanges = Set.of(charSet.getCharRanges());
+
+        // Assert
+        assertEquals(expectedRanges, actualRanges);
     }
 }
