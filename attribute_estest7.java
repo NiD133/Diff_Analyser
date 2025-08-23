@@ -1,30 +1,41 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Test suite for the static html generation methods in the {@link Attribute} class.
+ */
+// The original test class name "Attribute_ESTestTest7" is an artifact from a test generation tool.
+// A more conventional name would be AttributeTest. We retain the original name for this refactoring exercise.
 public class Attribute_ESTestTest7 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        StringBuilder stringBuilder0 = new StringBuilder();
-        Attribute.html("\"4}zG", "_", (Appendable) stringBuilder0, document_OutputSettings0);
-        assertEquals("_4}zG=\"_\"", stringBuilder0.toString());
+    /**
+     * Verifies that the static Attribute.html() method correctly sanitizes an attribute key
+     * containing invalid characters (like a double quote) by replacing them with an underscore.
+     */
+    @Test
+    public void htmlMethodReplacesInvalidCharacterInKey() throws IOException {
+        // Arrange
+        // According to the HTML specification, attribute names cannot contain double quotes.
+        // This test uses a key with a leading double quote to verify sanitization.
+        String invalidKey = "\"4}zG";
+        String value = "_";
+
+        StringBuilder outputBuilder = new StringBuilder();
+        // Use default output settings, which correspond to HTML syntax.
+        OutputSettings settings = new OutputSettings();
+
+        // Act
+        // Generate the HTML for the attribute. The method is expected to handle the invalid key.
+        Attribute.html(invalidKey, value, outputBuilder, settings);
+
+        // Assert
+        // The invalid double quote in the key should be replaced with an underscore,
+        // and the final output should be a correctly formatted HTML attribute string.
+        String expectedHtml = "_4}zG=\"_\"";
+        assertEquals(expectedHtml, outputBuilder.toString());
     }
 }
