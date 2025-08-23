@@ -1,51 +1,35 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
 import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.joda.time.Period;
+import org.junit.Test;
 
-public class StringConverter_ESTestTest28 extends StringConverter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        StringConverter stringConverter0 = new StringConverter();
-        MutableDateTime mutableDateTime0 = new MutableDateTime(0L);
-        DateTime dateTime0 = mutableDateTime0.toDateTimeISO();
-        MutablePeriod mutablePeriod0 = new MutablePeriod(dateTime0, dateTime0, (PeriodType) null);
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        GJChronology gJChronology0 = GJChronology.getInstance(dateTimeZone0, (ReadableInstant) mutableDateTime0);
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(gJChronology0, dateTimeZone0);
-        stringConverter0.setInto((ReadWritablePeriod) mutablePeriod0, (Object) "Pt2s", (Chronology) zonedChronology0);
+/**
+ * Contains tests for the {@link StringConverter} class, focusing on period conversion.
+ */
+public class StringConverterTest {
+
+    /**
+     * Tests that setInto() correctly parses a standard ISO-8601 period string
+     * and updates the provided ReadWritablePeriod object.
+     */
+    @Test
+    public void setInto_shouldParseIsoPeriodStringAndUpdatePeriod() {
+        // Arrange
+        StringConverter converter = StringConverter.INSTANCE;
+        String periodString = "PT2S"; // An ISO-8601 period string for 2 seconds.
+
+        // Initialize with non-zero values to ensure the method clears the period before setting new values.
+        MutablePeriod actualPeriod = new MutablePeriod(1, 1, 1, 1, 1, 1, 1, 1);
+        Period expectedPeriod = new Period().withSeconds(2);
+
+        // Act
+        // The chronology parameter can be null, as it defaults to the standard ISO chronology.
+        converter.setInto(actualPeriod, periodString, null);
+
+        // Assert
+        assertEquals("The period should be cleared and updated to 2 seconds.", expectedPeriod, actualPeriod);
     }
 }
