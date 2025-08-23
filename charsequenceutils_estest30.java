@@ -1,19 +1,25 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest30 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("");
-        char[] charArray0 = CharSequenceUtils.toCharArray(stringBuilder0);
-        assertArrayEquals(new char[] {}, charArray0);
+    @Test
+    public void testToCharArray_withEmptyCharSequence_returnsEmptyArray() {
+        // Arrange
+        // An empty StringBuilder is used as a representative empty CharSequence.
+        final CharSequence emptyInput = new StringBuilder("");
+        final char[] expectedArray = {};
+
+        // Act
+        final char[] resultArray = CharSequenceUtils.toCharArray(emptyInput);
+
+        // Assert
+        assertArrayEquals("toCharArray should return an empty array for an empty CharSequence",
+                expectedArray, resultArray);
     }
 }
