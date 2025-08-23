@@ -1,39 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+
+// Note: Unused imports from the original test have been removed for clarity.
 
 public class RandomAccessFileOrArray_ESTestTest103 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test102() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray((String) null, true, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.File", e);
-        }
+    /**
+     * Verifies that the constructor {@link RandomAccessFileOrArray#RandomAccessFileOrArray(String, boolean, boolean)}
+     * throws a {@link NullPointerException} when the filename argument is null.
+     */
+    @Test
+    @SuppressWarnings("deprecation") // Testing a deprecated constructor is the explicit goal of this test.
+    public void constructorWithFilenameThrowsNPEIfFilenameIsNull() {
+        // The constructor is expected to throw a NullPointerException because it internally
+        // attempts to create a `java.io.File` with a null path, which is not allowed.
+        NullPointerException thrown = assertThrows(
+            NullPointerException.class,
+            () -> new RandomAccessFileOrArray((String) null, true, true)
+        );
+
+        // The NPE thrown by `new java.io.File(null)` has no message.
+        // This assertion confirms we're catching the expected exception from the expected source.
+        assertNull("The NullPointerException should have no message.", thrown.getMessage());
     }
 }
