@@ -1,32 +1,33 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlTreeBuilder_ESTestTest43 extends XmlTreeBuilder_ESTest_scaffolding {
+import static org.jsoup.parser.Parser.NamespaceXml;
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.initialiseParseFragment((Element) null);
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
+/**
+ * Tests for the {@link XmlTreeBuilder} class, focusing on its initialization and namespace handling.
+ */
+public class XmlTreeBuilderTest {
+
+    /**
+     * Verifies that initializing a fragment parse with a null context correctly
+     * sets up the default XML namespace.
+     */
+    @Test
+    public void initialiseParseFragmentWithNullContextSetsDefaultXmlNamespace() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        String expectedNamespace = NamespaceXml; // "http://www.w3.org/XML/1998/namespace"
+
+        // Act
+        // Initialize the builder to parse a fragment without a specific parent context.
+        xmlTreeBuilder.initialiseParseFragment((Element) null);
+        String actualNamespace = xmlTreeBuilder.defaultNamespace();
+
+        // Assert
+        // The builder should be configured with the standard XML namespace by default.
+        assertEquals(expectedNamespace, actualNamespace);
     }
 }
