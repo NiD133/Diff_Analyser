@@ -2,26 +2,33 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class focuses on verifying the behavior of {@link TypeAdapter}.
+ * The original test class name and inheritance are kept to focus on the test case improvement.
+ * Unused imports and EvoSuite-specific annotations have been removed for clarity.
+ */
 public class TypeAdapter_ESTestTest2 extends TypeAdapter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Gson.FutureTypeAdapter<Integer> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Integer>();
-        TypeAdapter<Integer> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        JsonElement jsonElement0 = typeAdapter0.toJsonTree((Integer) null);
-        assertFalse(jsonElement0.isJsonPrimitive());
+    /**
+     * Tests that calling {@link TypeAdapter#toJsonTree(Object)} on a null-safe adapter
+     * with a null value correctly returns a {@link JsonNull} instance.
+     */
+    @Test
+    public void toJsonTree_onNullSafeAdapterWithNullInput_returnsJsonNull() {
+        // Arrange
+        // We need a concrete TypeAdapter instance to call nullSafe() on.
+        // Gson.FutureTypeAdapter is a convenient, accessible implementation for this purpose.
+        TypeAdapter<Integer> originalAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Integer> nullSafeAdapter = originalAdapter.nullSafe();
+
+        // Act
+        // Convert a null Integer to a JsonElement using the null-safe adapter.
+        JsonElement result = nullSafeAdapter.toJsonTree(null);
+
+        // Assert
+        // The nullSafe() wrapper should handle the null input and produce a JsonNull object,
+        // rather than a Java null or throwing an exception.
+        assertEquals(JsonNull.INSTANCE, result);
     }
 }
