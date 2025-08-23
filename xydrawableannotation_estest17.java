@@ -1,49 +1,44 @@
 package org.jfree.chart.annotations;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.math.BigInteger;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.Drawable;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.BlockContainer;
-import org.jfree.chart.legend.LegendTitle;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.PolarAxisLocation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.AbstractRenderer;
-import org.jfree.chart.renderer.category.ScatterRenderer;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.title.CompositeTitle;
-import org.jfree.chart.title.DateTitle;
-import org.jfree.chart.title.ShortTextTitle;
 import org.jfree.chart.title.TextTitle;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class XYDrawableAnnotation_ESTestTest17 extends XYDrawableAnnotation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYDrawableAnnotation} class.
+ */
+public class XYDrawableAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        TextTitle textTitle0 = new TextTitle("");
-        XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(0.0, 0.0, 0.0, 0.0, textTitle0);
-        double double0 = xYDrawableAnnotation0.getDisplayHeight();
-        assertEquals(0.0, double0, 0.01);
-        assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
-        assertEquals(0.0, xYDrawableAnnotation0.getX(), 0.01);
-        assertEquals(0.0, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
-        assertEquals(0.0, xYDrawableAnnotation0.getY(), 0.01);
+    private static final double DELTA = 1e-9;
+
+    /**
+     * Verifies that the five-argument constructor correctly initializes the annotation's properties
+     * and that the getter methods return the expected values.
+     */
+    @Test
+    public void testFiveArgumentConstructorInitialization() {
+        // Arrange: Define the properties for the annotation.
+        // The five-argument constructor should use a default drawScaleFactor of 1.0.
+        double expectedX = 10.0;
+        double expectedY = 20.0;
+        double expectedWidth = 100.0;
+        double expectedHeight = 50.0;
+        TextTitle dummyDrawable = new TextTitle("Test");
+
+        // Act: Create the annotation using the constructor under test.
+        XYDrawableAnnotation annotation = new XYDrawableAnnotation(
+                expectedX, expectedY, expectedWidth, expectedHeight, dummyDrawable);
+
+        // Assert: Confirm that all properties were set as expected.
+        assertEquals("X-coordinate should match the constructor argument",
+                expectedX, annotation.getX(), DELTA);
+        assertEquals("Y-coordinate should match the constructor argument",
+                expectedY, annotation.getY(), DELTA);
+        assertEquals("Display width should match the constructor argument",
+                expectedWidth, annotation.getDisplayWidth(), DELTA);
+        assertEquals("Display height should match the constructor argument",
+                expectedHeight, annotation.getDisplayHeight(), DELTA);
+        assertEquals("Draw scale factor should default to 1.0 for this constructor",
+                1.0, annotation.getDrawScaleFactor(), DELTA);
     }
 }
