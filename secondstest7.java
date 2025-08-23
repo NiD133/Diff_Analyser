@@ -1,51 +1,62 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class SecondsTestTest7 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for the {@link Seconds#parseSeconds(String)} factory method.
+ */
+@DisplayName("Seconds.parseSeconds(String)")
+class SecondsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    @DisplayName("should return ZERO when the input string is null")
+    void parseSeconds_whenInputIsNull_returnsZero() {
+        // The method defines that a null input string results in zero seconds.
+        Seconds result = Seconds.parseSeconds(null);
+        assertEquals(Seconds.ZERO, result);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
+    /**
+     * The parse method should correctly handle various valid ISO 8601 period formats,
+     * extracting only the seconds value.
+     */
+    @ParameterizedTest(name = "should return {1} seconds for input \"{0}\"")
+    @CsvSource({
+            "PT0S,         0",
+            "PT1S,         1",
+            "PT-3S,       -3",
+            "P0Y0M0DT2S,   2",  // A more complex format is valid if other fields are zero
+            "PT0H2S,       2"   // Hours field is present but zero
+    })
+    void parseSeconds_whenStringIsValid_returnsCorrectSeconds(String periodString, int expectedSeconds) {
+        Seconds result = Seconds.parseSeconds(periodString);
+        assertEquals(expectedSeconds, result.getSeconds());
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_parseSeconds_String() {
-        assertEquals(0, Seconds.parseSeconds((String) null).getSeconds());
-        assertEquals(0, Seconds.parseSeconds("PT0S").getSeconds());
-        assertEquals(1, Seconds.parseSeconds("PT1S").getSeconds());
-        assertEquals(-3, Seconds.parseSeconds("PT-3S").getSeconds());
-        assertEquals(2, Seconds.parseSeconds("P0Y0M0DT2S").getSeconds());
-        assertEquals(2, Seconds.parseSeconds("PT0H2S").getSeconds());
-        try {
-            Seconds.parseSeconds("P1Y1D");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
-        try {
-            Seconds.parseSeconds("P1DT1S");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+    /**
+     * According to the Javadoc, the parse will accept the full ISO syntax,
+     * but an exception is thrown if any field other than seconds is non-zero.
+     */
+    @ParameterizedTest(name = "should throw exception for invalid input \"{0}\"")
+    @ValueSource(strings = {
+            "P1Y",     // Year field is not allowed
+            "P1M",     // Month field is not allowed
+            "P1W",     // Week field is not allowed
+            "P1D",     // Day field is not allowed
+            "PT1H",    // Hour field is not allowed
+            "PT1M",    // Minute field is not allowed
+            "P1DT1S"   // Day and Second fields are not allowed together
+    })
+    void parseSeconds_whenStringContainsNonZeroFieldsOtherThanSeconds_throwsException(String invalidPeriodString) {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Seconds.parseSeconds(invalidPeriodString);
+        });
     }
 }
