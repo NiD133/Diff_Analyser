@@ -1,44 +1,35 @@
 package org.apache.commons.compress.utils;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest30 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MultiReadOnlySeekableByteChannel} class.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        File[] fileArray0 = new File[2];
-        MockFile mockFile0 = new MockFile("");
-        fileArray0[0] = (File) mockFile0;
-        fileArray0[1] = (File) mockFile0;
-        SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        ((MultiReadOnlySeekableByteChannel) seekableByteChannel0).close();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(5);
-        try {
-            seekableByteChannel0.read(byteBuffer0);
-            fail("Expecting exception: ClosedChannelException");
-        } catch (ClosedChannelException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.MultiReadOnlySeekableByteChannel", e);
-        }
+    @Rule
+    public final TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Test(expected = ClosedChannelException.class)
+    public void readFromClosedChannelShouldThrowException() throws IOException {
+        // Arrange: Create a multi-file channel from two temporary files and then close it.
+        final File file1 = tempFolder.newFile();
+        final File file2 = tempFolder.newFile();
+        final SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forFiles(file1, file2);
+        channel.close();
+
+        final ByteBuffer buffer = ByteBuffer.allocate(10);
+
+        // Act: Attempt to read from the now-closed channel.
+        // Assert: The @Test(expected) annotation asserts that a ClosedChannelException is thrown.
+        channel.read(buffer);
     }
 }
