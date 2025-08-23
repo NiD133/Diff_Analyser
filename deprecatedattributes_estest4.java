@@ -1,0 +1,19 @@
+package org.apache.commons.cli;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.junit.runner.RunWith;
+
+public class DeprecatedAttributes_ESTestTest4 extends DeprecatedAttributes_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test3() throws Throwable {
+        DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
+        deprecatedAttributes_Builder0.setSince("x-qz[]");
+        DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
+        String string0 = deprecatedAttributes0.toString();
+        assertEquals("Deprecated since x-qz[]", string0);
+    }
+}
