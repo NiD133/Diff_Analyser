@@ -1,31 +1,40 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest117 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class, focusing on the getChildrenAsProperties method.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test116() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.appendChild(iIOMetadataNode0);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Properties properties1 = xNode0.getChildrenAsProperties();
-        assertTrue(properties1.equals((Object) properties0));
+    /**
+     * Tests that getChildrenAsProperties returns an empty Properties object
+     * when child nodes do not have the required 'name' and 'value' attributes.
+     */
+    @Test
+    public void getChildrenAsPropertiesShouldReturnEmptyForChildWithoutNameAndValueAttributes() {
+        // Arrange
+        // Create a parent XML node with one child. The child node is intentionally
+        // created without the 'name' and 'value' attributes.
+        IIOMetadataNode parentNode = new IIOMetadataNode("properties");
+        Node childNode = new IIOMetadataNode("property");
+        parentNode.appendChild(childNode);
+
+        // The XPathParser and variables are not used by the method under test in this scenario.
+        XNode xNode = new XNode(null, parentNode, new Properties());
+
+        // Act
+        Properties resultProperties = xNode.getChildrenAsProperties();
+
+        // Assert
+        // The method should ignore the child node because it lacks the necessary attributes,
+        // resulting in an empty Properties object.
+        assertTrue("Properties should be empty when child nodes lack 'name' and 'value' attributes.",
+                   resultProperties.isEmpty());
     }
 }
