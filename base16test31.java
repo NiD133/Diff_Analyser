@@ -1,72 +1,57 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.junit.jupiter.api.Test;
 
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+/**
+ * Tests for the Base16 class, focusing on encoding byte arrays.
+ *
+ * Note: The original class name 'Base16TestTest31' was preserved,
+ * but a more descriptive name like 'Base16EncodingTest' would be conventional.
+ */
 public class Base16TestTest31 {
 
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+    private final Base16 base16 = new Base16();
 
     /**
-     * @return the random.
+     * Provides test data for encoding byte triplets. The test cases cover all 16
+     * possible values for the final byte (from 0 to 15), ensuring the full
+     * Base16 alphabet ('0'-'9', 'A'-'F') is correctly used for encoding.
+     *
+     * @return A stream of arguments, where each argument is a pair containing a
+     *         byte array to be encoded and its expected hexadecimal string representation.
      */
-    public Random getRandom() {
-        return this.random;
+    private static Stream<Arguments> provideByteTripletsForEncoding() {
+        // Programmatically generate test cases for values 0x00 to 0x0F.
+        return IntStream.range(0, 16).mapToObj(i -> {
+            final byte[] inputBytes = {0, 0, (byte) i};
+            // The first two bytes (0, 0) encode to "0000".
+            // The last byte 'i' is encoded to its two-character hex representation.
+            final String expectedHex = "0000" + String.format("%02X", i);
+            return Arguments.of(inputBytes, expectedHex);
+        });
     }
 
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
+    /**
+     * Tests that encoding a 3-byte array where the last byte varies from 0 to 15
+     * produces the correct hexadecimal string. This systematically verifies the
+     * encoding logic across the entire Base16 character set.
+     *
+     * @param inputBytes       The 3-byte array to encode.
+     * @param expectedEncoding The expected Base16 (hex) string.
+     */
+    @ParameterizedTest(name = "Encoding byte array {0} should result in \"{1}\"")
+    @MethodSource("provideByteTripletsForEncoding")
+    void testEncodeWithVaryingFinalByte(final byte[] inputBytes, final String expectedEncoding) {
+        // Act: Encode the byte array using the Base16 codec.
+        final String actualEncoding = new String(base16.encode(inputBytes));
 
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
-    @Test
-    void testTriplets() {
-        assertEquals("000000", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 0 })));
-        assertEquals("000001", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 1 })));
-        assertEquals("000002", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 2 })));
-        assertEquals("000003", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 3 })));
-        assertEquals("000004", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 4 })));
-        assertEquals("000005", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 5 })));
-        assertEquals("000006", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 6 })));
-        assertEquals("000007", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 7 })));
-        assertEquals("000008", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 8 })));
-        assertEquals("000009", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 9 })));
-        assertEquals("00000A", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 10 })));
-        assertEquals("00000B", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 11 })));
-        assertEquals("00000C", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 12 })));
-        assertEquals("00000D", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 13 })));
-        assertEquals("00000E", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 14 })));
-        assertEquals("00000F", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0, (byte) 15 })));
+        // Assert: Verify the encoded string matches the expected hex value.
+        assertEquals(expectedEncoding, actualEncoding);
     }
 }
