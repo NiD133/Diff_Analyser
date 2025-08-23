@@ -1,18 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest69 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        Instant instant0 = Instant.now();
-        Minutes minutes0 = Minutes.minutesBetween((ReadableInstant) instant0, (ReadableInstant) instant0);
-        assertEquals(0, minutes0.getMinutes());
+    @Test
+    public void minutesBetween_withSameStartAndEndInstant_shouldReturnZero() {
+        // Arrange: Define two identical instants in time.
+        Instant sameInstant = Instant.now();
+
+        // Act: Calculate the number of minutes between the start and end instants.
+        Minutes result = Minutes.minutesBetween(sameInstant, sameInstant);
+
+        // Assert: The result should be zero minutes.
+        assertEquals(Minutes.ZERO, result);
     }
 }
