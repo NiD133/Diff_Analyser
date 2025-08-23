@@ -1,35 +1,43 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.XmlDeclaration;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest13 {
-
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Test suite for the XmlTreeBuilder.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    public void testParseDeclarationWithoutAttributes() {
+    void parsesProcessingInstruction() {
+        // Arrange
+        // An XML string containing a standard XML declaration followed by a processing instruction.
         String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?myProcessingInstruction My Processing instruction.?>";
+
+        // Act
         Document doc = Jsoup.parse(xml, "", Parser.xmlParser());
-        XmlDeclaration decl = (XmlDeclaration) doc.childNode(2);
-        assertEquals("myProcessingInstruction", decl.name());
-        assertTrue(decl.hasAttr("My"));
-        assertEquals("<?myProcessingInstruction My Processing instruction.?>", decl.outerHtml());
+
+        // Assert
+        // The parsed document's children are:
+        // 1. An XmlDeclaration for the `<?xml...` tag.
+        // 2. A TextNode for the newline character `\n`.
+        // 3. An XmlDeclaration for the processing instruction `<?my...`.
+        Node node = doc.childNode(2);
+        assertInstanceOf(XmlDeclaration.class, node, "The third child node should be an XmlDeclaration representing the processing instruction.");
+
+        XmlDeclaration procInstruction = (XmlDeclaration) node;
+
+        // Jsoup uses the XmlDeclaration class to represent processing instructions.
+        // The content of the PI is parsed to extract its name and data.
+        assertAll("Processing Instruction properties",
+            () -> assertEquals("myProcessingInstruction", procInstruction.name(), "The name should be the target of the processing instruction."),
+            () -> assertTrue(procInstruction.hasAttr("My"), "The first word of the PI's content is treated as an attribute key."),
+            () -> assertEquals("<?myProcessingInstruction My Processing instruction.?>", procInstruction.outerHtml(), "The outer HTML should match the original PI string.")
+        );
     }
 }
