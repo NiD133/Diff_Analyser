@@ -1,26 +1,27 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LoopingListIterator_ESTestTest26 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LoopingListIterator}.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        LoopingListIterator<Integer> loopingListIterator0 = new LoopingListIterator<Integer>(linkedList0);
-        boolean boolean0 = loopingListIterator0.hasPrevious();
-        assertFalse(boolean0);
+    @Test
+    public void hasPrevious_onEmptyList_returnsFalse() {
+        // Arrange: Create an iterator for an empty list.
+        // The Javadoc states that hasPrevious() should return false for an empty list.
+        final List<Object> emptyList = Collections.emptyList();
+        final LoopingListIterator<Object> iterator = new LoopingListIterator<>(emptyList);
+
+        // Act: Check if the iterator has a previous element.
+        final boolean hasPrevious = iterator.hasPrevious();
+
+        // Assert: The result must be false.
+        assertFalse("An iterator for an empty list should not have a previous element.", hasPrevious);
     }
 }
