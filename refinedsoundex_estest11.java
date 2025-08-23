@@ -1,18 +1,24 @@
 package org.apache.commons.codec.language;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RefinedSoundex_ESTestTest11 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-        int int0 = refinedSoundex0.difference((String) null, (String) null);
-        assertEquals(0, int0);
+    @Test
+    public void differenceOfTwoNullStringsShouldReturnZero() throws EncoderException {
+        // Arrange
+        RefinedSoundex refinedSoundex = new RefinedSoundex();
+        
+        // Act
+        int difference = refinedSoundex.difference(null, null);
+        
+        // Assert
+        assertEquals("The difference between two null strings should be 0", 0, difference);
     }
 }
