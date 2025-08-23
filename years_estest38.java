@@ -1,17 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest38 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        Years years0 = Years.parseYears((String) null);
-        assertEquals(1, years0.size());
+    @Test
+    public void parseYears_withNullString_shouldReturnZeroYears() {
+        // The Javadoc for parseYears states that a null input string 
+        // should result in a zero Years object.
+        
+        // Act: Call the method under test with a null input.
+        Years result = Years.parseYears(null);
+
+        // Assert: Verify that the result is the constant for zero years.
+        assertEquals(Years.ZERO, result);
     }
 }
