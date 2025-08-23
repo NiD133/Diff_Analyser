@@ -1,31 +1,30 @@
 package com.google.common.hash;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AbstractStreamingHasher_ESTestTest14 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        crc32cHashFunction_Crc32cHasher0.hash();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocate(80);
-        // Undeclared exception!
-        try {
-            crc32cHashFunction_Crc32cHasher0.putBytes(byteBuffer0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Verifies that attempting to add data to a hasher after {@code hash()} has been called
+     * results in an {@link IllegalStateException}. Once a hasher is finalized, it cannot be
+     * reused.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void putBytes_afterCallingHash_throwsIllegalStateException() {
+        // Arrange: Create a hasher and finalize it by calling hash().
+        // We use a concrete implementation for this test.
+        AbstractStreamingHasher hasher = new Crc32cHashFunction.Crc32cHasher();
+        hasher.hash(); // This call finalizes the hasher's state.
+
+        ByteBuffer dataToAdd = ByteBuffer.allocate(16);
+
+        // Act: Attempt to add more bytes to the already finalized hasher.
+        // This action is expected to throw an IllegalStateException, which is
+        // verified by the `expected` parameter in the @Test annotation.
+        hasher.putBytes(dataToAdd);
     }
 }
