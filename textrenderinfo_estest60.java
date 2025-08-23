@@ -1,41 +1,53 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
 import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TextRenderInfo_ESTestTest60 extends TextRenderInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString();
-        Matrix matrix0 = graphicsState0.ctm;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        LineSegment lineSegment0 = textRenderInfo0.getAscentLine();
-        assertNotNull(lineSegment0);
+/**
+ * Test suite for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that getAscentLine() returns a non-null LineSegment
+     * when the TextRenderInfo is constructed with a valid GraphicsState
+     * that includes a font.
+     * <p>
+     * This is a basic sanity check to ensure the method doesn't crash
+     * with minimal, valid input, as font metrics are required for the calculation.
+     */
+    @Test
+    public void getAscentLine_withValidFont_returnsNonNull() {
+        // Arrange: Create a GraphicsState with a valid font, which is a prerequisite
+        // for calculating line segments.
+        GraphicsState graphicsState = new GraphicsState();
+        DocumentFont font = new CMapAwareDocumentFont(new PdfGState());
+        graphicsState.font = font;
+
+        // Arrange: Set up the other required parameters for the TextRenderInfo constructor.
+        PdfString emptyText = new PdfString();
+        Matrix identityMatrix = new Matrix();
+        Collection<MarkedContentInfo> emptyMarkedContent = new ArrayList<>();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                emptyText,
+                graphicsState,
+                identityMatrix,
+                emptyMarkedContent
+        );
+
+        // Act: Call the method under test.
+        LineSegment ascentLine = textRenderInfo.getAscentLine();
+
+        // Assert: The returned line segment should not be null.
+        assertNotNull("The ascent line should be successfully calculated when a font is available.", ascentLine);
     }
 }
