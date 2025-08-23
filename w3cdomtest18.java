@@ -1,125 +1,112 @@
 package org.jsoup.helper;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.integration.ParseTest;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-import java.util.Map;
+
 import java.util.stream.Stream;
-import static org.jsoup.TextUtil.normalizeSpaces;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class W3CDomTestTest18 {
+/**
+ * Tests for {@link W3CDom} conversion, focusing on security and attribute handling.
+ */
+@DisplayName("W3CDom Conversion")
+public class W3CDomTest {
 
-    private static Document parseXml(String xml, boolean nameSpaceAware) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(nameSpaceAware);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver((publicId, systemId) -> {
-                if (systemId.contains("about:legacy-compat")) {
-                    // <!doctype html>
-                    return new InputSource(new StringReader(""));
-                } else {
-                    return null;
-                }
-            });
-            Document dom = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-            dom.normalizeDocument();
-            return dom;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private NodeList xpath(Document w3cDoc, String query) throws XPathExpressionException {
-        XPathExpression xpath = XPathFactory.newInstance().newXPath().compile(query);
-        return ((NodeList) xpath.evaluate(w3cDoc, XPathConstants.NODE));
-    }
-
-    private String output(String in, boolean modeHtml) {
-        org.jsoup.nodes.Document jdoc = Jsoup.parse(in);
-        Document w3c = W3CDom.convert(jdoc);
-        Map<String, String> properties = modeHtml ? W3CDom.OutputHtml() : W3CDom.OutputXml();
-        return normalizeSpaces(W3CDom.asString(w3c, properties));
-    }
-
-    private void assertEqualsIgnoreCase(String want, String have) {
-        assertEquals(want.toLowerCase(Locale.ROOT), have.toLowerCase(Locale.ROOT));
+    /**
+     * Provides both the HTML and XML parsers to run tests against.
+     */
+    private static Stream<Arguments> parserProvider() {
+        return Stream.of(
+            Arguments.of(Parser.htmlParser()),
+            Arguments.of(Parser.xmlParser())
+        );
     }
 
     @ParameterizedTest
     @MethodSource("parserProvider")
-    void doesNotExpandEntities(Parser parser) {
-        // Tests that the billion laughs attack doesn't expand entities; also for XXE
-        // Not impacted because jsoup doesn't parse the entities within the doctype, and so won't get to the w3c.
-        // Added to confirm, and catch if that ever changes
-        String billionLaughs = "<?xml version=\"1.0\"?>\n" + "<!DOCTYPE lolz [\n" + " <!ENTITY lol \"lol\">\n" + " <!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">\n" + "]>\n" + "<html><body><p>&lol1;</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughs, parser);
-        W3CDom w3cDom = new W3CDom();
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
-        assertNotNull(w3cDoc);
-        // select the p and make sure it's unexpanded
-        NodeList p = w3cDoc.getElementsByTagName("p");
-        assertEquals(1, p.getLength());
-        assertEquals("&lol1;", p.item(0).getTextContent());
-        // Check the string
-        String string = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertFalse(string.contains("lololol"));
-        assertTrue(string.contains("&amp;lol1;"));
-    }
+    @DisplayName("Should prevent Billion Laughs and XXE attacks by not expanding entities")
+    void billionLaughsAttackDoesNotCauseEntityExpansion(Parser parser) {
+        // This test ensures that jsoup does not expand entities defined in a DOCTYPE.
+        // This prevents vulnerabilities like the "Billion Laughs" attack and XXE.
+        // The expected behavior is that the entity reference (&lol1;) is treated as literal text.
 
-    private static Stream<Arguments> parserProvider() {
-        return Stream.of(Arguments.of(Parser.htmlParser()), Arguments.of(Parser.xmlParser()));
+        // Arrange
+        String billionLaughsXml = """
+            <?xml version="1.0"?>
+            <!DOCTYPE lolz [
+             <!ENTITY lol "lol">
+             <!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+            ]>
+            <html><body><p>&lol1;</p></body></html>""";
+
+        // Act
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughsXml, parser);
+        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
+
+        // Assert
+        // 1. Check the W3C DOM text content
+        NodeList pElements = w3cDoc.getElementsByTagName("p");
+        assertEquals(1, pElements.getLength());
+        // The text content should be the unexpanded entity name, not "lololol..."
+        assertEquals("&lol1;", pElements.item(0).getTextContent());
+
+        // 2. Check the serialized string output
+        String outXml = W3CDom.asString(w3cDoc);
+        // The output should not contain the expanded entity.
+        assertFalse(outXml.contains("lololol"));
+        // It should contain the escaped entity reference, confirming it was treated as text.
+        assertTrue(outXml.contains("&amp;lol1;"));
     }
 
     @Test
-    void testHtmlParseAttributesAreCaseInsensitive() throws IOException {
-        // https://github.com/jhy/jsoup/issues/981
-        String html = "<html lang=en>\n" + "<body>\n" + "<img src=\"firstImage.jpg\" alt=\"Alt one\" />\n" + "<IMG SRC=\"secondImage.jpg\" AlT=\"Alt two\" />\n" + "</body>\n" + "</html>";
-        org.jsoup.nodes.Document jsoupDoc;
-        jsoupDoc = Jsoup.parse(html);
-        org.jsoup.helper.W3CDom jDom = new org.jsoup.helper.W3CDom();
-        Document doc = jDom.fromJsoup(jsoupDoc);
-        org.w3c.dom.Element body = (org.w3c.dom.Element) doc.getDocumentElement().getElementsByTagName("body").item(0);
-        NodeList imgs = body.getElementsByTagName("img");
-        assertEquals(2, imgs.getLength());
-        org.w3c.dom.Element first = (org.w3c.dom.Element) imgs.item(0);
-        assertEquals(first.getAttributes().getLength(), 2);
-        String img1 = first.getAttribute("src");
-        assertEquals("firstImage.jpg", img1);
-        String alt1 = first.getAttribute("alt");
-        assertEquals("Alt one", alt1);
-        org.w3c.dom.Element second = (org.w3c.dom.Element) imgs.item(1);
-        assertEquals(second.getAttributes().getLength(), 2);
-        String img2 = second.getAttribute("src");
-        assertEquals("secondImage.jpg", img2);
-        String alt2 = second.getAttribute("alt");
-        assertEquals("Alt two", alt2);
+    @DisplayName("Should handle HTML attributes case-insensitively after conversion")
+    void attributesInHtmlAreHandledCaseInsensitively() {
+        // This test verifies that when parsing HTML, attribute keys are normalized to lowercase,
+        // which is the standard behavior for HTML. This is important for reliable attribute access.
+        // See: https://github.com/jhy/jsoup/issues/981
+
+        // Arrange
+        String html = """
+            <html lang=en>
+            <body>
+              <img src="firstImage.jpg" alt="Alt one" />
+              <IMG SRC="secondImage.jpg" AlT="Alt two" />
+            </body>
+            </html>""";
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+
+        // Act
+        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
+        NodeList imgNodes = w3cDoc.getElementsByTagName("img");
+
+        // Assert
+        assertEquals(2, imgNodes.getLength(), "Should find two <img> elements");
+
+        // Assertions for the first image (attributes already lowercase)
+        Element firstImg = (Element) imgNodes.item(0);
+        assertAll("Attributes of first <img>",
+            () -> assertEquals("firstImage.jpg", firstImg.getAttribute("src")),
+            () -> assertEquals("Alt one", firstImg.getAttribute("alt")),
+            () -> assertEquals(2, firstImg.getAttributes().getLength())
+        );
+
+        // Assertions for the second image (attributes in mixed case in source)
+        Element secondImg = (Element) imgNodes.item(1);
+        assertAll("Attributes of second <IMG> (should be normalized to lowercase)",
+            // Note: W3C DOM's getAttribute is case-sensitive. This test confirms that
+            // jsoup's HTML parser correctly normalized 'SRC' to 'src' and 'AlT' to 'alt'.
+            () -> assertEquals("secondImage.jpg", secondImg.getAttribute("src")),
+            () -> assertEquals("Alt two", secondImg.getAttribute("alt")),
+            () -> assertEquals(2, secondImg.getAttributes().getLength())
+        );
     }
 }
