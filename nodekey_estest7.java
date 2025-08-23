@@ -1,20 +1,25 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class NodeKey_ESTestTest7 extends NodeKey_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NodeKey} class.
+ */
+public class NodeKeyTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Integer integer0 = new Integer(504);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(504, integer0);
-        boolean boolean0 = nodeKey0.equals((Object) null);
-        assertEquals(504, nodeKey0.getStage());
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method correctly returns false when a NodeKey
+     * instance is compared with a null object, adhering to the general contract
+     * of Object.equals().
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithNull() {
+        // Arrange: Create an instance of NodeKey.
+        // The specific values for stage and node are not critical for this test.
+        NodeKey<String> nodeKey = new NodeKey<>(1, "A");
+
+        // Act & Assert: Call equals() with null and assert the result is false.
+        assertFalse("A NodeKey instance should not be equal to null.", nodeKey.equals(null));
     }
 }
