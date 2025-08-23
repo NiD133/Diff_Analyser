@@ -1,32 +1,35 @@
 package org.apache.commons.collections4.bag;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class TreeBag_ESTestTest4 extends TreeBag_ESTest_scaffolding {
+/**
+ * Contains tests for the TreeBag class.
+ */
+public class TreeBagTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        TreeBag<Locale.FilteringMode> treeBag0 = new TreeBag<Locale.FilteringMode>((Comparator<? super Locale.FilteringMode>) null);
-        Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.IGNORE_EXTENDED_RANGES;
-        treeBag0.add(locale_FilteringMode0);
-        SortedMap<Locale.FilteringMode, AbstractMapBag.MutableInteger> sortedMap0 = (SortedMap<Locale.FilteringMode, AbstractMapBag.MutableInteger>) treeBag0.getMap();
-        assertFalse(sortedMap0.isEmpty());
+    /**
+     * Tests that the internal map returned by getMap() is correctly updated
+     * after an element is added to the bag.
+     */
+    @Test
+    public void getMap_shouldReturnNonEmptyMap_whenElementIsAdded() {
+        // Arrange: Create an empty TreeBag.
+        // The default constructor uses the natural ordering of elements.
+        final TreeBag<String> bag = new TreeBag<>();
+        final String element = "A";
+
+        // Act: Add a single element to the bag.
+        bag.add(element);
+
+        // Assert: Verify that the internal map reflects the new state.
+        // Note: getMap() is a protected method, so this is a white-box test
+        // verifying the bag's internal state.
+        final SortedMap<String, AbstractMapBag.MutableInteger> internalMap = bag.getMap();
+
+        assertFalse("The internal map should not be empty after adding an element.", internalMap.isEmpty());
+        assertEquals("The internal map should contain exactly one entry.", 1, internalMap.size());
     }
 }
