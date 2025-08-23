@@ -1,28 +1,23 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest5 extends StringUtil_ESTest_scaffolding {
+/**
+ * Unit tests for the StringUtil class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        boolean boolean0 = StringUtil.isHexDigit('9');
-        assertTrue(boolean0);
+    /**
+     * Verifies that isHexDigit() correctly identifies numeric characters as valid hex digits.
+     */
+    @Test
+    public void isHexDigitShouldReturnTrueForNumericDigit() {
+        // The character '9' is a valid hexadecimal digit (0-9, a-f, A-F).
+        // This test confirms that numeric digits are correctly recognized.
+        assertTrue(
+            "The character '9' should be recognized as a valid hex digit",
+            StringUtil.isHexDigit('9')
+        );
     }
 }
