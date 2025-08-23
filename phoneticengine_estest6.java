@@ -1,31 +1,26 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest6 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        RuleType ruleType0 = RuleType.EXACT;
-        NameType nameType0 = NameType.SEPHARDIC;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, true);
-        // Undeclared exception!
-        try {
-            phoneticEngine0.encode((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.language.bm.Lang", e);
-        }
+    /**
+     * Tests that calling encode() with a null input string results in a NullPointerException.
+     * This is the expected behavior for methods that do not explicitly handle null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeShouldThrowNullPointerExceptionForNullInput() {
+        // Arrange: Create a PhoneticEngine with a standard configuration.
+        // The specific configuration does not affect the outcome for a null input.
+        NameType nameType = NameType.SEPHARDIC;
+        RuleType ruleType = RuleType.EXACT;
+        boolean concatenate = true;
+        PhoneticEngine phoneticEngine = new PhoneticEngine(nameType, ruleType, concatenate);
+
+        // Act & Assert: Call encode with null, which is expected to throw the exception.
+        phoneticEngine.encode(null);
     }
 }
