@@ -1,20 +1,35 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest67 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ * This class focuses on the indexOf method.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test66() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer();
-        StringBuilder stringBuilder0 = new StringBuilder(stringBuffer0);
-        int int0 = CharSequenceUtils.indexOf(stringBuffer0, stringBuilder0, (-1231));
-        assertEquals(0, int0);
+    /**
+     * Tests that indexOf correctly handles a negative start index when searching for an
+     * empty CharSequence.
+     *
+     * <p>The behavior should align with {@link String#indexOf(String, int)}, where a negative
+     * start index is treated as 0. Searching for an empty string ("") should return
+     * the start index, which in this case becomes 0.</p>
+     */
+    @Test
+    public void indexOf_withEmptySearchSequenceAndNegativeStartIndex_shouldReturnZero() {
+        // Arrange
+        final CharSequence text = new StringBuffer();
+        final CharSequence searchSequence = new StringBuilder();
+        final int negativeStartIndex = -1;
+        final int expectedIndex = 0;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(text, searchSequence, negativeStartIndex);
+
+        // Assert
+        assertEquals("Searching for an empty sequence with a negative start index should result in 0.",
+                expectedIndex, actualIndex);
     }
 }
