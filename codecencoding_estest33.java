@@ -1,28 +1,26 @@
 package org.apache.commons.compress.harmony.pack200;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CodecEncoding_ESTestTest33 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * Tests for the {@link CodecEncoding} class.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        CodecEncoding codecEncoding0 = new CodecEncoding();
+    /**
+     * Verifies that the CodecEncoding class can be instantiated successfully.
+     *
+     * Although this class seems to be a utility class with static methods,
+     * this test ensures its constructor is accessible and executes without errors.
+     */
+    @Test
+    public void shouldInstantiateCodecEncoding() {
+        // Act: Attempt to create an instance of CodecEncoding.
+        final CodecEncoding codecEncoding = new CodecEncoding();
+
+        // Assert: Verify that the instance was created successfully.
+        assertNotNull("The created CodecEncoding instance should not be null.", codecEncoding);
     }
 }
