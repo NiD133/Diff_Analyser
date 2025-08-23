@@ -1,37 +1,36 @@
 package org.jfree.chart.renderer.category;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardBarPainter_ESTestTest14 extends StandardBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        GroupedStackedBarRenderer groupedStackedBarRenderer0 = new GroupedStackedBarRenderer();
-        Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float();
-        // Undeclared exception!
-        try {
-            standardBarPainter0.paintBarShadow((Graphics2D) null, groupedStackedBarRenderer0, 29, 29, rectangle2D_Float0, (RectangleEdge) null, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.renderer.category.StandardBarPainter", e);
-        }
+/**
+ * Unit tests for the {@link StandardBarPainter} class.
+ */
+public class StandardBarPainterTest {
+
+    /**
+     * Verifies that paintBarShadow() throws a NullPointerException if the 'base'
+     * edge is null. The base edge is required to calculate the shadow's position.
+     */
+    @Test(expected = NullPointerException.class)
+    public void paintBarShadowShouldThrowExceptionForNullBaseEdge() {
+        // Arrange: Set up the painter, renderer, and a mock graphics context.
+        StandardBarPainter painter = new StandardBarPainter();
+        BarRenderer renderer = new GroupedStackedBarRenderer();
+        Rectangle2D bar = new Rectangle2D.Double(10, 20, 30, 40);
+
+        // Create a dummy Graphics2D object to ensure the test focuses on the null 'base' argument.
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+
+        // Act: Call the method with a null 'base' edge.
+        // The method is expected to throw a NullPointerException.
+        painter.paintBarShadow(g2, renderer, 0, 0, bar, null, true);
+
+        // Assert: The @Test(expected) annotation handles the exception verification.
     }
 }
