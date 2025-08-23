@@ -1,45 +1,47 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Symmetry454Chronology_ESTestTest52 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Tests for {@link Symmetry454Chronology}.
+ * This class focuses on the conversion of temporal objects from other calendar systems.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        System.setCurrentTimeMillis((-1343L));
-        OffsetDateTime offsetDateTime0 = MockOffsetDateTime.now();
-        ChronoZonedDateTime<Symmetry454Date> chronoZonedDateTime0 = symmetry454Chronology0.zonedDateTime((TemporalAccessor) offsetDateTime0);
-        assertNotNull(chronoZonedDateTime0);
+    @Test
+    public void zonedDateTime_shouldCorrectlyConvertOffsetDateTimeBeforeEpoch() {
+        // --- Arrange ---
+        // The Symmetry454Chronology instance to test.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+
+        // Define an input based on an instant shortly before the Unix epoch.
+        // The value -1343L corresponds to 1969-12-31T23:59:58.657Z in the ISO calendar.
+        Instant instantBeforeEpoch = Instant.ofEpochMilli(-1343L);
+        OffsetDateTime isoDateTime = OffsetDateTime.ofInstant(instantBeforeEpoch, ZoneOffset.UTC);
+
+        // --- Act ---
+        // Convert the ISO OffsetDateTime to the Symmetry454 calendar system.
+        ChronoZonedDateTime<Symmetry454Date> result = chronology.zonedDateTime(isoDateTime);
+
+        // --- Assert ---
+        assertNotNull("The conversion result should not be null.", result);
+
+        // A common Symmetry454 year has 364 days, while a common ISO year has 365.
+        // Therefore, the last day of the ISO year 1969 (1969-12-31) corresponds to
+        // the first day of the Symmetry454 year 1970.
+        Symmetry454Date expectedDate = Symmetry454Date.of(1970, 1, 1);
+        LocalTime expectedTime = LocalTime.of(23, 59, 58, 657_000_000);
+
+        assertEquals("The converted date should match the expected Symmetry454 date.", expectedDate, result.toLocalDate());
+        assertEquals("The converted time should be preserved.", expectedTime, result.toLocalTime());
+        assertEquals("The zone offset should be preserved.", ZoneOffset.UTC, result.getZone());
     }
 }
