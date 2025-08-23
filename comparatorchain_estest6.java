@@ -1,42 +1,28 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparatorChain_ESTestTest6 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ComparatorChain} class.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        LinkedList<Comparator<ComparatorPredicate.Criterion>> linkedList0 = new LinkedList<Comparator<ComparatorPredicate.Criterion>>();
-        ComparatorChain<ComparatorPredicate.Criterion> comparatorChain0 = new ComparatorChain<ComparatorPredicate.Criterion>(linkedList0);
-        // Undeclared exception!
-        try {
-            comparatorChain0.setReverseSort((-2145));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // bitIndex < 0: -2145
-            //
-            verifyException("java.util.BitSet", e);
-        }
+    /**
+     * Tests that calling setReverseSort() with a negative index throws an
+     * IndexOutOfBoundsException.
+     *
+     * The method should not accept negative indices, as it delegates the call
+     * to an internal BitSet, which enforces this constraint.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void setReverseSort_withNegativeIndex_shouldThrowException() {
+        // Arrange: Create an empty ComparatorChain.
+        final ComparatorChain<Object> comparatorChain = new ComparatorChain<>();
+
+        // Act: Attempt to set the sort order using a negative index.
+        // This action is expected to throw an IndexOutOfBoundsException.
+        comparatorChain.setReverseSort(-1);
+
+        // Assert: The exception is caught and verified by the @Test(expected=...) annotation.
     }
 }
