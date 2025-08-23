@@ -1,28 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class SerializedString_ESTestTest52 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("2]sk2");
-        char[] charArray0 = serializedString0.asQuotedChars();
-        char[] charArray1 = serializedString0.asQuotedChars();
-        assertSame(charArray1, charArray0);
+    /**
+     * Verifies that the {@code asQuotedChars()} method caches its result after the first call.
+     * The {@link SerializedString} is designed to perform expensive serialization work only once
+     * and then reuse the result. This test ensures that subsequent calls return the exact same
+     * char array instance, confirming the caching mechanism is working as expected.
+     */
+    @Test
+    public void asQuotedCharsShouldReturnCachedArrayOnSubsequentCalls() {
+        // Arrange: Create a SerializedString instance.
+        SerializedString serializedString = new SerializedString("a test string");
+
+        // Act: Call the method twice to trigger and then use the cache.
+        char[] firstCallResult = serializedString.asQuotedChars();
+        char[] secondCallResult = serializedString.asQuotedChars();
+
+        // Assert: Verify that the same object instance is returned on both calls.
+        assertSame("Subsequent calls to asQuotedChars() should return the cached array instance",
+                firstCallResult, secondCallResult);
     }
 }
