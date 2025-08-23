@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.AbstractLangTest;
 import org.apache.commons.lang3.ThreadUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class BackgroundInitializerTestTest12 extends AbstractLangTest {
@@ -154,20 +155,23 @@ public class BackgroundInitializerTestTest12 extends AbstractLangTest {
         }
     }
 
-    /**
-     * Tests isInitialized() before and after the background task has finished.
-     */
     @Test
-    void testIsInitialized() throws ConcurrentException {
-        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
-        init.enableLatch();
-        init.start();
-        //Started and Initialized should return opposite values
-        assertTrue(init.isStarted(), "Not started");
-        assertFalse(init.isInitialized(), "Initialized before releasing latch");
-        init.releaseLatch();
-        //to ensure the initialize thread has completed.
-        init.get();
-        assertTrue(init.isInitialized(), "Not initialized after releasing latch");
+    @DisplayName("isInitialized() should return false during initialization and true after completion")
+    void isInitializedShouldReturnCorrectStateThroughoutLifecycle() throws ConcurrentException {
+        // Arrange: Create an initializer that we can pause during its background task.
+        final AbstractBackgroundInitializerTestImpl initializer = getBackgroundInitializerTestImpl();
+        initializer.enableLatch(); // This makes the initialize() method wait.
+
+        // Act & Assert: Check state while initialization is in progress.
+        initializer.start();
+
+        assertTrue(initializer.isStarted(), "isStarted() should be true immediately after start().");
+        assertFalse(initializer.isInitialized(), "isInitialized() should be false while the background task is running.");
+
+        // Act & Assert: Check state after initialization is complete.
+        initializer.releaseLatch(); // Allow the initialize() method to complete.
+        initializer.get();          // Block until the background task finishes.
+
+        assertTrue(initializer.isInitialized(), "isInitialized() should be true after the background task has completed.");
     }
 }
