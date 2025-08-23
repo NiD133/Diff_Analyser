@@ -1,25 +1,21 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LZMAUtils_ESTestTest12 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        // Undeclared exception!
-        try {
-            LZMAUtils.getCompressedFileName((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.compressors.FileNameUtil", e);
-        }
+    /**
+     * Tests that calling getCompressedFileName with a null input throws a
+     * NullPointerException, as the method contract requires a valid filename.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getCompressedFileNameShouldThrowExceptionForNullInput() {
+        // The getCompressedFileName method is expected to delegate to a utility
+        // that does not accept nulls. This test verifies that a
+        // NullPointerException is thrown as expected.
+        LZMAUtils.getCompressedFileName(null);
     }
 }
