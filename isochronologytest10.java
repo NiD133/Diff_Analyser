@@ -1,52 +1,35 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
+import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ISOChronologyTestTest10 extends TestCase {
+/**
+ * Tests for the time-related fields in ISOChronology.
+ * This test verifies that each time field has the correct name and is reported as supported.
+ */
+public class ISOChronologyTimeFieldsTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    // A fixed point in time for consistent test results: 2002-06-09T00:00:00.000Z
+    private static final long TEST_TIME_NOW = new DateTime(2002, 6, 9, 0, 0, 0, 0).getMillis();
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() {
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
@@ -56,56 +39,39 @@ public class ISOChronologyTestTest10 extends TestCase {
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    public void testTimeFields() {
+    @Test
+    public void testTimeFields_haveCorrectNamesAndAreSupported() {
         final ISOChronology iso = ISOChronology.getInstance();
-        assertEquals("halfdayOfDay", iso.halfdayOfDay().getName());
-        assertEquals("clockhourOfHalfday", iso.clockhourOfHalfday().getName());
-        assertEquals("hourOfHalfday", iso.hourOfHalfday().getName());
-        assertEquals("clockhourOfDay", iso.clockhourOfDay().getName());
-        assertEquals("hourOfDay", iso.hourOfDay().getName());
-        assertEquals("minuteOfDay", iso.minuteOfDay().getName());
-        assertEquals("minuteOfHour", iso.minuteOfHour().getName());
-        assertEquals("secondOfDay", iso.secondOfDay().getName());
-        assertEquals("secondOfMinute", iso.secondOfMinute().getName());
-        assertEquals("millisOfDay", iso.millisOfDay().getName());
-        assertEquals("millisOfSecond", iso.millisOfSecond().getName());
-        assertEquals(true, iso.halfdayOfDay().isSupported());
-        assertEquals(true, iso.clockhourOfHalfday().isSupported());
-        assertEquals(true, iso.hourOfHalfday().isSupported());
-        assertEquals(true, iso.clockhourOfDay().isSupported());
-        assertEquals(true, iso.hourOfDay().isSupported());
-        assertEquals(true, iso.minuteOfDay().isSupported());
-        assertEquals(true, iso.minuteOfHour().isSupported());
-        assertEquals(true, iso.secondOfDay().isSupported());
-        assertEquals(true, iso.secondOfMinute().isSupported());
-        assertEquals(true, iso.millisOfDay().isSupported());
-        assertEquals(true, iso.millisOfSecond().isSupported());
+
+        assertTimeField(iso.halfdayOfDay(), "halfdayOfDay");
+        assertTimeField(iso.clockhourOfHalfday(), "clockhourOfHalfday");
+        assertTimeField(iso.hourOfHalfday(), "hourOfHalfday");
+        assertTimeField(iso.clockhourOfDay(), "clockhourOfDay");
+        assertTimeField(iso.hourOfDay(), "hourOfDay");
+        assertTimeField(iso.minuteOfDay(), "minuteOfDay");
+        assertTimeField(iso.minuteOfHour(), "minuteOfHour");
+        assertTimeField(iso.secondOfDay(), "secondOfDay");
+        assertTimeField(iso.secondOfMinute(), "secondOfMinute");
+        assertTimeField(iso.millisOfDay(), "millisOfDay");
+        assertTimeField(iso.millisOfSecond(), "millisOfSecond");
+    }
+
+    /**
+     * Asserts that a given DateTimeField has the expected name and is supported.
+     *
+     * @param field the DateTimeField to check
+     * @param expectedName the expected name of the field
+     */
+    private void assertTimeField(DateTimeField field, String expectedName) {
+        assertEquals("Field name should match", expectedName, field.getName());
+        assertTrue("Field should be supported", field.isSupported());
     }
 }
