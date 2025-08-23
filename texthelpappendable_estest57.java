@@ -1,56 +1,34 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
 public class TextHelpAppendable_ESTestTest57 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-        textHelpAppendable0.setLeftPad((-3110));
-        LinkedList<String> linkedList0 = new LinkedList<String>();
-        LinkedHashSet<List<String>> linkedHashSet0 = new LinkedHashSet<List<String>>();
-        TableDefinition tableDefinition0 = TableDefinition.from("COo<SXX:", arrayList0, linkedList0, linkedHashSet0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendTable(tableDefinition0);
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.Util", e);
-        }
+    /**
+     * Tests that calling {@link TextHelpAppendable#appendTable(TableDefinition)} throws a
+     * {@link NegativeArraySizeException} if the left padding has been set to a negative value.
+     * This occurs because an internal utility attempts to create a character array of a negative
+     * size for the padding.
+     */
+    @Test(expected = NegativeArraySizeException.class)
+    public void testAppendTableWithNegativeLeftPaddingThrowsException() throws IOException {
+        // Arrange: Create a TextHelpAppendable and set its left padding to a negative value.
+        TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        helpAppendable.setLeftPad(-1);
+
+        // An empty table definition is sufficient to trigger the code path under test.
+        TableDefinition emptyTable = TableDefinition.from(
+                "Header",
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptySet());
+
+        // Act: Attempt to append the table. This should fail when trying to create the negative padding.
+        helpAppendable.appendTable(emptyTable);
+
+        // Assert: The NegativeArraySizeException is expected, as declared in the @Test annotation.
     }
 }
