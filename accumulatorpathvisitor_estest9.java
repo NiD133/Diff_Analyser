@@ -1,46 +1,39 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
+
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.apache.commons.io.filefilter.CanExecuteFileFilter;
-import org.apache.commons.io.filefilter.CanReadFileFilter;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.evosuite.runtime.mock.java.io.MockFile;
 import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class AccumulatorPathVisitor_ESTestTest9 extends AccumulatorPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link AccumulatorPathVisitor}.
+ */
+public class AccumulatorPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withLongCounters();
-        MockFile mockFile0 = new MockFile("", "");
-        Path path0 = mockFile0.toPath();
-        MockIOException mockIOException0 = new MockIOException();
-        accumulatorPathVisitor0.updateDirCounter(path0, mockIOException0);
-        MockFile mockFile1 = new MockFile("c+{ [lS|rLx6");
-        Path path1 = mockFile1.toPath();
-        // Undeclared exception!
-        try {
-            accumulatorPathVisitor0.relativizeDirectories(path1, true, (Comparator<? super Path>) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
+    /**
+     * Tests that relativizeDirectories() throws an IllegalArgumentException when trying
+     * to relativize a stored absolute path against a new relative path. This is because
+     * the underlying Path.relativize() method requires both paths to be of the same
+     * type (either both absolute or both relative).
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testRelativizeDirectoriesThrowsExceptionForMismatchedPathTypes() {
+        // Arrange: Create a visitor and add an absolute path to its directory list.
+        final AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withLongCounters();
+        
+        // On Unix-like systems, new MockFile("", "") creates a Path for the root ("/").
+        // This is an absolute path.
+        final Path absolutePath = new MockFile("", "").toPath(); 
+        
+        // The specific exception doesn't matter; it's just needed to add the path to the list.
+        visitor.updateDirCounter(absolutePath, new MockIOException("dummy exception"));
+
+        // This path is relative.
+        final Path relativePath = new MockFile("some/relative/dir").toPath();
+
+        // Act & Assert: Attempt to relativize the stored absolute path against the new
+        // relative path. This is expected to throw an IllegalArgumentException.
+        visitor.relativizeDirectories(relativePath, false, null);
     }
 }
