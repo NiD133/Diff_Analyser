@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest12 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Weeks weeks0 = Weeks.ZERO;
-        Duration duration0 = weeks0.TWO.toStandardDuration();
-        assertEquals(1209600000L, duration0.getMillis());
+    /**
+     * Tests that converting a {@link Weeks} object to a standard duration
+     * results in the correct number of milliseconds.
+     */
+    @Test
+    public void toStandardDuration_forTwoWeeks_convertsToCorrectMilliseconds() {
+        // Arrange
+        Weeks twoWeeks = Weeks.TWO;
+        // A standard week contains 604,800,000 milliseconds (7 * 24 * 60 * 60 * 1000).
+        // Using a constant makes the expected value's origin clear and less error-prone.
+        final long expectedMillis = 2L * DateTimeConstants.MILLIS_PER_WEEK;
+
+        // Act
+        Duration duration = twoWeeks.toStandardDuration();
+
+        // Assert
+        assertEquals("The duration for two weeks should be the correct number of milliseconds.",
+                     expectedMillis, duration.getMillis());
     }
 }
