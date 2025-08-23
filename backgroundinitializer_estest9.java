@@ -1,32 +1,27 @@
 package org.apache.commons.lang3.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
+import static org.junit.Assert.assertNull;
+
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BackgroundInitializer_ESTestTest9 extends BackgroundInitializer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BackgroundInitializer}.
+ */
+public class BackgroundInitializerTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        BackgroundInitializer<Delayed> backgroundInitializer0 = new BackgroundInitializer<Delayed>();
-        BackgroundInitializer<Exception> backgroundInitializer1 = new BackgroundInitializer<Exception>();
-        ExecutorService executorService0 = backgroundInitializer1.getActiveExecutor();
-        assertNull(executorService0);
+    /**
+     * Tests that getActiveExecutor() returns null if the initializer has not been started.
+     */
+    @Test
+    public void testGetActiveExecutorShouldReturnNullBeforeStart() {
+        // Arrange: Create a new BackgroundInitializer that has not been started.
+        final BackgroundInitializer<Object> initializer = new BackgroundInitializer<>();
+
+        // Act: Get the active executor.
+        final ExecutorService activeExecutor = initializer.getActiveExecutor();
+
+        // Assert: The executor should be null, as start() has not been called.
+        assertNull("The active executor should be null before start() is called", activeExecutor);
     }
 }
