@@ -1,34 +1,24 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class TaiInstant_ESTestTest38 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the TaiInstant class, focusing on the isAfter() method.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(2781L, 2781L);
-        // Undeclared exception!
-        try {
-            taiInstant0.isAfter((TaiInstant) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.scale.TaiInstant", e);
-        }
+    /**
+     * Verifies that the isAfter() method correctly throws a NullPointerException
+     * when passed a null argument, as per its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isAfter_shouldThrowNullPointerException_whenArgumentIsNull() {
+        // Arrange: Create an arbitrary instance of TaiInstant.
+        // The specific value of the instant is not relevant to this test.
+        TaiInstant anInstant = TaiInstant.ofTaiSeconds(1000L, 0);
+
+        // Act & Assert: Call isAfter() with a null argument.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        anInstant.isAfter(null);
     }
 }
