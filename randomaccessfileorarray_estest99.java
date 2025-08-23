@@ -1,41 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+// The original test class extends a scaffolding class, which is preserved 
+// to maintain compatibility with the existing test execution environment.
 public class RandomAccessFileOrArray_ESTestTest99 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test098() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.read();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray instance
+     * after it has been closed throws a NullPointerException.
+     * <p>
+     * This is the expected behavior, as closing the resource should release
+     * internal data structures, rendering subsequent read operations invalid.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void readShouldThrowNullPointerExceptionWhenStreamIsClosed() throws IOException {
+        // Arrange: Create an instance from a byte array and then immediately close it.
+        byte[] dummyData = new byte[]{42};
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(dummyData);
+        fileOrArray.close();
+
+        // Act: Attempt to read from the closed instance.
+        // This action is expected to throw a NullPointerException, which is
+        // asserted by the 'expected' attribute of the @Test annotation.
+        fileOrArray.read();
     }
 }
