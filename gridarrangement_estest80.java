@@ -1,31 +1,24 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GridArrangement_ESTestTest80 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test79() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(0, 0);
-        assertNotNull(gridArrangement0);
-        boolean boolean0 = gridArrangement0.equals(gridArrangement0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_whenComparedToItself_shouldReturnTrue() {
+        // Arrange
+        GridArrangement arrangement = new GridArrangement(0, 0);
+
+        // Act & Assert
+        // According to the contract of equals(), an object must be equal to itself.
+        assertEquals(arrangement, arrangement);
     }
 }
