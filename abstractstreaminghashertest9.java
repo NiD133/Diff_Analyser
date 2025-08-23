@@ -1,117 +1,64 @@
 package com.google.common.hash;
 
-import static java.nio.charset.StandardCharsets.UTF_16LE;
 import static org.junit.Assert.assertThrows;
-import com.google.common.collect.Iterables;
-import com.google.common.hash.HashTestUtils.RandomHasherAction;
-import java.io.ByteArrayOutputStream;
+
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
 
-public class AbstractStreamingHasherTestTest9 extends TestCase {
+/**
+ * Tests for the argument validation in {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    private static class Sink extends AbstractStreamingHasher {
-
-        final int chunkSize;
-
-        final int bufferSize;
-
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        int processCalled = 0;
-
-        boolean remainingCalled = false;
-
-        Sink(int chunkSize, int bufferSize) {
-            super(chunkSize, bufferSize);
-            this.chunkSize = chunkSize;
-            this.bufferSize = bufferSize;
-        }
-
-        Sink(int chunkSize) {
-            super(chunkSize);
-            this.chunkSize = chunkSize;
-            this.bufferSize = chunkSize;
-        }
-
-        @Override
-        protected HashCode makeHash() {
-            return HashCode.fromBytes(out.toByteArray());
+    /**
+     * A minimal, no-op implementation of {@link AbstractStreamingHasher} used to test the
+     * functionality of the abstract class itself, such as input validation.
+     */
+    private static class NoOpStreamingHasher extends AbstractStreamingHasher {
+        NoOpStreamingHasher() {
+            // The chunk size value does not matter for the tests in this class,
+            // as the exceptions are thrown before any processing logic is invoked.
+            super(4);
         }
 
         @Override
         protected void process(ByteBuffer bb) {
-            processCalled++;
-            assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() >= chunkSize);
-            for (int i = 0; i < chunkSize; i++) {
-                out.write(bb.get());
-            }
+            // This method is not called by the tests here.
         }
 
         @Override
         protected void processRemaining(ByteBuffer bb) {
-            assertFalse(remainingCalled);
-            remainingCalled = true;
-            assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() > 0);
-            assertTrue(bb.remaining() < bufferSize);
-            int before = processCalled;
-            super.processRemaining(bb);
-            int after = processCalled;
-            // default implementation pads and calls process()
-            assertEquals(before + 1, after);
-            // don't count the tail invocation (makes tests a bit more understandable)
-            processCalled--;
-        }
-
-        // ensures that the number of invocations looks sane
-        void assertInvariants(int expectedBytes) {
-            // we should have seen as many bytes as the next multiple of chunk after expectedBytes - 1
-            assertEquals(out.toByteArray().length, ceilToMultiple(expectedBytes, chunkSize));
-            assertEquals(expectedBytes / chunkSize, processCalled);
-            assertEquals(expectedBytes % chunkSize != 0, remainingCalled);
-        }
-
-        // returns the minimum x such as x >= a && (x % b) == 0
-        private static int ceilToMultiple(int a, int b) {
-            int remainder = a % b;
-            return remainder == 0 ? a : a + b - remainder;
-        }
-
-        void assertBytes(byte[] expected) {
-            byte[] got = out.toByteArray();
-            for (int i = 0; i < expected.length; i++) {
-                assertEquals(expected[i], got[i]);
-            }
-        }
-    }
-
-    // Assumes that AbstractNonStreamingHashFunction works properly (must be tested elsewhere!)
-    private static class Control extends AbstractNonStreamingHashFunction {
-
-        @Override
-        public HashCode hashBytes(byte[] input, int off, int len) {
-            return HashCode.fromBytes(Arrays.copyOfRange(input, off, off + len));
+            // This method is not called by the tests here.
         }
 
         @Override
-        public int bits() {
+        protected HashCode makeHash() {
+            // This method is not called by the tests here.
             throw new UnsupportedOperationException();
         }
     }
 
-    public void testCorrectExceptions() {
-        Sink sink = new Sink(4);
-        assertThrows(IndexOutOfBoundsException.class, () -> sink.putBytes(new byte[8], -1, 4));
-        assertThrows(IndexOutOfBoundsException.class, () -> sink.putBytes(new byte[8], 0, 16));
-        assertThrows(IndexOutOfBoundsException.class, () -> sink.putBytes(new byte[8], 0, -1));
+    @Test
+    public void putBytes_withInvalidArguments_throwsIndexOutOfBoundsException() {
+        Hasher hasher = new NoOpStreamingHasher();
+        byte[] bytes = new byte[8];
+
+        // Case 1: Negative offset
+        assertThrows(
+                "Should throw for a negative offset",
+                IndexOutOfBoundsException.class,
+                () -> hasher.putBytes(bytes, -1, 4));
+
+        // Case 2: Length extends beyond the array's bounds
+        assertThrows(
+                "Should throw when offset + length > array length",
+                IndexOutOfBoundsException.class,
+                () -> hasher.putBytes(bytes, 0, 9));
+
+        // Case 3: Negative length
+        assertThrows(
+                "Should throw for a negative length",
+                IndexOutOfBoundsException.class,
+                () -> hasher.putBytes(bytes, 0, -1));
     }
 }
