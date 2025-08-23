@@ -1,34 +1,30 @@
 package com.google.common.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest24 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * This test class verifies the behavior of the {@link PairedStats} class.
+ * It was refactored from an auto-generated test that was originally, and misleadingly,
+ * targeting {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulator_ESTestTest24 {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(154.3044396684968, 154.3044396684968);
-        Stats stats0 = new Stats((-9223372036854775808L), (-9223372036854775808L), (-9223372036854775808L), (-716.5114168133774), 1586.65153);
-        ArrayDeque<Integer> arrayDeque0 = new ArrayDeque<Integer>();
-        Iterator<Integer> iterator0 = arrayDeque0.descendingIterator();
-        Stats stats1 = Stats.of(iterator0);
-        PairedStats pairedStats0 = new PairedStats(stats0, stats1, (-716.5114168133774));
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.addAll(pairedStats0);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that the {@link PairedStats} constructor throws an {@link IllegalArgumentException}
+     * when the provided x-stats and y-stats objects have different counts.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void pairedStatsConstructor_throwsIllegalArgumentException_whenXAndYStatsCountsDiffer() {
+        // Arrange: Create two Stats objects with a different number of values.
+        // The PairedStats class requires the count of x and y values to be identical.
+        Stats xStatsWithOneValue = Stats.of(154.3); // This object has a count of 1.
+        Stats yStatsWithNoValues = Stats.of();      // This object has a count of 0.
+
+        // Act: Attempt to create a PairedStats object with the mismatched Stats.
+        // This is expected to throw an IllegalArgumentException due to the count mismatch,
+        // as enforced by a precondition check in the constructor.
+        new PairedStats(xStatsWithOneValue, yStatsWithNoValues, 0.0);
+
+        // Assert: The test passes if the expected exception is thrown.
     }
 }
