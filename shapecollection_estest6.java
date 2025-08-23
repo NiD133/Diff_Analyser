@@ -1,43 +1,35 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest6 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        arrayList0.add((JtsPoint) null);
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext1 = new SpatialContext(spatialContextFactory0);
-        // Undeclared exception!
-        try {
-            shapeCollection0.computeBoundingBox(arrayList0, spatialContext1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.ShapeCollection", e);
-        }
+/**
+ * A more focused and readable test for the ShapeCollection class.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Verifies that computeBoundingBox throws a NullPointerException if the provided
+     * collection of shapes contains a null element.
+     */
+    @Test(expected = NullPointerException.class)
+    public void computeBoundingBox_withNullShapeInList_throwsNullPointerException() {
+        // Arrange
+        SpatialContext ctx = SpatialContext.GEO;
+        List<Shape> shapesWithNull = Collections.singletonList(null);
+
+        // The method under test, computeBoundingBox, is protected. We need an instance
+        // of ShapeCollection to call it. The constructor requires a list that implements
+        // RandomAccess, so we provide an empty ArrayList.
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(new ArrayList<>(), ctx);
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException, which is handled by
+        // the 'expected' parameter in the @Test annotation.
+        shapeCollection.computeBoundingBox(shapesWithNull, ctx);
     }
 }
