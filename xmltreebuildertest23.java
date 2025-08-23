@@ -1,32 +1,31 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest23 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}.
+ */
+class XmlTreeBuilderTest {
 
+    /**
+     * Tests that the XML parser can gracefully handle an XML declaration
+     * that is not explicitly closed with '?&gt;'. This is a common case in
+     * malformed or truncated XML streams.
+     */
     @Test
-    public void handlesDodgyXmlDecl() {
-        String xml = "<?xml version='1.0'><val>One</val>";
-        Document doc = Jsoup.parse(xml, "", Parser.xmlParser());
-        assertEquals("One", doc.select("val").text());
+    void shouldParseXmlWithUnclosedDeclaration() {
+        // Arrange: An XML string with an unclosed declaration.
+        String xmlWithUnclosedDecl = "<?xml version='1.0'><val>One</val>";
+
+        // Act: Parse the string using the XML parser.
+        Document doc = Jsoup.parse(xmlWithUnclosedDecl, "", Parser.xmlParser());
+        String parsedText = doc.select("val").text();
+
+        // Assert: The content should be parsed correctly despite the malformed declaration.
+        assertEquals("One", parsedText);
     }
 }
