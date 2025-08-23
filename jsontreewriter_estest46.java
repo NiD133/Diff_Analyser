@@ -1,32 +1,40 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
+/**
+ * This class contains tests for JsonTreeWriter.
+ * This particular test was improved for clarity.
+ */
+// The original test class name and inheritance are preserved.
 public class JsonTreeWriter_ESTestTest46 extends JsonTreeWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginArray();
+    /**
+     * Verifies that closing a writer with an unclosed array (an incomplete document)
+     * throws an IOException.
+     */
+    @Test
+    public void close_withOpenArray_throwsIOException() {
+        // Arrange: Create a writer and start an array, but do not close it.
+        JsonTreeWriter writer = new JsonTreeWriter();
         try {
-            jsonTreeWriter0.close();
-            fail("Expecting exception: IOException");
+            writer.beginArray();
         } catch (IOException e) {
-            //
-            // Incomplete document
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+            // This is part of the setup and should not fail.
+            fail("Test setup failed: beginArray() should not throw an exception here.");
+        }
+
+        // Act & Assert: Attempting to close the writer should fail.
+        try {
+            writer.close();
+            fail("Expected an IOException because the JSON document is incomplete, but no exception was thrown.");
+        } catch (IOException expected) {
+            // Verify that the exception message clearly states the reason for the failure.
+            assertEquals("Incomplete document", expected.getMessage());
         }
     }
 }
