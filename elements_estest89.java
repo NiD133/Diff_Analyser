@@ -1,44 +1,30 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest89 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test088() throws Throwable {
-        Document document0 = Document.createShell("Bb,76");
-        Elements elements0 = document0.getAllElements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements} class.
+ * This class focuses on exception-handling scenarios.
+ */
+public class ElementsExceptionTest {
+
+    @Test
+    public void appendWithNullHtmlShouldThrowIllegalArgumentException() {
+        // Arrange: Create an Elements object to test against.
+        Document doc = Document.createShell("");
+        Elements elements = doc.getAllElements(); // Contains <html>, <head>, <body>
+
+        // Act & Assert: Verify that appending null throws the expected exception.
         try {
-            elements0.append((String) null);
-            fail("Expecting exception: IllegalArgumentException");
+            elements.append(null);
+            fail("Expected an IllegalArgumentException to be thrown for null HTML input.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert that the exception message is correct, confirming the validation logic.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
