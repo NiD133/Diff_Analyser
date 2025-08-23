@@ -1,18 +1,30 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class JsonSetter_ESTestTest23 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.from((JsonSetter) null);
-        assertEquals(Nulls.DEFAULT, jsonSetter_Value0.getValueNulls());
+    /**
+     * Tests that creating a {@link JsonSetter.Value} from a null annotation
+     * returns the default 'empty' instance.
+     */
+    @Test
+    public void from_withNullAnnotation_shouldReturnDefaultInstance() {
+        // Arrange: No setup needed, the input is null.
+
+        // Act: Call the factory method with a null input.
+        JsonSetter.Value value = JsonSetter.Value.from(null);
+
+        // Assert: The returned instance should be the default singleton,
+        // and its properties should have default values.
+        assertSame("The default 'empty' instance should be returned for null input",
+                JsonSetter.Value.empty(), value);
+        assertEquals(Nulls.DEFAULT, value.getValueNulls());
+        assertEquals(Nulls.DEFAULT, value.getContentNulls());
     }
 }
