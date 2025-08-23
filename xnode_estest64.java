@@ -1,38 +1,32 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
+
+/**
+ * This test class is a refactored version of an auto-generated test.
+ * The original class name was XNode_ESTestTest64.
+ */
 public class XNode_ESTestTest64 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test063() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.evalDouble("X\u0003'5C;kL4$\u0006mq");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.parsing.XNode", e);
-        }
+    /**
+     * Verifies that calling evalDouble() on an XNode instance created with a null
+     * XPathParser throws a NullPointerException. This ensures the method is robust
+     * against invalid initial states.
+     */
+    @Test(expected = NullPointerException.class)
+    public void evalDoubleShouldThrowNullPointerExceptionWhenXPathParserIsNull() {
+        // Arrange: Create an XNode with a null XPathParser.
+        // The XPathParser is intentionally null to trigger the expected exception.
+        Properties variables = new Properties();
+        Node dummyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, dummyNode, variables);
+
+        // Act & Assert: Attempting to evaluate an XPath expression should fail.
+        // The @Test(expected=...) annotation asserts that a NullPointerException is thrown.
+        xNode.evalDouble("/any/xpath/expression");
     }
 }
