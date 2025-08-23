@@ -1,21 +1,39 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest17 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the JsonLocation class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Object object0 = new Object();
-        JsonLocation jsonLocation0 = new JsonLocation(object0, 0L, 0L, (-1678), (-1678));
-        jsonLocation0.getCharOffset();
-        assertEquals((-1678), jsonLocation0.getLineNr());
-        assertEquals((-1678), jsonLocation0.getColumnNr());
+    /**
+     * Verifies that the constructor correctly initializes a JsonLocation object
+     * and that the line and column numbers can be retrieved via their respective getters.
+     */
+    @Test
+    public void constructorShouldCorrectlySetLineAndColumnNumbers() {
+        // Arrange: Define the input parameters for the JsonLocation.
+        Object sourceReference = new Object();
+        long totalBytes = 0L;
+        long totalChars = 0L;
+        int expectedLineNumber = -1678;
+        int expectedColumnNumber = -1678;
+
+        // Act: Create a new JsonLocation instance.
+        JsonLocation location = new JsonLocation(
+            sourceReference,
+            totalBytes,
+            totalChars,
+            expectedLineNumber,
+            expectedColumnNumber
+        );
+
+        // Assert: Check that the getters return the values provided to the constructor.
+        assertEquals("The line number should match the value provided in the constructor.",
+                expectedLineNumber, location.getLineNr());
+        assertEquals("The column number should match the value provided in the constructor.",
+                expectedColumnNumber, location.getColumnNr());
     }
 }
