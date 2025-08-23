@@ -1,39 +1,37 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest20 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        UTF8Writer uTF8Writer0 = null;
+/**
+ * Unit tests for the {@link UTF8Writer} class, focusing on its constructor.
+ */
+public class UTF8WriterTest {
+
+    /**
+     * Verifies that the constructor throws a NullPointerException when the
+     * provided IOContext is null. The IOContext is a mandatory dependency
+     * used for buffer allocation, and a null value should result in an immediate failure.
+     */
+    @Test
+    public void constructor_whenGivenNullIOContext_shouldThrowNullPointerException() {
+        // Arrange: Create a valid, non-null OutputStream to isolate the test
+        // to the IOContext parameter.
+        OutputStream dummyOutputStream = new ByteArrayOutputStream();
+        IOContext nullIOContext = null;
+
+        // Act & Assert
         try {
-            uTF8Writer0 = new UTF8Writer((IOContext) null, (OutputStream) null);
-            fail("Expecting exception: NullPointerException");
+            new UTF8Writer(nullIOContext, dummyOutputStream);
+            fail("Expected a NullPointerException because the IOContext cannot be null.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            // This is the expected behavior, so the test passes.
+            // No further assertions are needed.
         }
     }
 }
