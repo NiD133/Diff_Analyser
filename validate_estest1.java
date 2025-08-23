@@ -1,32 +1,24 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest1 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        // Undeclared exception!
-        try {
-            Validate.noNullElements((Object[]) null, "iCG#=R\u0003Hw!Qvbk1");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    /**
+     * Tests that the noNullElements method throws a NullPointerException
+     * when the input array itself is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void noNullElementsShouldThrowNpeForNullArray() {
+        // Arrange: The input array is null.
+        Object[] nullArray = null;
+        String message = "The array must not contain null elements";
+
+        // Act: Calling the method with a null array.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        Validate.noNullElements(nullArray, message);
     }
 }
