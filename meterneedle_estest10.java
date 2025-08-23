@@ -1,33 +1,30 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MeterNeedle_ESTestTest10 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ArrowNeedle arrowNeedle0 = new ArrowNeedle(false);
-        arrowNeedle0.setRotateX((-9.0));
-        double double0 = arrowNeedle0.getRotateX();
-        assertEquals((-9.0), double0, 0.01);
+    /**
+     * Verifies that the setRotateX() method correctly updates the rotateX value,
+     * which is then returned by getRotateX().
+     */
+    @Test
+    public void getRotateX_shouldReturnTheValuePreviouslySet() {
+        // Arrange
+        // ArrowNeedle is a concrete implementation of the abstract MeterNeedle class.
+        ArrowNeedle needle = new ArrowNeedle(false);
+        final double expectedRotateX = -9.0;
+
+        // Act
+        needle.setRotateX(expectedRotateX);
+        final double actualRotateX = needle.getRotateX();
+
+        // Assert
+        assertEquals("The value returned by getRotateX() should match the value set.",
+                expectedRotateX, actualRotateX, 0.01);
     }
 }
