@@ -1,33 +1,40 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest24 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("shapeFactoryClass", "shapeFactoryClass");
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        // Undeclared exception!
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ * This test case focuses on the initialization behavior with invalid arguments.
+ */
+public class SpatialContextFactoryTest {
+
+    @Test
+    public void init_withInvalidShapeFactoryClassName_shouldThrowRuntimeException() {
+        // Arrange
+        // Create configuration arguments for the SpatialContextFactory.
+        // We provide a value for 'shapeFactoryClass' that is not a valid,
+        // loadable, fully-qualified class name.
+        Map<String, String> configArgs = new HashMap<>();
+        configArgs.put("shapeFactoryClass", "shapeFactoryClass"); // This string is not a real class name.
+
+        SpatialContextFactory factory = new SpatialContextFactory();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act & Assert
         try {
-            spatialContextFactory0.init(hashMap0, classLoader0);
-            fail("Expecting exception: RuntimeException");
+            // The init method attempts to load the class by its name, which should fail.
+            factory.init(configArgs, classLoader);
+            fail("Expected a RuntimeException because the shapeFactoryClass is invalid.");
         } catch (RuntimeException e) {
-            //
-            // Invalid value 'shapeFactoryClass' on field shapeFactoryClass of type class java.lang.Class
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // Verify that the exception has the expected message, confirming the cause of the failure.
+            String expectedMessage = "Invalid value 'shapeFactoryClass' on field shapeFactoryClass of type class java.lang.Class";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
