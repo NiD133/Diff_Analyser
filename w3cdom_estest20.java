@@ -1,46 +1,33 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
-public class W3CDom_ESTestTest20 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link W3CDom} helper class.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that calling fromJsoup() with a null Document throws an IllegalArgumentException.
+     * This is crucial for ensuring the method's input validation is working correctly.
+     */
+    @Test
+    public void fromJsoupShouldThrowExceptionForNullDocument() {
+        // Arrange: Create an instance of the class under test.
+        W3CDom w3cDom = new W3CDom();
+        Document nullDocument = null;
+
+        // Act & Assert: Attempt the invalid operation and verify the expected exception.
         try {
-            w3CDom0.fromJsoup((Document) null);
-            fail("Expecting exception: IllegalArgumentException");
+            w3cDom.fromJsoup(nullDocument);
+            fail("Expected an IllegalArgumentException to be thrown for a null input document.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is correct, confirming the right validation failed.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
