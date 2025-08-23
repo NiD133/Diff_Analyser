@@ -1,37 +1,26 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest38 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for {@link Uncheck}.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        // Undeclared exception!
-        try {
-            Uncheck.compare((IOComparator<String>) null, "%0E@O`5Sj", "%0E@O`5Sj");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.function.Uncheck", e);
-        }
+    /**
+     * Tests that {@link Uncheck#compare(IOComparator, Object, Object)} throws a
+     * {@link NullPointerException} when the given comparator is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void compareWithNullComparatorThrowsNullPointerException() {
+        // Arrange: Define two arbitrary objects to be compared.
+        // Their values are irrelevant for this test, as the null comparator
+        // will be dereferenced before they are used.
+        final String object1 = "a";
+        final String object2 = "b";
+
+        // Act: Call the method under test with a null comparator.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        Uncheck.compare(null, object1, object2);
     }
 }
