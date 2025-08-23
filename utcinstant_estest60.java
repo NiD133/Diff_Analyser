@@ -1,26 +1,37 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Contains tests for the {@link UtcInstant} class.
+ * Note: The original class name was preserved, but a more descriptive name
+ * like {@code UtcInstantTest} would be preferable.
+ */
 public class UtcInstant_ESTestTest60 extends UtcInstant_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay((-2547L));
-        long long0 = utcInstant1.getModifiedJulianDay();
-        assertEquals((-2547L), long0);
-        assertEquals(0L, utcInstant1.getNanoOfDay());
+    /**
+     * Tests that {@code withModifiedJulianDay()} correctly updates the Modified Julian Day
+     * while preserving the nano-of-day component of the instant.
+     */
+    @Test
+    public void withModifiedJulianDay_shouldUpdateDayAndPreserveNanos() {
+        // Arrange: Create an initial UtcInstant at the start of a day.
+        final long initialNanoOfDay = 0L;
+        UtcInstant baseInstant = UtcInstant.ofModifiedJulianDay(0L, initialNanoOfDay);
+        long newModifiedJulianDay = -2547L;
+
+        // Act: Create a new instant by changing the Modified Julian Day.
+        UtcInstant updatedInstant = baseInstant.withModifiedJulianDay(newModifiedJulianDay);
+
+        // Assert: Verify the new instant has the updated day and the original nano-of-day.
+        assertEquals(
+                "The Modified Julian Day should be updated to the new value.",
+                newModifiedJulianDay,
+                updatedInstant.getModifiedJulianDay());
+        assertEquals(
+                "The nano-of-day should be preserved from the original instant.",
+                initialNanoOfDay,
+                updatedInstant.getNanoOfDay());
     }
 }
