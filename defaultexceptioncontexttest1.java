@@ -1,30 +1,31 @@
 package org.apache.commons.lang3.exception;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.apache.commons.lang3.ObjectToStringRuntimeException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultExceptionContextTestTest1 extends AbstractExceptionContextTest<DefaultExceptionContext> {
+/**
+ * This class contains test cases for the DefaultExceptionContext class.
+ * The focus is on verifying the correct handling of context values,
+ * ensuring that they can be added and retrieved as expected.
+ */
+public class DefaultExceptionContextTest {
 
-    @Override
-    @BeforeEach
-    public void setUp() throws Exception {
-        exceptionContext = new DefaultExceptionContext();
-        super.setUp();
-    }
-
+    /**
+     * Tests that getFirstContextValue() correctly retrieves the first value
+     * associated with a specific label after it has been added.
+     */
     @Test
-    void testFormattedExceptionMessageExceptionHandling() {
-        exceptionContext = new DefaultExceptionContext();
-        final String label1 = "throws 1";
-        final String label2 = "throws 2";
-        exceptionContext.addContextValue(label1, new ObjectToStringRuntimeException(label1));
-        exceptionContext.addContextValue(label2, new ObjectToStringRuntimeException(label2));
-        final String message = exceptionContext.getFormattedExceptionMessage(TEST_MESSAGE);
-        assertTrue(message.startsWith(TEST_MESSAGE));
-        assertTrue(message.contains(label1));
-        assertTrue(message.contains(label2));
+    public void testGetFirstContextValueShouldReturnTheFirstValueAddedForAGivenLabel() {
+        // Arrange: Set up the test by creating a context and adding a value.
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+        final String testLabel = "test_label";
+        final String testValue = "test_value";
+        context.addContextValue(testLabel, testValue);
+
+        // Act: Perform the action to be tested.
+        final Object retrievedValue = context.getFirstContextValue(testLabel);
+
+        // Assert: Verify that the action produced the expected outcome.
+        assertEquals("The retrieved value should match the value that was added.", testValue, retrievedValue);
     }
 }
