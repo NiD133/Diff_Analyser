@@ -1,18 +1,27 @@
 package com.google.gson.internal;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest7 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("5");
-        int int0 = lazilyParsedNumber0.intValue();
-        assertEquals(5, int0);
+    /**
+     * Tests that the {@link LazilyParsedNumber#intValue()} method correctly parses
+     * and returns the integer value from a valid integer string.
+     */
+    @Test
+    public void intValue_shouldReturnCorrectInteger_whenValueIsIntegerString() {
+        // Arrange
+        LazilyParsedNumber number = new LazilyParsedNumber("5");
+        int expectedValue = 5;
+
+        // Act
+        int actualValue = number.intValue();
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
