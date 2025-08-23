@@ -2,21 +2,38 @@ package org.joda.time.chrono;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
 
-public class IslamicChronology_ESTestTest21 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IslamicChronology} class, focusing on edge cases.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        int int0 = islamicChronology0.getMonthOfYear(1518L, 292271022);
-        assertEquals((-16657633), int0);
+    /**
+     * This test verifies the behavior of getMonthOfYear when the provided millisecond instant
+     * is far outside the calendar year given as context.
+     *
+     * <p>The method is expected to perform its calculation based on these mismatched inputs,
+     * resulting in a large negative month value. This serves as a regression test to ensure
+     * consistent behavior for this specific edge case, which might occur with unusual
+     * data or during complex date manipulations.</p>
+     */
+    @Test
+    public void getMonthOfYear_whenInstantIsFarOutsideTheGivenYear_calculatesLargeNegativeMonth() {
+        // Arrange
+        // The maximum supported year in IslamicChronology.
+        final int maxSupportedYear = 292271022;
+        // A millisecond instant very close to the standard Java epoch (1970-01-01).
+        final long instantNearEpoch = 1518L;
+        // The expected, large negative month value that results from the calculation.
+        final int expectedMonth = -16657633;
+
+        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
+
+        // Act
+        // Calculate the month of the year for an instant in 1970, but within the context of the max year.
+        int actualMonth = chronology.getMonthOfYear(instantNearEpoch, maxSupportedYear);
+
+        // Assert
+        assertEquals(expectedMonth, actualMonth);
     }
 }
