@@ -1,22 +1,39 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonParser_ESTestTest30 extends JsonParser_ESTest_scaffolding {
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        StringReader stringReader0 = new StringReader("[GoyG.G]");
-        JsonParser jsonParser0 = new JsonParser();
-        JsonArray jsonArray0 = (JsonArray) jsonParser0.parse((Reader) stringReader0);
-        assertFalse(jsonArray0.isEmpty());
+    /**
+     * Tests that parsing a JSON array containing an unquoted string from a Reader
+     * succeeds. This is because the parser operates in lenient mode by default,
+     * which allows for such syntax.
+     */
+    @Test
+    public void testParseReaderWithUnquotedStringInArray() {
+        // Arrange
+        String jsonWithUnquotedString = "[GoyG.G]";
+        Reader reader = new StringReader(jsonWithUnquotedString);
+
+        // Act
+        // Use the static `parseReader` method, as the JsonParser constructor and
+        // instance `parse` methods are deprecated.
+        JsonElement parsedElement = JsonParser.parseReader(reader);
+
+        // Assert
+        assertTrue("The parsed element should be a JsonArray.", parsedElement.isJsonArray());
+        JsonArray resultArray = parsedElement.getAsJsonArray();
+
+        assertFalse("The resulting array should not be empty.", resultArray.isEmpty());
+        assertEquals("The array should contain exactly one element.", 1, resultArray.size());
+
+        JsonElement element = resultArray.get(0);
+        assertEquals("The element's value should match the unquoted string.", "GoyG.G", element.getAsString());
     }
 }
