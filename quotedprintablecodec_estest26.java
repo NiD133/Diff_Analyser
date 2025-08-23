@@ -1,27 +1,28 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest26 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * This test suite focuses on specific behaviors of the QuotedPrintableCodec class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec((Charset) null);
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.encode("org.apache.commons.codec.DecoderException");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that attempting to encode a string with a QuotedPrintableCodec
+     * that was initialized with a null charset results in a NullPointerException.
+     * The encode method requires a valid charset to convert the input string into bytes.
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeStringWithNullCharsetShouldThrowNullPointerException() throws EncoderException {
+        // Arrange: Create a codec instance with a null charset.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec((Charset) null);
+        final String input = "any string";
+
+        // Act: Attempting to encode the string.
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
+        codec.encode(input);
     }
 }
