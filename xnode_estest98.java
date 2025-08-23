@@ -1,32 +1,45 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest98 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test097() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("(GuYxoEF5(T:yL", "false");
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Boolean boolean0 = xNode0.getBooleanAttribute("(GuYxoEF5(T:yL", (Boolean) null);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Tests that getBooleanAttribute correctly parses the string "false"
+     * into a Boolean FALSE value, ignoring the provided default.
+     */
+    @Test
+    public void getBooleanAttributeShouldReturnFalseWhenAttributeValueIsStringFalse() {
+        // Arrange
+        final String attributeName = "enabled";
+        final Boolean defaultValue = true; // Use a non-false default to ensure it's ignored.
+
+        // Create a DOM Node with an attribute set to the string "false".
+        // IIOMetadataNode is a convenient, standard library implementation of org.w3c.dom.Node.
+        Node node = new IIOMetadataNode();
+        node.setAttribute(attributeName, "false");
+
+        // Create an XNode instance. The XPathParser and Properties are required by the
+        // constructor but are not relevant to this specific test.
+        XPathParser parser = new XPathParser((Document) null, true);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(parser, node, variables);
+
+        // Act
+        Boolean actualValue = xNode.getBooleanAttribute(attributeName, defaultValue);
+
+        // Assert
+        // The method should parse the attribute's string value "false" and return Boolean.FALSE.
+        assertEquals(Boolean.FALSE, actualValue);
     }
 }
