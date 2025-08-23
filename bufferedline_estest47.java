@@ -1,37 +1,34 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest47 extends BufferedLine_ESTest_scaffolding {
+/**
+ * Test suite for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        // Undeclared exception!
-        try {
-            bufferedLine0.relate((Shape) null);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BufferedLine", e);
-        }
+    private final SpatialContext context = new SpatialContext(new SpatialContextFactory());
+
+    /**
+     * The `relate()` method in BufferedLine is not fully implemented and is expected
+     * to throw an exception for unsupported shape types. This test verifies that
+     * calling it with a null argument correctly throws an UnsupportedOperationException.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void relateWithNullShapeShouldThrowUnsupportedOperationException() {
+        // Arrange: Create a simple BufferedLine.
+        // A line from a point to itself with a zero buffer is a valid, simple case.
+        Point point = new PointImpl(0.0, 0.0, context);
+        BufferedLine bufferedLine = new BufferedLine(point, point, 0.0, context);
+
+        // Act: Call the relate() method with a null shape.
+        bufferedLine.relate((Shape) null);
+
+        // Assert: The test expects an UnsupportedOperationException.
+        // This is handled by the `expected` parameter in the @Test annotation.
     }
 }
