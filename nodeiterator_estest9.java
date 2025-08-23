@@ -2,27 +2,28 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class NodeIterator_ESTestTest9 extends NodeIterator_ESTest_scaffolding {
+/**
+ * Test suite for the {@link NodeIterator} class.
+ */
+public class NodeIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Class<FormElement> class0 = FormElement.class;
-        NodeIterator<FormElement> nodeIterator0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException
+     * when the root node provided is null, as this is an invalid state.
+     */
+    @Test
+    public void constructorThrowsExceptionForNullNode() {
         try {
-            nodeIterator0 = new NodeIterator<FormElement>((Node) null, class0);
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to create an iterator with a null root node.
+            new NodeIterator<>(null, Node.class);
+            
+            // If the constructor does not throw an exception, this test should fail.
+            fail("Expected an IllegalArgumentException to be thrown for a null root node.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Success: The expected exception was caught.
+            // We can also verify the message to ensure it's the one we expect from our validation logic.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
