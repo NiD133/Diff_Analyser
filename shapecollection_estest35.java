@@ -1,34 +1,40 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest35 extends ShapeCollection_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        PointImpl pointImpl0 = new PointImpl(2180.0, (-2963.967974), spatialContext0);
-        SpatialRelation spatialRelation0 = shapeCollection0.relate(pointImpl0);
-        assertFalse(spatialRelation0.intersects());
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the ShapeCollection class.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * This test verifies that an empty ShapeCollection is disjoint from any other shape.
+     * The 'relate' method should correctly identify that there is no spatial relationship
+     * (i.e., no intersection, containment, etc.) when the collection contains no shapes.
+     */
+    @Test
+    public void relate_shouldReturnDisjoint_whenCollectionIsEmpty() {
+        // Arrange: Set up the test objects and state.
+        // Use the standard geodetic context for simplicity and clarity.
+        final SpatialContext spatialContext = SpatialContext.GEO;
+
+        // Create an empty ShapeCollection.
+        ShapeCollection<Shape> emptyShapeCollection = new ShapeCollection<>(Collections.emptyList(), spatialContext);
+
+        // Create an arbitrary point to test against. Its specific location is irrelevant.
+        Point anyPoint = new PointImpl(0, 0, spatialContext);
+
+        // Act: Call the method under test.
+        SpatialRelation relation = emptyShapeCollection.relate(anyPoint);
+
+        // Assert: Verify the outcome.
+        // An empty collection must be disjoint from any other shape.
+        assertEquals("An empty collection should be disjoint from any shape", SpatialRelation.DISJOINT, relation);
     }
 }
