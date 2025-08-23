@@ -1,123 +1,83 @@
 package org.apache.commons.jxpath.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import org.apache.commons.io.IOUtils;
+
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.JXPathException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ClassLoaderUtilTestTest4 {
-
-    // special class loader which may be unable to load those classes.
-    private static final String TEST_CASE_CLASS_NAME = "org.apache.commons.jxpath.util.ClassLoaderUtilTest";
+/**
+ * Tests the fallback behavior of JXPath's class loading mechanism.
+ *
+ * <p>
+ * This test verifies that if the Thread's context class loader is unable to
+ * find a class, JXPath will successfully fall back to using its own class
+ * loader (the one that loaded the JXPath classes themselves), as handled by
+ * {@link ClassLoaderUtil}.
+ * </p>
+ */
+public class ClassLoaderUtilFallbackTest {
 
     private static final String EXAMPLE_CLASS_NAME = "org.apache.commons.jxpath.util.ClassLoadingExampleClass";
+    private static final String EXPECTED_MESSAGE = "an example class";
 
-    private ClassLoader orginalContextClassLoader;
-
-    /**
-     * Performs a basic query that requires a class be loaded dynamically by JXPath and asserts the dynamic class load fails.
-     */
-    public static void callExampleMessageMethodAndAssertClassNotFoundJXPathException() {
-        final JXPathContext context = JXPathContext.newContext(new Object());
-        assertThrows(JXPathException.class, () -> context.selectSingleNode(EXAMPLE_CLASS_NAME + ".getMessage()"), "We should not be able to load " + EXAMPLE_CLASS_NAME + ".");
-    }
+    private ClassLoader originalContextClassLoader;
 
     /**
-     * Performs a basic query that requires a class be loaded dynamically by JXPath and asserts the dynamic class load succeeds.
-     */
-    public static void callExampleMessageMethodAndAssertSuccess() {
-        final JXPathContext context = JXPathContext.newContext(new Object());
-        assertEquals("an example class", context.selectSingleNode(EXAMPLE_CLASS_NAME + ".getMessage()"));
-    }
-
-    /**
-     * Loads this class through the given class loader and then invokes the indicated no argument static method of the class.
-     *
-     * @param cl         the class loader under which to invoke the method.
-     * @param methodName the name of the static no argument method on this class to invoke.
-     * @throws ReflectiveOperationException on test failures.
-     */
-    private void executeTestMethodUnderClassLoader(final ClassLoader cl, final String methodName) throws ReflectiveOperationException {
-        final Class<?> testClass = cl.loadClass(TEST_CASE_CLASS_NAME);
-        final Method testMethod = testClass.getMethod(methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
-        try {
-            testMethod.invoke(null, (Object[]) null);
-        } catch (final InvocationTargetException e) {
-            if (e.getCause() instanceof RuntimeException) {
-                // Allow the runtime exception to propagate up.
-                throw (RuntimeException) e.getCause();
-            }
-        }
-    }
-
-    /**
-     * Setup for the tests.
+     * Saves the original context class loader before each test.
      */
     @BeforeEach
     public void setUp() {
-        this.orginalContextClassLoader = Thread.currentThread().getContextClassLoader();
+        this.originalContextClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     /**
-     * Cleanup for the tests.
+     * Restores the original context class loader after each test.
      */
     @AfterEach
     public void tearDown() {
-        Thread.currentThread().setContextClassLoader(this.orginalContextClassLoader);
+        Thread.currentThread().setContextClassLoader(this.originalContextClassLoader);
     }
 
     /**
-     * A simple class loader which delegates all class loading to its parent with two exceptions. First, attempts to load the class
-     * {@code org.apache.commons.jxpath.util.ClassLoaderUtilTest} will always result in a ClassNotFoundException. Second, loading the class
-     * {@code org.apache.commons.jxpath.util.ClassLoadingExampleClass} will result in the class being loaded by this class loader, regardless of whether the
-     * parent can/has loaded it.
+     * A custom class loader designed to fail when asked to load a specific class.
+     * For all other classes, it follows the standard delegation model.
      */
-    private static final class TestClassLoader extends ClassLoader {
+    private static class FailingContextClassLoader extends ClassLoader {
 
-        private Class<?> testCaseClass = null;
-
-        public TestClassLoader(final ClassLoader classLoader) {
-            super(classLoader);
+        public FailingContextClassLoader(final ClassLoader parent) {
+            super(parent);
         }
 
         @Override
-        public synchronized Class<?> loadClass(final String name, final boolean resolved) throws ClassNotFoundException {
+        public Class<?> loadClass(final String name) throws ClassNotFoundException {
+            // Intentionally fail to load the example class to trigger the fallback mechanism.
             if (EXAMPLE_CLASS_NAME.equals(name)) {
-                throw new ClassNotFoundException();
+                throw new ClassNotFoundException("This class loader is designed to fail for: " + name);
             }
-            if (TEST_CASE_CLASS_NAME.equals(name)) {
-                if (testCaseClass == null) {
-                    final URL classUrl = getParent().getResource("org/apache/commons/jxpath/util/ClassLoaderUtilTest.class");
-                    byte[] clazzBytes;
-                    try {
-                        clazzBytes = IOUtils.toByteArray(classUrl);
-                    } catch (final IOException e) {
-                        throw new ClassNotFoundException(classUrl.toString(), e);
-                    }
-                    this.testCaseClass = this.defineClass(TEST_CASE_CLASS_NAME, clazzBytes, 0, clazzBytes.length);
-                }
-                return this.testCaseClass;
-            }
-            return getParent().loadClass(name);
+            return super.loadClass(name);
         }
     }
 
     /**
-     * Tests that JXPath will use its class loader to dynamically load a requested class when the context class loader is set but unable to load the class.
+     * Verifies that JXPath successfully loads a class using its own class loader
+     * when the thread's context class loader is configured to fail.
      */
     @Test
-    void testCurrentClassLoaderFallback() {
-        final ClassLoader cl = new TestClassLoader(getClass().getClassLoader());
-        Thread.currentThread().setContextClassLoader(cl);
-        callExampleMessageMethodAndAssertSuccess();
+    void jxpathShouldUseCurrentClassLoaderWhenContextClassLoaderFails() {
+        // Arrange: Set a context class loader that will fail to load the target class.
+        final ClassLoader failingClassLoader = new FailingContextClassLoader(getClass().getClassLoader());
+        Thread.currentThread().setContextClassLoader(failingClassLoader);
+
+        // Act: Attempt to execute a JXPath expression that requires dynamic class loading.
+        // JXPath should first try the failing context class loader, then fall back
+        // to its own class loader, which can find the class.
+        final JXPathContext context = JXPathContext.newContext(new Object());
+        final String xpath = EXAMPLE_CLASS_NAME + ".getMessage()";
+        final Object result = context.selectSingleNode(xpath);
+
+        // Assert: The expression was evaluated successfully, proving the fallback worked.
+        assertEquals(EXPECTED_MESSAGE, result, "JXPath should have fallen back to its own class loader.");
     }
 }
