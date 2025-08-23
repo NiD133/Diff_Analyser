@@ -1,59 +1,28 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest13 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Test suite for the {@link OrderedProperties} class.
+ * This improved version focuses on clarity and standard testing practices.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        // Undeclared exception!
-        try {
-            orderedProperties0.putAll((Map<?, ?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.properties.OrderedProperties", e);
-        }
+    /**
+     * Verifies that calling putAll() with a null map argument results in a NullPointerException.
+     * This behavior is inherited from {@link java.util.Hashtable}.
+     */
+    @Test(expected = NullPointerException.class)
+    public void putAll_withNullMap_shouldThrowNullPointerException() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final Map<Object, Object> nullMap = null;
+
+        // Act & Assert
+        // The putAll method is called with a null map, which is expected to
+        // throw a NullPointerException. The assertion is handled by the
+        // @Test(expected) annotation.
+        properties.putAll(nullMap);
     }
 }
