@@ -1,54 +1,40 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
 import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Symmetry010Chronology_ESTestTest2 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Symmetry010Chronology}.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = Symmetry010Chronology.INSTANCE;
-        JulianDate julianDate0 = JulianDate.ofEpochDay((-604L));
-        JulianEra julianEra0 = julianDate0.getEra();
-        // Undeclared exception!
+    /**
+     * Tests that the date(Era, ...) method throws an exception when the provided
+     * Era is not an IsoEra, which is the only type supported by this chronology.
+     */
+    @Test
+    public void date_whenEraIsOfIncorrectType_throwsClassCastException() {
+        // Arrange: Set up the test conditions.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        
+        // The date(Era, ...) method in Symmetry010Chronology expects an IsoEra.
+        // We use a JapaneseEra to test the invalid type handling.
+        Era invalidEra = JapaneseEra.HEISEI;
+
+        // Act & Assert: Perform the action and verify the outcome.
         try {
-            symmetry010Chronology0.date((Era) julianEra0, (-793), 1231, (-3218));
-            fail("Expecting exception: ClassCastException");
+            // The actual date values (year, month, day) are not important
+            // as the exception is thrown due to the era type check.
+            chronology.date(invalidEra, 2000, 1, 1);
+            fail("Symmetry010Chronology.date() should have thrown a ClassCastException for a non-IsoEra.");
         } catch (ClassCastException e) {
-            //
-            // Invalid era: AD
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry010Chronology", e);
+            // The exception is expected.
+            // We verify that the exception message correctly identifies the invalid era.
+            assertEquals("Invalid era: " + invalidEra, e.getMessage());
         }
     }
 }
