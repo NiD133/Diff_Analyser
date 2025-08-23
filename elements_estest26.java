@@ -1,36 +1,42 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest26 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test025() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        String string0 = elements0.outerHtml();
-        assertEquals("<html>\n <head></head>\n <body></body>\n</html>\n<html>\n <head></head>\n <body></body>\n</html>\n<head></head>\n<body></body>", string0);
+/**
+ * Tests for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    @Test
+    public void outerHtmlReturnsOuterHtmlOfAllElementsSeparatedByNewlines() {
+        // Arrange
+        // 1. Create a standard document structure. The base URI is not relevant for this test.
+        Document doc = Document.createShell("");
+        Element html = doc.child(0); // The <html> tag
+        Element head = html.child(0); // The <head> tag
+        Element body = html.child(1); // The <body> tag
+
+        // 2. Define the expected result.
+        // The doc.getAllElements() method returns the document root itself, then its descendants.
+        // The Elements.outerHtml() method joins the outer HTML of each element with a newline.
+        String expectedHtml = String.join("\n",
+            doc.outerHtml(),    // The document's outer HTML (which is its children's HTML)
+            html.outerHtml(),   // The <html> element's outer HTML
+            head.outerHtml(),   // The <head> element's outer HTML
+            body.outerHtml()    // The <body> element's outer HTML
+        );
+
+        // Act
+        // 3. Get all elements and call the method under test.
+        Elements allElements = doc.getAllElements();
+        String actualHtml = allElements.outerHtml();
+
+        // Assert
+        // 4. Verify that the combined outer HTML matches the expected concatenated string.
+        assertEquals(expectedHtml, actualHtml);
     }
 }
