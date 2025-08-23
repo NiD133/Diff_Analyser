@@ -1,32 +1,32 @@
 package org.jsoup.helper;
 
+import org.jsoup.helper.HttpConnection;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
 
-public class CookieUtil_ESTestTest10 extends CookieUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        HttpConnection.Response httpConnection_Response0 = new HttpConnection.Response();
-        CookieUtil.parseCookie((String) null, httpConnection_Response0);
-        assertEquals(400, httpConnection_Response0.statusCode());
+/**
+ * Tests for the CookieUtil helper class.
+ */
+public class CookieUtilTest {
+
+    /**
+     * Verifies that calling parseCookie with a null input string
+     * does not throw an exception or modify the response object.
+     */
+    @Test
+    public void parseCookieWithNullStringShouldDoNothing() {
+        // Arrange: Create a new Response object.
+        // By default, it has a status code of 0 and an empty cookie map.
+        HttpConnection.Response response = new HttpConnection.Response();
+        int initialStatusCode = response.statusCode();
+
+        // Act: Call the method under test with a null cookie string.
+        CookieUtil.parseCookie(null, response);
+
+        // Assert: Verify that the response object remains unchanged.
+        assertTrue("The cookie map should remain empty.", response.cookies().isEmpty());
+        assertEquals("The status code should not be modified.", initialStatusCode, response.statusCode());
     }
 }
