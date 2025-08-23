@@ -1,33 +1,34 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
 import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AppendableJoiner_ESTestTest16 extends AppendableJoiner_ESTest_scaffolding {
+import java.io.IOException;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        AppendableJoiner.Builder<SQLNonTransientConnectionException> appendableJoiner_Builder0 = new AppendableJoiner.Builder<SQLNonTransientConnectionException>();
-        FailableBiConsumer<Appendable, SQLNonTransientConnectionException, IOException> failableBiConsumer0 = FailableBiConsumer.nop();
-        AppendableJoiner.Builder<SQLNonTransientConnectionException> appendableJoiner_Builder1 = appendableJoiner_Builder0.setElementAppender(failableBiConsumer0);
-        AppendableJoiner<SQLNonTransientConnectionException> appendableJoiner0 = appendableJoiner_Builder1.get();
-        assertNotNull(appendableJoiner0);
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for {@link AppendableJoiner.Builder}.
+ */
+public class AppendableJoinerTest {
+
+    /**
+     * Tests that an AppendableJoiner can be successfully built after setting a custom element appender.
+     */
+    @Test
+    public void testBuildWithCustomElementAppender() {
+        // Arrange
+        // A "no-operation" appender that does nothing with the elements.
+        final FailableBiConsumer<Appendable, String, IOException> nopAppender = FailableBiConsumer.nop();
+
+        // Act
+        // Use the builder to create a joiner with the custom appender.
+        final AppendableJoiner<String> joiner = new AppendableJoiner.Builder<String>()
+                .setElementAppender(nopAppender)
+                .get();
+
+        // Assert
+        // The builder should successfully produce a non-null AppendableJoiner instance.
+        assertNotNull("The created joiner should not be null.", joiner);
     }
 }
