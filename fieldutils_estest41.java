@@ -1,25 +1,27 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class FieldUtils_ESTestTest41 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        Object object0 = new Object();
-        Integer integer0 = new Integer(0);
-        boolean boolean0 = FieldUtils.equals(object0, (Object) integer0);
-        assertFalse(boolean0);
+    /**
+     * Tests that FieldUtils.equals() returns false when comparing two non-null objects
+     * of different types.
+     */
+    @Test
+    public void equals_withDifferentObjectTypes_shouldReturnFalse() {
+        // Arrange: Create two objects of different, non-null types.
+        Object genericObject = new Object();
+        Object integerObject = Integer.valueOf(0);
+
+        // Act: Call the equals method to compare the two objects.
+        boolean result = FieldUtils.equals(genericObject, integerObject);
+
+        // Assert: The result should be false, as the objects are of different types.
+        assertFalse("FieldUtils.equals should return false for objects of different types", result);
     }
 }
