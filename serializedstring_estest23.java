@@ -1,32 +1,31 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest23 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on boundary conditions
+ * and exception handling for the append methods.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("R^$t>9-hl+");
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            serializedString0.appendUnquotedUTF8(byteArray0, (-1910));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that appendUnquotedUTF8() throws an ArrayIndexOutOfBoundsException
+     * when called with a negative offset. The method should not allow writing to
+     * an invalid position in the buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void appendUnquotedUTF8_shouldThrowException_whenOffsetIsNegative() {
+        // Arrange
+        SerializedString serializedString = new SerializedString("test-string");
+        byte[] destinationBuffer = new byte[20];
+        int invalidNegativeOffset = -1;
+
+        // Act
+        // This call is expected to throw an ArrayIndexOutOfBoundsException due to the negative offset.
+        serializedString.appendUnquotedUTF8(destinationBuffer, invalidNegativeOffset);
+
+        // Assert
+        // The assertion is handled by the @Test(expected=...) annotation, which
+        // fails the test if the expected exception is not thrown.
     }
 }
