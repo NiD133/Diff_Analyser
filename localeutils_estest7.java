@@ -1,28 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class LocaleUtils_ESTestTest7 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that toLocale() throws an IllegalArgumentException for a string
+     * that starts with a separator ('_'), which is an invalid format.
+     */
+    @Test
+    public void toLocale_shouldThrowIllegalArgumentException_forInvalidFormatStartingWithSeparator() {
+        // Arrange: Define an invalid locale string and the expected exception message.
+        final String invalidLocaleString = "_HUP";
+        final String expectedMessage = "Invalid locale format: " + invalidLocaleString;
+
+        // Act & Assert: Verify that calling the method with the invalid string
+        // throws the correct exception with the expected message.
         try {
-            LocaleUtils.toLocale("_HUP");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: _HUP
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
+            LocaleUtils.toLocale(invalidLocaleString);
+            fail("Expected an IllegalArgumentException to be thrown for invalid format.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message is what we expect.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
