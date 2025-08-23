@@ -1,23 +1,32 @@
 package com.google.common.collect;
 
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CompactLinkedHashSet_ESTestTest5 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompactLinkedHashSet#toArray(Object[])} method.
+ */
+public class CompactLinkedHashSetToArrayTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Integer[] integerArray0 = new Integer[0];
-        CompactLinkedHashSet<Integer> compactLinkedHashSet0 = CompactLinkedHashSet.create(integerArray0);
-        Integer[] integerArray1 = compactLinkedHashSet0.toArray(integerArray0);
-        assertSame(integerArray0, integerArray1);
+    /**
+     * Verifies that calling toArray(T[]) on an empty set with a zero-sized array
+     * returns the original array instance, as specified by the Collection.toArray(T[]) contract.
+     */
+    @Test
+    public void toArray_onEmptySet_withEmptyInputArray_returnsSameArrayInstance() {
+        // Arrange: Create an empty set and an empty array to pass to the toArray method.
+        CompactLinkedHashSet<String> emptySet = CompactLinkedHashSet.create();
+        String[] inputArray = new String[0];
+
+        // Act: Call the toArray method.
+        String[] resultArray = emptySet.toArray(inputArray);
+
+        // Assert: The returned array should be the exact same instance as the input array,
+        // because the set's elements (zero of them) fit into the provided array.
+        assertSame(
+            "Expected toArray to return the same instance of the input array when the set is empty.",
+            inputArray,
+            resultArray);
     }
 }
