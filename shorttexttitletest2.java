@@ -1,22 +1,31 @@
 package org.jfree.chart.title;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ShortTextTitleTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
+/**
+ * Unit tests for the {@link ShortTextTitle} class.
+ */
+class ShortTextTitleTest {
+
     @Test
-    public void testHashcode() {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = new ShortTextTitle("ABC");
-        assertEquals(t1, t2);
-        int h1 = t1.hashCode();
-        int h2 = t2.hashCode();
-        assertEquals(h1, h2);
+    @DisplayName("hashCode() returns the same value for two equal objects")
+    void hashCode_whenObjectsAreEqual_thenHashCodesShouldBeEqual() {
+        // Given two ShortTextTitle objects that are considered equal
+        ShortTextTitle title1 = new ShortTextTitle("ABC");
+        ShortTextTitle title2 = new ShortTextTitle("ABC");
+
+        // A quick check to ensure the equals() method works as expected,
+        // which is a precondition for the hashCode() contract.
+        assertEquals(title1, title2, "Precondition failed: two titles with the same text should be equal.");
+
+        // When their hash codes are calculated
+        int hashCode1 = title1.hashCode();
+        int hashCode2 = title2.hashCode();
+
+        // Then the hash codes must be equal
+        assertEquals(hashCode1, hashCode2, "The hashCode() contract is broken: equal objects must have equal hash codes.");
     }
 }
