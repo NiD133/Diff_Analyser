@@ -2,27 +2,31 @@ package org.jfree.chart.urls;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
+import java.util.List;
+
+/**
+ * Contains tests for the equals() method of the {@link CustomCategoryURLGenerator} class.
+ */
 public class CustomCategoryURLGenerator_ESTestTest3 extends CustomCategoryURLGenerator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        List<String> list0 = List.of("2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "", "");
-        customCategoryURLGenerator0.addURLSeries(list0);
-        CustomCategoryURLGenerator customCategoryURLGenerator1 = new CustomCategoryURLGenerator();
-        boolean boolean0 = customCategoryURLGenerator0.equals(customCategoryURLGenerator1);
-        assertFalse(boolean0);
-        assertFalse(customCategoryURLGenerator1.equals((Object) customCategoryURLGenerator0));
+    /**
+     * Verifies that two CustomCategoryURLGenerator instances are not equal
+     * if one contains a URL series and the other is empty.
+     */
+    @Test
+    public void equals_shouldReturnFalseForGeneratorsWithDifferentContent() {
+        // Arrange: Create a generator and add a list of URLs to it.
+        CustomCategoryURLGenerator generatorWithURLs = new CustomCategoryURLGenerator();
+        List<String> urlSeries = List.of("series1_url1.html", "series1_url2.html");
+        generatorWithURLs.addURLSeries(urlSeries);
+
+        // Arrange: Create a second, empty generator.
+        CustomCategoryURLGenerator emptyGenerator = new CustomCategoryURLGenerator();
+
+        // Act & Assert: The two generators should not be equal because their content differs.
+        // We also check for symmetry, a key part of the equals() contract.
+        assertNotEquals("A generator with URLs should not be equal to an empty one.", generatorWithURLs, emptyGenerator);
+        assertNotEquals("Symmetry check: An empty generator should not be equal to one with URLs.", emptyGenerator, generatorWithURLs);
     }
 }
