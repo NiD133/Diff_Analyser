@@ -1,22 +1,29 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest34 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        pairedStatsAccumulator0.add(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        double double0 = pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-        assertEquals(Double.NaN, double0, 0.01);
+    @Test
+    public void pearsonsCorrelationCoefficient_withInfiniteValues_returnsNaN() {
+        // Arrange: Create an accumulator and add pairs containing non-finite values.
+        // The Javadoc for pearsonsCorrelationCoefficient() states that if the dataset
+        // contains any non-finite values, the result should be NaN.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        accumulator.add(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+        // Act: Calculate Pearson's correlation coefficient.
+        double correlation = accumulator.pearsonsCorrelationCoefficient();
+
+        // Assert: The result must be NaN.
+        assertTrue(
+            "Pearson's correlation coefficient should be NaN when the dataset contains non-finite values.",
+            Double.isNaN(correlation));
     }
 }
