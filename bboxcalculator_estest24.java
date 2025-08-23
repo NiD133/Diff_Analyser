@@ -1,28 +1,39 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest24 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        double double0 = bBoxCalculator0.getMinY();
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY, double0, 0.01);
+/**
+ * A test suite for the {@link BBoxCalculator} class.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that a newly created BBoxCalculator is initialized with inverted,
+     * infinite bounds. This is a standard practice to ensure that the first
+     * coordinate or shape added correctly establishes the initial bounding box.
+     */
+    @Test
+    public void newCalculatorShouldHaveDefaultInfiniteBounds() {
+        // Arrange: Create a new BBoxCalculator.
+        // A default geodetic context is sufficient for testing the initial state.
+        SpatialContext context = SpatialContext.GEO;
+        BBoxCalculator calculator = new BBoxCalculator(context);
+
+        // Act & Assert: Verify the initial state of the bounding box coordinates.
+        // The min values should be positive infinity and max values negative infinity.
+        // This ensures any valid coordinate will be "smaller" than the min and
+        // "larger" than the max, correctly setting the box on the first expansion.
+
+        assertEquals("Initial minX should be positive infinity",
+                Double.POSITIVE_INFINITY, calculator.getMinX(), 0.0);
+        assertEquals("Initial maxX should be negative infinity",
+                Double.NEGATIVE_INFINITY, calculator.getMaxX(), 0.0);
+        assertEquals("Initial minY should be positive infinity",
+                Double.POSITIVE_INFINITY, calculator.getMinY(), 0.0);
+        assertEquals("Initial maxY should be negative infinity",
+                Double.NEGATIVE_INFINITY, calculator.getMaxY(), 0.0);
     }
 }
