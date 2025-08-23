@@ -1,24 +1,45 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
 
-public class LZMAUtilsTestTest3 {
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+/**
+ * Tests for the filename utility methods in {@link LZMAUtils}.
+ */
+class LZMAUtilsTest {
+
+    /**
+     * Provides test cases for compressed filename generation.
+     * @return A stream of arguments, where each is an original filename and its expected compressed counterpart.
+     */
+    static Stream<Arguments> filenameTestCases() {
+        return Stream.of(
+            Arguments.of("", ".lzma"),
+            Arguments.of("x", "x.lzma"),
+            Arguments.of("x.wmf.y", "x.wmf.y.lzma"),
+            // Edge cases with whitespace
+            Arguments.of("x.wmf ", "x.wmf .lzma"),
+            Arguments.of("x.wmf\n", "x.wmf\n.lzma")
+        );
+    }
+
+    @DisplayName("getCompressedFileName() should append the .lzma suffix")
+    @ParameterizedTest(name = "Input: \"{0}\", Expected: \"{1}\"")
+    @MethodSource("filenameTestCases")
+    void getCompressedFileNameShouldAddLzmaSuffix(final String originalFilename, final String expectedFilename) {
+        assertEquals(expectedFilename, LZMAUtils.getCompressedFileName(originalFilename));
+    }
+
+    @DisplayName("Deprecated getCompressedFilename() should behave identically to the new method")
+    @ParameterizedTest(name = "Input: \"{0}\", Expected: \"{1}\"")
+    @MethodSource("filenameTestCases")
     @SuppressWarnings("deprecation")
-    @Test
-    void testGetCompressedFilename() {
-        assertEquals(".lzma", LZMAUtils.getCompressedFilename(""));
-        assertEquals(".lzma", LZMAUtils.getCompressedFileName(""));
-        assertEquals("x.lzma", LZMAUtils.getCompressedFilename("x"));
-        assertEquals("x.lzma", LZMAUtils.getCompressedFileName("x"));
-        assertEquals("x.wmf .lzma", LZMAUtils.getCompressedFilename("x.wmf "));
-        assertEquals("x.wmf .lzma", LZMAUtils.getCompressedFileName("x.wmf "));
-        assertEquals("x.wmf\n.lzma", LZMAUtils.getCompressedFilename("x.wmf\n"));
-        assertEquals("x.wmf\n.lzma", LZMAUtils.getCompressedFileName("x.wmf\n"));
-        assertEquals("x.wmf.y.lzma", LZMAUtils.getCompressedFilename("x.wmf.y"));
-        assertEquals("x.wmf.y.lzma", LZMAUtils.getCompressedFileName("x.wmf.y"));
+    void deprecatedGetCompressedFilenameShouldBehaveIdentically(final String originalFilename, final String expectedFilename) {
+        assertEquals(expectedFilename, LZMAUtils.getCompressedFilename(originalFilename));
     }
 }
