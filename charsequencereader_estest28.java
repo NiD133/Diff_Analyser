@@ -1,23 +1,23 @@
 package com.google.common.io;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceReader_ESTestTest28 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        boolean boolean0 = charSequenceReader0.markSupported();
-        assertTrue(boolean0);
+    @Test
+    public void markSupported_shouldAlwaysReturnTrue() {
+        // Arrange: Create a reader with any CharSequence. The content is irrelevant for this test.
+        CharSequenceReader reader = new CharSequenceReader("test-sequence");
+
+        // Act: Check if the reader supports the mark() operation.
+        boolean isMarkSupported = reader.markSupported();
+
+        // Assert: The reader is expected to support marking.
+        assertTrue("CharSequenceReader should support the mark() operation.", isMarkSupported);
     }
 }
