@@ -1,42 +1,38 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ComparatorChain_ESTestTest5 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Tests for {@link ComparatorChain}.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        BitSet bitSet0 = new BitSet();
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>((List<Comparator<Object>>) null, bitSet0);
-        // Undeclared exception!
+    /**
+     * Tests that calling size() on a ComparatorChain constructed with a null list
+     * throws a NullPointerException.
+     */
+    @Test
+    public void sizeShouldThrowNullPointerExceptionWhenConstructedWithNullList() {
+        // Arrange: Create a ComparatorChain with a null list of comparators.
+        // The constructor accepts a null list, but methods that access it are expected to fail.
+        final BitSet bitSet = new BitSet();
+        final ComparatorChain<Object> chain = new ComparatorChain<>((List<Comparator<Object>>) null, bitSet);
+
+        // Act & Assert: Verify that calling size() throws a NullPointerException.
         try {
-            comparatorChain0.size();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.comparators.ComparatorChain", e);
+            chain.size();
+            fail("Expected a NullPointerException because the internal comparator list is null.");
+        } catch (final NullPointerException e) {
+            // This is the expected behavior.
+            // We can also verify that the exception has no message, as was hinted
+            // at in the original auto-generated test.
+            assertNull("The NullPointerException should not have a message.", e.getMessage());
         }
     }
 }
