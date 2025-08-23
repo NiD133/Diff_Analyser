@@ -1,52 +1,57 @@
 package com.google.common.net;
 
 import static com.google.common.truth.Truth.assertThat;
-import com.google.common.collect.ImmutableList;
-import com.google.common.testing.EqualsTester;
-import com.google.common.testing.NullPointerTester;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.text.ParseException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class HostSpecifierTestTest3 extends TestCase {
+/**
+ * Tests for {@link HostSpecifier}. This test class focuses on domain name validation.
+ */
+@DisplayName("HostSpecifier")
+class HostSpecifierTest {
 
-    private static final ImmutableList<String> GOOD_IPS = ImmutableList.of("1.2.3.4", "2001:db8::1", "[2001:db8::1]");
+  @Nested
+  @DisplayName("when parsing domain names")
+  class DomainNameParsing {
 
-    private static final ImmutableList<String> BAD_IPS = ImmutableList.of("1.2.3", "2001:db8::1::::::0", "[2001:db8::1", "[::]:80");
+    @ParameterizedTest
+    @ValueSource(strings = {"com", "google.com", "foo.co.uk"})
+    @DisplayName("should succeed for valid public suffixes or domains")
+    void factoryMethods_withValidDomain_succeed(String validDomain) throws ParseException {
+      // HostSpecifier.isValid() should return true for valid domains.
+      assertThat(HostSpecifier.isValid(validDomain)).isTrue();
 
-    private static final ImmutableList<String> GOOD_DOMAINS = ImmutableList.of("com", "google.com", "foo.co.uk");
+      // HostSpecifier.from() should successfully parse the domain.
+      HostSpecifier fromSpecifier = HostSpecifier.from(validDomain);
+      assertThat(fromSpecifier.toString()).isEqualTo(validDomain);
 
-    private static final ImmutableList<String> BAD_DOMAINS = ImmutableList.of("foo.blah", "", "[google.com]");
-
-    private static HostSpecifier spec(String specifier) {
-        return HostSpecifier.fromValid(specifier);
+      // HostSpecifier.fromValid() should also parse, and create an equal instance.
+      HostSpecifier fromValidSpecifier = HostSpecifier.fromValid(validDomain);
+      assertThat(fromValidSpecifier).isEqualTo(fromSpecifier);
     }
 
-    private void assertGood(String spec) throws ParseException {
-        // Throws exception if not working correctly
-        HostSpecifier unused = HostSpecifier.fromValid(spec);
-        unused = HostSpecifier.from(spec);
-        assertTrue(HostSpecifier.isValid(spec));
-    }
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "foo.blah",     // Not a recognized public suffix
+        "",             // Empty string is invalid
+        "[google.com]"  // Brackets are only for IP literals
+    })
+    @DisplayName("should fail for invalid domains")
+    void factoryMethods_withInvalidDomain_fail(String invalidDomain) {
+      // HostSpecifier.isValid() should return false for invalid domains.
+      assertThat(HostSpecifier.isValid(invalidDomain)).isFalse();
 
-    private void assertBad(String spec) {
-        try {
-            HostSpecifier.fromValid(spec);
-            fail("Should have thrown IllegalArgumentException: " + spec);
-        } catch (IllegalArgumentException expected) {
-        }
-        try {
-            HostSpecifier.from(spec);
-            fail("Should have thrown ParseException: " + spec);
-        } catch (ParseException expected) {
-            assertThat(expected).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
-        }
-        assertFalse(HostSpecifier.isValid(spec));
-    }
+      // HostSpecifier.fromValid() should throw an IllegalArgumentException.
+      assertThrows(IllegalArgumentException.class, () -> HostSpecifier.fromValid(invalidDomain));
 
-    public void testGoodDomains() throws ParseException {
-        for (String spec : GOOD_DOMAINS) {
-            assertGood(spec);
-        }
+      // HostSpecifier.from() should throw a ParseException, caused by an IAE.
+      ParseException e = assertThrows(ParseException.class, () -> HostSpecifier.from(invalidDomain));
+      assertThat(e).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
     }
+  }
 }
