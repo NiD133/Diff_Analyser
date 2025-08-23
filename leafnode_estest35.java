@@ -1,23 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest35 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the LeafNode abstract class, using TextNode as a concrete implementation.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        TextNode textNode0 = new TextNode("body");
-        Document document0 = Parser.parseBodyFragment("body", "org.jsoup.internal.Normalizer");
-        textNode0.parentNode = (Node) document0;
-        String string0 = textNode0.baseUri();
-        assertEquals("org.jsoup.internal.Normalizer", string0);
+    /**
+     * Verifies that a LeafNode correctly inherits its base URI from its parent node.
+     */
+    @Test
+    public void baseUriShouldReturnParentBaseUriWhenParentIsSet() {
+        // Arrange: Create a parent document with a defined base URI and a child LeafNode.
+        final String expectedBaseUri = "https://jsoup.org/docs/";
+        Document parentDocument = new Document(expectedBaseUri);
+        TextNode textNode = new TextNode("This is a leaf node.");
+
+        // Use the public API to establish the parent-child relationship.
+        parentDocument.body().appendChild(textNode);
+
+        // Act: Call the method under test.
+        String actualBaseUri = textNode.baseUri();
+
+        // Assert: The LeafNode's base URI should match its parent's.
+        assertEquals("The base URI should be inherited from the parent document.", expectedBaseUri, actualBaseUri);
     }
 }
