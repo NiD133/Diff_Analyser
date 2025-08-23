@@ -1,38 +1,40 @@
 package org.apache.commons.compress.archivers.ar;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ArArchiveOutputStream_ESTestTest17 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ArArchiveOutputStream}.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream((OutputStream) null);
-        // Undeclared exception!
-        try {
-            arArchiveOutputStream0.close();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.FilterOutputStream", e);
-        }
+    /**
+     * Tests that calling close() on an ArArchiveOutputStream constructed with a
+     * null OutputStream throws a NullPointerException.
+     */
+    @Test
+    public void closeWithNullOutputStreamThrowsException() throws IOException {
+        // Arrange: Create an instance with a null underlying stream.
+        ArArchiveOutputStream archiveOutputStream = new ArArchiveOutputStream((OutputStream) null);
+
+        // Act & Assert: Verify that calling close() throws a NullPointerException.
+        // The exception is expected because the stream tries to close a null output stream.
+        assertThrows(NullPointerException.class, archiveOutputStream::close);
+    }
+
+    /**
+     * Alternative implementation using JUnit 4's 'expected' parameter.
+     * This is a common pattern in older JUnit 4 codebases.
+     */
+    @Test(expected = NullPointerException.class)
+    public void closeWithNullOutputStreamThrowsException_withExpected() throws IOException {
+        // Arrange
+        ArArchiveOutputStream archiveOutputStream = new ArArchiveOutputStream((OutputStream) null);
+
+        // Act: This call is expected to throw the NullPointerException.
+        archiveOutputStream.close();
     }
 }
