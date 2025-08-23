@@ -1,26 +1,32 @@
 package org.apache.commons.io;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteOrderMark_ESTestTest20 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ByteOrderMark}.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        int[] intArray0 = new int[0];
-        ByteOrderMark byteOrderMark0 = null;
+    /**
+     * Tests that the ByteOrderMark constructor throws an IllegalArgumentException
+     * when the provided byte array is empty.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionForEmptyByteArray() {
+        // Arrange: Define a valid charset name and an empty byte array.
+        final String charsetName = "UTF-8";
+        final int[] emptyBytes = {};
+
+        // Act & Assert: Attempt to create a ByteOrderMark and verify the exception.
         try {
-            byteOrderMark0 = new ByteOrderMark("+5{ll_Ze`iam[i)|fP", intArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // No bytes specified
-            //
-            verifyException("org.apache.commons.io.ByteOrderMark", e);
+            new ByteOrderMark(charsetName, emptyBytes);
+            fail("Expected an IllegalArgumentException to be thrown for an empty byte array.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            assertEquals("No bytes specified", e.getMessage());
         }
     }
 }
