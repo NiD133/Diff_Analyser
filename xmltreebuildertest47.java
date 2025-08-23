@@ -2,36 +2,42 @@ package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest47 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Test suite for the Jsoup XML Tree Builder.
+ * This class was refactored from the generated name XmlTreeBuilderTestTest47 for clarity.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    void selfClosingOK() {
-        // In XML, all tags can be self-closing regardless of tag type
-        Parser parser = Parser.xmlParser().setTrackErrors(10);
+    @DisplayName("XML parser should correctly handle self-closing and empty tags")
+    void xmlParserHandlesSelfClosingAndEmptyTags() {
+        // Arrange
+        // In XML, unlike HTML, any tag can be self-closing. This test verifies that the XML parser
+        // correctly handles a mix of explicitly self-closed tags (<div/>, <p/>) and standard
+        // empty tags (<div></div>, <foo></foo>).
         String xml = "<div id='1'/><p/><div>Foo</div><div></div><foo></foo>";
+        Parser parser = Parser.xmlParser().setTrackErrors(10);
+
+        // Act
         Document doc = Jsoup.parse(xml, "", parser);
         ParseErrorList errors = parser.getErrors();
-        assertEquals(0, errors.size());
-        assertEquals("<div id=\"1\" /><p /><div>Foo</div><div /><foo></foo>", TextUtil.stripNewlines(doc.outerHtml()));
-        // we infer that empty els can be represented with self-closing if seen in parse
+
+        // Assert
+        assertEquals(0, errors.size(), "Parsing should complete without errors for valid XML.");
+
+        // The expected output demonstrates how Jsoup serializes the parsed structure.
+        // By default, Jsoup.parse uses an XML parser but may retain HTML-like output settings.
+        // This can lead to nuanced behavior:
+        // 1. Explicitly self-closed tags like <div/> and <p/> are preserved as such.
+        // 2. Empty known HTML block tags like <div></div> are normalized to a self-closing form.
+        // 3. Empty unknown tags like <foo></foo> may retain their start and end tags.
+        String expectedOutput = "<div id=\"1\" /><p /><div>Foo</div><div /><foo></foo>";
+        assertEquals(expectedOutput, TextUtil.stripNewlines(doc.outerHtml()));
     }
 }
