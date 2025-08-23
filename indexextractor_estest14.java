@@ -1,21 +1,32 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public class IndexExtractor_ESTestTest14 extends IndexExtractor_ESTest_scaffolding {
+/**
+ * Tests for the {@link IndexExtractor} interface, focusing on default method implementations.
+ */
+public class IndexExtractorTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        int[] intArray0 = new int[4];
-        IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
-        IndexExtractor indexExtractor1 = indexExtractor0.uniqueIndices();
-        int[] intArray1 = indexExtractor1.asIndexArray();
-        assertEquals(1, intArray1.length);
-        assertArrayEquals(new int[] { 0 }, intArray1);
+    /**
+     * Tests that uniqueIndices() correctly identifies a single unique index
+     * from an input array containing only duplicates of that index.
+     */
+    @Test
+    public void uniqueIndicesShouldReturnSingleValueWhenInputContainsOnlyDuplicates() {
+        // Arrange: Create an IndexExtractor from an array with multiple duplicate values.
+        // Using an explicit array literal makes the input data clear.
+        int[] indicesWithDuplicates = {0, 0, 0, 0};
+        IndexExtractor extractorWithDuplicates = IndexExtractor.fromIndexArray(indicesWithDuplicates);
+
+        // Act: Call the method under test to get an extractor for the unique indices.
+        IndexExtractor uniqueExtractor = extractorWithDuplicates.uniqueIndices();
+
+        // Assert: Verify that the resulting extractor yields only the single unique index.
+        int[] resultIndices = uniqueExtractor.asIndexArray();
+
+        assertEquals("The array of unique indices should contain exactly one element.", 1, resultIndices.length);
+        assertArrayEquals("The single unique index should be 0.", new int[]{0}, resultIndices);
     }
 }
