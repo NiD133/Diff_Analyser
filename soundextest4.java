@@ -1,30 +1,41 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
 
-public class SoundexTestTest4 extends AbstractStringEncoderTest<Soundex> {
+import org.apache.commons.codec.AbstractStringEncoderTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/**
+ * Tests the default Soundex algorithm implementation.
+ */
+public class SoundexTest extends AbstractStringEncoderTest<Soundex> {
 
     @Override
     protected Soundex createStringEncoder() {
         return new Soundex();
     }
 
-    @Test
-    void testEncodeBasic() {
-        assertEquals("T235", getStringEncoder().encode("testing"));
-        assertEquals("T000", getStringEncoder().encode("The"));
-        assertEquals("Q200", getStringEncoder().encode("quick"));
-        assertEquals("B650", getStringEncoder().encode("brown"));
-        assertEquals("F200", getStringEncoder().encode("fox"));
-        assertEquals("J513", getStringEncoder().encode("jumped"));
-        assertEquals("O160", getStringEncoder().encode("over"));
-        assertEquals("T000", getStringEncoder().encode("the"));
-        assertEquals("L200", getStringEncoder().encode("lazy"));
-        assertEquals("D200", getStringEncoder().encode("dogs"));
+    /**
+     * Tests the US English Soundex encoding for a variety of common words.
+     * The test cases are derived from the sentence "The quick brown fox jumped over the lazy dogs".
+     */
+    @DisplayName("Should encode word to expected US English Soundex code")
+    @ParameterizedTest
+    @CsvSource({
+        "testing, T235",
+        "The,     T000",
+        "quick,   Q200",
+        "brown,   B650",
+        "fox,     F200",
+        "jumped,  J513",
+        "over,    O160",
+        "the,     T000",
+        "lazy,    L200",
+        "dogs,    D200"
+    })
+    void shouldEncodeToExpectedSoundexCode(final String input, final String expectedCode) {
+        assertEquals(expectedCode, getStringEncoder().encode(input));
     }
 }
