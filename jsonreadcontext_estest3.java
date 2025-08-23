@@ -1,33 +1,56 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonReadContext_ESTestTest3 extends JsonReadContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonReadContext} class.
+ */
+public class JsonReadContextTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonParser) null);
-        DupDetector dupDetector1 = dupDetector0.child();
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(dupDetector1);
-        JsonReadContext jsonReadContext1 = new JsonReadContext(jsonReadContext0, (-2901), dupDetector0, (-2901), 490, 2);
-        JsonReadContext jsonReadContext2 = jsonReadContext1.withDupDetector(dupDetector1);
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals("ROOT", jsonReadContext0.getTypeDesc());
-        assertEquals("?", jsonReadContext2.getTypeDesc());
-        assertEquals((-2901), jsonReadContext2.getNestingDepth());
-        assertEquals(0, jsonReadContext2.getEntryCount());
+    /**
+     * Tests that the withDupDetector() method creates a new context instance
+     * with the specified duplicate detector, while preserving all other properties
+     * from the original context.
+     */
+    @Test
+    public void withDupDetector_shouldReturnNewContextWithReplacedDetector() {
+        // Arrange
+        // 1. Create two distinct duplicate detectors to swap between.
+        DupDetector originalDetector = DupDetector.rootDetector((JsonParser) null);
+        DupDetector newDetector = originalDetector.child();
+
+        // 2. Create an initial JsonReadContext with the original detector.
+        JsonReadContext parentContext = JsonReadContext.createRootContext(null);
+        final int nestingDepth = 5;
+        final int type = JsonReadContext.TYPE_OBJECT;
+        final int lineNr = 10;
+        final int colNr = 20;
+        
+        JsonReadContext originalContext = new JsonReadContext(parentContext, nestingDepth, originalDetector, type, lineNr, colNr);
+
+        // Act
+        // Create a new context by replacing the duplicate detector.
+        JsonReadContext newContext = originalContext.withDupDetector(newDetector);
+
+        // Assert
+        // 1. A new instance should be created, not a modification of the original.
+        assertNotSame("withDupDetector should create a new instance.", originalContext, newContext);
+
+        // 2. The duplicate detector should be updated in the new context.
+        assertSame("The new context should have the new detector.", newDetector, newContext.getDupDetector());
+        assertNotSame("The new context's detector should be different from the original's.",
+                originalContext.getDupDetector(), newContext.getDupDetector());
+
+        // 3. All other properties should be copied from the original context.
+        assertSame("Parent context should be preserved.",
+                originalContext.getParent(), newContext.getParent());
+        assertEquals("Nesting depth should be copied.",
+                originalContext.getNestingDepth(), newContext.getNestingDepth());
+        assertEquals("Context type should be copied.",
+                originalContext.getTypeDesc(), newContext.getTypeDesc());
+        assertEquals("Entry count should be the same (initially zero).",
+                originalContext.getEntryCount(), newContext.getEntryCount());
     }
 }
