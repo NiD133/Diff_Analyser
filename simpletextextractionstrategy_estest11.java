@@ -1,32 +1,27 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import javax.swing.text.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SimpleTextExtractionStrategy_ESTestTest11 extends SimpleTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SimpleTextExtractionStrategy} class.
+ */
+public class SimpleTextExtractionStrategyTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
-        simpleTextExtractionStrategy0.beginTextBlock();
-        assertEquals("", simpleTextExtractionStrategy0.getResultantText());
+    /**
+     * Verifies that calling beginTextBlock() does not add any text to the output.
+     * This method is expected to be a no-op concerning the resultant text.
+     */
+    @Test
+    public void beginTextBlock_shouldNotAddTextToResult() {
+        // Arrange: Create a new instance of the text extraction strategy.
+        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+        // Act: Signal the beginning of a new text block.
+        strategy.beginTextBlock();
+
+        // Assert: Verify that the resultant text is still empty.
+        String resultantText = strategy.getResultantText();
+        assertEquals("The resultant text should be empty after starting a text block.", "", resultantText);
     }
 }
