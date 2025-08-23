@@ -1,31 +1,33 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
-public class GregorianChronology_ESTestTest11 extends GregorianChronology_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(531);
-        // Undeclared exception!
-        try {
-            GregorianChronology.getInstance(dateTimeZone0, 531);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid min days in first week: 531
-            //
-            verifyException("org.joda.time.chrono.GregorianChronology", e);
-        }
+/**
+ * Unit tests for the {@link GregorianChronology} factory methods.
+ */
+class GregorianChronologyTest {
+
+    @Test
+    void getInstance_throwsIllegalArgumentException_forInvalidMinDaysInFirstWeek() {
+        // Arrange
+        // The factory method `getInstance` expects minDaysInFirstWeek to be between 1 and 7.
+        // We use a value far outside this range to verify the input validation.
+        final int invalidMinDaysInFirstWeek = 531;
+        final DateTimeZone dummyZone = DateTimeZone.UTC;
+        final String expectedErrorMessage = "Invalid min days in first week: " + invalidMinDaysInFirstWeek;
+
+        // Act & Assert
+        // Verify that calling the method with an invalid argument throws the correct exception.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> GregorianChronology.getInstance(dummyZone, invalidMinDaysInFirstWeek)
+        );
+
+        // Further assert that the exception message is as expected.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
