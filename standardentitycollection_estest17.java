@@ -1,24 +1,26 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StandardEntityCollection_ESTestTest17 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        standardEntityCollection0.clear();
-        assertEquals(0, standardEntityCollection0.getEntityCount());
+    /**
+     * Verifies that calling clear() on an already empty collection
+     * correctly results in a collection with zero entities.
+     */
+    @Test
+    public void clear_onEmptyCollection_shouldResultInZeroEntities() {
+        // Arrange: Create a new, empty entity collection.
+        StandardEntityCollection collection = new StandardEntityCollection();
+
+        // Act: Clear the collection.
+        collection.clear();
+
+        // Assert: The collection should still have an entity count of 0.
+        assertEquals("Entity count should be 0 after clearing an empty collection", 0, collection.getEntityCount());
     }
 }
