@@ -1,39 +1,39 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.ConcurrentModificationException;
+
+/**
+ * This test class focuses on the behavior of JsonTreeReader.
+ * The original name, JsonTreeReader_ESTestTest15, suggests auto-generation.
+ * A more conventional name would be JsonTreeReaderTest.
+ */
 public class JsonTreeReader_ESTestTest15 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test014() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        Float float0 = new Float(1910.422785308);
-        jsonArray0.add((Number) float0);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.peek();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayList$Itr", e);
-        }
+    /**
+     * Verifies that modifying the underlying JsonArray while it is being read
+     * causes a ConcurrentModificationException.
+     *
+     * The JsonTreeReader uses an iterator internally to traverse the elements of a JsonArray.
+     * Modifying the array after the iterator has been created but before traversal is complete
+     * should fail-fast, as per the standard Java collections contract.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void modifyingArrayWhileReadingThrowsConcurrentModificationException() {
+        // Arrange: Create a JsonTreeReader for an empty array and begin reading it.
+        JsonArray jsonArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(jsonArray);
+
+        // This call obtains an internal iterator for the array.
+        reader.beginArray();
+
+        // Act: Modify the underlying array *after* the reader has started processing it.
+        jsonArray.add("new element");
+
+        // Assert: The next operation on the reader, which uses the now-invalidated
+        // iterator, is expected to throw a ConcurrentModificationException.
+        reader.peek();
     }
 }
