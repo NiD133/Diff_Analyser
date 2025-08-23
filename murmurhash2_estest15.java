@@ -1,25 +1,25 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest15 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        // Undeclared exception!
-        try {
+    /**
+     * Tests that calling hash64 with a null String input throws a NullPointerException.
+     */
+    @Test
+    public void hash64ShouldThrowNullPointerExceptionForNullStringInput() {
+        // The hash64(String) method is expected to throw a NullPointerException
+        // when the input is null, which is standard behavior for such utility methods.
+        assertThrows(NullPointerException.class, () -> {
+            // The cast to (String) is necessary to resolve ambiguity between
+            // hash64(String) and hash64(byte[], int).
             MurmurHash2.hash64((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+        });
     }
 }
