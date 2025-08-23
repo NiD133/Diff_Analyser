@@ -1,42 +1,32 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class ModuloAxis_ESTestTest48 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        double double0 = moduloAxis0.getDisplayStart();
-        assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
-        assertEquals(270.0, double0, 0.01);
+    /**
+     * Verifies that the constructor correctly sets the default display start and end values.
+     * The ModuloAxis is initialized with a display range of 270.0 to 90.0 by default.
+     */
+    @Test
+    public void testDefaultDisplayRangeAfterConstruction() {
+        // Arrange: Create a ModuloAxis instance. The specific range and label
+        // do not affect the default display values being tested here.
+        String axisLabel = "Angle (Degrees)";
+        Range fixedRange = new Range(0.0, 360.0);
+        ModuloAxis axis = new ModuloAxis(axisLabel, fixedRange);
+
+        // Act: Retrieve the default display start and end values.
+        double actualDisplayStart = axis.getDisplayStart();
+        double actualDisplayEnd = axis.getDisplayEnd();
+
+        // Assert: Check that the values match the expected defaults.
+        assertEquals("Default display start value should be 270.0", 270.0, actualDisplayStart, 0.0);
+        assertEquals("Default display end value should be 90.0", 90.0, actualDisplayEnd, 0.0);
     }
 }
