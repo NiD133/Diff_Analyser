@@ -1,30 +1,32 @@
 package org.apache.ibatis.jdbc;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
+
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class ScriptRunner_ESTestTest5 extends ScriptRunner_ESTest_scaffolding {
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Connection connection0 = mock(Connection.class, new ViolatedAssumptionAnswer());
-        ScriptRunner scriptRunner0 = new ScriptRunner(connection0);
-        scriptRunner0.closeConnection();
+/**
+ * Test suite for the ScriptRunner class.
+ */
+public class ScriptRunnerTest {
+
+    /**
+     * Verifies that the deprecated closeConnection() method correctly calls close()
+     * on the underlying SQL Connection. This ensures backward compatibility.
+     */
+    @Test
+    public void shouldCloseConnectionWhenCloseConnectionIsCalled() throws SQLException {
+        // Arrange: Create a mock Connection and a ScriptRunner instance.
+        Connection mockConnection = mock(Connection.class);
+        ScriptRunner scriptRunner = new ScriptRunner(mockConnection);
+
+        // Act: Call the method under test.
+        scriptRunner.closeConnection();
+
+        // Assert: Verify that the close() method of the mock Connection was called exactly once.
+        verify(mockConnection).close();
     }
 }
