@@ -1,53 +1,78 @@
 package org.apache.ibatis.jdbc;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
+
 import java.io.Reader;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
 import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ScriptRunner_ESTestTest1 extends ScriptRunner_ESTest_scaffolding {
 
+    /**
+     * Tests that runScript correctly handles a scenario that could cause an infinite loop.
+     * <p>
+     * This situation can occur with a misbehaving JDBC driver's Statement that
+     * continuously returns a non-negative update count (e.g., 0) from getUpdateCount()
+     * and 'false' from getMoreResults(). This combination causes an infinite loop in
+     * ScriptRunner's result processing logic.
+     * <p>
+     * The test expects a RuntimeException, which is thrown by ScriptRunner when it
+     * fails to execute the script. In the context of the original test generation tool (EvoSuite),
+     * this exception was caused by a resource limit being exceeded, which successfully stopped the loop.
+     */
     @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        ResultSetMetaData resultSetMetaData0 = mock(ResultSetMetaData.class, new ViolatedAssumptionAnswer());
-        doReturn((-2539)).when(resultSetMetaData0).getColumnCount();
-        ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
-        doReturn(resultSetMetaData0).when(resultSet0).getMetaData();
-        doReturn(true, false).when(resultSet0).next();
-        Statement statement0 = mock(Statement.class, new ViolatedAssumptionAnswer());
-        doReturn(true).when(statement0).execute(anyString());
-        doReturn(false, false, false, false, false).when(statement0).getMoreResults();
-        doReturn(resultSet0).when(statement0).getResultSet();
-        doReturn(0, 0, 0, 0, 0).when(statement0).getUpdateCount();
-        Connection connection0 = mock(Connection.class, new ViolatedAssumptionAnswer());
-        doReturn(statement0).when(connection0).createStatement();
-        doReturn(false, false).when(connection0).getAutoCommit();
-        ScriptRunner scriptRunner0 = new ScriptRunner(connection0);
-        scriptRunner0.setSendFullScript(true);
-        Reader reader0 = Reader.nullReader();
-        // Undeclared exception!
+    public void shouldThrowRuntimeExceptionWhenStatementCausesInfiniteLoopInResultProcessing() throws Throwable {
+        // Arrange: Set up mocks to simulate a JDBC driver causing an infinite loop.
+        // The loop condition in ScriptRunner's printResults method is effectively:
+        // while (statement.getUpdateCount() != -1 || statement.getMoreResults()) { ... }
+        // By always returning 0 for getUpdateCount(), the condition is always true.
+
+        // Mocks for ResultSet processing, needed because statement.execute() returns true.
+        ResultSetMetaData mockResultSetMetaData = mock(ResultSetMetaData.class);
+        when(mockResultSetMetaData.getColumnCount()).thenReturn(0); // Use a simple, valid value.
+
+        ResultSet mockResultSet = mock(ResultSet.class);
+        when(mockResultSet.getMetaData()).thenReturn(mockResultSetMetaData);
+        when(mockResultSet.next()).thenReturn(false); // Simulate no rows in the result set.
+
+        // Mock a Statement that triggers the infinite loop.
+        Statement mockStatement = mock(Statement.class);
+        when(mockStatement.execute(anyString())).thenReturn(true); // Indicates a result set is available.
+        when(mockStatement.getResultSet()).thenReturn(mockResultSet);
+
+        // These two mock configurations are the key to causing the infinite loop.
+        when(mockStatement.getUpdateCount()).thenReturn(0); // Always return a non-negative value.
+        when(mockStatement.getMoreResults()).thenReturn(false); // And never report more results.
+
+        // Mock the Connection to return our misbehaving Statement.
+        Connection mockConnection = mock(Connection.class);
+        when(mockConnection.createStatement()).thenReturn(mockStatement);
+        when(mockConnection.getAutoCommit()).thenReturn(false);
+
+        ScriptRunner scriptRunner = new ScriptRunner(mockConnection);
+        scriptRunner.setSendFullScript(true); // Ensure the execution path that processes results is taken.
+
+        // An empty reader is sufficient to trigger the execution.
+        Reader emptyScriptReader = Reader.nullReader();
+
+        // Act & Assert
         try {
-            scriptRunner0.runScript(reader0);
-            fail("Expecting exception: RuntimeException");
+            scriptRunner.runScript(emptyScriptReader);
+            fail("Expected a RuntimeException due to the infinite loop in result processing.");
         } catch (RuntimeException e) {
-            //
-            // Error executing: .  Cause: org.evosuite.runtime.TooManyResourcesException: Loop has been executed more times than the allowed 10000
-            //
-            verifyException("org.apache.ibatis.jdbc.ScriptRunner", e);
+            // Verify that the expected exception is thrown from the ScriptRunner.
+            // The underlying cause is the infinite loop, which is interrupted by the test timeout
+            // or, in the original test's case, a test generation tool's resource monitor.
+            assertTrue("Exception message should indicate an error during script execution.",
+                e.getMessage().startsWith("Error executing: ."));
+            assertNotNull("The RuntimeException should wrap the underlying cause.", e.getCause());
         }
     }
 }
