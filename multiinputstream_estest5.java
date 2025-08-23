@@ -1,36 +1,32 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static java.util.Collections.emptyIterator;
+
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest5 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        // Undeclared exception!
-        try {
-            multiInputStream0.read((byte[]) null, (-332), (-332));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that calling read() with a null buffer throws a NullPointerException,
+     * as required by the InputStream contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void read_withNullBuffer_throwsNullPointerException() throws IOException {
+        // Arrange: Create a MultiInputStream. The source of the stream is irrelevant
+        // for this precondition check, so an empty one is used for simplicity.
+        Iterator<ByteSource> emptySourceIterator = emptyIterator();
+        MultiInputStream stream = new MultiInputStream(emptySourceIterator);
+
+        // Act: Attempt to read into a null buffer. The invalid offset and length values
+        // are secondary, as the null buffer check should have precedence.
+        stream.read(null, -1, -1);
+
+        // Assert: The test passes if a NullPointerException is thrown, which is
+        // handled by the 'expected' attribute on the @Test annotation.
     }
 }
