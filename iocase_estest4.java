@@ -1,19 +1,36 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest4 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum, focusing on the static {@code value} method.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        IOCase iOCase0 = IOCase.SENSITIVE;
-        IOCase iOCase1 = IOCase.INSENSITIVE;
-        IOCase iOCase2 = IOCase.value(iOCase0, iOCase1);
-        assertEquals(IOCase.SENSITIVE, iOCase2);
+    @Test
+    public void value_shouldReturnValue_whenGivenValueIsNotNull() {
+        // Arrange
+        final IOCase inputValue = IOCase.SENSITIVE;
+        final IOCase defaultValue = IOCase.INSENSITIVE;
+
+        // Act
+        final IOCase result = IOCase.value(inputValue, defaultValue);
+
+        // Assert
+        assertEquals("The non-null input value should be returned", inputValue, result);
+    }
+
+    @Test
+    public void value_shouldReturnDefault_whenGivenValueIsNull() {
+        // Arrange
+        final IOCase defaultValue = IOCase.SYSTEM;
+
+        // Act
+        // The first argument is null, so the default should be returned.
+        final IOCase result = IOCase.value(null, defaultValue);
+
+        // Assert
+        assertEquals("The default value should be returned when the input is null", defaultValue, result);
     }
 }
