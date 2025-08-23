@@ -1,60 +1,81 @@
 package com.google.common.primitives;
 
-import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
+
 import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest11 extends TestCase {
+/**
+ * Tests for {@link SignedBytes#sortDescending(byte[])}.
+ */
+@GwtCompatible
+@RunWith(JUnit4.class)
+public class SignedBytesSortDescendingTest {
 
-    private static final byte[] EMPTY = {};
+  @Test
+  public void sortDescending_onEmptyArray_doesNothing() {
+    // Arrange
+    byte[] actual = {};
+    byte[] expected = {};
 
-    private static final byte[] ARRAY1 = { (byte) 1 };
+    // Act
+    SignedBytes.sortDescending(actual);
 
-    private static final byte LEAST = Byte.MIN_VALUE;
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
 
-    private static final byte GREATEST = Byte.MAX_VALUE;
+  @Test
+  public void sortDescending_onSingleElementArray_doesNothing() {
+    // Arrange
+    byte[] actual = {42};
+    byte[] expected = {42};
 
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
+    // Act
+    SignedBytes.sortDescending(actual);
 
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
-        }
-    }
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
 
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
+  @Test
+  public void sortDescending_onTwoElementArray_sortsCorrectly() {
+    // Arrange
+    byte[] actual = {1, 2};
+    byte[] expected = {2, 1};
 
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
+    // Act
+    SignedBytes.sortDescending(actual);
 
-    public void testSortDescending() {
-        testSortDescending(new byte[] {}, new byte[] {});
-        testSortDescending(new byte[] { 1 }, new byte[] { 1 });
-        testSortDescending(new byte[] { 1, 2 }, new byte[] { 2, 1 });
-        testSortDescending(new byte[] { 1, 3, 1 }, new byte[] { 3, 1, 1 });
-        testSortDescending(new byte[] { -1, 1, -2, 2 }, new byte[] { 2, 1, -1, -2 });
-    }
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void sortDescending_onArrayWithDuplicates_sortsCorrectly() {
+    // Arrange
+    byte[] actual = {1, 3, 1};
+    byte[] expected = {3, 1, 1};
+
+    // Act
+    SignedBytes.sortDescending(actual);
+
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  public void sortDescending_onArrayWithMixedSigns_sortsCorrectly() {
+    // Arrange
+    byte[] actual = {-1, 1, -2, 2};
+    byte[] expected = {2, 1, -1, -2};
+
+    // Act
+    SignedBytes.sortDescending(actual);
+
+    // Assert
+    assertThat(actual).isEqualTo(expected);
+  }
 }
