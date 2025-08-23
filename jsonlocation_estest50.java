@@ -1,19 +1,27 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest50 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        long long0 = jsonLocation0.getByteOffset();
-        assertEquals((-1L), long0);
+    /**
+     * Tests that the special 'Not Applicable' (NA) JsonLocation instance
+     * correctly reports its byte offset as -1, which signifies that the
+     * location information is not available.
+     */
+    @Test
+    public void getByteOffset_forNaLocation_shouldReturnNegativeOne() {
+        // Arrange: The special 'Not Applicable' location constant.
+        JsonLocation naLocation = JsonLocation.NA;
+
+        // Act: Retrieve the byte offset from the NA location.
+        long byteOffset = naLocation.getByteOffset();
+
+        // Assert: The byte offset should be -1 to indicate it's not available.
+        assertEquals("The byte offset for JsonLocation.NA should be -1.", -1L, byteOffset);
     }
 }
