@@ -1,100 +1,114 @@
 package com.google.common.math;
 
-import static com.google.common.math.StatsTesting.ALLOWED_ERROR;
-import static com.google.common.math.StatsTesting.ALL_MANY_VALUES;
 import static com.google.common.math.StatsTesting.EMPTY_STATS_ITERABLE;
 import static com.google.common.math.StatsTesting.MANY_VALUES;
-import static com.google.common.math.StatsTesting.MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.MANY_VALUES_STATS_ITERABLE;
-import static com.google.common.math.StatsTesting.MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
 import static com.google.common.math.StatsTesting.ONE_VALUE;
-import static com.google.common.math.StatsTesting.ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_COUNT;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_STATS;
 import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE;
 import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES;
 import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES_STATS;
 import static com.google.common.math.StatsTesting.TWO_VALUES;
-import static com.google.common.math.StatsTesting.TWO_VALUES_STATS;
-import static com.google.common.math.StatsTesting.TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
-import static com.google.common.math.StatsTesting.assertDiagonalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertHorizontalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertLinearTransformationNaN;
 import static com.google.common.math.StatsTesting.assertStatsApproxEqual;
-import static com.google.common.math.StatsTesting.assertVerticalLinearTransformation;
 import static com.google.common.math.StatsTesting.createFilledPairedStatsAccumulator;
 import static com.google.common.math.StatsTesting.createPartitionedFilledPairedStatsAccumulator;
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.Assert.assertThrows;
-import com.google.common.math.StatsTesting.ManyValues;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-public class PairedStatsAccumulatorTestTest4 extends TestCase {
+/**
+ * Tests for {@link PairedStatsAccumulator#yStats()}.
+ *
+ * <p>This test class is structured into two parts:
+ * <ul>
+ *   <li>A {@link Parameterized} test for common scenarios (empty, one, two, and many values).
+ *   <li>A standard test class for specific edge cases.
+ * </ul>
+ */
+@RunWith(Enclosed.class)
+@NullUnmarked
+public class PairedStatsAccumulatorYStatsTest {
 
-    private PairedStatsAccumulator emptyAccumulator;
+  /**
+   * Parameterized tests for common scenarios. Verifies that {@code yStats()} returns the correct
+   * statistics regardless of whether the accumulator is populated one-by-one (with {@code add}) or
+   * in bulk (with {@code addAll}).
+   */
+  @RunWith(Parameterized.class)
+  public static class CommonScenariosTest {
 
-    private PairedStatsAccumulator emptyAccumulatorByAddAllEmptyPairedStats;
+    private final Iterable<Double> xValues;
+    private final Iterable<Double> yValues;
+    private final Stats expectedYStats;
 
-    private PairedStatsAccumulator oneValueAccumulator;
-
-    private PairedStatsAccumulator oneValueAccumulatorByAddAllEmptyPairedStats;
-
-    private PairedStatsAccumulator twoValuesAccumulator;
-
-    private PairedStatsAccumulator twoValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator manyValuesAccumulator;
-
-    private PairedStatsAccumulator manyValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator horizontalValuesAccumulator;
-
-    private PairedStatsAccumulator horizontalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator verticalValuesAccumulator;
-
-    private PairedStatsAccumulator verticalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator constantValuesAccumulator;
-
-    private PairedStatsAccumulator constantValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        emptyAccumulator = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        oneValueAccumulator = new PairedStatsAccumulator();
-        oneValueAccumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        oneValueAccumulatorByAddAllEmptyPairedStats.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        twoValuesAccumulator = createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
-        twoValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
-        manyValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
-        manyValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
-        horizontalValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
-        verticalValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES);
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES, 2);
-        constantValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        constantValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
+    public CommonScenariosTest(
+        String scenario,
+        Iterable<Double> xValues,
+        Iterable<Double> yValues,
+        Stats expectedYStats) {
+      this.xValues = xValues;
+      this.yValues = yValues;
+      this.expectedYStats = expectedYStats;
     }
 
-    public void testYStats() {
-        assertStatsApproxEqual(EMPTY_STATS_ITERABLE, emptyAccumulator.yStats());
-        assertStatsApproxEqual(EMPTY_STATS_ITERABLE, emptyAccumulatorByAddAllEmptyPairedStats.yStats());
-        assertStatsApproxEqual(OTHER_ONE_VALUE_STATS, oneValueAccumulator.yStats());
-        assertStatsApproxEqual(OTHER_ONE_VALUE_STATS, oneValueAccumulatorByAddAllEmptyPairedStats.yStats());
-        assertStatsApproxEqual(OTHER_TWO_VALUES_STATS, twoValuesAccumulator.yStats());
-        assertStatsApproxEqual(OTHER_TWO_VALUES_STATS, twoValuesAccumulatorByAddAllPartitionedPairedStats.yStats());
-        assertStatsApproxEqual(OTHER_MANY_VALUES_STATS, manyValuesAccumulator.yStats());
-        assertStatsApproxEqual(OTHER_MANY_VALUES_STATS, manyValuesAccumulatorByAddAllPartitionedPairedStats.yStats());
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+      return Arrays.asList(
+          new Object[][] {
+            {"with no values", Collections.emptyList(), Collections.emptyList(), EMPTY_STATS_ITERABLE},
+            {
+              "with one value",
+              Collections.singletonList(ONE_VALUE),
+              Collections.singletonList(OTHER_ONE_VALUE),
+              OTHER_ONE_VALUE_STATS
+            },
+            {"with two values", TWO_VALUES, OTHER_TWO_VALUES, OTHER_TWO_VALUES_STATS},
+            {"with many values", MANY_VALUES, OTHER_MANY_VALUES, OTHER_MANY_VALUES_STATS}
+          });
     }
+
+    @Test
+    public void yStats_whenPopulatedWithAdd_isCorrect() {
+      PairedStatsAccumulator accumulator = createFilledPairedStatsAccumulator(xValues, yValues);
+      assertStatsApproxEqual(expectedYStats, accumulator.yStats());
+    }
+
+    @Test
+    public void yStats_whenPopulatedWithAddAll_isCorrect() {
+      // Partition into 2 chunks to test the addAll aggregation logic.
+      // For 0 or 1 elements, this is equivalent to adding a single PairedStats object.
+      PairedStatsAccumulator accumulator =
+          createPartitionedFilledPairedStatsAccumulator(xValues, yValues, 2);
+      assertStatsApproxEqual(expectedYStats, accumulator.yStats());
+    }
+  }
+
+  /** Tests for edge case behaviors of {@code yStats()}. */
+  public static class EdgeCasesTest {
+
+    private static final PairedStats EMPTY_PAIRED_STATS = new PairedStatsAccumulator().snapshot();
+
+    @Test
+    public void yStats_afterAddingEmptyStatsToNonEmptyAccumulator_isUnchanged() {
+      PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+      accumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
+
+      // Snapshot the state before the operation.
+      Stats statsBefore = accumulator.yStats();
+
+      // Perform the operation.
+      accumulator.addAll(EMPTY_PAIRED_STATS);
+
+      // Assert the state is unchanged.
+      assertStatsApproxEqual(statsBefore, accumulator.yStats());
+    }
+  }
 }
