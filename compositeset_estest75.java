@@ -1,66 +1,41 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class CompositeSet_ESTestTest75 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CompositeSet}.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        LinkedHashSet<Integer>[] linkedHashSetArray0 = (LinkedHashSet<Integer>[]) Array.newInstance(LinkedHashSet.class, 9);
-        linkedHashSetArray0[0] = linkedHashSet0;
-        linkedHashSetArray0[1] = linkedHashSet0;
-        linkedHashSetArray0[2] = linkedHashSet0;
-        linkedHashSetArray0[3] = linkedHashSet0;
-        linkedHashSetArray0[4] = linkedHashSet0;
-        linkedHashSetArray0[5] = linkedHashSet0;
-        linkedHashSetArray0[6] = linkedHashSet0;
-        linkedHashSetArray0[7] = linkedHashSet0;
-        linkedHashSetArray0[8] = linkedHashSet0;
-        LinkedHashSet<Integer>[] linkedHashSetArray1 = compositeSet0.toArray(linkedHashSetArray0);
-        assertEquals(9, linkedHashSetArray1.length);
+    /**
+     * Tests that the toArray(T[] array) method returns the same array instance
+     * when the provided array is large enough to hold the set's elements.
+     */
+    @Test
+    public void toArrayWithSufficientlyLargeArrayReturnsSameArrayInstance() {
+        // Arrange
+        // Create an empty composite set. The set's size is 0.
+        CompositeSet<Integer> emptyCompositeSet = new CompositeSet<>(new HashSet<>());
+
+        // Create a destination array that is larger than the set.
+        Integer[] destinationArray = new Integer[9];
+
+        // Act
+        // Call toArray() with the pre-sized array.
+        Integer[] resultArray = emptyCompositeSet.toArray(destinationArray);
+
+        // Assert
+        // The contract of Collection.toArray(T[]) states that if the provided
+        // array is large enough, it should be used and returned.
+        assertSame("The returned array should be the same instance as the one provided",
+                destinationArray, resultArray);
+
+        // The length of the array should, of course, be unchanged.
+        assertEquals("The length of the returned array should not change",
+                9, resultArray.length);
     }
 }
