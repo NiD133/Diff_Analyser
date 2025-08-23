@@ -1,23 +1,35 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GregorianChronology_ESTestTest17 extends GregorianChronology_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GregorianChronology} class.
+ */
+public class GregorianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        long long0 = gregorianChronology0.calculateFirstDayOfYearMillis((-292275054));
-        assertEquals((-9223372017043200000L), long0);
+    /**
+     * Tests that calculateFirstDayOfYearMillis() returns the correct value for the
+     * minimum supported year. This is a crucial boundary value test.
+     */
+    @Test
+    public void calculateFirstDayOfYearMillis_forMinimumYear_returnsCorrectValue() {
+        // Arrange
+        GregorianChronology chronology = GregorianChronology.getInstanceUTC();
+        int minYear = chronology.getMinYear(); // The minimum year is -292275054
+
+        // This is the pre-calculated expected millisecond value for the first day
+        // of the minimum supported year (00:00:00.000 on 01-Jan--292275054).
+        long expectedMillis = -9223372017043200000L;
+
+        // Act
+        long actualMillis = chronology.calculateFirstDayOfYearMillis(minYear);
+
+        // Assert
+        assertEquals(
+            "The first day of the minimum year should have the correct millisecond value.",
+            expectedMillis,
+            actualMillis
+        );
     }
 }
