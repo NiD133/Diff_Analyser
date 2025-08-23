@@ -1,23 +1,26 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest10 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        long long0 = FieldUtils.safeSubtract(3600L, 0L);
-        assertEquals(3600L, long0);
+    /**
+     * Tests that safeSubtract correctly returns the original value when zero is subtracted.
+     */
+    @Test
+    public void safeSubtract_shouldReturnOriginalValue_whenSubtractingZero() {
+        // Arrange
+        final long minuend = 3600L;
+        final long expectedResult = 3600L;
+
+        // Act
+        long actualResult = FieldUtils.safeSubtract(minuend, 0L);
+
+        // Assert
+        assertEquals(expectedResult, actualResult);
     }
 }
