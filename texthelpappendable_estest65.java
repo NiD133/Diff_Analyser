@@ -1,57 +1,36 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for {@link TextHelpAppendable}.
+ * This class contains the refactored test case.
+ */
 public class TextHelpAppendable_ESTestTest65 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-        Charset charset0 = Charset.defaultCharset();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(3);
-        CharBuffer charBuffer0 = charset0.decode(byteBuffer0);
-        CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-        arrayDeque0.add(charBuffer1);
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer1);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendList(true, arrayDeque0);
-            fail("Expecting exception: ReadOnlyBufferException");
-        } catch (ReadOnlyBufferException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that appendList throws a ReadOnlyBufferException when the underlying
+     * Appendable is a read-only buffer. This ensures that exceptions from the
+     * underlying Appendable are correctly propagated.
+     *
+     * @throws IOException if an I/O error occurs, though not expected in this test.
+     */
+    @Test(timeout = 4000, expected = ReadOnlyBufferException.class)
+    public void testAppendListThrowsExceptionWhenUsingReadOnlyBuffer() throws IOException {
+        // Arrange: Create a TextHelpAppendable with a read-only buffer as its output.
+        CharBuffer readOnlyBuffer = CharBuffer.wrap("").asReadOnlyBuffer();
+        TextHelpAppendable textHelpAppendable = new TextHelpAppendable(readOnlyBuffer);
+        List<CharSequence> itemsToAppend = Collections.singletonList("An item to append");
+
+        // Act & Assert: Attempting to append to the read-only buffer should throw
+        // a ReadOnlyBufferException. The 'expected' parameter of the @Test annotation
+        // handles the assertion.
+        textHelpAppendable.appendList(false, itemsToAppend);
     }
 }
