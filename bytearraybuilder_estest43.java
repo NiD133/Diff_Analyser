@@ -1,25 +1,24 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest43 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link ByteArrayBuilder} class, focusing on constructor behavior.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = null;
-        try {
-            byteArrayBuilder0 = new ByteArrayBuilder((BufferRecycler) null, (-1216));
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that the ByteArrayBuilder constructor throws a NegativeArraySizeException
+     * when initialized with a negative size for its first block. This is the expected
+     * behavior when any Java array is allocated with a negative size.
+     */
+    @Test(expected = NegativeArraySizeException.class)
+    public void constructorShouldThrowExceptionForNegativeInitialSize() {
+        // Arrange: A negative value for the initial buffer size.
+        final int negativeInitialSize = -1;
+
+        // Act & Assert: Attempt to create a ByteArrayBuilder with the negative size.
+        // The @Test(expected=...) annotation asserts that a NegativeArraySizeException is thrown.
+        new ByteArrayBuilder(null, negativeInitialSize);
     }
 }
