@@ -1,34 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest19 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray#skipBytes(int)} method.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test018() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        int int0 = randomAccessFileOrArray0.skipBytes((byte) 0);
-        assertEquals(0, int0);
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
+    /**
+     * Verifies that calling skipBytes(0) correctly returns 0 and does not
+     * change the internal file pointer's position.
+     */
+    @Test
+    public void skipBytes_whenSkippingZeroBytes_shouldReturnZeroAndNotAdvancePointer() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance with some data.
+        // The content of the array is not important for this specific test.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+        
+        // Sanity check: ensure the initial position is at the beginning.
+        assertEquals("Initial file pointer should be at the start", 0L, fileOrArray.getFilePointer());
+
+        // Act: Attempt to skip zero bytes.
+        int bytesSkipped = fileOrArray.skipBytes(0);
+
+        // Assert: Verify that the number of skipped bytes is 0 and the file pointer has not moved.
+        assertEquals("The number of skipped bytes should be 0", 0, bytesSkipped);
+        assertEquals("The file pointer should remain at the start", 0L, fileOrArray.getFilePointer());
     }
 }
