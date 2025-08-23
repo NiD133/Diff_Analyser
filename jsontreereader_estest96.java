@@ -1,29 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTreeReader_ESTestTest96 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for the JsonTreeReader class.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test095() throws Throwable {
-        JsonNull jsonNull0 = JsonNull.INSTANCE;
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonNull0);
-        jsonTreeReader0.nextNull();
-        boolean boolean0 = jsonTreeReader0.hasNext();
-        assertFalse(boolean0);
+    /**
+     * Verifies that hasNext() returns false after the single root element has been consumed.
+     */
+    @Test
+    public void hasNext_afterConsumingRootElement_returnsFalse() throws IOException {
+        // Arrange: Create a JsonTreeReader with a single JsonNull element.
+        JsonTreeReader reader = new JsonTreeReader(JsonNull.INSTANCE);
+
+        // Act: Consume the single null element from the reader.
+        reader.nextNull();
+
+        // Assert: Verify that the reader reports no more elements are available.
+        assertFalse("hasNext() should return false after the only element is consumed", reader.hasNext());
     }
 }
