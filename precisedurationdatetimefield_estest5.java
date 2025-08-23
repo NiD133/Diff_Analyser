@@ -1,35 +1,42 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest5 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        LocalDate localDate0 = LocalDate.now();
-        LocalDate localDate1 = localDate0.withDayOfYear(365);
-        assertNotSame(localDate1, localDate0);
+/**
+ * This test class focuses on the behavior of fields that are implemented using
+ * PreciseDurationDateTimeField, such as the 'dayOfYear' field in LocalDate.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    /**
+     * Tests that setting a value on a field managed by PreciseDurationDateTimeField,
+     * via a higher-level class like LocalDate, respects the immutability of the parent object.
+     * It verifies that a new instance is returned with the updated value, and the original
+     * instance is not modified.
+     */
+    @Test
+    public void setOnDateTimeFieldShouldReturnNewInstanceAndNotModifyOriginal() {
+        // Arrange: Create a fixed, deterministic date.
+        // The 'dayOfYear' field in LocalDate is a PreciseDurationDateTimeField.
+        LocalDate originalDate = new LocalDate(2023, 1, 15);
+        int originalDayOfYear = originalDate.getDayOfYear(); // is 15
+        int newDayOfYear = 365;
+
+        // Act: Call a method that internally uses the 'set' operation of the dayOfYear field.
+        LocalDate newDate = originalDate.withDayOfYear(newDayOfYear);
+
+        // Assert:
+        // 1. A new object instance was created.
+        assertNotSame("A new LocalDate instance should be returned", newDate, originalDate);
+
+        // 2. The new object has the correctly updated value.
+        assertEquals("The new date should have the correct day of year", newDayOfYear, newDate.getDayOfYear());
+
+        // 3. The original object remains unchanged.
+        assertEquals("The original date should not be modified", originalDayOfYear, originalDate.getDayOfYear());
     }
 }
