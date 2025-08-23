@@ -1,27 +1,32 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest49 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        // Undeclared exception!
-        try {
-            RandomUtils.nextBytes((-669));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Count cannot be negative.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
-        }
+    /**
+     * Tests that {@link RandomUtils#nextBytes(int)} throws an IllegalArgumentException
+     * when the provided count is negative.
+     */
+    @Test
+    public void nextBytesShouldThrowExceptionForNegativeCount() {
+        // Arrange: Define an invalid negative count.
+        final int negativeCount = -1;
+
+        // Act & Assert: Verify that calling nextBytes with a negative count throws
+        // the expected exception.
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> RandomUtils.nextBytes(negativeCount)
+        );
+
+        // Assert: Further verify that the exception message is correct.
+        assertEquals("Count cannot be negative.", thrown.getMessage());
     }
 }
