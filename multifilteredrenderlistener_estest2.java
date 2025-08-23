@@ -1,31 +1,30 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link MultiFilteredRenderListener}.
+ */
 public class MultiFilteredRenderListener_ESTestTest2 extends MultiFilteredRenderListener_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-        RenderFilter[] renderFilterArray0 = new RenderFilter[0];
-        multiFilteredRenderListener0.attachRenderListener((LocationTextExtractionStrategy) null, renderFilterArray0);
-        // Undeclared exception!
-        try {
-            multiFilteredRenderListener0.beginTextBlock();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
-        }
+    /**
+     * Verifies that calling beginTextBlock() throws a NullPointerException
+     * if a null RenderListener was previously attached. The MultiFilteredRenderListener
+     * should not permit null delegates, as it attempts to forward calls to them.
+     */
+    @Test(expected = NullPointerException.class)
+    public void beginTextBlock_throwsNullPointerException_whenAttachedListenerIsNull() {
+        // Arrange: Create a listener and attach a null delegate to it.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        RenderListener nullListener = null;
+        RenderFilter[] noFilters = new RenderFilter[0];
+
+        multiListener.attachRenderListener(nullListener, noFilters);
+
+        // Act: Call the method under test. This is expected to throw a NullPointerException
+        // because it will try to call beginTextBlock() on the null delegate.
+        multiListener.beginTextBlock();
+
+        // Assert: The exception is verified by the @Test(expected) annotation.
     }
 }
