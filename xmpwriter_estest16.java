@@ -1,53 +1,40 @@
 package com.itextpdf.text.xml.xmp;
 
+import com.itextpdf.xmp.XMPException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest16 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null);
+/**
+ * Unit tests for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that attempting to append an item to an alternate array using an
+     * unregistered schema namespace URI correctly throws an XMPException.
+     */
+    @Test
+    public void appendAlternateArrayItem_withUnregisteredSchema_shouldThrowException() throws IOException {
+        // Arrange: Create an XmpWriter and define test data with an invalid namespace.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XmpWriter xmpWriter = new XmpWriter(outputStream);
+
+        String unregisteredSchemaNS = "http://my.invalid.schema/ns/";
+        String arrayName = "MyAlternateArray";
+        String itemValue = "An example value";
+
+        // Act & Assert: Expect an XMPException when the method is called.
         try {
-            xmpWriter0.appendAlternateArrayItem("UTF-16", "UTF-16", "UTF-16");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Unregistered schema namespace URI
-            //
-            verifyException("com.itextpdf.xmp.impl.xpath.XMPPathParser", e);
+            xmpWriter.appendAlternateArrayItem(unregisteredSchemaNS, arrayName, itemValue);
+            fail("Expected an XMPException to be thrown due to the unregistered schema namespace.");
+        } catch (XMPException e) {
+            // Verify that the exception message is the one expected from the underlying XMP library.
+            assertEquals("Unregistered schema namespace URI", e.getMessage());
         }
     }
 }
