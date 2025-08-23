@@ -1,32 +1,30 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
+
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest25 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-        boolean boolean0 = multiReadOnlySeekableByteChannel0.isOpen();
-        assertTrue(boolean0);
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
+
+    @Test
+    public void isOpen_shouldReturnTrue_whenChannelIsNewlyCreated() {
+        // Arrange: Create a multi-channel instance.
+        // The list of underlying channels can be empty, as the 'open' state
+        // is independent of the number of concatenated channels.
+        List<SeekableByteChannel> emptyChannelList = Collections.emptyList();
+        MultiReadOnlySeekableByteChannel multiChannel = new MultiReadOnlySeekableByteChannel(emptyChannelList);
+
+        // Act: Check the status of the newly created channel.
+        boolean isOpen = multiChannel.isOpen();
+
+        // Assert: The channel should report itself as open immediately after creation.
+        assertTrue("A newly instantiated MultiReadOnlySeekableByteChannel should be open.", isOpen);
     }
 }
