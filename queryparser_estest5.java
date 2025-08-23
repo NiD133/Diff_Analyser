@@ -2,18 +2,43 @@ package org.jsoup.select;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest5 extends QueryParser_ESTest_scaffolding {
+/**
+ * Test suite for the QueryParser's static helper methods.
+ * This class focuses on the combinator logic.
+ */
+public class QueryParserCombinatorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Evaluator.AttributeWithValue evaluator_AttributeWithValue0 = new Evaluator.AttributeWithValue("6N8}sq&/", "org.jsoup.internal.SimpleStreamReader");
-        Evaluator evaluator0 = QueryParser.and(evaluator_AttributeWithValue0, evaluator_AttributeWithValue0);
-        Evaluator evaluator1 = QueryParser.combinator(evaluator_AttributeWithValue0, ' ', evaluator0);
-        assertNotSame(evaluator0, evaluator1);
+    /**
+     * Verifies that the `combinator` method, when used with a space character,
+     * creates a new structural evaluator representing a descendant relationship.
+     * A CSS selector like "div .content" uses a space as a descendant combinator.
+     * This test ensures that the method correctly wraps the evaluators rather than
+     * returning one of the original instances.
+     */
+    @Test
+    public void combinatorWithSpaceShouldCreateNewDescendantEvaluator() {
+        // Arrange: Create two distinct evaluators representing an ancestor and a descendant.
+        // e.g., for a selector like "div.container p"
+        Evaluator ancestorEvaluator = new Evaluator.Tag("div");
+        Evaluator descendantEvaluator = new Evaluator.Tag("p");
+        char descendantCombinator = ' ';
+
+        // Act: Combine the two evaluators using the descendant combinator.
+        Evaluator combinedEvaluator = QueryParser.combinator(ancestorEvaluator, descendantCombinator, descendantEvaluator);
+
+        // Assert: The result must be a new evaluator instance, not the same as the inputs.
+        // This confirms that a new structural evaluator was created to represent the relationship.
+        assertNotNull(combinedEvaluator);
+        assertNotSame(
+            "The combinator method should return a new wrapper evaluator, not the original descendant evaluator.",
+            descendantEvaluator,
+            combinedEvaluator
+        );
+        assertNotSame(
+            "The combinator method should return a new wrapper evaluator, not the original ancestor evaluator.",
+            ancestorEvaluator,
+            combinedEvaluator
+        );
     }
 }
