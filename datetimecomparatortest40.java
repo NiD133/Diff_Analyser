@@ -1,233 +1,76 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
+import org.junit.Test;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
 
-public class DateTimeComparatorTestTest40 extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-    private static final Chronology ISO = ISOChronology.getInstance();
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
+/**
+ * Tests for the time-only comparator provided by {@link DateTimeComparator#getTimeOnlyInstance()}.
+ */
+public class DateTimeComparatorTimeOnlyTest {
 
     /**
-     * A reference to a DateTime object.
+     * Verifies that the time-only comparator correctly sorts a list of DateTime objects
+     * based on their time of day, while ignoring their date components.
      */
-    DateTime bDateTime = null;
+    @Test
+    public void shouldSortDateTimeListByTimeIgnoringDate() {
+        // Arrange
+        // Create a list of DateTime objects with different dates and unsorted times.
+        // Using different dates makes it clear that the date part is being ignored.
+        List<DateTime> dateTimes = createDateTimesFromStrings(
+            "2000-01-01T01:02:05Z",
+            "2010-04-02T22:22:22Z",
+            "1999-12-31T05:30:45Z",
+            "2005-07-15T09:17:59Z",
+            "2008-02-29T09:17:58Z",
+            "2020-11-20T15:30:00Z",
+            "1995-09-01T17:00:44Z"
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
-     */
-    Comparator cMillis = null;
+        // Define the expected order after sorting by time of day.
+        List<DateTime> expectedOrder = createDateTimesFromStrings(
+            "2000-01-01T01:02:05Z", // 01:02:05
+            "1999-12-31T05:30:45Z", // 05:30:45
+            "2008-02-29T09:17:58Z", // 09:17:58
+            "2005-07-15T09:17:59Z", // 09:17:59
+            "2020-11-20T15:30:00Z", // 15:30:00
+            "1995-09-01T17:00:44Z", // 17:00:44
+            "2010-04-02T22:22:22Z"  // 22:22:22
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
+        // Ensure the list isn't already in the expected order by coincidence.
+        assertNotEquals("Test setup issue: initial list is already sorted.", expectedOrder, dateTimes);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
+        Comparator<Object> timeOnlyComparator = DateTimeComparator.getTimeOnlyInstance();
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
+        // Act
+        // Sort the list using the time-only comparator.
+        Collections.sort(dateTimes, timeOnlyComparator);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
+        // Assert
+        // Verify that the sorted list matches the expected order.
+        assertEquals(expectedOrder, dateTimes);
     }
 
     /**
-     * Junit <code>setUp()</code> method.
+     * Helper method to create a list of DateTime objects from ISO 8601 formatted strings.
+     *
+     * @param isoStrings The date-time strings to parse.
+     * @return A list of DateTime objects.
      */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
-    }
-
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
-
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
+    private static List<DateTime> createDateTimesFromStrings(String... isoStrings) {
+        List<DateTime> dateTimes = new ArrayList<>();
+        for (String s : isoStrings) {
+            // All test DateTimes are created in UTC to avoid time zone-related issues.
+            dateTimes.add(new DateTime(s, DateTimeZone.UTC));
         }
-        return retDT;
-    }
-
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test sorting with time only comparator.
-     */
-    public void testListTime() {
-        String[] dtStrs = { "1999-02-01T01:02:05", "1999-02-01T22:22:22", "1999-02-01T05:30:45", "1999-02-01T09:17:59", "1999-02-01T09:17:58", "1999-02-01T15:30:00", "1999-02-01T17:00:44" };
-        //
-        List sl = loadAList(dtStrs);
-        boolean isSorted1 = isListSorted(sl);
-        Collections.sort(sl, cTime);
-        boolean isSorted2 = isListSorted(sl);
-        assertEquals("ListTime", !isSorted1, isSorted2);
+        return dateTimes;
     }
 }
