@@ -1,46 +1,46 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.Range;
 import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class DeviationRenderer_ESTestTest7 extends DeviationRenderer_ESTest_scaffolding {
+import java.util.Date;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer();
-        Date[] dateArray0 = new Date[3];
-        TimeZone timeZone0 = TimeZone.getDefault();
-        Locale locale0 = Locale.PRC;
-        DateAxis dateAxis0 = new DateAxis("", timeZone0, locale0);
-        dateArray0[0] = dateAxis0.DEFAULT_ANCHOR_DATE;
-        dateArray0[1] = dateAxis0.DEFAULT_ANCHOR_DATE;
-        dateArray0[2] = dateArray0[1];
-        double[] doubleArray0 = new double[5];
-        doubleArray0[1] = (-1.0);
-        DefaultHighLowDataset defaultHighLowDataset0 = new DefaultHighLowDataset(deviationRenderer0.ZERO, dateArray0, doubleArray0, doubleArray0, doubleArray0, doubleArray0, doubleArray0);
-        deviationRenderer0.findRangeBounds(defaultHighLowDataset0);
-        assertTrue(deviationRenderer0.getDrawSeriesLineAsPath());
-        assertEquals(0.5F, deviationRenderer0.getAlpha(), 0.01F);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for the {@link DeviationRenderer} class, focusing on the findRangeBounds method.
+ */
+public class DeviationRendererTest {
+
+    /**
+     * Verifies that findRangeBounds correctly calculates the data range
+     * when the dataset includes negative values. The expected range should
+     * encompass both the lowest and highest values in the dataset.
+     */
+    @Test
+    public void findRangeBounds_withNegativeValues_returnsCorrectRange() {
+        // Arrange
+        DeviationRenderer renderer = new DeviationRenderer();
+
+        // Create a dataset with a mix of zero and negative values.
+        // The y-values (low, high) for the three data points are:
+        // (0.0, 0.0), (-1.0, -1.0), (0.0, 0.0)
+        // The overall range should therefore be from -1.0 to 0.0.
+        Date[] dates = {new Date(100L), new Date(200L), new Date(300L)};
+        double[] highValues = {0.0, -1.0, 0.0};
+        double[] lowValues = {0.0, -1.0, 0.0};
+        // Note: open, close, and volume are not used by DeviationRenderer for range calculation.
+        DefaultHighLowDataset dataset = new DefaultHighLowDataset(
+                "Series 1", dates, highValues, lowValues, lowValues, lowValues, lowValues);
+
+        // Act
+        Range actualRange = renderer.findRangeBounds(dataset);
+
+        // Assert
+        assertNotNull("The calculated range should not be null.", actualRange);
+        assertEquals("The lower bound of the range is incorrect.", -1.0, actualRange.getLowerBound(), 0.001);
+        assertEquals("The upper bound of the range is incorrect.", 0.0, actualRange.getUpperBound(), 0.001);
     }
 }
