@@ -1,33 +1,29 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest14 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        // Undeclared exception!
-        try {
-            bBoxCalculator0.expandRange((Rectangle) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
-        }
+/**
+ * Unit tests for the {@link BBoxCalculator} class.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that calling expandRange with a null Rectangle argument
+     * correctly throws a NullPointerException.
+     */
+    @Test
+    public void expandRange_withNullRectangle_shouldThrowNullPointerException() {
+        // Arrange: Create a BBoxCalculator with a standard geographic context.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator calculator = new BBoxCalculator(geoContext);
+
+        // Act & Assert: Verify that a NullPointerException is thrown when a null
+        // rectangle is passed to the expandRange method.
+        assertThrows(NullPointerException.class, () -> {
+            calculator.expandRange(null);
+        });
     }
 }
