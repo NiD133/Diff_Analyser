@@ -1,48 +1,30 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest40 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        MonthDay monthDay0 = new MonthDay();
-        MonthDay monthDay1 = monthDay0.plusDays(1);
-        boolean boolean0 = monthDay0.isBefore(monthDay1);
-        assertTrue(boolean0);
-        assertEquals(2, monthDay1.getMonthOfYear());
+/**
+ * Test suite for the isBefore() method in {@link AbstractPartial}.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Tests that isBefore() returns true when the partial instant is
+     * chronologically earlier than the one it is compared to.
+     */
+    @Test
+    public void isBefore_shouldReturnTrue_whenComparingToLaterPartial() {
+        // Arrange: Create two MonthDay instances, where the first is one day before the second.
+        // Using specific dates makes the test deterministic and independent of the system clock.
+        MonthDay partial = new MonthDay(2, 14); // February 14th
+        MonthDay laterPartial = new MonthDay(2, 15); // February 15th
+
+        // Act: Check if the first partial is before the second.
+        boolean isBefore = partial.isBefore(laterPartial);
+
+        // Assert: The result should be true.
+        assertTrue("A partial should be considered 'before' a chronologically later one.", isBefore);
     }
 }
