@@ -1,94 +1,39 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.junit.Test;
 
-public class ISOChronologyTestTest19 extends TestCase {
+/**
+ * Tests for leap year and leap day handling in {@link ISOChronology}.
+ */
+public class ISOChronologyLeapYearTest {
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Verifies that for a date on a leap day (Feb 29th), the relevant date fields
+     * correctly identify themselves as being part of a leap context.
+     */
+    @Test
+    public void isLeap_shouldReturnTrue_forFieldsOfLeapDay() {
+        // Arrange: Create a date for February 29th in a known leap year (2012).
+        // We use the UTC chronology to make the test independent of the system's default time zone.
+        final Chronology isoChronology = ISOChronology.getInstanceUTC();
+        final DateTime leapDayDateTime = new DateTime(2012, 2, 29, 0, 0, isoChronology);
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        // Act & Assert: Check the 'isLeap' property on various fields of the date.
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        // The year 2012 is a leap year.
+        assertTrue("The year field (2012) should be leap.", leapDayDateTime.year().isLeap());
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+        // The month of year (February) contains the leap day.
+        assertTrue("The month of year field (February) should be leap.", leapDayDateTime.monthOfYear().isLeap());
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+        // The day of month (29th) is the leap day itself.
+        assertTrue("The day of month field (29th) should be leap.", leapDayDateTime.dayOfMonth().isLeap());
 
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
-    }
-
-    public void testLeap_29feb() {
-        Chronology chrono = ISOChronology.getInstance();
-        DateTime dt = new DateTime(2012, 2, 29, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(true, dt.dayOfMonth().isLeap());
-        assertEquals(true, dt.dayOfYear().isLeap());
+        // The day of year (60th day) is the leap day.
+        assertTrue("The day of year field should be leap.", leapDayDateTime.dayOfYear().isLeap());
     }
 }
