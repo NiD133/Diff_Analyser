@@ -1,30 +1,37 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertThrows;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest16 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter}, focusing on its behavior in edge cases.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3558), (TypeToken<?>) null, annotationArray0, (Object) null);
-        // Undeclared exception!
-        try {
-            parameter0.equals(parameter0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.reflect.Parameter", e);
-        }
+    /**
+     * Verifies that calling equals() on a Parameter instance created with a null
+     * declaring Invokable throws a NullPointerException. The equals() implementation
+     * internally dereferences the Invokable, leading to this expected exception.
+     */
+    @Test
+    public void equals_whenDeclaringInvokableIsNull_throwsNullPointerException() {
+        // Arrange: Create a Parameter instance with a null Invokable.
+        // Note: The Parameter constructor is package-private, so this test must
+        // reside in the com.google.common.reflect package to compile.
+        Annotation[] noAnnotations = new Annotation[0];
+        Parameter parameterWithNullInvokable = new Parameter(
+                /* declaration */ null,
+                /* position */ 0,
+                /* type */ null,
+                noAnnotations,
+                /* annotatedType */ null);
+
+        // Act & Assert: Expect a NullPointerException when equals() is called.
+        assertThrows(
+                "Expected equals() to throw NullPointerException when the declaring invokable is null",
+                NullPointerException.class,
+                () -> parameterWithNullInvokable.equals(parameterWithNullInvokable));
     }
 }
