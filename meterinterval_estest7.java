@@ -1,28 +1,30 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class MeterInterval_ESTestTest7 extends MeterInterval_ESTest_scaffolding {
+/**
+ * Tests for the {@link MeterInterval} class, focusing on the getLabel() method.
+ */
+public class MeterInterval_ESTestTest7 {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Range range0 = Range.expandToInclude((Range) null, (-229.311906958652));
-        MeterInterval meterInterval0 = new MeterInterval("", range0);
-        String string0 = meterInterval0.getLabel();
-        assertEquals("", string0);
+    /**
+     * Verifies that getLabel() returns the exact string that was provided
+     * to the constructor, including an empty string.
+     */
+    @Test
+    public void getLabelShouldReturnLabelSetInConstructor() {
+        // Arrange: Create a MeterInterval with a specific label.
+        // The range value is not relevant for this test, so a simple one is used.
+        String expectedLabel = "";
+        Range dummyRange = new Range(0.0, 100.0);
+        MeterInterval interval = new MeterInterval(expectedLabel, dummyRange);
+
+        // Act: Retrieve the label from the MeterInterval instance.
+        String actualLabel = interval.getLabel();
+
+        // Assert: Verify that the retrieved label matches the one set at construction.
+        assertEquals(expectedLabel, actualLabel);
     }
 }
