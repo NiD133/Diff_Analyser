@@ -1,26 +1,42 @@
 package org.jfree.chart.annotations;
 
+import org.jfree.chart.TestUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.GradientPaint;
+import java.awt.Paint;
 import java.awt.Stroke;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XYLineAnnotationTestTest7 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static final double EPSILON = 0.000000001;
+/**
+ * Tests for the serialization of the {@link XYLineAnnotation} class.
+ */
+@DisplayName("XYLineAnnotation Serialization")
+class XYLineAnnotationTest {
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that an XYLineAnnotation instance can be serialized and
+     * deserialized without any loss of its state. The equals() method
+     * provides a comprehensive check of all properties.
      */
     @Test
-    public void testSerialization() {
+    @DisplayName("should be perfectly restored after serialization")
+    void serialization_preservesObjectState() {
+        // Arrange: Create an annotation with specific properties.
         Stroke stroke = new BasicStroke(2.0f);
-        XYLineAnnotation a1 = new XYLineAnnotation(10.0, 20.0, 100.0, 200.0, stroke, Color.BLUE);
-        XYLineAnnotation a2 = TestUtils.serialised(a1);
-        assertEquals(a1, a2);
+        Paint paint = Color.BLUE;
+        XYLineAnnotation originalAnnotation = new XYLineAnnotation(
+                10.0, 20.0, 100.0, 200.0, stroke, paint
+        );
+
+        // Act: Serialize the original annotation and then deserialize it.
+        XYLineAnnotation deserializedAnnotation = TestUtils.serialised(originalAnnotation);
+
+        // Assert: The deserialized object should be identical to the original.
+        assertEquals(originalAnnotation, deserializedAnnotation,
+                "The deserialized annotation should be equal to the original.");
     }
 }
