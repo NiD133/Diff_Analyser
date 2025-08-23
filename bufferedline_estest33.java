@@ -1,32 +1,51 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest33 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(47.596567977381824, 47.596567977381824, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 47.596567977381824, spatialContext0);
-        PointImpl pointImpl1 = new PointImpl(47.596567977381824, 47.596567977381824, spatialContext0);
-        pointImpl1.reset((-2340.0), (-2340.0));
-        BufferedLine bufferedLine1 = new BufferedLine(pointImpl0, pointImpl1, 47.596567977381824, spatialContext0);
-        boolean boolean0 = bufferedLine0.equals(bufferedLine1);
-        assertFalse(boolean0);
-        assertEquals(47.596567977381824, bufferedLine1.getBuf(), 0.01);
+/**
+ * Test for the {@link BufferedLine#equals(Object)} method.
+ */
+public class BufferedLineEqualsTest {
+
+    private final SpatialContext geoContext = SpatialContext.GEO;
+
+    /**
+     * Tests that two BufferedLine objects are not considered equal if they are defined
+     * by different endpoints, even if they share a common point and have the same buffer size.
+     *
+     * This test specifically compares a standard line with a "degenerate" line
+     * (where start and end points are identical).
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenLinesHaveDifferentEndpoints() {
+        // Arrange
+        final double buffer = 45.0;
+        Point pointA = geoContext.makePoint(45.0, 45.0);
+        Point pointB = geoContext.makePoint(-60.0, -70.0);
+
+        // Create a "degenerate" line where the start and end points are the same.
+        // This is effectively a buffered point.
+        BufferedLine degenerateLine = new BufferedLine(pointA, pointA, buffer, geoContext);
+
+        // Create a standard line with distinct start and end points.
+        BufferedLine standardLine = new BufferedLine(pointA, pointB, buffer, geoContext);
+
+        // Sanity check: ensure buffer sizes are as expected before comparison.
+        assertEquals(buffer, degenerateLine.getBuf(), 0.0);
+        assertEquals(buffer, standardLine.getBuf(), 0.0);
+
+        // Act & Assert
+        // The two lines should not be equal because their underlying geometries are different.
+        assertNotEquals("A degenerate line should not equal a standard line", degenerateLine, standardLine);
+
+        // For completeness, explicitly test the boolean return value of equals().
+        boolean areEqual = degenerateLine.equals(standardLine);
+        assertFalse("equals() should return false for lines with different endpoints", areEqual);
     }
 }
