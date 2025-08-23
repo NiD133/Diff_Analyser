@@ -1,21 +1,28 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LeafNode_ESTestTest8 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode class, focusing on attribute-related behavior.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("");
-        boolean boolean0 = cDataNode0.hasAttr("#cdata");
-        assertTrue(boolean0);
+    /**
+     * Verifies that a CDataNode, a type of LeafNode, correctly reports
+     * having an implicit attribute that represents its text content.
+     * The key for this implicit attribute is the node's name, "#cdata".
+     */
+    @Test
+    public void hasAttrOnCDataNodeReturnsTrueForImplicitTextAttribute() {
+        // Arrange: Create a CDataNode. Its content doesn't matter for this check.
+        CDataNode cdataNode = new CDataNode("some cdata content");
+        String implicitAttributeKey = "#cdata";
+
+        // Act: Check if the node has the implicit attribute.
+        boolean hasAttribute = cdataNode.hasAttr(implicitAttributeKey);
+
+        // Assert: The node should always report having this attribute.
+        assertTrue("A CDataNode should always have an implicit '#cdata' attribute representing its content.", hasAttribute);
     }
 }
