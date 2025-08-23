@@ -1,26 +1,23 @@
-package org.apache.ibatis.type;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-
-public class BaseTypeHandler_ESTestTest14 extends BaseTypeHandler_ESTest_scaffolding {
-
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        ClobTypeHandler clobTypeHandler0 = new ClobTypeHandler();
-        JdbcType jdbcType0 = JdbcType.DATALINK;
-        PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
-        clobTypeHandler0.setParameter(preparedStatement0, (-1), (String) null, jdbcType0);
+@_Override
+    public void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
+      if (parameter == null) {
+        if (jdbcType == null) {
+          throw new TypeException("JDBC requires that the JdbcType must be specified for all nullable parameters.");
+        }
+        try {
+          ps.setNull(i, jdbcType.TYPE_CODE);
+        } catch (SQLException e) {
+          throw new TypeException("Error setting null for parameter #" + i + " with JdbcType " + jdbcType + " . "
+              + "Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. "
+              + "Cause: " + e, e);
+        }
+      } else {
+        try {
+          setNonNullParameter(ps, i, parameter, jdbcType);
+        } catch (Exception e) {
+          throw new TypeException("Error setting non null for parameter #" + i + " with JdbcType " + jdbcType + " . "
+              + "Try setting a different generic type for this parameter or a different configuration property. "
+              + "Cause: " + e, e);
+        }
+      }
     }
-}
