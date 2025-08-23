@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Minutes_ESTestTest53 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        Minutes minutes0 = Minutes.ONE;
-        Minutes minutes1 = minutes0.plus((Minutes) null);
-        assertSame(minutes0, minutes1);
+    /**
+     * Tests that adding a null Minutes object is treated as adding zero,
+     * which should return the original, unchanged instance.
+     */
+    @Test
+    public void plus_withNullArgument_returnsSameInstance() {
+        // Arrange
+        final Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        // The plus() method's contract states that a null argument is treated as zero.
+        final Minutes result = oneMinute.plus((Minutes) null);
+
+        // Assert
+        // For an immutable object, adding zero should return the same instance, not just an equal one.
+        assertSame("Adding null should not create a new object, but return the same instance", oneMinute, result);
     }
 }
