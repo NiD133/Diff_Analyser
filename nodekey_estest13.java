@@ -2,18 +2,26 @@ package org.jfree.data.flow;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NodeKey_ESTestTest13 extends NodeKey_ESTest_scaffolding {
+/**
+ * Tests for the {@link NodeKey} class.
+ */
+public class NodeKeyTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Integer integer0 = new Integer(9);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(9, integer0);
-        nodeKey0.hashCode();
-        assertEquals(9, nodeKey0.getStage());
+    /**
+     * Verifies that the getStage() method returns the value that was provided
+     * to the constructor.
+     */
+    @Test
+    public void getStageShouldReturnStageSetInConstructor() {
+        // Arrange: Define the input values for the NodeKey.
+        int expectedStage = 9;
+        Integer nodeIdentifier = 9; // This value is required by the constructor but not under test here.
+
+        // Act: Create an instance of the NodeKey.
+        NodeKey<Integer> nodeKey = new NodeKey<>(expectedStage, nodeIdentifier);
+
+        // Assert: Check if the getStage() method returns the expected value.
+        assertEquals(expectedStage, nodeKey.getStage());
     }
 }
