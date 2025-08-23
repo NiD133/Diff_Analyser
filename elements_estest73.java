@@ -1,43 +1,26 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for the {@link Elements} class.
+ * Note: The original test class name `Elements_ESTestTest73` suggests it was
+ * auto-generated. This version uses a more conventional name and structure.
+ */
 public class Elements_ESTestTest73 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test072() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
-        try {
-            elements0.remove(401);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 401, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+    /**
+     * Verifies that calling remove() with an index on an empty Elements collection
+     * throws an IndexOutOfBoundsException, as expected for a list-like object.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void removeByIndexFromEmptyListThrowsIndexOutOfBoundsException() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act & Assert: Attempt to remove an element at index 0.
+        // Since the list is empty, this action is expected to throw an
+        // IndexOutOfBoundsException, which is verified by the @Test annotation.
+        emptyElements.remove(0);
     }
 }
