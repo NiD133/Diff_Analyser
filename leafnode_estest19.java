@@ -1,21 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest19 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the {@link LeafNode} abstract class.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        DataNode dataNode0 = new DataNode("7mqe");
-        int int0 = dataNode0.childNodeSize();
-        assertEquals(0, int0);
+    /**
+     * Verifies that a LeafNode, by definition, has a child node size of 0.
+     * Leaf nodes (like DataNode, TextNode, Comment) cannot contain other nodes.
+     */
+    @Test
+    public void childNodeSizeIsAlwaysZero() {
+        // Arrange: Create a concrete instance of a LeafNode.
+        // DataNode is used here as a representative example.
+        LeafNode leafNode = new DataNode("Sample data");
+
+        // Act: Get the number of child nodes.
+        int childCount = leafNode.childNodeSize();
+
+        // Assert: The size must be 0, as leaf nodes cannot have children.
+        assertEquals("A leaf node must not have any children", 0, childCount);
     }
 }
