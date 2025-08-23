@@ -2,22 +2,27 @@ package org.joda.time.field;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest20 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        int int0 = FieldUtils.safeMultiplyToInt(1L, 2765L);
-        assertEquals(2765, int0);
+    /**
+     * Tests that safeMultiplyToInt correctly calculates the product of two long values
+     * when the result fits within the range of an integer.
+     */
+    @Test
+    public void safeMultiplyToInt_shouldReturnProduct_whenResultFitsInInt() {
+        // Arrange
+        long multiplicand = 1L;
+        long multiplier = 2765L;
+        int expectedProduct = 2765;
+
+        // Act
+        int actualProduct = FieldUtils.safeMultiplyToInt(multiplicand, multiplier);
+
+        // Assert
+        assertEquals(expectedProduct, actualProduct);
     }
 }
