@@ -1,28 +1,32 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class LocaleUtils_ESTestTest19 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that toLocale() throws an IllegalArgumentException for a string
+     * with a valid language code followed by multiple trailing separators.
+     */
+    @Test
+    public void toLocaleShouldThrowExceptionForMalformedStringWithTrailingSeparators() {
+        // Arrange: Define an input string that is not a valid locale format.
+        // The format "at--" has a language code but empty/invalid country and variant parts.
+        final String malformedLocaleString = "at--";
+
         try {
-            LocaleUtils.toLocale("at--");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: at--
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
+            // Act: Attempt to convert the malformed string to a Locale.
+            LocaleUtils.toLocale(malformedLocaleString);
+            fail("Expected an IllegalArgumentException to be thrown for input: " + malformedLocaleString);
+        } catch (final IllegalArgumentException e) {
+            // Assert: Verify that the correct exception was thrown with a descriptive message.
+            final String expectedMessage = "Invalid locale format: " + malformedLocaleString;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
