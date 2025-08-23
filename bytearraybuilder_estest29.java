@@ -1,27 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest29 extends ByteArrayBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byteArrayBuilder0.setCurrentSegmentLength((-1));
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.getClearAndRelease();
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+/**
+ * Contains unit tests for the {@link ByteArrayBuilder} class, focusing on
+ * its behavior in edge cases and invalid states.
+ */
+public class ByteArrayBuilderTest {
+
+    /**
+     * Verifies that {@link ByteArrayBuilder#getClearAndRelease()} throws a
+     * {@link NegativeArraySizeException} if the current segment length is
+     * manually set to a negative value.
+     *
+     * This test ensures that the builder correctly handles an internally inconsistent
+     * state that would otherwise lead to an attempt to allocate a negative-sized array.
+     */
+    @Test
+    public void getClearAndRelease_whenCurrentSegmentLengthIsNegative_shouldThrowException() {
+        // Arrange: Create a builder and put it into an invalid state by setting a negative segment length.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        builder.setCurrentSegmentLength(-1);
+
+        // Act & Assert: Verify that attempting to retrieve the byte array throws the expected exception.
+        // The method getClearAndRelease() internally tries to create a new byte array whose size
+        // is based on the current segment length, which is now negative.
+        assertThrows(NegativeArraySizeException.class, builder::getClearAndRelease);
     }
 }
