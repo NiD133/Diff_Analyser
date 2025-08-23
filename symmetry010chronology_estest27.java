@@ -1,56 +1,43 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Clock;
-import java.time.DateTimeException;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest27 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        ChronoUnit chronoUnit0 = ChronoUnit.FOREVER;
-        Duration duration0 = chronoUnit0.getDuration();
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
+/**
+ * Tests for {@link Symmetry010Chronology}.
+ * This class contains a specific test case focusing on edge-case behavior.
+ */
+public class Symmetry010ChronologyTest {
+
+    /**
+     * Verifies that dateNow() throws an ArithmeticException when the provided Clock
+     * represents a time so far in the future that it causes a long overflow during
+     * internal calculations.
+     */
+    @Test
+    public void dateNow_withClockAtFutureInfinity_throwsArithmeticException() {
+        // Arrange: Create a clock that points to a time that will cause an overflow.
+        // ChronoUnit.FOREVER.getDuration() represents a duration so large it is
+        // effectively infinite for practical calculations.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        Clock baseClock = MockClock.systemDefaultZone();
+        Duration infiniteDuration = ChronoUnit.FOREVER.getDuration();
+        Clock clockAtFutureInfinity = MockClock.offset(baseClock, infiniteDuration);
+
+        // Act & Assert: Call dateNow and verify that it throws the expected exception.
         try {
-            symmetry010Chronology0.dateNow(clock1);
-            fail("Expecting exception: ArithmeticException");
+            chronology.dateNow(clockAtFutureInfinity);
+            fail("Expected an ArithmeticException to be thrown for a clock value that causes overflow.");
         } catch (ArithmeticException e) {
-            //
-            // long overflow
-            //
-            verifyException("java.lang.Math", e);
+            // The underlying implementation uses operations that throw this specific
+            // exception on overflow. We verify the message to be certain of the cause.
+            assertEquals("long overflow", e.getMessage());
         }
     }
 }
