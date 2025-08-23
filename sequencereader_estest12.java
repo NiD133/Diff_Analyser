@@ -1,37 +1,33 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedReader;
+
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class SequenceReader_ESTestTest12 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SequenceReader} class, focusing on its read behavior.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        char[] charArray0 = new char[0];
-        // Undeclared exception!
-        try {
-            sequenceReader0.read(charArray0, 136209934, 136209934);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Array Size=0, offset=136209934, length=136209934
-            //
-            verifyException("org.apache.commons.io.input.SequenceReader", e);
-        }
+    /**
+     * Verifies that read(char[], int, int) throws an IndexOutOfBoundsException
+     * when the provided offset and length are invalid for the given buffer.
+     * This is part of the standard contract for the java.io.Reader#read(char[], int, int) method.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void readWithBufferOutOfBoundsShouldThrowException() throws Exception {
+        // Arrange: Create a SequenceReader. The content of the reader is irrelevant
+        // for this test, as the exception is triggered by invalid buffer arguments.
+        final SequenceReader sequenceReader = new SequenceReader(Collections.<Reader>emptyList());
+        
+        final char[] emptyBuffer = new char[0];
+        final int invalidOffset = 1; // An offset that is out of bounds for an empty array.
+        final int invalidLength = 1; // A length that is out of bounds for an empty array.
+
+        // Act & Assert: Attempting to read with an offset and length that are
+        // out of bounds for the empty buffer should throw an IndexOutOfBoundsException.
+        // The assertion is handled by the @Test(expected=...) annotation.
+        sequenceReader.read(emptyBuffer, invalidOffset, invalidLength);
     }
 }
