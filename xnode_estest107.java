@@ -1,30 +1,33 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest107 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test106() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Boolean boolean0 = xNode0.getBooleanBody();
-        assertNull(boolean0);
+    /**
+     * Verifies that getBooleanBody() returns null when the underlying XML node
+     * has no text content (i.e., an empty body).
+     */
+    @Test
+    public void getBooleanBody_shouldReturnNull_whenNodeHasNoBodyContent() {
+        // Arrange: Create an XNode based on a DOM node that has no text content.
+        // IIOMetadataNode is a simple, concrete implementation of org.w3c.dom.Node.
+        Node emptyNode = new IIOMetadataNode();
+        Properties variables = new Properties();
+        XNode xNode = new XNode(null, emptyNode, variables);
+
+        // Act: Call the method under test.
+        Boolean result = xNode.getBooleanBody();
+
+        // Assert: The result should be null, as there is no body to parse.
+        assertNull("getBooleanBody() should return null for a node with no body.", result);
     }
 }
