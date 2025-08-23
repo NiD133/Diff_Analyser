@@ -1,40 +1,44 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CodecEncoding_ESTestTest15 extends CodecEncoding_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, 1024, 3294);
-        BHSDCodec bHSDCodec0 = Codec.UNSIGNED5;
-        // Undeclared exception!
+/**
+ * This test suite is focused on the CodecEncoding class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
+public class CodecEncoding_ESTestTest15 { // Note: Test class name kept for consistency.
+
+    /**
+     * Tests that getCodec() throws an IllegalArgumentException when provided with a negative
+     * encoding value, as this is an invalid input.
+     */
+    @Test
+    public void getCodecWithNegativeEncodingValueShouldThrowIllegalArgumentException() {
+        // Arrange
+        final int negativeEncodingValue = -1;
+        final String expectedErrorMessage = "Encoding cannot be less than zero";
+
+        // The input stream and default codec are required by the method signature but are not
+        // relevant to this specific test case. We use simple dummy values.
+        final InputStream dummyInputStream = new ByteArrayInputStream(new byte[0]);
+        final Codec dummyDefaultCodec = Codec.UNSIGNED5;
+
+        // Act & Assert
         try {
-            CodecEncoding.getCodec((-2300), byteArrayInputStream0, bHSDCodec0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Encoding cannot be less than zero
-            //
-            verifyException("org.apache.commons.compress.harmony.pack200.CodecEncoding", e);
+            CodecEncoding.getCodec(negativeEncodingValue, dummyInputStream, dummyDefaultCodec);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
+        } catch (final Exception e) {
+            // Fail the test if an unexpected exception type is thrown.
+            fail("Expected an IllegalArgumentException, but caught " + e.getClass().getName());
         }
     }
 }
