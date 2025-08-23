@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest21 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Seconds seconds0 = Seconds.ONE;
-        Seconds seconds1 = seconds0.multipliedBy((-701));
-        assertEquals((-701), seconds1.getSeconds());
+    /**
+     * Tests that multiplying a Seconds instance by a negative number
+     * results in a new instance with the correctly calculated negative value.
+     */
+    @Test
+    public void multipliedBy_withNegativeScalar_returnsCorrectlyNegativeSeconds() {
+        // Arrange
+        final Seconds oneSecond = Seconds.ONE;
+        final int multiplier = -701;
+        final int expectedSeconds = -701;
+
+        // Act
+        Seconds result = oneSecond.multipliedBy(multiplier);
+
+        // Assert
+        assertEquals(expectedSeconds, result.getSeconds());
     }
 }
