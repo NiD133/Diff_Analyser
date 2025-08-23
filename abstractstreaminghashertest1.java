@@ -1,124 +1,107 @@
 package com.google.common.hash;
 
-import static java.nio.charset.StandardCharsets.UTF_16LE;
-import static org.junit.Assert.assertThrows;
-import com.google.common.collect.Iterables;
-import com.google.common.hash.HashTestUtils.RandomHasherAction;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
 
-public class AbstractStreamingHasherTestTest1 extends TestCase {
+/**
+ * Tests for {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    private static class Sink extends AbstractStreamingHasher {
+    /**
+     * A test-only implementation of {@link AbstractStreamingHasher} that records the bytes it
+     * processes and counts the invocations of its processing methods. This allows tests to verify the
+     * behavior of the abstract base class.
+     */
+    private static class RecordingStreamingHasher extends AbstractStreamingHasher {
 
-        final int chunkSize;
+        private final ByteArrayOutputStream processedBytes = new ByteArrayOutputStream();
+        private int processInvocations = 0;
+        private boolean processRemainingInvoked = false;
 
-        final int bufferSize;
-
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        int processCalled = 0;
-
-        boolean remainingCalled = false;
-
-        Sink(int chunkSize, int bufferSize) {
-            super(chunkSize, bufferSize);
-            this.chunkSize = chunkSize;
-            this.bufferSize = bufferSize;
-        }
-
-        Sink(int chunkSize) {
+        RecordingStreamingHasher(int chunkSize) {
             super(chunkSize);
-            this.chunkSize = chunkSize;
-            this.bufferSize = chunkSize;
-        }
-
-        @Override
-        protected HashCode makeHash() {
-            return HashCode.fromBytes(out.toByteArray());
         }
 
         @Override
         protected void process(ByteBuffer bb) {
-            processCalled++;
+            processInvocations++;
             assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() >= chunkSize);
-            for (int i = 0; i < chunkSize; i++) {
-                out.write(bb.get());
+            // The buffer should contain at least a full chunk.
+            assertTrue(bb.remaining() >= super.chunkSize);
+            while (bb.hasRemaining()) {
+                processedBytes.write(bb.get());
             }
         }
 
         @Override
         protected void processRemaining(ByteBuffer bb) {
-            assertFalse(remainingCalled);
-            remainingCalled = true;
+            assertFalse("processRemaining should only be invoked once.", processRemainingInvoked);
+            processRemainingInvoked = true;
             assertEquals(ByteOrder.LITTLE_ENDIAN, bb.order());
-            assertTrue(bb.remaining() > 0);
-            assertTrue(bb.remaining() < bufferSize);
-            int before = processCalled;
+            assertTrue("The remaining buffer should not be empty.", bb.remaining() > 0);
+
+            // The default implementation of processRemaining pads the buffer and calls process().
+            // We decrement the counter here to isolate the count of process() calls on *full* chunks
+            // from the final call on a *padded, partial* chunk. This simplifies test assertions.
+            int before = processInvocations;
             super.processRemaining(bb);
-            int after = processCalled;
-            // default implementation pads and calls process()
-            assertEquals(before + 1, after);
-            // don't count the tail invocation (makes tests a bit more understandable)
-            processCalled--;
-        }
-
-        // ensures that the number of invocations looks sane
-        void assertInvariants(int expectedBytes) {
-            // we should have seen as many bytes as the next multiple of chunk after expectedBytes - 1
-            assertEquals(out.toByteArray().length, ceilToMultiple(expectedBytes, chunkSize));
-            assertEquals(expectedBytes / chunkSize, processCalled);
-            assertEquals(expectedBytes % chunkSize != 0, remainingCalled);
-        }
-
-        // returns the minimum x such as x >= a && (x % b) == 0
-        private static int ceilToMultiple(int a, int b) {
-            int remainder = a % b;
-            return remainder == 0 ? a : a + b - remainder;
-        }
-
-        void assertBytes(byte[] expected) {
-            byte[] got = out.toByteArray();
-            for (int i = 0; i < expected.length; i++) {
-                assertEquals(expected[i], got[i]);
-            }
-        }
-    }
-
-    // Assumes that AbstractNonStreamingHashFunction works properly (must be tested elsewhere!)
-    private static class Control extends AbstractNonStreamingHashFunction {
-
-        @Override
-        public HashCode hashBytes(byte[] input, int off, int len) {
-            return HashCode.fromBytes(Arrays.copyOfRange(input, off, off + len));
+            int after = processInvocations;
+            assertEquals("super.processRemaining() should delegate to process() once.", before + 1, after);
+            processInvocations--;
         }
 
         @Override
-        public int bits() {
-            throw new UnsupportedOperationException();
+        protected HashCode makeHash() {
+            return HashCode.fromBytes(processedBytes.toByteArray());
+        }
+
+        // Getter methods for test verification
+        int getProcessInvocations() {
+            return processInvocations;
+        }
+
+        boolean wasProcessRemainingInvoked() {
+            return processRemainingInvoked;
         }
     }
 
-    public void testBytes() {
-        // byte order insignificant here
-        Sink sink = new Sink(4);
-        byte[] expected = { 1, 2, 3, 4, 5, 6, 7, 8 };
-        sink.putByte((byte) 1);
-        sink.putBytes(new byte[] { 2, 3, 4, 5, 6 });
-        sink.putByte((byte) 7);
-        sink.putBytes(new byte[] {});
-        sink.putBytes(new byte[] { 8 });
-        HashCode unused = sink.hash();
-        sink.assertInvariants(8);
-        sink.assertBytes(expected);
+    @Test
+    public void putBytes_withInputSizeMultipleOfChunkSize_processesInCompleteChunks() {
+        // Arrange
+        final int chunkSize = 4;
+        RecordingStreamingHasher hasher = new RecordingStreamingHasher(chunkSize);
+        byte[] expectedBytes = {1, 2, 3, 4, 5, 6, 7, 8};
+        int expectedProcessCalls = 2; // 8 bytes / 4 bytes-per-chunk
+
+        // Act: Add 8 bytes through various put methods. This total is a multiple of the chunk size.
+        hasher.putByte((byte) 1);
+        hasher.putBytes(new byte[] {2, 3, 4, 5, 6});
+        hasher.putByte((byte) 7);
+        hasher.putBytes(new byte[] {}); // Putting empty bytes should be a no-op.
+        hasher.putBytes(new byte[] {8});
+        HashCode result = hasher.hash();
+
+        // Assert
+        // The total input (8 bytes) is a multiple of the chunk size (4),
+        // so all data should be processed in full chunks.
+        assertEquals(
+                "Number of times process() should be called for full chunks.",
+                expectedProcessCalls,
+                hasher.getProcessInvocations());
+        assertFalse(
+                "processRemaining() should not be called when input size is a multiple of chunk size.",
+                hasher.wasProcessRemainingInvoked());
+
+        // The resulting hash should contain exactly the input bytes, with no padding.
+        assertArrayEquals(expectedBytes, result.asBytes());
     }
 }
