@@ -1,47 +1,44 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
+import static org.junit.Assert.assertEquals;
+
+import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
 public class CharStreams_ESTestTest42 extends CharStreams_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Writer writer0 = CharStreams.nullWriter();
-        CharBuffer charBuffer0 = CharStreams.createBuffer();
-        MockPrintWriter mockPrintWriter0 = new MockPrintWriter(writer0, true);
-        mockPrintWriter0.append((CharSequence) charBuffer0);
-        assertEquals(2048, charBuffer0.remaining());
-        assertEquals(2048, charBuffer0.length());
+    /**
+     * Tests that appending a CharBuffer to a writer does not consume the buffer.
+     *
+     * <p>This behavior occurs because {@link PrintWriter#append(CharSequence)} internally calls the
+     * CharSequence's {@code toString()} method. This creates a new string from the buffer's
+     * remaining characters without advancing the buffer's position. The test uses
+     * {@link CharStreams#nullWriter()} as a simple data sink.
+     */
+    @Test
+    public void append_charBufferToWriter_doesNotChangeBufferState() {
+        // Arrange
+        Writer nullWriter = CharStreams.nullWriter();
+        PrintWriter printWriter = new PrintWriter(nullWriter);
+
+        CharBuffer buffer = CharStreams.createBuffer();
+        int expectedPosition = buffer.position();
+        int expectedRemaining = buffer.remaining();
+
+        // Act
+        printWriter.append(buffer);
+
+        // Assert
+        // The append operation should not have consumed the buffer or changed its position.
+        assertEquals(
+                "Buffer's position should remain unchanged after append",
+                expectedPosition,
+                buffer.position());
+        assertEquals(
+                "Buffer's remaining characters should be unchanged after append",
+                expectedRemaining,
+                buffer.remaining());
     }
 }
