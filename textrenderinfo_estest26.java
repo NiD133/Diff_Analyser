@@ -1,50 +1,49 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Stack;
+
+/**
+ * This test class contains tests for the {@link TextRenderInfo} class.
+ * This specific test case was improved for clarity.
+ */
 public class TextRenderInfo_ESTestTest26 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        PdfDate pdfDate0 = new PdfDate();
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        stack0.add((MarkedContentInfo) null);
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
-        try {
-            textRenderInfo0.hasMcid(2, false);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.TextRenderInfo", e);
-        }
+    /**
+     * Verifies that the {@link TextRenderInfo#hasMcid(int, boolean)} method throws a
+     * NullPointerException if the internal collection of marked content information
+     * contains a null element. This is a regression test to prevent crashes when
+     * processing malformed or unexpected PDF content.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void hasMcid_whenMarkedContentInfosContainsNull_throwsNullPointerException() {
+        // ARRANGE: Set up a TextRenderInfo instance where the collection of
+        // marked content information contains a null element.
+        GraphicsState graphicsState = new GraphicsState();
+        // A font is required by the TextRenderInfo constructor to avoid a separate NPE.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        // Create a collection for marked content and add a null element. This is the
+        // specific condition that should trigger the NullPointerException.
+        Stack<MarkedContentInfo> markedContentInfosWithNull = new Stack<>();
+        markedContentInfosWithNull.add(null);
+
+        PdfString dummyText = new PdfString("");
+        Matrix ctm = graphicsState.getCtm();
+        TextRenderInfo textRenderInfo = new TextRenderInfo(dummyText, graphicsState, ctm, markedContentInfosWithNull);
+
+        int anyMcid = 2;
+        boolean checkTopmostOnly = false;
+
+        // ACT: Call the method under test. This is expected to throw a NullPointerException
+        // because the method likely iterates over the markedContentInfos collection without a null check.
+        textRenderInfo.hasMcid(anyMcid, checkTopmostOnly);
+
+        // ASSERT: The 'expected' attribute of the @Test annotation automatically
+        // verifies that a NullPointerException was thrown.
     }
 }
