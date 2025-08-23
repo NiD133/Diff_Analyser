@@ -1,39 +1,37 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest16 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Test for {@link JsonTreeReader} focusing on concurrent modification scenarios.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test015() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        Boolean boolean0 = Boolean.FALSE;
-        jsonArray0.add(boolean0);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextString();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayList$Itr", e);
-        }
+    /**
+     * Verifies that modifying the underlying JsonArray while the JsonTreeReader is
+     * iterating over it results in a ConcurrentModificationException. This is the
+     * expected behavior for iterators in the Java Collections Framework.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void readingFromArrayAfterConcurrentModificationThrowsException() throws IOException {
+        // Arrange: Create a JsonTreeReader for an empty JsonArray.
+        JsonArray jsonArray = new JsonArray();
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(jsonArray);
+
+        // Start iterating the array. This creates an internal iterator over the array's elements.
+        jsonTreeReader.beginArray();
+
+        // Act: Modify the underlying JsonArray *after* the reader has started iterating.
+        // From the iterator's perspective, this is a concurrent modification.
+        jsonArray.add(false);
+
+        // Assert: The next attempt to read from the reader is expected to throw
+        // a ConcurrentModificationException because the underlying list was changed.
+        // The @Test(expected=...) annotation handles the assertion.
+        jsonTreeReader.nextString();
     }
 }
