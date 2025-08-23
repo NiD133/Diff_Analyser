@@ -1,28 +1,20 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest70 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil#isActuallyWhitespace(int)} method.
+ * This class focuses on a specific test case for the Form Feed character.
+ */
+public class StringUtilIsActuallyWhitespaceTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        boolean boolean0 = StringUtil.isActuallyWhitespace(12);
-        assertTrue(boolean0);
+    @Test
+    public void isActuallyWhitespace_shouldReturnTrue_forFormFeedCharacter() {
+        // The original test used the integer 12, which is the ASCII code for the Form Feed character ('\f').
+        // This test verifies that StringUtil correctly identifies Form Feed as a whitespace character.
+        final int formFeedChar = '\f';
+
+        assertTrue("The Form Feed character ('\\f') should be considered whitespace.", StringUtil.isActuallyWhitespace(formFeedChar));
     }
 }
