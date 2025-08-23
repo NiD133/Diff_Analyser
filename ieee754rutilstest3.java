@@ -1,0 +1,33 @@
+package org.apache.commons.lang3.math;
+
+import static org.apache.commons.lang3.LangAssertions.assertIllegalArgumentException;
+import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.commons.lang3.AbstractLangTest;
+import org.junit.jupiter.api.Test;
+
+public class IEEE754rUtilsTestTest3 extends AbstractLangTest {
+
+    @Test
+    void testLang381() {
+        assertEquals(1.2, IEEE754rUtils.min(1.2, 2.5, Double.NaN), 0.01);
+        assertEquals(2.5, IEEE754rUtils.max(1.2, 2.5, Double.NaN), 0.01);
+        assertTrue(Double.isNaN(IEEE754rUtils.max(Double.NaN, Double.NaN, Double.NaN)));
+        assertEquals(1.2f, IEEE754rUtils.min(1.2f, 2.5f, Float.NaN), 0.01);
+        assertEquals(2.5f, IEEE754rUtils.max(1.2f, 2.5f, Float.NaN), 0.01);
+        assertTrue(Float.isNaN(IEEE754rUtils.max(Float.NaN, Float.NaN, Float.NaN)));
+        final double[] a = { 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
+        assertEquals(42.0, IEEE754rUtils.max(a), 0.01);
+        assertEquals(1.2, IEEE754rUtils.min(a), 0.01);
+        final double[] b = { Double.NaN, 1.2, Double.NaN, 3.7, 27.0, 42.0, Double.NaN };
+        assertEquals(42.0, IEEE754rUtils.max(b), 0.01);
+        assertEquals(1.2, IEEE754rUtils.min(b), 0.01);
+        final float[] aF = { 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
+        assertEquals(1.2f, IEEE754rUtils.min(aF), 0.01);
+        assertEquals(42.0f, IEEE754rUtils.max(aF), 0.01);
+        final float[] bF = { Float.NaN, 1.2f, Float.NaN, 3.7f, 27.0f, 42.0f, Float.NaN };
+        assertEquals(1.2f, IEEE754rUtils.min(bF), 0.01);
+        assertEquals(42.0f, IEEE754rUtils.max(bF), 0.01);
+    }
+}
