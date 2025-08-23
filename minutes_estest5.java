@@ -1,18 +1,32 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest5 extends Minutes_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Minutes minutes0 = Minutes.MAX_VALUE;
-        Weeks weeks0 = minutes0.toStandardWeeks();
-        assertEquals(213044, weeks0.getWeeks());
+    /**
+     * Tests that converting the maximum possible number of minutes to weeks
+     * results in the correct number of whole weeks.
+     */
+    @Test
+    public void toStandardWeeks_whenConvertingMaxValue_calculatesWeeksCorrectly() {
+        // Arrange: Define the conversion factor and the expected result.
+        // A standard week contains 7 days * 24 hours/day * 60 minutes/hour = 10080 minutes.
+        final int MINUTES_PER_WEEK = 7 * 24 * 60;
+        
+        // The method performs integer division, so we expect the integer part of the result.
+        int expectedWeeks = Integer.MAX_VALUE / MINUTES_PER_WEEK;
+        
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+
+        // Act: Call the method under test.
+        Weeks resultingWeeks = maxMinutes.toStandardWeeks();
+
+        // Assert: Verify that the actual number of weeks matches the calculated expected value.
+        assertEquals(expectedWeeks, resultingWeeks.getWeeks());
     }
 }
