@@ -1,34 +1,41 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SparseBloomFilter_ESTestTest23 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Shape shape0 = Shape.fromKM(3, 3);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        long[] longArray0 = new long[3];
-        longArray0[2] = (long) 3;
-        BitMapExtractor bitMapExtractor0 = BitMapExtractor.fromBitMapArray(longArray0);
-        // Undeclared exception!
+    /**
+     * Tests that merging a BitMapExtractor containing an index that is out of bounds
+     * for the filter's shape throws an IllegalArgumentException.
+     */
+    @Test
+    public void mergeWithBitMapExtractorShouldThrowExceptionForIndexOutOfBounds() {
+        // Arrange
+        // Create a shape with 3 bits, so the maximum valid index is 2.
+        final int numberOfBits = 3;
+        final int numberOfHashFunctions = 3;
+        final Shape shape = Shape.fromKM(numberOfHashFunctions, numberOfBits);
+        final SparseBloomFilter filter = new SparseBloomFilter(shape);
+
+        // Create a bitmap with a bit set at an index (3) that is outside the
+        // valid range [0, 2] for the given shape.
+        // 1L << 3 corresponds to setting the 4th bit (index 3).
+        final long[] outOfBoundsBitMap = { 1L << 3 };
+        final BitMapExtractor extractorWithInvalidIndex = BitMapExtractor.fromBitMapArray(outOfBoundsBitMap);
+
+        // Act & Assert
         try {
-            sparseBloomFilter0.merge(bitMapExtractor0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Value in list 129 is greater than maximum value (2)
-            //
-            verifyException("org.apache.commons.collections4.bloomfilter.SparseBloomFilter", e);
+            filter.merge(extractorWithInvalidIndex);
+            fail("Expected an IllegalArgumentException to be thrown");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message clearly states the error.
+            final String expectedMessage = "Value in list 3 is greater than maximum value (2)";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
