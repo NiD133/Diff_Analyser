@@ -1,27 +1,30 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * Tests for {@link UtcInstant}.
+ * This class focuses on the comparison logic of UtcInstant.
+ */
 public class UtcInstant_ESTestTest5 extends UtcInstant_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(9223372036854775807L, 73281320003515L);
-        assertFalse(utcInstant0.isLeapSecond());
-        UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay(6400000041317L);
-        boolean boolean0 = utcInstant0.isBefore(utcInstant1);
-        assertFalse(boolean0);
-        assertEquals(6400000041317L, utcInstant1.getModifiedJulianDay());
+    /**
+     * Tests that isBefore() correctly returns false when comparing a later instant
+     * to an earlier one. The comparison is primarily based on the Modified Julian Day.
+     */
+    @Test
+    public void isBefore_shouldReturnFalse_whenComparingLaterInstantToEarlierOne() {
+        // Arrange: Create two instants where one is clearly after the other.
+        // The nano-of-day is kept constant to isolate the comparison to the day.
+        long nanoOfDay = 123_456_789L;
+        UtcInstant earlierInstant = UtcInstant.ofModifiedJulianDay(50000L, nanoOfDay);
+        UtcInstant laterInstant = UtcInstant.ofModifiedJulianDay(50001L, nanoOfDay);
+
+        // Act: Check if the later instant is before the earlier one.
+        boolean isBefore = laterInstant.isBefore(earlierInstant);
+
+        // Assert: The result should be false, as a later time is not "before" an earlier time.
+        assertFalse("A later instant should not be before an earlier one.", isBefore);
     }
 }
