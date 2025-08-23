@@ -1,18 +1,29 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest29 extends PatternOptionBuilder_ESTest_scaffolding {
+import java.io.File;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('>');
-        assertEquals("class java.io.File", class0.toString());
-        assertNotNull(class0);
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
+
+    /**
+     * Tests that the '>' character, used to denote a file type in a pattern string,
+     * correctly maps to the {@link java.io.File} class.
+     */
+    @Test
+    public void getValueTypeShouldReturnFileClassForGreaterThanCharacter() {
+        // Arrange: The '>' character represents a File type according to the class documentation.
+        final char fileTypeIndicator = '>';
+        final Class<?> expectedClass = File.class;
+
+        // Act: Retrieve the value type associated with the character.
+        final Class<?> actualClass = PatternOptionBuilder.getValueType(fileTypeIndicator);
+
+        // Assert: The returned class should be File.class.
+        assertEquals(expectedClass, actualClass);
     }
 }
