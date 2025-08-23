@@ -1,0 +1,106 @@
+package org.joda.time.chrono;
+
+import java.util.Locale;
+import java.util.TimeZone;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.joda.time.Chronology;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
+import org.joda.time.DurationFieldType;
+import org.joda.time.DateTime.Property;
+
+public class IslamicChronologyTestTest20 extends TestCase {
+
+    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+
+    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+
+    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+
+    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+
+    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
+
+    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+
+    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+
+    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+
+    // 2002-06-09
+    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+
+    private DateTimeZone originalDateTimeZone = null;
+
+    private TimeZone originalTimeZone = null;
+
+    private Locale originalLocale = null;
+
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+
+    public static TestSuite suite() {
+        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+        return new TestSuite(TestIslamicChronology.class);
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+        originalDateTimeZone = DateTimeZone.getDefault();
+        originalTimeZone = TimeZone.getDefault();
+        originalLocale = Locale.getDefault();
+        DateTimeZone.setDefault(LONDON);
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+        Locale.setDefault(Locale.UK);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        DateTimeUtils.setCurrentMillisSystem();
+        DateTimeZone.setDefault(originalDateTimeZone);
+        TimeZone.setDefault(originalTimeZone);
+        Locale.setDefault(originalLocale);
+        originalDateTimeZone = null;
+        originalTimeZone = null;
+        originalLocale = null;
+    }
+
+    public void test16BasedLeapYear() {
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(1));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(2));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(3));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(4));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(5));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(6));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(7));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(8));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(9));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(10));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(11));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(12));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(13));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(14));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(15));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(16));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(17));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(18));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(19));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(20));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(21));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(22));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(23));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(24));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(25));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(26));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(27));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(28));
+        assertEquals(true, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(29));
+        assertEquals(false, IslamicChronology.LEAP_YEAR_16_BASED.isLeapYear(30));
+    }
+}
