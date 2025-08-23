@@ -1,19 +1,34 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest36 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Tests for the {@link CircularByteBuffer} class.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer(0);
-        boolean boolean0 = circularByteBuffer0.hasSpace(0);
-        assertTrue(boolean0);
-        assertFalse(circularByteBuffer0.hasSpace());
+    /**
+     * Tests the behavior of the hasSpace() methods on a buffer with zero capacity.
+     * A buffer with zero capacity should correctly report that it has space for zero bytes,
+     * but no space for one or more bytes.
+     */
+    @Test
+    public void testHasSpaceWithZeroCapacityBuffer() {
+        // Arrange: Create a buffer with zero capacity, which is a valid edge case.
+        final CircularByteBuffer zeroCapacityBuffer = new CircularByteBuffer(0);
+
+        // Act & Assert
+
+        // A buffer should always have space for 0 bytes, even if its capacity is 0.
+        assertTrue("A zero-capacity buffer should have space for 0 bytes.",
+                zeroCapacityBuffer.hasSpace(0));
+
+        // The hasSpace() method without arguments checks for space for at least one byte.
+        // A zero-capacity buffer has no space for any bytes.
+        assertFalse("A zero-capacity buffer should not have space for one or more bytes.",
+                zeroCapacityBuffer.hasSpace());
     }
 }
