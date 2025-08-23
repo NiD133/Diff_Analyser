@@ -1,21 +1,28 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
 import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonParser_ESTestTest25 extends JsonParser_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonParser} class.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        JsonElement jsonElement0 = JsonParser.parseReader((Reader) stringReader0);
-        assertFalse(jsonElement0.isJsonArray());
+    /**
+     * Verifies that attempting to parse an empty string, which is not a valid
+     * JSON document, correctly throws a {@link JsonSyntaxException}.
+     */
+    @Test(expected = JsonSyntaxException.class)
+    public void parseReader_withEmptyInput_shouldThrowJsonSyntaxException() {
+        // Arrange: Create a reader for an empty string.
+        Reader emptyReader = new StringReader("");
+
+        // Act: Attempt to parse the empty reader.
+        // This call is expected to throw the exception.
+        JsonParser.parseReader(emptyReader);
+
+        // Assert: The test passes if a JsonSyntaxException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
