@@ -1,20 +1,35 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest27 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        List<Locale> list0 = LocaleUtils.languagesByCountry("RO");
-        assertEquals(1, list0.size());
+    /**
+     * Tests that {@link LocaleUtils#languagesByCountry(String)} returns the correct
+     * language for a known country code. For Romania ("RO"), it should return a list
+     * containing the Romanian locale ("ro_RO").
+     */
+    @Test
+    public void languagesByCountry_shouldReturnRomanianForRomania() {
+        // Arrange: Define the input and the expected outcome.
+        // The country code "RO" represents Romania.
+        final String countryCodeRO = "RO";
+        final Locale expectedLocale = new Locale("ro", "RO");
+
+        // Act: Call the method under test.
+        final List<Locale> actualLanguages = LocaleUtils.languagesByCountry(countryCodeRO);
+
+        // Assert: Verify the result is as expected.
+        assertNotNull("The returned list should not be null.", actualLanguages);
+        assertEquals("There should be exactly one language for the country code 'RO'.", 1, actualLanguages.size());
+        assertEquals("The language for 'RO' should be the Romanian locale.", expectedLocale, actualLanguages.get(0));
     }
 }
