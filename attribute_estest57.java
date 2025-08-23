@@ -23,7 +23,7 @@ public class Attribute_ESTestTest57 extends Attribute_ESTest_scaffolding {
     @Test(timeout = 4000)
     public void test56() throws Throwable {
         Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        String string0 = Attribute.getValidKey("w'8l4N", document_OutputSettings_Syntax0);
+        String string0 = Attribute.getValidKey(" w'8l4N", document_OutputSettings_Syntax0);
         assertNotNull(string0);
         assertEquals("_w_8l4N", string0);
     }
