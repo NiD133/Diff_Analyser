@@ -1,31 +1,35 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldUtils_ESTestTest51 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.verifyValueBounds((DateTimeFieldType) null, 112, 12544, 12544);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.IllegalFieldValueException", e);
-        }
+    /**
+     * Tests that verifyValueBounds throws a NullPointerException when passed a null
+     * DateTimeFieldType and a value that is out of bounds.
+     *
+     * The method is designed to throw an IllegalFieldValueException for out-of-bounds
+     * values. However, the construction of this exception involves calling getName()
+     * on the provided DateTimeFieldType. This test confirms that if the field type is
+     * null, this operation correctly results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void verifyValueBounds_withNullFieldTypeAndOutOfBoundsValue_throwsNullPointerException() {
+        // Arrange: A value that is outside the specified lower and upper bounds,
+        // and a null field type. This combination is necessary to trigger the
+        // creation of an IllegalFieldValueException, which in turn causes the NPE.
+        final DateTimeFieldType nullFieldType = null;
+        final int value = 10;
+        final int lowerBound = 20;
+        final int upperBound = 30;
+
+        // Act: Call the method under test.
+        FieldUtils.verifyValueBounds(nullFieldType, value, lowerBound, upperBound);
+
+        // Assert: The test expects a NullPointerException, as declared in the @Test annotation.
     }
 }
