@@ -1,21 +1,27 @@
 package org.mockito.internal.exceptions.stacktrace;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockitoutil.Conditions.onlyThoseClasses;
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
-import org.mockito.exceptions.base.TraceBuilder;
 import org.mockitoutil.TestBase;
 
-public class StackTraceFilterTestTest10 extends TestBase {
+/**
+ * Tests for {@link StackTraceFilter}.
+ */
+public class StackTraceFilterTest extends TestBase {
 
     private final StackTraceFilter filter = new StackTraceFilter();
 
     @Test
-    public void shouldReturnEmptyArrayWhenInputIsEmpty() throws Exception {
-        // when
-        StackTraceElement[] filtered = filter.filter(new StackTraceElement[0], false);
-        // then
-        assertEquals(0, filtered.length);
+    public void shouldReturnEmptyArray_whenFilteringEmptyStackTrace() {
+        // Arrange
+        StackTraceElement[] emptyStackTrace = new StackTraceElement[0];
+        boolean keepTop = false; // This flag has no effect on an empty stack trace
+
+        // Act
+        StackTraceElement[] filteredStackTrace = filter.filter(emptyStackTrace, keepTop);
+
+        // Assert
+        assertThat(filteredStackTrace).isEmpty();
     }
 }
