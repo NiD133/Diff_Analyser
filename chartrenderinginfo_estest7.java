@@ -1,31 +1,38 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
+import static org.junit.Assert.assertEquals;
 import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
-public class ChartRenderingInfo_ESTestTest7 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        rectangle2D_Double0.setFrameFromDiagonal(2626.9361169318868, 2868.898929, 0.0, 2868.898929);
-        chartRenderingInfo0.setChartArea(rectangle2D_Double0);
-        Rectangle2D rectangle2D0 = chartRenderingInfo0.getChartArea();
-        assertEquals(0.0, rectangle2D0.getMinX(), 0.01);
+    /**
+     * Verifies that the chart area rectangle set via setChartArea()
+     * is correctly returned by getChartArea().
+     */
+    @Test
+    public void setAndGetChartArea_shouldPreserveRectangleProperties() {
+        // Arrange: Create a ChartRenderingInfo instance and a test rectangle.
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo();
+        
+        // The rectangle is defined using setFrameFromDiagonal with non-normalized
+        // coordinates (where the first point's x-value is greater than the second's).
+        // This setup, using simple values, mirrors the logic of the original,
+        // more obscure test case. A rectangle from diagonal points (200, 100) and
+        // (0, 100) should result in a rectangle at (x=0, y=100) with a width of 200
+        // and a height of 0.
+        Rectangle2D.Double expectedArea = new Rectangle2D.Double();
+        expectedArea.setFrameFromDiagonal(200.0, 100.0, 0.0, 100.0);
+
+        // Act: Set the chart area and then retrieve it.
+        renderingInfo.setChartArea(expectedArea);
+        Rectangle2D actualArea = renderingInfo.getChartArea();
+
+        // Assert: The retrieved rectangle should be equal in value to the original.
+        // For Rectangle2D, assertEquals compares the x, y, width, and height properties.
+        assertEquals(expectedArea, actualArea);
     }
 }
