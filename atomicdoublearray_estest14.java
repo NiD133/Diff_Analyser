@@ -1,27 +1,57 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest14 extends AtomicDoubleArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        double[] doubleArray0 = new double[6];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-        doReturn((-1.0)).when(doubleBinaryOperator0).applyAsDouble(anyDouble(), anyDouble());
-        double double0 = atomicDoubleArray0.getAndAccumulate(1, (-2032.2), doubleBinaryOperator0);
-        assertEquals(0.0, double0, 0.01);
-        double double1 = atomicDoubleArray0.get(1);
-        assertEquals((-1.0), double1, 0.01);
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
+
+    /**
+     * Verifies that getAndAccumulate returns the previous value at an index
+     * and updates the element to the value produced by the accumulator function.
+     */
+    @Test
+    public void getAndAccumulate_shouldReturnPreviousValue_andUpdateElementWithAccumulatorResult() {
+        // Arrange
+        double[] initialValues = {10.0, 20.0, 30.0};
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(initialValues);
+
+        int indexToUpdate = 1;
+        double expectedPreviousValue = 20.0;
+        double valueFromAccumulator = 99.0; // The new value to be set in the array.
+        
+        // Create a mock accumulator function that always returns a fixed result.
+        // The input arguments to the function don't matter for this test's purpose.
+        DoubleBinaryOperator mockAccumulator = mock(DoubleBinaryOperator.class);
+        when(mockAccumulator.applyAsDouble(anyDouble(), anyDouble())).thenReturn(valueFromAccumulator);
+
+        // Act
+        // The 'x' parameter (5.0) is arbitrary since the mock controls the outcome.
+        double returnedValue = atomicArray.getAndAccumulate(indexToUpdate, 5.0, mockAccumulator);
+
+        // Assert
+        // 1. Verify the method returned the value at the index *before* the update.
+        assertEquals(
+            "getAndAccumulate should return the value before the update",
+            expectedPreviousValue,
+            returnedValue,
+            0.0
+        );
+
+        // 2. Verify the value at the index was updated to the result from the accumulator.
+        double valueAfterUpdate = atomicArray.get(indexToUpdate);
+        assertEquals(
+            "The element at the index should be updated to the accumulator's result",
+            valueFromAccumulator,
+            valueAfterUpdate,
+            0.0
+        );
     }
 }
