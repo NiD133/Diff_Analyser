@@ -1,21 +1,34 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest16 extends URLCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        byte[] byteArray0 = new byte[0];
-        byte[] byteArray1 = uRLCodec0.decode(byteArray0);
-        assertNotSame(byteArray0, byteArray1);
+/**
+ * Contains tests for the URLCodec class.
+ * This class focuses on providing clear, understandable, and maintainable tests.
+ */
+public class URLCodecTest {
+
+    /**
+     * Tests that decoding an empty byte array produces a new, empty byte array.
+     * This verifies the correct handling of an edge case.
+     */
+    @Test
+    public void testDecodeEmptyByteArrayReturnsNewEmptyArray() throws DecoderException {
+        // Arrange: Create a URLCodec instance and an empty byte array to decode.
+        final URLCodec urlCodec = new URLCodec();
+        final byte[] emptyInput = new byte[0];
+
+        // Act: Decode the empty byte array.
+        final byte[] decodedResult = urlCodec.decode(emptyInput);
+
+        // Assert: Verify the result is a new, non-null, and empty byte array.
+        assertNotNull("The decoded array should not be null.", decodedResult);
+        assertNotSame("The decoded array should be a new instance, not the original.", emptyInput, decodedResult);
+        assertArrayEquals("Decoding an empty array should result in an empty array.", new byte[0], decodedResult);
     }
 }
