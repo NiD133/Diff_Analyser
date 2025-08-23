@@ -1,34 +1,36 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class XmlTreeBuilder_ESTestTest10 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link XmlTreeBuilder} state after parsing operations.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Document document0 = xmlTreeBuilder0.parse("ME;}", "ME;}");
-        assertEquals("ME;}", document0.location());
-        xmlTreeBuilder0.completeParseFragment();
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
+    @Test
+    public void builderRetainsDefaultNamespaceAfterParsing() {
+        // Arrange
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        String textInput = "Some text";
+        String baseUri = "http://example.com/";
+        String expectedDefaultNamespace = "http://www.w3.org/XML/1998/namespace";
+
+        // Act
+        // Parse a simple string, which will be treated as a text node.
+        Document document = builder.parse(textInput, baseUri);
+
+        // This call is unusual after a full parse, but we are testing that it
+        // does not corrupt the builder's internal state.
+        builder.completeParseFragment();
+
+        // Assert
+        // First, a sanity check that the document was created with the correct base URI.
+        assertEquals("Document location should match base URI", baseUri, document.location());
+
+        // The main assertion: The builder's default namespace should remain unchanged
+        // after the parsing operations.
+        assertEquals("Builder's default namespace should be constant", expectedDefaultNamespace, builder.defaultNamespace());
     }
 }
