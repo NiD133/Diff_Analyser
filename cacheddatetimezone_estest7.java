@@ -1,24 +1,33 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest7 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        long long0 = cachedDateTimeZone0.nextTransition((-2614));
-        assertEquals((-2614L), long0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Verifies that for a fixed time zone, which has no transitions,
+     * nextTransition() returns the same instant that was passed in.
+     * The CachedDateTimeZone should preserve this behavior from the underlying zone.
+     */
+    @Test
+    public void nextTransition_forFixedZone_returnsSameInstant() {
+        // Arrange
+        // Create a fixed-offset zone. By definition, it has no transitions.
+        final DateTimeZone fixedOffsetZone = DateTimeZone.forOffsetMillis(-3600_000); // UTC-1
+        final CachedDateTimeZone cachedZone = CachedDateTimeZone.forZone(fixedOffsetZone);
+        final long testInstant = 123456789L;
+
+        // Act
+        final long nextTransitionInstant = cachedZone.nextTransition(testInstant);
+
+        // Assert
+        // For a fixed zone, the next transition is defined as the instant itself.
+        assertEquals(testInstant, nextTransitionInstant);
     }
 }
