@@ -18,22 +18,42 @@ package org.apache.commons.io.input;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ArrayUtils.EMPTY_BYTE_ARRAY;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.QueueOutputStream;
+import org.apache.commons.io.output.QueueOutputStreamTest;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,12 +67,9 @@ import com.google.common.base.Stopwatch;
  */
 public class QueueInputStreamTest {
 
-    /**
-     * Provides input data for parameterized tests.
-     */
     public static Stream<Arguments> inputData() {
-        return Stream.of(
-                Arguments.of(""),
+        // @formatter:off
+        return Stream.of(Arguments.of(""),
                 Arguments.of("1"),
                 Arguments.of("12"),
                 Arguments.of("1234"),
@@ -63,15 +80,14 @@ public class QueueInputStreamTest {
                 Arguments.of(StringUtils.repeat("A", 8191)),
                 Arguments.of(StringUtils.repeat("A", 8192)),
                 Arguments.of(StringUtils.repeat("A", 8193)),
-                Arguments.of(StringUtils.repeat("A", 8192 * 4))
-        );
+                Arguments.of(StringUtils.repeat("A", 8192 * 4)));
+        // @formatter:on
     }
 
     @TestFactory
-    @DisplayName("Bulk Read Error Handling Tests")
     public DynamicTest[] bulkReadErrorHandlingTests() {
         final QueueInputStream queueInputStream = new QueueInputStream();
-        return new DynamicTest[]{
+        return new DynamicTest[] {
                 dynamicTest("Offset too big", () ->
                         assertThrows(IndexOutOfBoundsException.class, () ->
                                 queueInputStream.read(EMPTY_BYTE_ARRAY, 1, 0))),
@@ -94,7 +110,7 @@ public class QueueInputStreamTest {
         return 8192;
     }
 
-    private void testReadLineByLine(final String inputData, final InputStream inputStream, final OutputStream outputStream) throws IOException {
+    private void doTestReadLineByLine(final String inputData, final InputStream inputStream, final OutputStream outputStream) throws IOException {
         final String[] lines = inputData.split("\n");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UTF_8))) {
             for (final String line : lines) {
@@ -117,7 +133,7 @@ public class QueueInputStreamTest {
         }
 
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int n;
+        int n = -1;
         while ((n = inputStream.read()) != -1) {
             byteArrayOutputStream.write(n);
             if (byteArrayOutputStream.size() >= maxBytes) {
@@ -127,6 +143,7 @@ public class QueueInputStreamTest {
         return byteArrayOutputStream.toString(StandardCharsets.UTF_8.name());
     }
 
+    @SuppressWarnings("resource")
     @ParameterizedTest(name = "inputData={0}")
     @MethodSource("inputData")
     void testAvailableAfterClose(final String inputData) throws IOException {
@@ -143,6 +160,7 @@ public class QueueInputStreamTest {
     void testAvailableAfterOpen(final String inputData) throws IOException {
         final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
         try (InputStream inputStream = new QueueInputStream(queue)) {
+            // Always 0 because read() blocks.
             assertEquals(0, inputStream.available());
             IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             assertEquals(0, inputStream.available());
@@ -166,7 +184,7 @@ public class QueueInputStreamTest {
     void testBufferedReadWrite(final String inputData) throws IOException {
         final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
         try (BufferedInputStream inputStream = new BufferedInputStream(new QueueInputStream(queue));
-             BufferedOutputStream outputStream = new BufferedOutputStream(new QueueOutputStream(queue), defaultBufferSize())) {
+                BufferedOutputStream outputStream = new BufferedOutputStream(new QueueOutputStream(queue), defaultBufferSize())) {
             outputStream.write(inputData.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             final String dataCopy = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
@@ -179,7 +197,7 @@ public class QueueInputStreamTest {
     void testBufferedWrites(final String inputData) throws IOException {
         final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
         try (QueueInputStream inputStream = new QueueInputStream(queue);
-             BufferedOutputStream outputStream = new BufferedOutputStream(new QueueOutputStream(queue), defaultBufferSize())) {
+                BufferedOutputStream outputStream = new BufferedOutputStream(new QueueOutputStream(queue), defaultBufferSize())) {
             outputStream.write(inputData.getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             final String actualData = readUnbuffered(inputStream);
@@ -203,7 +221,8 @@ public class QueueInputStreamTest {
             }
         };
 
-        // Simulate scenario where there is no data immediately available when bulk reading and QueueInputStream has to wait.
+        // Simulate scenario where there is not data immediately available when bulk reading and QueueInputStream has to
+        // wait.
         try (QueueInputStream queueInputStream = QueueInputStream.builder()
                 .setBlockingQueue(queue)
                 .setTimeout(Duration.ofHours(1))
@@ -240,6 +259,7 @@ public class QueueInputStreamTest {
         assertThrows(IllegalArgumentException.class, () -> QueueInputStream.builder().setTimeout(Duration.ofMillis(-1)).get(), "waitTime must not be negative");
     }
 
+    @SuppressWarnings("resource")
     @ParameterizedTest(name = "inputData={0}")
     @MethodSource("inputData")
     void testReadAfterClose(final String inputData) throws IOException {
@@ -258,7 +278,7 @@ public class QueueInputStreamTest {
         try (InputStream inputStream = Files.newInputStream(tempFile);
              OutputStream outputStream = Files.newOutputStream(tempFile)) {
 
-            testReadLineByLine(inputData, inputStream, outputStream);
+            doTestReadLineByLine(inputData, inputStream, outputStream);
         } finally {
             Files.delete(tempFile);
         }
@@ -267,6 +287,7 @@ public class QueueInputStreamTest {
     @ParameterizedTest(name = "inputData={0}")
     @MethodSource("inputData")
     void testReadLineByLineQueue(final String inputData) throws IOException {
+        final String[] lines = inputData.split("\n");
         final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
         try (QueueInputStream inputStream = QueueInputStream.builder()
                 .setBlockingQueue(queue)
@@ -274,7 +295,7 @@ public class QueueInputStreamTest {
                 .get();
              QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
 
-            testReadLineByLine(inputData, inputStream, outputStream);
+            doTestReadLineByLine(inputData, inputStream, outputStream);
         }
     }
 
@@ -294,11 +315,13 @@ public class QueueInputStreamTest {
     @DisplayName("If read is interrupted while waiting, then exception is thrown")
     void testTimeoutInterrupted() throws Exception {
         try (QueueInputStream inputStream = QueueInputStream.builder().setTimeout(Duration.ofMinutes(2)).get();
-             QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
+                QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
 
+            // read in a background thread
             final AtomicBoolean result = new AtomicBoolean();
             final CountDownLatch latch = new CountDownLatch(1);
             final Thread thread = new Thread(() -> {
+                // when thread is interrupted, verify ...
                 assertThrows(IllegalStateException.class, () -> readUnbuffered(inputStream, 3));
                 assertTrue(Thread.currentThread().isInterrupted());
                 result.set(true);
@@ -307,6 +330,7 @@ public class QueueInputStreamTest {
             thread.setDaemon(true);
             thread.start();
 
+            // interrupt and check that verification completed
             thread.interrupt();
             latch.await(500, TimeUnit.MILLISECONDS);
             assertTrue(result.get());
@@ -317,7 +341,7 @@ public class QueueInputStreamTest {
     @DisplayName("If data is not available in queue, then read will wait until wait time elapses")
     void testTimeoutUnavailableData() throws IOException {
         try (QueueInputStream inputStream = QueueInputStream.builder().setTimeout(Duration.ofMillis(500)).get();
-             QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
+                QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
             final Stopwatch stopwatch = Stopwatch.createStarted();
             final String actualData = assertTimeout(Duration.ofSeconds(1), () -> readUnbuffered(inputStream, 3));
             stopwatch.stop();
@@ -331,7 +355,7 @@ public class QueueInputStreamTest {
     @MethodSource("inputData")
     void testUnbufferedReadWrite(final String inputData) throws IOException {
         try (QueueInputStream inputStream = new QueueInputStream();
-             QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
+                QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
             writeUnbuffered(outputStream, inputData);
             final String actualData = readUnbuffered(inputStream);
             assertEquals(inputData, actualData);
@@ -343,7 +367,7 @@ public class QueueInputStreamTest {
     void testUnbufferedReadWriteWithTimeout(final String inputData) throws IOException {
         final Duration timeout = Duration.ofMinutes(2);
         try (QueueInputStream inputStream = QueueInputStream.builder().setTimeout(timeout).get();
-             QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
+                QueueOutputStream outputStream = inputStream.newQueueOutputStream()) {
             assertEquals(timeout, inputStream.getTimeout());
             writeUnbuffered(outputStream, inputData);
             final String actualData = assertTimeout(Duration.ofSeconds(1), () -> readUnbuffered(inputStream, inputData.length()));
