@@ -1,36 +1,37 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest96 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test095() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("", "");
-        Elements elements0 = document0.getElementsContainingText("");
-        Element element0 = elements0.first();
-        assertSame(element0, document0);
+/**
+ * Test suite for the {@link Elements} class.
+ * This improved test focuses on the behavior of the first() method.
+ */
+public class ElementsTest { // Renamed from the generated Elements_ESTestTest96
+
+    /**
+     * Verifies that Elements.first() returns the Document object itself
+     * when the Document is the first item in the collection.
+     */
+    @Test
+    public void first_whenDocumentIsFirstElementInList_returnsTheDocument() {
+        // ARRANGE
+        // Create a document and then an Elements collection that includes the document
+        // itself as the first member. `getElementsContainingText("")` on an empty document
+        // is a simple way to achieve this, as the document's own text ("") contains
+        // the empty search string.
+        Document document = Parser.parseBodyFragment("", "");
+        Elements elementsContainingDocument = document.getElementsContainingText("");
+
+        // ACT
+        Element firstElement = elementsContainingDocument.first();
+
+        // ASSERT
+        // Verify that the returned element is the exact same instance as the original document.
+        assertSame("The first element should be the document instance itself.", document, firstElement);
     }
 }
