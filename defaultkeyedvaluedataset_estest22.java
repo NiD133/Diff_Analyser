@@ -2,27 +2,29 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
 
-public class DefaultKeyedValueDataset_ESTestTest22 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        MockDate mockDate0 = new MockDate((-2363), (-1655), 1600);
-        OHLCDataItem oHLCDataItem0 = new OHLCDataItem(mockDate0, 1600, (-1655), 1.0, 1600, (-1655));
-        BigInteger bigInteger0 = BigInteger.TEN;
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset(oHLCDataItem0, bigInteger0);
-        defaultKeyedValueDataset0.setValue(oHLCDataItem0, bigInteger0);
-        assertTrue(defaultKeyedValueDataset0.getNotify());
+    /**
+     * Verifies that calling setValue() does not have the unintended side effect
+     * of disabling dataset notifications. The 'notify' flag, which controls
+     * event firing, should remain in its default 'true' state.
+     */
+    @Test
+    public void setValue_shouldPreserveNotifyFlag() {
+        // Arrange: Create a dataset with an initial key-value pair.
+        // By default, the 'notify' flag is enabled.
+        Comparable<String> key = "Series 1";
+        Number value = 100;
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset(key, value);
+
+        // Act: Update the value for the existing key.
+        dataset.setValue(key, 200);
+
+        // Assert: Confirm that the notify flag has not been changed and is still true.
+        assertTrue("Calling setValue should not disable the notify flag.", dataset.getNotify());
     }
 }
