@@ -1,26 +1,30 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest47 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer((byte) 0);
-        // Undeclared exception!
-        try {
-            circularByteBuffer0.add((byte) 0);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // No space available
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
-        }
+    /**
+     * Tests that attempting to add a byte to a buffer with zero capacity
+     * (which is inherently full) throws an {@link IllegalStateException}.
+     */
+    @Test
+    public void addByteToFullBufferThrowsIllegalStateException() {
+        // Arrange: Create a buffer with zero capacity, making it instantly full.
+        final CircularByteBuffer zeroCapacityBuffer = new CircularByteBuffer(0);
+
+        // Act & Assert: Verify that adding a byte throws an IllegalStateException
+        // with the expected message "No space available".
+        final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
+            zeroCapacityBuffer.add((byte) 1);
+        });
+
+        assertEquals("No space available", thrown.getMessage());
     }
 }
