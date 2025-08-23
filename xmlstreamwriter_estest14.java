@@ -1,37 +1,28 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmlStreamWriter_ESTestTest14 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link XmlStreamWriter}.
+ * This test focuses on the constructor behavior with invalid arguments.
+ */
+public class XmlStreamWriter_ESTestTest14 { // Note: Scaffolding inheritance removed for a standalone, minimal example.
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        XmlStreamWriter xmlStreamWriter0 = null;
-        try {
-            xmlStreamWriter0 = new XmlStreamWriter((File) null, "org.apache.commons.io.output.XmlStreamWriter$Builder");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.File", e);
-        }
+    /**
+     * Tests that the {@link XmlStreamWriter#XmlStreamWriter(File, String)} constructor
+     * throws a NullPointerException when the file argument is null.
+     *
+     * @throws FileNotFoundException because the constructor signature declares it.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullFileShouldThrowNullPointerException() throws FileNotFoundException {
+        // Arrange: A null file object. The encoding is irrelevant for this test case.
+        final String irrelevantEncoding = "UTF-8";
+
+        // Act & Assert: Attempt to construct an XmlStreamWriter with a null file.
+        // This should fail with a NullPointerException, as verified by the @Test annotation.
+        new XmlStreamWriter((File) null, irrelevantEncoding);
     }
 }
