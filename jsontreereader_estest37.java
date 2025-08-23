@@ -1,34 +1,31 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertThrows;
+
+// The original test class name and inheritance are preserved.
+// For better maintainability, this class would typically be named JsonTreeReaderTest.
 public class JsonTreeReader_ESTestTest37 extends JsonTreeReader_ESTest_scaffolding {
 
+    /**
+     * Verifies that calling {@code endArray()} on a {@code JsonTreeReader}
+     * initialized with a {@code null} {@code JsonElement} throws a {@code NullPointerException}.
+     *
+     * <p>This scenario tests the reader's robustness against an invalid initial state.
+     * The internal logic attempts to dereference the null element when peeking at the
+     * next token, which correctly results in an NPE.
+     */
     @Test(timeout = 4000)
-    public void test036() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.endArray();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    public void endArrayOnReaderInitializedWithNullThrowsNullPointerException() {
+        // Arrange: Create a JsonTreeReader with a null JsonElement, representing an
+        // invalid state.
+        JsonTreeReader reader = new JsonTreeReader((JsonElement) null);
+
+        // Act & Assert: Verify that attempting to call endArray() throws a
+        // NullPointerException. The method reference reader::endArray is a concise
+        // way to represent the action to be executed.
+        assertThrows(NullPointerException.class, reader::endArray);
     }
 }
