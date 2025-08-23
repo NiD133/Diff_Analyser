@@ -1,31 +1,33 @@
 package org.jsoup.select;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * Test suite for the {@link Elements} class.
+ */
 public class ElementsTestTest53 {
 
     @Test
-    void expectFirstThrowsOnNoMatch() {
+    void expectFirstShouldThrowExceptionWhenNoElementMatches() {
+        // Arrange: Create a document with <p> elements but no <span> elements.
         Document doc = Jsoup.parse("<p>One</p><p>Two</p><p>Three</p>");
-        boolean threw = false;
-        try {
-            Element span = doc.children().expectFirst("span");
-        } catch (IllegalArgumentException e) {
-            threw = true;
-            assertEquals("No elements matched the query 'span' in the elements.", e.getMessage());
-        }
-        assertTrue(threw);
+        Elements elements = doc.children(); // Contains the three <p> elements
+        String nonMatchingQuery = "span";
+
+        // Act & Assert: Verify that calling expectFirst() with a non-matching query
+        // throws an IllegalArgumentException.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> elements.expectFirst(nonMatchingQuery),
+            "Expected expectFirst() to throw an exception for a non-matching query, but it did not."
+        );
+
+        // Assert on the exception's message for more specific verification.
+        assertEquals("No elements matched the query 'span' in the elements.", thrown.getMessage());
     }
 }
