@@ -1,19 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class CharSequenceUtils_ESTestTest19 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder(0);
-        CharSequence charSequence0 = CharSequenceUtils.subSequence(stringBuilder0, 0);
-        assertEquals("", charSequence0);
+    /**
+     * Tests that CharSequenceUtils.subSequence returns an empty CharSequence
+     * when the input is an empty CharSequence and the start index is 0.
+     */
+    @Test
+    public void subSequence_withEmptyInput_shouldReturnEmptyCharSequence() {
+        // Arrange: Create an empty CharSequence input.
+        // Using StringBuilder to test a non-String CharSequence implementation.
+        final CharSequence emptyInput = new StringBuilder();
+
+        // Act: Call the method under test.
+        final CharSequence result = CharSequenceUtils.subSequence(emptyInput, 0);
+
+        // Assert: The result should be a non-null, empty CharSequence.
+        assertNotNull("The result of subSequence should not be null.", result);
+        assertEquals("The subsequence of an empty input should be an empty string.",
+                     "", result.toString());
     }
 }
