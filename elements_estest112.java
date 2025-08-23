@@ -1,36 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.jsoup.select.Elements;
+import org.junit.Test;
 
-public class Elements_ESTestTest112 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test111() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("*", "*");
-        Elements elements0 = document0.getAllElements();
-        boolean boolean0 = elements0.is("*");
-        assertTrue(boolean0);
+/**
+ * This is an improved version of a test case for the {@link Elements#is(String)} method.
+ * The original test, likely auto-generated, was functionally correct but used unclear
+ * names and a non-obvious setup. This version focuses on understandability and maintainability.
+ */
+public class ElementsIsTest {
+
+    /**
+     * Verifies that `is("*")` returns true for a non-empty Elements collection.
+     * The universal selector "*" should match any element present in the collection.
+     */
+    @Test
+    public void isWithUniversalSelectorReturnsTrueForNonEmptyCollection() {
+        // Arrange: Create a document containing several elements.
+        // A standard HTML snippet is more readable than the original `Parser.parseBodyFragment("*", "*")`.
+        Document doc = Parser.parseBodyFragment("<div><p>Test</p></div>", "");
+        Elements elements = doc.getAllElements(); // Contains <html>, <head>, <body>, <div>, <p>
+
+        // Act: Check if any element in the collection matches the universal selector.
+        boolean anyElementMatches = elements.is("*");
+
+        // Assert: The result must be true because the collection is not empty,
+        // and the universal selector matches every element.
+        assertTrue("is('*') should return true when the Elements collection is not empty.", anyElementMatches);
     }
 }
