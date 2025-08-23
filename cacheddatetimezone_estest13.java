@@ -1,24 +1,36 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest13 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        int int0 = cachedDateTimeZone0.getOffset((-418L));
-        assertEquals(0, int0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Verifies that getOffset() for a cached UTC zone correctly returns a zero offset.
+     *
+     * <p>This test uses a fixed time zone (UTC) to ensure it is deterministic and
+     * independent of the system's default time zone.
+     */
+    @Test
+    public void getOffsetForCachedUtcZoneShouldReturnZero() {
+        // Arrange
+        // Use a fixed time zone like UTC to ensure the test is stable and predictable.
+        DateTimeZone utcZone = DateTimeZone.UTC;
+        CachedDateTimeZone cachedUtcZone = CachedDateTimeZone.forZone(utcZone);
+
+        // An arbitrary instant in milliseconds just before the epoch.
+        long instantNearEpoch = -418L;
+        int expectedOffset = 0; // The offset for UTC is always zero.
+
+        // Act
+        int actualOffset = cachedUtcZone.getOffset(instantNearEpoch);
+
+        // Assert
+        assertEquals("The offset for a cached UTC zone should be zero.", expectedOffset, actualOffset);
     }
 }
