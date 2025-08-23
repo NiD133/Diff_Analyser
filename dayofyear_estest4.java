@@ -1,48 +1,44 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
+import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DayOfYear_ESTestTest4 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ZoneOffset zoneOffset0 = ZoneOffset.MAX;
-        DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
-        DayOfYear dayOfYear1 = DayOfYear.now();
-        int int0 = dayOfYear0.compareTo(dayOfYear1);
-        assertEquals(1, int0);
+    /**
+     * Tests that compareTo correctly handles DayOfYear instances created from the same
+     * instant but in different time zones that fall on different calendar days.
+     */
+    @Test
+    public void compareTo_returnsPositive_whenDayFromLaterTimeZoneIsComparedToEarlierOne() {
+        // Arrange: Set up a time where different time zones are on different days.
+        // Use a fixed instant that is late in the day in UTC (10 PM on March 15th, 2023).
+        Instant fixedInstant = Instant.parse("2023-03-15T22:00:00Z");
+
+        // In a time zone far ahead of UTC (Tokyo, UTC+9), it's already the next day (March 16th).
+        ZoneId tokyoZone = ZoneId.of("Asia/Tokyo");
+        Clock tokyoClock = Clock.fixed(fixedInstant, tokyoZone);
+        DayOfYear dayInTokyo = DayOfYear.now(tokyoClock); // Corresponds to day 75 of 2023
+
+        // In a time zone far behind UTC (New York, UTC-4), it's still the same day (March 15th).
+        ZoneId newYorkZone = ZoneId.of("America/New_York");
+        Clock newYorkClock = Clock.fixed(fixedInstant, newYorkZone);
+        DayOfYear dayInNewYork = DayOfYear.now(newYorkClock); // Corresponds to day 74 of 2023
+
+        // Act: Compare the day from the later time zone to the earlier one.
+        int comparisonResult = dayInTokyo.compareTo(dayInNewYork);
+
+        // Assert: The day in Tokyo (75) should be greater than the day in New York (74).
+        // The compareTo method should return a positive integer.
+        assertTrue("Expected dayInTokyo to be after dayInNewYork", comparisonResult > 0);
+        
+        // For completeness, we can also check the exact value.
+        assertEquals(1, comparisonResult);
     }
 }
