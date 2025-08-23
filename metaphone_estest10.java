@@ -1,19 +1,30 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest10 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the Metaphone class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("SFG");
-        //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
-        //  // Unstable assertion: assertEquals("XFK", string0);
+    /**
+     * Tests that a simple string of consonants is encoded correctly according to the Metaphone algorithm.
+     * The original Metaphone algorithm encodes 'G' as 'K' in this context.
+     */
+    @Test
+    public void shouldEncodeSimpleConsonantString() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "SFG";
+        final String expectedEncoding = "SFK";
+
+        // Act
+        final String actualEncoding = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("The Metaphone encoding for 'SFG' should be 'SFK'",
+                     expectedEncoding,
+                     actualEncoding);
     }
 }
