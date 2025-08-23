@@ -1,35 +1,45 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest38 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ * This specific test focuses on the readIntLE() method.
+ */
+public class RandomAccessFileOrArray_ESTestTest38 { // Retaining original class name for context
 
-    @Test(timeout = 4000)
-    public void test037() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[2] = (byte) (-9);
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        int int0 = randomAccessFileOrArray0.readIntLE();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(16187392, int0);
+    /**
+     * Tests that readIntLE() correctly parses a 32-bit integer from a byte array
+     * in little-endian format.
+     *
+     * Little-endian format means the least significant byte is read first.
+     * The test provides the byte sequence [0x00, 0x00, 0xF7, 0x00].
+     * The expected integer is constructed as:
+     * (b4 << 24) | (b3 << 16) | (b2 << 8) | b1
+     * (0x00 << 24) | (0xF7 << 16) | (0x00 << 8) | 0x00 = 0x00F70000 = 16187392
+     */
+    @Test
+    public void readIntLE_shouldCorrectlyParseLittleEndianInteger() throws IOException {
+        // Arrange
+        // Input bytes representing a little-endian integer. The value -9 is 0xF7 as a byte.
+        byte[] littleEndianBytes = {
+            (byte) 0x00, // Least significant byte
+            (byte) 0x00,
+            (byte) 0xF7,
+            (byte) 0x00  // Most significant byte
+        };
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(littleEndianBytes);
+        int expectedValue = 16187392; // Hex: 0x00F70000
+
+        // Act
+        int actualValue = reader.readIntLE();
+
+        // Assert
+        assertEquals("The parsed integer should match the expected little-endian value.",
+            expectedValue, actualValue);
+        assertEquals("File pointer should advance by 4 bytes after reading an int.",
+            4L, reader.getFilePointer());
     }
 }
