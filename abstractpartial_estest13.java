@@ -1,48 +1,35 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest13 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        MonthDay monthDay0 = new MonthDay(1516L, (Chronology) gregorianChronology0);
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfMonth();
-        int int0 = monthDay0.get(dateTimeFieldType0);
-        assertEquals(1, int0);
+/**
+ * Unit tests for the {@link AbstractPartial} class.
+ * <p>
+ * This test suite uses {@link MonthDay}, a concrete implementation of AbstractPartial,
+ * to verify the behavior of shared methods.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Verifies that the get() method correctly retrieves the value
+     * for a supported field type.
+     */
+    @Test
+    public void getShouldReturnCorrectValueForSupportedFieldType() {
+        // Arrange: Create a partial for January 1st.
+        // MonthDay is a concrete subclass of AbstractPartial.
+        MonthDay partial = new MonthDay(1, 1); // January 1st
+        DateTimeFieldType fieldToQuery = DateTimeFieldType.dayOfMonth();
+        int expectedDay = 1;
+
+        // Act: Retrieve the value of the day-of-month field.
+        int actualDay = partial.get(fieldToQuery);
+
+        // Assert: The retrieved value should match the expected value.
+        assertEquals(expectedDay, actualDay);
     }
 }
