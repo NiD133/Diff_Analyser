@@ -1,44 +1,34 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest16 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the constructor of the {@link LabelBlock} class.
+ */
+public class LabelBlockConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        LabelBlock labelBlock0 = null;
+    /**
+     * Verifies that the LabelBlock constructor throws an IllegalArgumentException
+     * when the provided font is null. A null font is not a permitted argument.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionForNullFont() {
+        // Arrange: Define the expected exception message.
+        final String expectedMessage = "Null 'font' argument.";
+
+        // Act & Assert: Attempt to create a LabelBlock with a null font and
+        // verify that the correct exception is thrown.
         try {
-            labelBlock0 = new LabelBlock("YpgCb8jaC&Q", (Font) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new LabelBlock("Test Label", (Font) null);
+            fail("Expected an IllegalArgumentException to be thrown for a null font, but none was.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'font' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the thrown exception has the expected message.
+            assertEquals("The exception message did not match the expected value.",
+                         expectedMessage, e.getMessage());
         }
     }
 }
