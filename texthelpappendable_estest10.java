@@ -1,46 +1,41 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextHelpAppendable_ESTestTest10 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ * This class focuses on improving the understandability of a specific test case.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        Queue<String> queue0 = textHelpAppendable0.makeColumnQueue("org.apache.commons.cli.help.TextStyle$1", textStyle0);
-        assertTrue(queue0.contains("org.apache.commons.cli.help.TextStyle$1"));
-        assertEquals(3, textHelpAppendable0.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
+    /**
+     * Tests that makeColumnQueue does not wrap a string that is shorter than the
+     * maximum line width.
+     */
+    @Test
+    public void makeColumnQueue_shouldNotWrapText_whenTextIsShorterThanMaxWidth() {
+        // Arrange
+        // The systemOut() factory method creates an instance with default settings.
+        TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        TextStyle defaultStyle = TextStyle.DEFAULT;
+        String shortText = "org.apache.commons.cli.help.TextStyle$1";
+
+        // Act
+        Queue<String> resultQueue = helpAppendable.makeColumnQueue(shortText, defaultStyle);
+
+        // Assert
+        // 1. Verify the primary behavior: the queue contains the unwrapped string.
+        assertNotNull("The returned queue should not be null.", resultQueue);
+        assertEquals("Queue should contain exactly one line for a short string.", 1, resultQueue.size());
+        assertEquals("The single line in the queue should be the original string.", shortText, resultQueue.peek());
+
+        // 2. Verify the state of the TextHelpAppendable instance.
+        // This confirms the test was executed against an instance with the expected default values.
+        assertEquals("Default indent should be used.", TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
+        assertEquals("Default max width should be used.", TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
     }
 }
