@@ -1,20 +1,25 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Seconds_ESTestTest42 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class, focusing on comparison methods.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(2);
-        Seconds seconds1 = Seconds.MIN_VALUE;
-        boolean boolean0 = seconds0.isGreaterThan(seconds1);
-        assertEquals(2, seconds0.getSeconds());
-        assertTrue(boolean0);
+    /**
+     * Verifies that isGreaterThan() returns true when comparing a larger Seconds
+     * instance to a smaller one.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingLargerToSmaller() {
+        // Arrange: Define two Seconds instances where one is clearly greater than the other.
+        Seconds greaterSeconds = Seconds.seconds(2);
+        Seconds lesserSeconds = Seconds.MIN_VALUE;
+
+        // Act & Assert: Directly assert the result of the comparison.
+        assertTrue("Expected 2 seconds to be greater than MIN_VALUE seconds",
+                   greaterSeconds.isGreaterThan(lesserSeconds));
     }
 }
