@@ -1,21 +1,30 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
+/**
+ * This test suite focuses on the {@link JacksonInject.Value} class.
+ * The original class name "JacksonInject_ESTestTest27" was auto-generated.
+ */
 public class JacksonInject_ESTestTest27 extends JacksonInject_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Object object0 = new Object();
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.forId(object0);
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withId(object0);
-        assertSame(jacksonInject_Value1, jacksonInject_Value0);
+    /**
+     * Verifies that calling `withId()` with the same ID that the `Value` object
+     * already possesses returns the original instance, not a new one.
+     * This behavior is an important optimization to avoid unnecessary object allocation.
+     */
+    @Test
+    public void withId_whenIdIsUnchanged_shouldReturnSameInstance() {
+        // Arrange: Create an ID and a JacksonInject.Value instance with that ID.
+        Object injectionId = new Object();
+        JacksonInject.Value initialValue = JacksonInject.Value.forId(injectionId);
+
+        // Act: Call the withId() method with the exact same ID.
+        JacksonInject.Value resultValue = initialValue.withId(injectionId);
+
+        // Assert: The returned object should be the same instance as the original.
+        assertSame("Expected withId() to return the same instance for an unchanged ID",
+                initialValue, resultValue);
     }
 }
