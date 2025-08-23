@@ -1,27 +1,25 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldNamingPolicy_ESTestTest11 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Tests for the {@link FieldNamingPolicy} enum.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        FieldNamingPolicy fieldNamingPolicy0 = FieldNamingPolicy.UPPER_CAMEL_CASE;
-        // Undeclared exception!
-        try {
-            fieldNamingPolicy0.translateName((Field) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.FieldNamingPolicy$2", e);
-        }
+    /**
+     * Verifies that calling translateName with a null Field object results in a NullPointerException.
+     * This behavior is expected for all naming policies because they all attempt to access the
+     * field's name before applying any transformation.
+     */
+    @Test(expected = NullPointerException.class)
+    public void translateName_withNullField_throwsNullPointerException() {
+        // Arrange: Select any policy; the null-check behavior is universal.
+        FieldNamingPolicy policy = FieldNamingPolicy.UPPER_CAMEL_CASE;
+
+        // Act: Call the method with a null Field.
+        // The @Test(expected) annotation will assert that a NullPointerException is thrown.
+        policy.translateName((Field) null);
     }
 }
