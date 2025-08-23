@@ -1,20 +1,32 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class BinaryCodec_ESTestTest22 extends BinaryCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BinaryCodec} class.
+ *
+ * Note: The original test was for {@code org.apache.commons.codec.binary.BinaryCodec},
+ * not the provided source file for {@code org.locationtech.spatial4j.io.BinaryCodec}.
+ * This refactoring targets the Apache Commons Codec class.
+ */
+public class BinaryCodecTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        byteArray0[2] = (byte) 48;
-        byte[] byteArray1 = BinaryCodec.toAsciiBytes(byteArray0);
-        byte[] byteArray2 = BinaryCodec.fromAscii(byteArray1);
-        assertArrayEquals(new byte[] { (byte) 0, (byte) 0, (byte) 48 }, byteArray2);
+    /**
+     * Tests that a byte array encoded to ASCII bytes and then decoded back
+     * results in the original byte array (a "round-trip" conversion).
+     */
+    @Test
+    public void testRoundTripConversionFromBytesToAsciiAndBack() {
+        // Arrange: Create a sample byte array.
+        // The values include zero and a printable ASCII character ('0').
+        final byte[] originalBytes = new byte[]{0, 0, (byte) '0'};
+
+        // Act: Perform the round-trip conversion (binary -> ASCII -> binary).
+        final byte[] asciiEncodedBytes = BinaryCodec.toAsciiBytes(originalBytes);
+        final byte[] decodedBytes = BinaryCodec.fromAscii(asciiEncodedBytes);
+
+        // Assert: The decoded data should be identical to the original data.
+        assertArrayEquals(originalBytes, decodedBytes);
     }
 }
