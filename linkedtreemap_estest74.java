@@ -1,26 +1,32 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+// Note: The original test class name and inheritance are preserved.
 public class LinkedTreeMap_ESTestTest74 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test73() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        LinkedTreeMap.KeySet linkedTreeMap_KeySet0 = linkedTreeMap0.new KeySet();
-        linkedTreeMap_KeySet0.clear();
-        assertEquals(0, linkedTreeMap_KeySet0.size());
+    @Test
+    public void keySetClear_shouldAlsoClearTheUnderlyingMap() {
+        // Arrange: Create a map and add some elements.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        map.put("one", 1);
+        map.put("two", 2);
+        map.put("three", 3);
+
+        Set<String> keySet = map.keySet();
+        assertFalse("Precondition failed: Map should not be empty before clear", map.isEmpty());
+        assertEquals("Precondition failed: KeySet size should be 3 before clear", 3, keySet.size());
+
+        // Act: Clear the key set.
+        keySet.clear();
+
+        // Assert: Verify that both the key set and the map are now empty.
+        assertTrue("KeySet should be empty after clear", keySet.isEmpty());
+        assertTrue("Map should be empty after its key set is cleared", map.isEmpty());
+        assertEquals("Map size should be 0 after its key set is cleared", 0, map.size());
     }
 }
