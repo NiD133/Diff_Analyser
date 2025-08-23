@@ -1,249 +1,166 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
 import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Before;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest22 extends TestCase {
+import static org.junit.Assert.assertArrayEquals;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+/**
+ * Unit tests for the addWrapField method in PreciseDurationDateTimeField.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    private MockPreciseDurationDateTimeField secondOfMinuteField;
+    private TimeOfDay dummyPartial;
+
+    @Before
+    public void setUp() {
+        // A mock field representing 'secondOfMinute', with a range of 0-59.
+        secondOfMinuteField = new MockPreciseDurationDateTimeField();
+        // A dummy ReadablePartial instance, required by the method under test.
+        dummyPartial = new TimeOfDay();
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
+    @Test
+    public void addWrapField_shouldDoNothingWhenAmountIsZero() {
+        // Arrange
+        final int fieldIndexToModify = 2;
+        final int[] initialValues = {10, 20, 30, 40};
+        final int amountToAdd = 0;
+        final int[] expectedValues = {10, 20, 30, 40};
+
+        // Act
+        int[] actualValues = secondOfMinuteField.addWrapField(dummyPartial, fieldIndexToModify, initialValues, amountToAdd);
+
+        // Assert
+        assertArrayEquals(expectedValues, actualValues);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void addWrapField_shouldAddAmountWithoutWrapping() {
+        // Arrange
+        final int fieldIndexToModify = 2;
+        final int[] initialValues = {10, 20, 30, 40};
+        // Adding 29 to 30 results in 59, which is the maximum value.
+        final int amountToAdd = 29;
+        final int[] expectedValues = {10, 20, 59, 40};
+
+        // Act
+        int[] actualValues = secondOfMinuteField.addWrapField(dummyPartial, fieldIndexToModify, initialValues, amountToAdd);
+
+        // Assert
+        assertArrayEquals(expectedValues, actualValues);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void addWrapField_shouldWrapAroundToMinimumValue() {
+        // Arrange
+        final int fieldIndexToModify = 2;
+        final int[] initialValues = {10, 20, 30, 40};
+        // Adding 30 to 30 results in 60. The field wraps around (0-59), so the result is 0.
+        final int amountToAdd = 30;
+        final int[] expectedValues = {10, 20, 0, 40};
+
+        // Act
+        int[] actualValues = secondOfMinuteField.addWrapField(dummyPartial, fieldIndexToModify, initialValues, amountToAdd);
+
+        // Assert
+        assertArrayEquals(expectedValues, actualValues);
+    }
+
+    @Test
+    public void addWrapField_shouldWrapAroundPastMinimumValue() {
+        // Arrange
+        final int fieldIndexToModify = 2;
+        final int[] initialValues = {10, 20, 30, 40};
+        // Adding 31 to 30 results in 61. The field wraps around (0-59), so the result is 1.
+        final int amountToAdd = 31;
+        final int[] expectedValues = {10, 20, 1, 40};
+
+        // Act
+        int[] actualValues = secondOfMinuteField.addWrapField(dummyPartial, fieldIndexToModify, initialValues, amountToAdd);
+
+        // Assert
+        assertArrayEquals(expectedValues, actualValues);
     }
 
     //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
+    // Mock classes used for testing
+    //-----------------------------------------------------------------------
+
+    /**
+     * A mock PreciseDurationDateTimeField that simulates a "second of minute" field.
+     * It has a fixed range from 0 to 59.
+     */
+    private static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
 
         protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
-        }
-
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
+            super(DateTimeFieldType.secondOfMinute(), new MockSecondsDurationField());
         }
 
         @Override
         public int get(long instant) {
+            // Not used in these tests, but required for the abstract class.
             return (int) (instant / 60L);
         }
 
         @Override
         public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+            // A dummy range field, sufficient for the test.
+            return new MockMinutesDurationField();
         }
 
         @Override
         public int getMaximumValue() {
             return 59;
         }
+        
+        // getMinimumValue() defaults to 0 in the superclass BaseDateTimeField.
     }
 
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
+    /**
+     * A mock DurationField for seconds.
+     */
+    private static class MockSecondsDurationField extends BaseDurationField {
+        protected MockSecondsDurationField() {
+            super(DurationFieldType.seconds());
+        }
 
-        protected MockStandardBaseDateTimeField() {
+        @Override
+        public boolean isPrecise() {
+            return true;
+        }
+
+        @Override
+        public long getUnitMillis() {
+            return 60; // This value is not critical for the addWrapField test.
+        }
+
+        // The following methods are not used by the tests and can be minimal.
+        @Override
+        public long getValueAsLong(long duration, long instant) { return 0; }
+        @Override
+        public long getMillis(int value, long instant) { return 0; }
+        @Override
+        public long getMillis(long value, long instant) { return 0; }
+        @Override
+        public long add(long instant, int value) { return instant + (value * 60L); }
+        @Override
+        public long add(long instant, long value) { return instant + (value * 60L); }
+        @Override
+        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) { return 0; }
+    }
+
+    /**
+     * A mock DurationField for minutes, used as the range field.
+     */
+    private static class MockMinutesDurationField extends MockSecondsDurationField {
+        protected MockMinutesDurationField() {
             super();
         }
-
-        @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_addWrapField_RP_int_intarray_int() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        int[] values = new int[] { 10, 20, 30, 40 };
-        int[] expected = new int[] { 10, 20, 30, 40 };
-        int[] result = field.addWrapField(new TimeOfDay(), 2, values, 0);
-        assertEquals(true, Arrays.equals(result, expected));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 59, 40 };
-        result = field.addWrapField(new TimeOfDay(), 2, values, 29);
-        assertEquals(true, Arrays.equals(result, expected));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 0, 40 };
-        result = field.addWrapField(new TimeOfDay(), 2, values, 30);
-        assertEquals(true, Arrays.equals(result, expected));
-        values = new int[] { 10, 20, 30, 40 };
-        expected = new int[] { 10, 20, 1, 40 };
-        result = field.addWrapField(new TimeOfDay(), 2, values, 31);
-        assertEquals(true, Arrays.equals(result, expected));
     }
 }
