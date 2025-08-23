@@ -1,42 +1,37 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest21 extends ByteUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * Tests for {@link ByteUtils}.
+ */
+public class ByteUtilsTest {
+
+    /**
+     * Tests that {@link ByteUtils#toLittleEndian(OutputStream, long, int)}
+     * correctly propagates an {@link IOException} thrown by the underlying stream.
+     */
     @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
+    public void toLittleEndianShouldPropagateIOExceptionFromOutputStream() {
+        // Arrange: Create a PipedOutputStream that is not connected to an input stream.
+        // Any attempt to write to this stream will result in an IOException.
+        PipedOutputStream unconnectedStream = new PipedOutputStream();
+        final long valueToWrite = 1L;
+        final int length = 8; // Using the size of a long in bytes for clarity.
+
+        // Act & Assert
         try {
-            ByteUtils.toLittleEndian((OutputStream) pipedOutputStream0, (long) 1, 2970);
-            fail("Expecting exception: IOException");
+            ByteUtils.toLittleEndian(unconnectedStream, valueToWrite, length);
+            fail("Expected an IOException to be thrown, but the operation succeeded.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
+            // Verify that the propagated exception is the one we expect from the unconnected pipe.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
