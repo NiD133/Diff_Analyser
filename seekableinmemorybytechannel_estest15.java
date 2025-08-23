@@ -1,30 +1,27 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
+
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest15 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
-        // Undeclared exception!
-        try {
-            seekableInMemoryByteChannel0.read((ByteBuffer) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
-        }
+    /**
+     * Verifies that the read() method throws a NullPointerException
+     * when called with a null ByteBuffer argument.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readWithNullBufferThrowsNullPointerException() {
+        // Arrange: Create an empty channel.
+        final SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+
+        // Act: Attempt to read into a null buffer.
+        // The test expects this call to throw a NullPointerException.
+        channel.read((ByteBuffer) null);
+
+        // Assert: The expected exception is verified by the @Test annotation.
     }
 }
