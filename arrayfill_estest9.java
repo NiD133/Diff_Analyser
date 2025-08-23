@@ -1,21 +1,26 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest9 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        char[] charArray0 = new char[1];
-        char[] charArray1 = ArrayFill.fill(charArray0, ']');
-        assertArrayEquals(new char[] { ']' }, charArray1);
+    @Test
+    public void testFillCharArray() {
+        // Arrange: Create an array and define the expected state after filling.
+        final char[] inputArray = new char[3];
+        final char fillValue = 'X';
+        final char[] expectedArray = {'X', 'X', 'X'};
+
+        // Act: Call the method under test.
+        final char[] resultArray = ArrayFill.fill(inputArray, fillValue);
+
+        // Assert: Verify the array is filled correctly and the same instance is returned.
+        assertArrayEquals("The array should be filled with the specified value.", expectedArray, resultArray);
+        assertSame("The method should return the same array instance that was passed in.", inputArray, resultArray);
     }
 }
