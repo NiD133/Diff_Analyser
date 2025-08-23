@@ -1,74 +1,76 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
+
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class LangCollectorsTestTest16 {
+/**
+ * Tests for {@link LangCollectors#joining(CharSequence, CharSequence, CharSequence)}.
+ */
+@DisplayName("LangCollectors.joining")
+class LangCollectorsJoiningTest {
 
-    private static final Long _1L = Long.valueOf(1);
+    @Nested
+    @DisplayName("with delimiter, prefix, and suffix")
+    class JoiningWithDelimiterPrefixAndSuffix {
 
-    private static final Long _2L = Long.valueOf(2);
+        private final Collector<Object, ?, String> collector = LangCollectors.joining("-", "<", ">");
 
-    private static final Long _3L = Long.valueOf(3);
+        @Test
+        @DisplayName("should return only prefix and suffix for an empty stream")
+        void onEmptyStream_shouldReturnPrefixAndSuffix() {
+            // Given an empty stream
+            final Stream<String> stream = Stream.of();
 
-    private static final Function<Object, String> TO_STRING = Objects::toString;
+            // When collecting
+            final String result = stream.collect(collector);
 
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
-    }
-
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
-
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
-
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
-    private static final class Fixture {
-
-        int value;
-
-        private Fixture(final int value) {
-            this.value = value;
+            // Then the result is just the prefix and suffix
+            assertEquals("<>", result);
         }
 
-        @Override
-        public String toString() {
-            return Integer.toString(value);
-        }
-    }
+        @Test
+        @DisplayName("should wrap a single element in prefix and suffix")
+        void onSingleElementStream_shouldWrapElementInPrefixAndSuffix() {
+            // Given a stream with one element
+            final Stream<String> stream = Stream.of("1");
 
-    @Test
-    void testJoiningStrings3Args() {
-        assertEquals("<>", Stream.of().collect(JOINING_3));
-        assertEquals("<1>", Stream.of("1").collect(JOINING_3));
-        assertEquals("<1-2>", Stream.of("1", "2").collect(JOINING_3));
-        assertEquals("<1-2-3>", Stream.of("1", "2", "3").collect(JOINING_3));
-        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(JOINING_3));
+            // When collecting
+            final String result = stream.collect(collector);
+
+            // Then the element is enclosed in the prefix and suffix
+            assertEquals("<1>", result);
+        }
+
+        @Test
+        @DisplayName("should join multiple elements with the delimiter")
+        void onMultipleElementStream_shouldJoinWithDelimiter() {
+            // Given a stream with multiple elements
+            final Stream<String> stream = Stream.of("1", "2", "3");
+
+            // When collecting
+            final String result = stream.collect(collector);
+
+            // Then the elements are joined by the delimiter and enclosed
+            assertEquals("<1-2-3>", result);
+        }
+
+        @Test
+        @DisplayName("should convert null elements to the string 'null'")
+        void onStreamWithNull_shouldConvertNullToString() {
+            // Given a stream containing a null element
+            final Stream<String> stream = Stream.of("1", null, "3");
+
+            // When collecting
+            final String result = stream.collect(collector);
+
+            // Then the null is converted to "null" in the output
+            assertEquals("<1-null-3>", result);
+        }
     }
 }
