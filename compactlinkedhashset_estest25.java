@@ -1,29 +1,22 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CompactLinkedHashSet_ESTestTest25 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        // Undeclared exception!
-        try {
-            CompactLinkedHashSet.create((Collection<? extends Integer>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.collect.CompactLinkedHashSet", e);
-        }
+    /**
+     * Verifies that the create(Collection) factory method throws a NullPointerException
+     * when the input collection is null, as this is a prohibited argument.
+     */
+    @Test(expected = NullPointerException.class)
+    public void create_withNullCollection_shouldThrowNullPointerException() {
+        // The cast to a Collection is necessary to resolve ambiguity between
+        // create(Collection) and the varargs create(E...) method.
+        CompactLinkedHashSet.create((Collection<Object>) null);
     }
 }
