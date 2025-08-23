@@ -1,32 +1,57 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
 import com.google.gson.internal.LazilyParsedNumber;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import org.junit.Test;
 
-public class ToNumberPolicyTestTest2 {
+/**
+ * Tests for {@link ToNumberPolicy#LAZILY_PARSED_NUMBER}.
+ *
+ * <p>This policy ensures that numbers are read as a {@link LazilyParsedNumber},
+ * preserving their original string representation to prevent precision loss or overflow
+ * until a specific numeric type is requested.
+ */
+public class ToNumberPolicyLazilyParsedNumberTest {
 
-    private static JsonReader fromString(String json) {
-        return new JsonReader(new StringReader(json));
-    }
+  private final ToNumberStrategy lazilyParsedNumberStrategy = ToNumberPolicy.LAZILY_PARSED_NUMBER;
 
-    private static JsonReader fromStringLenient(String json) {
-        JsonReader jsonReader = fromString(json);
-        jsonReader.setStrictness(Strictness.LENIENT);
-        return jsonReader;
-    }
+  private static JsonReader fromString(String json) {
+    return new JsonReader(new StringReader(json));
+  }
 
-    @Test
-    public void testLazilyParsedNumber() throws IOException {
-        ToNumberStrategy strategy = ToNumberPolicy.LAZILY_PARSED_NUMBER;
-        assertThat(strategy.readNumber(fromString("10.1"))).isEqualTo(new LazilyParsedNumber("10.1"));
-        assertThat(strategy.readNumber(fromString("3.141592653589793238462643383279"))).isEqualTo(new LazilyParsedNumber("3.141592653589793238462643383279"));
-        assertThat(strategy.readNumber(fromString("1e400"))).isEqualTo(new LazilyParsedNumber("1e400"));
-    }
+  @Test
+  public void readNumber_whenDecimal_returnsLazilyParsedNumber() throws IOException {
+    String jsonNumber = "10.1";
+    Number result = lazilyParsedNumberStrategy.readNumber(fromString(jsonNumber));
+
+    // The policy should wrap the number without parsing it, preserving the original string.
+    assertThat(result).isEqualTo(new LazilyParsedNumber(jsonNumber));
+    assertThat(result.toString()).isEqualTo(jsonNumber);
+  }
+
+  @Test
+  public void readNumber_whenHighPrecisionDecimal_returnsLazilyParsedNumber() throws IOException {
+    String jsonNumber = "3.141592653589793238462643383279";
+    Number result = lazilyParsedNumberStrategy.readNumber(fromString(jsonNumber));
+
+    // Using LazilyParsedNumber is crucial here to prevent the precision loss that would
+    // occur if this number were immediately parsed as a `double`.
+    assertThat(result).isEqualTo(new LazilyParsedNumber(jsonNumber));
+    assertThat(result.toString()).isEqualTo(jsonNumber);
+  }
+
+  @Test
+  public void readNumber_whenLargeExponent_returnsLazilyParsedNumber() throws IOException {
+    String jsonNumber = "1e400";
+    Number result = lazilyParsedNumberStrategy.readNumber(fromString(jsonNumber));
+
+    // Using LazilyParsedNumber prevents this value from being parsed as `Double.POSITIVE_INFINITY`.
+    // The original string representation is preserved for later conversion, for example to a BigDecimal.
+    assertThat(result).isEqualTo(new LazilyParsedNumber(jsonNumber));
+    assertThat(result.toString()).isEqualTo(jsonNumber);
+  }
 }
