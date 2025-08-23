@@ -1,24 +1,29 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest1 extends UtcInstant_ESTest_scaffolding {
+/**
+ * A test suite for the {@link UtcInstant} class, focusing on clarity and maintainability.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(73281320003518L, 73281320003518L);
-        utcInstant0.hashCode();
-        assertEquals(73281320003518L, utcInstant0.getModifiedJulianDay());
+    /**
+     * Tests that the ofModifiedJulianDay factory method correctly creates an instance
+     * and that the getModifiedJulianDay getter returns the same value.
+     */
+    @Test
+    public void ofModifiedJulianDay_createsInstanceWithCorrectModifiedJulianDay() {
+        // Arrange: Define a valid Modified Julian Day and a valid nano-of-day.
+        // Using the MJD for a known date (2024-01-01) makes the test data meaningful.
+        long expectedModifiedJulianDay = 60309L; // MJD for 2024-01-01
+        long anyValidNanoOfDay = 12345L;
+
+        // Act: Create a UtcInstant instance using the factory method.
+        UtcInstant utcInstant = UtcInstant.ofModifiedJulianDay(expectedModifiedJulianDay, anyValidNanoOfDay);
+
+        // Assert: Verify that the getter returns the value used during construction.
+        long actualModifiedJulianDay = utcInstant.getModifiedJulianDay();
+        assertEquals(expectedModifiedJulianDay, actualModifiedJulianDay);
     }
 }
