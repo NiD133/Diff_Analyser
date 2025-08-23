@@ -1,20 +1,28 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TagSet_ESTestTest22 extends TagSet_ESTest_scaffolding {
+/**
+ * Test suite for verifying the contents and behavior of the default HTML {@link TagSet}.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        boolean boolean0 = Tag.isKnownTag("cxpPE");
-        assertFalse(boolean0);
+    /**
+     * Verifies that Tag.isKnownTag() returns false for a tag name that is not a standard, known HTML tag.
+     * This method indirectly tests the contents of the default HTML TagSet, which is the source of truth
+     * for known tags.
+     */
+    @Test
+    public void isKnownTagShouldReturnFalseForUnknownTagName() {
+        // Arrange: Define a tag name that does not exist in the standard HTML tag set.
+        // The mixed-case name "cxpPE" is an arbitrary, non-standard tag.
+        String unknownTagName = "cxpPE";
+
+        // Act: Check if the tag is recognized as a known HTML tag.
+        boolean isKnown = Tag.isKnownTag(unknownTagName);
+
+        // Assert: The result should be false, as the tag is not part of the standard set.
+        assertFalse("A non-standard tag name should not be identified as a known tag.", isKnown);
     }
 }
