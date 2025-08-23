@@ -1,32 +1,26 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
+import static org.junit.Assert.assertThrows;
+
 import java.nio.CharBuffer;
 import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest14 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-        // Undeclared exception!
-        try {
-            charSequenceReader0.read(charBuffer1);
-            fail("Expecting exception: ReadOnlyBufferException");
-        } catch (ReadOnlyBufferException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.StringCharBuffer", e);
-        }
+    @Test
+    public void read_intoReadOnlyBuffer_throwsReadOnlyBufferException() {
+        // Arrange: Create a reader and a read-only buffer to serve as the destination.
+        CharSequenceReader reader = new CharSequenceReader("source data");
+        
+        // CharBuffer.wrap(CharSequence) is a standard way to create a read-only buffer.
+        CharBuffer readOnlyTargetBuffer = CharBuffer.wrap("some text");
+
+        // Act & Assert: Verify that attempting to write to the read-only buffer throws the
+        // correct exception.
+        assertThrows(ReadOnlyBufferException.class, () -> reader.read(readOnlyTargetBuffer));
     }
 }
