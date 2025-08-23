@@ -1,29 +1,39 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest32 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * This class contains improved, more understandable tests for {@link ExtraFieldUtils}.
+ * The original test was auto-generated and has been refactored for clarity and maintainability.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        ZipExtraField[] zipExtraFieldArray0 = new ZipExtraField[0];
-        byte[] byteArray0 = ExtraFieldUtils.mergeLocalFileDataData(zipExtraFieldArray0);
-        Zip64ExtendedInformationExtraField zip64ExtendedInformationExtraField0 = new Zip64ExtendedInformationExtraField();
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.fillExtraField(zip64ExtendedInformationExtraField0, byteArray0, 935, 935, true);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Verifies that calling {@code fillExtraField} with an offset and length
+     * that are out of bounds for the given byte array throws an
+     * {@code IndexOutOfBoundsException}.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void fillExtraFieldWithOutOfBoundsOffsetAndLengthShouldThrowException() throws ZipException {
+        // Arrange
+        // A concrete ZipExtraField instance to be filled. The specific type is not critical for this test.
+        final ZipExtraField fieldToFill = new Zip64ExtendedInformationExtraField();
+        
+        // Use an empty byte array as the source data. This makes any positive
+        // offset and length combination invalid and clearly demonstrates the boundary condition.
+        final byte[] emptyData = new byte[0];
+        
+        // Define an offset and length that are clearly out of bounds for the empty array.
+        final int invalidOffset = 100;
+        final int invalidLength = 100;
+        final boolean isLocalHeader = true;
+
+        // Act & Assert
+        // This call is expected to fail with an IndexOutOfBoundsException
+        // because the provided offset and length point outside the emptyData array.
+        // The assertion is handled by the @Test(expected=...) annotation.
+        ExtraFieldUtils.fillExtraField(fieldToFill, emptyData, invalidOffset, invalidLength, isLocalHeader);
     }
 }
