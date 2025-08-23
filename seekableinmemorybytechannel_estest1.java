@@ -1,26 +1,34 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest1 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
-        ByteBuffer byteBuffer0 = ByteBuffer.allocate(0);
-        int int0 = seekableInMemoryByteChannel0.write(byteBuffer0);
-        assertEquals(0, int0);
-        assertEquals(0L, seekableInMemoryByteChannel0.position());
-        assertEquals(5L, seekableInMemoryByteChannel0.size());
+    /**
+     * Verifies that writing an empty ByteBuffer to the channel writes zero bytes
+     * and does not alter the channel's position or size.
+     */
+    @Test
+    public void writeWithEmptyBufferShouldReturnZeroAndNotChangeState() throws IOException {
+        // Arrange: Create a channel with 5 bytes of initial data.
+        final byte[] initialData = new byte[5];
+        final SeekableByteChannel channel = new SeekableInMemoryByteChannel(initialData);
+        final ByteBuffer emptyBuffer = ByteBuffer.allocate(0);
+
+        // Act: Attempt to write the contents of the empty buffer to the channel.
+        final int bytesWritten = channel.write(emptyBuffer);
+
+        // Assert: Check that the write operation had no effect.
+        assertEquals("Writing an empty buffer should result in 0 bytes written.", 0, bytesWritten);
+        assertEquals("The channel position should not change.", 0L, channel.position());
+        assertEquals("The channel size should remain unchanged.", 5L, channel.size());
     }
 }
