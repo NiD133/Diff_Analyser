@@ -1,80 +1,41 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
+import org.jfree.chart.util.Size2D;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest32 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(0, 0);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range((-1966.702450689393), (-1966.702450689393));
-        assertEquals("Range[-1966.702450689393,-1966.702450689393]", range0.toString());
-        assertEquals((-1966.702450689393), range0.getCentralValue(), 0.01);
-        assertEquals((-1966.702450689393), range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals((-1966.702450689393), range0.getLowerBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(0, range0);
-        assertEquals("Range[-1966.702450689393,-1966.702450689393]", range0.toString());
-        assertEquals((-1966.702450689393), range0.getCentralValue(), 0.01);
-        assertEquals((-1966.702450689393), range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals((-1966.702450689393), range0.getLowerBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer(gridArrangement0);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNotNull(blockContainer0);
-        Size2D size2D0 = gridArrangement0.arrangeFF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals("Range[-1966.702450689393,-1966.702450689393]", range0.toString());
-        assertEquals((-1966.702450689393), range0.getCentralValue(), 0.01);
-        assertEquals((-1966.702450689393), range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals((-1966.702450689393), range0.getLowerBound(), 0.01);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(Double.NaN, size2D0.getHeight(), 0.01);
-        assertEquals("Size2D[width=NaN, height=NaN]", size2D0.toString());
-        assertEquals(Double.NaN, size2D0.getWidth(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(Double.NaN, size2D0.height, 0.01);
-        assertEquals(Double.NaN, size2D0.width, 0.01);
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Unit tests for the {@link GridArrangement} class, focusing on edge cases.
+ */
+public class GridArrangementTest {
+
+    /**
+     * Tests that calling the protected method {@code arrangeFF} with a grid
+     * configured to have zero rows and zero columns results in a size with
+     * NaN (Not a Number) dimensions. This is an important edge case, as it
+     * could lead to division-by-zero errors when calculating cell sizes.
+     */
+    @Test
+    public void arrangeFF_withZeroRowsAndColumns_shouldReturnNaNDimensions() {
+        // Arrange: Create a 0x0 grid arrangement and an empty container for it.
+        GridArrangement arrangement = new GridArrangement(0, 0);
+        BlockContainer emptyContainer = new BlockContainer(arrangement);
+
+        // Define a constraint with a fixed width and height. The arrangeFF method
+        // is designed for fixed-fixed constraints.
+        RectangleConstraint fixedConstraint = new RectangleConstraint(0.0, new Range(0.0, 0.0));
+
+        // Act: Directly invoke the protected arrangeFF method with the 0x0 grid.
+        // We pass a null Graphics2D object as it is not used in this calculation.
+        Size2D resultSize = arrangement.arrangeFF(emptyContainer, (Graphics2D) null, fixedConstraint);
+
+        // Assert: The resulting size should have NaN for both width and height,
+        // which is the expected outcome of a division-by-zero (e.g., width / 0 columns).
+        assertTrue("Width should be NaN for a 0x0 grid", Double.isNaN(resultSize.getWidth()));
+        assertTrue("Height should be NaN for a 0x0 grid", Double.isNaN(resultSize.getHeight()));
     }
 }
