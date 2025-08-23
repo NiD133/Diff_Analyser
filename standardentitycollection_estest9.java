@@ -1,25 +1,26 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StandardEntityCollection_ESTestTest9 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        StandardEntityCollection standardEntityCollection1 = new StandardEntityCollection();
-        boolean boolean0 = standardEntityCollection0.equals(standardEntityCollection1);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two newly created, empty StandardEntityCollection instances
+     * are considered equal.
+     */
+    @Test
+    public void equals_onTwoEmptyCollections_shouldReturnTrue() {
+        // Arrange: Create two separate, empty entity collections.
+        StandardEntityCollection collection1 = new StandardEntityCollection();
+        StandardEntityCollection collection2 = new StandardEntityCollection();
+
+        // Act & Assert: Verify that the two empty collections are equal.
+        // The assertEquals method is the standard way to check for object equality
+        // in tests and provides a more informative failure message than assertTrue.
+        assertEquals(collection1, collection2);
     }
 }
