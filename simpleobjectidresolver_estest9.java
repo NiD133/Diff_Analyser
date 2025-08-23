@@ -1,18 +1,30 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
-public class SimpleObjectIdResolver_ESTestTest9 extends SimpleObjectIdResolver_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SimpleObjectIdResolver} class.
+ */
+public class SimpleObjectIdResolverTest {
 
-    @Test(timeout = 4000)
-    public void test8() throws Throwable {
-        SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-        ObjectIdResolver objectIdResolver0 = simpleObjectIdResolver0.newForDeserialization((Object) null);
-        assertNotSame(objectIdResolver0, simpleObjectIdResolver0);
+    /**
+     * Verifies that newForDeserialization() creates a new, distinct instance of
+     * SimpleObjectIdResolver. This is important to ensure that each deserialization
+     * process gets a fresh resolver without any shared state from previous operations.
+     */
+    @Test
+    public void newForDeserialization_shouldReturnNewInstance() {
+        // Arrange: Create an initial instance of the resolver.
+        SimpleObjectIdResolver originalResolver = new SimpleObjectIdResolver();
+        Object deserializationContext = null; // The context is not used in this implementation.
+
+        // Act: Call the method to get a new resolver for a deserialization process.
+        ObjectIdResolver newResolver = originalResolver.newForDeserialization(deserializationContext);
+
+        // Assert: The returned resolver must be a new object, not the same instance.
+        assertNotSame("The factory method should create a new resolver instance.", originalResolver, newResolver);
+        assertTrue("The new resolver should be of type SimpleObjectIdResolver.", newResolver instanceof SimpleObjectIdResolver);
     }
 }
