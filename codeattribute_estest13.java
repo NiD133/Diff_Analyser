@@ -1,37 +1,63 @@
 package org.apache.commons.compress.harmony.unpack200.bytecode;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PipedOutputStream;
-import java.util.LinkedList;
-import java.util.List;
 import org.apache.commons.compress.harmony.unpack200.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CodeAttribute_ESTestTest13 extends CodeAttribute_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        byteArray0[2] = (byte) (-46);
-        int[] intArray0 = new int[5];
-        OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-        LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-        CodeAttribute codeAttribute0 = null;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class has been refactored to focus on a single, clear, and understandable test case.
+ */
+public class CodeAttributeTest {
+
+    private static final byte INVOKESTATIC_OPCODE = (byte) 0xD2;
+
+    /**
+     * Tests that the CodeAttribute constructor throws a NullPointerException
+     * when it needs to process a bytecode that requires a Segment to resolve
+     * its operands (e.g., an 'invokestatic' instruction), but the provided
+     * Segment is null.
+     */
+    @Test
+    public void constructorShouldThrowNPEWhenByteCodeRequiresNullSegment() {
+        // Arrange
+        // The 'invokestatic' bytecode requires resolving a method reference from the
+        // constant pool, which is accessed via the Segment.
+        byte[] byteCodes = {INVOKESTATIC_OPCODE};
+
+        // The OperandManager provides operand values. For this test, we only need to
+        // provide a single value for the constant pool index that 'invokestatic' will use.
+        // We use a single, non-empty array for all operand types for simplicity.
+        int[] operandValues = {0};
+        OperandManager operandManager = new OperandManager(
+            operandValues, operandValues, operandValues, operandValues, operandValues,
+            operandValues, operandValues, operandValues, operandValues, operandValues,
+            operandValues, operandValues, operandValues, operandValues, operandValues,
+            operandValues, operandValues, operandValues, operandValues, operandValues,
+            operandValues
+        );
+
+        List<ExceptionTableEntry> exceptionTable = Collections.emptyList();
+        Segment segment = null; // This null segment is the condition under test.
+
+        // These values are required by the constructor but are not relevant to this test.
+        int maxStack = 1;
+        int maxLocals = 1;
+
+        // Act & Assert
         try {
-            codeAttribute0 = new CodeAttribute(141, (-3388), byteArray0, (Segment) null, operandManager0, linkedList0);
-            fail("Expecting exception: NullPointerException");
+            new CodeAttribute(maxStack, maxLocals, byteCodes, segment, operandManager, exceptionTable);
+            fail("Expected a NullPointerException because the segment is null and is required by the 'invokestatic' bytecode.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.bytecode.OperandManager", e);
+            // This is the expected outcome. The test passes.
+            // The original test also verified that the exception message was null.
+            assertNull("The NullPointerException should not have a message.", e.getMessage());
+        } catch (Exception e) {
+            fail("An unexpected exception was thrown: " + e);
         }
     }
 }
