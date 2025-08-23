@@ -1,29 +1,27 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest57 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for {@link StringUtil#resolve(URL, String)}.
+ */
+public class StringUtilResolveTest {
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        URL uRL0 = MockURL.getFtpExample();
-        URL uRL1 = StringUtil.resolve(uRL0, "=:,DeW^");
-        assertEquals("ftp://ftp.someFakeButWellFormedURL.org/=:,DeW^", uRL1.toString());
+    @Test
+    public void resolveShouldHandleUrlPathsWithSpecialCharacters() throws MalformedURLException {
+        // Arrange
+        // The base URL from the original test's MockURL.getFtpExample()
+        URL baseUrl = new URL("ftp://ftp.someFakeButWellFormedURL.org/");
+        String relativeUrl = "=:,DeW^";
+        String expectedResolvedUrl = "ftp://ftp.someFakeButWellFormedURL.org/=:,DeW^";
+
+        // Act
+        URL actualResolvedUrl = StringUtil.resolve(baseUrl, relativeUrl);
+
+        // Assert
+        assertEquals(expectedResolvedUrl, actualResolvedUrl.toString());
     }
 }
