@@ -1,18 +1,31 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest71 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        int int0 = CharSequenceUtils.indexOf((CharSequence) null, (CharSequence) null, 120);
-        assertEquals((-1), int0);
+    /**
+     * Tests that CharSequenceUtils.indexOf returns -1 (not found) when both the source
+     * CharSequence and the search CharSequence are null.
+     * The class is documented as being null-safe, and this test verifies that behavior.
+     */
+    @Test
+    public void indexOf_withNullSourceAndNullSearch_shouldReturnNotFound() {
+        // Arrange
+        final CharSequence nullSource = null;
+        final CharSequence nullSearch = null;
+        final int startIndex = 120; // The starting index should not affect the outcome.
+        final int expected = -1;
+
+        // Act
+        final int actual = CharSequenceUtils.indexOf(nullSource, nullSearch, startIndex);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
