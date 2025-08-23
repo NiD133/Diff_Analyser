@@ -1,26 +1,30 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for {@link UtcInstant}.
+ * This focuses on the conversion between {@link UtcInstant} and {@link TaiInstant}.
+ */
 public class UtcInstant_ESTestTest13 extends UtcInstant_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(3217L, 1000L);
-        TaiInstant taiInstant1 = taiInstant0.withTaiSeconds(0L);
-        UtcInstant utcInstant0 = UtcInstant.of(taiInstant1);
-        TaiInstant taiInstant2 = utcInstant0.toTaiInstant();
-        assertEquals(0L, taiInstant2.getTaiSeconds());
+    /**
+     * Tests that converting a TaiInstant to a UtcInstant and back again
+     * results in the original TaiInstant value. This verifies that the
+     * round-trip conversion is lossless.
+     */
+    @Test
+    public void conversionToAndFromTaiInstantIsLossless() {
+        // Arrange: Create an initial TAI instant.
+        // The original test used 0 TAI seconds and 1000 nanoseconds.
+        TaiInstant originalTaiInstant = TaiInstant.ofTaiSeconds(0L, 1000L);
+
+        // Act: Convert the TAI instant to a UTC instant, and then convert it back.
+        UtcInstant intermediateUtcInstant = UtcInstant.of(originalTaiInstant);
+        TaiInstant roundTripTaiInstant = intermediateUtcInstant.toTaiInstant();
+
+        // Assert: The final TAI instant should be identical to the original.
+        assertEquals(originalTaiInstant, roundTripTaiInstant);
     }
 }
