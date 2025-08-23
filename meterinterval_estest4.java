@@ -1,29 +1,31 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MeterInterval_ESTestTest4 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Range range0 = new Range((-3041.91489), (-3041.91489));
-        Range range1 = Range.expandToInclude(range0, 3388.0);
-        MeterInterval meterInterval0 = new MeterInterval("", range1);
-        Range range2 = meterInterval0.getRange();
-        assertNotSame(range2, range0);
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that the getRange() method correctly returns the Range object
+     * that was provided to the constructor.
+     */
+    @Test
+    public void getRange_shouldReturnTheRangeSetInConstructor() {
+        // Arrange: Create a Range and a MeterInterval with that range.
+        Range expectedRange = new Range(50.0, 75.0);
+        MeterInterval meterInterval = new MeterInterval("Normal", expectedRange);
+
+        // Act: Retrieve the range from the MeterInterval.
+        Range actualRange = meterInterval.getRange();
+
+        // Assert: The retrieved range should be the same instance as the one
+        // used during construction, as MeterInterval is expected to store the reference.
+        assertSame("The returned range should be the same object instance provided to the constructor.",
+                expectedRange, actualRange);
     }
 }
