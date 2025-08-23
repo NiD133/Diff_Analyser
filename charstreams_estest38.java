@@ -1,45 +1,32 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest38 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams#toString(Readable)}.
+ */
+// The original test class name "CharStreams_ESTestTest38" was likely auto-generated.
+// A more descriptive name like "CharStreamsTest" is used here for clarity.
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        char[] charArray0 = new char[3];
-        CharArrayReader charArrayReader0 = new CharArrayReader(charArray0);
-        String string0 = CharStreams.toString((Readable) charArrayReader0);
-        assertEquals("\u0000\u0000\u0000", string0);
+    @Test
+    public void toString_readsAllCharactersFromReadable() throws IOException {
+        // Arrange
+        // A char array is initialized with null characters ('\u0000') by default.
+        // This test verifies that even non-printable characters are handled correctly.
+        char[] inputCharacters = new char[3];
+        Reader reader = new CharArrayReader(inputCharacters);
+        String expectedString = new String(inputCharacters); // The expected string is "\u0000\u0000\u0000"
+
+        // Act
+        String actualString = CharStreams.toString(reader);
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
