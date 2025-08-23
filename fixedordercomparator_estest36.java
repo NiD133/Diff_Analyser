@@ -1,40 +1,49 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.ArrayList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class FixedOrderComparator_ESTestTest36 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * This test class contains the improved test case.
+ * The original test was part of a larger, auto-generated suite.
+ */
+public class FixedOrderComparator_ESTestTest36 {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>();
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        FixedOrderComparator<Object> fixedOrderComparator1 = new FixedOrderComparator<Object>(linkedList0);
-        FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-        fixedOrderComparator1.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-        fixedOrderComparator1.compare(fixedOrderComparator0, fixedOrderComparator0);
-        // Undeclared exception!
+    /**
+     * Tests that attempting to modify the comparator after a comparison has been made
+     * (which locks it) throws an UnsupportedOperationException.
+     */
+    @Test
+    public void addAsEqual_shouldThrowException_whenComparatorIsLockedAfterComparison() {
+        // Arrange: Create a comparator and confirm its initial state is unlocked.
+        final FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(new ArrayList<>());
+        assertFalse("Comparator should not be locked before the first comparison.", comparator.isLocked());
+
+        // To compare unknown objects without an exception, we must set the behavior.
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.AFTER);
+
+        // Act: Perform a comparison. According to the class documentation,
+        // this action should permanently lock the comparator from further modification.
+        final Object obj1 = "object 1";
+        final Object obj2 = "object 2";
+        comparator.compare(obj1, obj2);
+
+        // Assert: Verify that the comparator is now locked.
+        assertTrue("Comparator should be locked after the first comparison.", comparator.isLocked());
+
+        // Act & Assert: Attempt to modify the locked comparator and expect an exception.
         try {
-            fixedOrderComparator1.addAsEqual(fixedOrderComparator_UnknownObjectBehavior0, fixedOrderComparator0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // Cannot modify a FixedOrderComparator after a comparison
-            //
-            verifyException("org.apache.commons.collections4.comparators.FixedOrderComparator", e);
+            final Object existingObject = "any object";
+            final Object newObject = "a new object";
+            comparator.addAsEqual(existingObject, newObject);
+            fail("Expected an UnsupportedOperationException because the comparator is locked.");
+        } catch (final UnsupportedOperationException e) {
+            // Verify the exception message is as expected.
+            assertEquals("Cannot modify a FixedOrderComparator after a comparison", e.getMessage());
         }
     }
 }
