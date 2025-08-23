@@ -1,5 +1,6 @@
 package org.apache.commons.lang3.concurrent;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -125,6 +127,8 @@ public class BackgroundInitializerTestTest1 extends AbstractLangTest {
             closed.set(true);
         }
 
+
+
         public int getInitializeCalls() {
             return initializeCalls.get();
         }
@@ -154,14 +158,27 @@ public class BackgroundInitializerTestTest1 extends AbstractLangTest {
         }
     }
 
+    /**
+     * Tests that the builder creates a BackgroundInitializer in a valid,
+     * default initial state before it has been started.
+     */
     @Test
-    void testBuilder() throws ConcurrentException {
-        // @formatter:off
-        final BackgroundInitializer<Object> backgroundInitializer = BackgroundInitializer.builder().setCloser(null).setExternalExecutor(null).setInitializer(null).get();
-        // @formatter:on
-        assertNull(backgroundInitializer.getExternalExecutor());
-        assertFalse(backgroundInitializer.isInitialized());
-        assertFalse(backgroundInitializer.isStarted());
-        assertThrows(IllegalStateException.class, backgroundInitializer::getFuture);
+    void builderShouldCreateInitializerInDefaultState() {
+        // Arrange & Act: Build a BackgroundInitializer using its builder
+        // with all optional properties explicitly set to null.
+        final BackgroundInitializer<Object> initializer = BackgroundInitializer.builder()
+            .setCloser(null)
+            .setExternalExecutor(null)
+            .setInitializer(null)
+            .get();
+
+        // Assert: Verify the initial state of the newly created object.
+        assertAll("Initial state of a built BackgroundInitializer",
+            () -> assertNull(initializer.getExternalExecutor(), "External executor should be null by default."),
+            () -> assertFalse(initializer.isStarted(), "Initializer should not be in 'started' state upon creation."),
+            () -> assertFalse(initializer.isInitialized(), "Initializer should not be in 'initialized' state upon creation."),
+            () -> assertThrows(IllegalStateException.class, initializer::getFuture,
+                "Calling getFuture() before start() should throw an IllegalStateException.")
+        );
     }
 }
