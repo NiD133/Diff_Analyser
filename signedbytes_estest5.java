@@ -1,18 +1,27 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest5 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        byte byte0 = SignedBytes.saturatedCast(0L);
-        assertEquals((byte) 0, byte0);
+    /**
+     * Tests that saturatedCast correctly returns the same value when the input
+     * long is well within the byte's valid range.
+     */
+    @Test
+    public void saturatedCast_withValueInByteRange_returnsSameValue() {
+        // Arrange
+        long valueToCast = 0L;
+        byte expectedByte = 0;
+
+        // Act
+        byte actualByte = SignedBytes.saturatedCast(valueToCast);
+
+        // Assert
+        assertEquals(expectedByte, actualByte);
     }
 }
