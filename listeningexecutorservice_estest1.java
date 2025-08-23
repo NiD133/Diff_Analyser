@@ -1,33 +1,34 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertTrue;
+
 import java.time.Duration;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ListeningExecutorService_ESTestTest1 extends ListeningExecutorService_ESTest_scaffolding {
+/**
+ * Tests for implementations of {@link ListeningExecutorService}, focusing on the behavior of
+ * {@link DirectExecutorService}.
+ */
+public class ListeningExecutorServiceTest {
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        DirectExecutorService directExecutorService0 = new DirectExecutorService();
-        Duration duration0 = Duration.ZERO;
-        directExecutorService0.shutdown();
-        boolean boolean0 = directExecutorService0.awaitTermination(duration0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that a shutdown DirectExecutorService terminates immediately.
+     */
+    @Test
+    public void awaitTermination_onShutdownDirectExecutorService_returnsTrueImmediately()
+            throws InterruptedException {
+        // Arrange
+        // A DirectExecutorService runs tasks on the calling thread and has no thread pool to manage.
+        DirectExecutorService executorService = new DirectExecutorService();
+        executorService.shutdown();
+
+        // Act
+        // Since the service is shut down and has no active tasks, awaitTermination with a
+        // zero timeout should return true, indicating it has terminated.
+        boolean isTerminated = executorService.awaitTermination(Duration.ZERO);
+
+        // Assert
+        assertTrue(
+                "A shutdown DirectExecutorService should report as terminated immediately.", isTerminated);
     }
 }
