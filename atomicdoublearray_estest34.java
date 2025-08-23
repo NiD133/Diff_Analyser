@@ -1,31 +1,45 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AtomicDoubleArray_ESTestTest34 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
+    /**
+     * Verifies that accumulateAndGet throws an IndexOutOfBoundsException when the provided
+     * index is equal to the array's length, which is an invalid, out-of-bounds index.
+     */
     @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(3740);
-        DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-        // Undeclared exception!
+    public void accumulateAndGet_withIndexEqualToLength_throwsIndexOutOfBoundsException() {
+        // Arrange: Create an array of a small, easy-to-understand size.
+        int arrayLength = 10;
+        AtomicDoubleArray array = new AtomicDoubleArray(arrayLength);
+
+        // The first invalid index is the one equal to the array's length.
+        int outOfBoundsIndex = arrayLength;
+
+        // The accumulator function is not used when the index check fails,
+        // so a simple dummy implementation is sufficient.
+        DoubleBinaryOperator dummyAccumulator = (left, right) -> left + right;
+
+        // Act & Assert
         try {
-            atomicDoubleArray0.accumulateAndGet(3740, 3740, doubleBinaryOperator0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 3740
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
+            array.accumulateAndGet(outOfBoundsIndex, 1.0, dummyAccumulator);
+            fail("Expected an IndexOutOfBoundsException for index " + outOfBoundsIndex);
+        } catch (IndexOutOfBoundsException expected) {
+            // This is the expected behavior.
+            // For a more robust test, we can verify the exception message.
+            String expectedMessageFragment = "index " + outOfBoundsIndex;
+            assertTrue(
+                "Exception message should contain the out-of-bounds index.",
+                expected.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
