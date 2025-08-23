@@ -1,55 +1,84 @@
 package org.apache.ibatis.jdbc;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
+import org.junit.jupiter.api.Test;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
 import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ScriptRunner_ESTestTest8 extends ScriptRunner_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ResultSetMetaData resultSetMetaData0 = mock(ResultSetMetaData.class, new ViolatedAssumptionAnswer());
-        doReturn(1649).when(resultSetMetaData0).getColumnCount();
-        doReturn((String) null, (String) null, (String) null, (String) null, (String) null).when(resultSetMetaData0).getColumnLabel(anyInt());
-        ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
-        doReturn(resultSetMetaData0).when(resultSet0).getMetaData();
-        doReturn((String) null, (String) null, (String) null, (String) null, (String) null).when(resultSet0).getString(anyInt());
-        doReturn(true, false).when(resultSet0).next();
-        Statement statement0 = mock(Statement.class, new ViolatedAssumptionAnswer());
-        doReturn(true).when(statement0).execute(anyString());
-        doReturn(false, false, false, false, false).when(statement0).getMoreResults();
-        doReturn(resultSet0).when(statement0).getResultSet();
-        doReturn(0, 0, 0, 0, 0).when(statement0).getUpdateCount();
-        Connection connection0 = mock(Connection.class, new ViolatedAssumptionAnswer());
-        doReturn(statement0).when(connection0).createStatement();
-        doReturn(true, true).when(connection0).getAutoCommit();
-        ScriptRunner scriptRunner0 = new ScriptRunner(connection0);
-        StringReader stringReader0 = new StringReader(";");
-        // Undeclared exception!
-        try {
-            scriptRunner0.runScript(stringReader0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error executing:
-            // .  Cause: org.evosuite.runtime.TooManyResourcesException: Loop has been executed more times than the allowed 10000
-            //
-            verifyException("org.apache.ibatis.jdbc.ScriptRunner", e);
-        }
+/**
+ * Test suite for the ScriptRunner class.
+ */
+class ScriptRunnerTest {
+
+    /**
+     * Tests that ScriptRunner correctly handles and wraps exceptions that occur during
+     * the processing of a result set.
+     *
+     * This scenario is simulated by mocking a ResultSet with an excessively large number of columns.
+     * Processing such a result set would be a long-running operation, which in some test environments
+     * (like the one that generated the original test) can trigger a resource limit exception.
+     *
+     * The test verifies that ScriptRunner catches such an underlying exception and wraps it
+     * in a descriptive RuntimeException, ensuring robust error handling.
+     */
+    @Test
+    void runScript_shouldWrapExecutionErrorInRuntimeException() throws Exception {
+        // --- Arrange ---
+        // 1. Simulate a ResultSet with a very large number of columns to trigger a
+        //    long-running internal loop within ScriptRunner's result printing logic.
+        final int EXCESSIVE_COLUMN_COUNT = 1649;
+
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+        when(mockMetaData.getColumnCount()).thenReturn(EXCESSIVE_COLUMN_COUNT);
+        when(mockMetaData.getColumnLabel(anyInt())).thenReturn("ANY_COLUMN_LABEL");
+
+        ResultSet mockResultSet = mock(ResultSet.class);
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockResultSet.getString(anyInt())).thenReturn("ANY_VALUE");
+        // Simulate a result set with exactly one row.
+        when(mockResultSet.next()).thenReturn(true, false);
+
+        // 2. Simulate a Statement that returns the problematic ResultSet.
+        Statement mockStatement = mock(Statement.class);
+        when(mockStatement.execute(anyString())).thenReturn(true); // Indicates a ResultSet is available.
+        when(mockStatement.getResultSet()).thenReturn(mockResultSet);
+        when(mockStatement.getMoreResults()).thenReturn(false); // No more results after this one.
+        when(mockStatement.getUpdateCount()).thenReturn(-1); // Standard for "no update count".
+
+        // 3. Simulate a Connection that provides the mocked Statement.
+        Connection mockConnection = mock(Connection.class);
+        when(mockConnection.createStatement()).thenReturn(mockStatement);
+        when(mockConnection.getAutoCommit()).thenReturn(true);
+
+        ScriptRunner scriptRunner = new ScriptRunner(mockConnection);
+        Reader scriptReader = new StringReader(";"); // A simple script with one command.
+
+        // --- Act & Assert ---
+        // Execute the script and assert that ScriptRunner catches the underlying problem
+        // and wraps it in its own RuntimeException.
+        // Note: We use JUnit 5's assertThrows for a more readable assertion.
+        RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
+            scriptRunner.runScript(scriptReader);
+        });
+
+        // Verify the exception message to confirm it originates from ScriptRunner's error handling.
+        assertTrue(
+            thrownException.getMessage().startsWith("Error executing: ;"),
+            "Exception message should indicate an error during script execution."
+        );
+        assertNotNull(
+            thrownException.getCause(),
+            "The RuntimeException should wrap the original cause of the failure."
+        );
     }
 }
