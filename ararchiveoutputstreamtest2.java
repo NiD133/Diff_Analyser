@@ -1,31 +1,46 @@
 package org.apache.commons.compress.archivers.ar;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.compress.AbstractTest;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
+
+/**
+ * Tests for {@link ArArchiveOutputStream} focusing on long file name handling.
+ */
 public class ArArchiveOutputStreamTestTest2 extends AbstractTest {
 
+    /**
+     * Verifies that the BSD dialect correctly handles file names longer than the standard 16-character limit.
+     */
     @Test
-    void testLongFileNamesWorkUsingBSDDialect() throws Exception {
-        final File file = createTempFile();
-        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(file.toPath()))) {
+    void shouldCreateArchiveWithLongFileNameWhenBsdDialectIsUsed() throws Exception {
+        // Arrange
+        // The standard AR format has a 16-character limit for file names.
+        // This name is intentionally longer to test the BSD extension.
+        final String longFileName = "this_is_a_long_file_name.txt"; // 30 characters
+        final String fileContent = "Hello, world!\n";
+        final byte[] contentBytes = fileContent.getBytes(StandardCharsets.UTF_8);
+
+        final File archiveFile = createTempFile();
+
+        // Act
+        try (ArArchiveOutputStream outputStream = new ArArchiveOutputStream(Files.newOutputStream(archiveFile.toPath()))) {
+            // Configure the stream to use the BSD dialect for long file name support.
             outputStream.setLongFileMode(ArArchiveOutputStream.LONGFILE_BSD);
-            final ArArchiveEntry ae = new ArArchiveEntry("this_is_a_long_name.txt", 14);
-            outputStream.putArchiveEntry(ae);
-            outputStream.write(new byte[] { 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n' });
+
+            final ArArchiveEntry entry = new ArArchiveEntry(longFileName, contentBytes.length);
+            outputStream.putArchiveEntry(entry);
+            outputStream.write(contentBytes);
             outputStream.closeArchiveEntry();
-            final List<String> expected = new ArrayList<>();
-            expected.add("this_is_a_long_name.txt");
-            checkArchiveContent(file, expected);
         }
+
+        // Assert
+        // The checkArchiveContent helper from AbstractTest verifies the archive's contents.
+        final List<String> expectedEntryNames = List.of(longFileName);
+        checkArchiveContent(archiveFile, expectedEntryNames);
     }
 }
