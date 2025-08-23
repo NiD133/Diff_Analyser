@@ -1,35 +1,64 @@
 package org.jsoup.select;
 
-import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import org.jsoup.parser.Parser;
+import org.junit.runner.RunWith;
 
-public class ElementsTestTest38 {
+public class Elements_ESTestTest38 extends Elements_ESTest_scaffolding {
 
-    @Test
-    public void eachAttr() {
-        Document doc = Jsoup.parse("<div><a href='/foo'>1</a><a href='http://example.com/bar'>2</a><a href=''>3</a><a>4</a>", "http://example.com");
-        List<String> hrefAttrs = doc.select("a").eachAttr("href");
-        assertEquals(3, hrefAttrs.size());
-        assertEquals("/foo", hrefAttrs.get(0));
-        assertEquals("http://example.com/bar", hrefAttrs.get(1));
-        assertEquals("", hrefAttrs.get(2));
-        assertEquals(4, doc.select("a").size());
-        List<String> absAttrs = doc.select("a").eachAttr("abs:href");
-        assertEquals(3, absAttrs.size());
-        assertEquals(3, absAttrs.size());
-        assertEquals("http://example.com/foo", absAttrs.get(0));
-        assertEquals("http://example.com/bar", absAttrs.get(1));
-        assertEquals("http://example.com", absAttrs.get(2));
+    /**
+     * Tests that modifications to the DOM through one Elements object are reflected
+     * in another Elements object that points to the same underlying nodes.
+     *
+     * This test verifies that after prepending a new element to the parent of the
+     * <head> tag, its sibling index is correctly updated in a separate selection.
+     */
+    @Test(timeout = 4000)
+    public void testSiblingIndexIsUpdatedAfterDomModification() throws Throwable {
+        // Arrange: Create a document and select a specific element.
+        Document doc = Document.createShell("<m-2,eXTA:N5y7");
+        Elements allElements = doc.getAllElements(); // Contains [<html>, <head>, <body>]
+
+        // The prev() method finds the immediate previous sibling for each element.
+        // For the list [<html>, <head>, <body>], only <body> has a previous
+        // element sibling, which is <head>.
+        Elements prevElements = allElements.prev(); // Contains just [<head>]
+
+        // Act: Modify the DOM by prepending a new element to all elements.
+        // The key modification happens when a new node is prepended to <html>,
+        // which is the parent of <head>.
+        allElements.prepend("<m-2,eXTA:N5y7");
+
+        // Assert: Verify that the change in the DOM is reflected in the original selection.
+        Element headElement = prevElements.first();
+
+        // The selection should still contain the single <head> element.
+        assertEquals("Selection should still contain one element", 1, prevElements.size());
+
+        // The sibling index of <head> should be updated because a new element
+        // was inserted before it inside <html>. The original test expects an index of 2,
+        // which implies the prepended string might be parsed into multiple nodes
+        // in the test environment.
+        assertEquals("Sibling index of <head> should be updated after prepend", 2, headElement.siblingIndex());
     }
 }
