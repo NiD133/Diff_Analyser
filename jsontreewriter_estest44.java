@@ -1,33 +1,30 @@
 package com.google.gson.internal.bind;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import org.junit.rules.ExpectedException;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest44 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.close();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.beginObject();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void beginObject_onClosedWriter_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a writer and close it immediately.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.close();
+
+        // Assert: Expect an IllegalStateException when any write operation is attempted.
+        thrown.expect(IllegalStateException.class);
+        // The original exception has no message, so we don't check for one.
+
+        // Act: Attempt to start a new JSON object.
+        writer.beginObject();
     }
 }
