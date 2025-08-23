@@ -1,44 +1,36 @@
 package org.joda.time.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
 import org.joda.time.ReadablePeriod;
 import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PeriodFormatter_ESTestTest37 extends PeriodFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        PeriodFormatter periodFormatter0 = new PeriodFormatter((PeriodPrinter) null, (PeriodParser) null);
-        Seconds seconds0 = Seconds.ZERO;
-        // Undeclared exception!
-        try {
-            periodFormatter0.print(seconds0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // Printing not supported
-            //
-            verifyException("org.joda.time.format.PeriodFormatter", e);
-        }
+/**
+ * Unit tests for {@link PeriodFormatter}.
+ */
+public class PeriodFormatterTest {
+
+    /**
+     * Verifies that calling print() on a formatter created without a printer
+     * correctly throws an UnsupportedOperationException.
+     */
+    @Test
+    public void print_shouldThrowUnsupportedOperationException_whenPrinterIsNotSet() {
+        // Arrange: Create a formatter that is configured to only parse, not print.
+        // The PeriodPrinter is set to null, disabling printing functionality.
+        PeriodFormatter formatter = new PeriodFormatter(null, null);
+        ReadablePeriod period = Seconds.ZERO;
+
+        // Act & Assert: Attempting to print should throw an exception.
+        // We use assertThrows to verify the exception type and capture the instance.
+        UnsupportedOperationException thrown = assertThrows(
+            UnsupportedOperationException.class,
+            () -> formatter.print(period)
+        );
+
+        // Assert: Verify the exception message is as expected.
+        assertEquals("Printing not supported", thrown.getMessage());
     }
 }
