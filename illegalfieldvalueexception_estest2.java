@@ -2,18 +2,35 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IllegalFieldValueException_ESTestTest2 extends IllegalFieldValueException_ESTest_scaffolding {
+/**
+ * Tests for {@link IllegalFieldValueException}.
+ */
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        DurationFieldType durationFieldType0 = DurationFieldType.CENTURIES_TYPE;
-        IllegalFieldValueException illegalFieldValueException0 = new IllegalFieldValueException(durationFieldType0, "Value ");
-        illegalFieldValueException0.getIllegalStringValue();
-        assertEquals("Value \"Value \" for centuries is not supported", illegalFieldValueException0.getMessage());
+    @Test
+    public void constructor_WithDurationFieldTypeAndStringValue_ShouldSetPropertiesCorrectly() {
+        // Arrange
+        final DurationFieldType fieldType = DurationFieldType.centuries();
+        final String illegalValue = "InvalidTextValue";
+        final String expectedMessage = "Value \"InvalidTextValue\" for centuries is not supported";
+
+        // Act
+        IllegalFieldValueException exception = new IllegalFieldValueException(fieldType, illegalValue);
+
+        // Assert
+        // Verify that the exception message is formatted as expected.
+        assertEquals(expectedMessage, exception.getMessage());
+
+        // Verify that the exception's properties are correctly initialized.
+        assertEquals(fieldType, exception.getDurationFieldType());
+        assertEquals("centuries", exception.getFieldName());
+        assertEquals(illegalValue, exception.getIllegalStringValue());
+        
+        // Verify that properties related to other constructors are null.
+        assertNull(exception.getDateTimeFieldType());
+        assertNull(exception.getIllegalNumberValue());
+        assertNull(exception.getLowerBound());
+        assertNull(exception.getUpperBound());
     }
 }
