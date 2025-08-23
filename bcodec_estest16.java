@@ -1,29 +1,30 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest16 extends BCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        try {
-            bCodec0.decode("WgJp7)");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // RFC 1522 violation: malformed encoded content
-            //
-            verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
-        }
+/**
+ * Tests for {@link BCodec}.
+ */
+public class BCodecTest {
+
+    @Test
+    public void decodeShouldThrowDecoderExceptionForMalformedInput() {
+        // Arrange: Create a BCodec instance and define an input string that
+        // does not conform to the RFC 1522 encoded-word format "=?charset?encoding?encoded-text?=".
+        final BCodec bCodec = new BCodec();
+        final String malformedInput = "An invalid encoded string";
+
+        // Act & Assert: Verify that attempting to decode the malformed string
+        // throws a DecoderException with the expected message.
+        final DecoderException exception = assertThrows(
+            DecoderException.class,
+            () -> bCodec.decode(malformedInput)
+        );
+
+        assertEquals("RFC 1522 violation: malformed encoded content", exception.getMessage());
     }
 }
