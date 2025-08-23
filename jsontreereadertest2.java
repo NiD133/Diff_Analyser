@@ -1,40 +1,38 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonArray;
+
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
 public class JsonTreeReaderTestTest2 {
 
     @Test
-    public void testSkipValue_filledJsonObject() throws IOException {
-        JsonObject jsonObject = new JsonObject();
-        JsonArray jsonArray = new JsonArray();
-        jsonArray.add('c');
-        jsonArray.add("text");
-        jsonObject.add("a", jsonArray);
-        jsonObject.addProperty("b", true);
-        jsonObject.addProperty("i", 1);
-        jsonObject.add("n", JsonNull.INSTANCE);
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.addProperty("n", 2L);
-        jsonObject.add("o", jsonObject2);
-        jsonObject.addProperty("s", "text");
-        JsonTreeReader in = new JsonTreeReader(jsonObject);
-        in.skipValue();
-        assertThat(in.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-        assertThat(in.getPath()).isEqualTo("$");
+    public void skipValue_onRootJsonObject_consumesObjectAndStopsAtEndDocument() throws IOException {
+        // Arrange
+        String json = "{"
+            + "  \"a\": ['c', \"text\"],"
+            + "  \"b\": true,"
+            + "  \"i\": 1,"
+            + "  \"n\": null,"
+            + "  \"o\": {"
+            + "    \"n\": 2"
+            + "  },"
+            + "  \"s\": \"text\""
+            + "}";
+        JsonElement rootElement = JsonParser.parseString(json);
+        JsonTreeReader reader = new JsonTreeReader(rootElement);
+
+        // Act
+        reader.skipValue();
+
+        // Assert
+        // After skipping the entire root object, the reader should be at the end of the document.
+        assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+        // The path should still point to the root, as the reader has consumed the single top-level element.
+        assertThat(reader.getPath()).isEqualTo("$");
     }
 }
