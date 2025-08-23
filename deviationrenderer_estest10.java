@@ -1,37 +1,40 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class DeviationRenderer_ESTestTest10 extends DeviationRenderer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DeviationRenderer} class.
+ */
+public class DeviationRendererTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer(true, true);
-        boolean boolean0 = deviationRenderer0.equals(deviationRenderer0);
-        assertEquals(0.5F, deviationRenderer0.getAlpha(), 0.01F);
-        assertTrue(deviationRenderer0.getDrawSeriesLineAsPath());
-        assertTrue(boolean0);
+    /**
+     * Verifies that the constructor correctly initializes the renderer with its
+     * default properties. The default alpha should be 0.5f, and drawing the
+     * series line as a path should be enabled.
+     */
+    @Test
+    public void constructor_shouldSetDefaultProperties() {
+        // Arrange & Act: Create a new renderer instance with lines and shapes visible.
+        DeviationRenderer renderer = new DeviationRenderer(true, true);
+
+        // Assert: Check that the default property values are set as expected.
+        assertEquals("Default alpha value should be 0.5f", 0.5f, renderer.getAlpha(), 0.0f);
+        assertTrue("Drawing series line as a path should be enabled by default", renderer.getDrawSeriesLineAsPath());
+    }
+
+    /**
+     * Tests the reflexivity property of the equals() method. An object must
+     * always be equal to itself.
+     */
+    @Test
+    public void equals_shouldReturnTrueForSameInstance() {
+        // Arrange: Create a new renderer instance.
+        DeviationRenderer renderer = new DeviationRenderer(true, true);
+
+        // Act & Assert: An instance should always be equal to itself.
+        // This confirms the reflexive property of the equals() method.
+        assertEquals("A renderer instance should be equal to itself", renderer, renderer);
     }
 }
