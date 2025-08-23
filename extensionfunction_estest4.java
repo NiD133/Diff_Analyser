@@ -1,49 +1,56 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
 import org.apache.commons.jxpath.ri.axes.RootContext;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ExtensionFunction_ESTestTest4 extends ExtensionFunction_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        QName qName0 = new QName("org.apache.commons.jxpath.ri.Parser");
-        ExtensionFunction extensionFunction0 = new ExtensionFunction(qName0, (Expression[]) null);
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        NodeSetContext nodeSetContext0 = new NodeSetContext((EvalContext) null, basicNodeSet0);
-        JXPathContextReferenceImpl jXPathContextReferenceImpl0 = (JXPathContextReferenceImpl) JXPathContext.newContext((Object) nodeSetContext0);
-        Locale locale0 = Locale.PRC;
-        BeanPointer beanPointer0 = (BeanPointer) NodePointer.newNodePointer(qName0, nodeSetContext0, locale0);
-        RootContext rootContext0 = new RootContext(jXPathContextReferenceImpl0, beanPointer0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link ExtensionFunction} class.
+ * This improved version focuses on clarity and maintainability.
+ */
+public class ExtensionFunctionTest {
+
+    /**
+     * Tests that computeValue() throws a RuntimeException when the specified
+     * extension function cannot be found or invoked.
+     * <p>
+     * This scenario is simulated by providing a QName that corresponds to a
+     * class name ("org.apache.commons.jxpath.ri.Parser") rather than a
+     * valid, invokable function.
+     */
+    @Test
+    public void computeValue_whenFunctionCannotBeInvoked_throwsRuntimeException() {
+        // Arrange: Set up an extension function with a name that cannot be resolved
+        // to an actual function, and create the necessary evaluation context.
+        QName unresolvableFunctionName = new QName("org.apache.commons.jxpath.ri.Parser");
+        Expression[] noArguments = null;
+        ExtensionFunction extensionFunction = new ExtensionFunction(unresolvableFunctionName, noArguments);
+
+        // The computeValue method requires a valid EvalContext. We create a minimal
+        // RootContext, which is a common type of EvalContext used by the JXPath engine.
+        JXPathContext jxpathContext = JXPathContext.newContext(new Object());
+        NodePointer rootPointer = NodePointer.newNodePointer(new QName("root"), jxpathContext.getContextBean(), Locale.getDefault());
+        EvalContext evalContext = new RootContext((JXPathContextReferenceImpl) jxpathContext, rootPointer);
+
+        // Act & Assert: Verify that calling computeValue throws the expected exception
+        // with a descriptive message.
         try {
-            extensionFunction0.computeValue(rootContext0);
-            fail("Expecting exception: RuntimeException");
+            extensionFunction.computeValue(evalContext);
+            fail("Expected a RuntimeException because the extension function is not invokable.");
         } catch (RuntimeException e) {
-            //
-            // Cannot invoke extension function org.apache.commons.jxpath.ri.Parser
-            //
-            verifyException("org.apache.commons.jxpath.PackageFunctions", e);
+            // The JXPath engine wraps the underlying error in a JXPathException (a subclass of RuntimeException).
+            // We verify the message to ensure it's the correct error.
+            String expectedMessage = "Cannot invoke extension function " + unresolvableFunctionName;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
