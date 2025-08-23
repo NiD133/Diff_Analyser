@@ -1,23 +1,25 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
 import java.util.Locale;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.ISOChronology;
 
-public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
+/**
+ * Test class for PreciseDurationDateTimeField.
+ */
+public class PreciseDurationDateTimeFieldTest extends TestCase {
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
     public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
+        // Corrected to run tests from this class
+        return new TestSuite(PreciseDurationDateTimeFieldTest.class);
     }
 
     @Override
@@ -29,6 +31,12 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
     }
 
     //-----------------------------------------------------------------------
+    /**
+     * A mock PreciseDurationDateTimeField for testing purposes.
+     * It simulates a field with a unit size of 60 milliseconds.
+     * The core `get(long instant)` method is implemented as `instant / 60`,
+     * which allows for predictable return values in tests.
+     */
     static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
 
         protected MockPreciseDurationDateTimeField() {
@@ -41,6 +49,7 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
 
         @Override
         public int get(long instant) {
+            // Simplified logic for predictable test outcomes.
             return (int) (instant / 60L);
         }
 
@@ -55,6 +64,8 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
         }
     }
 
+    // NOTE: The following mock classes are used by other tests in the full suite.
+    
     static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
 
         protected MockStandardBaseDateTimeField() {
@@ -76,9 +87,7 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
     static class MockCountingDurationField extends BaseDurationField {
 
         static int add_int = 0;
-
         static int add_long = 0;
-
         static int difference_long = 0;
 
         protected MockCountingDurationField(DurationFieldType type) {
@@ -92,6 +101,7 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
 
         @Override
         public long getUnitMillis() {
+            // A non-standard unit of 60ms is used for testing purposes.
             return 60;
         }
 
@@ -143,7 +153,6 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
 
         @Override
         public long getUnitMillis() {
-            // this is zero
             return 0;
         }
 
@@ -187,7 +196,6 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
 
         @Override
         public boolean isPrecise() {
-            // this is false
             return false;
         }
 
@@ -228,9 +236,32 @@ public class PreciseDurationDateTimeFieldTestTest8 extends TestCase {
     }
 
     //-----------------------------------------------------------------------
-    public void test_getAsText_long_Locale() {
+    /**
+     * Tests that getAsText returns the string representation of the field's value,
+     * ignoring the provided Locale.
+     */
+    public void testGetAsText_returnsStringRepresentationOfValue() {
+        // Arrange
+        // The getAsText() method in the base class calls get() and converts the integer result to a String.
+        // Our mock field's get(instant) is implemented as `instant / 60`.
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("29", field.getAsText(60L * 29, Locale.ENGLISH));
-        assertEquals("29", field.getAsText(60L * 29, null));
+
+        final int FIELD_VALUE = 29;
+        final long INSTANT_TO_TEST = 60L * FIELD_VALUE; // An instant that yields a value of 29
+        final String EXPECTED_TEXT = "29";
+
+        // Act & Assert
+        // The default implementation of getAsText should ignore the locale.
+        assertEquals(
+                "getAsText should format the value correctly with a non-null locale",
+                EXPECTED_TEXT,
+                field.getAsText(INSTANT_TO_TEST, Locale.ENGLISH)
+        );
+
+        assertEquals(
+                "getAsText should format the value correctly with a null locale",
+                EXPECTED_TEXT,
+                field.getAsText(INSTANT_TO_TEST, null)
+        );
     }
 }
