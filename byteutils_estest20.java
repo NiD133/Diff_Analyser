@@ -1,42 +1,29 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test class contains tests for the {@link ByteUtils} class.
+ * Note: The class name and inheritance are preserved from the original auto-generated test.
+ * A manual rewrite would likely rename the class to ByteUtilsTest and remove the inheritance.
+ */
 public class ByteUtils_ESTestTest20 extends ByteUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        // Undeclared exception!
-        try {
-            ByteUtils.toLittleEndian((OutputStream) null, (long) (byte) (-1), 3);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Tests that {@link ByteUtils#toLittleEndian(OutputStream, long, int)} throws
+     * a {@code NullPointerException} when the provided OutputStream is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toLittleEndianWithNullOutputStreamThrowsNullPointerException() {
+        // Arrange: Define dummy arguments for the method call.
+        // The actual value and length do not matter for this test, as the
+        // NullPointerException should be thrown when accessing the null stream.
+        final long DUMMY_VALUE = 0L;
+        final int DUMMY_LENGTH = 4;
+        final OutputStream nullStream = null;
+
+        // Act & Assert: Call the method with a null stream, expecting an exception.
+        ByteUtils.toLittleEndian(nullStream, DUMMY_VALUE, DUMMY_LENGTH);
     }
 }
