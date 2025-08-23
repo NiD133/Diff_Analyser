@@ -1,19 +1,38 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest31 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on long-to-char conversion.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        char[] charArray0 = new char[6];
-        int int0 = NumberOutput.outputLong((-3640L), charArray0, 0);
-        assertArrayEquals(new char[] { '-', '3', '6', '4', '0', '\u0000' }, charArray0);
-        assertEquals(5, int0);
+    /**
+     * Tests that {@link NumberOutput#outputLong(long, char[], int)} correctly converts
+     * a negative long value into its character representation in a buffer.
+     */
+    @Test
+    public void shouldWriteNegativeLongToCharArray() {
+        // Arrange: Set up the input value and the output buffer.
+        long valueToTest = -3640L;
+        String expectedString = "-3640";
+        // The buffer must be large enough to hold the string representation.
+        char[] buffer = new char[10];
+        int initialOffset = 0;
+
+        // Act: Call the method under test.
+        int newOffset = NumberOutput.outputLong(valueToTest, buffer, initialOffset);
+
+        // Assert: Verify the method's output and return value.
+        // 1. The method should return the new offset, which is the number of characters written.
+        int charsWritten = expectedString.length();
+        assertEquals("The method should return the new offset after writing the number.",
+                charsWritten, newOffset);
+
+        // 2. The buffer should contain the correct string representation of the number.
+        String actualString = new String(buffer, initialOffset, charsWritten);
+        assertEquals("The buffer should contain the correct string representation of the negative long.",
+                expectedString, actualString);
     }
 }
