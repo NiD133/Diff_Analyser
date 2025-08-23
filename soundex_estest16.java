@@ -1,19 +1,37 @@
 package org.apache.commons.codec.language;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Soundex_ESTestTest16 extends Soundex_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Soundex} class, focusing on specific edge cases.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Soundex soundex0 = new Soundex();
-        int int0 = soundex0.difference("01230120022455012623010202", "6]5]'j=[IE=9");
-        assertEquals(4, soundex0.getMaxLength());
-        assertEquals(0, int0);
+    /**
+     * Tests that the difference score is 0 when comparing a string that contains
+     * no letters against another string.
+     * <p>
+     * The Soundex algorithm ignores non-alphabetic characters. A string without any
+     * letters will produce an empty Soundex code. The difference utility considers
+     * a comparison involving an empty code to have a difference of 0.
+     * </p>
+     */
+    @Test
+    public void testDifferenceIsZeroWhenOneStringContainsNoLetters() throws EncoderException {
+        // Arrange
+        final Soundex soundex = new Soundex();
+        // This string contains no letters and will result in an empty Soundex code.
+        final String stringWithoutLetters = "6]5]'=[=9";
+        // A standard string for comparison.
+        final String standardString = "Testing";
+        final int expectedDifference = 0;
+
+        // Act
+        final int actualDifference = soundex.difference(stringWithoutLetters, standardString);
+
+        // Assert
+        assertEquals(expectedDifference, actualDifference);
     }
 }
