@@ -1,18 +1,30 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest1 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        int int0 = iOCase0.checkIndexOf("1", 0, "1");
-        assertEquals(0, int0);
+    /**
+     * Tests that {@code checkIndexOf} with {@code IOCase.INSENSITIVE}
+     * finds a substring even when the casing does not match.
+     */
+    @Test
+    public void checkIndexOfWithInsensitiveShouldFindSubstringWithDifferentCase() {
+        // Arrange
+        final String text = "Apache Commons IO";
+        final String searchString = "commons"; // Substring with different case
+        final int startIndex = 0;
+        final int expectedIndex = 7;
+
+        // Act
+        final int actualIndex = IOCase.INSENSITIVE.checkIndexOf(text, startIndex, searchString);
+
+        // Assert
+        assertEquals("Expected to find the substring at index 7, ignoring case.",
+                     expectedIndex, actualIndex);
     }
 }
