@@ -1,20 +1,30 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
+import static org.junit.Assert.assertSame;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CopticChronology_ESTestTest19 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the CopticChronology class, focusing on its time zone handling.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-        Chronology chronology0 = copticChronology0.withZone((DateTimeZone) null);
-        assertSame(copticChronology0, chronology0);
+    /**
+     * Tests that calling withZone() with the same time zone returns the same instance.
+     * Chronology objects are immutable, so this is an important caching optimization.
+     */
+    @Test
+    public void withZone_whenZoneIsUnchanged_shouldReturnSameInstance() {
+        // Arrange: Create a CopticChronology instance for the UTC time zone.
+        CopticChronology initialChronology = CopticChronology.getInstanceUTC();
+
+        // Act: Request the chronology for the same time zone it already has.
+        Chronology resultChronology = initialChronology.withZone(DateTimeZone.UTC);
+
+        // Assert: The returned object should be the exact same instance, not just an equal one.
+        assertSame("Expected the same instance when the time zone is not changed",
+                   initialChronology, resultChronology);
     }
 }
