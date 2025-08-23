@@ -2,23 +2,30 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest2 extends JsonArray_ESTest_scaffolding {
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Float float0 = new Float(0.0);
-        jsonArray0.add((Number) float0);
-        JsonPrimitive jsonPrimitive0 = (JsonPrimitive) jsonArray0.set(0, (JsonElement) null);
-        assertFalse(jsonPrimitive0.isBoolean());
+    @Test
+    public void setShouldReturnThePreviouslyStoredElement() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        JsonPrimitive originalElement = new JsonPrimitive(0.0f);
+        jsonArray.add(originalElement);
+
+        // The element that will replace the original one.
+        JsonElement newElement = new JsonPrimitive("new value");
+
+        // Act
+        // The `set` method replaces the element at the specified index
+        // and is expected to return the element that was previously at that position.
+        JsonElement returnedElement = jsonArray.set(0, newElement);
+
+        // Assert
+        // Verify that the returned element is the one we originally added.
+        assertEquals(originalElement, returnedElement);
+
+        // For completeness, also verify the array's current state.
+        assertEquals(1, jsonArray.size());
+        assertEquals(newElement, jsonArray.get(0));
     }
 }
