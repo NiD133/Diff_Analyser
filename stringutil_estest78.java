@@ -1,28 +1,22 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest78 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test77() throws Throwable {
-        boolean boolean0 = StringUtil.isNumeric("Yn)+vHQao!UlQ0jsv(O");
-        assertFalse(boolean0);
+    @Test
+    public void isNumericShouldReturnFalseForNonNumericString() {
+        // Arrange: A string containing a mix of letters, symbols, and numbers.
+        String nonNumericInput = "Yn)+vHQao!UlQ0jsv(O";
+
+        // Act: Check if the string is numeric.
+        boolean isNumeric = StringUtil.isNumeric(nonNumericInput);
+
+        // Assert: The result should be false.
+        assertFalse("A string containing non-digit characters should not be considered numeric.", isNumeric);
     }
 }
