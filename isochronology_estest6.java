@@ -1,20 +1,23 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ISOChronology_ESTestTest6 extends ISOChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ISOChronology} class.
+ */
+public class ISOChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
-        String string0 = iSOChronology0.toString();
-        assertEquals("ISOChronology[UTC]", string0);
+    @Test
+    public void toString_forUTCInstance_shouldReturnCorrectStringRepresentation() {
+        // Arrange
+        ISOChronology utcChronology = ISOChronology.getInstanceUTC();
+        String expectedToString = "ISOChronology[UTC]";
+
+        // Act
+        String actualToString = utcChronology.toString();
+
+        // Assert
+        assertEquals(expectedToString, actualToString);
     }
 }
