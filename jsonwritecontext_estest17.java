@@ -2,32 +2,38 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest17 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on its state management.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        Object object0 = new Object();
-        jsonWriteContext0._currentValue = object0;
-        jsonWriteContext0.getCurrentValue();
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertEquals("ROOT", jsonWriteContext0.getTypeDesc());
+    /**
+     * Tests that a value can be set and retrieved on a root context,
+     * and that this operation does not alter other fundamental context properties
+     * like nesting depth or type.
+     */
+    @Test
+    public void shouldSetAndGetCurrentValueOnRootContext() {
+        // Arrange: Create a root context and a value to associate with it.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+        Object testValue = new Object();
+
+        // Act: Set the current value on the context and then retrieve it.
+        rootContext.setCurrentValue(testValue);
+        Object retrievedValue = rootContext.getCurrentValue();
+
+        // Assert
+        // 1. Verify that the current value was set and can be retrieved correctly.
+        assertSame("The retrieved value should be the same instance that was set.",
+                testValue, retrievedValue);
+
+        // 2. Verify that setting the current value does not affect other context properties.
+        assertEquals("Nesting depth should remain 0 for the root context.",
+                0, rootContext.getNestingDepth());
+        assertEquals("Entry count should remain 0 for a new root context.",
+                0, rootContext.getEntryCount());
+        assertEquals("Type description should remain 'ROOT' for the root context.",
+                "ROOT", rootContext.getTypeDesc());
     }
 }
