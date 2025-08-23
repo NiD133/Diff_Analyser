@@ -1,41 +1,29 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlTreeBuilder_ESTestTest27 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for {@link XmlTreeBuilder}, focusing on its internal state management.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        CDataNode cDataNode0 = new CDataNode("xl`t");
-        // Undeclared exception!
-        try {
-            xmlTreeBuilder0.insertLeafNode(cDataNode0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.TreeBuilder", e);
-        }
+    /**
+     * Verifies that attempting to insert a node into an XmlTreeBuilder
+     * before it has been initialized (e.g., by a call to parse())
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void insertLeafNodeOnUninitializedBuilderThrowsException() {
+        // Arrange: Create a builder but do not initialize it.
+        // This means its internal document, which nodes are appended to, is null.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        CDataNode cdataNode = new CDataNode("some cdata");
+
+        // Act: Attempt to insert a leaf node. This should fail because there is no
+        // root document to append the node to.
+        xmlTreeBuilder.insertLeafNode(cdataNode);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
