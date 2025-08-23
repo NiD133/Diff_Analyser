@@ -1,46 +1,32 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class ClusteredXYBarRenderer_ESTestTest26 extends ClusteredXYBarRenderer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ClusteredXYBarRenderer} class, focusing on core
+ * object behaviors like cloning and equality.
+ */
+public class ClusteredXYBarRendererTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        Object object0 = clusteredXYBarRenderer0.clone();
-        boolean boolean0 = clusteredXYBarRenderer0.equals(object0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the clone() method creates a new object that is equal
+     * to the original, but is a different object instance. This test validates
+     * the contract between the clone() and equals() methods.
+     */
+    @Test
+    public void clone_shouldProduceEqualButDistinctInstance() throws CloneNotSupportedException {
+        // Arrange: Create an instance of the renderer.
+        ClusteredXYBarRenderer originalRenderer = new ClusteredXYBarRenderer();
+
+        // Act: Create a clone of the original instance.
+        ClusteredXYBarRenderer clonedRenderer = (ClusteredXYBarRenderer) originalRenderer.clone();
+
+        // Assert: The clone should be a different object instance...
+        assertNotSame("The cloned object should be a new instance.", originalRenderer, clonedRenderer);
+        
+        // ...but it should be equal in value to the original.
+        assertEquals("The cloned object should be equal to the original.", originalRenderer, clonedRenderer);
     }
 }
