@@ -1,55 +1,39 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
 import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class is derived from an auto-generated one.
+ * The class name and inheritance are kept to match the original structure.
+ */
 public class DayOfYear_ESTestTest13 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        ChronoField chronoField0 = ChronoField.ERA;
-        // Undeclared exception!
+    /**
+     * Verifies that calling get() with an unsupported TemporalField throws an exception.
+     * The DayOfYear class is designed to support only the DAY_OF_YEAR field.
+     * Accessing any other field, such as ERA, should fail.
+     */
+    @Test
+    public void get_withUnsupportedField_throwsException() {
+        // Arrange: Create a DayOfYear instance and select an unsupported field.
+        // The specific day (e.g., 150) is arbitrary and does not affect the outcome.
+        DayOfYear dayOfYear = DayOfYear.of(150);
+        ChronoField unsupportedField = ChronoField.ERA;
+
+        // Act & Assert: Attempt to get the value for the unsupported field and
+        // verify that the correct exception is thrown with a specific message.
         try {
-            dayOfYear0.get(chronoField0);
-            fail("Expecting exception: UnsupportedTemporalTypeException");
+            dayOfYear.get(unsupportedField);
+            fail("Expected UnsupportedTemporalTypeException was not thrown.");
         } catch (UnsupportedTemporalTypeException e) {
-            //
-            // Unsupported field: Era
-            //
-            verifyException("java.time.temporal.TemporalAccessor", e);
+            // This is the expected outcome.
+            // Check the exception message to ensure the failure is for the correct reason.
+            assertEquals("Unsupported field: Era", e.getMessage());
         }
     }
 }
