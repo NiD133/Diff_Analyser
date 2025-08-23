@@ -1,27 +1,71 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class EnumOrdinalTypeHandler_ESTestTest2 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn(15).when(callableStatement0).getInt(anyInt());
-        JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(callableStatement0, 0);
-        PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
-        enumOrdinalTypeHandler0.setNonNullParameter(preparedStatement0, 1996, jdbcType0, jdbcType0);
+/**
+ * Tests for {@link EnumOrdinalTypeHandler}.
+ * This class verifies that the handler can correctly convert between a JDBC integer (ordinal)
+ * and a Java Enum constant.
+ */
+public class EnumOrdinalTypeHandlerTest {
+
+    private final EnumOrdinalTypeHandler<JdbcType> handler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+
+    /**
+     * Verifies that the handler can correctly read an integer ordinal from a CallableStatement
+     * and convert it into the corresponding Enum constant.
+     */
+    @Test
+    public void shouldGetEnumByOrdinalFromCallableStatement() throws SQLException {
+        // Arrange
+        // We expect the database to return the ordinal for NVARCHAR.
+        JdbcType expectedEnum = JdbcType.NVARCHAR;
+        int enumOrdinal = expectedEnum.ordinal();
+        int columnIndex = 1;
+
+        // Mock the JDBC CallableStatement to simulate a database call.
+        CallableStatement cs = mock(CallableStatement.class);
+        when(cs.getInt(columnIndex)).thenReturn(enumOrdinal);
+        when(cs.wasNull()).thenReturn(false);
+
+        // Act
+        // Call the method under test to get the result.
+        JdbcType actualEnum = handler.getNullableResult(cs, columnIndex);
+
+        // Assert
+        // Verify that the handler returned the correct enum constant.
+        assertEquals(expectedEnum, actualEnum);
+    }
+
+    /**
+     * Verifies that the handler can correctly take an Enum constant and set its
+     * integer ordinal on a PreparedStatement.
+     */
+    @Test
+    public void shouldSetEnumOrdinalOnPreparedStatement() throws SQLException {
+        // Arrange
+        // We want to set the NVARCHAR enum as a parameter.
+        JdbcType parameter = JdbcType.NVARCHAR;
+        int parameterIndex = 1;
+        int expectedOrdinal = parameter.ordinal();
+
+        // Mock the JDBC PreparedStatement to simulate a database call.
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        // Act
+        // Call the method under test to set the parameter.
+        handler.setNonNullParameter(ps, parameterIndex, parameter, null);
+
+        // Assert
+        // Verify that the handler called the setInt method on the PreparedStatement
+        // with the correct index and the enum's ordinal value.
+        verify(ps).setInt(parameterIndex, expectedOrdinal);
     }
 }
