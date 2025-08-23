@@ -1,34 +1,34 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest102 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonTreeReader} class, focusing on its behavior
+ * under specific edge-case conditions.
+ *
+ * Note: The original test class name 'JsonTreeReader_ESTestTest102' was renamed to
+ * 'JsonTreeReaderTest' to follow standard naming conventions.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test101() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.promoteNameToValue();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling {@code promoteNameToValue()} on a {@code JsonTreeReader}
+     * that was initialized with a {@code null} {@code JsonElement} results in a
+     * {@code NullPointerException}.
+     *
+     * This test ensures the method handles being in an invalid state gracefully
+     * by failing fast, rather than causing unpredictable behavior later.
+     */
+    @Test(expected = NullPointerException.class)
+    public void promoteNameToValue_whenInitializedWithNull_throwsNullPointerException() {
+        // Arrange: Create a JsonTreeReader with a null JsonElement, putting it into
+        // an uninitialized or invalid state.
+        JsonTreeReader reader = new JsonTreeReader((JsonElement) null);
+
+        // Act: Attempt to call the method under test.
+        // Assert: The @Test(expected=...) annotation will automatically handle the
+        // assertion, failing the test if a NullPointerException is not thrown.
+        reader.promoteNameToValue();
     }
 }
