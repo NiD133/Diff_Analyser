@@ -1,38 +1,43 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.ParentContext;
-import org.apache.commons.jxpath.ri.axes.PrecedingOrFollowingContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.axes.SelfContext;
-import org.apache.commons.jxpath.ri.axes.UnionContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CoreOperation_ESTestTest15 extends CoreOperation_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        NameAttributeTest nameAttributeTest0 = new NameAttributeTest((Expression) null, (Expression) null);
-        // Undeclared exception!
+/**
+ * Tests for the {@link CoreOperation} class, focusing on its contract
+ * and behavior when used with invalid arguments.
+ */
+public class CoreOperationTest {
+
+    /**
+     * Tests that calling compute() on a CoreOperation with null arguments
+     * and a null EvalContext throws a NullPointerException.
+     * <p>
+     * This behavior is tested via the {@link NameAttributeTest} class, a concrete
+     * subclass of {@link CoreOperationCompare}, which in turn extends {@link CoreOperation}.
+     * The exception is expected because the underlying implementation in
+     * {@link CoreOperationCompare} does not perform a null-check on its arguments
+     * before using them.
+     */
+    @Test
+    public void computeWithNullArgumentsAndContextShouldThrowNullPointerException() {
+        // Arrange: Create an operation with null arguments. Since CoreOperation is
+        // abstract, we must use a concrete subclass for instantiation.
+        CoreOperation operationWithNullArgs = new NameAttributeTest(null, null);
+        EvalContext nullContext = null;
+
+        // Act & Assert
         try {
-            nameAttributeTest0.compute((EvalContext) null);
-            fail("Expecting exception: NullPointerException");
+            operationWithNullArgs.compute(nullContext);
+            fail("Expected a NullPointerException because the operation was initialized with null arguments.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.jxpath.ri.compiler.CoreOperationCompare", e);
+            // This is the expected outcome.
+            // We can also assert that the exception has no message, which is typical
+            // for a direct null dereference and consistent with the original test's findings.
+            assertNull("The NullPointerException should not have a message.", e.getMessage());
         }
     }
 }
