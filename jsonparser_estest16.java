@@ -1,31 +1,38 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.Reader;
+import org.junit.Test;
+
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class JsonParser_ESTestTest16 extends JsonParser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        StringReader stringReader0 = new StringReader("R3P?4");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        JsonParser.parseReader(jsonReader0);
-        // Undeclared exception!
+    /**
+     * Tests that calling {@link JsonParser#parseReader(JsonReader)} on a reader
+     * that has already been fully consumed results in an {@link IllegalStateException}.
+     */
+    @Test
+    public void parseReader_whenCalledOnConsumedReader_throwsIllegalStateException() {
+        // Arrange: Create a JsonReader with a single JSON element.
+        String json = "\"single-element\"";
+        JsonReader jsonReader = new JsonReader(new StringReader(json));
+
+        // Act 1: Consume the first (and only) element from the reader.
+        // This moves the reader's cursor to the end of the stream.
+        JsonElement firstElement = JsonParser.parseReader(jsonReader);
+        assertNotNull("The first parse should successfully return a JsonElement", firstElement);
+
+        // Act 2 & Assert: Attempt to parse from the reader again.
         try {
-            JsonParser.parseReader(jsonReader0);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Unexpected token: END_DOCUMENT
-            //
-            verifyException("com.google.gson.internal.bind.JsonElementTypeAdapter", e);
+            JsonParser.parseReader(jsonReader);
+            fail("Expected an IllegalStateException because the reader is already at the end of the document.");
+        } catch (IllegalStateException expected) {
+            // Verify that the exception is thrown for the correct reason.
+            assertEquals("Unexpected token: END_DOCUMENT", expected.getMessage());
         }
     }
 }
