@@ -1,29 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Attribute_ESTestTest9 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the static helper methods in the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        boolean boolean0 = Attribute.shouldCollapseAttribute("4*it@", (String) null, document_OutputSettings0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that an attribute with a null value is considered "collapsible"
+     * when using HTML syntax. A collapsible attribute can be rendered without a
+     * value (e.g., {@code <div my-attribute>}).
+     */
+    @Test
+    public void attributeWithNullValueShouldCollapseInHtmlMode() {
+        // Arrange: Create standard HTML output settings.
+        // The default syntax is HTML, which allows for attribute collapsing.
+        Document.OutputSettings settings = new Document.OutputSettings();
+        String attributeKey = "custom-attribute"; // The key does not need to be a known boolean attribute for this case.
+
+        // Act: Check if an attribute with a null value should be collapsed.
+        boolean shouldCollapse = Attribute.shouldCollapseAttribute(attributeKey, null, settings);
+
+        // Assert: In HTML mode, any attribute with a null value should be collapsible.
+        assertTrue("Any attribute with a null value should be collapsible in HTML mode.", shouldCollapse);
     }
 }
