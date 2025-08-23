@@ -1,29 +1,25 @@
 package com.google.common.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest1 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(0.0, 0.0);
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.leastSquaresFit();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that leastSquaresFit() throws an IllegalStateException when the accumulator
+     * contains only a single data point, as a linear fit is undefined in this case.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void leastSquaresFit_withSingleDataPoint_throwsIllegalStateException() {
+        // Arrange: Create an accumulator and add a single data point.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(10.0, 20.0);
+
+        // Act: Attempt to calculate the least squares fit, which is expected to fail.
+        accumulator.leastSquaresFit();
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
     }
 }
