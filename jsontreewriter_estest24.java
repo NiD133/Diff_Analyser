@@ -1,26 +1,33 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class JsonTreeWriter_ESTestTest24 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        JsonTreeWriter jsonTreeWriter1 = (JsonTreeWriter) jsonTreeWriter0.beginObject();
-        jsonTreeWriter0.endObject();
-        JsonObject jsonObject0 = (JsonObject) jsonTreeWriter1.get();
-        assertFalse(jsonObject0.isJsonNull());
+    @Test
+    public void get_afterWritingEmptyObject_returnsEmptyJsonObject() throws IOException {
+        // Arrange: Create a new JsonTreeWriter
+        JsonTreeWriter writer = new JsonTreeWriter();
+        
+        // Act: Write an empty JSON object and retrieve the result
+        writer.beginObject();
+        writer.endObject();
+        JsonElement result = writer.get();
+
+        // Assert: The result should be an empty JsonObject
+        JsonObject expected = new JsonObject();
+        assertEquals(expected, result);
+
+        // A more detailed assertion could also be used:
+        // assertTrue("The result should be a JsonObject", result.isJsonObject());
+        // assertTrue("The JsonObject should be empty", result.getAsJsonObject().isEmpty());
     }
 }
