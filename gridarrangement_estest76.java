@@ -1,50 +1,45 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest76 extends GridArrangement_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test75() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(3306, 3306);
-        assertNotNull(gridArrangement0);
-        LabelBlock labelBlock0 = new LabelBlock("org.jfree.chart.block.FlowArrangement");
-        assertEquals(TextBlockAnchor.CENTER, labelBlock0.getContentAlignmentPoint());
-        assertEquals(0.0, labelBlock0.getContentXOffset(), 0.01);
-        assertNull(labelBlock0.getToolTipText());
-        assertEquals(RectangleAnchor.CENTER, labelBlock0.getTextAnchor());
-        assertEquals(0.0, labelBlock0.getWidth(), 0.01);
-        assertEquals(0.0, labelBlock0.getHeight(), 0.01);
-        assertNull(labelBlock0.getID());
-        assertEquals(0.0, labelBlock0.getContentYOffset(), 0.01);
-        assertNull(labelBlock0.getURLText());
-        assertNotNull(labelBlock0);
-        gridArrangement0.add(labelBlock0, "org.jfree.chart.block.FlowArrangement");
-        assertEquals(TextBlockAnchor.CENTER, labelBlock0.getContentAlignmentPoint());
-        assertEquals(0.0, labelBlock0.getContentXOffset(), 0.01);
-        assertNull(labelBlock0.getToolTipText());
-        assertEquals(RectangleAnchor.CENTER, labelBlock0.getTextAnchor());
-        assertEquals(0.0, labelBlock0.getWidth(), 0.01);
-        assertEquals(0.0, labelBlock0.getHeight(), 0.01);
-        assertNull(labelBlock0.getID());
-        assertEquals(0.0, labelBlock0.getContentYOffset(), 0.01);
-        assertNull(labelBlock0.getURLText());
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
+
+    private static final double DELTA = 0.01;
+
+    /**
+     * Verifies that adding a block to the arrangement does not alter the state
+     * of the block itself. The add() method is intended to be a callback used
+     * by a container, and this test confirms it has no side effects on the
+     * provided block.
+     */
+    @Test
+    public void addShouldNotModifyBlockState() {
+        // Arrange
+        GridArrangement arrangement = new GridArrangement(2, 2);
+        LabelBlock block = new LabelBlock("Test Block");
+
+        // Act
+        arrangement.add(block, "Test Key");
+
+        // Assert: Verify the block's properties remain unchanged from their defaults.
+        assertNull("ID should be null by default", block.getID());
+        assertEquals("Width should be 0.0 by default", 0.0, block.getWidth(), DELTA);
+        assertEquals("Height should be 0.0 by default", 0.0, block.getHeight(), DELTA);
+        assertNull("URL text should be null by default", block.getURLText());
+        assertNull("Tool tip text should be null by default", block.getToolTipText());
+        assertEquals("Content X offset should be 0.0 by default", 0.0, block.getContentXOffset(), DELTA);
+        assertEquals("Content Y offset should be 0.0 by default", 0.0, block.getContentYOffset(), DELTA);
+        assertEquals("Content alignment point should be CENTER by default",
+                TextBlockAnchor.CENTER, block.getContentAlignmentPoint());
+        assertEquals("Text anchor should be CENTER by default",
+                RectangleAnchor.CENTER, block.getTextAnchor());
     }
 }
