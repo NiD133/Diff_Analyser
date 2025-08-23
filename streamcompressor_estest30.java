@@ -1,35 +1,32 @@
 package org.apache.commons.compress.archivers.zip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
 import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StreamCompressor_ESTestTest30 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        StreamCompressor streamCompressor0 = StreamCompressor.create((ScatterGatherBackingStore) null);
-        assertEquals(0L, streamCompressor0.getTotalBytesWritten());
+/**
+ * Unit tests for the {@link StreamCompressor} class.
+ */
+public class StreamCompressorTest {
+
+    /**
+     * Verifies that a newly created StreamCompressor instance initializes its
+     * 'total bytes written' counter to zero. This confirms the correct
+     * initial state of the object upon instantiation.
+     */
+    @Test
+    public void newlyCreatedCompressorShouldHaveZeroTotalBytesWritten() {
+        // Arrange
+        // The factory method is called with a null ScatterGatherBackingStore because
+        // this test only verifies the initial state of the compressor, not its
+        // interaction with a backing store.
+
+        // Act
+        StreamCompressor compressor = StreamCompressor.create((ScatterGatherBackingStore) null);
+
+        // Assert
+        assertEquals("A new StreamCompressor should have a totalBytesWritten count of 0.",
+                0L, compressor.getTotalBytesWritten());
     }
 }
