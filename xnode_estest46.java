@@ -1,37 +1,36 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
 
+/**
+ * Test suite for the {@link XNode} class.
+ * This refactored test focuses on a specific failure case.
+ */
+// The original test class name and inheritance are preserved as their full context is not provided.
+// In a real-world scenario, the class would likely be renamed to XNodeTest.
 public class XNode_ESTestTest46 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test045() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getStringAttribute((String) null, "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that {@link XNode#getStringAttribute(String, String)} throws a
+     * NullPointerException when the attribute name provided is null.
+     *
+     * This is expected behavior, as the underlying implementation likely uses a
+     * collection (like java.util.Properties) that disallows null keys.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getStringAttributeShouldThrowNullPointerExceptionWhenNameIsNull() {
+        // Arrange: Set up the test objects.
+        // We need a dummy Node and an empty Properties object to construct an XNode.
+        Node dummyNode = new IIOMetadataNode();
+        Properties variables = new Properties();
+        XNode xNode = new XNode(null, dummyNode, variables);
+        String defaultValue = "default-value";
+
+        // Act & Assert: Call the method with a null attribute name.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        xNode.getStringAttribute(null, defaultValue);
     }
 }
