@@ -1,32 +1,26 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest16 extends BBoxCalculator_ESTest_scaffolding {
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
-        // Undeclared exception!
-        try {
-            bBoxCalculator0.doesXWorldWrap();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
-        }
+    /**
+     * Verifies that calling doesXWorldWrap() throws a NullPointerException
+     * if the BBoxCalculator was constructed with a null SpatialContext.
+     * The context is required to determine world-wrapping behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void doesXWorldWrap_shouldThrowNPE_whenContextIsNull() {
+        // Given a BBoxCalculator initialized with a null context
+        BBoxCalculator bboxCalculator = new BBoxCalculator((SpatialContext) null);
+
+        // When doesXWorldWrap is called, it should fail because the context is needed
+        bboxCalculator.doesXWorldWrap();
+
+        // Then a NullPointerException is expected (verified by the @Test annotation)
     }
 }
