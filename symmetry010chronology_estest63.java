@@ -1,52 +1,36 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+import org.junit.jupiter.api.Test;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest63 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        // Undeclared exception!
-        try {
-            symmetry010Chronology0.dateYearDay(371, 371);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid date 'DayOfYear 371' as '371' is not a leap year
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry010Date", e);
-        }
+/**
+ * Tests for the {@link Symmetry010Chronology} class, focusing on date creation logic.
+ */
+class Symmetry010ChronologyTest {
+
+    /**
+     * Tests that creating a date with a day-of-year of 371 fails for a non-leap year.
+     * In the Symmetry010 calendar, a normal year has 364 days, while a leap year has 371.
+     * The year 371 is not a leap year, so requesting the 371st day should be invalid.
+     */
+    @Test
+    void dateYearDay_throwsExceptionForDay371InNonLeapYear() {
+        // Arrange
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        int nonLeapYear = 371;
+        int invalidDayOfYearForNonLeapYear = 371;
+
+        // Act & Assert
+        DateTimeException thrownException = assertThrows(
+            DateTimeException.class,
+            () -> chronology.dateYearDay(nonLeapYear, invalidDayOfYearForNonLeapYear),
+            "Should throw DateTimeException for a day-of-year that only exists in a leap year."
+        );
+
+        // Verify the exception message for correctness
+        assertEquals("Invalid date 'DayOfYear 371' as '371' is not a leap year", thrownException.getMessage());
     }
 }
