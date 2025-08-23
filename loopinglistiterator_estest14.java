@@ -1,36 +1,36 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertThrows;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LoopingListIterator_ESTestTest14 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link LoopingListIterator} focusing on concurrent modification scenarios.
+ */
+public class LoopingListIteratorConcurrentModificationTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        List<Integer> list0 = linkedList0.subList(0, 0);
-        Integer integer0 = new Integer(0);
-        linkedList0.add(integer0);
-        LoopingListIterator<Integer> loopingListIterator0 = null;
-        try {
-            loopingListIterator0 = new LoopingListIterator<Integer>(list0);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.SubList", e);
-        }
+    /**
+     * Tests that the constructor throws a ConcurrentModificationException if it is
+     * given a subList whose backing list has been structurally modified.
+     * <p>
+     * The LoopingListIterator constructor internally calls list.listIterator(),
+     * which, for a subList, checks for concurrent modifications of the parent list.
+     */
+    @Test
+    public void constructorShouldThrowCMEWhenBackingListOfSubListIsModified() {
+        // Arrange: Create a list and a subList view of it.
+        final List<Integer> originalList = new LinkedList<>();
+        final List<Integer> subListView = originalList.subList(0, 0);
+
+        // Act: Structurally modify the original list. This invalidates the subList view.
+        originalList.add(100);
+
+        // Assert: Creating an iterator from the invalidated subList view should fail.
+        assertThrows(ConcurrentModificationException.class, () -> {
+            new LoopingListIterator<>(subListView);
+        });
     }
 }
