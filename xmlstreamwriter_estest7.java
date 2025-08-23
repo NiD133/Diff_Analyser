@@ -1,35 +1,33 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+/**
+ * Contains tests for the {@link XmlStreamWriter} class.
+ * This class focuses on behavior related to stream state (e.g., closed).
+ */
+// Note: The original class name and inheritance are preserved.
 public class XmlStreamWriter_ESTestTest7 extends XmlStreamWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        java.io.ByteArrayOutputStream byteArrayOutputStream0 = new java.io.ByteArrayOutputStream();
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(byteArrayOutputStream0);
-        xmlStreamWriter0.close();
-        try {
-            xmlStreamWriter0.flush();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-        }
+    /**
+     * Verifies that attempting to flush a closed XmlStreamWriter throws an IOException.
+     * A writer must not be usable after it has been closed.
+     */
+    @Test(expected = IOException.class)
+    public void flushOnClosedWriterShouldThrowIOException() throws IOException {
+        // Arrange: Create a writer and immediately close it to set up the test state.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+        writer.close();
+
+        // Act: Attempt to flush the closed writer.
+        // This action is expected to throw an IOException.
+        writer.flush();
+
+        // Assert: The test succeeds if an IOException is thrown, as declared
+        // by the 'expected' attribute of the @Test annotation.
     }
 }
