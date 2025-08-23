@@ -1,30 +1,47 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest42 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        PointImpl pointImpl0 = new PointImpl(3.150319189088167, Double.POSITIVE_INFINITY, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, Double.POSITIVE_INFINITY, spatialContext0);
-        SpatialRelation spatialRelation0 = bufferedLine0.relate((Shape) pointImpl0);
-        assertEquals(SpatialRelation.DISJOINT, spatialRelation0);
-        assertTrue(bufferedLine0.hasArea());
+/**
+ * Test suite for edge cases in {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    private final SpatialContext cartesianContext = SpatialContext.GEO_FALSE;
+
+    /**
+     * This test verifies the behavior of BufferedLine when constructed with non-finite values.
+     * When a point has an infinite coordinate and the buffer is also infinite, geometric
+     * calculations can lead to counter-intuitive results (e.g., NaN - Not a Number).
+     *
+     * The expected outcome is that the shape is considered DISJOINT from its own defining point,
+     * as the internal distance checks fail due to the non-finite arithmetic.
+     */
+    @Test
+    public void relateWithInfiniteCoordinateAndBufferShouldReturnDisjoint() {
+        // Arrange: Create a point with an infinite Y-coordinate and a BufferedLine
+        // from this point to itself with an infinite buffer.
+        Point pointWithInfiniteY = new PointImpl(10.0, Double.POSITIVE_INFINITY, cartesianContext);
+        BufferedLine lineWithInfiniteBuffer = new BufferedLine(
+                pointWithInfiniteY, pointWithInfiniteY, Double.POSITIVE_INFINITY, cartesianContext);
+
+        // Act: Check the spatial relationship of the line to its own defining point.
+        SpatialRelation relation = lineWithInfiniteBuffer.relate(pointWithInfiniteY);
+
+        // Assert: The relation should be DISJOINT, not CONTAINS.
+        // This occurs because internal calculations with Double.POSITIVE_INFINITY likely
+        // produce NaN, causing containment checks to fail.
+        assertEquals("A shape with infinite values should be disjoint from its defining point",
+                SpatialRelation.DISJOINT, relation);
+
+        // A line with an infinite buffer logically has an area.
+        assertTrue("A line with an infinite buffer should have an area",
+                lineWithInfiniteBuffer.hasArea());
     }
 }
