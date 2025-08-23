@@ -1,40 +1,50 @@
 package com.itextpdf.text.pdf;
 
-import java.io.ByteArrayOutputStream;
-import junit.framework.Assert;
-import org.junit.After;
+import com.itextpdf.text.io.RandomAccessSourceFactory;
 import org.junit.Before;
 import org.junit.Test;
-import com.itextpdf.text.io.RandomAccessSourceFactory;
 
-public class RandomAccessFileOrArrayTestTest1 {
+import java.io.IOException;
 
-    byte[] data;
+import static org.junit.Assert.assertEquals;
 
-    RandomAccessFileOrArray rafoa;
+/**
+ * Tests for the RandomAccessFileOrArray class.
+ */
+public class RandomAccessFileOrArrayTest {
+
+    private byte[] testData;
+    private RandomAccessFileOrArray randomAccess;
 
     @Before
-    public void setUp() throws Exception {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        for (int i = 0; i < 10000; i++) {
-            os.write(i);
-        }
-        data = os.toByteArray();
-        rafoa = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(data));
+    public void setUp() {
+        // Use a small, explicit byte array for clarity.
+        // The original 10,000-byte array was unnecessarily large for this test's scope.
+        testData = new byte[]{10, 20, 30, 40, 50};
+        randomAccess = new RandomAccessFileOrArray(new RandomAccessSourceFactory().createSource(testData));
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
+    /**
+     * Verifies that pushBack() places a byte at the head of the stream,
+     * which is then returned by the next read() call. After that, reading
+     * should continue from the original stream position.
+     */
     @Test
-    public void testPushback_byteByByte() throws Exception {
-        Assert.assertEquals(data[0], (byte) rafoa.read());
-        Assert.assertEquals(data[1], (byte) rafoa.read());
-        byte pushBackVal = (byte) (data[1] + 42);
-        rafoa.pushBack(pushBackVal);
-        Assert.assertEquals(pushBackVal, (byte) rafoa.read());
-        Assert.assertEquals(data[2], (byte) rafoa.read());
-        Assert.assertEquals(data[3], (byte) rafoa.read());
+    public void pushBack_shouldBeReturnedOnNextRead_beforeResumingStream() throws IOException {
+        // Arrange: Read the first two bytes to advance the stream's position.
+        // This sets up the state for testing the pushBack functionality.
+        assertEquals("Pre-condition: First byte should be read correctly.", testData[0], (byte) randomAccess.read());
+        assertEquals("Pre-condition: Second byte should be read correctly.", testData[1], (byte) randomAccess.read());
+
+        byte valueToPushBack = 99;
+
+        // Act: Push a new byte back into the stream.
+        randomAccess.pushBack(valueToPushBack);
+
+        // Assert: The next read should return the pushed-back byte,
+        // and subsequent reads should continue from the original stream position.
+        assertEquals("The pushed-back value should be read next.", valueToPushBack, (byte) randomAccess.read());
+        assertEquals("Reading should resume from the third byte in the original data.", testData[2], (byte) randomAccess.read());
+        assertEquals("Reading should continue sequentially.", testData[3], (byte) randomAccess.read());
     }
 }
