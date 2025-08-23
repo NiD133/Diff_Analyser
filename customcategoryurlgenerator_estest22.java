@@ -2,25 +2,32 @@ package org.jfree.chart.urls;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest22 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        Stack<String> stack0 = new Stack<String>();
-        customCategoryURLGenerator0.addURLSeries(stack0);
-        String string0 = customCategoryURLGenerator0.getURL(0, 0);
-        assertNull(string0);
+    /**
+     * Verifies that getURL() returns null when the requested series has been added
+     * but is empty. This tests the boundary condition where a valid series index
+     * is provided, but the item index is out of bounds because the series
+     * contains no URLs.
+     */
+    @Test
+    public void getURL_forItemInEmptySeries_shouldReturnNull() {
+        // Arrange: Create a generator and add an empty list of URLs for a series.
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        List<String> emptyUrlSeries = new ArrayList<>();
+        generator.addURLSeries(emptyUrlSeries);
+
+        // Act: Attempt to retrieve the first URL from the first (empty) series.
+        String url = generator.getURL(0, 0);
+
+        // Assert: The returned URL should be null, as the series is empty.
+        assertNull("Expected a null URL when accessing an item in an empty series.", url);
     }
 }
