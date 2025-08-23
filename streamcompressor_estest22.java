@@ -1,44 +1,33 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedOutputStream;
+import java.util.zip.Deflater;
+
+/**
+ * Contains tests for the {@link StreamCompressor} class.
+ * This refactored test focuses on a specific failure scenario.
+ */
+// The original test extended a scaffolding class, which is preserved here.
 public class StreamCompressor_ESTestTest22 extends StreamCompressor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0, (Deflater) null);
-        // Undeclared exception!
-        try {
-            streamCompressor0.deflate();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling deflate() on a StreamCompressor created with a null Deflater
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void deflateWithNullDeflaterShouldThrowNullPointerException() throws IOException {
+        // Arrange: Create a StreamCompressor with a null Deflater.
+        // A PipedOutputStream is used as a dummy output; it won't be written to
+        // because the operation is expected to fail beforehand.
+        OutputStream dummyOutputStream = new PipedOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(dummyOutputStream, (Deflater) null);
+
+        // Act & Assert: Calling deflate() should immediately throw a NullPointerException,
+        // which is verified by the `expected` attribute of the @Test annotation.
+        streamCompressor.deflate();
     }
 }
