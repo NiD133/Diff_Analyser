@@ -1,28 +1,28 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest16 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        String string0 = StringUtil.padding(21, 21);
-        assertEquals("                     ", string0);
+    /**
+     * Tests that the padding method returns a string of spaces of the correct length.
+     * This specific test case uses a width of 21, which is just beyond the
+     * internal cache size (0-20), ensuring the non-cached logic is exercised.
+     */
+    @Test
+    public void paddingReturnsCorrectStringForWidthGreaterThanCache() {
+        // Arrange
+        final int width = 21;
+        final String expectedPadding = new String(new char[width]).replace('\0', ' ');
+
+        // Act
+        final String actualPadding = StringUtil.padding(width, width);
+
+        // Assert
+        assertEquals(expectedPadding, actualPadding);
     }
 }
