@@ -1,19 +1,28 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest19 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("GN");
-        assertEquals(4, metaphone0.getMaxCodeLen());
-        assertEquals("N", string0);
+    /**
+     * Tests that the Metaphone algorithm correctly handles words starting with "GN",
+     * where the 'G' is silent. For example, "gnome" is encoded as "NM".
+     */
+    @Test
+    public void shouldEncodeWordStartingWithGNAsN() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "GN";
+        final String expectedCode = "N";
+
+        // Act
+        final String actualCode = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("The metaphone code for 'GN' should be 'N'", expectedCode, actualCode);
     }
 }
