@@ -1,27 +1,30 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest34 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec((Charset) null);
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.decode("org.apache.commons.codec.net.QuotedPrintableCodec");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that attempting to decode a string with a codec initialized with a null
+     * charset throws a NullPointerException.
+     * <p>
+     * The underlying implementation eventually calls {@code new String(bytes, charset)},
+     * which does not permit a null charset.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void decodeStringWithNullCharsetThrowsNullPointerException() throws DecoderException {
+        // Arrange: Create a codec instance with a null charset.
+        QuotedPrintableCodec codecWithNullCharset = new QuotedPrintableCodec((Charset) null);
+        String irrelevantInput = "test string";
+
+        // Act & Assert: Decoding any string should throw a NullPointerException.
+        codecWithNullCharset.decode(irrelevantInput);
     }
 }
