@@ -1,30 +1,28 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LookupTranslator_ESTestTest11 extends LookupTranslator_ESTest_scaffolding {
+/**
+ * Tests for {@link LookupTranslator}.
+ */
+public class LookupTranslatorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LookupTranslator lookupTranslator0 = new LookupTranslator((CharSequence[][]) null);
-        StringWriter stringWriter0 = new StringWriter(7);
-        // Undeclared exception!
-        try {
-            lookupTranslator0.translate((CharSequence) null, 7, (Writer) stringWriter0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.lang3.text.translate.LookupTranslator", e);
-        }
+    /**
+     * Verifies that the translate method throws a NullPointerException when the input CharSequence is null.
+     * The behavior is expected regardless of the translator's internal state (e.g., even with a null lookup map).
+     */
+    @Test(expected = NullPointerException.class)
+    public void translateShouldThrowNullPointerExceptionForNullInput() {
+        // Arrange: Create a translator. Its internal lookup table can be null for this test case,
+        // as we are focused on how the method handles null input.
+        final LookupTranslator translator = new LookupTranslator((CharSequence[][]) null);
+        final Writer writer = new StringWriter();
+        final int anyIndex = 0; // The index value is irrelevant as the null check on the input should occur first.
+
+        // Act & Assert: Calling translate with a null input CharSequence should throw a NullPointerException.
+        translator.translate(null, anyIndex, writer);
     }
 }
