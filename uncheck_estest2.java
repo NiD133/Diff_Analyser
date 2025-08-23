@@ -1,29 +1,25 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest2 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        IOBiConsumer<String, String> iOBiConsumer0 = IOBiConsumer.noop();
-        Uncheck.accept(iOBiConsumer0, "I8ucG1|7Y@", ">jR><;J|_0");
+    /**
+     * Tests that {@link Uncheck#accept(IOBiConsumer, Object, Object)} completes
+     * successfully when the underlying consumer does not throw an {@link java.io.IOException}.
+     */
+    @Test
+    public void acceptWithBiConsumerShouldNotThrowExceptionWhenNoIOExceptionOccurs() {
+        // Arrange: Create a no-op IOBiConsumer that does nothing and never throws an exception.
+        final IOBiConsumer<String, String> noOpConsumer = IOBiConsumer.noop();
+        final String firstArgument = "test-string-1";
+        final String secondArgument = "test-string-2";
+
+        // Act & Assert: The call to Uncheck.accept should execute without throwing any exceptions.
+        // This test implicitly passes if the following line executes without error.
+        Uncheck.accept(noOpConsumer, firstArgument, secondArgument);
     }
 }
