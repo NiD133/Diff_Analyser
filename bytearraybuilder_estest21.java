@@ -1,22 +1,31 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest21 extends ByteArrayBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.write((byte[]) null, 557, 557);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
+
+    /**
+     * Verifies that the write(byte[], int, int) method correctly throws a
+     * NullPointerException when the provided byte array buffer is null.
+     */
+    @Test
+    public void write_shouldThrowNullPointerException_whenBufferIsNull() {
+        // Arrange
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        byte[] nullBuffer = null;
+        int offset = 0;
+        int length = 0;
+
+        // Act & Assert
+        // The call to write() is expected to fail fast with a NullPointerException
+        // because the source buffer cannot be null.
+        assertThrows(NullPointerException.class, () -> {
+            builder.write(nullBuffer, offset, length);
+        });
     }
 }
