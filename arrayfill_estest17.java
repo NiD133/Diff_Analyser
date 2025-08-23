@@ -1,21 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
+/**
+ * This test class contains tests for the ArrayFill class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class ArrayFill_ESTestTest17 extends ArrayFill_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        short[] shortArray0 = new short[0];
-        short[] shortArray1 = ArrayFill.fill(shortArray0, (short) 2);
-        assertSame(shortArray0, shortArray1);
+    /**
+     * Tests that ArrayFill.fill() returns the same instance when called with an empty short array.
+     * This verifies the fluent API behavior for an edge case where no elements are modified.
+     */
+    @Test
+    public void testFillEmptyShortArrayReturnsSameInstance() {
+        // Arrange: Create an empty short array.
+        final short[] emptyArray = new short[0];
+
+        // Act: Call the fill method on the empty array.
+        final short[] resultArray = ArrayFill.fill(emptyArray, (short) 42);
+
+        // Assert: The returned array should be the exact same instance as the input array.
+        assertSame("The fill method should return the same array instance for fluent chaining.",
+                   emptyArray, resultArray);
     }
 }
