@@ -1,31 +1,38 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest65 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test064() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        Boolean boolean0 = Boolean.TRUE;
-        jsonArray0.add(boolean0);
-        jsonTreeReader0.beginArray();
-        jsonTreeReader0.skipValue();
-        assertFalse(jsonTreeReader0.isLenient());
+/**
+ * Contains tests for the {@link JsonTreeReader} class, focusing on specific behaviors.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling skipValue() on an element within a JsonArray
+     * correctly advances the reader's position to the next token.
+     */
+    @Test
+    public void skipValueSkipsArrayElement() throws IOException {
+        // Arrange: Create a JsonTreeReader for a JSON array with one element: [true]
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(true);
+        JsonTreeReader reader = new JsonTreeReader(jsonArray);
+
+        // Position the reader inside the array, before the 'true' element
+        reader.beginArray();
+
+        // Act: Skip the value of the current element
+        reader.skipValue();
+
+        // Assert: The reader should now be positioned at the end of the array.
+        // This confirms that the 'true' value was successfully skipped.
+        assertEquals("After skipping the element, the next token should be END_ARRAY",
+                     JsonToken.END_ARRAY, reader.peek());
     }
 }
