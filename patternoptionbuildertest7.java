@@ -1,30 +1,37 @@
 package org.apache.commons.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Vector;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for {@link PatternOptionBuilder} focusing on required options.
+ */
+// The original class name 'PatternOptionBuilderTestTest7' is kept as requested.
 public class PatternOptionBuilderTestTest7 {
 
     @Test
-    void testRequiredOption() throws Exception {
-        final Options options = PatternOptionBuilder.parsePattern("!n%m%");
+    @DisplayName("Parsing should throw MissingOptionException when a required option is not provided.")
+    void parse_shouldThrowMissingOptionException_forMissingRequiredOption() {
+        // Arrange
+        // Define a pattern where 'n' is a required option (indicated by '!')
+        // and both 'n' and 'm' expect a Number argument (indicated by '%').
+        final String pattern = "!n%m%";
+        final Options options = PatternOptionBuilder.parsePattern(pattern);
         final CommandLineParser parser = new PosixParser();
-        final MissingOptionException e = assertThrows(MissingOptionException.class, () -> parser.parse(options, new String[] { "" }));
-        assertEquals(1, e.getMissingOptions().size());
-        assertTrue(e.getMissingOptions().contains("n"));
+        final String[] emptyArgs = {};
+
+        // Act & Assert
+        // Verify that parsing with no arguments throws MissingOptionException because 'n' is required.
+        final MissingOptionException thrown = assertThrows(MissingOptionException.class, () -> {
+            parser.parse(options, emptyArgs);
+        });
+
+        // Further Assertions to confirm the exception details
+        assertEquals(1, thrown.getMissingOptions().size(), "There should be exactly one missing option.");
+        assertTrue(thrown.getMissingOptions().contains("n"), "The list of missing options should contain 'n'.");
     }
 }
