@@ -1,29 +1,23 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest18 extends BCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BCodec} class.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        BCodec bCodec0 = null;
-        try {
-            bCodec0 = new BCodec((Charset) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // charset
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the BCodec constructor throws a NullPointerException
+     * when the provided Charset is null. This is the expected behavior
+     * as a Charset is required for encoding and decoding operations.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullCharsetShouldThrowNullPointerException() {
+        // Attempt to create a BCodec instance with a null Charset.
+        // This should trigger a NullPointerException.
+        new BCodec((Charset) null);
     }
 }
