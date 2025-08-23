@@ -1,22 +1,22 @@
 package org.apache.commons.collections4.iterators;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LoopingListIteratorTestTest2 {
+/**
+ * Tests for {@link LoopingListIterator}.
+ */
+class LoopingListIteratorTest {
 
-    /**
-     * Tests constructor exception.
-     */
     @Test
-    void testConstructorEx() {
-        assertThrows(NullPointerException.class, () -> new LoopingListIterator<>(null));
+    @DisplayName("Constructor should throw a NullPointerException for a null list")
+    void constructorShouldThrowNullPointerExceptionWhenListIsNull() {
+        // The constructor contract specifies that a null list is not permissible.
+        // This test verifies that the expected NullPointerException is thrown.
+        assertThrows(NullPointerException.class,
+            () -> new LoopingListIterator<>(null),
+            "The constructor must throw a NullPointerException when initialized with a null list.");
     }
 }
