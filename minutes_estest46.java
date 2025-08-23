@@ -1,19 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest46 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        Minutes minutes0 = Minutes.minutes(31);
-        boolean boolean0 = minutes0.isLessThan(minutes0);
-        assertFalse(boolean0);
-        assertEquals(31, minutes0.getMinutes());
+    @Test
+    public void isLessThanShouldReturnFalseWhenComparingInstanceToItself() {
+        // Arrange
+        Minutes thirtyOneMinutes = Minutes.minutes(31);
+
+        // Act
+        boolean result = thirtyOneMinutes.isLessThan(thirtyOneMinutes);
+
+        // Assert
+        assertFalse("A Minutes instance should not be considered less than itself.", result);
+        assertEquals(31, thirtyOneMinutes.getMinutes()); // Verify state remains unchanged
     }
 }
