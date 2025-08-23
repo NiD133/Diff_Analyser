@@ -1,22 +1,33 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class JsonSetter_ESTestTest5 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on its equality contract.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Nulls nulls0 = Nulls.AS_EMPTY;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.forValueNulls(nulls0, nulls0);
-        boolean boolean0 = jsonSetter_Value0.equals((Object) null);
-        assertFalse(boolean0);
-        assertEquals(Nulls.AS_EMPTY, jsonSetter_Value0.getContentNulls());
-        assertEquals(Nulls.AS_EMPTY, jsonSetter_Value0.getValueNulls());
+    /**
+     * Verifies that the equals() method of JsonSetter.Value returns false
+     * when the object is compared with null, adhering to the Java Object contract.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenComparedToNull() {
+        // Arrange: Create a JsonSetter.Value instance with specific null handling settings.
+        // This also implicitly tests the factory method's behavior.
+        Nulls nullsHandling = Nulls.AS_EMPTY;
+        JsonSetter.Value setterValue = JsonSetter.Value.forValueNulls(nullsHandling, nullsHandling);
+
+        // Assert state before the main test to ensure our object is configured correctly.
+        assertEquals("Value nulls should be configured as AS_EMPTY",
+                Nulls.AS_EMPTY, setterValue.getValueNulls());
+        assertEquals("Content nulls should be configured as AS_EMPTY",
+                Nulls.AS_EMPTY, setterValue.getContentNulls());
+
+        // Act & Assert: The primary goal is to test the equals() method against null.
+        boolean isEqual = setterValue.equals(null);
+        assertFalse("A JsonSetter.Value instance should never be equal to null.", isEqual);
     }
 }
