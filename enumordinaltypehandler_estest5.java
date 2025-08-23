@@ -1,32 +1,29 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
-public class EnumOrdinalTypeHandler_ESTestTest5 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link EnumOrdinalTypeHandler}.
+ */
+class EnumOrdinalTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        // Undeclared exception!
-        try {
-            enumOrdinalTypeHandler0.getNullableResult((ResultSet) null, (-2905));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.type.EnumOrdinalTypeHandler", e);
-        }
+    /**
+     * Verifies that getNullableResult(ResultSet, int) throws a NullPointerException
+     * when the provided ResultSet is null. The underlying database driver would typically
+     * throw this exception when methods are called on a null object.
+     */
+    @Test
+    void shouldThrowNullPointerExceptionWhenResultSetIsNullForGetResultByIndex() {
+        // Arrange: Create a handler for a standard enum type.
+        EnumOrdinalTypeHandler<JdbcType> typeHandler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+        int anyColumnIndex = 1;
+
+        // Act & Assert: Expect a NullPointerException when the method is called with a null ResultSet.
+        assertThrows(NullPointerException.class, () -> {
+            typeHandler.getNullableResult((ResultSet) null, anyColumnIndex);
+        });
     }
 }
