@@ -1,19 +1,24 @@
 package com.google.common.primitives;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class SignedBytes_ESTestTest4 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        SignedBytes.sortDescending(byteArray0, (int) (byte) 0, 1);
-        assertArrayEquals(new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 }, byteArray0);
+    @Test
+    public void sortDescending_withSingleElementRange_doesNotModifyArray() {
+        // Arrange: Create an array with unsorted values.
+        byte[] array = {10, 5, 20, 15};
+        byte[] expected = {10, 5, 20, 15};
+
+        // Act: Sort the sub-array from index 1 (inclusive) to 2 (exclusive).
+        // This range contains only the single element '5', so sorting it is a no-op.
+        SignedBytes.sortDescending(array, 1, 2);
+
+        // Assert: The array should remain completely unchanged.
+        assertArrayEquals(expected, array);
     }
 }
