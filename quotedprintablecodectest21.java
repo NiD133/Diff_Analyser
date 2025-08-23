@@ -1,37 +1,42 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest21 {
-
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
     @Test
-    void testUnsafeEncodeDecode() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "=\r\n";
-        final String encoded = qpcodec.encode(plain);
-        assertEquals("=3D=0D=0A", encoded, "Unsafe chars quoted-printable encoding test");
-        assertEquals(plain, qpcodec.decode(encoded), "Unsafe chars quoted-printable decoding test");
+    @DisplayName("Encoding and decoding should handle special characters like '=', CR, and LF correctly")
+    void testSpecialCharacterRoundTrip() throws EncoderException, DecoderException {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        // The input string contains characters that have special meaning in Quoted-Printable encoding
+        // and must be escaped: the '=' escape character itself, and the CR/LF control characters.
+        final String originalString = "=\r\n";
+
+        // The expected result is the hexadecimal representation of each character, prefixed with '='.
+        //   '='  (ASCII 61, 0x3D) -> =3D
+        //   '\r' (ASCII 13, 0x0D) -> =0D
+        //   '\n' (ASCII 10, 0x0A) -> =0A
+        final String expectedEncodedString = "=3D=0D=0A";
+
+        // Act
+        final String actualEncodedString = codec.encode(originalString);
+        final String decodedString = codec.decode(actualEncodedString);
+
+        // Assert
+        // Verify that the encoding produces the correct Quoted-Printable string.
+        assertEquals(expectedEncodedString, actualEncodedString, "The string was not encoded correctly.");
+
+        // Verify that decoding the encoded string returns the original string (a successful round-trip).
+        assertEquals(originalString, decodedString, "The decoded string does not match the original.");
     }
 }
