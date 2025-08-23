@@ -1,36 +1,34 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
 import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StreamCompressor_ESTestTest35 extends StreamCompressor_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link StreamCompressor} class.
+ */
+public class StreamCompressorTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Deflater deflater0 = new Deflater();
-        StreamCompressor streamCompressor0 = StreamCompressor.create((SeekableByteChannel) null, deflater0);
-        assertEquals(0L, streamCompressor0.getBytesRead());
+    /**
+     * Verifies that a newly created StreamCompressor instance correctly initializes
+     * its "bytes read" counter to zero.
+     */
+    @Test
+    public void newlyCreatedCompressorShouldHaveZeroBytesRead() {
+        // Arrange
+        Deflater deflater = new Deflater();
+        // The factory method is tested with a null output channel, which creates
+        // a valid compressor instance.
+        SeekableByteChannel nullOutputChannel = null;
+
+        // Act
+        StreamCompressor compressor = StreamCompressor.create(nullOutputChannel, deflater);
+
+        // Assert
+        long expectedBytesRead = 0L;
+        long actualBytesRead = compressor.getBytesRead();
+        assertEquals("A new StreamCompressor should report zero bytes read upon creation.",
+                     expectedBytesRead, actualBytesRead);
     }
 }
