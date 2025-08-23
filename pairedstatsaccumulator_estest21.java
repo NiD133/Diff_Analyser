@@ -1,23 +1,40 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest21 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        Stats stats0 = new Stats((-1418L), (-1672.7733723256124), 0.03, (-1418L), 0.03);
-        PairedStats pairedStats0 = new PairedStats(stats0, stats0, (-1418L));
-        pairedStatsAccumulator0.addAll(pairedStats0);
-        long long0 = pairedStatsAccumulator0.count();
-        assertEquals((-1418L), long0);
+    @Test
+    public void addAll_withPairedStatsHavingNegativeCount_updatesAccumulatorCount() {
+        // This test case, derived from automatically generated code, explores an edge case:
+        // adding a PairedStats object that was constructed with a negative count.
+        // While negative counts are not expected in typical usage, this test verifies
+        // that the accumulator's internal count correctly reflects the data from the
+        // added PairedStats object.
+
+        // Arrange
+        final long negativeCount = -1418L;
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+
+        // Create a Stats object with a negative count. The other statistical values (mean, etc.)
+        // are not relevant to this test's purpose and are set to simple defaults.
+        Stats xStats = new Stats(negativeCount, 0.0, 0.0, 0.0, 0.0);
+        Stats yStats = new Stats(negativeCount, 0.0, 0.0, 0.0, 0.0);
+        PairedStats statsToAdd = new PairedStats(xStats, yStats, 0.0 /* population covariance */);
+
+        // Act
+        accumulator.addAll(statsToAdd);
+        long actualCount = accumulator.count();
+
+        // Assert
+        assertEquals(
+                "The accumulator's count should match the negative count from the added PairedStats.",
+                negativeCount,
+                actualCount);
     }
 }
