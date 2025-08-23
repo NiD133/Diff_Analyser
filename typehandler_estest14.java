@@ -1,23 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class TypeHandler_ESTestTest14 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link TypeHandler}.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        TypeHandler typeHandler0 = TypeHandler.getDefault();
-        Class<Date> class0 = Date.class;
-        Converter<Date, ?> converter0 = typeHandler0.getConverter(class0);
-        assertNotNull(converter0);
+    /**
+     * Verifies that the default TypeHandler provides a non-null converter for the built-in Date type.
+     */
+    @Test
+    public void getConverterShouldReturnConverterForBuiltInDateType() {
+        // Arrange
+        TypeHandler typeHandler = TypeHandler.getDefault();
+
+        // Act
+        Converter<Date, ?> dateConverter = typeHandler.getConverter(Date.class);
+
+        // Assert
+        assertNotNull("The default TypeHandler should have a registered converter for java.util.Date", dateConverter);
     }
 }
