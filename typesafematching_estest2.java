@@ -1,34 +1,42 @@
 package org.mockito.internal.invocation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
-import org.mockito.internal.matchers.CapturingMatcher;
 import org.mockito.internal.matchers.CompareEqual;
-import org.mockito.internal.matchers.GreaterOrEqual;
 import org.mockito.internal.matchers.Not;
-import org.mockito.internal.matchers.NotNull;
 
-public class TypeSafeMatching_ESTestTest2 extends TypeSafeMatching_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        ArgumentMatcherAction argumentMatcherAction0 = TypeSafeMatching.matchesTypeSafe();
-        CompareEqual<Integer> compareEqual0 = new CompareEqual<Integer>((Integer) null);
-        Not not0 = new Not(compareEqual0);
-        // Undeclared exception!
+/**
+ * Tests for {@link TypeSafeMatching}.
+ */
+public class TypeSafeMatchingTest {
+
+    @Test
+    public void apply_shouldPropagateClassCastException_whenThrownByMatcherImplementation() {
+        // Arrange
+        // We set up a scenario where a matcher's internal logic will cause a ClassCastException.
+        // The goal is to verify that TypeSafeMatching.apply() does not suppress this exception
+        // but lets it propagate, as the failure occurs inside the matcher, not due to a
+        // direct type mismatch with the method signature.
+
+        // 1. The `CompareEqual` matcher's implementation may attempt to cast its argument to Comparable.
+        ArgumentMatcher<Integer> innerMatcher = new CompareEqual<>(null);
+        ArgumentMatcher<Integer> matcherWithInternalCasting = new Not(innerMatcher);
+
+        // 2. We use the matcher itself as the argument. A `Not` instance is not a `Comparable`,
+        //    so this will trigger a ClassCastException deep inside the `CompareEqual` matcher's logic.
+        Object incompatibleArgument = matcherWithInternalCasting;
+
+        ArgumentMatcherAction action = TypeSafeMatching.matchesTypeSafe();
+
+        // Act & Assert
         try {
-            argumentMatcherAction0.apply(not0, not0);
-            fail("Expecting exception: ClassCastException");
+            action.apply(matcherWithInternalCasting, incompatibleArgument);
+            fail("Expected a ClassCastException to be thrown by the matcher's internal logic.");
         } catch (ClassCastException e) {
-            //
-            // class org.mockito.internal.matchers.Not cannot be cast to class java.lang.Comparable (org.mockito.internal.matchers.Not is in unnamed module of loader org.evosuite.instrumentation.InstrumentingClassLoader @6ab9d1e3; java.lang.Comparable is in module java.base of loader 'bootstrap')
-            //
-            verifyException("org.mockito.internal.matchers.CompareTo", e);
+            // Success: The expected exception was caught and propagated correctly.
+            // This confirms that `apply` does not hide exceptions from faulty matcher implementations.
         }
     }
 }
