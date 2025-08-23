@@ -1,19 +1,42 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Vector_ESTestTest11 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Vector vector0 = new Vector(1864.694F, (-105.0F), (-1351.098F));
-        float float0 = vector0.get(1);
-        assertEquals(5313574.5F, vector0.lengthSquared(), 0.01F);
-        assertEquals((-105.0F), float0, 0.01F);
+    /**
+     * A small delta is used for floating-point comparisons to account for
+     * potential precision errors.
+     */
+    private static final float DELTA = 0.001f;
+
+    /**
+     * Verifies that a Vector is constructed correctly and that its properties,
+     * such as a specific coordinate and its squared length, are accurate.
+     */
+    @Test
+    public void vectorProperties_shouldBeCorrectAfterConstruction() {
+        // Arrange: Define vector components and create the vector.
+        // Using simple, whole numbers makes the test's logic easy to verify.
+        float x = 3.0f;
+        float y = 4.0f;
+        float z = 12.0f;
+        Vector vector = new Vector(x, y, z);
+
+        // Act: Retrieve a coordinate and calculate the squared length.
+        float retrievedY = vector.get(Vector.I2); // Using the constant for the Y-coordinate index
+        float actualLengthSquared = vector.lengthSquared();
+
+        // Assert: Verify that the retrieved and calculated values are correct.
+        // The expected squared length is x*x + y*y + z*z = 3*3 + 4*4 + 12*12 = 9 + 16 + 144 = 169.
+        float expectedLengthSquared = 169.0f;
+
+        assertEquals("The Y coordinate should be retrieved correctly.", y, retrievedY, DELTA);
+        assertEquals("The squared length should be calculated correctly.",
+                expectedLengthSquared, actualLengthSquared, DELTA);
     }
 }
