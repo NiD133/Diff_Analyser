@@ -1,30 +1,29 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class is focused on the MultiFilteredRenderListener.
+ * The original test was automatically generated and has been refactored for clarity.
+ */
 public class MultiFilteredRenderListener_ESTestTest5 extends MultiFilteredRenderListener_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-        multiFilteredRenderListener0.attachRenderListener((LocationTextExtractionStrategy) null, (RenderFilter[]) null);
-        // Undeclared exception!
-        try {
-            multiFilteredRenderListener0.endTextBlock();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
-        }
+    /**
+     * Verifies that endTextBlock() throws a NullPointerException if it attempts to
+     * delegate the call to a listener that is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void endTextBlock_whenAttachedListenerIsNull_throwsNullPointerException() {
+        // Arrange: Create a listener and attach a null delegate.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        RenderFilter[] noFilters = null; // Using a null filter set
+        multiListener.attachRenderListener(null, noFilters);
+
+        // Act: Call the method under test. This should trigger the exception
+        // because it will try to call endTextBlock() on the null delegate.
+        multiListener.endTextBlock();
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
