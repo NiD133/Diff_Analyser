@@ -1,34 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PdfImage_ESTestTest4 extends PdfImage_ESTest_scaffolding {
+/**
+ * Test suite for the utility methods in the {@link PdfImage} class.
+ */
+public class PdfImageTest {
 
+    /**
+     * Verifies that transferBytes() correctly handles a request to transfer zero bytes.
+     * It should not read from the input stream or write to the output stream.
+     */
     @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ByteBuffer byteBuffer0 = new ByteBuffer();
-        byte[] byteArray0 = new byte[8];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        PdfImage.transferBytes(byteArrayInputStream0, byteBuffer0, (byte) 0);
-        assertEquals(8, byteArrayInputStream0.available());
-        assertEquals(0, byteBuffer0.size());
+    public void transferBytes_whenLengthIsZero_shouldTransferNoBytes() throws IOException {
+        // Arrange: Set up an input stream with data and an empty output buffer.
+        byte[] inputData = new byte[8];
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(inputData);
+        ByteBuffer outputBuffer = new ByteBuffer();
+        int initialAvailableBytes = inputStream.available();
+
+        // Act: Attempt to transfer zero bytes from the input to the output.
+        PdfImage.transferBytes(inputStream, outputBuffer, 0);
+
+        // Assert: Verify that the state of both streams remains unchanged.
+        assertEquals("Output buffer should remain empty.", 0, outputBuffer.size());
+        assertEquals("Input stream should not have been read from.", initialAvailableBytes, inputStream.available());
     }
 }
