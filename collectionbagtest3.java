@@ -1,21 +1,26 @@
 package org.apache.commons.collections4.bag;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.collection.AbstractCollectionTest;
-import org.apache.commons.collections4.functors.NonePredicate;
 import org.junit.jupiter.api.Test;
 
-public class CollectionBagTestTest3<T> extends AbstractCollectionTest<T> {
+/**
+ * Tests for {@link CollectionBag}.
+ * <p>
+ * This class extends {@link AbstractCollectionTest} to leverage its comprehensive
+ * contract testing capabilities for the {@link java.util.Collection} interface.
+ * </p>
+ * @param <T> the type of elements in the tested bag
+ */
+public class CollectionBagTest<T> extends AbstractCollectionTest<T> {
 
     @Override
     public String getCompatibilityVersion() {
@@ -55,17 +60,26 @@ public class CollectionBagTestTest3<T> extends AbstractCollectionTest<T> {
     }
 
     /**
-     * Compares the current serialized form of the Bag
-     * against the canonical version in SCM.
+     * Verifies that the serialized form of an empty bag is compatible with the
+     * canonical version stored on disk, ensuring backward compatibility.
      */
     @Test
-    void testEmptyBagCompatibility() throws IOException, ClassNotFoundException {
-        // test to make sure the canonical form has been preserved
-        final Bag<T> bag = makeObject();
-        if (bag instanceof Serializable && !skipSerializedCanonicalTests() && isTestSerialization()) {
-            final Bag<?> bag2 = (Bag<?>) readExternalFormFromDisk(getCanonicalEmptyCollectionName(bag));
-            assertTrue(bag2.isEmpty(), "Bag is empty");
-            assertEquals(bag, bag2);
+    void testEmptyBagSerializationCompatibility() throws IOException, ClassNotFoundException {
+        // Arrange
+        final Bag<T> emptyBag = makeObject();
+
+        // This test is only relevant for serializable bags and when serialization
+        // tests are enabled in the test framework.
+        if (!(emptyBag instanceof Serializable && isTestSerialization() && !skipSerializedCanonicalTests())) {
+            return; // Skip test if not applicable
         }
+
+        // Act: Read the canonical serialized empty bag from a file.
+        final String canonicalFileName = getCanonicalEmptyCollectionName(emptyBag);
+        final Bag<?> deserializedBag = (Bag<?>) readExternalFormFromDisk(canonicalFileName);
+
+        // Assert
+        assertTrue(deserializedBag.isEmpty(), "Deserialized bag should be empty");
+        assertEquals(emptyBag, deserializedBag, "Deserialized bag should be equal to a new empty bag");
     }
 }
