@@ -1,35 +1,31 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Attribute_ESTestTest5 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        FilterOutputStream filterOutputStream0 = new FilterOutputStream(byteArrayOutputStream0);
-        CharsetEncoder charsetEncoder0 = charset0.newEncoder();
-        OutputStreamWriter outputStreamWriter0 = new OutputStreamWriter(filterOutputStream0, charsetEncoder0);
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(outputStreamWriter0);
-        Attribute.htmlNoValidate((String) null, (String) null, quietAppendable0, document_OutputSettings0);
-        assertTrue(document_OutputSettings0.prettyPrint());
+/**
+ * Tests for the static helper methods in the {@link Attribute} class.
+ */
+public class AttributeStaticHelpersTest {
+
+    /**
+     * Verifies that Attribute.htmlNoValidate() gracefully handles a null attribute key
+     * by not writing any output. This prevents potential NullPointerExceptions and ensures
+     * robust behavior with invalid input.
+     */
+    @Test
+    public void htmlNoValidateWithNullKeyWritesNothing() {
+        // Arrange: Create a simple StringBuilder to capture the output.
+        final StringBuilder accumulator = new StringBuilder();
+        final QuietAppendable quietAppendable = new QuietAppendable(accumulator);
+        final Document.OutputSettings settings = new Document.OutputSettings();
+
+        // Act: Call the method with a null key. The value is irrelevant in this case.
+        Attribute.htmlNoValidate(null, "any-value", quietAppendable, settings);
+
+        // Assert: Verify that nothing was appended to the StringBuilder.
+        assertEquals("Output should be empty when the attribute key is null.", "", accumulator.toString());
     }
 }
