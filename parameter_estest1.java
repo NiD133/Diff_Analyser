@@ -1,27 +1,44 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest1 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter}.
+ * This class contains the refactored test case.
+ */
+public class ParameterTest { // Renamed for clarity
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Class<Annotation> class0 = Annotation.class;
-        TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
-        Annotation[] annotationArray0 = new Annotation[0];
-        Object object0 = new Object();
-        Parameter parameter0 = new Parameter(invokable0, 2473, typeToken0, annotationArray0, object0);
-        Parameter parameter1 = new Parameter((Invokable<?, ?>) null, 1021, typeToken0, annotationArray0, parameter0);
-        boolean boolean0 = parameter0.equals(parameter1);
-        assertFalse(boolean0);
+    @Test
+    public void equals_whenInvokableAndPositionDiffer_returnsFalse() {
+        // Arrange: Set up two distinct Parameter objects.
+        
+        // 1. Define common properties for creating the parameters.
+        TypeToken<Annotation> typeToken = TypeToken.of(Annotation.class);
+        Annotation[] noAnnotations = new Annotation[0];
+        Object dummyAnnotatedType = new Object();
+
+        // 2. Create the first parameter with a mocked Invokable and a specific position.
+        Invokable<?, ?> mockInvokable = mock(Invokable.class);
+        int position1 = 1;
+        Parameter parameter1 = new Parameter(
+                mockInvokable, position1, typeToken, noAnnotations, dummyAnnotatedType);
+
+        // 3. Create a second parameter that differs by its declaring invokable (null) and position.
+        // The identity of a Parameter is primarily defined by its declaration and position.
+        int position2 = 2;
+        Parameter parameter2 = new Parameter(
+                null, position2, typeToken, noAnnotations, dummyAnnotatedType);
+
+        // Act: Compare the two objects for equality.
+        boolean areEqual = parameter1.equals(parameter2);
+
+        // Assert: Verify that they are not equal.
+        assertFalse(
+                "Parameters with different declaring invokables and positions should not be equal.",
+                areEqual);
     }
 }
