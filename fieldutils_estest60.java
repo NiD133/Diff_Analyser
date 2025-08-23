@@ -1,31 +1,21 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest60 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeDivide((-9223372036854775808L), (long) (-1));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows a long: -9223372036854775808 / -1
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that {@code safeDivide} throws an {@link ArithmeticException} when
+     * attempting to divide {@code Long.MIN_VALUE} by -1. This is a classic
+     * integer overflow edge case, as the result (2^63) is one greater than
+     * {@code Long.MAX_VALUE} (2^63 - 1) and cannot be represented in a long.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void safeDivide_whenDividingLongMinValueByMinusOne_throwsArithmeticException() {
+        // This operation is expected to throw an exception because the result overflows the long type.
+        FieldUtils.safeDivide(Long.MIN_VALUE, -1L);
     }
 }
