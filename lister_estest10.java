@@ -1,30 +1,29 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Lister_ESTestTest10 extends Lister_ESTest_scaffolding {
+/**
+ * Tests for the {@link Lister} command-line application wrapper.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Lister lister0 = new Lister();
-        // Undeclared exception!
-        try {
-            lister0.go();
-            fail("Expecting exception: NoClassDefFoundError");
-        } catch (NoClassDefFoundError e) {
-            //
-            // org/apache/commons/compress/utils/IOUtils
-            //
-            verifyException("org.apache.commons.compress.archivers.ArchiveStreamFactory", e);
-        }
+    /**
+     * Verifies that calling go() on a Lister instance created without a file path
+     * throws an InvalidPathException. This simulates running the application
+     * with an empty or missing file argument.
+     *
+     * The deprecated default constructor `new Lister()` is used here as it
+     * directly creates this invalid state.
+     */
+    @Test(expected = InvalidPathException.class)
+    public void goShouldThrowExceptionWhenInitializedWithEmptyFilePath() throws Exception {
+        // Arrange: Create a Lister instance using the default constructor.
+        // This sets up the internal state with an empty, and therefore invalid, file path.
+        Lister lister = new Lister();
+
+        // Act & Assert: Calling go() should immediately fail when it tries to
+        // process the empty file path, throwing an InvalidPathException.
+        lister.go();
     }
 }
