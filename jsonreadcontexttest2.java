@@ -1,25 +1,42 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.DupDetector;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JUnit5TestBase;
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonReadContextTestTest2 extends JUnit5TestBase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-    static class MyContext extends JsonReadContext {
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its name-handling capabilities.
+ */
+class JsonReadContextTest extends JUnit5TestBase {
 
-        public MyContext(JsonReadContext parent, int nestingDepth, DupDetector dups, int type, int lineNr, int colNr) {
-            super(parent, nestingDepth, dups, type, lineNr, colNr);
-        }
+    @Test
+    void shouldSetAndRetrieveCurrentName() throws JsonProcessingException {
+        // Arrange: Create a root context. The duplicate detector is null, as it's not
+        // relevant to this test.
+        JsonReadContext context = JsonReadContext.createRootContext(null);
+        String expectedName = "abc";
+
+        // Act: Set the current name on the context.
+        context.setCurrentName(expectedName);
+
+        // Assert: Verify that getCurrentName() returns the name that was set.
+        assertEquals(expectedName, context.getCurrentName());
     }
 
     @Test
-    void setCurrentName() throws Exception {
-        JsonReadContext jsonReadContext = JsonReadContext.createRootContext(0, 0, (DupDetector) null);
-        jsonReadContext.setCurrentName("abc");
-        assertEquals("abc", jsonReadContext.getCurrentName());
-        jsonReadContext.setCurrentName(null);
-        assertNull(jsonReadContext.getCurrentName());
+    void shouldAllowSettingCurrentNameToNull() throws JsonProcessingException {
+        // Arrange: Create a context and give it an initial name to ensure we are testing a state change.
+        JsonReadContext context = JsonReadContext.createRootContext(null);
+        context.setCurrentName("initialName");
+
+        // Act: Set the current name to null.
+        context.setCurrentName(null);
+
+        // Assert: Verify that the current name is now null.
+        assertNull(context.getCurrentName());
     }
 }
