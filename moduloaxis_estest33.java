@@ -1,44 +1,37 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class ModuloAxis_ESTestTest33 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        DefaultValueDataset defaultValueDataset0 = new DefaultValueDataset();
-        ThermometerPlot thermometerPlot0 = new ThermometerPlot(defaultValueDataset0);
-        Range range0 = thermometerPlot0.getDataRange((ValueAxis) null);
-        ModuloAxis moduloAxis0 = new ModuloAxis("", range0);
-        moduloAxis0.setDisplayRange(0.0, 10);
-        double double0 = moduloAxis0.getDisplayStart();
-        assertEquals(0.0, double0, 0.01);
+    private static final double DELTA = 1e-9;
+
+    /**
+     * Verifies that getDisplayStart() returns the correct value after
+     * setDisplayRange() has been called.
+     */
+    @Test
+    public void setDisplayRangeShouldCorrectlySetDisplayStart() {
+        // Arrange: Create a ModuloAxis with a fixed range of 0 to 100.
+        // This simplified setup is equivalent to the original test's use of a
+        // ThermometerPlot, which defaults to the same range.
+        Range fixedRange = new Range(0.0, 100.0);
+        ModuloAxis moduloAxis = new ModuloAxis("Test Axis", fixedRange);
+
+        double expectedStart = 0.0;
+        double displayEnd = 10.0;
+
+        // Act: Set a new display range on the axis.
+        moduloAxis.setDisplayRange(expectedStart, displayEnd);
+        double actualStart = moduloAxis.getDisplayStart();
+
+        // Assert: The retrieved display start value should match the one that was set.
+        assertEquals("The display start value should match the value set via setDisplayRange.",
+                expectedStart, actualStart, DELTA);
     }
 }
