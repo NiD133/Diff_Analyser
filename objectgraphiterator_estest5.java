@@ -1,56 +1,46 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ObjectGraphIterator_ESTestTest5 extends ObjectGraphIterator_ESTest_scaffolding {
+/**
+ * Test class for ObjectGraphIterator.
+ * This class contains a refactored test case for the findNextByIterator method.
+ */
+public class ObjectGraphIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Iterator<Integer> iterator0 = linkedList0.descendingIterator();
-        ObjectGraphIterator<Object> objectGraphIterator0 = new ObjectGraphIterator<Object>(iterator0);
-        ObjectGraphIterator<Integer> objectGraphIterator1 = new ObjectGraphIterator<Integer>(iterator0);
-        ListIterator<Integer> listIterator0 = linkedList0.listIterator();
-        objectGraphIterator1.findNextByIterator(listIterator0);
-        assertFalse(listIterator0.hasPrevious());
+    /**
+     * Tests that calling findNextByIterator with an empty iterator does not find a
+     * next element or alter the state of the iterators.
+     */
+    @Test
+    public void findNextByIteratorWithEmptyIteratorShouldNotFindNextElement() {
+        // Arrange: Create an ObjectGraphIterator initialized with an empty root iterator.
+        List<String> emptyList = Collections.emptyList();
+        Iterator<String> emptyRootIterator = emptyList.iterator();
+        ObjectGraphIterator<String> graphIterator = new ObjectGraphIterator<>(emptyRootIterator);
+
+        // Create another empty iterator to pass to the method under test.
+        LinkedList<String> anotherEmptyList = new LinkedList<>();
+        ListIterator<String> emptyIteratorToSearch = anotherEmptyList.listIterator();
+
+        // Act: Attempt to find the next element using the empty iterator.
+        // Note: findNextByIterator is a protected method, so this test must be
+        // in the same package to access it.
+        graphIterator.findNextByIterator(emptyIteratorToSearch);
+
+        // Assert: Verify that the state of both iterators remains unchanged.
+        // The main graph iterator should still report that it has no next element.
+        assertFalse("The graph iterator should not have a next element after the search", graphIterator.hasNext());
+
+        // The passed-in iterator should also remain at its beginning.
+        assertFalse("The searched iterator should not have a next element", emptyIteratorToSearch.hasNext());
+        assertFalse("The searched iterator should not have a previous element", emptyIteratorToSearch.hasPrevious());
     }
 }
