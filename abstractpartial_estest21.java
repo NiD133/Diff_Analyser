@@ -1,54 +1,25 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
 import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest21 extends AbstractPartial_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the {@link AbstractPartial#compareTo(ReadablePartial)} method.
+ */
+public class AbstractPartialTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        // Undeclared exception!
-        try {
-            yearMonth0.compareTo((ReadablePartial) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.base.AbstractPartial", e);
-        }
+    /**
+     * Verifies that compareTo(null) throws a NullPointerException as per the method's contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void compareTo_whenComparingWithNull_shouldThrowNullPointerException() {
+        // Arrange: Create an instance of a concrete subclass of AbstractPartial.
+        // YearMonth is used here as a representative example.
+        ReadablePartial partial = YearMonth.now();
+
+        // Act: Attempt to compare the partial to null.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        partial.compareTo(null);
     }
 }
