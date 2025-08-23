@@ -1,44 +1,46 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DayOfMonth_ESTestTest9 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Test suite for the atYearMonth() method in the DayOfMonth class.
+ */
+public class DayOfMonthAtYearMonthTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        YearMonth yearMonth0 = MockYearMonth.now();
-        dayOfMonth0.atYearMonth(yearMonth0);
-        assertEquals(14, dayOfMonth0.getValue());
+    @Test
+    public void atYearMonth_shouldCombineDayAndYearMonthIntoCorrectLocalDate() {
+        // Arrange: Create a specific day-of-month and a year-month.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+        YearMonth yearMonth = YearMonth.of(2023, Month.AUGUST);
+        LocalDate expectedDate = LocalDate.of(2023, Month.AUGUST, 15);
+
+        // Act: Combine the day-of-month with the year-month.
+        LocalDate actualDate = dayOfMonth.atYearMonth(yearMonth);
+
+        // Assert: The resulting LocalDate should match the expected date.
+        assertEquals(expectedDate, actualDate);
+    }
+
+    /**
+     * The Javadoc for atYearMonth states that if the day is invalid for the
+     * given month, the date is adjusted to the last valid day of that month.
+     * This test verifies that behavior.
+     */
+    @Test
+    public void atYearMonth_whenDayIsInvalidForMonth_shouldAdjustToLastValidDayOfMonth() {
+        // Arrange: Day 31 is invalid for April, which has 30 days.
+        DayOfMonth dayOfMonth = DayOfMonth.of(31);
+        YearMonth april2023 = YearMonth.of(2023, Month.APRIL);
+        LocalDate expectedDate = LocalDate.of(2023, Month.APRIL, 30);
+
+        // Act
+        LocalDate actualDate = dayOfMonth.atYearMonth(april2023);
+
+        // Assert: The result should be adjusted to the last day of April.
+        assertEquals(expectedDate, actualDate);
     }
 }
