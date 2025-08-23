@@ -1,31 +1,27 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest13 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Shape shape0 = Shape.fromNM(1014, 1014);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            sparseBloomFilter0.processBitMaps((LongPredicate) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // consumer
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that a NullPointerException is thrown when processBitMaps is called with a null consumer.
+     * The method contract requires a non-null predicate to process the bit maps.
+     */
+    @Test(expected = NullPointerException.class)
+    public void processBitMaps_withNullConsumer_throwsNullPointerException() {
+        // Arrange: Create a filter with any valid shape.
+        // The specific dimensions of the shape do not matter for this test.
+        Shape shape = Shape.fromNM(10, 100);
+        SparseBloomFilter filter = new SparseBloomFilter(shape);
+
+        // Act: Call the method under test with a null argument.
+        filter.processBitMaps(null);
+
+        // Assert: The test will pass only if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
