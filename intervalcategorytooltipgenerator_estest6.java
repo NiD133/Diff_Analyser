@@ -1,33 +1,35 @@
 package org.jfree.chart.labels;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class IntervalCategoryToolTipGenerator_ESTestTest6 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the constructor of the {@link IntervalCategoryToolTipGenerator} class.
+ */
+public class IntervalCategoryToolTipGeneratorConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = null;
+    /**
+     * Verifies that the constructor correctly throws an IllegalArgumentException
+     * when a null DateFormat is provided. A non-null formatter is a mandatory
+     * dependency for the generator.
+     */
+    @Test
+    public void constructor_WithNullDateFormat_ShouldThrowIllegalArgumentException() {
+        // Arrange: Define the arguments for the constructor, with a null formatter.
+        String labelFormat = "({0}, {1}) = {2}";
+        DateFormat nullDateFormatter = null;
+        String expectedExceptionMessage = "Null 'formatter' argument.";
+
+        // Act & Assert: Attempt to create the object and verify the exception.
         try {
-            intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("({0}, {1}) = {2}", (DateFormat) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new IntervalCategoryToolTipGenerator(labelFormat, nullDateFormatter);
+            fail("Expected an IllegalArgumentException to be thrown for a null date formatter.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'formatter' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception has the expected message.
+            assertEquals(expectedExceptionMessage, e.getMessage());
         }
     }
 }
