@@ -1,20 +1,37 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest15 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder(";i]b}Z<[yv");
-        stringBuilder0.appendCodePoint(1114111);
-        int int0 = CharSequenceUtils.indexOf(stringBuilder0, 65536, (-897));
-        assertEquals((-1), int0);
+    /**
+     * Tests that indexOf returns -1 when searching for a supplementary character
+     * that is not present in the CharSequence, especially when the search
+     * starts from a negative index. According to the Javadoc, a negative start
+     * index should be treated as 0.
+     */
+    @Test
+    public void indexOfShouldReturnNotFoundForMissingSupplementaryCharWithNegativeStartIndex() {
+        // Arrange
+        // A CharSequence containing a supplementary character (the max code point).
+        final StringBuilder text = new StringBuilder("somePrefix");
+        text.appendCodePoint(Character.MAX_CODE_POINT);
+
+        // The supplementary character to search for (U+10000), which is not in the text.
+        final int searchChar = 0x10000; // 65536 is the first supplementary code point.
+
+        // A negative start index, which should be treated as 0.
+        final int startIndex = -1;
+        final int expectedIndex = -1; // The "not found" result.
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(text, searchChar, startIndex);
+
+        // Assert
+        assertEquals("indexOf should return -1 for a character not found.", expectedIndex, actualIndex);
     }
 }
