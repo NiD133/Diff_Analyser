@@ -1,82 +1,51 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.joda.time.IllegalFieldValueException;
 
-public class IslamicChronologyTestTest12 extends TestCase {
-
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * This class contains tests for the era-related functionality of the IslamicChronology.
+ * It focuses on verifying the era constant and the handling of dates before the first Islamic year.
+ */
+public class IslamicChronologyEraTest extends TestCase {
 
     private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Tests that the Anno Hegirae (AH) era constant has the expected value.
+     */
+    public void testEraConstant_isAH() {
+        // The Islamic calendar has only one era, AH (Anno Hegirae).
+        // Its value is expected to be 1, consistent with the CE era in other chronologies.
+        assertEquals("IslamicChronology.AH should have a value of 1", 1, IslamicChronology.AH);
     }
 
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
+    /**
+     * Tests that creating a DateTime for a year before 1 AH throws an exception.
+     * The IslamicChronology is not proleptic and does not support years before the Hijrah.
+     */
+    public void testDateTimeCreation_throwsExceptionForYearsBeforeEra() {
+        // Year 1 is the first year in the Islamic calendar.
+        // Attempts to create a date in year 0 or a negative year should fail.
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testEra() {
-        assertEquals(1, IslamicChronology.AH);
+        // Test with year 0
         try {
-            new DateTime(-1, 13, 5, 0, 0, 0, 0, ISLAMIC_UTC);
-            fail();
-        } catch (IllegalArgumentException ex) {
+            new DateTime(0, 1, 1, 0, 0, 0, 0, ISLAMIC_UTC);
+            fail("Creating a DateTime in year 0 should have thrown an exception.");
+        } catch (IllegalFieldValueException ex) {
+            // This is the expected behavior.
+        }
+
+        // Test with a negative year (-1)
+        try {
+            // The original test used an invalid month (13), which could mask the true reason for failure.
+            // Using a valid month (1) ensures we are testing the year validation logic specifically.
+            new DateTime(-1, 1, 5, 0, 0, 0, 0, ISLAMIC_UTC);
+            fail("Creating a DateTime in a negative year should have thrown an exception.");
+        } catch (IllegalFieldValueException ex) {
+            // This is the expected behavior.
         }
     }
 }
