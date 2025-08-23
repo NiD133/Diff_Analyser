@@ -1,32 +1,51 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class CompactLinkedHashSet_ESTestTest20 extends CompactLinkedHashSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        ImmutableSortedSet<Locale.Category> immutableSortedSet0 = ImmutableSortedSet.of(locale_Category0, locale_Category0, locale_Category0);
-        CompactLinkedHashSet<Locale.Category> compactLinkedHashSet0 = CompactLinkedHashSet.create((Collection<? extends Locale.Category>) immutableSortedSet0);
-        // Undeclared exception!
+    /**
+     * Verifies that the internal `insertEntry` method throws an `ArrayIndexOutOfBoundsException`
+     * when called with an entry index that is outside the bounds of the set's internal arrays.
+     *
+     * <p><b>Test Logic:</b>
+     * 1. A `CompactLinkedHashSet` is created with a single element. This results in a small
+     *    internal capacity (the default initial capacity is 3).
+     * 2. The package-private `insertEntry` method is then called with an index deliberately chosen
+     *    to be much larger than this capacity.
+     * 3. The test asserts that an `ArrayIndexOutOfBoundsException` is thrown, confirming
+     *    the expected boundary check behavior of the internal data structure.
+     */
+    @Test
+    public void insertEntry_withOutOfBoundsIndex_throwsException() {
+        // Arrange: Create a set with a single element to ensure its internal arrays
+        // have a small, predictable capacity.
+        CompactLinkedHashSet<Locale.Category> set =
+                CompactLinkedHashSet.create(Collections.singleton(Locale.Category.FORMAT));
+
+        // An index that is guaranteed to be out of the bounds of the internal arrays.
+        final int outOfBoundsIndex = 133;
+        final Locale.Category elementToInsert = Locale.Category.FORMAT;
+        // The hash and mask values are required by the method signature but are not
+        // relevant to triggering this specific exception.
+        final int arbitraryHash = 133;
+        final int arbitraryMask = 1485;
+
+        // Act & Assert
         try {
-            compactLinkedHashSet0.insertEntry(133, locale_Category0, 133, 1485);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 133
-            //
-            verifyException("com.google.common.collect.CompactHashSet", e);
+            set.insertEntry(outOfBoundsIndex, elementToInsert, arbitraryHash, arbitraryMask);
+            fail("Expected an ArrayIndexOutOfBoundsException but none was thrown.");
+        } catch (ArrayIndexOutOfBoundsException expected) {
+            // The exception is expected. For ArrayIndexOutOfBoundsException, the message
+            // typically contains the invalid index, which provides a more specific check.
+            assertEquals(
+                    "Exception message should contain the out-of-bounds index",
+                    String.valueOf(outOfBoundsIndex),
+                    expected.getMessage());
         }
     }
 }
