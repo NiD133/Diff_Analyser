@@ -1,20 +1,30 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertNull;
+
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest42 extends URLCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link URLCodec} class.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        Object object0 = uRLCodec0.decode((Object) null);
-        assertNull(object0);
+    /**
+     * Tests that the decode(Object) method returns null when the input is null.
+     * This is the expected behavior according to the method's contract for handling
+     * null inputs.
+     */
+    @Test
+    public void decodeObjectWithNullInputShouldReturnNull() throws DecoderException {
+        // Arrange
+        URLCodec urlCodec = new URLCodec();
+        Object nullInput = null;
+
+        // Act
+        Object result = urlCodec.decode(nullInput);
+
+        // Assert
+        assertNull("Decoding a null object should result in a null value.", result);
     }
 }
