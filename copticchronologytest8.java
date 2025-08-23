@@ -1,141 +1,143 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CopticChronologyTestTest8 extends TestCase {
+/**
+ * Tests for the duration fields of CopticChronology.
+ */
+public class CopticChronologyDurationFieldTest {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    // A specific instant in time, 2002-06-09T00:00:00Z.
+    private static final long TEST_TIME_NOW = new DateTime(2002, 6, 9, 0, 0, DateTimeZone.UTC).getMillis();
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() {
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
+
+        // Set a default time zone with DST to test its impact on field precision.
+        DateTimeZone.setDefault(DateTimeZone.forID("Europe/London"));
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    //-----------------------------------------------------------------------
-    public void testDurationFields() {
-        final CopticChronology coptic = CopticChronology.getInstance();
+    @Test
+    public void testFieldNamesAndSupport() {
+        Chronology coptic = CopticChronology.getInstanceUTC();
+
         assertEquals("eras", coptic.eras().getName());
+        assertFalse("Eras field should not be supported", coptic.eras().isSupported());
+
         assertEquals("centuries", coptic.centuries().getName());
+        assertTrue(coptic.centuries().isSupported());
+
         assertEquals("years", coptic.years().getName());
+        assertTrue(coptic.years().isSupported());
+
         assertEquals("weekyears", coptic.weekyears().getName());
+        assertTrue(coptic.weekyears().isSupported());
+
         assertEquals("months", coptic.months().getName());
+        assertTrue(coptic.months().isSupported());
+
         assertEquals("weeks", coptic.weeks().getName());
+        assertTrue(coptic.weeks().isSupported());
+
         assertEquals("days", coptic.days().getName());
+        assertTrue(coptic.days().isSupported());
+
         assertEquals("halfdays", coptic.halfdays().getName());
+        assertTrue(coptic.halfdays().isSupported());
+
         assertEquals("hours", coptic.hours().getName());
+        assertTrue(coptic.hours().isSupported());
+
         assertEquals("minutes", coptic.minutes().getName());
+        assertTrue(coptic.minutes().isSupported());
+
         assertEquals("seconds", coptic.seconds().getName());
+        assertTrue(coptic.seconds().isSupported());
+
         assertEquals("millis", coptic.millis().getName());
-        assertEquals(false, coptic.eras().isSupported());
-        assertEquals(true, coptic.centuries().isSupported());
-        assertEquals(true, coptic.years().isSupported());
-        assertEquals(true, coptic.weekyears().isSupported());
-        assertEquals(true, coptic.months().isSupported());
-        assertEquals(true, coptic.weeks().isSupported());
-        assertEquals(true, coptic.days().isSupported());
-        assertEquals(true, coptic.halfdays().isSupported());
-        assertEquals(true, coptic.hours().isSupported());
-        assertEquals(true, coptic.minutes().isSupported());
-        assertEquals(true, coptic.seconds().isSupported());
-        assertEquals(true, coptic.millis().isSupported());
-        assertEquals(false, coptic.centuries().isPrecise());
-        assertEquals(false, coptic.years().isPrecise());
-        assertEquals(false, coptic.weekyears().isPrecise());
-        assertEquals(false, coptic.months().isPrecise());
-        assertEquals(false, coptic.weeks().isPrecise());
-        assertEquals(false, coptic.days().isPrecise());
-        assertEquals(false, coptic.halfdays().isPrecise());
-        assertEquals(true, coptic.hours().isPrecise());
-        assertEquals(true, coptic.minutes().isPrecise());
-        assertEquals(true, coptic.seconds().isPrecise());
-        assertEquals(true, coptic.millis().isPrecise());
-        final CopticChronology copticUTC = CopticChronology.getInstanceUTC();
-        assertEquals(false, copticUTC.centuries().isPrecise());
-        assertEquals(false, copticUTC.years().isPrecise());
-        assertEquals(false, copticUTC.weekyears().isPrecise());
-        assertEquals(false, copticUTC.months().isPrecise());
-        assertEquals(true, copticUTC.weeks().isPrecise());
-        assertEquals(true, copticUTC.days().isPrecise());
-        assertEquals(true, copticUTC.halfdays().isPrecise());
-        assertEquals(true, copticUTC.hours().isPrecise());
-        assertEquals(true, copticUTC.minutes().isPrecise());
-        assertEquals(true, copticUTC.seconds().isPrecise());
-        assertEquals(true, copticUTC.millis().isPrecise());
-        final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
-        final CopticChronology copticGMT = CopticChronology.getInstance(gmt);
-        assertEquals(false, copticGMT.centuries().isPrecise());
-        assertEquals(false, copticGMT.years().isPrecise());
-        assertEquals(false, copticGMT.weekyears().isPrecise());
-        assertEquals(false, copticGMT.months().isPrecise());
-        assertEquals(true, copticGMT.weeks().isPrecise());
-        assertEquals(true, copticGMT.days().isPrecise());
-        assertEquals(true, copticGMT.halfdays().isPrecise());
-        assertEquals(true, copticGMT.hours().isPrecise());
-        assertEquals(true, copticGMT.minutes().isPrecise());
-        assertEquals(true, copticGMT.seconds().isPrecise());
-        assertEquals(true, copticGMT.millis().isPrecise());
+        assertTrue(coptic.millis().isSupported());
+    }
+
+    @Test
+    public void testFieldPrecision_InZoneWithDST() {
+        // The default zone is set to "Europe/London" in setUp(), which has Daylight Saving Time.
+        // Fields longer than a day are imprecise due to DST transitions.
+        Chronology coptic = CopticChronology.getInstance();
+
+        assertFalse("centuries", coptic.centuries().isPrecise());
+        assertFalse("years", coptic.years().isPrecise());
+        assertFalse("weekyears", coptic.weekyears().isPrecise());
+        assertFalse("months", coptic.months().isPrecise());
+        assertFalse("weeks", coptic.weeks().isPrecise());
+        assertFalse("days", coptic.days().isPrecise());
+        assertFalse("halfdays", coptic.halfdays().isPrecise());
+
+        assertTrue("hours", coptic.hours().isPrecise());
+        assertTrue("minutes", coptic.minutes().isPrecise());
+        assertTrue("seconds", coptic.seconds().isPrecise());
+        assertTrue("millis", coptic.millis().isPrecise());
+    }
+
+    @Test
+    public void testFieldPrecision_InUTC() {
+        Chronology copticUTC = CopticChronology.getInstanceUTC();
+        assertPrecisionForFixedOffsetZone(copticUTC);
+    }
+
+    @Test
+    public void testFieldPrecision_InFixedOffsetZone() {
+        DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
+        Chronology copticGMT = CopticChronology.getInstance(gmt);
+        assertPrecisionForFixedOffsetZone(copticGMT);
+    }
+
+    /**
+     * Asserts the precision of duration fields for a Chronology in a fixed-offset time zone (like UTC or GMT).
+     * In these zones, day-based fields are precise, but year/month-based fields are not due to leap years.
+     */
+    private void assertPrecisionForFixedOffsetZone(Chronology chronology) {
+        assertFalse("centuries", chronology.centuries().isPrecise());
+        assertFalse("years", chronology.years().isPrecise());
+        assertFalse("weekyears", chronology.weekyears().isPrecise());
+        assertFalse("months", chronology.months().isPrecise());
+
+        assertTrue("weeks", chronology.weeks().isPrecise());
+        assertTrue("days", chronology.days().isPrecise());
+        assertTrue("halfdays", chronology.halfdays().isPrecise());
+        assertTrue("hours", chronology.hours().isPrecise());
+        assertTrue("minutes", chronology.minutes().isPrecise());
+        assertTrue("seconds", chronology.seconds().isPrecise());
+        assertTrue("millis", chronology.millis().isPrecise());
     }
 }
