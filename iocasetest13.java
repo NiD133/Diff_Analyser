@@ -1,51 +1,44 @@
 package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class IOCaseTestTest13 {
+/**
+ * Tests for the factory method {@link IOCase#forName(String)}.
+ */
+class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    @DisplayName("forName should return the correct IOCase for valid names")
+    @ParameterizedTest(name = "IOCase.forName(\"{0}\") should return IOCase.{1}")
+    @CsvSource({
+        "Sensitive,   SENSITIVE",
+        "Insensitive, INSENSITIVE",
+        "System,      SYSTEM"
+    })
+    void forName_withValidName_shouldReturnCorrespondingEnum(final String name, final IOCase expected) {
+        // When
+        final IOCase result = IOCase.forName(name);
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
+        // Then
+        assertEquals(expected, result);
     }
 
     @Test
-    void test_forName() {
-        assertEquals(IOCase.SENSITIVE, IOCase.forName("Sensitive"));
-        assertEquals(IOCase.INSENSITIVE, IOCase.forName("Insensitive"));
-        assertEquals(IOCase.SYSTEM, IOCase.forName("System"));
-        assertThrows(IllegalArgumentException.class, () -> IOCase.forName("Blah"));
+    @DisplayName("forName should throw IllegalArgumentException for an unknown name")
+    void forName_withUnknownName_shouldThrowException() {
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> IOCase.forName("UnknownName"));
+    }
+
+    @Test
+    @DisplayName("forName should throw IllegalArgumentException for a null name")
+    void forName_withNullName_shouldThrowException() {
+        // When & Then
         assertThrows(IllegalArgumentException.class, () -> IOCase.forName(null));
     }
 }
