@@ -1,29 +1,31 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PdfDictionary_ESTestTest33 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        PdfName pdfName0 = PdfName.FRM;
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.putEx(pdfName0, pdfName0);
-        PdfNumber pdfNumber0 = pdfResources0.getAsNumber(pdfName0);
-        assertNull(pdfNumber0);
+    /**
+     * Verifies that getAsNumber() returns null when the requested key holds a value
+     * that is not a PdfNumber. This ensures the type-safe getter handles
+     * type mismatches gracefully.
+     */
+    @Test
+    public void getAsNumber_shouldReturnNull_whenValueIsOfIncorrectType() {
+        // Arrange: Create a dictionary and add an entry where the value is a PdfName,
+        // not the expected PdfNumber.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName testKey = PdfName.FRM;
+        PdfName valueWithIncorrectType = new PdfName("NotANumber");
+        dictionary.put(testKey, valueWithIncorrectType);
+
+        // Act: Attempt to retrieve the value using the type-specific getAsNumber() method.
+        PdfNumber result = dictionary.getAsNumber(testKey);
+
+        // Assert: The method should return null because the stored object cannot be cast to PdfNumber.
+        assertNull("Expected getAsNumber() to return null for a non-PdfNumber value.", result);
     }
 }
