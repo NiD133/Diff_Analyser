@@ -1,55 +1,37 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
 import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StringConverter_ESTestTest15 extends StringConverter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        CopticChronology copticChronology0 = CopticChronology.getInstanceUTC();
-        // Undeclared exception!
+/**
+ * This class contains tests for the {@link StringConverter}.
+ * The original test was auto-generated; this version has been refactored for clarity.
+ */
+public class StringConverter_ESTestTest15 {
+
+    /**
+     * Tests that getInstantMillis() throws an IllegalArgumentException when provided with a string
+     * that does not conform to the expected date-time format.
+     */
+    @Test
+    public void getInstantMillis_shouldThrowIllegalArgumentException_forInvalidStringFormat() {
+        // Arrange
+        final StringConverter converter = StringConverter.INSTANCE;
+        final String invalidDateTimeString = " cannot be compared to ";
+        final Chronology chronology = CopticChronology.getInstanceUTC();
+        final String expectedErrorMessage = "Invalid format: \"" + invalidDateTimeString + "\"";
+
+        // Act & Assert
         try {
-            stringConverter0.getInstantMillis(" cannot be compared to ", copticChronology0);
-            fail("Expecting exception: IllegalArgumentException");
+            converter.getInstantMillis(invalidDateTimeString, chronology);
+            fail("Expected an IllegalArgumentException to be thrown for an invalid format string.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \" cannot be compared to \"
-            //
-            verifyException("org.joda.time.format.DateTimeParserBucket", e);
+            // Verify that the exception has the expected message
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
