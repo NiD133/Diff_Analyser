@@ -1,26 +1,36 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest62 extends JsonIgnoreProperties_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties((Set<String>) linkedHashSet0);
-        jsonIgnoreProperties_Value0.valueFor();
-        assertFalse(jsonIgnoreProperties_Value0.getAllowSetters());
-        assertFalse(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class.
+ */
+public class JsonIgnorePropertiesValueTest {
+
+    /**
+     * Verifies that creating a {@link JsonIgnoreProperties.Value} instance
+     * via the {@code forIgnoredProperties} factory method with an empty set
+     * results in an object with the correct default boolean flag values.
+     */
+    @Test
+    public void forIgnoredPropertiesWithEmptySetShouldHaveDefaultBooleanFlags() {
+        // Arrange: Create an empty set of property names to ignore.
+        Set<String> emptyIgnoredProperties = Collections.emptySet();
+
+        // Act: Create a Value instance using the factory method.
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.forIgnoredProperties(emptyIgnoredProperties);
+
+        // Assert: Verify that the boolean properties have their expected default values.
+        assertTrue("The set of ignored properties should be empty", value.getIgnored().isEmpty());
+        assertFalse("'ignoreUnknown' should be false by default", value.getIgnoreUnknown());
+        assertFalse("'allowGetters' should be false by default", value.getAllowGetters());
+        assertFalse("'allowSetters' should be false by default", value.getAllowSetters());
+        assertTrue("'merge' should be true by default", value.getMerge());
     }
 }
