@@ -1,46 +1,31 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest4 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams#copyReaderToBuilder(java.io.Reader, StringBuilder)}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StringReader stringReader0 = new StringReader("com.google.common.primitives.Shorts$ShortConverter");
-        StringBuilder stringBuilder0 = new StringBuilder(607);
-        long long0 = CharStreams.copyReaderToBuilder(stringReader0, stringBuilder0);
-        assertEquals("com.google.common.primitives.Shorts$ShortConverter", stringBuilder0.toString());
-        assertEquals(50L, long0);
+    @Test
+    public void copyReaderToBuilder_copiesAllCharactersAndReturnsCorrectCount() throws IOException {
+        // Arrange
+        String inputString = "com.google.common.primitives.Shorts$ShortConverter";
+        StringReader reader = new StringReader(inputString);
+        StringBuilder destinationBuilder = new StringBuilder();
+
+        // Act
+        long numberOfCharsCopied = CharStreams.copyReaderToBuilder(reader, destinationBuilder);
+
+        // Assert
+        // Verify that the entire string was copied to the StringBuilder.
+        assertEquals(inputString, destinationBuilder.toString());
+
+        // Verify that the returned count matches the input string's length.
+        assertEquals((long) inputString.length(), numberOfCharsCopied);
     }
 }
