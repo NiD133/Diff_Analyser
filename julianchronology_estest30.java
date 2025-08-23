@@ -1,64 +1,37 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
 import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JulianChronology_ESTestTest30 extends JulianChronology_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JulianChronology} class.
+ */
+public class JulianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        JulianChronology julianChronology0 = JulianChronology.INSTANCE;
-        JapaneseEra japaneseEra0 = JapaneseEra.HEISEI;
-        // Undeclared exception!
+    /**
+     * Verifies that prolepticYear() throws a ClassCastException when an era
+     * from an incorrect chronology (e.g., Japanese) is provided.
+     * The method is specified to only accept a JulianEra.
+     */
+    @Test
+    public void prolepticYear_throwsClassCastException_forNonJulianEra() {
+        // Arrange: Set up the test objects. We need the chronology under test
+        // and an era from a different, incompatible chronology.
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        Era invalidEra = JapaneseEra.HEISEI;
+        int yearOfEra = 1; // An arbitrary valid year for the era.
+
+        // Act & Assert: We expect the method call to throw a ClassCastException.
         try {
-            julianChronology0.INSTANCE.prolepticYear(japaneseEra0, (-1768));
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // Era must be JulianEra
-            //
-            verifyException("org.threeten.extra.chrono.JulianChronology", e);
+            julianChronology.prolepticYear(invalidEra, yearOfEra);
+            fail("Expected a ClassCastException, but it was not thrown.");
+        } catch (ClassCastException ex) {
+            // Verify that the exception has the expected message, confirming
+            // the reason for the failure is correct.
+            assertEquals("Era must be JulianEra", ex.getMessage());
         }
     }
 }
