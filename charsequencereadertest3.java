@@ -1,109 +1,198 @@
 package com.google.common.io;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.CharBuffer;
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CharSequenceReaderTestTest3 extends TestCase {
+/**
+ * Tests for {@link CharSequenceReader}.
+ *
+ * <p>This suite focuses on verifying the correctness of various read and skip operations, as well
+ * as the mark/reset functionality, across different types of CharSequence inputs.
+ */
+public class CharSequenceReaderTest extends TestCase {
 
-    /**
-     * Creates a CharSequenceReader wrapping the given CharSequence and tests that the reader produces
-     * the same sequence when read using each type of read method it provides.
-     */
-    private static void assertReadsCorrectly(CharSequence charSequence) throws IOException {
-        String expected = charSequence.toString();
-        // read char by char
-        CharSequenceReader reader = new CharSequenceReader(charSequence);
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), reader.read());
-        }
-        assertFullyRead(reader);
-        // read all to one array
-        reader = new CharSequenceReader(charSequence);
-        char[] buf = new char[expected.length()];
-        assertEquals(expected.length() == 0 ? -1 : expected.length(), reader.read(buf));
-        assertEquals(expected, new String(buf));
-        assertFullyRead(reader);
-        // read in chunks to fixed array
-        reader = new CharSequenceReader(charSequence);
-        buf = new char[5];
-        StringBuilder builder = new StringBuilder();
-        int read;
-        while ((read = reader.read(buf, 0, buf.length)) != -1) {
-            builder.append(buf, 0, read);
-        }
-        assertEquals(expected, builder.toString());
-        assertFullyRead(reader);
-        // read all to one CharBuffer
-        reader = new CharSequenceReader(charSequence);
-        CharBuffer buf2 = CharBuffer.allocate(expected.length());
-        assertEquals(expected.length() == 0 ? -1 : expected.length(), reader.read(buf2));
-        Java8Compatibility.flip(buf2);
-        assertEquals(expected, buf2.toString());
-        assertFullyRead(reader);
-        // read in chunks to fixed CharBuffer
-        reader = new CharSequenceReader(charSequence);
-        buf2 = CharBuffer.allocate(5);
-        builder = new StringBuilder();
-        while (reader.read(buf2) != -1) {
-            Java8Compatibility.flip(buf2);
-            builder.append(buf2);
-            Java8Compatibility.clear(buf2);
-        }
-        assertEquals(expected, builder.toString());
-        assertFullyRead(reader);
-        // skip fully
-        reader = new CharSequenceReader(charSequence);
-        assertEquals(expected.length(), reader.skip(Long.MAX_VALUE));
-        assertFullyRead(reader);
-        // skip 5 and read the rest
-        if (expected.length() > 5) {
-            reader = new CharSequenceReader(charSequence);
-            assertEquals(5, reader.skip(5));
-            buf = new char[expected.length() - 5];
-            assertEquals(buf.length, reader.read(buf, 0, buf.length));
-            assertEquals(expected.substring(5), new String(buf));
-            assertFullyRead(reader);
-        }
+  private static final String SHORT_STRING = "abcdef";
+  private static final String LONG_STRING = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  // *****************************************************************
+  // ** Tests for various read() and skip() operations
+  // *****************************************************************
+
+  public void testReadOperations_withEmptyString() throws IOException {
+    assertReadOperationsWorkCorrectly("");
+  }
+
+  public void testReadOperations_withShortString() throws IOException {
+    assertReadOperationsWorkCorrectly(SHORT_STRING);
+  }
+
+  public void testReadOperations_withLongString() throws IOException {
+    assertReadOperationsWorkCorrectly(LONG_STRING);
+  }
+
+  /**
+   * A test battery that runs a series of read/skip assertions against a given CharSequence. This
+   * method is called by the public test methods with different inputs.
+   */
+  private void assertReadOperationsWorkCorrectly(String sequence) throws IOException {
+    assertCanReadCharByChar(sequence);
+    assertCanReadToFullCharArray(sequence);
+    assertCanReadToCharArrayInChunks(sequence);
+    assertCanReadToFullCharBuffer(sequence);
+    assertCanReadToCharBufferInChunks(sequence);
+    assertCanSkipEntireSequence(sequence);
+    assertCanSkipPartially(sequence);
+  }
+
+  private void assertCanReadCharByChar(String expected) throws IOException {
+    Reader reader = new CharSequenceReader(expected);
+    for (int i = 0; i < expected.length(); i++) {
+      assertEquals("Character at index " + i, expected.charAt(i), reader.read());
+    }
+    assertFullyRead(reader);
+  }
+
+  private void assertCanReadToFullCharArray(String expected) throws IOException {
+    Reader reader = new CharSequenceReader(expected);
+    char[] buffer = new char[expected.length()];
+
+    int expectedBytesRead = expected.isEmpty() ? -1 : expected.length();
+    assertEquals(expectedBytesRead, reader.read(buffer));
+    assertEquals(expected, new String(buffer));
+
+    assertFullyRead(reader);
+  }
+
+  private void assertCanReadToCharArrayInChunks(String expected) throws IOException {
+    final int chunkSize = 5;
+    Reader reader = new CharSequenceReader(expected);
+    char[] buffer = new char[chunkSize];
+    StringBuilder result = new StringBuilder();
+
+    int read;
+    while ((read = reader.read(buffer, 0, buffer.length)) != -1) {
+      result.append(buffer, 0, read);
     }
 
-    private static void assertFullyRead(CharSequenceReader reader) throws IOException {
-        assertEquals(-1, reader.read());
-        assertEquals(-1, reader.read(new char[10], 0, 10));
-        assertEquals(-1, reader.read(CharBuffer.allocate(10)));
-        assertEquals(0, reader.skip(10));
+    assertEquals(expected, result.toString());
+    assertFullyRead(reader);
+  }
+
+  private void assertCanReadToFullCharBuffer(String expected) throws IOException {
+    Reader reader = new CharSequenceReader(expected);
+    CharBuffer buffer = CharBuffer.allocate(expected.length());
+
+    int expectedBytesRead = expected.isEmpty() ? -1 : expected.length();
+    assertEquals(expectedBytesRead, reader.read(buffer));
+
+    buffer.flip(); // Prepare buffer for reading
+    assertEquals(expected, buffer.toString());
+    assertFullyRead(reader);
+  }
+
+  private void assertCanReadToCharBufferInChunks(String expected) throws IOException {
+    final int chunkSize = 5;
+    Reader reader = new CharSequenceReader(expected);
+    CharBuffer buffer = CharBuffer.allocate(chunkSize);
+    StringBuilder result = new StringBuilder();
+
+    while (reader.read(buffer) != -1) {
+      buffer.flip(); // Prepare buffer for reading
+      result.append(buffer);
+      buffer.clear(); // Prepare buffer for writing
     }
 
-    private static String readFully(CharSequenceReader reader) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        int read;
-        while ((read = reader.read()) != -1) {
-            builder.append((char) read);
-        }
-        return builder.toString();
-    }
+    assertEquals(expected, result.toString());
+    assertFullyRead(reader);
+  }
 
-    public void testMarkAndReset() throws IOException {
-        String string = "abcdefghijklmnopqrstuvwxyz";
-        CharSequenceReader reader = new CharSequenceReader(string);
-        assertTrue(reader.markSupported());
-        assertEquals(string, readFully(reader));
-        assertFullyRead(reader);
-        // reset and read again
-        reader.reset();
-        assertEquals(string, readFully(reader));
-        assertFullyRead(reader);
-        // reset, skip, mark, then read the rest
-        reader.reset();
-        assertEquals(5, reader.skip(5));
-        reader.mark(Integer.MAX_VALUE);
-        assertEquals(string.substring(5), readFully(reader));
-        assertFullyRead(reader);
-        // reset to the mark and then read the rest
-        reader.reset();
-        assertEquals(string.substring(5), readFully(reader));
-        assertFullyRead(reader);
+  private void assertCanSkipEntireSequence(String expected) throws IOException {
+    Reader reader = new CharSequenceReader(expected);
+    assertEquals(expected.length(), reader.skip(Long.MAX_VALUE));
+    assertFullyRead(reader);
+  }
+
+  private void assertCanSkipPartially(String expected) throws IOException {
+    if (expected.length() <= 5) {
+      return; // Skip test for strings that are too short
     }
+    Reader reader = new CharSequenceReader(expected);
+    long charsToSkip = 5;
+    assertEquals(charsToSkip, reader.skip(charsToSkip));
+    assertEquals(expected.substring(5), readFully(reader));
+    assertFullyRead(reader);
+  }
+
+  // *****************************************************************
+  // ** Tests for mark() and reset()
+  // *****************************************************************
+
+  public void testMarkAndReset_allowsReReading() throws IOException {
+    String data = "abcdefghijklmnopqrstuvwxyz";
+    CharSequenceReader reader = new CharSequenceReader(data);
+
+    assertTrue("Reader should support mark()", reader.markSupported());
+
+    // Scenario 1: Read fully, reset to beginning, and read again.
+    assertEquals("First read should match original data", data, readFully(reader));
+    assertFullyRead(reader);
+
+    reader.reset();
+    assertEquals("Second read after reset should match original data", data, readFully(reader));
+    assertFullyRead(reader);
+
+    // Scenario 2: Reset, skip, mark, read, then reset to the mark.
+    reader.reset();
+    long skipped = reader.skip(5);
+    assertEquals(5, skipped);
+
+    reader.mark(Integer.MAX_VALUE);
+    String remainingAfterSkip = data.substring(5);
+    assertEquals(
+        "Read after skip and mark should match remaining data",
+        remainingAfterSkip,
+        readFully(reader));
+    assertFullyRead(reader);
+
+    // Reset to the mark (after the first 5 chars) and read again.
+    reader.reset();
+    assertEquals(
+        "Read after resetting to mark should match remaining data",
+        remainingAfterSkip,
+        readFully(reader));
+    assertFullyRead(reader);
+  }
+
+  // *****************************************************************
+  // ** Helper Methods
+  // *****************************************************************
+
+  /** Asserts that the reader is at its end and subsequent reads return EOF or 0. */
+  private static void assertFullyRead(Reader reader) throws IOException {
+    assertEquals("Reading a single char from a finished reader should return -1", -1, reader.read());
+    assertEquals(
+        "Reading into a char[] from a finished reader should return -1",
+        -1,
+        reader.read(new char[10], 0, 10));
+    assertEquals(
+        "Reading into a CharBuffer from a finished reader should return -1",
+        -1,
+        reader.read(CharBuffer.allocate(10)));
+    assertEquals("Skipping from a finished reader should return 0", 0, reader.skip(10));
+  }
+
+  /** Reads all remaining characters from the reader and returns them as a String. */
+  private static String readFully(Reader reader) throws IOException {
+    StringBuilder builder = new StringBuilder();
+    int ch;
+    while ((ch = reader.read()) != -1) {
+      builder.append((char) ch);
+    }
+    return builder.toString();
+  }
 }
