@@ -1,43 +1,33 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
 import org.locationtech.spatial4j.shape.jts.JtsPoint;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShapeCollection_ESTestTest5 extends ShapeCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        arrayList0.add((JtsPoint) null);
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext1 = new SpatialContext(spatialContextFactory0);
-        // Undeclared exception!
-        try {
-            shapeCollection0.getBuffered(0.0, spatialContext1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.ShapeCollection", e);
-        }
+    /**
+     * Tests that getBuffered() throws a NullPointerException if the underlying
+     * list of shapes contains a null element. This can happen if the list is
+     * modified after the ShapeCollection is created, as the collection holds a
+     * reference to the original list.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getBufferedShouldThrowNPEWhenCollectionContainsNullShape() {
+        // Arrange: Create a ShapeCollection with an empty list of shapes.
+        // The collection maintains a reference to this list, not a defensive copy.
+        List<JtsPoint> shapes = new ArrayList<>();
+        SpatialContext spatialContext = SpatialContext.GEO;
+        ShapeCollection<JtsPoint> shapeCollection = new ShapeCollection<>(shapes, spatialContext);
+
+        // Mutate the list to an invalid state by adding a null element after construction.
+        shapes.add(null);
+
+        // Act & Assert: Calling getBuffered() should fail with an NPE because it will
+        // attempt to process the null element in the list.
+        shapeCollection.getBuffered(0.0, spatialContext);
     }
 }
