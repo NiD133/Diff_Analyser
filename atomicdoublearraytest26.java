@@ -1,68 +1,71 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
 
-public class AtomicDoubleArrayTestTest26 extends JSR166TestCase {
+/**
+ * Tests for {@link AtomicDoubleArray#toString()}.
+ */
+public class AtomicDoubleArrayToStringTest extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+    // A comprehensive set of double values to test string representation,
+    // including special cases like NaN, infinities, and zeros.
+    private static final double[] TEST_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
-    static final long COUNTDOWN = 100000;
+    public void testToString_withPopulatedArray_returnsCorrectRepresentation() {
+        // Arrange
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(TEST_VALUES);
+        String expected = Arrays.toString(TEST_VALUES);
 
-    /**
-     * The notion of equality used by AtomicDoubleArray
-     */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
+        // Act
+        String actual = atomicArray.toString();
+
+        // Assert
+        assertEquals(
+            "The string representation should match the one from Arrays.toString()",
+            expected,
+            actual);
     }
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
+    public void testToString_forEmptyArrayFromSizeConstructor_returnsEmptyBrackets() {
+        // Arrange: Test the constructor that takes a size.
+        AtomicDoubleArray emptyArray = new AtomicDoubleArray(0);
+
+        // Act
+        String result = emptyArray.toString();
+
+        // Assert
+        assertEquals("[]", result);
     }
 
-    class Counter extends CheckedRunnable {
+    public void testToString_forEmptyArrayFromArrayConstructor_returnsEmptyBrackets() {
+        // Arrange: Test the constructor that takes an initial array.
+        AtomicDoubleArray emptyArray = new AtomicDoubleArray(new double[0]);
 
-        final AtomicDoubleArray aa;
+        // Act
+        String result = emptyArray.toString();
 
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * toString returns current value
-     */
-    public void testToString() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(VALUES);
-        assertEquals(Arrays.toString(VALUES), aa.toString());
-        assertEquals("[]", new AtomicDoubleArray(0).toString());
-        assertEquals("[]", new AtomicDoubleArray(new double[0]).toString());
+        // Assert
+        assertEquals("[]", result);
     }
 }
