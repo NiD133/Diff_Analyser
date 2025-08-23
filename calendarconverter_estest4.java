@@ -1,32 +1,35 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
 
-public class CalendarConverter_ESTestTest4 extends CalendarConverter_ESTest_scaffolding {
+/**
+ * Test suite for {@link CalendarConverter}.
+ */
+public class CalendarConverterTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        System.setCurrentTimeMillis((-1870L));
-        CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-        TimeZone timeZone0 = TimeZone.getDefault();
-        MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar(timeZone0);
-        long long0 = calendarConverter0.getInstantMillis(mockGregorianCalendar0, (Chronology) null);
-        assertEquals((-1870L), long0);
+    /**
+     * Tests that getInstantMillis() correctly extracts the millisecond
+     * value from a given Calendar object.
+     */
+    @Test
+    public void getInstantMillis_shouldReturnMillisFromCalendar() {
+        // Arrange
+        final long expectedMillis = 123456789L;
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(expectedMillis);
+
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+
+        // Act
+        // The Chronology argument is not used by this method, so passing null is acceptable.
+        long actualMillis = converter.getInstantMillis(calendar, (Chronology) null);
+
+        // Assert
+        assertEquals(expectedMillis, actualMillis);
     }
 }
