@@ -1,32 +1,27 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class BackgroundInitializer_ESTestTest14 extends BackgroundInitializer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BackgroundInitializer}.
+ */
+public class BackgroundInitializerTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        BackgroundInitializer<Delayed> backgroundInitializer0 = new BackgroundInitializer<Delayed>();
-        ConcurrentException concurrentException0 = new ConcurrentException();
-        Exception exception0 = backgroundInitializer0.getTypedException(concurrentException0);
-        assertNotNull(exception0);
+    /**
+     * Tests that getTypedException() correctly returns the same exception instance
+     * that was passed to it, as per its contract.
+     */
+    @Test
+    public void getTypedExceptionShouldReturnTheGivenException() {
+        // Arrange
+        final BackgroundInitializer<Object> initializer = new BackgroundInitializer<>();
+        final ConcurrentException cause = new ConcurrentException("Test Exception");
+
+        // Act
+        final Exception result = initializer.getTypedException(cause);
+
+        // Assert
+        assertSame("The method should return the exact same exception instance.", cause, result);
     }
 }
