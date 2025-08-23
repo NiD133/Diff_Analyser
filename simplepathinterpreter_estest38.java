@@ -1,70 +1,64 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.compiler.Constant;
 import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
-import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimplePathInterpreter_ESTestTest38 extends SimplePathInterpreter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        Locale locale0 = Locale.JAPANESE;
-        QName qName0 = new QName("org.apache.Wommons.jxpaPh.ri.compiler.VaiableReference");
-        NodePointer nodePointer0 = NodePointer.newNodePointer(qName0, locale0, locale0);
-        Expression[] expressionArray0 = new Expression[8];
-        Constant constant0 = new Constant("(MgA");
-        expressionArray0[0] = (Expression) constant0;
-        CoreFunction coreFunction0 = new CoreFunction(14, expressionArray0);
-        NameAttributeTest nameAttributeTest0 = new NameAttributeTest(constant0, coreFunction0);
-        expressionArray0[1] = (Expression) nameAttributeTest0;
-        // Undeclared exception!
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains improved tests for the {@link SimplePathInterpreter} class, focusing on understandability.
+ */
+public class SimplePathInterpreterTest {
+
+    /**
+     * Tests that interpretSimpleExpressionPath throws a RuntimeException when a predicate
+     * contains a function call with an incorrect number of arguments.
+     * <p>
+     * The test constructs a predicate equivalent to XPath's {@code [@name=substring('arg1')]}.
+     * This is invalid because the 'substring' function requires at least two arguments.
+     * The interpreter is expected to fail while evaluating this invalid predicate.
+     */
+    @Test
+    public void interpretSimpleExpressionPathWithInvalidFunctionInPredicateThrowsException() {
+        // ARRANGE: Set up a predicate with a call to the 'substring' function
+        // using an incorrect number of arguments.
+
+        // A simple root node pointer is sufficient for this test's purpose.
+        NodePointer rootPointer = NodePointer.newNodePointer(new QName("root"), new Object(), Locale.ENGLISH);
+
+        // Create arguments for the 'substring' function. Providing only one is invalid.
+        Expression[] substringArgs = {new Constant("arg1")};
+
+        // The internal JXPath code for the 'substring' function is 14.
+        final int SUBSTRING_FUNCTION_CODE = 14;
+        CoreFunction invalidSubstringCall = new CoreFunction(SUBSTRING_FUNCTION_CODE, substringArgs);
+
+        // Create a NameAttributeTest predicate, e.g., [@name=substring(...)],
+        // using the invalid function call as the value to match against.
+        NameAttributeTest invalidNamePredicate = new NameAttributeTest(new Constant("anyName"), invalidSubstringCall);
+
+        Expression[] predicates = {invalidNamePredicate};
+
+        // ACT & ASSERT: Execute the method and verify the expected exception.
         try {
-            SimplePathInterpreter.interpretSimpleExpressionPath((EvalContext) null, nodePointer0, expressionArray0, (Step[]) null);
-            fail("Expecting exception: RuntimeException");
+            // The EvalContext and steps array can be null as they are not needed to trigger this specific exception.
+            SimplePathInterpreter.interpretSimpleExpressionPath(null, rootPointer, predicates, null);
+            fail("Expected a RuntimeException to be thrown due to incorrect function arguments.");
         } catch (RuntimeException e) {
-            //
-            // Incorrect number of arguments: substring('(MgA', org.apache.commons.jxpath.ri.compiler.Constant@0000000003 = org.apache.commons.jxpath.ri.compiler.CoreFunction@0000000004, null, null, null, null, null, null)
-            //
-            verifyException("org.apache.commons.jxpath.ri.compiler.CoreFunction", e);
+            // Verify that the exception message clearly indicates the problem.
+            String expectedMessagePart = "Incorrect number of arguments: substring";
+            assertTrue(
+                    "Exception message should indicate incorrect argument count for 'substring'. Actual: " + e.getMessage(),
+                    e.getMessage().startsWith(expectedMessagePart)
+            );
         }
     }
 }
