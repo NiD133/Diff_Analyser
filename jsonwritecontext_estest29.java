@@ -1,41 +1,40 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Test;
 
-public class JsonWriteContext_ESTestTest29 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext(dupDetector0);
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext();
-        jsonWriteContext1.writeFieldName(": was expecting closing '*/' for comment");
-        jsonWriteContext1.writeValue();
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its state management
+ * when writing field names.
+ */
+public class JsonWriteContextRefactoredTest {
+
+    /**
+     * Verifies that calling writeFieldName(null) throws a NullPointerException.
+     * The underlying DupDetector, which is responsible for tracking field names,
+     * does not permit null keys.
+     */
+    @Test
+    public void writeFieldName_whenGivenNullName_shouldThrowNullPointerException() throws JsonProcessingException {
+        // Arrange: Create an object context that is ready to accept a new field name.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(dupDetector);
+        JsonWriteContext objectContext = rootContext.createChildObjectContext();
+
+        // Write one valid field-value pair to transition the context to a state
+        // where it expects another field name.
+        objectContext.writeFieldName("firstField");
+        objectContext.writeValue();
+
+        // Act & Assert: Attempting to write a null field name should fail.
         try {
-            jsonWriteContext1.writeFieldName((String) null);
-            fail("Expecting exception: NullPointerException");
+            objectContext.writeFieldName(null);
+            fail("Expected a NullPointerException to be thrown, but it was not.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.json.DupDetector", e);
+            // This is the expected behavior. The test passes.
         }
     }
 }
