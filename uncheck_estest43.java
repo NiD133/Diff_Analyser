@@ -1,37 +1,25 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest43 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for {@link Uncheck}.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        // Undeclared exception!
-        try {
-            Uncheck.accept((IOTriConsumer<String, String, String>) null, "P!ebq\"v'`L[1fuAO5S", "P!ebq\"v'`L[1fuAO5S", "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.function.Uncheck", e);
-        }
+    /**
+     * Tests that {@link Uncheck#accept(IOTriConsumer, Object, Object, Object)} throws a
+     * {@link NullPointerException} when the consumer argument is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void acceptWithNullTriConsumerThrowsNullPointerException() {
+        // Arrange: Define a null IOTriConsumer. The other arguments are arbitrary non-null values.
+        final IOTriConsumer<String, String, String> nullConsumer = null;
+        final String arg1 = "first argument";
+        final String arg2 = "second argument";
+        final String arg3 = "third argument";
+
+        // Act & Assert: Calling accept with a null consumer should throw a NullPointerException.
+        Uncheck.accept(nullConsumer, arg1, arg2, arg3);
     }
 }
