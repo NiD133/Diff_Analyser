@@ -1,85 +1,39 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest17 extends CompositeSet_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the CompositeSet.
+ * The original test class name "CompositeSet_ESTestTest17" suggests it was
+ * auto-generated, so it has been renamed for clarity.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        Integer integer0 = new Integer(512);
-        assertNotNull(integer0);
-        assertEquals(512, (int) integer0);
-        boolean boolean0 = linkedHashSet0.add(integer0);
-        assertTrue(linkedHashSet0.contains(512));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertTrue(boolean0);
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>();
-        assertNotNull(compositeSet0);
-        assertFalse(compositeSet0.contains(512));
-        Set<Object> set0 = compositeSet0.toSet();
-        assertNotNull(set0);
-        assertFalse(compositeSet0.contains(512));
-        assertFalse(set0.contains(512));
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        compositeSet0.addComposited(set0);
-        assertFalse(compositeSet0.contains(512));
-        assertFalse(set0.contains(512));
-        assertEquals(0, set0.size());
-        assertTrue(set0.isEmpty());
-        boolean boolean1 = compositeSet0.containsAll(linkedHashSet0);
-        assertTrue(linkedHashSet0.contains(512));
-        assertFalse(compositeSet0.contains(512));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertFalse(boolean1 == boolean0);
-        assertFalse(boolean1);
+    /**
+     * Tests that containsAll() returns false when the CompositeSet is effectively empty
+     * but is checked against a non-empty collection.
+     */
+    @Test
+    public void containsAllShouldReturnFalseWhenCompositeSetIsEmptyAndArgumentIsNotEmpty() {
+        // Arrange
+        // Create a composite set that contains a single, empty set.
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>();
+        compositeSet.addComposited(new HashSet<>());
+
+        // Create a non-empty collection to check against.
+        final Set<Integer> nonEmptyCollection = Collections.singleton(512);
+
+        // Act
+        // Check if the empty composite set contains all elements of the non-empty collection.
+        final boolean result = compositeSet.containsAll(nonEmptyCollection);
+
+        // Assert
+        // The result should be false, as the composite set contains no elements.
+        assertFalse("An empty CompositeSet should not 'contain all' elements from a non-empty collection", result);
     }
 }
