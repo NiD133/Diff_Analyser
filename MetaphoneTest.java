@@ -22,300 +22,395 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.codec.AbstractStringEncoderTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
+ * Tests for Metaphone.
+ *
+ * The test names and groupings aim to make the intent of each rule-focused test clear,
+ * reduce noise by centralizing common assertions, and keep the original behavior.
  */
 class MetaphoneTest extends AbstractStringEncoderTest<Metaphone> {
 
-    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
-        // match source to all matches
-        for (final String matche : matches) {
-            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
+    // ---------------------------------------------------------------------
+    // Test helpers
+    // ---------------------------------------------------------------------
+
+    private String code(final String input) {
+        return getStringEncoder().metaphone(input);
+    }
+
+    private void assertEncodesTo(final String input, final String expected) {
+        assertEquals(expected, code(input), "metaphone(\"" + input + "\")");
+    }
+
+    /**
+     * Asserts that:
+     * - source is metaphone-equal to every candidate
+     * - and every candidate is metaphone-equal to every other candidate
+     */
+    private void assertAllMetaphoneEqual(final String source, final String... candidates) {
+        // source vs. each candidate
+        for (final String candidate : candidates) {
+            assertTrue(getStringEncoder().isMetaphoneEqual(source, candidate),
+                "Expected same metaphone: source=" + source + ", candidate=" + candidate);
         }
-        // match to each other
-        for (final String matche : matches) {
-            for (final String matche2 : matches) {
-                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
+        // candidates vs. each other
+        for (final String a : candidates) {
+            for (final String b : candidates) {
+                assertTrue(getStringEncoder().isMetaphoneEqual(a, b),
+                    "Expected same metaphone: a=" + a + ", b=" + b);
             }
         }
     }
 
-    public void assertMetaphoneEqual(final String[][] pairs) {
-        validateFixture(pairs);
+    /**
+     * Asserts symmetry of metaphone equality for the given pairs.
+     * Each pair is [left, right].
+     */
+    private void assertPairsAreMetaphoneEqual(final String[][] pairs) {
+        validatePairsFixture(pairs);
         for (final String[] pair : pairs) {
-            final String name0 = pair[0];
-            final String name1 = pair[1];
-            final String failMsg = "Expected match between " + name0 + " and " + name1;
-            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
-            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
+            final String left = pair[0];
+            final String right = pair[1];
+            final String msg = "Expected metaphone match between \"" + left + "\" and \"" + right + '"';
+            assertTrue(getStringEncoder().isMetaphoneEqual(left, right), msg);
+            assertTrue(getStringEncoder().isMetaphoneEqual(right, left), msg);
         }
     }
+
+    private void validatePairsFixture(final String[][] pairs) {
+        if (pairs.length == 0) {
+            fail("Test fixture is empty");
+        }
+        for (int i = 0; i < pairs.length; i++) {
+            if (pairs[i].length != 2) {
+                fail("Each fixture row must have 2 elements [left, right]; bad row index: " + i);
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Boilerplate
+    // ---------------------------------------------------------------------
 
     @Override
     protected Metaphone createStringEncoder() {
         return new Metaphone();
     }
 
-    @Test
-    void testDiscardOfSCEOrSCIOrSCY() {
-        assertEquals("SNS", getStringEncoder().metaphone("SCIENCE"));
-        assertEquals("SN", getStringEncoder().metaphone("SCENE"));
-        assertEquals("S", getStringEncoder().metaphone("SCY"));
-    }
+    // ---------------------------------------------------------------------
+    // Rule-focused tests
+    // ---------------------------------------------------------------------
 
-    @Test
-    void testDiscardOfSilentGN() {
-        // NOTE: This does not test for silent GN, but for starting with GN
-        assertEquals("N", getStringEncoder().metaphone("GNU"));
+    @Nested
+    @DisplayName("Discard/translation rules")
+    class DiscardAndTranslateRules {
 
-        // NOTE: Trying to test for GNED, but expected code does not appear to execute
-        assertEquals("SNT", getStringEncoder().metaphone("SIGNED"));
-    }
-
-    @Test
-    void testDiscardOfSilentHAfterG() {
-        assertEquals("KNT", getStringEncoder().metaphone("GHENT"));
-        assertEquals("B", getStringEncoder().metaphone("BAUGH"));
-    }
-
-    @Test
-    void testExceedLength() {
-        // should be AKSKS, but is truncated by Max Code Length
-        assertEquals("AKSK", getStringEncoder().metaphone("AXEAXE"));
-    }
-
-    @Test
-    void testIsMetaphoneEqual1() {
-        assertMetaphoneEqual(new String[][] { { "Case", "case" }, { "CASE", "Case" }, { "caSe", "cAsE" }, { "quick", "cookie" } });
-    }
-
-    /**
-     * Matches computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqual2() {
-        assertMetaphoneEqual(new String[][] { { "Lawrence", "Lorenza" }, { "Gary", "Cahra" }, });
-    }
-
-    /**
-     * Initial AE case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualAero() {
-        assertIsMetaphoneEqual("Aero", new String[] { "Eure" });
-    }
-
-    /**
-     * Initial A, not followed by an E case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualAlbert() {
-        assertIsMetaphoneEqual("Albert", new String[] { "Ailbert", "Alberik", "Albert", "Alberto", "Albrecht" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualGary() {
-        assertIsMetaphoneEqual("Gary",
-                new String[] { "Cahra", "Cara", "Carey", "Cari", "Caria", "Carie", "Caro", "Carree", "Carri", "Carrie", "Carry", "Cary", "Cora", "Corey",
-                        "Cori", "Corie", "Correy", "Corri", "Corrie", "Corry", "Cory", "Gray", "Kara", "Kare", "Karee", "Kari", "Karia", "Karie", "Karrah",
-                        "Karrie", "Karry", "Kary", "Keri", "Kerri", "Kerrie", "Kerry", "Kira", "Kiri", "Kora", "Kore", "Kori", "Korie", "Korrie", "Korry" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualJohn() {
-        assertIsMetaphoneEqual("John",
-                new String[] { "Gena", "Gene", "Genia", "Genna", "Genni", "Gennie", "Genny", "Giana", "Gianna", "Gina", "Ginni", "Ginnie", "Ginny", "Jaine",
-                        "Jan", "Jana", "Jane", "Janey", "Jania", "Janie", "Janna", "Jany", "Jayne", "Jean", "Jeana", "Jeane", "Jeanie", "Jeanna", "Jeanne",
-                        "Jeannie", "Jen", "Jena", "Jeni", "Jenn", "Jenna", "Jennee", "Jenni", "Jennie", "Jenny", "Jinny", "Jo Ann", "Jo-Ann", "Jo-Anne", "Joan",
-                        "Joana", "Joane", "Joanie", "Joann", "Joanna", "Joanne", "Joeann", "Johna", "Johnna", "Joni", "Jonie", "Juana", "June", "Junia",
-                        "Junie" });
-    }
-
-    /**
-     * Initial KN case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualKnight() {
-        assertIsMetaphoneEqual("Knight", new String[] { "Hynda", "Nada", "Nadia", "Nady", "Nat", "Nata", "Natty", "Neda", "Nedda", "Nedi", "Netta",
-                "Netti", "Nettie", "Netty", "Nita", "Nydia" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualMary() {
-        assertIsMetaphoneEqual("Mary", new String[] { "Mair", "Maire", "Mara", "Mareah", "Mari", "Maria", "Marie", "Mary", "Maura", "Maure", "Meara",
-                "Merrie", "Merry", "Mira", "Moira", "Mora", "Moria", "Moyra", "Muire", "Myra", "Myrah" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualParis() {
-        assertIsMetaphoneEqual("Paris", new String[] { "Pearcy", "Perris", "Piercy", "Pierz", "Pryse" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualPeter() {
-        assertIsMetaphoneEqual("Peter", new String[] { "Peadar", "Peder", "Pedro", "Peter", "Petr", "Peyter", "Pieter", "Pietro", "Piotr" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualRay() {
-        assertIsMetaphoneEqual("Ray", new String[] { "Ray", "Rey", "Roi", "Roy", "Ruy" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualSusan() {
-        assertIsMetaphoneEqual("Susan",
-                new String[] { "Siusan", "Sosanna", "Susan", "Susana", "Susann", "Susanna", "Susannah", "Susanne", "Suzann", "Suzanna", "Suzanne", "Zuzana" });
-    }
-
-    /**
-     * Initial WH case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualWhite() {
-        assertIsMetaphoneEqual("White",
-                new String[] { "Wade", "Wait", "Waite", "Wat", "Whit", "Wiatt", "Wit", "Wittie", "Witty", "Wood", "Woodie", "Woody" });
-    }
-
-    /**
-     * Initial WR case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualWright() {
-        assertIsMetaphoneEqual("Wright", new String[] { "Rota", "Rudd", "Ryde" });
-    }
-
-    /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualXalan() {
-        assertIsMetaphoneEqual("Xalan", new String[] { "Celene", "Celina", "Celine", "Selena", "Selene", "Selina", "Seline", "Suellen", "Xylina" });
-    }
-
-    @Test
-    void testMetaphone() {
-        assertEquals("HL", getStringEncoder().metaphone("howl"));
-        assertEquals("TSTN", getStringEncoder().metaphone("testing"));
-        assertEquals("0", getStringEncoder().metaphone("The"));
-        assertEquals("KK", getStringEncoder().metaphone("quick"));
-        assertEquals("BRN", getStringEncoder().metaphone("brown"));
-        assertEquals("FKS", getStringEncoder().metaphone("fox"));
-        assertEquals("JMPT", getStringEncoder().metaphone("jumped"));
-        assertEquals("OFR", getStringEncoder().metaphone("over"));
-        assertEquals("0", getStringEncoder().metaphone("the"));
-        assertEquals("LS", getStringEncoder().metaphone("lazy"));
-        assertEquals("TKS", getStringEncoder().metaphone("dogs"));
-    }
-
-    @Test
-    void testPHTOF() {
-        assertEquals("FX", getStringEncoder().metaphone("PHISH"));
-    }
-
-    @Test
-    void testSetMaxLengthWithTruncation() {
-        // should be AKSKS, but istruncated by Max Code Length
-        getStringEncoder().setMaxCodeLen(6);
-        assertEquals("AKSKSK", getStringEncoder().metaphone("AXEAXEAXE"));
-    }
-
-    @Test
-    void testSHAndSIOAndSIAToX() {
-        assertEquals("XT", getStringEncoder().metaphone("SHOT"));
-        assertEquals("OTXN", getStringEncoder().metaphone("ODSIAN"));
-        assertEquals("PLXN", getStringEncoder().metaphone("PULSION"));
-    }
-
-    @Test
-    void testTCH() {
-        assertEquals("RX", getStringEncoder().metaphone("RETCH"));
-        assertEquals("WX", getStringEncoder().metaphone("WATCH"));
-    }
-
-    @Test
-    void testTIOAndTIAToX() {
-        assertEquals("OX", getStringEncoder().metaphone("OTIA"));
-        assertEquals("PRXN", getStringEncoder().metaphone("PORTION"));
-    }
-
-    @Test
-    void testTranslateOfSCHAndCH() {
-        assertEquals("SKTL", getStringEncoder().metaphone("SCHEDULE"));
-        assertEquals("SKMT", getStringEncoder().metaphone("SCHEMATIC"));
-
-        assertEquals("KRKT", getStringEncoder().metaphone("CHARACTER"));
-        assertEquals("TX", getStringEncoder().metaphone("TEACH"));
-    }
-
-    @Test
-    void testTranslateToJOfDGEOrDGIOrDGY() {
-        assertEquals("TJ", getStringEncoder().metaphone("DODGY"));
-        assertEquals("TJ", getStringEncoder().metaphone("DODGE"));
-        assertEquals("AJMT", getStringEncoder().metaphone("ADGIEMTI"));
-    }
-
-    /**
-     * Tests (CODEC-57) Metaphone.Metaphone(String) returns an empty string when passed the word "why"
-     */
-    @Test
-    void testWhy() {
-        // PHP returns "H". The original Metaphone returns an empty string.
-        assertEquals("", getStringEncoder().metaphone("WHY"));
-    }
-
-    @Test
-    void testWordEndingInMB() {
-        assertEquals("KM", getStringEncoder().metaphone("COMB"));
-        assertEquals("TM", getStringEncoder().metaphone("TOMB"));
-        assertEquals("WM", getStringEncoder().metaphone("WOMB"));
-    }
-
-    @Test
-    void testWordsWithCIA() {
-        assertEquals("XP", getStringEncoder().metaphone("CIAPO"));
-    }
-
-    public void validateFixture(final String[][] pairs) {
-        if (pairs.length == 0) {
-            fail("Test fixture is empty");
+        @Test
+        @DisplayName("Discard of SCE/SCI/SCY")
+        void discardOfSCEOrSCIOrSCY() {
+            assertEncodesTo("SCIENCE", "SNS");
+            assertEncodesTo("SCENE", "SN");
+            assertEncodesTo("SCY", "S");
         }
-        for (int i = 0; i < pairs.length; i++) {
-            if (pairs[i].length != 2) {
-                fail("Error in test fixture in the data array at index " + i);
-            }
+
+        @Test
+        @DisplayName("Discard of silent GN (start of word) and handling of GNED")
+        void discardOfSilentGN() {
+            // NOTE: This does not test for silent GN, but for starting with GN
+            assertEncodesTo("GNU", "N");
+
+            // NOTE: Trying to test for GNED, but expected code path in original impl does not appear to execute
+            assertEncodesTo("SIGNED", "SNT");
+        }
+
+        @Test
+        @DisplayName("Discard of silent H after G")
+        void discardOfSilentHAfterG() {
+            assertEncodesTo("GHENT", "KNT");
+            assertEncodesTo("BAUGH", "B");
+        }
+
+        @Test
+        @DisplayName("PH -> F")
+        void phToF() {
+            assertEncodesTo("PHISH", "FX");
+        }
+
+        @Test
+        @DisplayName("SH / SIO / SIA -> X")
+        void shAndSioAndSiaToX() {
+            assertEncodesTo("SHOT", "XT");
+            assertEncodesTo("ODSIAN", "OTXN");
+            assertEncodesTo("PULSION", "PLXN");
+        }
+
+        @Test
+        @DisplayName("TCH handling")
+        void tch() {
+            assertEncodesTo("RETCH", "RX");
+            assertEncodesTo("WATCH", "WX");
+        }
+
+        @Test
+        @DisplayName("TIO / TIA -> X")
+        void tioAndTiaToX() {
+            assertEncodesTo("OTIA", "OX");
+            assertEncodesTo("PORTION", "PRXN");
+        }
+
+        @Test
+        @DisplayName("SCH/CH translations")
+        void translateOfSCHAndCH() {
+            assertEncodesTo("SCHEDULE", "SKTL");
+            assertEncodesTo("SCHEMATIC", "SKMT");
+
+            assertEncodesTo("CHARACTER", "KRKT");
+            assertEncodesTo("TEACH", "TX");
+        }
+
+        @Test
+        @DisplayName("DGE / DGI / DGY -> J")
+        void translateToJOfDGEOrDGIOrDGY() {
+            assertEncodesTo("DODGY", "TJ");
+            assertEncodesTo("DODGE", "TJ");
+            assertEncodesTo("ADGIEMTI", "AJMT");
+        }
+
+        @Test
+        @DisplayName("Words ending in MB")
+        void wordEndingInMB() {
+            assertEncodesTo("COMB", "KM");
+            assertEncodesTo("TOMB", "TM");
+            assertEncodesTo("WOMB", "WM");
+        }
+
+        @Test
+        @DisplayName("Words with CIA")
+        void wordsWithCIA() {
+            assertEncodesTo("CIAPO", "XP");
         }
     }
 
+    @Nested
+    @DisplayName("Length behavior")
+    class LengthBehavior {
+
+        @Test
+        @DisplayName("Code truncated by default max length")
+        void exceedLength() {
+            // The raw code would be "AKSKS", but is truncated by the default max code length (4)
+            assertEncodesTo("AXEAXE", "AKSK");
+        }
+
+        @Test
+        @DisplayName("Custom max length with truncation")
+        void setMaxLengthWithTruncation() {
+            // The raw code would extend further; with max length 6 we expect "AKSKSK"
+            getStringEncoder().setMaxCodeLen(6);
+            assertEncodesTo("AXEAXEAXE", "AKSKSK");
+        }
+    }
+
+    @Nested
+    @DisplayName("Sample sentence")
+    class SampleSentence {
+
+        @Test
+        void testMetaphone() {
+            assertEncodesTo("howl", "HL");
+            assertEncodesTo("testing", "TSTN");
+            assertEncodesTo("The", "0");
+            assertEncodesTo("quick", "KK");
+            assertEncodesTo("brown", "BRN");
+            assertEncodesTo("fox", "FKS");
+            assertEncodesTo("jumped", "JMPT");
+            assertEncodesTo("over", "OFR");
+            assertEncodesTo("the", "0");
+            assertEncodesTo("lazy", "LS");
+            assertEncodesTo("dogs", "TKS");
+        }
+    }
+
+    @Nested
+    @DisplayName("Equality checks")
+    class EqualityChecks {
+
+        @Test
+        @DisplayName("Case-insensitivity and a simple near-match")
+        void isMetaphoneEqual_basic() {
+            assertPairsAreMetaphoneEqual(new String[][] {
+                { "Case", "case" },
+                { "CASE", "Case" },
+                { "caSe", "cAsE" },
+                { "quick", "cookie" }
+            });
+        }
+
+        @Test
+        @DisplayName("Pairs from reference fixture")
+        void isMetaphoneEqual_referencePairs() {
+            // Matches computed from http://www.lanw.com/java/phonetic/default.htm
+            assertPairsAreMetaphoneEqual(new String[][] {
+                { "Lawrence", "Lorenza" },
+                { "Gary", "Cahra" }
+            });
+        }
+
+        @Test
+        @DisplayName("Initial AE case: Aero")
+        void isMetaphoneEqual_aero() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Aero", "Eure");
+        }
+
+        @Test
+        @DisplayName("Initial A not followed by E: Albert and variants")
+        void isMetaphoneEqual_albert() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Albert", "Ailbert", "Alberik", "Albert", "Alberto", "Albrecht");
+        }
+
+        @Test
+        @DisplayName("Gary and many variants")
+        void isMetaphoneEqual_gary() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Gary",
+                "Cahra", "Cara", "Carey", "Cari", "Caria", "Carie", "Caro", "Carree", "Carri", "Carrie", "Carry", "Cary",
+                "Cora", "Corey", "Cori", "Corie", "Correy", "Corri", "Corrie", "Corry", "Cory",
+                "Gray",
+                "Kara", "Kare", "Karee", "Kari", "Karia", "Karie", "Karrah", "Karrie", "Karry", "Kary",
+                "Keri", "Kerri", "Kerrie", "Kerry",
+                "Kira", "Kiri",
+                "Kora", "Kore", "Kori", "Korie", "Korrie", "Korry"
+            );
+        }
+
+        @Test
+        @DisplayName("John and many variants")
+        void isMetaphoneEqual_john() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("John",
+                "Gena", "Gene", "Genia", "Genna", "Genni", "Gennie", "Genny",
+                "Giana", "Gianna", "Gina",
+                "Ginni", "Ginnie", "Ginny",
+                "Jaine",
+                "Jan", "Jana", "Jane", "Janey", "Jania", "Janie", "Janna", "Jany", "Jayne",
+                "Jean", "Jeana", "Jeane", "Jeanie", "Jeanna", "Jeanne", "Jeannie",
+                "Jen", "Jena", "Jeni", "Jenn", "Jenna", "Jennee", "Jenni", "Jennie", "Jenny",
+                "Jinny",
+                "Jo Ann", "Jo-Ann", "Jo-Anne",
+                "Joan", "Joana", "Joane", "Joanie", "Joann", "Joanna", "Joanne", "Joeann",
+                "Johna", "Johnna",
+                "Joni", "Jonie",
+                "Juana",
+                "June", "Junia", "Junie"
+            );
+        }
+
+        @Test
+        @DisplayName("Initial KN case: Knight and variants")
+        void isMetaphoneEqual_knight() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Knight",
+                "Hynda", "Nada", "Nadia", "Nady", "Nat", "Nata", "Natty",
+                "Neda", "Nedda", "Nedi",
+                "Netta", "Netti", "Nettie", "Netty",
+                "Nita", "Nydia"
+            );
+        }
+
+        @Test
+        @DisplayName("Mary and variants")
+        void isMetaphoneEqual_mary() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Mary",
+                "Mair", "Maire", "Mara", "Mareah",
+                "Mari", "Maria", "Marie", "Mary",
+                "Maura", "Maure",
+                "Meara",
+                "Merrie", "Merry",
+                "Mira",
+                "Moira",
+                "Mora", "Moria",
+                "Moyra",
+                "Muire",
+                "Myra", "Myrah"
+            );
+        }
+
+        @Test
+        @DisplayName("Paris and variants")
+        void isMetaphoneEqual_paris() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Paris", "Pearcy", "Perris", "Piercy", "Pierz", "Pryse");
+        }
+
+        @Test
+        @DisplayName("Peter and variants")
+        void isMetaphoneEqual_peter() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Peter", "Peadar", "Peder", "Pedro", "Peter", "Petr", "Peyter", "Pieter", "Pietro", "Piotr");
+        }
+
+        @Test
+        @DisplayName("Ray and variants")
+        void isMetaphoneEqual_ray() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Ray", "Ray", "Rey", "Roi", "Roy", "Ruy");
+        }
+
+        @Test
+        @DisplayName("Susan and variants")
+        void isMetaphoneEqual_susan() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Susan",
+                "Siusan", "Sosanna", "Susan", "Susana", "Susann", "Susanna", "Susannah", "Susanne",
+                "Suzann", "Suzanna", "Suzanne", "Zuzana"
+            );
+        }
+
+        @Test
+        @DisplayName("Initial WH case: White and variants")
+        void isMetaphoneEqual_white() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("White",
+                "Wade", "Wait", "Waite", "Wat", "Whit", "Wiatt", "Wit", "Wittie", "Witty",
+                "Wood", "Woodie", "Woody"
+            );
+        }
+
+        @Test
+        @DisplayName("Initial WR case: Wright and variants")
+        void isMetaphoneEqual_wright() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Wright", "Rota", "Rudd", "Ryde");
+        }
+
+        @Test
+        @DisplayName("Xalan and variants")
+        void isMetaphoneEqual_xalan() {
+            // Match data from http://www.lanw.com/java/phonetic/default.htm
+            assertAllMetaphoneEqual("Xalan",
+                "Celene", "Celina", "Celine", "Selena", "Selene", "Selina", "Seline", "Suellen", "Xylina"
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("Edge cases")
+    class EdgeCases {
+
+        /**
+         * Tests (CODEC-57) Metaphone.Metaphone(String) returns an empty string when passed the word "why".
+         * PHP returns "H". The original Metaphone returns an empty string.
+         */
+        @Test
+        void whyReturnsEmptyString() {
+            assertEncodesTo("WHY", "");
+        }
+    }
 }
