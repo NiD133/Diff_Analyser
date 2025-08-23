@@ -2,17 +2,28 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DateTimeComparator_ESTestTest17 extends DateTimeComparator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DateTimeComparator}.
+ */
+public class DateTimeComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.dayOfYear();
-        DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance((DateTimeFieldType) null, dateTimeFieldType0);
-        assertNotNull(dateTimeComparator0);
+    /**
+     * Tests that getInstance() can create a comparator with a null lower limit
+     * and a specific upper limit. This configuration creates a "time-only" comparator.
+     */
+    @Test
+    public void getInstance_withNullLowerLimit_shouldCreateComparatorWithCorrectBounds() {
+        // Arrange: Define the upper limit for the comparison.
+        // A null lower limit means the comparison is unbounded at the lower end.
+        DateTimeFieldType upperLimit = DateTimeFieldType.dayOfYear();
+
+        // Act: Create the comparator instance.
+        DateTimeComparator comparator = DateTimeComparator.getInstance(null, upperLimit);
+
+        // Assert: Verify that the comparator was created and configured correctly.
+        assertNotNull("The created comparator should not be null.", comparator);
+        assertNull("The lower limit should be null as specified.", comparator.getLowerLimit());
+        assertEquals("The upper limit should be set to the specified field type.", upperLimit, comparator.getUpperLimit());
     }
 }
