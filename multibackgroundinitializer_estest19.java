@@ -1,38 +1,29 @@
 package org.apache.commons.lang3.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
 
-public class MultiBackgroundInitializer_ESTestTest19 extends MultiBackgroundInitializer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link MultiBackgroundInitializer}.
+ */
+public class MultiBackgroundInitializerTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer();
-        multiBackgroundInitializer0.initialize();
-        // Undeclared exception!
-        try {
-            multiBackgroundInitializer0.addInitializer("/]X}!$h>", (BackgroundInitializer<?>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // backgroundInitializer
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Test
+    public void addInitializerShouldThrowNullPointerExceptionWhenInitializerIsNull() {
+        // Arrange
+        final MultiBackgroundInitializer multiInitializer = new MultiBackgroundInitializer();
+        final String initializerName = "testInitializer";
+
+        // Act & Assert
+        // The addInitializer method should throw a NullPointerException because the
+        // provided BackgroundInitializer instance is null.
+        final NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
+            multiInitializer.addInitializer(initializerName, null);
+        });
+
+        // Verify that the exception message is as expected from Objects.requireNonNull.
+        assertEquals("backgroundInitializer", thrown.getMessage());
     }
 }
