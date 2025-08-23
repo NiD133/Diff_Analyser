@@ -1,29 +1,34 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest7 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonParser) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(191, 191, dupDetector0);
-        jsonReadContext0.expectComma();
-        jsonReadContext0.expectComma();
-        jsonReadContext0.withDupDetector(dupDetector0);
-        assertEquals(2, jsonReadContext0.getEntryCount());
+/**
+ * Contains tests for the {@link JsonReadContext} class, focusing on its state management.
+ */
+public class JsonReadContextTest {
+
+    /**
+     * Tests that calling expectComma() correctly increments the internal entry count.
+     * The entry count tracks how many values have been processed in the current context.
+     */
+    @Test
+    public void expectCommaShouldIncrementEntryCount() {
+        // Arrange: Create a root-level read context.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonParser) null);
+        JsonReadContext context = JsonReadContext.createRootContext(dupDetector);
+
+        // Assert initial state: A new context should have an entry count of 0.
+        assertEquals("A newly created context should have an entry count of 0.", 0, context.getEntryCount());
+
+        // Act: Simulate processing two elements. In JSON, this would correspond to
+        // reading a value and expecting a comma before the next one.
+        context.expectComma();
+        context.expectComma();
+
+        // Assert: The entry count should reflect that two elements have been processed.
+        assertEquals("Entry count should be 2 after two calls to expectComma.", 2, context.getEntryCount());
     }
 }
