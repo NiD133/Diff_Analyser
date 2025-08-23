@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.commons.codec.language.bm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,74 +27,69 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Unit tests for the PhoneticEngine class.
+ * Tests PhoneticEngine.
  */
 class PhoneticEngineTest {
 
-    private static final int DEFAULT_MAX_PHONEMES = 10;
+    private static final Integer TEN = Integer.valueOf(10);
 
-    /**
-     * Provides test data for valid phonetic encoding scenarios.
-     */
-    public static Stream<Arguments> validEncodingData() {
+    public static Stream<Arguments> data() {
+        // @formatter:off
         return Stream.of(
-            Arguments.of("Renault", "rinD|rinDlt|rina|rinalt|rino|rinolt|rinu|rinult", NameType.GENERIC, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-            Arguments.of("Renault", "rYnDlt|rYnalt|rYnult|rinDlt|rinalt|rinolt|rinult", NameType.ASHKENAZI, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-            Arguments.of("Renault", "rinDlt", NameType.ASHKENAZI, RuleType.APPROX, true, 1),
-            Arguments.of("Renault", "rinDlt", NameType.SEPHARDIC, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-            Arguments.of("SntJohn-Smith", "sntjonsmit", NameType.GENERIC, RuleType.EXACT, true, DEFAULT_MAX_PHONEMES),
-            Arguments.of("d'ortley", "(ortlaj|ortlej)-(dortlaj|dortlej)", NameType.GENERIC, RuleType.EXACT, true, DEFAULT_MAX_PHONEMES),
-            Arguments.of("van helsing", "(elSink|elsink|helSink|helsink|helzink|xelsink)-(banhelsink|fanhelsink|fanhelzink|vanhelsink|vanhelzink|vanjelsink)", NameType.GENERIC, RuleType.EXACT, false, DEFAULT_MAX_PHONEMES),
-            Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, true, DEFAULT_MAX_PHONEMES),
-            Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, true, Integer.MAX_VALUE)
-        );
+                Arguments.of("Renault", "rinD|rinDlt|rina|rinalt|rino|rinolt|rinu|rinult", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("Renault", "rYnDlt|rYnalt|rYnult|rinDlt|rinalt|rinolt|rinult", NameType.ASHKENAZI, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("Renault", "rinDlt", NameType.ASHKENAZI, RuleType.APPROX, Boolean.TRUE, Integer.valueOf(1)),
+                Arguments.of("Renault", "rinDlt", NameType.SEPHARDIC, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("SntJohn-Smith", "sntjonsmit", NameType.GENERIC, RuleType.EXACT, Boolean.TRUE, TEN),
+                Arguments.of("d'ortley", "(ortlaj|ortlej)-(dortlaj|dortlej)", NameType.GENERIC, RuleType.EXACT, Boolean.TRUE, TEN),
+                Arguments.of("van helsing", "(elSink|elsink|helSink|helsink|helzink|xelsink)-(banhelsink|fanhelsink|fanhelzink|vanhelsink|vanhelzink|vanjelsink)", NameType.GENERIC, RuleType.EXACT, Boolean.FALSE, TEN),
+                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, TEN),
+                Arguments.of("Judenburg", "iudnbYrk|iudnbirk|iudnburk|xudnbirk|xudnburk|zudnbirk|zudnburk", NameType.GENERIC, RuleType.APPROX, Boolean.TRUE, Integer.MAX_VALUE)
+                );
+        // @formatter:on
     }
 
-    /**
-     * Provides test data for invalid phonetic encoding scenarios.
-     */
-    public static Stream<Arguments> invalidEncodingData() {
+    public static Stream<Arguments> invalidData() {
+        // @formatter:off
         return Stream.of(
-            Arguments.of("bar", "bar|bor|var|vor", NameType.ASHKENAZI, RuleType.APPROX, false, DEFAULT_MAX_PHONEMES),
-            Arguments.of("al", "|al", NameType.SEPHARDIC, RuleType.APPROX, false, DEFAULT_MAX_PHONEMES),
-            Arguments.of("da", "da|di", NameType.GENERIC, RuleType.EXACT, false, DEFAULT_MAX_PHONEMES),
-            Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, false, DEFAULT_MAX_PHONEMES),
-            Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, false, Integer.MAX_VALUE)
-        );
+                Arguments.of("bar", "bar|bor|var|vor", NameType.ASHKENAZI, RuleType.APPROX, Boolean.FALSE, TEN),
+                Arguments.of("al", "|al", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, TEN),
+                Arguments.of("da", "da|di", NameType.GENERIC, RuleType.EXACT, Boolean.FALSE, TEN),
+                Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, TEN),
+                Arguments.of("'''", "", NameType.SEPHARDIC, RuleType.APPROX, Boolean.FALSE, Integer.MAX_VALUE)
+                );
+        // @formatter:on
     }
 
-    /**
-     * Tests the encoding of valid names using the PhoneticEngine.
-     */
+    // TODO Identify if there is a need to an assertTimeout(Duration.ofMillis(10000L) in some point, since this method was marked as @Test(timeout = 10000L)
     @ParameterizedTest
-    @MethodSource("validEncodingData")
-    void testValidEncoding(final String name, final String expectedPhonetic, final NameType nameType,
+    @MethodSource("data")
+    void testEncode(final String name, final String phoneticExpected, final NameType nameType,
                            final RuleType ruleType, final boolean concat, final int maxPhonemes) {
-        PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
-        String actualPhonetic = engine.encode(name);
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
 
-        assertEquals(expectedPhonetic, actualPhonetic, "Phonetic encoding is incorrect");
+        final String phoneticActual = engine.encode(name);
+
+        assertEquals(phoneticExpected, phoneticActual, "phoneme incorrect");
 
         if (concat) {
-            String[] phonemes = actualPhonetic.split("\\|");
-            assertTrue(phonemes.length <= maxPhonemes, "Exceeded maximum phonemes");
+            final String[] split = phoneticActual.split("\\|");
+            assertTrue(split.length <= maxPhonemes);
         } else {
-            String[] words = actualPhonetic.split("-");
-            for (String word : words) {
-                String[] phonemes = word.split("\\|");
-                assertTrue(phonemes.length <= maxPhonemes, "Exceeded maximum phonemes for word");
+            final String[] words = phoneticActual.split("-");
+            for (final String word : words) {
+                final String[] split = word.split("\\|");
+                assertTrue(split.length <= maxPhonemes);
             }
         }
     }
 
-    /**
-     * Tests the encoding of invalid names using the PhoneticEngine.
-     */
     @ParameterizedTest
-    @MethodSource("invalidEncodingData")
-    void testInvalidEncoding(final String input, final String expectedPhonetic, final NameType nameType,
-                             final RuleType ruleType, final boolean concat, final int maxPhonemes) {
-        PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
-        assertEquals(expectedPhonetic, engine.encode(input), "Phonetic encoding for invalid input is incorrect");
+    @MethodSource("invalidData")
+    void testInvalidEncode(final String input, final String phoneticExpected, final NameType nameType,
+                                  final RuleType ruleType, final boolean concat, final int maxPhonemes) {
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat, maxPhonemes);
+
+        assertEquals(engine.encode(input), phoneticExpected);
     }
 }
