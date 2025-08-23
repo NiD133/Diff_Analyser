@@ -1,27 +1,41 @@
 package org.apache.commons.collections4.bloomfilter;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimpleBloomFilter_ESTestTest8 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@code processBitMaps} method in {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterProcessBitMapsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Shape shape0 = Shape.fromNM(10, 10);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        long[] longArray0 = new long[1];
-        LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(longBiPredicate0).test(anyLong(), anyLong());
-        CountingLongPredicate countingLongPredicate0 = new CountingLongPredicate(longArray0, longBiPredicate0);
-        boolean boolean0 = simpleBloomFilter0.processBitMaps(countingLongPredicate0);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@code processBitMaps} returns {@code false} and stops processing
+     * (short-circuits) as soon as the provided predicate returns {@code false}.
+     */
+    @Test
+    public void testProcessBitMapsShortCircuitsAndReturnsFalseWhenPredicateIsFalse() {
+        // Arrange
+        // Create a shape that results in a bitmap with more than one long value (2 in this case),
+        // which is necessary to properly verify the short-circuiting behavior.
+        final Shape shape = Shape.fromNM(100, 10);
+        final SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Create a predicate that counts its invocations and returns false on the first call.
+        final AtomicInteger callCount = new AtomicInteger(0);
+        final LongPredicate stoppingPredicate = bitMap -> {
+            callCount.incrementAndGet();
+            return false; // Signal to stop processing
+        };
+
+        // Act
+        final boolean result = filter.processBitMaps(stoppingPredicate);
+
+        // Assert
+        assertFalse("The method should return false when the predicate returns false.", result);
+        assertEquals("The predicate should have been called only once due to short-circuiting.", 1, callCount.get());
     }
 }
