@@ -1,47 +1,49 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
+import org.apache.commons.cli.help.TextStyle.Builder;
+import org.junit.Test;
+
+/**
+ * Tests for {@link TextHelpAppendable}.
+ *
+ * This test class is a refactoring of an auto-generated EvoSuite test case.
+ */
 public class TextHelpAppendable_ESTestTest14 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textStyle_Builder0.setMinWidth(74);
-        TextStyle.Builder textStyle_Builder1 = textHelpAppendable0.getTextStyleBuilder();
-        assertEquals(1, textStyle_Builder1.getLeftPad());
-        assertEquals(3, textStyle_Builder1.getIndent());
-        assertEquals(74, textStyle_Builder1.getMaxWidth());
+    /**
+     * Tests that successive calls to getTextStyleBuilder() return the same
+     * modifiable instance, ensuring that changes to the builder are persistent.
+     */
+    @Test
+    public void getTextStyleBuilderShouldReturnSameModifiableInstance() {
+        // Arrange
+        final TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        final int newMaxWidth = 120;
+
+        // Act
+        // Retrieve the builder and modify its max width property.
+        final Builder initialBuilder = helpAppendable.getTextStyleBuilder();
+        initialBuilder.setMaxWidth(newMaxWidth);
+
+        // Retrieve the builder again to check if the change is reflected.
+        final Builder subsequentBuilder = helpAppendable.getTextStyleBuilder();
+
+        // Assert
+        // 1. Verify that the same builder instance is returned on each call.
+        assertSame("Expected getTextStyleBuilder() to return the same instance every time.",
+                initialBuilder, subsequentBuilder);
+
+        // 2. Verify that the modification is reflected in the retrieved instance.
+        assertEquals("The max width should be updated to the new value.",
+                newMaxWidth, subsequentBuilder.getMaxWidth());
+
+        // 3. Verify that other properties remain at their default values.
+        assertEquals("The left pad should remain at its default value.",
+                1, subsequentBuilder.getLeftPad());
+        assertEquals("The indent should remain at its default value.",
+                3, subsequentBuilder.getIndent());
     }
 }
