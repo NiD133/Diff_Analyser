@@ -1,30 +1,35 @@
 package org.apache.ibatis.type;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.Types;
+
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
-public class ArrayTypeHandlerTestTest8 extends BaseTypeHandlerTest {
+/**
+ * Tests for {@link ArrayTypeHandler}.
+ * This test class focuses on scenarios involving null values.
+ */
+class ArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
-    private static final TypeHandler<Object> TYPE_HANDLER = new ArrayTypeHandler();
+  private static final TypeHandler<Object> ARRAY_TYPE_HANDLER = new ArrayTypeHandler();
 
-    @Mock
-    Array mockArray;
+  /**
+   * This test verifies that the ArrayTypeHandler correctly returns null
+   * when the database provides a null SQL ARRAY, accessed by column index.
+   * The method signature is defined by the abstract base class {@link BaseTypeHandlerTest}.
+   */
+  @Override
+  @Test
+  void shouldGetResultNullFromResultSetByPosition() throws Exception {
+    // Arrange: Configure the mocked ResultSet to return null for the array at a specific column index.
+    // This simulates reading a NULL value from an array-type column in the database.
+    int columnIndex = 1;
+    when(rs.getArray(columnIndex)).thenReturn(null);
 
-    @Override
-    @Test
-    public void shouldGetResultNullFromResultSetByPosition() throws Exception {
-        when(rs.getArray(1)).thenReturn(null);
-        assertNull(TYPE_HANDLER.getResult(rs, 1));
-    }
+    // Act: Call the method under test to retrieve the result.
+    Object result = ARRAY_TYPE_HANDLER.getResult(rs, columnIndex);
+
+    // Assert: Verify that the handler correctly translated the database NULL to a Java null.
+    assertNull(result, "The handler should return null when the database returns a null array.");
+  }
 }
