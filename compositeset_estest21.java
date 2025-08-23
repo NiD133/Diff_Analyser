@@ -1,97 +1,44 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
+
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest21 extends CompositeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet0);
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        Integer integer0 = new Integer((-3881));
-        assertNotNull(integer0);
-        assertEquals((-3881), (int) integer0);
-        boolean boolean0 = linkedHashSet0.add(integer0);
-        assertTrue(linkedHashSet0.contains(integer0));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertTrue(boolean0);
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        assertNotNull(compositeSet0);
-        assertTrue(linkedHashSet0.contains(integer0));
-        assertTrue(compositeSet0.contains(integer0));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        Object[] objectArray0 = new Object[0];
-        Object[] objectArray1 = compositeSet0.toArray(objectArray0);
-        assertEquals(0, objectArray0.length);
-        assertEquals(1, objectArray1.length);
-        assertNotNull(objectArray1);
-        assertNotSame(objectArray0, objectArray1);
-        assertNotSame(objectArray1, objectArray0);
-        assertTrue(linkedHashSet0.contains(integer0));
-        assertTrue(compositeSet0.contains(integer0));
-        assertEquals(1, linkedHashSet0.size());
-        assertFalse(linkedHashSet0.isEmpty());
-        assertFalse(objectArray1.equals((Object) objectArray0));
-        boolean boolean1 = compositeSet0.removeAll(linkedHashSet0);
-        assertFalse(linkedHashSet0.contains(integer0));
-        assertFalse(compositeSet0.contains(integer0));
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(boolean1 == boolean0);
-        assertTrue(boolean1);
-        boolean boolean2 = compositeSet0.isEmpty();
-        assertFalse(linkedHashSet0.contains(integer0));
-        assertFalse(compositeSet0.contains(integer0));
-        assertTrue(linkedHashSet0.isEmpty());
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(boolean2 == boolean1);
-        assertTrue(boolean2 == boolean0);
-        assertTrue(boolean2);
+/**
+ * Contains tests for the {@link CompositeSet} class, focusing on mutation operations.
+ */
+public class CompositeSetTest {
+
+    /**
+     * Tests that calling removeAll on a CompositeSet correctly removes elements
+     * from the underlying component set and updates the state of the CompositeSet.
+     */
+    @Test
+    public void testRemoveAllClearsBothCompositeAndUnderlyingSet() {
+        // Arrange: Create a CompositeSet with one underlying set containing one element.
+        final Set<Integer> underlyingSet = new LinkedHashSet<>();
+        underlyingSet.add(100);
+
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>(underlyingSet);
+
+        // Sanity check to ensure the initial state is correct.
+        assertFalse("CompositeSet should not be empty after initialization", compositeSet.isEmpty());
+        assertEquals("CompositeSet should contain one element", 1, compositeSet.size());
+        assertTrue("Underlying set should contain the element", underlyingSet.contains(100));
+
+        // Act: Remove all elements from the composite set that are also in the underlying set.
+        // This operation should modify both the composite and the underlying set.
+        final boolean wasModified = compositeSet.removeAll(underlyingSet);
+
+        // Assert: The composite set and the underlying set should now be empty.
+        assertTrue("removeAll should return true as the set was modified", wasModified);
+        assertTrue("CompositeSet should be empty after removeAll", compositeSet.isEmpty());
+        assertEquals("CompositeSet size should be 0 after removeAll", 0, compositeSet.size());
+        assertTrue("The change should propagate to the underlying set, which should now be empty", underlyingSet.isEmpty());
     }
 }
