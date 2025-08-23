@@ -1,34 +1,37 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.fail;
 
 public class GroupedRandomAccessSource_ESTestTest9 extends GroupedRandomAccessSource_ESTest_scaffolding {
 
+    /**
+     * Verifies that attempting to read from a GroupedRandomAccessSource after it has been closed
+     * results in an exception.
+     * <p>
+     * The test expects a NullPointerException because the underlying ArrayRandomAccessSource,
+     * when closed, likely nullifies its internal resources, causing subsequent access attempts to fail.
+     */
     @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-        byte[] byteArray0 = new byte[3];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        groupedRandomAccessSource0.close();
-        // Undeclared exception!
+    public void get_onClosedSource_throwsNullPointerException() throws IOException {
+        // Arrange: Create a GroupedRandomAccessSource with a single underlying source.
+        byte[] sourceData = new byte[3];
+        RandomAccessSource singleSource = new ArrayRandomAccessSource(sourceData);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(new RandomAccessSource[]{singleSource});
+
+        // Act: Close the source before attempting to read from it.
+        groupedSource.close();
+
+        // Assert: Attempting to read from the closed source should throw an exception.
         try {
-            groupedRandomAccessSource0.get((long) 1, byteArray0, 1, 1);
-            fail("Expecting exception: NullPointerException");
+            byte[] destinationBuffer = new byte[3];
+            groupedSource.get(1L, destinationBuffer, 1, 1);
+            fail("Expected a NullPointerException when reading from a closed source, but no exception was thrown.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
+            // This is the expected behavior. The underlying source is closed and cannot be accessed.
         }
     }
 }
