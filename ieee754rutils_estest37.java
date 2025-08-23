@@ -1,18 +1,26 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest37 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        float[] floatArray0 = new float[3];
-        float float0 = IEEE754rUtils.max(floatArray0);
-        assertEquals(0.0F, float0, 0.01F);
+    /**
+     * Tests that max() returns 0.0f for an array containing only zero values.
+     */
+    @Test
+    public void maxFloatArray_shouldReturnZero_whenAllElementsAreZero() {
+        // Arrange: Create an array containing only the value 0.0f.
+        final float[] numbers = {0.0f, 0.0f, 0.0f};
+        final float expectedMax = 0.0f;
+
+        // Act: Call the method under test.
+        final float actualMax = IEEE754rUtils.max(numbers);
+
+        // Assert: Verify that the result is the expected maximum value.
+        assertEquals(expectedMax, actualMax, 0.0f);
     }
 }
