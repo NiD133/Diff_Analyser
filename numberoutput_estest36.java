@@ -1,17 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest36 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on its number-to-string
+ * conversion capabilities.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        String string0 = NumberOutput.toString((-2304.1F), false);
-        assertEquals("-2304.1", string0);
+    /**
+     * Tests that {@link NumberOutput#toString(float, boolean)} correctly converts a negative float
+     * to its string representation when the "fast writer" optimization is disabled.
+     */
+    @Test
+    public void toString_shouldConvertNegativeFloat_whenFastWriterIsDisabled() {
+        // Arrange
+        final float inputValue = -2304.1F;
+        final String expectedString = "-2304.1";
+        final boolean useFastWriter = false;
+
+        // Act
+        final String actualString = NumberOutput.toString(inputValue, useFastWriter);
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
