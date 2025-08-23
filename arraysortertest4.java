@@ -2,17 +2,39 @@ package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ArraySorterTestTest4 extends AbstractLangTest {
+/**
+ * Tests for {@link ArraySorter}.
+ */
+class ArraySorterTest extends AbstractLangTest {
 
     @Test
-    void testSortDoubleArray() {
-        final double[] array1 = { 2, 1 };
-        final double[] array2 = array1.clone();
-        Arrays.sort(array1);
-        assertArrayEquals(array1, ArraySorter.sort(array2));
-        assertNull(ArraySorter.sort((double[]) null));
+    @DisplayName("sort() with a valid double array should return a sorted array")
+    void sort_withUnsortedDoubleArray_returnsSortedArray() {
+        // Arrange
+        final double[] array = {2d, 1d, 3d};
+        final double[] expected = {1d, 2d, 3d};
+
+        // Act
+        final double[] actual = ArraySorter.sort(array);
+
+        // Assert
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("sort() with a null array should return null")
+    void sort_withNullArray_returnsNull() {
+        // Arrange
+        final double[] array = null;
+
+        // Act
+        final double[] result = ArraySorter.sort(array);
+
+        // Assert
+        assertNull(result);
     }
 }
