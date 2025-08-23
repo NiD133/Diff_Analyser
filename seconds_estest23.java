@@ -2,17 +2,27 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest23 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(0);
-        Seconds seconds1 = seconds0.minus(0);
-        assertEquals(0, seconds1.getSeconds());
+    /**
+     * Tests that subtracting zero from a Seconds object returns the same instance,
+     * verifying the optimization for no-op subtractions.
+     */
+    @Test
+    public void minus_whenSubtractingZero_shouldReturnSameInstance() {
+        // Arrange: Create an initial Seconds object.
+        // Using the constant Seconds.ZERO is idiomatic and clear.
+        Seconds initialSeconds = Seconds.ZERO;
+
+        // Act: Subtract zero from the object.
+        Seconds result = initialSeconds.minus(0);
+
+        // Assert: The result should be the exact same instance, not just an equal one.
+        // This confirms the immutability optimization where no new object is created.
+        assertSame("Subtracting zero should return the same instance", initialSeconds, result);
     }
 }
