@@ -1,24 +1,32 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ConstructorUtils_ESTestTest3 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Class<Object> class0 = Object.class;
-        Class<Object>[] classArray0 = (Class<Object>[]) Array.newInstance(Class.class, 0);
-        Object object0 = ConstructorUtils.invokeConstructor(class0, (Object[]) classArray0);
-        assertNotNull(object0);
+    /**
+     * Tests that invokeConstructor can create an instance of a class (Object)
+     * by calling its default, no-argument constructor.
+     */
+    @Test
+    public void testInvokeConstructorWithNoArguments() throws NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException, InstantiationException {
+        // Arrange: The class to instantiate is Object.class, which has a public no-arg constructor.
+        final Class<Object> classToInstantiate = Object.class;
+
+        // Act: Invoke the constructor with no arguments.
+        final Object createdInstance = ConstructorUtils.invokeConstructor(classToInstantiate);
+
+        // Assert: The method should successfully return a new, non-null instance of Object.
+        assertNotNull("The created instance should not be null.", createdInstance);
+        assertEquals("The created instance should be of type Object.",
+                Object.class, createdInstance.getClass());
     }
 }
