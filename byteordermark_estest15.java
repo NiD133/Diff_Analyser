@@ -1,19 +1,29 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class ByteOrderMark_ESTestTest15 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ByteOrderMark}.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        int[] intArray0 = new int[6];
-        ByteOrderMark byteOrderMark0 = new ByteOrderMark("Bt^D2-fqe2We[-^J#", intArray0);
-        boolean boolean0 = byteOrderMark0.matches(intArray0);
-        assertTrue(boolean0);
+    /**
+     * Tests that the matches() method returns true when the provided byte array
+     * is identical to the Byte Order Mark's internal bytes.
+     */
+    @Test
+    public void testMatchesReturnsTrueForIdenticalByteArray() {
+        // Arrange
+        // Use a non-trivial byte sequence to define the BOM.
+        final int[] bomBytes = {0x12, 0x34, 0x56};
+        final ByteOrderMark bom = new ByteOrderMark("CUSTOM-BOM", bomBytes);
+
+        // Act
+        // Check if the BOM matches the exact same byte sequence it was created with.
+        final boolean isMatch = bom.matches(bomBytes);
+
+        // Assert
+        assertTrue("matches() should return true for an identical byte array.", isMatch);
     }
 }
