@@ -1,49 +1,29 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests for the {@link DayOfYear#isValidYear(int)} method.
+ */
 public class DayOfYear_ESTestTest34 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
-        ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
-        DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
-        boolean boolean0 = dayOfYear0.isValidYear(8);
-        assertEquals(46, dayOfYear0.getValue());
-        assertTrue(boolean0);
+    /**
+     * Tests that isValidYear() returns true for a day-of-year that exists in every year (i.e., not day 366).
+     * Any day from 1 to 365 should be considered valid for any given year, leap or not.
+     */
+    @Test
+    public void isValidYear_forDayInAnyYear_shouldReturnTrue() {
+        // Arrange: Create a DayOfYear instance for a day that is not the 366th day.
+        // Day 46 is used to maintain consistency with the original test's value,
+        // but any day from 1 to 365 would demonstrate the same behavior.
+        DayOfYear dayOfYear = DayOfYear.of(46);
+        int anyYear = 8; // The year 8 is a leap year, but this is irrelevant for day 46.
+
+        // Act: Check if this day is valid for the given year.
+        boolean isValid = dayOfYear.isValidYear(anyYear);
+
+        // Assert: The result must be true because day 46 exists in every year.
+        assertTrue("Day 46 should be valid for any year", isValid);
     }
 }
