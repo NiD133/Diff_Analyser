@@ -1,39 +1,37 @@
 package org.apache.commons.lang3.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.util.concurrent.Delayed;
+import org.junit.Test;
+
+/**
+ * This test case verifies the behavior of the BackgroundInitializer class,
+ * specifically when its methods are called in an incorrect order.
+ *
+ * Note: The original test class name and hierarchy are preserved to maintain
+ * structural consistency with the existing test suite.
+ */
 public class BackgroundInitializer_ESTestTest10 extends BackgroundInitializer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        BackgroundInitializer<Delayed> backgroundInitializer0 = new BackgroundInitializer<Delayed>();
-        // Undeclared exception!
+    /**
+     * Tests that calling getFuture() before start() throws an IllegalStateException.
+     * The contract of BackgroundInitializer requires start() to be called before
+     * the Future result can be accessed.
+     */
+    @Test
+    public void getFutureShouldThrowIllegalStateExceptionIfStartNotCalled() {
+        // Arrange: Create a BackgroundInitializer instance that has not been started.
+        BackgroundInitializer<Delayed> initializer = new BackgroundInitializer<>();
+
+        // Act & Assert: Attempt to get the Future and verify the expected exception.
         try {
-            backgroundInitializer0.getFuture();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // start() must be called first!
-            //
-            verifyException("org.apache.commons.lang3.concurrent.BackgroundInitializer", e);
+            initializer.getFuture();
+            fail("Expected an IllegalStateException because start() was not called.");
+        } catch (final IllegalStateException e) {
+            // Verify that the exception has the correct, specified message.
+            assertEquals("start() must be called first!", e.getMessage());
         }
     }
 }
