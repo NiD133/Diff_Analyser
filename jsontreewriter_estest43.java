@@ -1,32 +1,30 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JsonTreeWriter_ESTestTest43 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTreeWriter} class.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        // Undeclared exception!
+    /**
+     * Verifies that calling the name() method with a null argument
+     * results in a NullPointerException, as the name of a JSON property cannot be null.
+     */
+    @Test
+    public void name_whenNameIsNull_throwsNullPointerException() {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act & Assert
         try {
-            jsonTreeWriter0.name((String) null);
-            fail("Expecting exception: NullPointerException");
+            writer.name(null);
+            fail("Expected a NullPointerException to be thrown, but no exception was thrown.");
         } catch (NullPointerException e) {
-            //
-            // name == null
-            //
-            verifyException("java.util.Objects", e);
+            // The underlying implementation uses Objects.requireNonNull, which provides this specific message.
+            assertEquals("name == null", e.getMessage());
         }
     }
 }
