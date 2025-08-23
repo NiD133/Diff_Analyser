@@ -1,26 +1,41 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This class contains tests for the {@link GroupedRandomAccessSource}.
+ * This specific test focuses on the getStartingSourceIndex method.
+ */
 public class GroupedRandomAccessSource_ESTestTest23 extends GroupedRandomAccessSource_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-        byte[] byteArray0 = new byte[8];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        int int0 = groupedRandomAccessSource0.getStartingSourceIndex(1L);
-        assertEquals(8L, groupedRandomAccessSource0.length());
-        assertEquals(0, int0);
+    /**
+     * Verifies that getStartingSourceIndex returns the correct index (0) for an offset
+     * that falls within the bounds of the first (and only) underlying source.
+     */
+    @Test
+    public void getStartingSourceIndex_whenOffsetIsInFirstSource_shouldReturnZero() throws IOException {
+        // Arrange: Create a GroupedRandomAccessSource with a single source of length 8.
+        byte[] sourceData = new byte[8];
+        RandomAccessSource singleSource = new ArrayRandomAccessSource(sourceData);
+        RandomAccessSource[] sources = { singleSource };
+
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(sources);
+
+        // An offset that is clearly within the bounds of the single source (0-7).
+        long offsetWithinFirstSource = 1L;
+
+        // Act: Get the index of the source that should contain the specified offset.
+        int actualSourceIndex = groupedSource.getStartingSourceIndex(offsetWithinFirstSource);
+
+        // Assert: The index should be 0, as it's the first (and only) source.
+        // The method is expected to find the correct source for the given offset.
+        int expectedSourceIndex = 0;
+        assertEquals(expectedSourceIndex, actualSourceIndex);
+
+        // A sanity check to ensure the total length of the grouped source is correct.
+        assertEquals("The total length of the grouped source should match the single source's length.",
+                8L, groupedSource.length());
     }
 }
