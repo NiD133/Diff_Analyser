@@ -1,35 +1,49 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
+// The original test class name and inheritance are kept to match the provided context.
 public class RandomAccessFileOrArray_ESTestTest20 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test019() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) (-123));
-        int int0 = randomAccessFileOrArray0.read(byteArray0);
-        assertArrayEquals(new byte[] { (byte) (-123), (byte) (-123), (byte) 0, (byte) 0, (byte) 0 }, byteArray0);
-        assertEquals(5, int0);
+    /**
+     * Tests the behavior of read() when a byte has been pushed back and the destination
+     * for the read operation is the same byte array that backs the RandomAccessFileOrArray.
+     * This setup tests an edge case where the initial write (from the pushed-back byte)
+     * modifies the source for the subsequent block read within the same operation.
+     */
+    @Test
+    public void readAfterPushBack_whenReadingIntoSourceBuffer_reflectsIntermediateModification() throws IOException {
+        // Arrange
+        final byte PUSHED_BACK_BYTE = (byte) -123;
+        // This buffer serves as BOTH the data source for the reader and the destination for the read operation.
+        byte[] buffer = new byte[]{0, 0, 0, 0, 0};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(buffer);
+
+        reader.pushBack(PUSHED_BACK_BYTE);
+
+        // Act
+        int bytesRead = reader.read(buffer);
+
+        // Assert
+        assertEquals("Should have read the full buffer length", 5, bytesRead);
+
+        // The expected result is due to a feedback effect:
+        // 1. The first byte read is the pushed-back byte (-123). It is written to buffer[0].
+        //    The buffer's state becomes: [-123, 0, 0, 0, 0].
+        // 2. The reader then performs a block read for the remaining 4 bytes from the underlying
+        //    source (which is the now-modified buffer), starting from position 0.
+        // 3. The first byte of this block read is buffer[0], which is now -123. This value is
+        //    written to the destination at buffer[1].
+        // 4. The rest of the block read proceeds, reading from source positions 1, 2, and 3
+        //    (which are still 0) and writing to buffer[2], buffer[3], and buffer[4].
+        byte[] expectedBufferState = new byte[]{PUSHED_BACK_BYTE, PUSHED_BACK_BYTE, 0, 0, 0};
+        assertArrayEquals(
+                "The buffer should reflect the modification from the pushed-back byte affecting the subsequent read",
+                expectedBufferState,
+                buffer
+        );
     }
 }
