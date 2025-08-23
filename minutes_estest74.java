@@ -1,18 +1,25 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest74 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test73() throws Throwable {
-        Minutes minutes0 = Minutes.ONE;
-        Weeks weeks0 = minutes0.toStandardWeeks();
-        assertEquals(0, weeks0.getWeeks());
+    @Test
+    public void toStandardWeeks_fromOneMinute_returnsZeroWeeks() {
+        // Arrange
+        Minutes oneMinute = Minutes.ONE;
+        
+        // Act
+        // Convert the one-minute duration to standard weeks.
+        Weeks resultInWeeks = oneMinute.toStandardWeeks();
+        
+        // Assert
+        // One minute is less than the number of minutes in a standard week (10,080),
+        // so the conversion should result in zero whole weeks.
+        assertEquals(Weeks.ZERO, resultInWeeks);
     }
 }
