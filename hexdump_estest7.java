@@ -1,42 +1,37 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest7 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for {@link HexDump}.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        CharBuffer charBuffer0 = CharBuffer.allocate((byte) 3);
-        // Undeclared exception!
-        try {
-            HexDump.dump(byteArray0, (long) (byte) 17, (Appendable) charBuffer0, 1, (int) (byte) 2);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Tests that HexDump.dump throws a BufferOverflowException when the provided
+     * Appendable (a CharBuffer in this case) has insufficient capacity to hold
+     * the formatted hex output.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void testDumpThrowsBufferOverflowExceptionForInsufficientlySizedAppendable() throws IOException {
+        // Arrange: Create data to dump and a buffer that is too small for the output.
+        byte[] dataToDump = { 0x00, 0x01, 0x02 };
+
+        // The hex dump format includes an offset, hex codes, and ASCII representation,
+        // which requires significant space. A buffer of size 3 is guaranteed to be too small
+        // as even the initial offset string (e.g., "00000000 ") exceeds this capacity.
+        final int insufficientCapacity = 3;
+        Appendable smallBuffer = CharBuffer.allocate(insufficientCapacity);
+
+        long initialOffset = 0L;
+        int startIndex = 0;
+        int bytesToDump = 1; // We only need to attempt to dump one byte to trigger the overflow.
+
+        // Act & Assert: Calling dump with the small buffer is expected to throw the exception.
+        HexDump.dump(dataToDump, initialOffset, smallBuffer, startIndex, bytesToDump);
     }
 }
