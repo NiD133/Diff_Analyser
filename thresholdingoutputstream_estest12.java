@@ -1,30 +1,29 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class ThresholdingOutputStream_ESTestTest12 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link DeferredFileOutputStream}, a subclass of {@link ThresholdingOutputStream}.
+ */
+public class DeferredFileOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DeferredFileOutputStream.Builder deferredFileOutputStream_Builder0 = new DeferredFileOutputStream.Builder();
-        DeferredFileOutputStream deferredFileOutputStream0 = deferredFileOutputStream_Builder0.get();
-        // Undeclared exception!
-        try {
-            deferredFileOutputStream0.write(0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.file.Files", e);
-        }
+    /**
+     * Tests that attempting to write to a DeferredFileOutputStream created with a
+     * default builder throws a NullPointerException. This occurs because the
+     * default builder does not configure a destination file, leading to an
+     * attempt to create a file with a null path upon the first write.
+     */
+    @Test(expected = NullPointerException.class)
+    public void writeToStreamWithDefaultBuilderShouldThrowNullPointerException() throws IOException {
+        // Arrange: Create a stream using the default builder, which does not set an output file.
+        final DeferredFileOutputStream stream = new DeferredFileOutputStream.Builder().get();
+
+        // Act: The first write triggers the creation of the underlying file stream.
+        // Since no file was specified in the builder, this operation fails with an NPE
+        // when trying to access the null file path.
+        stream.write(0);
+
+        // Assert: The expected NullPointerException is verified by the @Test annotation.
     }
 }
