@@ -1,33 +1,37 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.io.StringReader;
+
+// Note: The class name and inheritance are artifacts from a test generation tool.
+// In a real-world scenario, this test would be part of a consolidated `ProxyReaderTest` class.
 public class ProxyReader_ESTestTest44 extends ProxyReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        // Undeclared exception!
+    /**
+     * Tests that calling mark() with a negative read-ahead limit throws an IllegalArgumentException.
+     * This verifies that the method call is correctly delegated to the underlying reader,
+     * which is responsible for input validation.
+     */
+    @Test
+    public void markWithNegativeReadAheadLimitShouldThrowIllegalArgumentException() throws IOException {
+        // Arrange
+        // A TaggedReader is used as a concrete implementation of the abstract ProxyReader.
+        final StringReader underlyingReader = new StringReader("test-data");
+        final ProxyReader proxyReader = new TaggedReader(underlyingReader);
+        final int invalidReadAheadLimit = -1;
+
+        // Act & Assert
         try {
-            taggedReader0.mark((-1520));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Read-ahead limit < 0
-            //
-            verifyException("java.io.StringReader", e);
+            proxyReader.mark(invalidReadAheadLimit);
+            fail("Expected an IllegalArgumentException to be thrown for a negative read-ahead limit.");
+        } catch (final IllegalArgumentException e) {
+            // This assertion confirms that the exception originates from the underlying
+            // java.io.StringReader, which is responsible for throwing this specific error.
+            assertEquals("Read-ahead limit < 0", e.getMessage());
         }
     }
 }
