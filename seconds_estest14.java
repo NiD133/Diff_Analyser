@@ -1,17 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Seconds_ESTestTest14 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Seconds seconds0 = Seconds.standardSecondsIn((ReadablePeriod) null);
-        assertEquals(0, seconds0.getSeconds());
+    /**
+     * Tests that standardSecondsIn() returns the ZERO constant when the input period is null.
+     * The Javadoc for the method specifies that a null input should result in zero seconds.
+     */
+    @Test
+    public void standardSecondsIn_whenPeriodIsNull_returnsZero() {
+        // Act: Call the factory method with a null input.
+        Seconds result = Seconds.standardSecondsIn(null);
+
+        // Assert: The result should be the singleton instance of ZERO seconds.
+        assertSame("standardSecondsIn(null) should return the singleton Seconds.ZERO", Seconds.ZERO, result);
     }
 }
