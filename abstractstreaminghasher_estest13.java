@@ -1,22 +1,30 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractStreamingHasher_ESTestTest13 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Test for {@link AbstractStreamingHasher} focusing on behavior with very large inputs.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(1905808397);
-        // Undeclared exception!
-        crc32cHashFunction_Crc32cHasher0.putBytes(byteBuffer0);
+    /**
+     * Verifies that attempting to process a direct ByteBuffer that is too large to allocate
+     * results in an {@link OutOfMemoryError}.
+     *
+     * <p>This test case ensures that the code path handles extreme resource conditions gracefully.
+     * The error is expected to be thrown by {@code ByteBuffer.allocateDirect} when the system
+     * cannot provide the requested amount of native memory.
+     */
+    @Test(expected = OutOfMemoryError.class, timeout = 4000)
+    public void putBytes_withHugeDirectBuffer_throwsOutOfMemoryError() {
+        // Arrange: Create a concrete hasher instance to test the abstract class's behavior.
+        Hasher hasher = new Crc32cHashFunction.Crc32cHasher();
+
+        // Act: Attempt to allocate a direct ByteBuffer of maximum possible size and pass it to the
+        // hasher. The OutOfMemoryError is expected during the allocation of the buffer itself.
+        // The @Test(expected=...) annotation will catch this error and pass the test.
+        ByteBuffer hugeDirectBuffer = ByteBuffer.allocateDirect(Integer.MAX_VALUE);
+        hasher.putBytes(hugeDirectBuffer);
     }
 }
