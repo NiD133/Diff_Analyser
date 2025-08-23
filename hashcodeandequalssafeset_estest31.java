@@ -1,29 +1,37 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+
 import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest31 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Object[] objectArray0 = new Object[14];
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-        Predicate<Object> predicate0 = Predicate.isEqual((Object) null);
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.removeIf(predicate0);
-        assertTrue(boolean0);
+/**
+ * Test suite for {@link HashCodeAndEqualsSafeSet}.
+ * This class demonstrates clear, human-written tests for the collection's behavior.
+ */
+public class HashCodeAndEqualsSafeSetTest {
+
+    @Test
+    public void removeIf_shouldRemoveNullElement_whenPredicateMatchesNull() {
+        // Arrange
+        // Create a set that contains a single null element.
+        // The 'of' factory method correctly handles multiple nulls, resulting in a set of size 1.
+        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(null, null);
+        assertEquals("Precondition: Set should contain one null element.", 1, safeSet.size());
+
+        // Create a predicate to identify null elements.
+        Predicate<Object> isNullPredicate = Predicate.isEqual(null);
+
+        // Act
+        // Attempt to remove all elements matching the predicate.
+        boolean wasModified = safeSet.removeIf(isNullPredicate);
+
+        // Assert
+        // The method should return true because the set was changed.
+        assertTrue("removeIf should return true as the null element was removed.", wasModified);
+        // The set should be empty after the removal operation.
+        assertTrue("The set should be empty after removing its only element.", safeSet.isEmpty());
     }
 }
