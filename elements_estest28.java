@@ -1,36 +1,38 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class Elements_ESTestTest28 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class, focusing on filtering methods.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test027() throws Throwable {
-        Document document0 = Document.createShell("");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.not(":containsWholeOwnText(%s)");
-        assertEquals(4, elements1.size());
+    /**
+     * Verifies that the .not() method returns an unfiltered list of elements
+     * when provided with a selector that matches nothing.
+     */
+    @Test
+    public void notWithNonMatchingSelectorReturnsAllOriginalElements() {
+        // Arrange
+        // A shell document contains 4 elements: the document root, <html>, <head>, and <body>.
+        Document doc = Document.createShell("");
+        Elements allElements = doc.getAllElements();
+        final int expectedInitialSize = 4;
+        assertEquals("A shell document should contain 4 elements", expectedInitialSize, allElements.size());
+
+        // This selector is syntactically valid but will not match any elements in the blank
+        // shell document, as none contain the literal text "%s".
+        String nonMatchingSelector = ":containsWholeOwnText(%s)";
+
+        // Act
+        // The .not() method should remove elements that match the selector.
+        Elements filteredElements = allElements.not(nonMatchingSelector);
+
+        // Assert
+        // Since no elements matched the selector, none should have been removed.
+        // The resulting collection should be the same size as the original.
+        assertEquals("The size of the collection should be unchanged", expectedInitialSize, filteredElements.size());
     }
 }
