@@ -1,30 +1,50 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest27 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder((CharSequence) "");
-        ErrorReportConfiguration errorReportConfiguration0 = new ErrorReportConfiguration(8, (-1));
-        ContentReference contentReference0 = ContentReference.construct(true, (Object) stringBuilder0, errorReportConfiguration0);
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference0, (long) 8, (long) 500, 1571, 500);
-        // Undeclared exception!
+/**
+ * This test class focuses on the behavior of the JsonLocation class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
+public class JsonLocation_ESTestTest27 { // In a real-world scenario, this class would be renamed to JsonLocationTest
+
+    /**
+     * Tests that sourceDescription() throws an exception when the location's character
+     * offset is far beyond the end of the actual source content.
+     */
+    @Test
+    public void sourceDescription_shouldThrowException_whenOffsetIsBeyondEmptyContent() {
+        // Arrange: Set up a JsonLocation with an empty content source but a large character offset.
+        // The sourceDescription() method tries to create a snippet of the source around the
+        // location. When the offset is far beyond the actual content length, an indexing
+        // error is expected.
+
+        StringBuilder emptyContent = new StringBuilder("");
+        long charOffsetFarBeyondContent = 500L;
+        long byteOffset = 8L;
+        int lineNumber = 1571;
+        int columnNumber = 500;
+
+        // The ErrorReportConfiguration is needed to construct the ContentReference.
+        // Its values are not critical to this specific test's outcome.
+        ErrorReportConfiguration reportConfig = new ErrorReportConfiguration(8, -1);
+        ContentReference contentRef = ContentReference.construct(true, emptyContent, reportConfig);
+
+        // Create the location pointing to an offset (500) that is out of bounds for the empty content (length 0).
+        JsonLocation location = new JsonLocation(contentRef, byteOffset, charOffsetFarBeyondContent, lineNumber, columnNumber);
+
+        // Act & Assert
         try {
-            jsonLocation0.sourceDescription();
-            fail("Expecting exception: StringIndexOutOfBoundsException");
+            location.sourceDescription();
+            fail("Expected a StringIndexOutOfBoundsException because the character offset is outside the bounds of the source content.");
         } catch (StringIndexOutOfBoundsException e) {
-            //
-            // String index out of range: -1
-            //
-            verifyException("java.lang.AbstractStringBuilder", e);
+            // The underlying implementation attempts to access the content at a calculated
+            // negative index, which is the expected behavior in this scenario.
+            assertEquals("String index out of range: -1", e.getMessage());
         }
     }
 }
