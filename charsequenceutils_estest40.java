@@ -1,19 +1,37 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class CharSequenceUtils_ESTestTest40 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CharSequenceUtils} class.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("', is neither of type Map.Entry nor an Array");
-        boolean boolean0 = CharSequenceUtils.regionMatches("', is neither of type Map.Entry nor an Array", false, (-3004), stringBuilder0, 65, (-93));
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link CharSequenceUtils#regionMatches(CharSequence, boolean, int, CharSequence, int, int)}
+     * returns false when the provided length of the region to compare is negative.
+     *
+     * <p>This behavior is consistent with {@link String#regionMatches(boolean, int, String, int, int)},
+     * which also returns false for a negative length.</p>
+     */
+    @Test
+    public void testRegionMatchesReturnsFalseForNegativeLength() {
+        // Arrange
+        // Use different CharSequence implementations (String and StringBuilder) to ensure broad compatibility.
+        final CharSequence sourceString = "some arbitrary string";
+        final CharSequence substring = new StringBuilder("arbitrary");
+
+        final boolean ignoreCase = false;
+        final int sourceStartOffset = 5;
+        final int substringStartOffset = 0;
+        final int negativeLength = -1; // The key condition being tested
+
+        // Act
+        final boolean result = CharSequenceUtils.regionMatches(
+                sourceString, ignoreCase, sourceStartOffset, substring, substringStartOffset, negativeLength);
+
+        // Assert
+        assertFalse("A negative length should cause regionMatches to return false.", result);
     }
 }
