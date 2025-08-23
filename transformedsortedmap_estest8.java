@@ -1,46 +1,42 @@
 package org.apache.commons.collections4.map;
 
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.functors.NOPTransformer;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// The original test class name is kept for context.
 public class TransformedSortedMap_ESTestTest8 extends TransformedSortedMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        TreeMap<Integer, Integer> treeMap0 = new TreeMap<Integer, Integer>();
-        LinkedList<Transformer<Integer, Integer>> linkedList0 = new LinkedList<Transformer<Integer, Integer>>();
-        Transformer<Integer, Integer> transformer0 = ChainedTransformer.chainedTransformer((Collection<? extends Transformer<? super Integer, ? extends Integer>>) linkedList0);
-        TransformedSortedMap<Integer, Integer> transformedSortedMap0 = new TransformedSortedMap<Integer, Integer>(treeMap0, transformer0, transformer0);
-        Integer integer0 = new Integer((-17));
-        treeMap0.put(integer0, integer0);
-        Integer integer1 = new Integer(0);
-        SortedMap<Integer, Integer> sortedMap0 = transformedSortedMap0.headMap(integer1);
-        assertEquals(1, sortedMap0.size());
+    /**
+     * Tests that the headMap() method returns a correctly functioning view of the map.
+     * The view should contain all entries with keys strictly less than the 'toKey'.
+     */
+    @Test
+    public void headMapShouldReturnViewWithElementsLessThanToKey() {
+        // Arrange
+        // Create a base sorted map and add an element.
+        final SortedMap<Integer, Integer> baseMap = new TreeMap<>();
+        baseMap.put(-17, -17);
+
+        // Decorate the map with an identity transformer, which performs no transformation.
+        // This ensures we are testing the view logic of TransformedSortedMap itself.
+        final Transformer<Integer, Integer> identityTransformer = NOPTransformer.nopTransformer();
+        final TransformedSortedMap<Integer, Integer> transformedMap =
+                new TransformedSortedMap<>(baseMap, identityTransformer, identityTransformer);
+
+        // Act
+        // Get the headMap, which should contain all entries with keys less than 0.
+        final SortedMap<Integer, Integer> headMap = transformedMap.headMap(0);
+
+        // Assert
+        // The resulting view should contain exactly one element: the entry for key -17.
+        assertEquals("The headMap should contain one element", 1, headMap.size());
+        assertTrue("The headMap should contain the key -17", headMap.containsKey(-17));
     }
 }
