@@ -1,29 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PdfDictionary_ESTestTest30 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        PdfName pdfName0 = PdfName.URL;
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.putEx(pdfName0, pdfName0);
-        PdfBoolean pdfBoolean0 = pdfResources0.getAsBoolean(pdfName0);
-        assertNull(pdfBoolean0);
+    /**
+     * Verifies that getAsBoolean() returns null when the value associated with a key
+     * is not a PdfBoolean object.
+     */
+    @Test
+    public void getAsBooleanShouldReturnNullWhenEntryIsNotABoolean() {
+        // Arrange: Create a dictionary and add an entry where the value is a PdfName,
+        // which is not a PdfBoolean.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName key = PdfName.URL;
+        PdfName nonBooleanValue = new PdfName("SomeValue");
+        dictionary.put(key, nonBooleanValue);
+
+        // Act: Attempt to retrieve the entry as a PdfBoolean.
+        PdfBoolean result = dictionary.getAsBoolean(key);
+
+        // Assert: The result must be null, as the stored value cannot be cast to PdfBoolean.
+        assertNull("getAsBoolean() should return null for a non-boolean value.", result);
     }
 }
