@@ -1,36 +1,37 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
 
-public class Elements_ESTestTest129 extends Elements_ESTest_scaffolding {
+/**
+ * Tests for the {@link Elements} class.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test128() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("Bb,Y6", "Bb,Y6");
-        Elements elements0 = document0.getAllElements();
-        List<String> list0 = elements0.eachText();
-        assertTrue(list0.contains("Bb,Y6"));
+    @Test
+    public void eachTextReturnsTextOfElementsThatHaveTextContent() {
+        // Arrange
+        // Jsoup.parseBodyFragment creates a full HTML document for the given fragment.
+        // The resulting structure is: <html><head></head><body>Bb,Y6</body></html>
+        String htmlFragment = "Bb,Y6";
+        Document doc = Jsoup.parseBodyFragment(htmlFragment);
+
+        // doc.getAllElements() returns a list of all elements: [<html>, <head>, <body>].
+        Elements elements = doc.getAllElements();
+
+        // Act
+        // The eachText() method extracts the text content from each element in the list.
+        List<String> texts = elements.eachText();
+
+        // Assert
+        // The method should only include text from elements that actually have text.
+        // - <html>'s text content is "Bb,Y6".
+        // - <head>'s text content is empty and is therefore excluded from the result.
+        // - <body>'s text content is "Bb,Y6".
+        List<String> expectedTexts = List.of("Bb,Y6", "Bb,Y6");
+        assertEquals(expectedTexts, texts);
     }
 }
