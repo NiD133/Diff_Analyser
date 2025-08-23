@@ -1,24 +1,32 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IslamicChronology_ESTestTest54 extends IslamicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1);
-        IslamicChronology islamicChronology1 = IslamicChronology.getInstance(dateTimeZone0, islamicChronology0.LEAP_YEAR_INDIAN);
-        boolean boolean0 = islamicChronology0.equals(islamicChronology1);
-        assertFalse(boolean0);
+/**
+ * Unit tests for the equals() method of {@link IslamicChronology}.
+ */
+public class IslamicChronologyEqualsTest {
+
+    /**
+     * Tests that two IslamicChronology instances are not equal if they have
+     * different time zones and different leap year patterns.
+     */
+    @Test
+    public void equals_returnsFalse_forDifferentTimeZoneAndLeapYearPattern() {
+        // Arrange
+        // Create a chronology with the default leap year pattern (16-based) in UTC.
+        IslamicChronology utcChronology = IslamicChronology.getInstanceUTC();
+
+        // Create a second chronology with a non-UTC time zone and the "Indian" leap year pattern.
+        DateTimeZone nonUtcZone = DateTimeZone.forOffsetMillis(1);
+        IslamicChronology differentChronology = IslamicChronology.getInstance(
+                nonUtcZone, IslamicChronology.LEAP_YEAR_INDIAN);
+
+        // Act & Assert
+        // The two chronologies have different configurations, so they should not be equal.
+        assertNotEquals(utcChronology, differentChronology);
     }
 }
