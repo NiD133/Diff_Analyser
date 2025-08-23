@@ -1,38 +1,32 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LookupTranslator_ESTestTest10 extends LookupTranslator_ESTest_scaffolding {
+/**
+ * Test suite for {@link LookupTranslator}.
+ */
+public class LookupTranslatorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        CharSequence[] charSequenceArray0 = new CharSequence[3];
-        char[] charArray0 = new char[2];
-        charArray0[1] = '1';
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        charSequenceArray0[0] = (CharSequence) charBuffer0;
-        charSequenceArray0[1] = (CharSequence) "FFFFF15A";
-        CharBuffer charBuffer1 = CharBuffer.wrap(charSequenceArray0[0]);
-        CharBuffer charBuffer2 = CharBuffer.wrap(charSequenceArray0[1]);
-        CharSequence[][] charSequenceArray1 = new CharSequence[4][7];
-        charSequenceArray1[0] = charSequenceArray0;
-        charSequenceArray1[1] = charSequenceArray0;
-        charSequenceArray1[2] = charSequenceArray0;
-        charBuffer1.get();
-        CharSequence[] charSequenceArray2 = new CharSequence[10];
-        charSequenceArray2[0] = (CharSequence) charBuffer1;
-        charSequenceArray2[1] = (CharSequence) "FFFFF15A";
-        charSequenceArray1[3] = charSequenceArray2;
-        LookupTranslator lookupTranslator0 = new LookupTranslator(charSequenceArray1);
-        String string0 = lookupTranslator0.translate((CharSequence) charBuffer2);
-        assertEquals("FFFFFFFFFF15A5A", string0);
+    @Test
+    public void translateShouldReplaceMatchingKeyInString() {
+        // Arrange: Define a lookup table where "1" is translated to "FFFFF15A".
+        // The original test created this mapping in a very complex way. This simplified
+        // setup captures the essential logic that was being tested.
+        final CharSequence[][] lookupTable = {
+            {"1", "FFFFF15A"}
+        };
+        final LookupTranslator translator = new LookupTranslator(lookupTable);
+
+        // Act: Translate a string that contains the lookup key.
+        final String input = "FFFFF15A";
+        final String actualOutput = translator.translate(input);
+
+        // Assert: The key "1" in the input string should be replaced by its corresponding value.
+        // The expected output is constructed by taking the parts of the input string
+        // before and after the key, and inserting the translated value in between.
+        // "FFFFF" (before) + "FFFFF15A" (translation) + "5A" (after)
+        final String expectedOutput = "FFFFFFFFFFF15A5A";
+        assertEquals(expectedOutput, actualOutput);
     }
 }
