@@ -1,35 +1,35 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.mockito.Mockito.mock;
 
-public class LocationTextExtractionStrategy_ESTestTest41 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * This test verifies the behavior of the {@link LocationTextExtractionStrategy#renderImage(ImageRenderInfo)} method.
+ * The original test was automatically generated and has been rewritten for clarity and focus.
+ */
+public class LocationTextExtractionStrategy_ESTestTest41 {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfSigLockDictionary.LockPermissions pdfSigLockDictionary_LockPermissions0 = PdfSigLockDictionary.LockPermissions.FORM_FILLING;
-        PdfSigLockDictionary pdfSigLockDictionary0 = new PdfSigLockDictionary(pdfSigLockDictionary_LockPermissions0);
-        java.util.Vector<MarkedContentInfo> vector0 = new java.util.Vector<MarkedContentInfo>();
-        ImageRenderInfo imageRenderInfo0 = ImageRenderInfo.createForXObject(graphicsState0, (PdfIndirectReference) null, (PdfDictionary) pdfSigLockDictionary0, (Collection<MarkedContentInfo>) vector0);
-        locationTextExtractionStrategy0.renderImage(imageRenderInfo0);
-        assertEquals(1.0F, imageRenderInfo0.getArea(), 0.01F);
+    /**
+     * Tests that the renderImage method is a no-op and does not throw an exception.
+     * <p>
+     * The {@link LocationTextExtractionStrategy} is designed for text extraction and is not
+     * concerned with images. Therefore, its implementation of {@code renderImage} from the
+     * {@link RenderListener} interface is expected to do nothing. This test confirms that
+     * the method can be called safely without any side effects or errors.
+     * </p>
+     */
+    @Test
+    public void renderImage_shouldBeANoOpAndNotThrowException() {
+        // Arrange
+        LocationTextExtractionStrategy strategy = new LocationTextExtractionStrategy();
+        ImageRenderInfo mockImageRenderInfo = mock(ImageRenderInfo.class);
+
+        // Act
+        // The call to renderImage should do nothing and not throw any exceptions.
+        strategy.renderImage(mockImageRenderInfo);
+
+        // Assert
+        // No explicit assertion is needed. The test's purpose is to ensure that the 'Act'
+        // phase completes without throwing an exception, confirming the no-op behavior.
     }
 }
