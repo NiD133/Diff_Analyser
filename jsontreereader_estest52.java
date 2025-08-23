@@ -1,31 +1,37 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest52 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test051() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        Character character0 = new Character('7');
-        jsonArray0.add(character0);
-        jsonTreeReader0.beginArray();
-        JsonToken jsonToken0 = jsonTreeReader0.peek();
-        assertEquals(JsonToken.STRING, jsonToken0);
+/**
+ * Test suite for {@link JsonTreeReader}.
+ * This refactored version replaces the original EvoSuite-generated class.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that peeking at a Character element within a JsonArray
+     * correctly identifies its type as a STRING token. This confirms
+     * that Gson handles single characters as strings when reading a JSON tree.
+     */
+    @Test
+    public void peek_whenArrayContainsCharacter_returnsStringToken() throws IOException {
+        // Arrange: Create a JSON array containing a single character.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add('7');
+
+        JsonTreeReader reader = new JsonTreeReader(jsonArray);
+        reader.beginArray(); // Position the reader inside the array.
+
+        // Act: Peek at the next token in the stream.
+        JsonToken actualToken = reader.peek();
+
+        // Assert: The token should be of type STRING.
+        assertEquals(JsonToken.STRING, actualToken);
     }
 }
