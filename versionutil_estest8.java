@@ -1,27 +1,21 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.Version;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class VersionUtil_ESTestTest8 extends VersionUtil_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link VersionUtil} class.
+ */
+public class VersionUtilTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        // Undeclared exception!
-        try {
-            VersionUtil.mavenVersionFor((ClassLoader) null, "", "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
-        }
+    /**
+     * Verifies that {@code mavenVersionFor} throws a NullPointerException when
+     * the provided ClassLoader is null. The ClassLoader is a required argument
+     * for locating the Maven version properties.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mavenVersionFor_withNullClassLoader_shouldThrowNullPointerException() {
+        // Act: Call the method with a null ClassLoader.
+        // The other arguments are non-null to isolate the cause of the exception.
+        VersionUtil.mavenVersionFor(null, "com.fasterxml.jackson.core", "jackson-core");
     }
 }
