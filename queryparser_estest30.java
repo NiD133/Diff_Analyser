@@ -1,17 +1,27 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest30 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":last-of-type");
-        assertEquals(":last-of-type", evaluator0.toString());
+    /**
+     * Verifies that the {@code :last-of-type} pseudo-selector is parsed correctly
+     * and that its string representation matches the original query.
+     */
+    @Test
+    public void shouldParseLastOfTypePseudoSelector() {
+        // Arrange
+        String query = ":last-of-type";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert
+        assertEquals("The toString() representation of the parsed evaluator should match the original query.",
+                query, evaluator.toString());
     }
 }
