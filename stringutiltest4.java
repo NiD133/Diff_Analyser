@@ -1,22 +1,29 @@
 package org.jsoup.internal;
 
-import org.jsoup.Jsoup;
-import org.junit.jupiter.api.Test;
-import java.util.Arrays;
-import java.util.Collections;
-import static org.jsoup.internal.StringUtil.normaliseWhitespace;
-import static org.jsoup.internal.StringUtil.resolve;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class StringUtilTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Test
-    public void isBlank() {
-        assertTrue(StringUtil.isBlank(null));
-        assertTrue(StringUtil.isBlank(""));
-        assertTrue(StringUtil.isBlank("      "));
-        assertTrue(StringUtil.isBlank("   \r\n  "));
-        assertFalse(StringUtil.isBlank("hello"));
-        assertFalse(StringUtil.isBlank("   hello   "));
+/**
+ * Tests for {@link StringUtil}.
+ */
+class StringUtilTest {
+
+    @ParameterizedTest
+    @NullAndEmptySource // Covers null and ""
+    @ValueSource(strings = {"  ", "   \r\n  "}) // Covers various whitespace-only strings
+    void isBlank_shouldReturnTrue_forNullOrWhitespaceStrings(String blankInput) {
+        // Act & Assert
+        assertTrue(StringUtil.isBlank(blankInput));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"hello", "   hello   "})
+    void isBlank_shouldReturnFalse_forNonBlankStrings(String nonBlankInput) {
+        // Act & Assert
+        assertFalse(StringUtil.isBlank(nonBlankInput));
     }
 }
