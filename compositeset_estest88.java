@@ -1,55 +1,29 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class CompositeSet_ESTestTest88 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CompositeSet} class, focusing on the toArray() method.
+ */
+public class CompositeSetToArrayTest {
 
-    @Test(timeout = 4000)
-    public void test87() throws Throwable {
-        CompositeSet<Boolean> compositeSet0 = new CompositeSet<Boolean>();
-        Object[] objectArray0 = compositeSet0.toArray();
-        assertEquals(0, objectArray0.length);
+    /**
+     * Tests that calling {@code toArray()} on a newly created, empty CompositeSet
+     * returns an empty, non-null object array.
+     */
+    @Test
+    public void toArrayOnEmptySetShouldReturnEmptyArray() {
+        // Arrange: Create an empty CompositeSet.
+        // The generic type is not critical for this test, so Object is used for generality.
+        CompositeSet<Object> emptyCompositeSet = new CompositeSet<>();
+
+        // Act: Call the toArray() method.
+        Object[] resultArray = emptyCompositeSet.toArray();
+
+        // Assert: Verify the returned array is what we expect.
+        assertNotNull("The result of toArray() should never be null.", resultArray);
+        assertEquals("The array from an empty set should have a length of 0.", 0, resultArray.length);
     }
 }
