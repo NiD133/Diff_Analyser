@@ -1,30 +1,35 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest25 extends PhoneticEngine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        NameType nameType0 = NameType.ASHKENAZI;
-        RuleType ruleType0 = RuleType.RULES;
-        PhoneticEngine phoneticEngine0 = null;
+/**
+ * Unit tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
+
+    /**
+     * Tests that the PhoneticEngine constructor throws an IllegalArgumentException
+     * when initialized with the disallowed RuleType.RULES.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionForRulesRuleType() {
+        // Arrange: Define the invalid input for the constructor.
+        // The RuleType.RULES is explicitly disallowed by the constructor's contract.
+        final NameType nameType = NameType.ASHKENAZI;
+        final RuleType invalidRuleType = RuleType.RULES;
+        final boolean concatenate = false;
+
+        // Act & Assert
         try {
-            phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // ruleType must not be RULES
-            //
-            verifyException("org.apache.commons.codec.language.bm.PhoneticEngine", e);
+            new PhoneticEngine(nameType, invalidRuleType, concatenate);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was thrown.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            final String expectedMessage = "ruleType must not be " + RuleType.RULES;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
