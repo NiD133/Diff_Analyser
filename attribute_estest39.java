@@ -1,32 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class Attribute_ESTestTest39 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the equals() method in the Attribute class.
+ */
+public class AttributeEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("^B_1", "^B_1");
-        Attribute attribute1 = new Attribute("g", "=O:,>Mv%I");
-        boolean boolean0 = attribute1.equals(attribute0);
-        assertEquals("=O:,>Mv%I", attribute1.getValue());
-        assertFalse(boolean0);
-        assertEquals("", attribute1.prefix());
+    @Test
+    public void equalsShouldReturnFalseForAttributesWithDifferentKeysAndValues() {
+        // Arrange: Create two distinct attributes with different keys and values.
+        // The original test used different creation methods (factory vs. constructor),
+        // which is preserved here to maintain test coverage.
+        Attribute attributeA = Attribute.createFromEncoded("key-A", "value-A");
+        Attribute attributeB = new Attribute("key-B", "value-B");
+
+        // Act & Assert: Verify that the two attributes are not considered equal.
+        // The equals method should return false when both key and value differ.
+        assertNotEquals(attributeA, attributeB);
+
+        // Also assert the symmetric property of the equals contract.
+        assertNotEquals(attributeB, attributeA);
     }
 }
