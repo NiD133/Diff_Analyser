@@ -1,31 +1,34 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest76 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test75() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that safeMultiply(int, int) throws an ArithmeticException
+     * when the multiplication result overflows the integer range.
+     */
+    @Test
+    public void safeMultiply_whenIntOverflow_shouldThrowArithmeticException() {
+        // Arrange: Define two integer values whose product will exceed Integer.MAX_VALUE.
+        // Multiplying the smallest possible integer by itself is a classic overflow case.
+        final int value1 = Integer.MIN_VALUE;
+        final int value2 = Integer.MIN_VALUE;
+
+        // Act & Assert
         try {
-            FieldUtils.safeMultiply(Integer.MIN_VALUE, Integer.MIN_VALUE);
-            fail("Expecting exception: ArithmeticException");
+            FieldUtils.safeMultiply(value1, value2);
+            fail("Expected an ArithmeticException to be thrown due to integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: -2147483648 * -2147483648
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the correct exception was thrown with the expected detailed message.
+            final String expectedMessage = "Multiplication overflows an int: -2147483648 * -2147483648";
+            assertEquals("The exception message did not match the expected overflow details.",
+                         expectedMessage, e.getMessage());
         }
     }
 }
