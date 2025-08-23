@@ -1,34 +1,41 @@
 package org.apache.commons.io.output;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlStreamWriter_ESTestTest20 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XmlStreamWriter} class.
+ */
+public class XmlStreamWriterTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream(pipedInputStream0);
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(pipedOutputStream0);
-        char[] charArray0 = new char[9];
-        xmlStreamWriter0.write(charArray0);
-        xmlStreamWriter0.flush();
-        assertEquals(9, pipedInputStream0.available());
+    /**
+     * Tests that writing a character array and flushing the writer correctly
+     * pushes the data to the underlying output stream. The test uses the default
+     * UTF-8 encoding, where single-byte ASCII characters are expected.
+     */
+    @Test
+    public void writeAndFlushShouldPushDataToUnderlyingStream() throws IOException {
+        // Arrange: Set up a PipedInputStream to capture the output from the writer.
+        // The PipedOutputStream and XmlStreamWriter will be closed automatically by try-with-resources.
+        final PipedInputStream inputStream = new PipedInputStream();
+        try (final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
+             final XmlStreamWriter xmlWriter = new XmlStreamWriter(outputStream)) {
+
+            final char[] dataToWrite = "test-data".toCharArray();
+            // In the default UTF-8 encoding, each ASCII character is one byte.
+            final int expectedByteCount = dataToWrite.length;
+
+            // Act: Write the character data and flush the stream to ensure it's sent.
+            xmlWriter.write(dataToWrite);
+            xmlWriter.flush();
+
+            // Assert: Verify that the correct number of bytes were written to the pipe.
+            assertEquals("The number of available bytes should match the number of characters written.",
+                    expectedByteCount, inputStream.available());
+        }
     }
 }
