@@ -1,22 +1,34 @@
 package org.apache.commons.lang3.exception;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultExceptionContext_ESTestTest2 extends DefaultExceptionContext_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        DefaultExceptionContext defaultExceptionContext1 = defaultExceptionContext0.addContextValue("\t[", "\t[");
-        Set<String> set0 = defaultExceptionContext1.getContextLabels();
-        assertFalse(set0.isEmpty());
+    /**
+     * Tests that a label added to the context is returned by getContextLabels().
+     */
+    @Test
+    public void getContextLabels_shouldContainLabel_afterAddingContextValue() {
+        // Arrange: Create a new context and define a label/value pair to add.
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+        final String testLabel = "Error Code";
+        final int testValue = 404;
+
+        // Act: Add the value to the context and retrieve the set of labels.
+        context.addContextValue(testLabel, testValue);
+        final Set<String> labels = context.getContextLabels();
+
+        // Assert: Verify that the set of labels is not empty and contains the added label.
+        assertFalse("The set of labels should not be empty after adding a value.", labels.isEmpty());
+        assertEquals("The set should contain exactly one label.", 1, labels.size());
+        assertTrue("The set of labels should contain the label that was added.", labels.contains(testLabel));
     }
 }
