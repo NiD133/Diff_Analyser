@@ -1,47 +1,42 @@
 package com.itextpdf.text.xml.xmp;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class XmpWriter_ESTestTest9 extends XmpWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "3Y'G95KH", 10633);
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream(1024);
-        // Undeclared exception!
-        xmpWriter0.serialize(byteArrayOutputStream0);
+    /**
+     * Verifies that the serialize(OutputStream) method throws a NullPointerException
+     * if the XmpWriter was constructed with a null OutputStream.
+     *
+     * This test case is based on an auto-generated test which identified that
+     * providing a null stream to the constructor causes a subsequent call to
+     * serialize() to fail, even when a valid stream is passed to serialize() itself.
+     * This suggests an unexpected internal state dependency.
+     */
+    @Test
+    public void serialize_whenConstructedWithNullOutputStream_throwsNullPointerException() throws IOException {
+        // Arrange
+        // Use arbitrary, non-standard encoding and padding values as found in the original test.
+        String arbitraryEncoding = "3Y'G95KH";
+        int arbitraryPadding = 10633;
+
+        // Create an XmpWriter instance with a null OutputStream, which is the
+        // specific condition under test.
+        XmpWriter xmpWriter = new XmpWriter(null, arbitraryEncoding, arbitraryPadding);
+        ByteArrayOutputStream validOutputStream = new ByteArrayOutputStream();
+
+        // Act & Assert
+        // The serialize method is expected to throw a NullPointerException because of
+        // how the writer was initialized, despite being passed a valid output stream.
+        assertThrows(NullPointerException.class, () -> {
+            xmpWriter.serialize(validOutputStream);
+        });
     }
 }
