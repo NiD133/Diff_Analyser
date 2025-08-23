@@ -1,49 +1,45 @@
 package com.itextpdf.text.xml.xmp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.xmp.XMPException;
 import com.itextpdf.xmp.XMPMeta;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class XmpWriter_ESTestTest2 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("qTF+8");
-        MockPrintStream mockPrintStream0 = new MockPrintStream(mockFileOutputStream0, true);
-        AsianFontMapper asianFontMapper0 = new AsianFontMapper("s'E=)qP", "Prducer");
-        HashMap<String, String> hashMap0 = asianFontMapper0.getAliases();
-        XmpWriter xmpWriter0 = new XmpWriter(mockPrintStream0, hashMap0);
-        xmpWriter0.setProperty("http://ns.adobe.com/pdf/1.3/", "UniGB-UCS2-H", "</rdf:Description></rdf:RDF>\n");
+/**
+ * Test suite for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that calling setProperty() correctly adds a new property
+     * to the internal XMP metadata object.
+     */
+    @Test
+    public void setPropertyShouldAddPropertyToXmpMetadata() throws IOException, XMPException {
+        // Arrange: Set up the XmpWriter and define the property to be added.
+        // A ByteArrayOutputStream is used as a lightweight, in-memory stream.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        
+        // The original test used a complex method to create a map.
+        // For this test's purpose, an empty map is sufficient and much clearer.
+        XmpWriter xmpWriter = new XmpWriter(outputStream, Collections.emptyMap());
+
+        final String schemaNamespace = "http://ns.adobe.com/pdf/1.3/";
+        final String propertyName = "CustomProducer";
+        final String expectedValue = "My Custom Application";
+
+        // Act: Call the method under test.
+        xmpWriter.setProperty(schemaNamespace, propertyName, expectedValue);
+
+        // Assert: Verify that the property was correctly set in the XMP metadata.
+        XMPMeta internalXmpMeta = xmpWriter.getXmpMeta();
+        String actualValue = internalXmpMeta.getPropertyString(schemaNamespace, propertyName);
+
+        assertEquals("The property value should be correctly set in the XMP metadata.", expectedValue, actualValue);
     }
 }
