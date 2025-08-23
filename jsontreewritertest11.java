@@ -1,28 +1,35 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.google.gson.Strictness;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonObject;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeWriterTestTest11 {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
     @Test
-    public void testSerializeNullsTrue() throws IOException {
+    public void writeNullProperty_whenSerializeNullsIsEnabled_succeeds() throws IOException {
+        // Arrange
         JsonTreeWriter writer = new JsonTreeWriter();
         writer.setSerializeNulls(true);
+
+        // Act
         writer.beginObject();
         writer.name("A");
         writer.nullValue();
         writer.endObject();
-        assertThat(writer.get().toString()).isEqualTo("{\"A\":null}");
+
+        // Assert
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.add("A", JsonNull.INSTANCE);
+        
+        JsonElement actualJson = writer.get();
+        assertThat(actualJson).isEqualTo(expectedJson);
     }
 }
