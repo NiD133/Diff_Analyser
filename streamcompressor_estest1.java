@@ -1,40 +1,37 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
 
-public class StreamCompressor_ESTestTest1 extends StreamCompressor_ESTest_scaffolding {
+/**
+ * Unit tests for the StreamCompressor class.
+ */
+public class StreamCompressorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StreamCompressor streamCompressor0 = StreamCompressor.create(0, (ScatterGatherBackingStore) null);
-        Enumeration<DataInputStream> enumeration0 = (Enumeration<DataInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        streamCompressor0.deflate(sequenceInputStream0, 0);
-        assertEquals(0L, streamCompressor0.getBytesWrittenForLastEntry());
-        assertEquals(0L, streamCompressor0.getBytesRead());
+    /**
+     * Verifies that deflating an empty input stream using the STORED method
+     * results in zero bytes being read from the source and zero bytes being
+     * written to the destination.
+     */
+    @Test
+    public void deflateWithEmptyInputStreamAndStoredMethodShouldWriteZeroBytes() throws IOException {
+        // Arrange: Set up the compressor and an empty input stream.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        StreamCompressor compressor = StreamCompressor.create(outputStream);
+        InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);
+
+        // Act: Call the method under test.
+        compressor.deflate(emptyInputStream, ZipEntry.STORED);
+
+        // Assert: Verify the outcome.
+        assertEquals("Bytes read from an empty stream should be 0", 0L, compressor.getBytesRead());
+        assertEquals("Bytes written for the entry should be 0", 0L, compressor.getBytesWrittenForLastEntry());
+        assertEquals("The underlying output stream should be empty", 0, outputStream.size());
     }
 }
