@@ -1,25 +1,36 @@
 package org.apache.commons.compress.archivers.cpio;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CpioUtil_ESTestTest9 extends CpioUtil_ESTest_scaffolding {
+/**
+ * Unit tests for the CpioUtil class.
+ */
+public class CpioUtilTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that long2byteArray throws an UnsupportedOperationException when the
+     * requested byte array length is zero. The method's contract requires a
+     * positive length.
+     */
+    @Test
+    public void long2byteArrayShouldThrowExceptionForZeroLength() {
+        // Arrange: The number and swapHalfWord parameters are arbitrary, as the
+        // exception is triggered by the invalid length.
+        final long anyNumber = 3061L;
+        final int invalidLength = 0;
+        final boolean swapHalfWord = true;
+
+        // Act & Assert
         try {
-            CpioUtil.long2byteArray(3061L, (byte) 0, true);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
+            CpioUtil.long2byteArray(anyNumber, invalidLength, swapHalfWord);
+            fail("Expected an UnsupportedOperationException for a non-positive length.");
+        } catch (final UnsupportedOperationException e) {
+            // This is the expected behavior.
+            // The original test also verified that the exception has no message.
+            assertNull("The exception message was expected to be null.", e.getMessage());
         }
     }
 }
