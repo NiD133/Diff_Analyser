@@ -1,19 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomUtils_ESTestTest37 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        double double0 = RandomUtils.nextDouble(269.70357193641604, 269.70357193641604);
-        assertEquals(269.70357193641604, double0, 0.01);
+    /**
+     * Tests that {@code RandomUtils.nextDouble(start, end)} returns the lower bound
+     * when the start and end bounds are identical. This verifies the behavior
+     * for a zero-sized range, which is an important edge case.
+     */
+    @Test
+    public void nextDoubleShouldReturnBoundWhenRangeIsZero() {
+        // Arrange: Define a representative boundary value. The specific value is not
+        // important, only that the start and end bounds are the same.
+        final double bound = 123.456;
+
+        // Act: Call the method with identical start and end bounds.
+        final double result = RandomUtils.nextDouble(bound, bound);
+
+        // Assert: The result must be exactly the boundary value.
+        // A delta of 0.0 is used for an exact floating-point comparison, as no
+        // random calculation should occur in this case.
+        assertEquals(bound, result, 0.0);
     }
 }
