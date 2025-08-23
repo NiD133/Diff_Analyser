@@ -1,23 +1,24 @@
 package org.apache.ibatis.datasource.jndi;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Properties;
+import static org.junit.Assert.assertNull;
+
 import javax.sql.DataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JndiDataSourceFactory_ESTestTest7 extends JndiDataSourceFactory_ESTest_scaffolding {
+/**
+ * Test suite for {@link JndiDataSourceFactory}.
+ */
+public class JndiDataSourceFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test6() throws Throwable {
-        JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
-        DataSource dataSource0 = jndiDataSourceFactory0.getDataSource();
-        assertNull(dataSource0);
+    @Test
+    public void shouldReturnNullDataSourceWhenNotConfigured() {
+        // Arrange: Create a new factory without setting any properties.
+        JndiDataSourceFactory factory = new JndiDataSourceFactory();
+
+        // Act: Attempt to get the data source.
+        DataSource dataSource = factory.getDataSource();
+
+        // Assert: The data source should be null as it has not been initialized via JNDI lookup.
+        assertNull("DataSource should be null before properties are set", dataSource);
     }
 }
