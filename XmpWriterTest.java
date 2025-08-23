@@ -1,45 +1,3 @@
-/*
-    This file is part of the iText (R) project.
-    Copyright (c) 1998-2022 iText Group NV
-    Authors: iText Software.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License version 3
-    as published by the Free Software Foundation with the addition of the
-    following permission added to Section 15 as permitted in Section 7(a):
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS
-    
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Affero General Public License for more details.
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, see http://www.gnu.org/licenses or write to
-    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-    Boston, MA, 02110-1301 USA, or download the license from the following URL:
-    http://itextpdf.com/terms-of-use/
-    
-    The interactive user interfaces in modified source and object code versions
-    of this program must display Appropriate Legal Notices, as required under
-    Section 5 of the GNU Affero General Public License.
-    
-    In accordance with Section 7(b) of the GNU Affero General Public License,
-    a covered work must retain the producer line in every PDF that is created
-    or manipulated using iText.
-    
-    You can be released from the requirements of the license by purchasing
-    a commercial license. Buying such a license is mandatory as soon as you
-    develop commercial activities involving the iText software without
-    disclosing the source code of your own applications.
-    These activities include: offering paid services to customers as an ASP,
-    serving PDFs on the fly in a web application, shipping iText with a closed
-    source product.
-    
-    For more information, please contact iText Software Corp. at this
-    address: sales@itextpdf.com
- */
 package com.itextpdf.text.xml.xmp;
 
 import com.itextpdf.testutils.CompareTool;
@@ -59,133 +17,173 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class XmpWriterTest {
+
     public static final String OUT_FOLDER = "./target/com/itextpdf/text/xml/xmp/";
     public static final String CMP_FOLDER = "./src/test/resources/com/itextpdf/text/xml/xmp/";
+
+    private static final String SAMPLE_PARAGRAPH = "Hello World";
+    private static final String[] SUBJECTS = { "Hello World", "XMP & Metadata", "Metadata" };
+    private static final String KEYWORDS = "Hello World, XMP & Metadata, Metadata";
+    private static final String PDF_VERSION = "1.4";
+    private static final String SOURCE_PDF_WITH_INFO = "pdf_metadata.pdf";
 
     @Before
     public void init() {
         new File(OUT_FOLDER).mkdirs();
     }
 
+    /**
+     * Writes XMP explicitly via XmpWriter and verifies it matches the reference.
+     */
     @Test
-    public void createPdfTest() throws IOException, DocumentException, XMPException {
+    public void explicitXmpMetadataIsWrittenAndMatchesReference() throws IOException, DocumentException, XMPException {
         String fileName = "xmp_metadata.pdf";
-        // step 1
+
         Document document = new Document();
-        // step 2
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUT_FOLDER + fileName));
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XmpWriter xmp = new XmpWriter(os);
 
-        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Hello World");
-        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "XMP & Metadata");
-        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Metadata");
+        ByteArrayOutputStream xmpBytes = new ByteArrayOutputStream();
+        XmpWriter xmp = new XmpWriter(xmpBytes);
 
-        PdfProperties.setKeywords(xmp.getXmpMeta(), "Hello World, XMP & Metadata, Metadata");
-        PdfProperties.setVersion(xmp.getXmpMeta(), "1.4");
-
+        addStandardSubjects(xmp);
+        PdfProperties.setKeywords(xmp.getXmpMeta(), KEYWORDS);
+        PdfProperties.setVersion(xmp.getXmpMeta(), PDF_VERSION);
         xmp.close();
 
-        writer.setXmpMetadata(os.toByteArray());
-        // step 3
+        writer.setXmpMetadata(xmpBytes.toByteArray());
+
         document.open();
-        // step 4
-        document.add(new Paragraph("Hello World"));
-        // step 5
+        addSampleContent(document);
         document.close();
 
-        CompareTool ct = new CompareTool();
-        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
+        assertXmpEquals(fileName, fileName);
     }
 
+    /**
+     * Uses writer.createXmpMetadata() to auto-generate XMP from document info.
+     */
     @Test
-    public void createPdfAutomaticTest() throws IOException, DocumentException {
+    public void automaticXmpMetadataMatchesReference() throws IOException, DocumentException {
         String fileName = "xmp_metadata_automatic.pdf";
-        // step 1
+
         Document document = new Document();
-        // step 2
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUT_FOLDER + fileName));
+
         document.addTitle("Hello World example");
         document.addSubject("This example shows how to add metadata & XMP");
         document.addKeywords("Metadata, iText, step 3");
         document.addCreator("My program using 'iText'");
         document.addAuthor("Bruno Lowagie & Paulo Soares");
         writer.createXmpMetadata();
-        // step 3
+
         document.open();
-        // step 4
-        document.add(new Paragraph("Hello World"));
-        // step 5
+        addSampleContent(document);
         document.close();
-        CompareTool ct = new CompareTool();
-        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
+
+        assertXmpEquals(fileName, fileName);
     }
 
+    /**
+     * Reads an existing PDF's document info and writes equivalent XMP into a stamped output.
+     */
     @Test
-    public void manipulatePdfTest() throws IOException, DocumentException {
+    public void stampingAddsXmpFromDocInfoAndMatchesReference() throws IOException, DocumentException {
         String fileName = "xmp_metadata_added.pdf";
-        PdfReader reader = new PdfReader(CMP_FOLDER + "pdf_metadata.pdf");
+
+        PdfReader reader = new PdfReader(CMP_FOLDER + SOURCE_PDF_WITH_INFO);
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(OUT_FOLDER + fileName));
+
         HashMap<String, String> info = reader.getInfo();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XmpWriter xmp = new XmpWriter(baos, info);
+
+        ByteArrayOutputStream xmpBytes = new ByteArrayOutputStream();
+        XmpWriter xmp = new XmpWriter(xmpBytes, info);
         xmp.close();
-        stamper.setXmpMetadata(baos.toByteArray());
+
+        stamper.setXmpMetadata(xmpBytes.toByteArray());
+
         stamper.close();
         reader.close();
 
-        CompareTool ct = new CompareTool();
-        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
+        assertXmpEquals(fileName, fileName);
     }
 
+    /**
+     * Creates XMP on a stamper and enriches it with subjects and version info.
+     */
     @Test
-    public void manipulatePdf2Test() throws IOException, DocumentException, XMPException {
+    public void stampingCreatesAndEnrichesXmpAndMatchesReference() throws IOException, DocumentException, XMPException {
         String fileName = "xmp_metadata_added2.pdf";
-        PdfReader reader = new PdfReader(CMP_FOLDER + "pdf_metadata.pdf");
+
+        PdfReader reader = new PdfReader(CMP_FOLDER + SOURCE_PDF_WITH_INFO);
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(OUT_FOLDER + fileName));
+
         stamper.createXmpMetadata();
         XmpWriter xmp = stamper.getXmpWriter();
-        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Hello World");
-        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "XMP & Metadata");
-        DublinCoreProperties.addSubject(xmp.getXmpMeta(), "Metadata");
 
-        PdfProperties.setVersion(xmp.getXmpMeta(), "1.4");
+        addStandardSubjects(xmp);
+        PdfProperties.setVersion(xmp.getXmpMeta(), PDF_VERSION);
+
         stamper.close();
         reader.close();
 
-        CompareTool ct = new CompareTool();
-        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + fileName, true));
+        assertXmpEquals(fileName, fileName);
     }
 
+    /**
+     * Verifies deprecated XMP-creation logic still produces the same XMP as the explicit approach.
+     */
     @Test
-    public void deprecatedLogicTest() throws IOException, DocumentException {
+    public void deprecatedXmpCreationStillMatchesReference() throws IOException, DocumentException {
         String fileName = "xmp_metadata_deprecated.pdf";
-        // step 1
+
         Document document = new Document();
-        // step 2
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(OUT_FOLDER + fileName));
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XmpWriter xmp = new XmpWriter(os);
+
+        ByteArrayOutputStream xmpBytes = new ByteArrayOutputStream();
+        XmpWriter xmp = new XmpWriter(xmpBytes);
+
+        // Build XMP using deprecated APIs to ensure backward compatibility
         XmpSchema dc = new com.itextpdf.text.xml.xmp.DublinCoreSchema();
         XmpArray subject = new XmpArray(XmpArray.UNORDERED);
-        subject.add("Hello World");
-        subject.add("XMP & Metadata");
-        subject.add("Metadata");
+        for (String s : SUBJECTS) {
+            subject.add(s);
+        }
         dc.setProperty(DublinCoreSchema.SUBJECT, subject);
         xmp.addRdfDescription(dc.getXmlns(), dc.toString());
+
         PdfSchema pdf = new PdfSchema();
-        pdf.setProperty(PdfSchema.KEYWORDS, "Hello World, XMP & Metadata, Metadata");
-        pdf.setProperty(PdfSchema.VERSION, "1.4");
+        pdf.setProperty(PdfSchema.KEYWORDS, KEYWORDS);
+        pdf.setProperty(PdfSchema.VERSION, PDF_VERSION);
         xmp.addRdfDescription(pdf);
+
         xmp.close();
-        writer.setXmpMetadata(os.toByteArray());
-        // step 3
+
+        writer.setXmpMetadata(xmpBytes.toByteArray());
+
         document.open();
-        // step 4
-        document.add(new Paragraph("Hello World"));
-        // step 5
+        addSampleContent(document);
         document.close();
+
+        // Compare with the non-deprecated explicit reference file
+        assertXmpEquals(fileName, "xmp_metadata.pdf");
+    }
+
+    // ---------- Helper methods ----------
+
+    private void addStandardSubjects(XmpWriter xmp) throws XMPException {
+        for (String subject : SUBJECTS) {
+            DublinCoreProperties.addSubject(xmp.getXmpMeta(), subject);
+        }
+    }
+
+    private void addSampleContent(Document document) throws DocumentException {
+        document.add(new Paragraph(SAMPLE_PARAGRAPH));
+    }
+
+    private void assertXmpEquals(String actualFileName, String expectedFileName) throws IOException {
         CompareTool ct = new CompareTool();
-        Assert.assertNull(ct.compareXmp(OUT_FOLDER + fileName, CMP_FOLDER + "xmp_metadata.pdf", true));
+        String actual = OUT_FOLDER + actualFileName;
+        String expected = CMP_FOLDER + expectedFileName;
+        Assert.assertNull(ct.compareXmp(actual, expected, true));
     }
 }
