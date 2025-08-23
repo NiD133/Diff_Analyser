@@ -1,27 +1,36 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
-import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest6 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        VerificationOverTimeImpl verificationOverTimeImpl1 = verificationOverTimeImpl0.copyWithVerificationMode((VerificationMode) null);
-        assertFalse(verificationOverTimeImpl1.equals((Object) verificationOverTimeImpl0));
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * Verifies that copyWithVerificationMode() creates a new, distinct instance
+     * rather than modifying or returning the original object.
+     */
+    @Test
+    public void copyWithVerificationModeShouldReturnNewInstance() {
+        // Arrange: Create an initial VerificationOverTimeImpl instance.
+        // The specific constructor arguments are not critical for this test's purpose.
+        VerificationMode delegateMode = null;
+        VerificationOverTimeImpl originalMode = new VerificationOverTimeImpl(100L, 50L, delegateMode, true);
+
+        // Act: Create a copy of the original instance.
+        VerificationOverTimeImpl copiedMode = originalMode.copyWithVerificationMode(delegateMode);
+
+        // Assert: The copied object should be a new instance and therefore not the same as the original.
+        // We assert that the two references point to different objects in memory.
+        assertNotSame(originalMode, copiedMode);
+
+        // As a secondary check, since VerificationOverTimeImpl does not override equals(),
+        // this assertion is equivalent to assertNotSame().
+        assertNotEquals(originalMode, copiedMode);
     }
 }
