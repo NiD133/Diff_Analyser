@@ -1,30 +1,38 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class contains tests for the {@link PhoneticEngine} constructor.
+ * Note: The class name and inheritance structure are preserved from the original
+ * auto-generated test.
+ */
 public class PhoneticEngine_ESTestTest8 extends PhoneticEngine_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        NameType nameType0 = NameType.SEPHARDIC;
-        RuleType ruleType0 = RuleType.RULES;
-        PhoneticEngine phoneticEngine0 = null;
+    /**
+     * Tests that the PhoneticEngine constructor throws an IllegalArgumentException
+     * when the provided RuleType is RULES, as this is an explicitly disallowed value.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionWhenRuleTypeIsRules() {
+        // Arrange: The RuleType.RULES is an invalid argument for the constructor.
+        // The other parameters can be any valid value, as they are not under test.
+        final NameType anyNameType = NameType.SEPHARDIC;
+        final RuleType invalidRuleType = RuleType.RULES;
+        final boolean anyConcat = true;
+        final int anyMaxPhonemes = 10;
+        final String expectedMessage = "ruleType must not be " + RuleType.RULES;
+
         try {
-            phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, true, 772);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // ruleType must not be RULES
-            //
-            verifyException("org.apache.commons.codec.language.bm.PhoneticEngine", e);
+            // Act: Attempt to create a PhoneticEngine with the invalid RuleType.
+            new PhoneticEngine(anyNameType, invalidRuleType, anyConcat, anyMaxPhonemes);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
+        } catch (final IllegalArgumentException e) {
+            // Assert: Verify that the caught exception has the expected message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
