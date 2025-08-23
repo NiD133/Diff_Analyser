@@ -1,43 +1,40 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
-import java.io.IOException;
+
 import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest14 extends MergedStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MergedStream} class, focusing on edge cases and error handling.
+ */
+public class MergedStreamTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[1];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, (byte) 98, (byte) 98);
-        // Undeclared exception!
-        try {
-            mergedStream0.read(byteArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling read() on a MergedStream throws an ArrayIndexOutOfBoundsException
+     * if the stream was constructed with a starting pointer that is outside the bounds of the
+     * initial buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void read_whenConstructedWithOutOfBoundsStartIndex_shouldThrowException() throws Exception {
+        // Arrange: Set up a MergedStream where the initial read position in the
+        //          pre-filled buffer is invalid.
+        byte[] buffer = new byte[10];
+        int outOfBoundsStartIndex = 100; // An index clearly outside the buffer's valid range [0-9]
+        int endIndex = 100;
+        InputStream underlyingStream = new PipedInputStream(); // A dummy stream, as it won't be reached.
+
+        // The IOContext is not relevant for this specific failure path, so null is acceptable.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, buffer, outOfBoundsStartIndex, endIndex);
+
+        byte[] destination = new byte[10];
+
+        // Act: Attempt to read from the stream. This should immediately try to access the
+        // internal buffer at the invalid start index.
+        mergedStream.read(destination);
+
+        // Assert: The test is expected to throw an ArrayIndexOutOfBoundsException,
+        // which is handled by the @Test(expected=...) annotation. The test will fail
+        // if any other exception is thrown or if no exception is thrown.
     }
 }
