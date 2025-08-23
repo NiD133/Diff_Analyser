@@ -1,27 +1,36 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest45 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        byte[] byteArray0 = new byte[16];
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        // Undeclared exception!
+    /**
+     * Tests that the {@code add(byte[], int, int)} method throws an
+     * IllegalArgumentException when the provided offset is negative.
+     */
+    @Test
+    public void addWithNegativeOffsetShouldThrowIllegalArgumentException() {
+        // Arrange
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] sourceData = new byte[16];
+        final int negativeOffset = -4;
+        // The length is also invalid, but the implementation checks the offset first.
+        final int anyLength = -4;
+
+        // Act & Assert
         try {
-            circularByteBuffer0.add(byteArray0, (int) (byte) (-4), (int) (byte) (-4));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: -4
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.add(sourceData, negativeOffset, anyLength);
+            fail("Expected an IllegalArgumentException to be thrown due to the negative offset.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message is correct.
+            final String expectedMessage = "Illegal offset: " + negativeOffset;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
