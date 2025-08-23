@@ -1,25 +1,31 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class LinkedTreeMap_ESTestTest13 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LinkedTreeMap} class, focusing on specific edge cases.
+ */
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>((Comparator<? super Integer>) null, true);
-        linkedTreeMap0.findByObject(linkedTreeMap0);
-        assertEquals(0, linkedTreeMap0.size());
+    /**
+     * Verifies that findByObject() returns null when called with a key of an incompatible type,
+     * without modifying the map.
+     */
+    @Test
+    public void findByObject_withIncompatibleKeyType_shouldReturnNullAndNotModifyMap() {
+        // Arrange: Create an empty map that expects Integer keys.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        Object incompatibleKey = "this is a string, not an integer";
+
+        // Act: Attempt to find a node using a key of an incompatible type.
+        // The findByObject method is expected to catch the internal ClassCastException
+        // that occurs when casting the key and return null.
+        LinkedTreeMap.Node<Integer, String> foundNode = map.findByObject(incompatibleKey);
+
+        // Assert: The method should return null, and the map should remain unchanged.
+        assertNull("findByObject should return null for an incompatible key type.", foundNode);
+        assertEquals("The map's size should remain 0 after a failed search.", 0, map.size());
     }
 }
