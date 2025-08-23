@@ -2,147 +2,142 @@ package org.apache.commons.lang3.reflect;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang3.AbstractLangTest;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.BeforeEach;
+
+import java.lang.reflect.InvocationTargetException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ConstructorUtilsTestTest6 extends AbstractLangTest {
+/**
+ * Unit tests for {@link ConstructorUtils#invokeExactConstructor(Class, Object...)}
+ * and {@link ConstructorUtils#invokeExactConstructor(Class, Object[], Class[])}.
+ */
+class ConstructorUtilsInvokeExactConstructorTest {
 
-    private final Map<Class<?>, Class<?>[]> classCache;
-
-    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
-        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
-    }
-
-    @BeforeEach
-    public void setUp() {
-        classCache.clear();
-    }
-
-    private Class<?>[] singletonArray(final Class<?> c) {
-        Class<?>[] result = classCache.get(c);
-        if (result == null) {
-            result = new Class[] { c };
-            classCache.put(c, result);
-        }
-        return result;
-    }
-
-    private String toString(final Class<?>[] c) {
-        return Arrays.asList(c).toString();
-    }
+    // region Test Fixtures
 
     private static class BaseClass {
-    }
-
-    static class PrivateClass {
-
-        @SuppressWarnings("unused")
-        public static class PublicInnerClass {
-
-            public PublicInnerClass() {
-            }
-        }
-
-        @SuppressWarnings("unused")
-        public PrivateClass() {
-        }
     }
 
     private static final class SubClass extends BaseClass {
     }
 
+    /**
+     * A test bean with various constructors, used to verify that the correct
+     * one is invoked. The toString() method returns a string representation
+     * of the constructor's signature that was called.
+     */
     public static class TestBean {
 
         private final String toString;
-
         final String[] varArgs;
 
         public TestBean() {
-            toString = "()";
-            varArgs = null;
+            this.toString = "()";
+            this.varArgs = null;
         }
 
-        public TestBean(final BaseClass bc, final String... s) {
-            toString = "(BaseClass, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final double d) {
-            toString = "(double)";
-            varArgs = null;
-        }
-
-        public TestBean(final int i) {
-            toString = "(int)";
-            varArgs = null;
+        public TestBean(final String s) {
+            this.toString = "(String)";
+            this.varArgs = null;
         }
 
         public TestBean(final Integer i) {
-            toString = "(Integer)";
-            varArgs = null;
+            this.toString = "(Integer)";
+            this.varArgs = null;
+        }
+
+        public TestBean(final double d) {
+            this.toString = "(double)";
+            this.varArgs = null;
+        }
+
+        public TestBean(final Object o) {
+            this.toString = "(Object)";
+            this.varArgs = null;
+        }
+
+        // Constructors with varargs, not used in these specific tests but part of the fixture
+        public TestBean(final String... s) {
+            this.toString = "(String...)";
+            this.varArgs = s;
         }
 
         public TestBean(final Integer first, final int... args) {
-            toString = "(Integer, String...)";
-            varArgs = new String[args.length];
+            this.toString = "(Integer, String...)";
+            this.varArgs = new String[args.length];
             for (int i = 0; i < args.length; ++i) {
                 varArgs[i] = Integer.toString(args[i]);
             }
         }
 
         public TestBean(final Integer i, final String... s) {
-            toString = "(Integer, String...)";
-            varArgs = s;
+            this.toString = "(Integer, String...)";
+            this.varArgs = s;
         }
 
-        public TestBean(final Object o) {
-            toString = "(Object)";
-            varArgs = null;
-        }
-
-        public TestBean(final String s) {
-            toString = "(String)";
-            varArgs = null;
-        }
-
-        public TestBean(final String... s) {
-            toString = "(String...)";
-            varArgs = s;
+        public TestBean(final BaseClass bc, final String... s) {
+            this.toString = "(BaseClass, String...)";
+            this.varArgs = s;
         }
 
         @Override
         public String toString() {
             return toString;
         }
+    }
+    // endregion
 
-        void verify(final String str, final String[] args) {
-            assertEquals(str, toString);
-            assertArrayEquals(args, varArgs);
-        }
+    @Test
+    @DisplayName("invokeExactConstructor() with no arguments should invoke the no-arg constructor")
+    void invokeWithNoArgsShouldCallNoArgConstructor() throws Exception {
+        final TestBean instance = ConstructorUtils.invokeExactConstructor(TestBean.class);
+        assertEquals("()", instance.toString());
     }
 
     @Test
-    void testInvokeExactConstructor() throws Exception {
-        assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) ArrayUtils.EMPTY_CLASS_ARRAY).toString());
-        assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) null).toString());
-        assertEquals("(String)", ConstructorUtils.invokeExactConstructor(TestBean.class, "").toString());
-        assertEquals("(Object)", ConstructorUtils.invokeExactConstructor(TestBean.class, new Object()).toString());
-        assertEquals("(Integer)", ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.INTEGER_ONE).toString());
-        assertEquals("(double)", ConstructorUtils.invokeExactConstructor(TestBean.class, new Object[] { NumberUtils.DOUBLE_ONE }, new Class[] { Double.TYPE }).toString());
-        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.BYTE_ONE));
-        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.LONG_ONE));
-        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, Boolean.TRUE));
+    @DisplayName("invokeExactConstructor() with a null arguments array should invoke the no-arg constructor")
+    void invokeWithNullArgsShouldCallNoArgConstructor() throws Exception {
+        final TestBean instance = ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) null);
+        assertEquals("()", instance.toString());
+    }
+
+    @Test
+    @DisplayName("invokeExactConstructor() should find a constructor with an exact String argument match")
+    void invokeWithExactStringArg() throws Exception {
+        final TestBean instance = ConstructorUtils.invokeExactConstructor(TestBean.class, "test");
+        assertEquals("(String)", instance.toString());
+    }
+
+    @Test
+    @DisplayName("invokeExactConstructor() should find a constructor with an exact Object argument match")
+    void invokeWithExactObjectArg() throws Exception {
+        final TestBean instance = ConstructorUtils.invokeExactConstructor(TestBean.class, new Object());
+        assertEquals("(Object)", instance.toString());
+    }
+
+    @Test
+    @DisplayName("invokeExactConstructor() should find a constructor with an exact Integer argument match")
+    void invokeWithExactIntegerArg() throws Exception {
+        final TestBean instance = ConstructorUtils.invokeExactConstructor(TestBean.class, 1);
+        assertEquals("(Integer)", instance.toString());
+    }
+
+    @Test
+    @DisplayName("invokeExactConstructor() should find a constructor with a primitive double argument")
+    void invokeWithPrimitiveDoubleArg() throws Exception {
+        final Object[] args = {1.0d};
+        final Class<?>[] parameterTypes = {double.class};
+        final TestBean instance = ConstructorUtils.invokeExactConstructor(TestBean.class, args, parameterTypes);
+        assertEquals("(double)", instance.toString());
+    }
+
+    @Test
+    @DisplayName("invokeExactConstructor() should throw NoSuchMethodException for non-matching argument types")
+    void invokeWithNonMatchingArgsThrowsException() {
+        // TestBean has no constructor for byte, long, or boolean
+        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, (byte) 1));
+        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, 1L));
+        assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, true));
     }
 }
