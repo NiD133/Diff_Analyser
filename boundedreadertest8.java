@@ -1,65 +1,56 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest8 {
+/**
+ * Tests for {@link BoundedReader}, focusing on the interaction between mark/reset
+ * and the reader's character bound.
+ */
+public class BoundedReaderTest {
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
-
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * Tests that calling mark() with a readAheadLimit greater than the BoundedReader's
+     * maximum character limit still works correctly.
+     * <p>
+     * The reader should be able to reset and re-read, but it must still enforce its
+     * original bound and return EOF once the total number of characters read reaches that bound.
+     * </p>
+     */
     @Test
-    void testMarkResetMarkMore() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.mark(4);
-            mr.read();
-            mr.read();
-            mr.read();
-            mr.reset();
-            mr.read();
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
+    void testMarkWithReadAheadLimitGreaterThanBound() throws IOException {
+        // Arrange
+        final String inputData = "0123456789";
+        final int bound = 3;
+        // Use a readAheadLimit that is intentionally larger than the reader's bound
+        // to test that the bound is still respected.
+        final int readAheadLimit = bound + 1;
+        final Reader underlyingReader = new StringReader(inputData);
+
+        try (final BoundedReader boundedReader = new BoundedReader(underlyingReader, bound)) {
+            // Act: Mark the initial position.
+            boundedReader.mark(readAheadLimit);
+
+            // Assert: Read up to the bound, verifying the content.
+            assertEquals('0', boundedReader.read());
+            assertEquals('1', boundedReader.read());
+            assertEquals('2', boundedReader.read());
+
+            // Act: Reset the reader to the marked position.
+            boundedReader.reset();
+
+            // Assert: We can read the same characters again after the reset.
+            assertEquals('0', boundedReader.read());
+            assertEquals('1', boundedReader.read());
+            assertEquals('2', boundedReader.read());
+
+            // Assert: The next read should return EOF, as we have hit the bound (3 chars).
+            // This confirms the BoundedReader's limit is enforced even after a reset.
+            assertEquals(-1, boundedReader.read(), "Reader should return EOF after reading the maximum number of characters.");
         }
     }
 }
