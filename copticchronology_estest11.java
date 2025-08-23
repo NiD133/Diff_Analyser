@@ -1,20 +1,37 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertNotEquals;
 
-public class CopticChronology_ESTestTest11 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link CopticChronology} class, focusing on object equality.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance();
-        CopticChronology copticChronology1 = new CopticChronology((Chronology) null, copticChronology0, 1);
-        assertFalse(copticChronology1.equals((Object) copticChronology0));
+    @Test
+    public void equals_returnsFalse_forInstancesWithDifferentInternalParameters() {
+        // ARRANGE
+        // Get a standard, cached instance of CopticChronology.
+        // Its internal 'param' object, used for equality checks, is null.
+        CopticChronology standardInstance = CopticChronology.getInstance();
+
+        // Create a second instance using a package-private constructor.
+        // We deliberately pass the first instance as the 'param' object, making its
+        // internal state different from the standard instance.
+        CopticChronology instanceWithCustomParam = new CopticChronology(
+                null,               // Base chronology
+                standardInstance,   // 'param' object for equality check
+                1                   // minDaysInFirstWeek
+        );
+
+        // ACT & ASSERT
+        // The two instances should not be equal because the equals() method in the
+        // base class compares the internal 'param' object.
+        assertNotEquals(
+                "Chronology instances with different internal parameters should not be equal.",
+                standardInstance,
+                instanceWithCustomParam
+        );
     }
 }
