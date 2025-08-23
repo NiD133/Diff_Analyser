@@ -1,31 +1,40 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import com.google.common.hash.Crc32cHashFunction.Crc32cHasher;
+import org.junit.Test;
+
+// The scaffolding class is kept for structural compatibility with the original test suite.
 public class AbstractStreamingHasher_ESTestTest6 extends AbstractStreamingHasher_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        crc32cHashFunction_Crc32cHasher0.makeHash();
-        crc32cHashFunction_Crc32cHasher0.putLong((-4265267296055464877L));
-        // Undeclared exception!
+    /**
+     * Tests that attempting to add data to a hasher after it has been finalized
+     * throws an IllegalStateException when its internal buffer is flushed.
+     */
+    @Test
+    public void putLong_afterHashFinalized_throwsIllegalStateExceptionOnBufferFlush() {
+        // Arrange: Create a hasher and finalize it by calling the protected makeHash() method.
+        // This test targets a specific internal behavior. It simulates the state after a hash
+        // has been computed, which should prevent further data processing.
+        Crc32cHasher hasher = new Crc32cHashFunction.Crc32cHasher();
+        hasher.makeHash();
+
+        // Act 1: The first call to putLong() succeeds. It writes to the hasher's
+        // internal buffer but does not fill it enough to trigger a processing cycle (a "flush").
+        hasher.putLong(-4265267296055464877L);
+
+        // Act 2 & Assert: The second call to putLong() is designed to overfill the buffer,
+        // forcing a flush. Since the hasher has already been finalized, this operation is
+        // expected to fail by throwing an IllegalStateException.
         try {
-            crc32cHashFunction_Crc32cHasher0.putLong(2304L);
-            fail("Expecting exception: IllegalStateException");
+            hasher.putLong(2304L);
+            fail("Expected an IllegalStateException, but it was not thrown.");
         } catch (IllegalStateException e) {
-            //
-            // The behavior of calling any method after calling hash() is undefined.
-            //
-            verifyException("com.google.common.hash.Crc32cHashFunction$Crc32cHasher", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals(
+                "The behavior of calling any method after calling hash() is undefined.", e.getMessage());
         }
     }
 }
