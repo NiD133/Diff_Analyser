@@ -1,26 +1,45 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest38 extends JsonIgnoreProperties_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.construct(linkedHashSet0, false, false, false, false);
-        linkedHashSet0.contains(jsonIgnoreProperties_Value0);
-        assertFalse(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value0.getMerge());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowSetters());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class.
+ */
+public class JsonIgnorePropertiesValueTest {
+
+    /**
+     * Verifies that the `construct` factory method correctly creates an instance
+     * with the specified properties, particularly when all boolean flags are set to false.
+     */
+    @Test
+    public void shouldConstructValueWithAllBooleanFlagsDisabled() {
+        // Arrange
+        Set<String> ignoredProperties = Collections.emptySet();
+        boolean ignoreUnknown = false;
+        boolean allowGetters = false;
+        boolean allowSetters = false;
+        boolean merge = false;
+
+        // Act
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.construct(
+                ignoredProperties,
+                ignoreUnknown,
+                allowGetters,
+                allowSetters,
+                merge
+        );
+
+        // Assert
+        assertEquals("Ignored properties set should be empty", ignoredProperties, value.getIgnored());
+        assertFalse("ignoreUnknown should be false", value.getIgnoreUnknown());
+        assertFalse("allowGetters should be false", value.getAllowGetters());
+        assertFalse("allowSetters should be false", value.getAllowSetters());
+        assertFalse("merge should be false", value.getMerge());
     }
 }
