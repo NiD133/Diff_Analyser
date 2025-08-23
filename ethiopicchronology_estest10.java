@@ -1,28 +1,36 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class EthiopicChronology_ESTestTest10 extends EthiopicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1900);
-        // Undeclared exception!
-        try {
-            EthiopicChronology.getInstance(dateTimeZone0, (-4898));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid min days in first week: -4898
-            //
-            verifyException("org.joda.time.chrono.EthiopicChronology", e);
-        }
+/**
+ * Tests for the factory method {@link EthiopicChronology#getInstance(DateTimeZone, int)}.
+ */
+public class EthiopicChronologyTest {
+
+    /**
+     * Verifies that getInstance() throws an IllegalArgumentException when the
+     * 'minDaysInFirstWeek' parameter is outside the valid range of 1 to 7.
+     */
+    @Test
+    public void getInstance_withInvalidMinDaysInFirstWeek_throwsIllegalArgumentException() {
+        // Arrange: Define an invalid value for the minimum days in the first week.
+        // The valid range is [1, 7].
+        final int invalidMinDays = -4898;
+        final DateTimeZone utcZone = DateTimeZone.UTC;
+        final String expectedErrorMessage = "Invalid min days in first week: " + invalidMinDays;
+
+        // Act & Assert: Use assertThrows to verify that the correct exception is thrown.
+        // This is a modern, readable way to test for expected exceptions.
+        IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> EthiopicChronology.getInstance(utcZone, invalidMinDays)
+        );
+
+        // Further assert that the exception message is as expected.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
