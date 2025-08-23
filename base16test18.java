@@ -1,62 +1,83 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class Base16TestTest18 {
+/**
+ * Tests for the Base16 class, focusing on encoding operations.
+ */
+public class Base16EncodingTest {
 
     private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 
-    private final Random random = new Random();
+    private Base16 base16;
+
+    @BeforeEach
+    void setUp() {
+        // Use the default Base16 encoder, which produces upper-case output.
+        base16 = new Base16();
+    }
 
     /**
-     * @return the random.
+     * Provides a stream of test cases with plain text and their known Base16 (hex) encoded representation.
+     *
+     * @return A stream of arguments for the parameterized test.
      */
-    public Random getRandom() {
-        return this.random;
+    static Stream<Arguments> knownEncodings() {
+        return Stream.of(
+            Arguments.of("The quick brown fox jumped over the lazy dogs.", "54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e"),
+            Arguments.of("It was the best of times, it was the worst of times.", "497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e"),
+            Arguments.of("http://jakarta.apache.org/commmons", "687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73"),
+            Arguments.of("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz", "4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a"),
+            Arguments.of("{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }", "7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d"),
+            Arguments.of("xyzzy!", "78797a7a7921")
+        );
     }
 
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
+    @DisplayName("Should encode well-known strings correctly")
+    @ParameterizedTest(name = "Input: \"{0}\"")
+    @MethodSource("knownEncodings")
+    void testEncodeWithKnownValues(final String plainText, final String expectedHex) {
+        // Arrange
+        final byte[] plainBytes = plainText.getBytes(CHARSET_UTF8);
 
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
+        // Act
+        final byte[] encodedBytes = base16.encode(plainBytes);
+        final String actualHex = new String(encodedBytes, CHARSET_UTF8);
+
+        // Assert
+        assertEquals(expectedHex, actualHex);
     }
 
     @Test
-    void testKnownEncodings() {
-        assertEquals("54686520717569636b2062726f776e20666f78206a756d706564206f76657220746865206c617a7920646f67732e", new String(new Base16(true).encode("The quick brown fox jumped over the lazy dogs.".getBytes(CHARSET_UTF8))));
-        assertEquals("497420776173207468652062657374206f662074696d65732c206974207761732074686520776f727374206f662074696d65732e", new String(new Base16(true).encode("It was the best of times, it was the worst of times.".getBytes(CHARSET_UTF8))));
-        assertEquals("687474703a2f2f6a616b617274612e6170616368652e6f72672f636f6d6d6d6f6e73", new String(new Base16(true).encode("http://jakarta.apache.org/commmons".getBytes(CHARSET_UTF8))));
-        assertEquals("4161426243634464456546664767486849694a6a4b6b4c6c4d6d4e6e4f6f50705171527253735474557556765777587859795a7a", new String(new Base16(true).encode("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz".getBytes(CHARSET_UTF8))));
-        assertEquals("7b20302c20312c20322c20332c20342c20352c20362c20372c20382c2039207d", new String(new Base16(true).encode("{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }".getBytes(CHARSET_UTF8))));
-        assertEquals("78797a7a7921", new String(new Base16(true).encode("xyzzy!".getBytes(CHARSET_UTF8))));
+    @DisplayName("Should encode a sub-array correctly, ignoring surrounding bytes")
+    void testEncodeSubArrayIgnoringPadding() {
+        // Arrange
+        final String contentToEncode = "Hello World";
+        final String expectedHex = "48656C6C6F20576F726C64";
+        final byte[] contentBytes = contentToEncode.getBytes(CHARSET_UTF8);
+
+        final int prefixPaddingSize = 5;
+        final int suffixPaddingSize = 10;
+
+        // Create a buffer with the content surrounded by padding bytes (zeros)
+        final byte[] buffer = new byte[prefixPaddingSize + contentBytes.length + suffixPaddingSize];
+        System.arraycopy(contentBytes, 0, buffer, prefixPaddingSize, contentBytes.length);
+
+        // Act: Encode only the relevant part of the buffer
+        final byte[] encodedBytes = base16.encode(buffer, prefixPaddingSize, contentBytes.length);
+        final String actualHex = new String(encodedBytes, CHARSET_UTF8);
+
+        // Assert
+        assertEquals(expectedHex, actualHex, "Encoding a sub-array should ignore the padding bytes.");
     }
 }
