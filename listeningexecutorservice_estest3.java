@@ -1,45 +1,56 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Duration;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ListeningExecutorService_ESTestTest3 extends ListeningExecutorService_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
+/**
+ * Contains tests for implementations of {@link ListeningExecutorService}.
+ */
+public class ListeningExecutorServiceTest {
+
+    /**
+     * This test verifies that calling invokeAny results in a NoClassDefFoundError
+     * if a core internal dependency is missing from the classpath.
+     *
+     * This is an edge-case test, likely originating from an auto-generation tool
+     * that discovered a brittle dependency. It confirms that the service fails predictably
+     * in a broken environment.
+     */
     @Test(timeout = 4000)
-    public void test2() throws Throwable {
-        DirectExecutorService directExecutorService0 = new DirectExecutorService();
-        ArrayList<Callable<Integer>> arrayList0 = new ArrayList<Callable<Integer>>();
-        Callable<Integer> callable0 = (Callable<Integer>) mock(Callable.class, new ViolatedAssumptionAnswer());
-        arrayList0.add(callable0);
-        ChronoField chronoField0 = ChronoField.SECOND_OF_MINUTE;
-        TemporalUnit temporalUnit0 = chronoField0.getRangeUnit();
-        Duration duration0 = Duration.of(5112L, temporalUnit0);
-        // Undeclared exception!
+    public void invokeAny_whenDependencyIsMissing_throwsNoClassDefFoundError() {
+        // Arrange: Set up the executor service and a task.
+        // DirectExecutorService is a simple implementation that runs tasks on the calling thread.
+        ListeningExecutorService executorService = new DirectExecutorService();
+
+        // Create a mock task. Its behavior is irrelevant as the code fails before execution.
+        @SuppressWarnings("unchecked") // Required for mocking a generic type
+        Callable<Integer> mockTask = mock(Callable.class);
+        Collection<Callable<Integer>> tasks = Collections.singletonList(mockTask);
+        Duration timeout = Duration.ofSeconds(10);
+
+        // Act & Assert: Expect an error due to the missing class.
         try {
-            directExecutorService0.invokeAny((Collection<? extends Callable<Integer>>) arrayList0, duration0);
-            fail("Expecting exception: NoClassDefFoundError");
+            executorService.invokeAny(tasks, timeout);
+            fail("Expected a NoClassDefFoundError, but no exception was thrown.");
         } catch (NoClassDefFoundError e) {
-            //
-            // com/google/common/util/concurrent/TrustedListenableFutureTask
-            //
-            verifyException("com.google.common.util.concurrent.AbstractListeningExecutorService", e);
+            // The AbstractListeningExecutorService implementation relies on TrustedListenableFutureTask.
+            // This assertion confirms that the error is caused by this specific missing class.
+            String expectedMissingClass = "com/google/common/util/concurrent/TrustedListenableFutureTask";
+            String actualMessage = e.getMessage();
+
+            assertTrue(
+                "The error message should identify the missing class. "
+                    + "Expected to contain: <" + expectedMissingClass + ">, but was: <" + actualMessage + ">",
+                actualMessage != null && actualMessage.contains(expectedMissingClass)
+            );
         }
     }
 }
