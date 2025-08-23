@@ -1,26 +1,25 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest2 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on boundary conditions and error handling.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(9164449253911987585L, byteArray0, (int) (byte) (-48));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -48
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with a negative offset throws an
+     * {@link ArrayIndexOutOfBoundsException}. The underlying array access should
+     * be protected against invalid negative indices.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLongShouldThrowExceptionForNegativeOffset() {
+        // Arrange: Set up the test conditions
+        byte[] buffer = new byte[20]; // A buffer large enough to hold any long value
+        int negativeOffset = -1;      // An invalid negative offset
+        long anyNumber = 123L;        // The actual number doesn't matter for this test
+
+        // Act & Assert: This call is expected to throw the exception
+        NumberOutput.outputLong(anyNumber, buffer, negativeOffset);
     }
 }
