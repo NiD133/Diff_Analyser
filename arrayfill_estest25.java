@@ -1,21 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest25 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ArrayFill} class.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        double[] doubleArray0 = new double[8];
-        double[] doubleArray1 = ArrayFill.fill(doubleArray0, 0.0);
-        assertArrayEquals(new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, doubleArray1, 0.01);
+    @Test
+    public void fillDoubleArray_shouldFillArrayWithGivenValueAndReturnSameInstance() {
+        // Arrange
+        final double[] inputArray = new double[8];
+        final double fillValue = 0.0;
+        final double[] expectedArray = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+        // Act
+        final double[] resultArray = ArrayFill.fill(inputArray, fillValue);
+
+        // Assert
+        // 1. Verify that the array content is correctly filled.
+        assertArrayEquals("The array should be filled with the specified value.", expectedArray, resultArray, 0.0);
+
+        // 2. Verify that the method returns the same array instance for fluent chaining.
+        assertSame("The returned array should be the same instance as the input.", inputArray, resultArray);
     }
 }
