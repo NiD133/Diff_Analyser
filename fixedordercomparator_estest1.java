@@ -1,29 +1,26 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class FixedOrderComparator_ESTestTest1 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Tests for the {@link FixedOrderComparator#equals(Object)} method.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Comparable<Object>[] comparableArray0 = (Comparable<Object>[]) Array.newInstance(Comparable.class, 8);
-        FixedOrderComparator<Comparable<Object>> fixedOrderComparator0 = new FixedOrderComparator<Comparable<Object>>(comparableArray0);
-        FixedOrderComparator<Object> fixedOrderComparator1 = new FixedOrderComparator<Object>();
-        boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-        assertFalse(boolean0);
+    @Test
+    public void testEquals_returnsFalse_whenComparatorsHaveDifferentItems() {
+        // Arrange
+        // Create a comparator with a specific order of items.
+        final FixedOrderComparator<String> comparatorWithItems = new FixedOrderComparator<>("Mercury", "Venus", "Earth");
+
+        // Create an empty comparator, which has a different internal state.
+        final FixedOrderComparator<String> emptyComparator = new FixedOrderComparator<>();
+
+        // Act & Assert
+        // An empty comparator should not be equal to a comparator configured with items.
+        // The equals method should return false.
+        assertFalse("An empty comparator should not be equal to one with items",
+                    emptyComparator.equals(comparatorWithItems));
     }
 }
