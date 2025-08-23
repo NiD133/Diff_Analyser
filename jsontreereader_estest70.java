@@ -1,28 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
+import static org.junit.Assert.assertSame;
+
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest70 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test069() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        JsonElement jsonElement0 = jsonTreeReader0.nextJsonElement();
-        assertFalse(jsonElement0.isJsonArray());
+    /**
+     * Verifies that calling {@link JsonTreeReader#nextJsonElement()} on a reader
+     * initialized with a JsonObject returns that same object instance.
+     */
+    @Test
+    public void nextJsonElement_whenReadingJsonObject_returnsSameInstance() throws IOException {
+        // Arrange: Create a JsonObject and a reader for it.
+        JsonObject jsonObject = new JsonObject();
+        JsonTreeReader reader = new JsonTreeReader(jsonObject);
+
+        // Act: Read the next element from the reader.
+        JsonElement resultElement = reader.nextJsonElement();
+
+        // Assert: The returned element should be the exact same object instance.
+        assertSame("The returned JsonElement should be the same instance as the input",
+            jsonObject, resultElement);
     }
 }
