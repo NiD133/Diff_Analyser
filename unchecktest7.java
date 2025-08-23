@@ -1,73 +1,36 @@
 package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest7 {
+/**
+ * Tests {@link Uncheck#apply(IOTriFunction, Object, Object, Object)}.
+ */
+class UncheckApplyTriFunctionTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
-    }
+    private static final byte[] TEST_DATA = {'a', 'b'};
 
     /**
-     * Tests {@link Uncheck#apply(IOTriFunction, Object, Object, Object)}.
+     * Tests that Uncheck.apply() correctly invokes a three-argument, IO-throwing
+     * function and returns its result when the operation succeeds.
      */
     @Test
-    void testApply3() {
-        final ByteArrayInputStream stream = newInputStream();
-        final byte[] buf = new byte[BYTES.length];
-        assertEquals(1, Uncheck.apply((b, o, l) -> stream.read(b, o, l), buf, 0, 1).intValue());
-        assertEquals('a', buf[0]);
+    void shouldApplyTriFunctionAndReturnResultOnSuccess() {
+        // Arrange
+        final InputStream inputStream = new ByteArrayInputStream(TEST_DATA);
+        final byte[] buffer = new byte[TEST_DATA.length];
+        // The IOTriFunction to test is InputStream#read(byte[], int, int)
+        final IOTriFunction<byte[], Integer, Integer, Integer> readFunction = inputStream::read;
+
+        // Act
+        // Uncheck.apply should wrap the call and return the result from the read function.
+        final int bytesRead = Uncheck.apply(readFunction, buffer, 0, 1);
+
+        // Assert
+        assertEquals(1, bytesRead, "Should return the number of bytes read.");
+        assertEquals('a', buffer[0], "The first byte should be read into the buffer.");
     }
 }
