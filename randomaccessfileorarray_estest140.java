@@ -1,34 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest140 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test139() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        char char0 = randomAccessFileOrArray0.readCharLE();
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals('\u0000', char0);
+    /**
+     * Verifies that readCharLE() correctly reads two null bytes as a little-endian character ('\u0000')
+     * and advances the internal pointer by two bytes.
+     */
+    @Test
+    public void readCharLE_withTwoNullBytes_returnsNullCharAndAdvancesPointer() throws IOException {
+        // Arrange
+        // A char is 2 bytes. We provide extra bytes to ensure only two are read.
+        byte[] inputBytes = new byte[]{0, 0, 1, 2, 3};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputBytes);
+
+        char expectedChar = '\u0000';
+        long expectedPointerPosition = 2L;
+
+        // Act
+        char actualChar = reader.readCharLE();
+        long actualPointerPosition = reader.getFilePointer();
+
+        // Assert
+        assertEquals("The method should correctly interpret two null bytes as a null character.", expectedChar, actualChar);
+        assertEquals("The file pointer should advance by 2 bytes after reading a char.", expectedPointerPosition, actualPointerPosition);
     }
 }
