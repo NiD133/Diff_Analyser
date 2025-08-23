@@ -1,30 +1,35 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonReadContext_ESTestTest47 extends JsonReadContext_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonReadContext} class, focusing on its behavior
+ * as a node in a parsing context tree.
+ */
+public class JsonReadContextTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(dupDetector0);
-        JsonReadContext jsonReadContext1 = jsonReadContext0.clearAndGetParent();
-        assertNull(jsonReadContext1);
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals("ROOT", jsonReadContext0.getTypeDesc());
-        assertEquals(0, jsonReadContext0.getEntryCount());
+    /**
+     * Verifies that calling {@link JsonReadContext#clearAndGetParent()} on a root context
+     * correctly returns null, as a root context has no parent.
+     */
+    @Test
+    public void clearAndGetParent_whenCalledOnRootContext_shouldReturnNull() {
+        // Arrange: Create a root-level JsonReadContext.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonReadContext rootContext = JsonReadContext.createRootContext(dupDetector);
+
+        // Act: Attempt to get the parent of the root context.
+        JsonReadContext parentContext = rootContext.clearAndGetParent();
+
+        // Assert:
+        // The primary expectation is that a root context has no parent.
+        assertNull("The parent of a root context should be null.", parentContext);
+
+        // Also, verify that the state of the root context itself remains valid and unchanged.
+        assertEquals("Type description should remain 'ROOT'", "ROOT", rootContext.getTypeDesc());
+        assertEquals("Nesting depth should remain 0", 0, rootContext.getNestingDepth());
+        assertEquals("Entry count should remain 0", 0, rootContext.getEntryCount());
     }
 }
