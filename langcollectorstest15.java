@@ -1,74 +1,75 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
+
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class LangCollectorsTestTest15 {
+/**
+ * Tests for the joining collectors in {@link LangCollectors}.
+ */
+@DisplayName("LangCollectors.joining")
+class LangCollectorsJoiningTest {
 
-    private static final Long _1L = Long.valueOf(1);
+    @Nested
+    @DisplayName("when using joining(delimiter)")
+    class JoiningWithDelimiter {
 
-    private static final Long _2L = Long.valueOf(2);
+        private final Collector<Object, ?, String> joiningWithHyphen = LangCollectors.joining("-");
 
-    private static final Long _3L = Long.valueOf(3);
+        @Test
+        @DisplayName("should return an empty string for an empty stream")
+        void shouldReturnEmptyStringForEmptyStream() {
+            // Arrange
+            final Stream<String> emptyStream = Stream.empty();
 
-    private static final Function<Object, String> TO_STRING = Objects::toString;
+            // Act
+            final String result = emptyStream.collect(joiningWithHyphen);
 
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
-    }
-
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
-
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
-
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
-    private static final class Fixture {
-
-        int value;
-
-        private Fixture(final int value) {
-            this.value = value;
+            // Assert
+            assertEquals("", result);
         }
 
-        @Override
-        public String toString() {
-            return Integer.toString(value);
-        }
-    }
+        @Test
+        @DisplayName("should return the element itself for a single-element stream")
+        void shouldReturnElementForSingleElementStream() {
+            // Arrange
+            final Stream<String> singleElementStream = Stream.of("item");
 
-    @Test
-    void testJoiningStrings1Arg() {
-        assertEquals("", Stream.of().collect(JOINING_1));
-        assertEquals("1", Stream.of("1").collect(JOINING_1));
-        assertEquals("1-2", Stream.of("1", "2").collect(JOINING_1));
-        assertEquals("1-2-3", Stream.of("1", "2", "3").collect(JOINING_1));
-        assertEquals("1-null-3", Stream.of("1", null, "3").collect(JOINING_1));
+            // Act
+            final String result = singleElementStream.collect(joiningWithHyphen);
+
+            // Assert
+            assertEquals("item", result);
+        }
+
+        @Test
+        @DisplayName("should join multiple elements with the delimiter")
+        void shouldJoinMultipleElementsWithDelimiter() {
+            // Arrange
+            final Stream<String> stream = Stream.of("a", "b", "c");
+
+            // Act
+            final String result = stream.collect(joiningWithHyphen);
+
+            // Assert
+            assertEquals("a-b-c", result);
+        }
+
+        @Test
+        @DisplayName("should treat null elements as the string 'null'")
+        void shouldTreatNullAsLiteralString() {
+            // Arrange
+            final Stream<Object> streamWithNull = Stream.of("a", null, "c");
+
+            // Act
+            final String result = streamWithNull.collect(joiningWithHyphen);
+
+            // Assert
+            assertEquals("a-null-c", result);
+        }
     }
 }
