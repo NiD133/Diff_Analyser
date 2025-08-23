@@ -1,29 +1,35 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
+import java.util.Collections;
+import java.util.Iterator;
+
+// The original test class name and scaffolding are kept to match the provided context.
+// In a real-world scenario, this would likely be renamed to 'ZippingIteratorTest'.
 public class ZippingIterator_ESTestTest3 extends ZippingIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Object object0 = new Object();
-        linkedList0.push(object0);
-        Iterator<Object> iterator0 = linkedList0.descendingIterator();
-        ZippingIterator<Object> zippingIterator0 = new ZippingIterator<Object>(iterator0, iterator0);
-        Object object1 = zippingIterator0.next();
-        assertSame(object1, object0);
+    /**
+     * Tests that the first call to next() on a ZippingIterator returns the
+     * element from the first underlying iterator.
+     * <p>
+     * This test specifically covers the edge case where the same iterator instance
+     * is used for both inputs, meaning they share state.
+     * </p>
+     */
+    @Test
+    public void testNext_withSharedIteratorInstance_returnsFirstElement() {
+        // Arrange: Create a simple iterator with a single element.
+        final String element = "A";
+        final Iterator<String> sourceIterator = Collections.singletonList(element).iterator();
+
+        // Act: Create a ZippingIterator with the same iterator instance provided twice.
+        final ZippingIterator<String> zippingIterator = new ZippingIterator<>(sourceIterator, sourceIterator);
+        final String result = zippingIterator.next();
+
+        // Assert: The first element returned should be the one from the underlying iterator.
+        assertSame("The first call to next() should return the single element from the source iterator.",
+                   element, result);
     }
 }
