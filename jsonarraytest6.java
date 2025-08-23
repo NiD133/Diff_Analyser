@@ -1,22 +1,24 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.testing.EqualsTester;
-import com.google.gson.common.MoreAsserts;
-import java.math.BigInteger;
+
 import org.junit.Test;
 
-public class JsonArrayTestTest6 {
+public class JsonArrayTest {
 
-    @Test
-    public void testIsEmpty() {
-        JsonArray array = new JsonArray();
-        assertThat(array).isEmpty();
-        JsonPrimitive a = new JsonPrimitive("a");
-        array.add(a);
-        assertThat(array).isNotEmpty();
-        array.remove(0);
-        assertThat(array).isEmpty();
-    }
+  @Test
+  public void testIsEmpty_reflectsArrayContent() {
+    // 1. A newly created array should be empty
+    JsonArray array = new JsonArray();
+    assertThat(array).isEmpty();
+
+    // 2. After adding an element, the array should not be empty
+    JsonPrimitive element = new JsonPrimitive("a");
+    array.add(element);
+    assertThat(array).isNotEmpty();
+
+    // 3. After removing the only element, the array should be empty again
+    array.remove(0);
+    assertThat(array).isEmpty();
+  }
 }
