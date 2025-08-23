@@ -1,26 +1,26 @@
 package org.jfree.chart.plot.dial;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.chart.internal.CloneUtils;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import java.awt.Paint;
 
-public class DialBackgroundTestTest2 {
+/**
+ * Contains unit tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that the setPaint() method correctly throws an
+     * IllegalArgumentException when a null argument is provided. The background
+     * paint is a required component and cannot be null.
      */
-    @Test
-    public void testHashCode() {
-        DialBackground b1 = new DialBackground(Color.RED);
-        DialBackground b2 = new DialBackground(Color.RED);
-        assertEquals(b1, b2);
-        int h1 = b1.hashCode();
-        int h2 = b2.hashCode();
-        assertEquals(h1, h2);
+    @Test(expected = IllegalArgumentException.class)
+    public void setPaint_withNullArgument_shouldThrowIllegalArgumentException() {
+        // Arrange: Create a new DialBackground instance.
+        DialBackground dialBackground = new DialBackground();
+
+        // Act: Attempt to set the paint property to null.
+        // Assert: The @Test(expected) annotation asserts that an
+        // IllegalArgumentException is thrown by this method call.
+        dialBackground.setPaint((Paint) null);
     }
 }
