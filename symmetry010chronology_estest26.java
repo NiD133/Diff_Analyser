@@ -1,52 +1,35 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.time.Clock;
+import org.junit.Test;
+
+/**
+ * This test class focuses on verifying the behavior of the Symmetry010Chronology class.
+ * The original test class name and inheritance are preserved as they might be
+ * required by the test runner or test suite configuration.
+ */
 public class Symmetry010Chronology_ESTestTest26 extends Symmetry010Chronology_ESTest_scaffolding {
 
+    /**
+     * Tests that calling dateNow() with a null Clock throws a NullPointerException.
+     * This is the expected behavior, as the method should not accept null arguments.
+     */
     @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = Symmetry010Chronology.INSTANCE;
-        // Undeclared exception!
+    public void dateNow_withNullClock_throwsNullPointerException() {
+        // Arrange: Get an instance of the chronology to test.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+
+        // Act & Assert: Attempt to call the method with a null argument and verify the exception.
         try {
-            symmetry010Chronology0.dateNow((Clock) null);
-            fail("Expecting exception: NullPointerException");
+            chronology.dateNow((Clock) null);
+            fail("Expected a NullPointerException to be thrown, but no exception was thrown.");
         } catch (NullPointerException e) {
-            //
-            // clock
-            //
-            verifyException("java.util.Objects", e);
+            // The underlying implementation is expected to use Objects.requireNonNull(clock, "clock"),
+            // so we verify the exception message for robustness.
+            assertEquals("clock", e.getMessage());
         }
     }
 }
