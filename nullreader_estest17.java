@@ -1,28 +1,35 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class NullReader_ESTestTest17 extends NullReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link NullReader} class.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        NullReader nullReader0 = new NullReader();
-        nullReader0.read();
+    @Test
+    public void skipAfterEOFShouldThrowIOException() throws IOException {
+        // Arrange: Create a NullReader and advance it to the end of the file.
+        // The default constructor creates a reader with a size of 0.
+        final NullReader reader = new NullReader();
+        
+        // A single read() call on a zero-size reader sets its internal EOF flag.
+        reader.read();
+
+        // Act & Assert
         try {
-            nullReader0.skip((-1));
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Skip after end of file
-            //
-            verifyException("org.apache.commons.io.input.NullReader", e);
+            // Attempting to skip after the stream is at EOF should fail.
+            // The negative value is incidental; any skip call would fail here.
+            reader.skip(-1);
+            fail("Expected an IOException to be thrown when skipping after EOF.");
+        } catch (final IOException e) {
+            // Verify that the correct exception was thrown.
+            final String expectedMessage = "Skip after end of file";
+            assertEquals("The exception message should match the expected text.",
+                         expectedMessage, e.getMessage());
         }
     }
 }
