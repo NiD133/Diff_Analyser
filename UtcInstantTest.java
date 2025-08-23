@@ -1,9 +1,49 @@
+/*
+ * Copyright (c) 2007-present, Stephen Colebourne & Michael Nascimento Santos
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ *  * Neither the name of JSR-310 nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.threeten.extra.scale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.*;
-import java.time.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,119 +52,118 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.google.common.testing.EqualsTester;
 
 /**
- * Unit tests for the UtcInstant class.
+ * Test UtcInstant.
  */
 public class TestUtcInstant {
 
-    // Constants for Modified Julian Days (MJD) and nanoseconds
     private static final long MJD_1972_12_30 = 41681;
     private static final long MJD_1972_12_31_LEAP = 41682;
     private static final long MJD_1973_01_01 = 41683;
     private static final long MJD_1973_12_31_LEAP = MJD_1972_12_31_LEAP + 365;
     private static final long SECS_PER_DAY = 24L * 60 * 60;
-    private static final long NANOS_PER_SEC = 1_000_000_000L;
+    private static final long NANOS_PER_SEC = 1000000000L;
     private static final long NANOS_PER_DAY = SECS_PER_DAY * NANOS_PER_SEC;
     private static final long NANOS_PER_LEAP_DAY = (SECS_PER_DAY + 1) * NANOS_PER_SEC;
 
-    // Test if UtcInstant implements Serializable and Comparable interfaces
+    //-----------------------------------------------------------------------
     @Test
     public void test_interfaces() {
         assertTrue(Serializable.class.isAssignableFrom(UtcInstant.class));
         assertTrue(Comparable.class.isAssignableFrom(UtcInstant.class));
     }
 
-    // Test serialization and deserialization of UtcInstant
+    //-----------------------------------------------------------------------
+    // serialization
+    //-----------------------------------------------------------------------
     @Test
     public void test_serialization() throws Exception {
-        UtcInstant original = UtcInstant.ofModifiedJulianDay(2, 3);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
-            objectOutputStream.writeObject(original);
+        UtcInstant test = UtcInstant.ofModifiedJulianDay(2, 3);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(test);
         }
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()))) {
-            UtcInstant deserialized = (UtcInstant) objectInputStream.readObject();
-            assertEquals(original, deserialized);
+        try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
+            assertEquals(test, ois.readObject());
         }
     }
 
-    // Test factory method for creating UtcInstant with Modified Julian Day and nanoseconds
+    //-----------------------------------------------------------------------
+    // ofModififiedJulianDay(long,long)
+    //-----------------------------------------------------------------------
     @Test
-    public void test_factory_ofModifiedJulianDay() {
-        for (long day = -2; day <= 2; day++) {
-            for (int nanos = 0; nanos < 10; nanos++) {
-                UtcInstant instant = UtcInstant.ofModifiedJulianDay(day, nanos);
-                assertEquals(day, instant.getModifiedJulianDay());
-                assertEquals(nanos, instant.getNanoOfDay());
-                assertFalse(instant.isLeapSecond());
+    public void factory_ofModifiedJulianDay_long_long() {
+        for (long i = -2; i <= 2; i++) {
+            for (int j = 0; j < 10; j++) {
+                UtcInstant t = UtcInstant.ofModifiedJulianDay(i, j);
+                assertEquals(i, t.getModifiedJulianDay());
+                assertEquals(j, t.getNanoOfDay());
+                assertEquals(false, t.isLeapSecond());
             }
         }
     }
 
-    // Test UtcInstant creation at the end of a normal day
     @Test
-    public void test_factory_endNormalDay() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1);
-        assertEquals(MJD_1972_12_31_LEAP, instant.getModifiedJulianDay());
-        assertEquals(NANOS_PER_DAY - 1, instant.getNanoOfDay());
-        assertFalse(instant.isLeapSecond());
-        assertEquals("1972-12-31T23:59:59.999999999Z", instant.toString());
+    public void factory_ofModifiedJulianDay_long_long_endNormal() {
+        UtcInstant t = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1);
+        assertEquals(MJD_1972_12_31_LEAP, t.getModifiedJulianDay());
+        assertEquals(NANOS_PER_DAY - 1, t.getNanoOfDay());
+        assertFalse(t.isLeapSecond());
+        assertEquals("1972-12-31T23:59:59.999999999Z", t.toString());
     }
 
-    // Test UtcInstant creation at the start of a leap second
     @Test
-    public void test_factory_startLeapSecond() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY);
-        assertEquals(MJD_1972_12_31_LEAP, instant.getModifiedJulianDay());
-        assertEquals(NANOS_PER_DAY, instant.getNanoOfDay());
-        assertTrue(instant.isLeapSecond());
-        assertEquals("1972-12-31T23:59:60Z", instant.toString());
+    public void factory_ofModifiedJulianDay_long_long_startLeap() {
+        UtcInstant t = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY);
+        assertEquals(MJD_1972_12_31_LEAP, t.getModifiedJulianDay());
+        assertEquals(NANOS_PER_DAY, t.getNanoOfDay());
+        assertTrue(t.isLeapSecond());
+        assertEquals("1972-12-31T23:59:60Z", t.toString());
     }
 
-    // Test UtcInstant creation at the end of a leap second
     @Test
-    public void test_factory_endLeapSecond() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_LEAP_DAY - 1);
-        assertEquals(MJD_1972_12_31_LEAP, instant.getModifiedJulianDay());
-        assertEquals(NANOS_PER_LEAP_DAY - 1, instant.getNanoOfDay());
-        assertTrue(instant.isLeapSecond());
-        assertEquals("1972-12-31T23:59:60.999999999Z", instant.toString());
+    public void factory_ofModifiedJulianDay_long_long_endLeap() {
+        UtcInstant t = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_LEAP_DAY - 1);
+        assertEquals(MJD_1972_12_31_LEAP, t.getModifiedJulianDay());
+        assertEquals(NANOS_PER_LEAP_DAY - 1, t.getNanoOfDay());
+        assertTrue(t.isLeapSecond());
+        assertEquals("1972-12-31T23:59:60.999999999Z", t.toString());
     }
 
-    // Test UtcInstant creation with negative nanoseconds
     @Test
-    public void test_factory_negativeNanos() {
+    public void factory_ofModifiedJulianDay_long_long_nanosNegative() {
         assertThrows(DateTimeException.class, () -> UtcInstant.ofModifiedJulianDay(MJD_1973_01_01, -1));
     }
 
-    // Test UtcInstant creation with too large nanoseconds on a non-leap day
     @Test
-    public void test_factory_nanosTooBig_nonLeapDay() {
+    public void factory_ofModifiedJulianDay_long_long_nanosTooBig_notLeap() {
         assertThrows(DateTimeException.class, () -> UtcInstant.ofModifiedJulianDay(MJD_1973_01_01, NANOS_PER_DAY));
     }
 
-    // Test UtcInstant creation with too large nanoseconds on a leap day
     @Test
-    public void test_factory_nanosTooBig_leapDay() {
+    public void factory_ofModifiedJulianDay_long_long_nanosTooBig_leap() {
         assertThrows(DateTimeException.class, () -> UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_LEAP_DAY));
     }
 
-    // Test UtcInstant creation from an Instant
+    //-----------------------------------------------------------------------
+    // of(Instant)
+    //-----------------------------------------------------------------------
     @Test
-    public void test_factory_fromInstant() {
-        UtcInstant instant = UtcInstant.of(Instant.ofEpochSecond(0, 2));  // 1970-01-01
-        assertEquals(40587, instant.getModifiedJulianDay());
-        assertEquals(2, instant.getNanoOfDay());
+    public void factory_of_Instant() {
+        UtcInstant test = UtcInstant.of(Instant.ofEpochSecond(0, 2));  // 1970-01-01
+        assertEquals(40587, test.getModifiedJulianDay());
+        assertEquals(2, test.getNanoOfDay());
     }
 
-    // Test UtcInstant creation from a null Instant
     @Test
-    public void test_factory_fromNullInstant() {
+    public void factory_of_Instant_null() {
         assertThrows(NullPointerException.class, () -> UtcInstant.of((Instant) null));
     }
 
-    // Test UtcInstant creation from a TaiInstant
+    //-----------------------------------------------------------------------
+    // of(TaiInstant)
+    //-----------------------------------------------------------------------
     @Test
-    public void test_factory_fromTaiInstant() {
+    public void factory_of_TaiInstant() {
         for (int i = -1000; i < 1000; i++) {
             for (int j = 0; j < 10; j++) {
                 UtcInstant expected = UtcInstant.ofModifiedJulianDay(36204 + i, j * NANOS_PER_SEC + 2L);
@@ -134,48 +173,47 @@ public class TestUtcInstant {
         }
     }
 
-    // Test UtcInstant creation from a null TaiInstant
     @Test
-    public void test_factory_fromNullTaiInstant() {
+    public void factory_of_TaiInstant_null() {
         assertThrows(NullPointerException.class, () -> UtcInstant.of((TaiInstant) null));
     }
 
-    // Test UtcInstant parsing from a valid string
+    //-----------------------------------------------------------------------
+    // parse(CharSequence)
+    //-----------------------------------------------------------------------
     @Test
-    public void test_factory_parseValidString() {
+    public void factory_parse_CharSequence() {
         assertEquals(UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY - NANOS_PER_SEC), UtcInstant.parse("1972-12-31T23:59:59Z"));
         assertEquals(UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY), UtcInstant.parse("1972-12-31T23:59:60Z"));
     }
 
-    // Data provider for invalid parse strings
-    public static Object[][] data_invalidParseStrings() {
+    public static Object[][] data_badParse() {
         return new Object[][] {
             {""},
             {"A"},
-            {"2012-13-01T00:00:00Z"},  // Invalid month
+            {"2012-13-01T00:00:00Z"},  // bad month
         };
     }
 
-    // Test UtcInstant parsing from invalid strings
     @ParameterizedTest
-    @MethodSource("data_invalidParseStrings")
-    public void test_factory_parseInvalidString(String str) {
+    @MethodSource("data_badParse")
+    public void factory_parse_CharSequence_invalid(String str) {
         assertThrows(DateTimeException.class, () -> UtcInstant.parse(str));
     }
 
-    // Test UtcInstant parsing from an invalid leap second string
     @Test
-    public void test_factory_parseInvalidLeapSecond() {
-        assertThrows(DateTimeException.class, () -> UtcInstant.parse("1972-11-11T23:59:60Z")); // Invalid leap second
+    public void factory_parse_CharSequence_invalidLeapSecond() {
+        assertThrows(DateTimeException.class, () -> UtcInstant.parse("1972-11-11T23:59:60Z")); // leap second but not leap day
     }
 
-    // Test UtcInstant parsing from a null string
     @Test
-    public void test_factory_parseNullString() {
+    public void factory_parse_CharSequence_null() {
         assertThrows(NullPointerException.class, () -> UtcInstant.parse((String) null));
     }
 
-    // Data provider for withModifiedJulianDay tests
+    //-----------------------------------------------------------------------
+    // withModifiedJulianDay()
+    //-----------------------------------------------------------------------
     public static Object[][] data_withModifiedJulianDay() {
         return new Object[][] {
             {0L, 12345L, 1L, 1L, 12345L},
@@ -191,21 +229,22 @@ public class TestUtcInstant {
         };
     }
 
-    // Test withModifiedJulianDay method
     @ParameterizedTest
     @MethodSource("data_withModifiedJulianDay")
     public void test_withModifiedJulianDay(long mjd, long nanos, long newMjd, Long expectedMjd, Long expectedNanos) {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(mjd, nanos);
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos);
         if (expectedMjd != null) {
-            UtcInstant modifiedInstant = instant.withModifiedJulianDay(newMjd);
-            assertEquals(expectedMjd.longValue(), modifiedInstant.getModifiedJulianDay());
-            assertEquals(expectedNanos.longValue(), modifiedInstant.getNanoOfDay());
+            UtcInstant withModifiedJulianDay = i.withModifiedJulianDay(newMjd);
+            assertEquals(expectedMjd.longValue(), withModifiedJulianDay.getModifiedJulianDay());
+            assertEquals(expectedNanos.longValue(), withModifiedJulianDay.getNanoOfDay());
         } else {
-            assertThrows(DateTimeException.class, () -> instant.withModifiedJulianDay(newMjd));
+            assertThrows(DateTimeException.class, () -> i.withModifiedJulianDay(newMjd));
         }
     }
 
-    // Data provider for withNanoOfDay tests
+    //-----------------------------------------------------------------------
+    // withNanoOfDay()
+    //-----------------------------------------------------------------------
     public static Object[][] data_withNanoOfDay() {
         return new Object[][] {
             {0L, 12345L, 1L, 0L, 1L},
@@ -227,21 +266,22 @@ public class TestUtcInstant {
         };
     }
 
-    // Test withNanoOfDay method
     @ParameterizedTest
     @MethodSource("data_withNanoOfDay")
     public void test_withNanoOfDay(long mjd, long nanos, long newNanoOfDay, Long expectedMjd, Long expectedNanos) {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(mjd, nanos);
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos);
         if (expectedMjd != null) {
-            UtcInstant modifiedInstant = instant.withNanoOfDay(newNanoOfDay);
-            assertEquals(expectedMjd.longValue(), modifiedInstant.getModifiedJulianDay());
-            assertEquals(expectedNanos.longValue(), modifiedInstant.getNanoOfDay());
+            UtcInstant withNanoOfDay = i.withNanoOfDay(newNanoOfDay);
+            assertEquals(expectedMjd.longValue(), withNanoOfDay.getModifiedJulianDay());
+            assertEquals(expectedNanos.longValue(), withNanoOfDay.getNanoOfDay());
         } else {
-            assertThrows(DateTimeException.class, () -> instant.withNanoOfDay(newNanoOfDay));
+            assertThrows(DateTimeException.class, () -> i.withNanoOfDay(newNanoOfDay));
         }
     }
 
-    // Data provider for plus method tests
+    //-----------------------------------------------------------------------
+    // plus(Duration)
+    //-----------------------------------------------------------------------
     public static Object[][] data_plus() {
         return new Object[][] {
             {0, 0,  -2 * SECS_PER_DAY, 5, -2, 5},
@@ -276,30 +316,29 @@ public class TestUtcInstant {
         };
     }
 
-    // Test plus method
     @ParameterizedTest
     @MethodSource("data_plus")
     public void test_plus(long mjd, long nanos, long plusSeconds, int plusNanos, long expectedMjd, long expectedNanos) {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(mjd, nanos).plus(Duration.ofSeconds(plusSeconds, plusNanos));
-        assertEquals(expectedMjd, instant.getModifiedJulianDay());
-        assertEquals(expectedNanos, instant.getNanoOfDay());
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos).plus(Duration.ofSeconds(plusSeconds, plusNanos));
+        assertEquals(expectedMjd, i.getModifiedJulianDay());
+        assertEquals(expectedNanos, i.getNanoOfDay());
     }
 
-    // Test plus method overflow
     @Test
     public void test_plus_overflowTooBig() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(Long.MAX_VALUE, NANOS_PER_DAY - 1);
-        assertThrows(ArithmeticException.class, () -> instant.plus(Duration.ofNanos(1)));
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(Long.MAX_VALUE, NANOS_PER_DAY - 1);
+        assertThrows(ArithmeticException.class, () -> i.plus(Duration.ofNanos(1)));
     }
 
-    // Test plus method underflow
     @Test
     public void test_plus_overflowTooSmall() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(Long.MIN_VALUE, 0);
-        assertThrows(ArithmeticException.class, () -> instant.plus(Duration.ofNanos(-1)));
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(Long.MIN_VALUE, 0);
+        assertThrows(ArithmeticException.class, () -> i.plus(Duration.ofNanos(-1)));
     }
 
-    // Data provider for minus method tests
+    //-----------------------------------------------------------------------
+    // minus(Duration)
+    //-----------------------------------------------------------------------
     public static Object[][] data_minus() {
         return new Object[][] {
             {0, 0,  2 * SECS_PER_DAY, -5, -2, 5},
@@ -334,95 +373,97 @@ public class TestUtcInstant {
         };
     }
 
-    // Test minus method
     @ParameterizedTest
     @MethodSource("data_minus")
     public void test_minus(long mjd, long nanos, long minusSeconds, int minusNanos, long expectedMjd, long expectedNanos) {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(mjd, nanos).minus(Duration.ofSeconds(minusSeconds, minusNanos));
-        assertEquals(expectedMjd, instant.getModifiedJulianDay());
-        assertEquals(expectedNanos, instant.getNanoOfDay());
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos).minus(Duration.ofSeconds(minusSeconds, minusNanos));
+        assertEquals(expectedMjd, i.getModifiedJulianDay());
+        assertEquals(expectedNanos, i.getNanoOfDay());
     }
 
-    // Test minus method underflow
     @Test
     public void test_minus_overflowTooSmall() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(Long.MIN_VALUE, 0);
-        assertThrows(ArithmeticException.class, () -> instant.minus(Duration.ofNanos(1)));
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(Long.MIN_VALUE, 0);
+        assertThrows(ArithmeticException.class, () -> i.minus(Duration.ofNanos(1)));
     }
 
-    // Test minus method overflow
     @Test
     public void test_minus_overflowTooBig() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(Long.MAX_VALUE, NANOS_PER_DAY - 1);
-        assertThrows(ArithmeticException.class, () -> instant.minus(Duration.ofNanos(-1)));
+        UtcInstant i = UtcInstant.ofModifiedJulianDay(Long.MAX_VALUE, NANOS_PER_DAY - 1);
+        assertThrows(ArithmeticException.class, () -> i.minus(Duration.ofNanos(-1)));
     }
 
-    // Test durationUntil method for one day without leap second
+    //-----------------------------------------------------------------------
+    // durationUntil()
+    //-----------------------------------------------------------------------
     @Test
     public void test_durationUntil_oneDayNoLeap() {
-        UtcInstant start = UtcInstant.ofModifiedJulianDay(MJD_1972_12_30, 0);
-        UtcInstant end = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, 0);
-        Duration duration = start.durationUntil(end);
-        assertEquals(86400, duration.getSeconds());
-        assertEquals(0, duration.getNano());
+        UtcInstant utc1 = UtcInstant.ofModifiedJulianDay(MJD_1972_12_30, 0);
+        UtcInstant utc2 = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, 0);
+        Duration test = utc1.durationUntil(utc2);
+        assertEquals(86400, test.getSeconds());
+        assertEquals(0, test.getNano());
     }
 
-    // Test durationUntil method for one day with leap second
     @Test
     public void test_durationUntil_oneDayLeap() {
-        UtcInstant start = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, 0);
-        UtcInstant end = UtcInstant.ofModifiedJulianDay(MJD_1973_01_01, 0);
-        Duration duration = start.durationUntil(end);
-        assertEquals(86401, duration.getSeconds());
-        assertEquals(0, duration.getNano());
+        UtcInstant utc1 = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, 0);
+        UtcInstant utc2 = UtcInstant.ofModifiedJulianDay(MJD_1973_01_01, 0);
+        Duration test = utc1.durationUntil(utc2);
+        assertEquals(86401, test.getSeconds());
+        assertEquals(0, test.getNano());
     }
 
-    // Test durationUntil method for one day with negative leap second
     @Test
     public void test_durationUntil_oneDayLeapNegative() {
-        UtcInstant start = UtcInstant.ofModifiedJulianDay(MJD_1973_01_01, 0);
-        UtcInstant end = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, 0);
-        Duration duration = start.durationUntil(end);
-        assertEquals(-86401, duration.getSeconds());
-        assertEquals(0, duration.getNano());
+        UtcInstant utc1 = UtcInstant.ofModifiedJulianDay(MJD_1973_01_01, 0);
+        UtcInstant utc2 = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, 0);
+        Duration test = utc1.durationUntil(utc2);
+        assertEquals(-86401, test.getSeconds());
+        assertEquals(0, test.getNano());
     }
 
-    // Test conversion to TaiInstant
+    //-----------------------------------------------------------------------
+    // toTaiInstant()
+    //-----------------------------------------------------------------------
     @Test
     public void test_toTaiInstant() {
         for (int i = -1000; i < 1000; i++) {
             for (int j = 0; j < 10; j++) {
                 UtcInstant utc = UtcInstant.ofModifiedJulianDay(36204 + i, j * NANOS_PER_SEC + 2L);
-                TaiInstant tai = utc.toTaiInstant();
-                assertEquals(i * SECS_PER_DAY + j + 10, tai.getTaiSeconds());
-                assertEquals(2, tai.getNano());
+                TaiInstant test = utc.toTaiInstant();
+                assertEquals(i * SECS_PER_DAY + j + 10, test.getTaiSeconds());
+                assertEquals(2, test.getNano());
             }
         }
     }
 
-    // Test conversion to TaiInstant with max invalid value
     @Test
     public void test_toTaiInstant_maxInvalid() {
         UtcInstant utc = UtcInstant.ofModifiedJulianDay(Long.MAX_VALUE, 0);
         assertThrows(ArithmeticException.class, () -> utc.toTaiInstant());
     }
 
-    // Test conversion to Instant
+    //-----------------------------------------------------------------------
+    // toInstant()
+    //-----------------------------------------------------------------------
     @Test
     public void test_toInstant() {
         for (int i = -1000; i < 1000; i++) {
             for (int j = 0; j < 10; j++) {
                 Instant expected = Instant.ofEpochSecond(315532800 + i * SECS_PER_DAY + j).plusNanos(2);
-                UtcInstant utc = UtcInstant.ofModifiedJulianDay(44239 + i, j * NANOS_PER_SEC + 2);
-                assertEquals(expected, utc.toInstant());
+                UtcInstant test = UtcInstant.ofModifiedJulianDay(44239 + i, j * NANOS_PER_SEC + 2);
+                assertEquals(expected, test.toInstant());
             }
         }
     }
 
-    // Test comparisons between UtcInstant instances
+    //-----------------------------------------------------------------------
+    // compareTo()
+    //-----------------------------------------------------------------------
     @Test
     public void test_comparisons() {
-        UtcInstant[] instants = {
+        doTest_comparisons_UtcInstant(
             UtcInstant.ofModifiedJulianDay(-2L, 0),
             UtcInstant.ofModifiedJulianDay(-2L, NANOS_PER_DAY - 2),
             UtcInstant.ofModifiedJulianDay(-2L, NANOS_PER_DAY - 1),
@@ -436,29 +477,27 @@ public class TestUtcInstant {
             UtcInstant.ofModifiedJulianDay(0L, NANOS_PER_DAY - 1),
             UtcInstant.ofModifiedJulianDay(1L, 0),
             UtcInstant.ofModifiedJulianDay(2L, 0)
-        };
-        doTest_comparisons_UtcInstant(instants);
+        );
     }
 
-    // Helper method for testing comparisons
-    private void doTest_comparisons_UtcInstant(UtcInstant... instants) {
+    void doTest_comparisons_UtcInstant(UtcInstant... instants) {
         for (int i = 0; i < instants.length; i++) {
             UtcInstant a = instants[i];
             for (int j = 0; j < instants.length; j++) {
                 UtcInstant b = instants[j];
                 if (i < j) {
-                    assertTrue(a.compareTo(b) < 0);
-                    assertFalse(a.equals(b));
+                    assertEquals(-1, a.compareTo(b));
+                    assertEquals(false, a.equals(b));
                     assertTrue(a.isBefore(b));
                     assertFalse(a.isAfter(b));
                 } else if (i > j) {
-                    assertTrue(a.compareTo(b) > 0);
-                    assertFalse(a.equals(b));
+                    assertEquals(1, a.compareTo(b));
+                    assertEquals(false, a.equals(b));
                     assertFalse(a.isBefore(b));
                     assertTrue(a.isAfter(b));
                 } else {
                     assertEquals(0, a.compareTo(b));
-                    assertTrue(a.equals(b));
+                    assertEquals(true, a.equals(b));
                     assertFalse(a.isBefore(b));
                     assertFalse(a.isAfter(b));
                 }
@@ -466,22 +505,22 @@ public class TestUtcInstant {
         }
     }
 
-    // Test comparison to null
     @Test
     public void test_compareTo_ObjectNull() {
-        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0);
-        assertThrows(NullPointerException.class, () -> instant.compareTo(null));
+        UtcInstant a = UtcInstant.ofModifiedJulianDay(0L, 0);
+        assertThrows(NullPointerException.class, () -> a.compareTo(null));
     }
 
-    // Test comparison to non-UtcInstant object
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void test_compareToNonUtcInstant() {
-        Comparable comparable = UtcInstant.ofModifiedJulianDay(0L, 2);
-        assertThrows(ClassCastException.class, () -> comparable.compareTo(new Object()));
+        Comparable c = UtcInstant.ofModifiedJulianDay(0L, 2);
+        assertThrows(ClassCastException.class, () -> c.compareTo(new Object()));
     }
 
-    // Test equals and hashCode methods
+    //-----------------------------------------------------------------------
+    // equals() / hashCode()
+    //-----------------------------------------------------------------------
     @Test
     public void test_equals_and_hashCode() {
         new EqualsTester()
@@ -491,7 +530,9 @@ public class TestUtcInstant {
             .testEquals();
     }
 
-    // Data provider for toString method tests
+    //-----------------------------------------------------------------------
+    // toString()
+    //-----------------------------------------------------------------------
     public static Object[][] data_toString() {
         return new Object[][] {
             {40587, 0, "1970-01-01T00:00:00Z"},
@@ -510,17 +551,16 @@ public class TestUtcInstant {
         };
     }
 
-    // Test toString method
     @ParameterizedTest
     @MethodSource("data_toString")
     public void test_toString(long mjd, long nod, String expected) {
         assertEquals(expected, UtcInstant.ofModifiedJulianDay(mjd, nod).toString());
     }
 
-    // Test parsing from toString output
     @ParameterizedTest
     @MethodSource("data_toString")
     public void test_toString_parse(long mjd, long nod, String str) {
         assertEquals(UtcInstant.ofModifiedJulianDay(mjd, nod), UtcInstant.parse(str));
     }
+
 }
