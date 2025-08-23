@@ -1,140 +1,76 @@
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import com.itextpdf.testutils.TestResourceUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import com.itextpdf.awt.geom.AffineTransform;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class SimpleTextExtractionStrategyTestTest4 {
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-    String TEXT1 = "TEXT1 TEXT1";
+/**
+ * Tests the text extraction behavior of the {@link SimpleTextExtractionStrategy}.
+ */
+public class SimpleTextExtractionStrategyTest {
 
-    String TEXT2 = "TEXT2 TEXT2";
+    private static final String FIRST_LINE_TEXT = "This is the first line.";
+    private static final String SECOND_LINE_TEXT = "This is the second line.";
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    public TextExtractionStrategy createRenderListenerForTest() {
-        return new SimpleTextExtractionStrategy();
-    }
-
-    byte[] createPdfWithXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        PdfTemplate template = writer.getDirectContent().createTemplate(100, 100);
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        template.moveText(5, template.getHeight() - 5);
-        template.showText(xobjectText);
-        template.endText();
-        Image xobjectImage = Image.getInstance(template);
-        doc.add(xobjectImage);
-        doc.add(new Paragraph("C"));
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private static byte[] createPdfWithArrayText(String directContentTj) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.transform(AffineTransform.getTranslateInstance(100, 500));
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append(directContentTj + "\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithArrayText(String text1, String text2, int spaceInPoints) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append("[(" + text1 + ")" + (-spaceInPoints) + "(" + text2 + ")]TJ\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithRotatedText(String text1, String text2, float rotation, boolean moveTextToNextLine, float moveTextDelta) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        float x = document.getPageSize().getWidth() / 2;
-        float y = document.getPageSize().getHeight() / 2;
-        cb.transform(AffineTransform.getTranslateInstance(x, y));
-        cb.moveTo(-10, 0);
-        cb.lineTo(10, 0);
-        cb.moveTo(0, -10);
-        cb.lineTo(0, 10);
-        cb.stroke();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.transform(AffineTransform.getRotateInstance(rotation / 180f * Math.PI));
-        cb.showText(text1);
-        if (moveTextToNextLine)
-            cb.moveText(0, moveTextDelta);
-        else
-            cb.transform(AffineTransform.getTranslateInstance(moveTextDelta, 0));
-        cb.showText(text2);
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static class SingleCharacterSimpleTextExtractionStrategy extends SimpleTextExtractionStrategy {
-
-        @Override
-        public void renderText(TextRenderInfo renderInfo) {
-            for (TextRenderInfo tri : renderInfo.getCharacterRenderInfos()) super.renderText(tri);
-        }
-    }
-
+    /**
+     * Tests that the strategy correctly inserts a newline character between chunks of text
+     * that are rendered on separate lines in the PDF. This is determined by a change in the
+     * vertical (Y) coordinate between text rendering operations.
+     */
     @Test
-    public void testUnRotatedText() throws Exception {
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 0, true, -20);
-        Assert.assertEquals(TEXT1 + "\n" + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
+    public void extractsTextWithNewlineForTextOnSeparateLines() throws Exception {
+        // Arrange: Create a PDF with two lines of text, one directly below the other.
+        // The SimpleTextExtractionStrategy should detect the vertical separation and
+        // insert a newline.
+        String expectedText = FIRST_LINE_TEXT + "\n" + SECOND_LINE_TEXT;
+        byte[] pdfBytes = createPdfWithTwoLinesSeparatedVertically(FIRST_LINE_TEXT, SECOND_LINE_TEXT);
+        TextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+        // Act: Extract text from the generated PDF.
+        String actualText = PdfTextExtractor.getTextFromPage(new PdfReader(pdfBytes), 1, strategy);
+
+        // Assert: Verify the extracted text contains a newline between the two lines.
+        Assert.assertEquals(expectedText, actualText);
+    }
+
+    /**
+     * Creates a simple PDF document containing two strings of text on separate lines.
+     *
+     * @param line1 The text for the first line.
+     * @param line2 The text for the second line, to be placed directly below the first.
+     * @return A byte array representing the generated PDF file.
+     */
+    private byte[] createPdfWithTwoLinesSeparatedVertically(String line1, String line2) throws Exception {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        final Document document = new Document(PageSize.LETTER);
+        final PdfWriter writer = PdfWriter.getInstance(document, byteStream);
+        document.open();
+
+        PdfContentByte cb = writer.getDirectContent();
+        BaseFont font = BaseFont.createFont();
+        float x = 100;
+        float y = 500;
+        float verticalOffset = -20; // A negative offset moves the text cursor down for the next line.
+
+        cb.beginText();
+        cb.setFontAndSize(font, 12);
+        cb.moveText(x, y); // Set initial position.
+
+        cb.showText(line1);
+        cb.moveText(0, verticalOffset); // Move to the next line, directly below.
+        cb.showText(line2);
+
+        cb.endText();
+        document.close();
+
+        return byteStream.toByteArray();
     }
 }
