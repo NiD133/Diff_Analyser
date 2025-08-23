@@ -1,199 +1,87 @@
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import com.itextpdf.text.DocumentException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import com.itextpdf.awt.geom.AffineTransform;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfTextArray;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class LocationTextExtractionStrategyTestTest10 extends SimpleTextExtractionStrategyTest {
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-    }
+/**
+ * Tests the {@link LocationTextExtractionStrategy} for its ability to handle
+ * complex text spacing, such as negative character spacing and kerning.
+ */
+public class LocationTextExtractionStrategyComplexSpacingTest extends SimpleTextExtractionStrategyTest {
 
     @Override
     public TextExtractionStrategy createRenderListenerForTest() {
         return new LocationTextExtractionStrategy();
     }
 
-    private byte[] createPdfWithNegativeCharSpacing(String str1, float charSpacing, String str2) throws Exception {
+    /**
+     * Tests that the strategy correctly extracts a single word when its characters are positioned
+     * using a combination of negative character spacing and individual kerning adjustments.
+     */
+    @Test
+    public void shouldExtractWordCorrectly_whenTextHasComplexKerning() throws Exception {
+        // ARRANGE: Create a PDF with the word "Preface" where characters have complex spacing.
+        byte[] pdfBytes = createPdfWithKerningAdjustments();
+        PdfReader reader = new PdfReader(pdfBytes);
+        TextExtractionStrategy strategy = createRenderListenerForTest();
+        String expectedText = "Preface";
+
+        // ACT: Extract text from the PDF page.
+        String extractedText = PdfTextExtractor.getTextFromPage(reader, 1, strategy);
+
+        // ASSERT: The strategy should correctly assemble the characters into a single word.
+        Assert.assertEquals(expectedText, extractedText);
+    }
+
+    /**
+     * Creates a PDF containing the word "Preface" with complex character positioning.
+     * <p>
+     * This method uses low-level PDF operators to simulate text with fine-grained spacing control:
+     * 1. A negative character spacing (`Tc` operator) is applied globally.
+     * 2. A `PdfTextArray` is used with the `TJ` operator to apply individual kerning
+     *    adjustments between each character.
+     * </p>
+     * This setup creates a challenging scenario for a text extraction algorithm, ensuring it can
+     * correctly reassemble a word from characters with non-standard spacing.
+     *
+     * @return A byte array representing the generated PDF.
+     */
+    private byte[] createPdfWithKerningAdjustments() throws DocumentException, IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Document doc = new Document();
         PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
+        writer.setCompressionLevel(0); // Disable compression for easier inspection
         doc.open();
+
         PdfContentByte canvas = writer.getDirectContent();
         canvas.beginText();
-        canvas.setFontAndSize(BaseFont.createFont(), 12);
-        canvas.moveText(45, doc.getPageSize().getHeight() - 45);
-        PdfTextArray ta = new PdfTextArray();
-        ta.add(str1);
-        ta.add(charSpacing);
-        ta.add(str2);
-        canvas.showText(ta);
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
 
-    private byte[] createPdfWithRotatedXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        boolean rotate = true;
-        PdfTemplate template = writer.getDirectContent().createTemplate(20, 100);
-        template.setColorStroke(BaseColor.GREEN);
-        template.rectangle(0, 0, template.getWidth(), template.getHeight());
-        template.stroke();
-        AffineTransform tx = new AffineTransform();
-        if (rotate) {
-            tx.translate(0, template.getHeight());
-            tx.rotate(-90 / 180f * Math.PI);
-        }
-        template.transform(tx);
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        if (rotate)
-            template.moveText(0, template.getWidth() - 12);
-        else
-            template.moveText(0, template.getHeight() - 12);
-        template.showText(xobjectText);
-        template.endText();
-        Image xobjectImage = Image.getInstance(template);
-        if (rotate)
-            xobjectImage.setRotationDegrees(90);
-        doc.add(xobjectImage);
-        doc.add(new Paragraph("C"));
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private byte[] createSimplePdf(Rectangle pageSize, final String... text) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document(pageSize);
-        PdfWriter.getInstance(document, byteStream);
-        document.open();
-        for (String string : text) {
-            document.add(new Paragraph(string));
-            document.newPage();
-        }
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    protected byte[] createPdfWithOverlappingTextHorizontal(String[] text1, String[] text2) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        PdfContentByte canvas = writer.getDirectContent();
-        float ystart = 500;
-        float xstart = 50;
-        canvas.beginText();
-        canvas.setFontAndSize(BaseFont.createFont(), 12);
-        float x = xstart;
-        float y = ystart;
-        for (String text : text1) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            x += 70.0;
-        }
-        x = xstart + 12;
-        y = ystart;
-        for (String text : text2) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            x += 70.0;
-        }
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private PdfReader createPdfWithOverlappingTextVertical(String[] text1, String[] text2) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        PdfContentByte canvas = writer.getDirectContent();
-        float ystart = 500;
-        canvas.beginText();
-        canvas.setFontAndSize(BaseFont.createFont(), 12);
-        float x = 50;
-        float y = ystart;
-        for (String text : text1) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            y -= 25.0;
-        }
-        y = ystart - 13;
-        for (String text : text2) {
-            canvas.showTextAligned(PdfContentByte.ALIGN_LEFT, text, x, y, 0);
-            y -= 25.0;
-        }
-        canvas.endText();
-        doc.close();
-        return new PdfReader(baos.toByteArray());
-    }
-
-    private byte[] createPdfWithSupescript(String regularText, String superscriptText) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter.getInstance(document, byteStream);
-        document.open();
-        document.add(new Chunk(regularText));
-        Chunk c2 = new Chunk(superscriptText);
-        c2.setTextRise(7.0f);
-        document.add(c2);
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private byte[] createPdfWithFontSpacingEqualsCharSpacing() throws DocumentException, IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
         BaseFont font = BaseFont.createFont();
         int fontSize = 12;
-        float charSpace = font.getWidth(' ') / 1000.0f;
-        PdfContentByte canvas = writer.getDirectContent();
-        canvas.beginText();
         canvas.setFontAndSize(font, fontSize);
         canvas.moveText(45, doc.getPageSize().getHeight() - 45);
-        canvas.setCharacterSpacing(-charSpace * fontSize);
+
+        // Set a negative character spacing (`Tc` operator) based on the font's space width.
+        float spaceWidthInGlyphSpace = font.getWidth(' '); // e.g., 250
+        float spaceWidthInTextSpace = spaceWidthInGlyphSpace / 1000.0f; // e.g., 0.250
+        canvas.setCharacterSpacing(-spaceWidthInTextSpace * fontSize);
+
+        // Use a `PdfTextArray` (`TJ` operator) to write "Preface" with individual kerning.
+        // The negative numbers are adjustments in thousandths of text space units,
+        // moving the subsequent character to the left.
         PdfTextArray textArray = new PdfTextArray();
         textArray.add("P");
-        textArray.add(-226.2f);
+        textArray.add(-226.2f); // Kerning adjustment between 'P' and 'r'
         textArray.add("r");
         textArray.add(-231.8f);
         textArray.add("e");
@@ -206,44 +94,9 @@ public class LocationTextExtractionStrategyTestTest10 extends SimpleTextExtracti
         textArray.add(-228.9f);
         textArray.add("e");
         canvas.showText(textArray);
+
         canvas.endText();
         doc.close();
         return baos.toByteArray();
-    }
-
-    private byte[] createPdfWithLittleFontSize() throws IOException, DocumentException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        BaseFont font = BaseFont.createFont();
-        PdfContentByte canvas = writer.getDirectContent();
-        canvas.beginText();
-        canvas.setFontAndSize(font, 0.2f);
-        canvas.moveText(45, doc.getPageSize().getHeight() - 45);
-        PdfTextArray textArray = new PdfTextArray();
-        textArray.add("P");
-        textArray.add("r");
-        textArray.add("e");
-        textArray.add("f");
-        textArray.add("a");
-        textArray.add("c");
-        textArray.add("e");
-        textArray.add(" ");
-        canvas.showText(textArray);
-        canvas.setFontAndSize(font, 10);
-        canvas.showText(textArray);
-        canvas.endText();
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    @Test
-    public void testFontSpacingEqualsCharSpacing() throws Exception {
-        byte[] content = createPdfWithFontSpacingEqualsCharSpacing();
-        PdfReader r = new PdfReader(content);
-        String text = PdfTextExtractor.getTextFromPage(r, 1, createRenderListenerForTest());
-        Assert.assertEquals("Preface", text);
     }
 }
