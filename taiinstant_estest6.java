@@ -1,26 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest6 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test class for {@link TaiInstant}.
+ * This improved test focuses on clarity and correctness.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        taiInstant0.durationUntil(taiInstant0);
-        assertEquals(0, taiInstant0.getNano());
+    /**
+     * Tests that calculating the duration from an instant to itself results in a zero duration.
+     */
+    @Test
+    public void durationUntil_whenCalledWithSameInstant_returnsZeroDuration() {
+        // Arrange: Create an instance of TaiInstant.
+        // The TAI epoch (0 seconds, 0 nanoseconds) is a simple, clear choice.
+        TaiInstant instant = TaiInstant.ofTaiSeconds(0L, 0L);
+
+        // Act: Calculate the duration from the instant to itself.
+        Duration duration = instant.durationUntil(instant);
+
+        // Assert: The duration between an instant and itself must be zero.
+        assertEquals(Duration.ZERO, duration);
     }
 }
