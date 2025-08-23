@@ -1,21 +1,27 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class BasicNodeSet_ESTestTest15 extends BasicNodeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BasicNodeSet}.
+ */
+public class BasicNodeSetTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        String string0 = basicNodeSet0.toString();
-        assertEquals("[]", string0);
+    /**
+     * Tests that the toString() method on a newly created, empty BasicNodeSet
+     * returns an empty list representation "[]".
+     */
+    @Test
+    public void toString_onEmptySet_returnsEmptyBrackets() {
+        // Arrange: Create an empty node set
+        BasicNodeSet emptyNodeSet = new BasicNodeSet();
+        String expectedRepresentation = "[]";
+
+        // Act: Get the string representation
+        String actualRepresentation = emptyNodeSet.toString();
+
+        // Assert: Verify the representation is correct
+        assertEquals(expectedRepresentation, actualRepresentation);
     }
 }
