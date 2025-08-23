@@ -2,21 +2,29 @@ package org.joda.time.chrono;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
 
-public class IslamicChronology_ESTestTest62 extends IslamicChronology_ESTest_scaffolding {
+import org.joda.time.chrono.IslamicChronology;
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        int int0 = islamicChronology0.getMinYear();
-        assertEquals(1, int0);
+/**
+ * Tests for the {@link IslamicChronology#getMinYear()} method.
+ */
+public class IslamicChronology_ESTestTest62 { // Note: Retaining original class name for context.
+
+    /**
+     * Verifies that the minimum year for the IslamicChronology is always 1,
+     * as the calendar is not proleptic (does not support dates before year 1 AH).
+     */
+    @Test
+    public void getMinYear_shouldAlwaysReturnOne() {
+        // Arrange: The IslamicChronology is a non-proleptic calendar system.
+        // Its first year is defined as 1 AH (Anno Hegirae).
+        IslamicChronology islamicChronology = IslamicChronology.getInstanceUTC();
+        int expectedMinYear = 1;
+
+        // Act: Get the minimum supported year from the chronology.
+        int actualMinYear = islamicChronology.getMinYear();
+
+        // Assert: The minimum year must be 1.
+        assertEquals("The minimum year for the IslamicChronology should be 1.", expectedMinYear, actualMinYear);
     }
 }
