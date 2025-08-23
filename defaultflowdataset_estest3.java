@@ -2,29 +2,36 @@ package org.jfree.data.flow;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultFlowDataset_ESTestTest3 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Tests for the equals() and clone() methods of the DefaultFlowDataset class.
+ */
+public class DefaultFlowDatasetEqualityTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.DEFAULT_LAYER;
-        DefaultFlowDataset<Integer> defaultFlowDataset1 = new DefaultFlowDataset<Integer>();
-        assertTrue(defaultFlowDataset1.equals((Object) defaultFlowDataset0));
-        defaultFlowDataset1.setFlow(1, integer0, integer0, 1);
-        Object object0 = defaultFlowDataset1.clone();
-        boolean boolean0 = defaultFlowDataset0.equals(object0);
-        assertFalse(defaultFlowDataset1.equals((Object) defaultFlowDataset0));
-        assertFalse(boolean0);
+    @Test
+    public void equals_returnsFalseWhenComparingToACloneOfADifferentDataset() throws CloneNotSupportedException {
+        // Arrange: Create two distinct but initially identical datasets.
+        DefaultFlowDataset<Integer> originalDataset = new DefaultFlowDataset<>();
+        DefaultFlowDataset<Integer> datasetToModify = new DefaultFlowDataset<>();
+
+        // Sanity check: ensure they are equal when empty.
+        assertTrue("Two new empty datasets should be equal", originalDataset.equals(datasetToModify));
+
+        // Act: Modify one dataset and then create a clone of it.
+        Integer node = 0;
+        double flowValue = 1.0;
+        datasetToModify.setFlow(1, node, node, flowValue);
+        
+        Object cloneOfModifiedDataset = datasetToModify.clone();
+
+        // Assert: The original empty dataset should not be equal to the modified one or its clone.
+        assertFalse("An empty dataset should not be equal to a modified one",
+                originalDataset.equals(datasetToModify));
+        assertFalse("An empty dataset should not be equal to the clone of a modified one",
+                originalDataset.equals(cloneOfModifiedDataset));
+
+        // Also, verify that the modified dataset is equal to its own clone.
+        assertTrue("A dataset should be equal to its clone",
+                datasetToModify.equals(cloneOfModifiedDataset));
     }
 }
