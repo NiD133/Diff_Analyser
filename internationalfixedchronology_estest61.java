@@ -1,48 +1,29 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class InternationalFixedChronology_ESTestTest61 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the range of fields in {@link InternationalFixedChronology}.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        ChronoField chronoField0 = ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR;
-        ValueRange valueRange0 = internationalFixedChronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+    /**
+     * Tests that the range for ALIGNED_DAY_OF_WEEK_IN_YEAR is correctly handled.
+     * This field is delegated to the default ISO implementation, which has a range of 1-7.
+     */
+    @Test
+    public void range_forAlignedDayOfWeekInYear_returnsCorrectRange() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        ValueRange expectedRange = ValueRange.of(1, 7);
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR);
+
+        // Assert
+        assertEquals("The range for ALIGNED_DAY_OF_WEEK_IN_YEAR should be 1-7", expectedRange, actualRange);
     }
 }
