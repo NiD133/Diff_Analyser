@@ -1,30 +1,30 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest21 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ * This class focuses on testing specific behaviors of the factory initialization.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        // Undeclared exception!
-        try {
-            spatialContextFactory0.initFormats();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
-        }
+    /**
+     * Verifies that calling initFormats() on a SpatialContextFactory instance
+     * created with the default constructor throws a NullPointerException.
+     * <p>
+     * This occurs because the default constructor does not initialize the internal 'args'
+     * map, and initFormats() attempts to access it without a null check.
+     */
+    @Test(expected = NullPointerException.class)
+    public void initFormats_whenArgsNotInitialized_throwsNullPointerException() {
+        // Arrange: Create a factory using the default constructor.
+        // In this state, the internal 'args' map is null.
+        SpatialContextFactory factory = new SpatialContextFactory();
+
+        // Act: Attempt to initialize formats. This is expected to fail.
+        factory.initFormats();
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
