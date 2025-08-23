@@ -1,44 +1,27 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DayOfMonth_ESTestTest22 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Test class for {@link DayOfMonth}.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        ChronoField chronoField0 = ChronoField.DAY_OF_MONTH;
-        long long0 = dayOfMonth0.getLong(chronoField0);
-        assertEquals(14L, long0);
+    /**
+     * Tests that getLong() with ChronoField.DAY_OF_MONTH returns the correct day value.
+     */
+    @Test
+    public void getLongWithDayOfMonthFieldReturnsCorrectValue() {
+        // Arrange: Create a DayOfMonth instance representing the 14th day of the month.
+        DayOfMonth dayOfMonth = DayOfMonth.of(14);
+        long expectedDay = 14L;
+
+        // Act: Get the value using the getLong() method.
+        long actualDay = dayOfMonth.getLong(ChronoField.DAY_OF_MONTH);
+
+        // Assert: The returned value should match the day the instance was created with.
+        assertEquals(expectedDay, actualDay);
     }
 }
