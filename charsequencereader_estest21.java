@@ -1,31 +1,35 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest21 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * This class contains improved tests for {@link CharSequenceReader}.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+public class CharSequenceReader_ESTestTest21 {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        // Undeclared exception!
+    /**
+     * Verifies that the mark() method rejects negative arguments, as specified by its contract.
+     */
+    @Test
+    public void mark_throwsIllegalArgumentException_forNegativeReadAheadLimit() throws IOException {
+        // Arrange: Create a reader and define an invalid input value.
+        // The actual content of the sequence is not relevant for this test.
+        CharSequenceReader reader = new CharSequenceReader("any-sequence");
+        int invalidReadAheadLimit = -1;
+
+        // Act & Assert: Verify that calling mark() with a negative value throws an exception.
         try {
-            charSequenceReader0.mark((-1897));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // readAheadLimit (java.lang.Integer@0000000002) may not be negative
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+            reader.mark(invalidReadAheadLimit);
+            fail("Expected mark() to throw IllegalArgumentException for a negative readAheadLimit.");
+        } catch (IllegalArgumentException expected) {
+            // The implementation uses Guava's Preconditions, which generates a specific message.
+            // Verifying this message ensures the correct validation is being triggered.
+            assertEquals("readAheadLimit may not be negative", expected.getMessage());
         }
     }
 }
