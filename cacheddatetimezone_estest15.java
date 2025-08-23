@@ -1,24 +1,32 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class CachedDateTimeZone_ESTestTest15 extends CachedDateTimeZone_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        String string0 = cachedDateTimeZone0.getNameKey((-1048L));
-        assertEquals("UTC", string0);
+    @Test
+    public void getNameKey_forCachedUTCZone_returnsUTC() {
+        // Arrange
+        // Use a specific, non-default time zone (UTC) to ensure the test is deterministic.
+        // The behavior of a test should not depend on the environment's default time zone.
+        DateTimeZone utcZone = DateTimeZone.UTC;
+        CachedDateTimeZone cachedUtcZone = CachedDateTimeZone.forZone(utcZone);
+
+        // The specific instant does not matter for a fixed zone like UTC,
+        // as the name key is always the same.
+        long instant = -1048L;
+        String expectedNameKey = "UTC";
+
+        // Act
+        String actualNameKey = cachedUtcZone.getNameKey(instant);
+
+        // Assert
+        assertEquals("The name key for the cached UTC zone should always be 'UTC'",
+                     expectedNameKey, actualNameKey);
     }
 }
