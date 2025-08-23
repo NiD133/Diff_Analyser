@@ -1,44 +1,41 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
 import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
+/**
+ * This test class contains the refactored test case.
+ * The original class name 'ModuloAxis_ESTestTest38' and scaffolding are preserved
+ * to match the context provided.
+ */
 public class ModuloAxis_ESTestTest38 extends ModuloAxis_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        ModuloAxis moduloAxis1 = (ModuloAxis) moduloAxis0.clone();
-        boolean boolean0 = moduloAxis0.equals(moduloAxis1);
-        assertEquals(90.0, moduloAxis1.getDisplayEnd(), 0.01);
-        assertTrue(boolean0);
-        assertEquals(270.0, moduloAxis1.getDisplayStart(), 0.01);
+    /**
+     * Verifies that a cloned ModuloAxis instance is equal to the original object,
+     * but is not the same instance, fulfilling the contract of clone() and equals().
+     */
+    @Test
+    public void clone_shouldReturnEqualButNotSameInstance() throws CloneNotSupportedException {
+        // Arrange: Create an original ModuloAxis instance with a specific range.
+        Range fixedRange = DateAxis.DEFAULT_DATE_RANGE;
+        ModuloAxis originalAxis = new ModuloAxis("Test Axis", fixedRange);
+
+        // Act: Clone the original axis.
+        ModuloAxis clonedAxis = (ModuloAxis) originalAxis.clone();
+
+        // Assert: The cloned object should be a different instance from the original.
+        assertNotSame("The cloned object should be a new instance.", originalAxis, clonedAxis);
+
+        // Assert: The cloned object should be considered equal to the original.
+        assertEquals("The cloned object's state should be equal to the original's.", originalAxis, clonedAxis);
+
+        // Further Assert: Verify that key properties were correctly copied to the clone.
+        // The constructor sets default display values of 270.0 (start) and 90.0 (end).
+        assertEquals("Cloned displayStart should match default value.", 270.0, clonedAxis.getDisplayStart(), 0.01);
+        assertEquals("Cloned displayEnd should match default value.", 90.0, clonedAxis.getDisplayEnd(), 0.01);
     }
 }
