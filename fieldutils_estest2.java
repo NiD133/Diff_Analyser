@@ -1,23 +1,31 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest2 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        int int0 = FieldUtils.getWrappedValue((-436), 0, (-436), 0);
-        assertEquals((-436), int0);
+    /**
+     * Tests that getWrappedValue returns the minimum value when the current value
+     * is already the minimum and the wrap amount is zero. This is a test for a
+     * basic boundary condition.
+     */
+    @Test
+    public void getWrappedValue_withValueAtMinimumAndZeroWrap_shouldReturnMinimum() {
+        // Arrange
+        int currentValue = -436;
+        int wrapValue = 0;
+        int minValue = -436;
+        int maxValue = 0;
+        int expectedValue = -436;
+
+        // Act
+        int actualValue = FieldUtils.getWrappedValue(currentValue, wrapValue, minValue, maxValue);
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
