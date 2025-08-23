@@ -1,27 +1,39 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class LinkedTreeMap_ESTestTest76 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Test for the EntrySet view of the LinkedTreeMap.
+ * This focuses on the behavior of the clear() method.
+ */
+public class LinkedTreeMapEntrySetTest {
 
-    @Test(timeout = 4000)
-    public void test75() throws Throwable {
-        Comparator<LinkedTreeMap<Integer, Integer>> comparator0 = (Comparator<LinkedTreeMap<Integer, Integer>>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap0 = new LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer>(comparator0, false);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        linkedTreeMap_EntrySet0.clear();
-        assertEquals(0, linkedTreeMap_EntrySet0.size());
+    @Test
+    public void entrySetClear_removesAllEntriesFromBackingMap() {
+        // Arrange: Create a LinkedTreeMap and add several entries.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        map.put("one", 1);
+        map.put("two", 2);
+        map.put("three", 3);
+
+        // The entrySet is a view of the map, so it should not be empty.
+        Set<Map.Entry<String, Integer>> entrySet = map.entrySet();
+        assertFalse("Precondition failed: Map should not be empty", map.isEmpty());
+        assertEquals("Precondition failed: Entry set size should match map size", 3, entrySet.size());
+
+        // Act: Clear the entry set.
+        entrySet.clear();
+
+        // Assert: The entry set and the backing map should both be empty.
+        assertTrue("The entry set should be empty after clear()", entrySet.isEmpty());
+        assertEquals("The entry set size should be 0 after clear()", 0, entrySet.size());
+
+        assertTrue("The backing map should be empty after clearing its entry set", map.isEmpty());
+        assertEquals("The backing map size should be 0 after clearing its entry set", 0, map.size());
     }
 }
