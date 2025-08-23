@@ -1,27 +1,27 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest31 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Test suite for the QuotedPrintableCodec class, focusing on exception handling.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.decode("4>&$1^)O:\"", (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that the decode(String, String) method throws a NullPointerException
+     * when the provided charset name is null. This is the expected behavior as
+     * the underlying {@link java.nio.charset.Charset#forName(String)} method
+     * throws a NullPointerException for a null input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testDecodeWithNullCharsetNameThrowsNullPointerException() {
+        // Arrange
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        // The actual content of the input string is irrelevant for this test.
+        String anyEncodedString = "some-text";
+
+        // Act & Assert
+        // Calling decode with a null charset name should trigger the exception.
+        codec.decode(anyEncodedString, (String) null);
     }
 }
