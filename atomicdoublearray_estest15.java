@@ -1,23 +1,29 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest15 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Unit tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        double[] doubleArray0 = new double[8];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        double double0 = atomicDoubleArray0.addAndGet(0, 0.0);
-        assertEquals(0.0, double0, 0.01);
+    @Test
+    public void addAndGet_whenAddingZero_returnsUnchangedValue() {
+        // Arrange
+        final double initialValue = 12.34;
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(new double[]{initialValue});
+        final int index = 0;
+        final double deltaToAdd = 0.0;
+
+        // Act
+        double updatedValue = atomicArray.addAndGet(index, deltaToAdd);
+
+        // Assert
+        // The method should return the new value, which is unchanged.
+        assertEquals(initialValue, updatedValue, 0.0);
+        // The value in the array at the specified index should also remain unchanged.
+        assertEquals(initialValue, atomicArray.get(index), 0.0);
     }
 }
