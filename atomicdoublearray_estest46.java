@@ -1,31 +1,32 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest46 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        double[] doubleArray0 = new double[9];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        // Undeclared exception!
-        try {
-            atomicDoubleArray0.getAndAdd((-200), (-198.0));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index -200
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-        }
+    @Test
+    public void getAndAdd_withNegativeIndex_throwsIndexOutOfBoundsException() {
+        // Arrange: Create an array and define an invalid (negative) index.
+        // The array size and value to add are arbitrary for this test.
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(10);
+        int negativeIndex = -200;
+        double valueToAdd = 1.0;
+
+        // Act & Assert: Verify that calling getAndAdd with the negative index throws the
+        // correct exception with the expected message.
+        IndexOutOfBoundsException thrown = assertThrows(
+            IndexOutOfBoundsException.class,
+            () -> atomicArray.getAndAdd(negativeIndex, valueToAdd)
+        );
+
+        // The exception message format "index <index>" is part of the contract
+        // of the underlying java.util.concurrent.atomic.AtomicLongArray.
+        assertEquals("index " + negativeIndex, thrown.getMessage());
     }
 }
