@@ -1,17 +1,28 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest1 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        float float0 = IEEE754rUtils.min(0.0F, 629.0559F, (-161.0F));
-        assertEquals((-161.0F), float0, 0.01F);
+    /**
+     * Tests that {@link IEEE754rUtils#min(float, float, float)} correctly returns the smallest
+     * of three distinct float values.
+     */
+    @Test
+    public void testMinFloatShouldReturnSmallestOfThreeValues() {
+        // Arrange
+        final float value1 = 0.0F;
+        final float value2 = 629.0559F;
+        final float smallestValue = -161.0F;
+        
+        // Act
+        final float result = IEEE754rUtils.min(value1, value2, smallestValue);
+
+        // Assert
+        assertEquals(smallestValue, result, 0.0F);
     }
 }
