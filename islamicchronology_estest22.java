@@ -1,24 +1,36 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+
+/**
+ * This test class focuses on the behavior of the IslamicChronology.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class IslamicChronology_ESTestTest22 extends IslamicChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        UTCProvider uTCProvider0 = new UTCProvider();
-        GJChronology gJChronology0 = GJChronology.getInstance((DateTimeZone) null);
-        IslamicChronology islamicChronology0 = new IslamicChronology(gJChronology0, uTCProvider0, (IslamicChronology.LeapYearPatternType) null);
-        IslamicChronology.LeapYearPatternType islamicChronology_LeapYearPatternType0 = islamicChronology0.getLeapYearPatternType();
-        assertNull(islamicChronology_LeapYearPatternType0);
+    /**
+     * Tests that getLeapYearPatternType() returns null if the chronology is
+     * instantiated with a null leap year pattern via its package-private constructor.
+     */
+    @Test
+    public void getLeapYearPatternType_shouldReturnNull_whenConstructedWithNullPattern() {
+        // Arrange
+        // This test directly invokes the package-private constructor to test an internal state.
+        // The public factory methods (e.g., getInstance()) always provide a default leap year pattern.
+        Chronology baseChronology = GJChronology.getInstance(DateTimeZone.UTC);
+        Object dummyParam = "test-param"; // The 'param' object is for internal use (serialization).
+        IslamicChronology.LeapYearPatternType nullPattern = null;
+
+        IslamicChronology chronology = new IslamicChronology(baseChronology, dummyParam, nullPattern);
+
+        // Act
+        IslamicChronology.LeapYearPatternType actualPattern = chronology.getLeapYearPatternType();
+
+        // Assert
+        assertNull("The leap year pattern should be null when the chronology is constructed with a null pattern.", actualPattern);
     }
 }
