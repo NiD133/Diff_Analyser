@@ -1,51 +1,69 @@
 package org.apache.ibatis.submitted.blocking_cache;
 
-import java.io.Reader;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class BlockingCacheTestTest2 {
+import java.io.Reader;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+/**
+ * Test for the BlockingCache decorator to ensure it does not cause deadlocks.
+ *
+ * @see org.apache.ibatis.cache.decorators.BlockingCache
+ */
+class BlockingCacheTest {
 
     private static SqlSessionFactory sqlSessionFactory;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        // create a SqlSessionFactory
+    @BeforeAll
+    static void setup() throws Exception {
+        // Create a shared SqlSessionFactory for all tests in this class.
         try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/blocking_cache/mybatis-config.xml")) {
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         }
-        // populate in-memory database
-        BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(), "org/apache/ibatis/submitted/blocking_cache/CreateDB.sql");
+
+        // Populate the in-memory database once.
+        BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
+                "org/apache/ibatis/submitted/blocking_cache/CreateDB.sql");
     }
 
-    private void accessDB() {
-        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-            PersonMapper pm = sqlSession.getMapper(PersonMapper.class);
-            pm.findAll();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Assertions.fail(e.getMessage());
-            }
-        }
-    }
-
+    /**
+     * Verifies that a cache miss following a cache clear does not cause a deadlock.
+     *
+     * This scenario was known to cause deadlocks in earlier versions (see MyBatis issue #593).
+     * The test simulates this by:
+     * 1. Flushing the cache using a mapper method configured with `flushCache=true`.
+     * 2. Immediately querying the cache, causing a cache miss that engages the locking mechanism.
+     *
+     * The test passes if the sequence completes without a timeout or exception.
+     */
     @Test
-    void ensureLockIsAcquiredBeforePut() {
-        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-            PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
-            mapper.delete(-1);
-            mapper.findAll();
-            sqlSession.commit();
-        }
+    void shouldNotDeadlockOnCacheMissAfterClear() {
+        // The assertion is that the following block executes without throwing an exception,
+        // which would indicate a deadlock or timeout in the BlockingCache.
+        assertDoesNotThrow(() -> {
+            try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+                // Arrange: Get a mapper instance.
+                PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
+
+                // Act:
+                // 1. The delete() operation is configured with flushCache="true" in PersonMapper.xml,
+                //    effectively clearing the cache for this namespace.
+                mapper.delete(-1);
+
+                // 2. This query will now result in a cache miss. The BlockingCache will acquire a
+                //    lock to prevent other threads from hitting the database for the same key.
+                //    The test ensures this process doesn't lead to a self-deadlock.
+                mapper.findAll();
+
+                sqlSession.commit();
+            }
+        });
     }
 }
