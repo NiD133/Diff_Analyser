@@ -1,32 +1,52 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import org.w3c.dom.Node;
+
+import javax.imageio.metadata.IIOMetadataNode;
 import java.util.Properties;
 import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest99 extends XNode_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test098() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Supplier<String> supplier0 = (Supplier<String>) mock(Supplier.class, new ViolatedAssumptionAnswer());
-        doReturn("cK(Z'").when(supplier0).get();
-        String string0 = xNode0.getStringAttribute("cK(Z'", supplier0);
-        assertEquals("cK(Z'", string0);
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Tests that getStringAttribute() returns the default value from a supplier
+     * when the requested attribute does not exist on the XML node.
+     */
+    @Test
+    public void shouldReturnDefaultValueFromSupplierWhenAttributeIsMissing() {
+        // Arrange
+        // 1. Create an empty XML node that has no attributes.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+
+        // 2. Define the attribute we are looking for and its expected default value.
+        String attributeName = "id";
+        String defaultValue = "default-id-123";
+
+        // 3. Mock a supplier to provide the default value when called.
+        @SuppressWarnings("unchecked") // Mockito's mock() returns a raw Supplier
+        Supplier<String> defaultValueSupplier = mock(Supplier.class);
+        when(defaultValueSupplier.get()).thenReturn(defaultValue);
+
+        // Act
+        // Attempt to get the non-existent attribute, which should trigger the supplier.
+        String actualValue = xNode.getStringAttribute(attributeName, defaultValueSupplier);
+
+        // Assert
+        // 1. The returned value should be the default value provided by the supplier.
+        assertEquals(defaultValue, actualValue);
+
+        // 2. Verify that the supplier's get() method was called exactly once to confirm
+        //    that the default value was sourced correctly.
+        verify(defaultValueSupplier).get();
     }
 }
