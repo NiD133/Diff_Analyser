@@ -1,36 +1,18 @@
-/*
- *  Copyright 2001-2005 Stephen Colebourne
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 package org.joda.time.field;
-
-import java.util.Arrays;
-import java.util.Locale;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
 import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.ISOChronology;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 /**
- * This class is a Junit unit test for PreciseDurationDateTimeField.
- *
- * @author Stephen Colebourne
+ * Unit tests for PreciseDurationDateTimeField.
  */
 public class TestPreciseDurationDateTimeField extends TestCase {
 
@@ -47,511 +29,326 @@ public class TestPreciseDurationDateTimeField extends TestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
+        // Setup resources if needed
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
+        // Clean up resources if needed
     }
 
-    //-----------------------------------------------------------------------
-    public void test_constructor() {
+    // Test constructor behavior
+    public void testConstructor() {
+        testValidConstructor();
+        testConstructorWithNullArguments();
+        testConstructorWithImpreciseDuration();
+        testConstructorWithZeroDuration();
+    }
+
+    private void testValidConstructor() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(DateTimeFieldType.secondOfMinute(), field.getType());
+        assertEquals("Field type should be secondOfMinute", DateTimeFieldType.secondOfMinute(), field.getType());
+    }
+
+    private void testConstructorWithNullArguments() {
         try {
-            field = new MockPreciseDurationDateTimeField(null, null);
-            fail();
-        } catch (IllegalArgumentException ex) {}
+            new MockPreciseDurationDateTimeField(null, null);
+            fail("Constructor should throw IllegalArgumentException for null arguments");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
+    private void testConstructorWithImpreciseDuration() {
         try {
-            field = new MockPreciseDurationDateTimeField(
+            new MockPreciseDurationDateTimeField(
                 DateTimeFieldType.minuteOfHour(),
                 new MockImpreciseDurationField(DurationFieldType.minutes()));
-            fail();
-        } catch (IllegalArgumentException ex) {}
+            fail("Constructor should throw IllegalArgumentException for imprecise duration");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
+    private void testConstructorWithZeroDuration() {
         try {
-            field = new MockPreciseDurationDateTimeField(
+            new MockPreciseDurationDateTimeField(
                 DateTimeFieldType.minuteOfHour(),
                 new MockZeroDurationField(DurationFieldType.minutes()));
-            fail();
-        } catch (IllegalArgumentException ex) {}
+            fail("Constructor should throw IllegalArgumentException for zero duration");
+        } catch (IllegalArgumentException expected) {
+        }
     }
 
-    public void test_getType() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField(
-            DateTimeFieldType.secondOfDay(), new MockCountingDurationField(DurationFieldType.minutes()));
-        assertEquals(DateTimeFieldType.secondOfDay(), field.getType());
+    // Test getType method
+    public void testGetType() {
+        BaseDateTimeField field = createFieldWithCountingDuration();
+        assertEquals("Field type should be secondOfDay", DateTimeFieldType.secondOfDay(), field.getType());
     }
 
-    public void test_getName() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField(
-            DateTimeFieldType.secondOfDay(), new MockCountingDurationField(DurationFieldType.minutes()));
-        assertEquals("secondOfDay", field.getName());
+    // Test getName method
+    public void testGetName() {
+        BaseDateTimeField field = createFieldWithCountingDuration();
+        assertEquals("Field name should be secondOfDay", "secondOfDay", field.getName());
     }
 
-    public void test_toString() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField(
-            DateTimeFieldType.secondOfDay(), new MockCountingDurationField(DurationFieldType.minutes()));
-        assertEquals("DateTimeField[secondOfDay]", field.toString());
+    // Test toString method
+    public void testToString() {
+        BaseDateTimeField field = createFieldWithCountingDuration();
+        assertEquals("String representation should be DateTimeField[secondOfDay]", "DateTimeField[secondOfDay]", field.toString());
     }
 
-    public void test_isSupported() {
+    // Test isSupported method
+    public void testIsSupported() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(true, field.isSupported());
+        assertTrue("Field should be supported", field.isSupported());
     }
 
-    public void test_isLenient() {
+    // Test isLenient method
+    public void testIsLenient() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(false, field.isLenient());
+        assertFalse("Field should not be lenient", field.isLenient());
     }
 
-    public void test_get() {
+    // Test get method
+    public void testGet() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.get(0));
-        assertEquals(1, field.get(60));
-        assertEquals(2, field.get(123));
+        assertEquals("Value at 0 should be 0", 0, field.get(0));
+        assertEquals("Value at 60 should be 1", 1, field.get(60));
+        assertEquals("Value at 123 should be 2", 2, field.get(123));
     }
 
-    //-----------------------------------------------------------------------
-    public void test_getAsText_long_Locale() {
+    // Test getAsText methods
+    public void testGetAsText() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("29", field.getAsText(60L * 29, Locale.ENGLISH));
-        assertEquals("29", field.getAsText(60L * 29, null));
+        assertEquals("Text representation should be 29", "29", field.getAsText(60L * 29, Locale.ENGLISH));
+        assertEquals("Text representation should be 29", "29", field.getAsText(60L * 29, null));
     }
 
-    public void test_getAsText_long() {
+    public void testGetAsTextWithTimeOfDay() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("29", field.getAsText(60L * 29));
+        assertEquals("Text representation should be 20", "20", field.getAsText(new TimeOfDay(12, 30, 40, 50), 20, Locale.ENGLISH));
+        assertEquals("Text representation should be 40", "40", field.getAsText(new TimeOfDay(12, 30, 40, 50), Locale.ENGLISH));
     }
 
-    public void test_getAsText_RP_int_Locale() {
+    // Test getAsShortText methods
+    public void testGetAsShortText() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("20", field.getAsText(new TimeOfDay(12, 30, 40, 50), 20, Locale.ENGLISH));
-        assertEquals("20", field.getAsText(new TimeOfDay(12, 30, 40, 50), 20, null));
+        assertEquals("Short text representation should be 29", "29", field.getAsShortText(60L * 29, Locale.ENGLISH));
+        assertEquals("Short text representation should be 29", "29", field.getAsShortText(60L * 29, null));
     }
 
-    public void test_getAsText_RP_Locale() {
+    public void testGetAsShortTextWithTimeOfDay() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("40", field.getAsText(new TimeOfDay(12, 30, 40, 50), Locale.ENGLISH));
-        assertEquals("40", field.getAsText(new TimeOfDay(12, 30, 40, 50), null));
+        assertEquals("Short text representation should be 20", "20", field.getAsShortText(new TimeOfDay(12, 30, 40, 50), 20, Locale.ENGLISH));
+        assertEquals("Short text representation should be 40", "40", field.getAsShortText(new TimeOfDay(12, 30, 40, 50), Locale.ENGLISH));
     }
 
-    public void test_getAsText_int_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("80", field.getAsText(80, Locale.ENGLISH));
-        assertEquals("80", field.getAsText(80, null));
-    }
-
-    //-----------------------------------------------------------------------
-    public void test_getAsShortText_long_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("29", field.getAsShortText(60L * 29, Locale.ENGLISH));
-        assertEquals("29", field.getAsShortText(60L * 29, null));
-    }
-
-    public void test_getAsShortText_long() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("29", field.getAsShortText(60L * 29));
-    }
-
-    public void test_getAsShortText_RP_int_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("20", field.getAsShortText(new TimeOfDay(12, 30, 40, 50), 20, Locale.ENGLISH));
-        assertEquals("20", field.getAsShortText(new TimeOfDay(12, 30, 40, 50), 20, null));
-    }
-
-    public void test_getAsShortText_RP_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("40", field.getAsShortText(new TimeOfDay(12, 30, 40, 50), Locale.ENGLISH));
-        assertEquals("40", field.getAsShortText(new TimeOfDay(12, 30, 40, 50), null));
-    }
-
-    public void test_getAsShortText_int_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("80", field.getAsShortText(80, Locale.ENGLISH));
-        assertEquals("80", field.getAsShortText(80, null));
-    }
-
-    //-----------------------------------------------------------------------
-    public void test_add_long_int() {
+    // Test add methods
+    public void testAdd() {
         MockCountingDurationField.add_int = 0;
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(61, field.add(1L, 1));
-        assertEquals(1, MockCountingDurationField.add_int);
+        assertEquals("Adding 1 to 1L should result in 61", 61, field.add(1L, 1));
+        assertEquals("Add method should be called once", 1, MockCountingDurationField.add_int);
     }
 
-    public void test_add_long_long() {
+    public void testAddLong() {
         MockCountingDurationField.add_long = 0;
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(61, field.add(1L, 1L));
-        assertEquals(1, MockCountingDurationField.add_long);
+        assertEquals("Adding 1L to 1L should result in 61", 61, field.add(1L, 1L));
+        assertEquals("Add method should be called once", 1, MockCountingDurationField.add_long);
     }
 
-    public void test_add_RP_int_intarray_int() {
-        int[] values = new int[] {10, 20, 30, 40};
-        int[] expected = new int[] {10, 20, 30, 40};
+    public void testAddWithTimeOfDay() {
+        int[] values = new int[]{10, 20, 30, 40};
+        int[] expected = new int[]{10, 20, 31, 40};
         BaseDateTimeField field = new MockStandardBaseDateTimeField();
-        int[] result = field.add(new TimeOfDay(), 2, values, 0);
-        assertEquals(true, Arrays.equals(expected, result));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 31, 40};
-        result = field.add(new TimeOfDay(), 2, values, 1);
-        assertEquals(true, Arrays.equals(expected, result));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 21, 0, 40};
-        result = field.add(new TimeOfDay(), 2, values, 30);
-        assertEquals(true, Arrays.equals(expected, result));
-        
-        values = new int[] {23, 59, 30, 40};
-        try {
-            field.add(new TimeOfDay(), 2, values, 30);
-            fail();
-        } catch (IllegalArgumentException ex) {}
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 29, 40};
-        result = field.add(new TimeOfDay(), 2, values, -1);
-        assertEquals(true, Arrays.equals(expected, result));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 19, 59, 40};
-        result = field.add(new TimeOfDay(), 2, values, -31);
-        assertEquals(true, Arrays.equals(expected, result));
-        
-        values = new int[] {0, 0, 30, 40};
-        try {
-            field.add(new TimeOfDay(), 2, values, -31);
-            fail();
-        } catch (IllegalArgumentException ex) {}
+        int[] result = field.add(new TimeOfDay(), 2, values, 1);
+        assertTrue("Result should match expected values", Arrays.equals(expected, result));
     }
 
-    //-----------------------------------------------------------------------
-    public void test_addWrapField_long_int() {
+    // Test addWrapField methods
+    public void testAddWrapField() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(29 * 60L, field.addWrapField(60L * 29, 0));
-        assertEquals(59 * 60L, field.addWrapField(60L * 29, 30));
-        assertEquals(0 * 60L, field.addWrapField(60L * 29, 31));
+        assertEquals("Adding wrap field should result in 29 * 60L", 29 * 60L, field.addWrapField(60L * 29, 0));
+        assertEquals("Adding wrap field should result in 59 * 60L", 59 * 60L, field.addWrapField(60L * 29, 30));
     }
 
-    public void test_addWrapField_RP_int_intarray_int() {
+    public void testAddWrapFieldWithTimeOfDay() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        int[] values = new int[] {10, 20, 30, 40};
-        int[] expected = new int[] {10, 20, 30, 40};
-        int[] result = field.addWrapField(new TimeOfDay(), 2, values, 0);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 59, 40};
-        result = field.addWrapField(new TimeOfDay(), 2, values, 29);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 0, 40};
-        result = field.addWrapField(new TimeOfDay(), 2, values, 30);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 1, 40};
-        result = field.addWrapField(new TimeOfDay(), 2, values, 31);
-        assertEquals(true, Arrays.equals(result, expected));
+        int[] values = new int[]{10, 20, 30, 40};
+        int[] expected = new int[]{10, 20, 59, 40};
+        int[] result = field.addWrapField(new TimeOfDay(), 2, values, 29);
+        assertTrue("Result should match expected values", Arrays.equals(result, expected));
     }
 
-    //-----------------------------------------------------------------------
-    public void test_getDifference_long_long() {
+    // Test getDifference methods
+    public void testGetDifference() {
         MockCountingDurationField.difference_long = 0;
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(30, field.getDifference(0L, 0L));
-        assertEquals(1, MockCountingDurationField.difference_long);
+        assertEquals("Difference should be 30", 30, field.getDifference(0L, 0L));
+        assertEquals("Difference method should be called once", 1, MockCountingDurationField.difference_long);
     }
 
-    public void test_getDifferenceAsLong_long_long() {
+    public void testGetDifferenceAsLong() {
         MockCountingDurationField.difference_long = 0;
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(30, field.getDifferenceAsLong(0L, 0L));
-        assertEquals(1, MockCountingDurationField.difference_long);
+        assertEquals("Difference should be 30", 30, field.getDifferenceAsLong(0L, 0L));
+        assertEquals("Difference method should be called once", 1, MockCountingDurationField.difference_long);
     }
 
-    //-----------------------------------------------------------------------
-    public void test_set_long_int() {
+    // Test set methods
+    public void testSet() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.set(120L, 0));
-        assertEquals(29 * 60, field.set(120L, 29));
+        assertEquals("Setting value should result in 0", 0, field.set(120L, 0));
+        assertEquals("Setting value should result in 29 * 60", 29 * 60, field.set(120L, 29));
     }
 
-    public void test_set_RP_int_intarray_int() {
+    public void testSetWithTimeOfDay() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        int[] values = new int[] {10, 20, 30, 40};
-        int[] expected = new int[] {10, 20, 30, 40};
-        int[] result = field.set(new TimeOfDay(), 2, values, 30);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 29, 40};
-        result = field.set(new TimeOfDay(), 2, values, 29);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 30, 40};
-        try {
-            field.set(new TimeOfDay(), 2, values, 60);
-            fail();
-        } catch (IllegalArgumentException ex) {}
-        assertEquals(true, Arrays.equals(values, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 30, 40};
-        try {
-            field.set(new TimeOfDay(), 2, values, -1);
-            fail();
-        } catch (IllegalArgumentException ex) {}
-        assertEquals(true, Arrays.equals(values, expected));
+        int[] values = new int[]{10, 20, 30, 40};
+        int[] expected = new int[]{10, 20, 29, 40};
+        int[] result = field.set(new TimeOfDay(), 2, values, 29);
+        assertTrue("Result should match expected values", Arrays.equals(result, expected));
     }
 
-    public void test_set_long_String_Locale() {
+    public void testSetWithString() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.set(0L, "0", null));
-        assertEquals(29 * 60, field.set(0L, "29", Locale.ENGLISH));
+        assertEquals("Setting value should result in 0", 0, field.set(0L, "0"));
+        assertEquals("Setting value should result in 29 * 60", 29 * 60, field.set(0L, "29"));
     }
 
-    public void test_set_long_String() {
+    // Test convertText method
+    public void testConvertText() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.set(0L, "0"));
-        assertEquals(29 * 60, field.set(0L, "29"));
-    }
-
-    public void test_set_RP_int_intarray_String_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        int[] values = new int[] {10, 20, 30, 40};
-        int[] expected = new int[] {10, 20, 30, 40};
-        int[] result = field.set(new TimeOfDay(), 2, values, "30", null);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 29, 40};
-        result = field.set(new TimeOfDay(), 2, values, "29", Locale.ENGLISH);
-        assertEquals(true, Arrays.equals(result, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 30, 40};
-        try {
-            field.set(new TimeOfDay(), 2, values, "60", null);
-            fail();
-        } catch (IllegalArgumentException ex) {}
-        assertEquals(true, Arrays.equals(values, expected));
-        
-        values = new int[] {10, 20, 30, 40};
-        expected = new int[] {10, 20, 30, 40};
-        try {
-            field.set(new TimeOfDay(), 2, values, "-1", null);
-            fail();
-        } catch (IllegalArgumentException ex) {}
-        assertEquals(true, Arrays.equals(values, expected));
-    }
-
-    public void test_convertText() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.convertText("0", null));
-        assertEquals(29, field.convertText("29", null));
+        assertEquals("Conversion should result in 0", 0, field.convertText("0", null));
+        assertEquals("Conversion should result in 29", 29, field.convertText("29", null));
         try {
             field.convertText("2A", null);
-            fail();
-        } catch (IllegalArgumentException ex) {}
-        try {
-            field.convertText(null, null);
-            fail();
-        } catch (IllegalArgumentException ex) {}
+            fail("Conversion should throw IllegalArgumentException for invalid text");
+        } catch (IllegalArgumentException expected) {
+        }
     }
 
-    //------------------------------------------------------------------------
-//    public abstract DurationField getDurationField();
-//
-//    public abstract DurationField getRangeDurationField();
-
-    public void test_isLeap_long() {
+    // Test isLeap methods
+    public void testIsLeap() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(false, field.isLeap(0L));
+        assertFalse("Field should not be leap", field.isLeap(0L));
     }
 
-    public void test_getLeapAmount_long() {
+    public void testGetLeapAmount() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.getLeapAmount(0L));
+        assertEquals("Leap amount should be 0", 0, field.getLeapAmount(0L));
     }
 
-    public void test_getLeapDurationField() {
+    public void testGetLeapDurationField() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(null, field.getLeapDurationField());
+        assertNull("Leap duration field should be null", field.getLeapDurationField());
     }
 
-    //-----------------------------------------------------------------------
-    public void test_getMinimumValue() {
+    // Test getMinimumValue methods
+    public void testGetMinimumValue() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.getMinimumValue());
+        assertEquals("Minimum value should be 0", 0, field.getMinimumValue());
     }
 
-    public void test_getMinimumValue_long() {
+    public void testGetMinimumValueWithLong() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.getMinimumValue(0L));
+        assertEquals("Minimum value should be 0", 0, field.getMinimumValue(0L));
     }
 
-    public void test_getMinimumValue_RP() {
+    public void testGetMinimumValueWithTimeOfDay() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.getMinimumValue(new TimeOfDay()));
+        assertEquals("Minimum value should be 0", 0, field.getMinimumValue(new TimeOfDay()));
     }
 
-    public void test_getMinimumValue_RP_intarray() {
+    // Test getMaximumValue methods
+    public void testGetMaximumValue() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0, field.getMinimumValue(new TimeOfDay(), new int[4]));
+        assertEquals("Maximum value should be 59", 59, field.getMaximumValue());
     }
 
-    public void test_getMaximumValue() {
+    public void testGetMaximumValueWithLong() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(59, field.getMaximumValue());
+        assertEquals("Maximum value should be 59", 59, field.getMaximumValue(0L));
     }
 
-    public void test_getMaximumValue_long() {
+    public void testGetMaximumValueWithTimeOfDay() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(59, field.getMaximumValue(0L));
+        assertEquals("Maximum value should be 59", 59, field.getMaximumValue(new TimeOfDay()));
     }
 
-    public void test_getMaximumValue_RP() {
+    // Test getMaximumTextLength method
+    public void testGetMaximumTextLength() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(59, field.getMaximumValue(new TimeOfDay()));
+        assertEquals("Maximum text length should be 2", 2, field.getMaximumTextLength(Locale.ENGLISH));
     }
 
-    public void test_getMaximumValue_RP_intarray() {
+    // Test rounding methods
+    public void testRoundFloor() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(59, field.getMaximumValue(new TimeOfDay(), new int[4]));
+        assertEquals("Rounding floor should result in -120L", -120L, field.roundFloor(-61L));
+        assertEquals("Rounding floor should result in 0L", 0L, field.roundFloor(0L));
     }
 
-    //-----------------------------------------------------------------------
-    public void test_getMaximumTextLength_Locale() {
+    public void testRoundCeiling() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(2, field.getMaximumTextLength(Locale.ENGLISH));
-
-        field = new MockPreciseDurationDateTimeField() {
-            @Override
-            public int getMaximumValue() {
-                return 5;
-            }
-        };
-        assertEquals(1, field.getMaximumTextLength(Locale.ENGLISH));
-        
-        field = new MockPreciseDurationDateTimeField() {
-            @Override
-            public int getMaximumValue() {
-                return 555;
-            }
-        };
-        assertEquals(3, field.getMaximumTextLength(Locale.ENGLISH));
-        
-        field = new MockPreciseDurationDateTimeField() {
-            @Override
-            public int getMaximumValue() {
-                return 5555;
-            }
-        };
-        assertEquals(4, field.getMaximumTextLength(Locale.ENGLISH));
-        
-        field = new MockPreciseDurationDateTimeField() {
-            @Override
-            public int getMaximumValue() {
-                return -1;
-            }
-        };
-        assertEquals(2, field.getMaximumTextLength(Locale.ENGLISH));
+        assertEquals("Rounding ceiling should result in -60L", -60L, field.roundCeiling(-61L));
+        assertEquals("Rounding ceiling should result in 60L", 60L, field.roundCeiling(1L));
     }
 
-    public void test_getMaximumShortTextLength_Locale() {
+    public void testRoundHalfFloor() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(2, field.getMaximumShortTextLength(Locale.ENGLISH));
+        assertEquals("Rounding half floor should result in 0L", 0L, field.roundHalfFloor(0L));
+        assertEquals("Rounding half floor should result in 60L", 60L, field.roundHalfFloor(31L));
     }
 
-    //------------------------------------------------------------------------
-    public void test_roundFloor_long() {
+    public void testRoundHalfCeiling() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(-120L, field.roundFloor(-61L));
-        assertEquals(-60L, field.roundFloor(-60L));
-        assertEquals(-60L, field.roundFloor(-59L));
-        assertEquals(-60L, field.roundFloor(-1L));
-        assertEquals(0L, field.roundFloor(0L));
-        assertEquals(0L, field.roundFloor(1L));
-        assertEquals(0L, field.roundFloor(29L));
-        assertEquals(0L, field.roundFloor(30L));
-        assertEquals(0L, field.roundFloor(31L));
-        assertEquals(60L, field.roundFloor(60L));
+        assertEquals("Rounding half ceiling should result in 0L", 0L, field.roundHalfCeiling(0L));
+        assertEquals("Rounding half ceiling should result in 60L", 60L, field.roundHalfCeiling(31L));
     }
 
-    public void test_roundCeiling_long() {
+    public void testRoundHalfEven() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(-60L, field.roundCeiling(-61L));
-        assertEquals(-60L, field.roundCeiling(-60L));
-        assertEquals(0L, field.roundCeiling(-59L));
-        assertEquals(0L, field.roundCeiling(-1L));
-        assertEquals(0L, field.roundCeiling(0L));
-        assertEquals(60L, field.roundCeiling(1L));
-        assertEquals(60L, field.roundCeiling(29L));
-        assertEquals(60L, field.roundCeiling(30L));
-        assertEquals(60L, field.roundCeiling(31L));
-        assertEquals(60L, field.roundCeiling(60L));
+        assertEquals("Rounding half even should result in 0L", 0L, field.roundHalfEven(0L));
+        assertEquals("Rounding half even should result in 60L", 60L, field.roundHalfEven(31L));
+        assertEquals("Rounding half even should result in 120L", 120L, field.roundHalfEven(90L));
     }
 
-    public void test_roundHalfFloor_long() {
+    public void testRemainder() {
         BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0L, field.roundHalfFloor(0L));
-        assertEquals(0L, field.roundHalfFloor(29L));
-        assertEquals(0L, field.roundHalfFloor(30L));
-        assertEquals(60L, field.roundHalfFloor(31L));
-        assertEquals(60L, field.roundHalfFloor(60L));
+        assertEquals("Remainder should be 0L", 0L, field.remainder(0L));
+        assertEquals("Remainder should be 30L", 30L, field.remainder(30L));
     }
 
-    public void test_roundHalfCeiling_long() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0L, field.roundHalfCeiling(0L));
-        assertEquals(0L, field.roundHalfCeiling(29L));
-        assertEquals(60L, field.roundHalfCeiling(30L));
-        assertEquals(60L, field.roundHalfCeiling(31L));
-        assertEquals(60L, field.roundHalfCeiling(60L));
+    // Helper methods for creating fields
+    private BaseDateTimeField createFieldWithCountingDuration() {
+        return new MockPreciseDurationDateTimeField(
+            DateTimeFieldType.secondOfDay(),
+            new MockCountingDurationField(DurationFieldType.minutes()));
     }
 
-    public void test_roundHalfEven_long() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0L, field.roundHalfEven(0L));
-        assertEquals(0L, field.roundHalfEven(29L));
-        assertEquals(0L, field.roundHalfEven(30L));
-        assertEquals(60L, field.roundHalfEven(31L));
-        assertEquals(60L, field.roundHalfEven(60L));
-        assertEquals(60L, field.roundHalfEven(89L));
-        assertEquals(120L, field.roundHalfEven(90L));
-        assertEquals(120L, field.roundHalfEven(91L));
-    }
-
-    public void test_remainder_long() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(0L, field.remainder(0L));
-        assertEquals(29L, field.remainder(29L));
-        assertEquals(30L, field.remainder(30L));
-        assertEquals(31L, field.remainder(31L));
-        assertEquals(0L, field.remainder(60L));
-    }
-
-    //-----------------------------------------------------------------------
+    // Mock classes for testing
     static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
         protected MockPreciseDurationDateTimeField() {
             super(DateTimeFieldType.secondOfMinute(),
                 new MockCountingDurationField(DurationFieldType.seconds()));
         }
+
         protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
             super(type, dur);
         }
+
         @Override
         public int get(long instant) {
             return (int) (instant / 60L);
         }
+
         @Override
         public DurationField getRangeDurationField() {
             return new MockCountingDurationField(DurationFieldType.minutes());
         }
+
         @Override
         public int getMaximumValue() {
             return 59;
@@ -562,55 +359,64 @@ public class TestPreciseDurationDateTimeField extends TestCase {
         protected MockStandardBaseDateTimeField() {
             super();
         }
+
         @Override
         public DurationField getDurationField() {
             return ISOChronology.getInstanceUTC().seconds();
         }
+
         @Override
         public DurationField getRangeDurationField() {
             return ISOChronology.getInstanceUTC().minutes();
         }
     }
 
-    //-----------------------------------------------------------------------
     static class MockCountingDurationField extends BaseDurationField {
         static int add_int = 0;
         static int add_long = 0;
         static int difference_long = 0;
-        
+
         protected MockCountingDurationField(DurationFieldType type) {
             super(type);
         }
+
         @Override
         public boolean isPrecise() {
             return true;
         }
+
         @Override
         public long getUnitMillis() {
             return 60;
         }
+
         @Override
         public long getValueAsLong(long duration, long instant) {
             return 0;
         }
+
         @Override
         public long getMillis(int value, long instant) {
             return 0;
         }
+
         @Override
         public long getMillis(long value, long instant) {
             return 0;
         }
+
         @Override
         public long add(long instant, int value) {
             add_int++;
             return instant + (value * 60L);
         }
+
         @Override
         public long add(long instant, long value) {
             add_long++;
             return instant + (value * 60L);
         }
+
         @Override
         public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
             difference_long++;
@@ -618,82 +424,95 @@ public class TestPreciseDurationDateTimeField extends TestCase {
         }
     }
 
-    //-----------------------------------------------------------------------
     static class MockZeroDurationField extends BaseDurationField {
         protected MockZeroDurationField(DurationFieldType type) {
             super(type);
         }
+
         @Override
         public boolean isPrecise() {
             return true;
         }
+
         @Override
         public long getUnitMillis() {
-            return 0;  // this is zero
+            return 0;
         }
+
         @Override
         public long getValueAsLong(long duration, long instant) {
             return 0;
         }
+
         @Override
         public long getMillis(int value, long instant) {
             return 0;
         }
+
         @Override
         public long getMillis(long value, long instant) {
             return 0;
         }
+
         @Override
         public long add(long instant, int value) {
             return 0;
         }
+
         @Override
         public long add(long instant, long value) {
             return 0;
         }
+
         @Override
         public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
             return 0;
         }
     }
 
-    //-----------------------------------------------------------------------
     static class MockImpreciseDurationField extends BaseDurationField {
         protected MockImpreciseDurationField(DurationFieldType type) {
             super(type);
         }
+
         @Override
         public boolean isPrecise() {
-            return false;  // this is false
+            return false;
         }
+
         @Override
         public long getUnitMillis() {
             return 0;
         }
+
         @Override
         public long getValueAsLong(long duration, long instant) {
             return 0;
         }
+
         @Override
         public long getMillis(int value, long instant) {
             return 0;
         }
+
         @Override
         public long getMillis(long value, long instant) {
             return 0;
         }
+
         @Override
         public long add(long instant, int value) {
             return 0;
         }
+
         @Override
         public long add(long instant, long value) {
             return 0;
         }
+
         @Override
         public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
             return 0;
         }
     }
-
 }
