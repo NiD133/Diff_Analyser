@@ -1,29 +1,23 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonParser_ESTestTest17 extends JsonParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonParser} class.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        // Undeclared exception!
-        try {
-            jsonParser0.parse((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.StringReader", e);
-        }
+    /**
+     * Verifies that parsing a null string results in a NullPointerException.
+     *
+     * The underlying implementation uses a `java.io.StringReader`, which
+     * throws a NullPointerException when initialized with a null string.
+     * This test ensures that this behavior is handled correctly.
+     */
+    @Test(expected = NullPointerException.class)
+    public void parseString_whenInputIsNull_throwsNullPointerException() {
+        // The static parseString method is the modern, recommended API.
+        // Calling it with a null input is expected to throw.
+        JsonParser.parseString(null);
     }
 }
