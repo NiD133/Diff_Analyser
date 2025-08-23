@@ -1,35 +1,52 @@
 package org.apache.commons.compress.utils;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest20 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        File[] fileArray0 = new File[2];
-        MockFile mockFile0 = new MockFile("");
-        fileArray0[0] = (File) mockFile0;
-        fileArray0[1] = (File) mockFile0;
-        SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        seekableByteChannel0.position(704L);
-        assertEquals(704L, seekableByteChannel0.position());
+/**
+ * Contains tests for {@link MultiReadOnlySeekableByteChannel}.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
+
+    // The TemporaryFolder rule ensures that files created are deleted after the test runs.
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    /**
+     * Tests that setting the position beyond the end of the channel is a valid
+     * operation and correctly updates the channel's position. This is consistent
+     * with the contract of {@link SeekableByteChannel#position(long)}.
+     */
+    @Test
+    public void settingPositionBeyondChannelSizeShouldUpdatePosition() throws IOException {
+        // Arrange
+        // Create a multi-channel from two empty files. The resulting channel will have a size of 0.
+        File emptyFile1 = tempFolder.newFile("emptyFile1.bin");
+        File emptyFile2 = tempFolder.newFile("emptyFile2.bin");
+
+        try (SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forFiles(emptyFile1, emptyFile2)) {
+            // Sanity check to confirm our setup is correct.
+            assertEquals("Channel size should be zero for two empty files.", 0L, channel.size());
+
+            final long positionBeyondSize = 500L;
+
+            // Act
+            // Set the position to a value greater than the channel's current size.
+            // This is allowed and should not throw an exception. A subsequent read
+            // from this position would simply return an end-of-file indication (-1).
+            channel.position(positionBeyondSize);
+
+            // Assert
+            // Verify that the channel's position is updated to the new value.
+            assertEquals("The position should be updatable to a value beyond the channel's size.",
+                    positionBeyondSize, channel.position());
+        }
     }
 }
