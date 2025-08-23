@@ -1,26 +1,29 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest28 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber((String) null);
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.hashCode();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.LazilyParsedNumber", e);
-        }
+    /**
+     * The constructor's Javadoc states that the value must not be null.
+     * This test verifies that if this contract is violated, a subsequent call
+     * to hashCode() will fail with a NullPointerException, as it tries to
+     * access the null internal value.
+     */
+    @Test(expected = NullPointerException.class)
+    public void hashCode_whenConstructedWithNull_throwsNullPointerException() {
+        // Arrange: Create a LazilyParsedNumber with a null string value,
+        // which violates the class's contract.
+        LazilyParsedNumber number = new LazilyParsedNumber(null);
+
+        // Act: Attempt to calculate the hash code.
+        // This action is expected to throw a NullPointerException.
+        number.hashCode();
+
+        // Assert: The test passes if the expected NullPointerException is thrown.
+        // This is handled by the @Test(expected = ...) annotation.
     }
 }
