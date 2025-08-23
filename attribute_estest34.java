@@ -1,30 +1,24 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest34 extends Attribute_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Attribute attribute0 = new Attribute("AttributeName", "AttributeName", attributes0);
-        String string0 = attribute0.namespace();
-        assertEquals("", string0);
+    @Test
+    public void namespaceShouldBeEmptyForAttributeWithoutPrefix() {
+        // Arrange: Create a standard attribute without a namespace prefix (e.g., "key" instead of "ns:key").
+        // The parent Attributes object is not relevant for testing the namespace() method's logic.
+        Attribute attribute = new Attribute("AttributeName", "someValue", null);
+
+        // Act: Retrieve the namespace from the attribute.
+        String namespace = attribute.namespace();
+
+        // Assert: The namespace should be an empty string, as specified in the method's documentation
+        // for attributes that do not have a prefix.
+        assertEquals("", namespace);
     }
 }
