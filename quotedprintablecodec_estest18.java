@@ -1,26 +1,49 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
+
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class QuotedPrintableCodec_ESTestTest18 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(charset0);
-        byte[] byteArray0 = new byte[0];
-        byte[] byteArray1 = quotedPrintableCodec0.decode(byteArray0);
-        byte[] byteArray2 = quotedPrintableCodec0.encode(byteArray1);
-        assertNotSame(byteArray1, byteArray2);
+// Note: The original test extended an EvoSuite scaffolding class.
+// This has been removed to make the test more self-contained and readable.
+public class QuotedPrintableCodec_ESTestTest18 {
+
+    /**
+     * Tests that decoding and then re-encoding an empty byte array
+     * correctly results in an empty byte array. This verifies the codec's
+     * behavior for a common edge case.
+     */
+    @Test
+    public void testDecodeThenEncodeOnEmptyByteArrayProducesEmptyArray() throws Exception {
+        // Arrange
+        // Use a specific charset for test consistency, avoiding platform-dependent behavior.
+        final Charset charset = StandardCharsets.UTF_8;
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(charset);
+        final byte[] emptyInput = new byte[0];
+
+        // Act
+        // First, decode the empty input.
+        final byte[] decodedBytes = codec.decode(emptyInput);
+        // Then, encode the result of the decoding.
+        final byte[] finalResult = codec.encode(decodedBytes);
+
+        // Assert
+        // The intermediate decoded array should be empty.
+        assertNotNull("Decoding should not result in a null array", decodedBytes);
+        assertEquals("Decoding an empty array should produce an empty array", 0, decodedBytes.length);
+
+        // The final re-encoded array should be content-equal to the original empty array.
+        assertNotNull("Encoding should not result in a null array", finalResult);
+        assertArrayEquals("Encoding an empty array should produce an empty array", emptyInput, finalResult);
+
+        // The original test checked for instance inequality, which ensures a new array is
+        // created rather than returning the input object. We'll keep this check.
+        assertNotSame("Encoding should produce a new array instance", decodedBytes, finalResult);
     }
 }
