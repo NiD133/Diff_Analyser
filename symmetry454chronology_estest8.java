@@ -1,42 +1,30 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Symmetry454Chronology_ESTestTest8 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods of {@link Symmetry454Chronology}.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        long long0 = Symmetry454Chronology.getLeapYearsBefore((-60L));
-        assertEquals((-11L), long0);
+    /**
+     * Tests the calculation of the number of leap years before a given negative (BCE) proleptic year.
+     *
+     * <p>The Symmetry454 calendar has a specific leap year rule. This test verifies that the
+     * implementation correctly calculates the cumulative count of leap years for years
+     * before the common era (represented by negative proleptic years).
+     */
+    @Test
+    public void getLeapYearsBefore_withNegativeYear_returnsCorrectCount() {
+        // Arrange: Define a proleptic year in the BCE era and the expected leap year count.
+        long prolepticYearBCE = -60L;
+        long expectedLeapYears = -11L;
+
+        // Act: Calculate the actual number of leap years before the given year.
+        long actualLeapYears = Symmetry454Chronology.getLeapYearsBefore(prolepticYearBCE);
+
+        // Assert: Verify that the calculated count matches the expected value.
+        assertEquals(expectedLeapYears, actualLeapYears);
     }
 }
