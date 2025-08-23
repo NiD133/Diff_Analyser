@@ -1,32 +1,46 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest78 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test077() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.setAttribute("2pY", "2pY");
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        String string0 = xNode0.getStringAttribute("2pY", "-%Y");
-        assertEquals("2pY", string0);
+    /**
+     * Verifies that getStringAttribute(name, defaultValue) returns the actual
+     * attribute value when the attribute exists, ignoring the default value.
+     */
+    @Test
+    public void shouldReturnAttributeValueWhenAttributeExists() {
+        // Arrange
+        final String attributeName = "id";
+        final String expectedValue = "test-node-123";
+        final String defaultValue = "default-id";
+
+        // Create a DOM node and set the attribute we want to test
+        Node domNode = new IIOMetadataNode();
+        domNode.getAttributes().setNamedItem(
+            domNode.getOwnerDocument().createAttribute(attributeName)
+        );
+        domNode.getAttributes().getNamedItem(attributeName).setNodeValue(expectedValue);
+
+        // Dependencies needed for XNode instantiation
+        XPathParser xPathParser = new XPathParser((Document) null, false);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(xPathParser, domNode, variables);
+
+        // Act
+        String actualValue = xNode.getStringAttribute(attributeName, defaultValue);
+
+        // Assert
+        assertEquals("The method should return the actual attribute value, not the default.",
+            expectedValue, actualValue);
     }
 }
