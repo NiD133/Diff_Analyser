@@ -1,90 +1,77 @@
 package com.google.common.io;
 
-import static org.junit.Assert.assertThrows;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import java.io.EOFException;
-import java.io.FilterReader;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.CharBuffer;
-import java.util.List;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CharStreamsTestTest14 extends IoTestCase {
+/**
+ * Tests for {@link CharStreams#exhaust(Readable)}. This class focuses on verifying the behavior of
+ * exhausting characters from various {@link Readable} sources.
+ */
+public class CharStreamsExhaustReadableTest extends IoTestCase {
 
-    private static final String TEXT = "The quick brown fox jumped over the lazy dog.";
+  /**
+   * Tests that calling {@code exhaust()} on a non-empty readable consumes all its characters and
+   * returns the correct count.
+   */
+  public void testExhaust_onNonEmptyReadable_readsAllCharacters() throws IOException {
+    // Arrange
+    CharBuffer readable = CharBuffer.wrap(ASCII);
+    int expectedCharCount = ASCII.length();
 
-    /**
-     * Returns a reader wrapping the given reader that only reads half of the maximum number of
-     * characters that it could read in read(char[], int, int).
-     */
-    private static Reader newNonBufferFillingReader(Reader reader) {
-        return new FilterReader(reader) {
+    // Act
+    long consumedCharCount = CharStreams.exhaust(readable);
 
-            @Override
-            public int read(char[] cbuf, int off, int len) throws IOException {
-                // if a buffer isn't being cleared correctly, this method will eventually start being called
-                // with a len of 0 forever
-                if (len <= 0) {
-                    fail("read called with a len of " + len);
-                }
-                // read fewer than the max number of chars to read
-                // shouldn't be a problem unless the buffer is shrinking each call
-                return in.read(cbuf, off, Math.max(len - 1024, 0));
-            }
-        };
-    }
+    // Assert
+    assertEquals(
+        "exhaust() should return the total number of characters that were read.",
+        expectedCharCount,
+        consumedCharCount);
+    assertEquals(
+        "After exhausting, the readable should have no characters remaining.",
+        0,
+        readable.remaining());
+  }
 
-    /**
-     * Wrap an appendable in an appendable to defeat any type specific optimizations.
-     */
-    private static Appendable wrapAsGenericAppendable(Appendable a) {
-        return new Appendable() {
+  /**
+   * Tests that calling {@code exhaust()} on a readable that has already been fully consumed returns
+   * 0.
+   */
+  public void testExhaust_onAlreadyConsumedReadable_returnsZero() throws IOException {
+    // Arrange
+    CharBuffer readable = CharBuffer.wrap(ASCII);
+    CharStreams.exhaust(readable); // Consume the readable completely before the test.
+    assertEquals("Precondition failed: readable should be empty for this test.", 0, readable.remaining());
 
-            @Override
-            public Appendable append(CharSequence csq) throws IOException {
-                a.append(csq);
-                return this;
-            }
+    // Act
+    long consumedCharCount = CharStreams.exhaust(readable);
 
-            @Override
-            public Appendable append(CharSequence csq, int start, int end) throws IOException {
-                a.append(csq, start, end);
-                return this;
-            }
+    // Assert
+    assertEquals(
+        "exhaust() on an already-consumed readable should return 0.", 0, consumedCharCount);
+    assertEquals(
+        "An already-consumed readable should still have 0 characters remaining.",
+        0,
+        readable.remaining());
+  }
 
-            @Override
-            public Appendable append(char c) throws IOException {
-                a.append(c);
-                return this;
-            }
-        };
-    }
+  /**
+   * Tests that calling {@code exhaust()} on a readable that was initially empty returns 0.
+   */
+  public void testExhaust_onInitiallyEmptyReadable_returnsZero() throws IOException {
+    // Arrange
+    CharBuffer emptyReadable = CharBuffer.wrap("");
 
-    /**
-     * Wrap a readable in a readable to defeat any type specific optimizations.
-     */
-    private static Readable wrapAsGenericReadable(Readable a) {
-        return new Readable() {
+    // Act
+    long consumedCharCount = CharStreams.exhaust(emptyReadable);
 
-            @Override
-            public int read(CharBuffer cb) throws IOException {
-                return a.read(cb);
-            }
-        };
-    }
-
-    public void testExhaust_readable() throws IOException {
-        CharBuffer buf = CharBuffer.wrap(ASCII);
-        assertEquals(ASCII.length(), CharStreams.exhaust(buf));
-        assertEquals(0, buf.remaining());
-        assertEquals(0, CharStreams.exhaust(buf));
-        CharBuffer empty = CharBuffer.wrap("");
-        assertEquals(0, CharStreams.exhaust(empty));
-        assertEquals(0, empty.remaining());
-    }
+    // Assert
+    assertEquals(
+        "exhaust() on an initially empty readable should return 0.", 0, consumedCharCount);
+    assertEquals(
+        "An empty readable should have no characters remaining after the operation.",
+        0,
+        emptyReadable.remaining());
+  }
 }
