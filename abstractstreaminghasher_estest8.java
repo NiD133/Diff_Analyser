@@ -1,32 +1,38 @@
 package com.google.common.hash;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractStreamingHasher_ESTestTest8 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Unit tests for {@link AbstractStreamingHasher}, focusing on its lifecycle and state management.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(13);
-        crc32cHashFunction_Crc32cHasher0.putBytes(byteBuffer0);
-        crc32cHashFunction_Crc32cHasher0.makeHash();
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to update the hasher after the hash has been computed
+     * throws an {@link IllegalStateException}. Once {@code hash()} is called, the hasher
+     * instance is considered "consumed" and cannot be modified further.
+     */
+    @Test
+    public void putIntAfterHashThrowsIllegalStateException() {
+        // Arrange: Create a concrete hasher, add data, and consume it by calling hash().
+        // We use Crc32cHasher as a concrete implementation of the abstract class under test.
+        Hasher hasher = new Crc32cHashFunction.Crc32cHasher();
+        hasher.putBytes(ByteBuffer.allocate(16)); // Add some arbitrary data.
+        hasher.hash(); // This is a terminal operation that consumes the hasher.
+
+        // Act & Assert: Verify that any subsequent 'put' operation fails.
         try {
-            crc32cHashFunction_Crc32cHasher0.putInt(13);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // The behavior of calling any method after calling hash() is undefined.
-            //
-            verifyException("com.google.common.hash.Crc32cHashFunction$Crc32cHasher", e);
+            hasher.putInt(42); // Attempt to reuse the consumed hasher.
+            fail("Expected an IllegalStateException because the hasher cannot be used after hash() is called.");
+        } catch (IllegalStateException expected) {
+            // This is the correct behavior, confirming the hasher is a one-time-use object.
+            assertEquals(
+                "The behavior of calling any method after calling hash() is undefined.",
+                expected.getMessage());
         }
     }
 }
