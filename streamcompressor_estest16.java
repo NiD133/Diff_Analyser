@@ -1,44 +1,38 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class StreamCompressor_ESTestTest16 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
+/**
+ * Contains tests for the {@link StreamCompressor} class.
+ */
+public class StreamCompressorTest {
+
+    /**
+     * Verifies that flushDeflater() correctly propagates an IOException when the
+     * underlying output stream is not ready for writing.
+     */
+    @Test
+    public void flushDeflaterShouldThrowIOExceptionWhenPipeIsNotConnected() {
+        // Arrange: Create a StreamCompressor with an unconnected PipedOutputStream.
+        // This simulates a stream that is not ready for writing.
+        PipedOutputStream unconnectedPipe = new PipedOutputStream();
+        StreamCompressor compressor = StreamCompressor.create((OutputStream) unconnectedPipe);
+
+        // Act & Assert: Attempting to flush should throw an IOException.
         try {
-            streamCompressor0.flushDeflater();
-            fail("Expecting exception: IOException");
+            compressor.flushDeflater();
+            fail("Expected an IOException because the underlying pipe is not connected.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
+            // Verify that the expected exception was thrown with the correct message,
+            // confirming the failure is due to the unconnected pipe.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
