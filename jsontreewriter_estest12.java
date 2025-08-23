@@ -1,26 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest12 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setSerializeNulls(false);
-        Boolean boolean0 = Boolean.TRUE;
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value(boolean0);
-        assertSame(jsonTreeWriter0, jsonWriter0);
+/**
+ * Test suite for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    @Test
+    public void value_withBoolean_shouldWriteBooleanPrimitiveAndReturnSameInstance() {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act
+        JsonWriter resultWriter = writer.value(Boolean.TRUE);
+
+        // Assert
+        // 1. Verify the method returns the same instance for a fluent API.
+        assertSame("The value() method should return the same writer instance for chaining.", writer, resultWriter);
+
+        // 2. Verify the correct JSON element was written.
+        JsonElement producedElement = writer.get();
+        assertEquals(new JsonPrimitive(true), producedElement);
     }
 }
