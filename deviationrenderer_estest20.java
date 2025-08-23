@@ -1,36 +1,31 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class DeviationRenderer_ESTestTest20 extends DeviationRenderer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DeviationRenderer} class, focusing on its constructor logic.
+ */
+public class DeviationRendererTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer(false, false);
-        deviationRenderer0.setDrawSeriesLineAsPath(true);
-        assertEquals(0.5F, deviationRenderer0.getAlpha(), 0.01F);
-        assertTrue(deviationRenderer0.getDrawSeriesLineAsPath());
+    /**
+     * Verifies that the constructor correctly initializes the renderer with its
+     * specific default properties.
+     */
+    @Test
+    public void constructor_ShouldInitializeRendererWithDefaultProperties() {
+        // Arrange: Create a new DeviationRenderer instance.
+        // The constructor is the action being tested.
+        DeviationRenderer renderer = new DeviationRenderer(false, false);
+
+        // Assert: Check that the renderer's properties are set as expected.
+
+        // 1. The alpha transparency for the deviation band should default to 0.5f.
+        assertEquals("Default alpha should be 0.5F.", 0.5F, renderer.getAlpha(), 0.0f);
+
+        // 2. The 'drawSeriesLineAsPath' property should be true by default.
+        // For this specific renderer, this property is always true and cannot be changed.
+        assertTrue("drawSeriesLineAsPath should be true by default.", renderer.getDrawSeriesLineAsPath());
     }
 }
