@@ -2,53 +2,82 @@ package org.apache.commons.io.output;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ThresholdingOutputStreamTestTest2 {
+/**
+ * Tests for {@link ThresholdingOutputStream} focusing on scenarios with a broken underlying stream.
+ */
+class ThresholdingOutputStreamTest {
 
     /**
-     * Asserts initial state without changing it.
-     *
-     * @param out the stream to test.
-     * @param expectedThreshold the expected threshold.
-     * @param expectedByeCount the expected byte count.
+     * A simple OutputStream that throws an IOException on all operations.
+     * This is a common test utility for simulating I/O failures.
      */
-    static void assertThresholdingInitialState(final ThresholdingOutputStream out, final int expectedThreshold, final int expectedByeCount) {
-        assertFalse(out.isThresholdExceeded());
-        assertEquals(expectedThreshold, out.getThreshold());
-        assertEquals(expectedByeCount, out.getByteCount());
+    private static class BrokenOutputStream extends OutputStream {
+        static final BrokenOutputStream INSTANCE = new BrokenOutputStream();
+        private final IOException exception = new IOException("Broken output stream");
+
+        @Override
+        public void write(final int b) throws IOException {
+            throw exception;
+        }
+
+        @Override
+        public void close() throws IOException {
+            // Use a distinct message for close to differentiate from write failures.
+            throw new IOException("Broken output stream: close()");
+        }
+    }
+
+    private final int threshold = 1;
+    private AtomicInteger thresholdReachedInvocations;
+
+    @BeforeEach
+    void setUp() {
+        thresholdReachedInvocations = new AtomicInteger(0);
     }
 
     @Test
-    void testResetByteCountBrokenOutputStream() {
-        final int threshold = 1;
-        final AtomicInteger counter = new AtomicInteger();
-        final IOException e = assertThrows(IOException.class, () -> {
-            try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ThresholdingOutputStream out = new ThresholdingOutputStream(threshold, tos -> {
-                    counter.incrementAndGet();
+    @DisplayName("Write and close should throw exceptions when the underlying stream is broken")
+    void whenUnderlyingStreamIsBroken_writeAndCloseThrowExceptions() {
+        // This outer assertThrows is specifically to verify that the close() method,
+        // called automatically by the try-with-resources statement, throws an IOException.
+        final IOException thrownOnClose = assertThrows(IOException.class, () -> {
+            // Arrange: Create a stream that is configured to use a BrokenOutputStream.
+            // The threshold consumer resets the byte count, but it should never be called.
+            try (final ThresholdingOutputStream stream = new ThresholdingOutputStream(threshold,
+                tos -> {
+                    thresholdReachedInvocations.incrementAndGet();
                     tos.resetByteCount();
-                }, o -> BrokenOutputStream.INSTANCE)) {
-                assertThresholdingInitialState(out, threshold, 0);
-                assertEquals(0, counter.get());
-                assertThrows(IOException.class, () -> out.write('a'));
-                assertFalse(out.isThresholdExceeded());
-                assertThrows(IOException.class, () -> out.write('a'));
-                assertEquals(0, counter.get());
-                assertFalse(out.isThresholdExceeded());
-                assertThrows(IOException.class, () -> out.write('a'));
-                assertThrows(IOException.class, () -> out.write('a'));
-                assertEquals(0, counter.get());
-            }
+                },
+                outputStream -> BrokenOutputStream.INSTANCE)) {
+
+                // Assert initial state
+                assertFalse(stream.isThresholdExceeded());
+                assertEquals(threshold, stream.getThreshold());
+                assertEquals(0, stream.getByteCount());
+                assertEquals(0, thresholdReachedInvocations.get(), "Threshold consumer should not have been called yet.");
+
+                // Act & Assert: A write attempt should fail due to the BrokenOutputStream.
+                assertThrows(IOException.class, () -> stream.write('a'));
+
+                // Assert state after failed write: The stream's state should not change,
+                // and the threshold should not be considered reached.
+                assertFalse(stream.isThresholdExceeded(), "Threshold should not be exceeded on a failed write.");
+                assertEquals(0, stream.getByteCount(), "Byte count should not increase on a failed write.");
+                assertEquals(0, thresholdReachedInvocations.get(), "Threshold consumer should not be called on a failed write.");
+
+            } // stream.close() is called here, which is expected to throw the outer exception.
         });
-        // Should only happen on close
-        assertEquals("Broken output stream: close()", e.getMessage());
+
+        // Assert: The exception caught was the one from the close() method.
+        assertEquals("Broken output stream: close()", thrownOnClose.getMessage());
     }
 }
