@@ -2,26 +2,30 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest3 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeAdapter} class, focusing on the behavior of the null-safe wrapper.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        String string0 = typeAdapter0.toJson((Object) null);
-        assertEquals("null", string0);
+    /**
+     * Verifies that calling toJson(null) on a null-safe TypeAdapter
+     * correctly serializes the null value to the JSON literal "null".
+     */
+    @Test
+    public void toJsonWithNullOnNullSafeAdapterReturnsJsonNullString() {
+        // Arrange
+        // Create a base TypeAdapter. The specific implementation (FutureTypeAdapter)
+        // is not important here, as we are testing the nullSafe() wrapper's behavior.
+        TypeAdapter<Object> delegateAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+
+        // Act
+        // Serialize a null object using the null-safe adapter.
+        String jsonOutput = nullSafeAdapter.toJson(null);
+
+        // Assert
+        // The null-safe adapter should handle the null input and produce the JSON literal "null".
+        assertEquals("null", jsonOutput);
     }
 }
