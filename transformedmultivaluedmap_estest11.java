@@ -1,68 +1,48 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
 import org.apache.commons.collections4.functors.MapTransformer;
 import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest11 extends TransformedMultiValuedMap_ESTest_scaffolding {
+/**
+ * Contains tests for {@link TransformedMultiValuedMap} focusing on specific edge cases.
+ */
+public class TransformedMultiValuedMapTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LinkedHashSetValuedLinkedHashMap<Object, Integer> linkedHashSetValuedLinkedHashMap0 = new LinkedHashSetValuedLinkedHashMap<Object, Integer>(2566);
-        Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 0);
-        Transformer<Object, Integer>[] transformerArray0 = (Transformer<Object, Integer>[]) Array.newInstance(Transformer.class, 1);
-        HashMap<Object, Integer> hashMap0 = new HashMap<Object, Integer>();
-        Integer integer0 = new Integer(2566);
-        hashMap0.put(linkedHashSetValuedLinkedHashMap0, integer0);
-        linkedHashSetValuedLinkedHashMap0.putAll((Map<?, ? extends Integer>) hashMap0);
-        Transformer<Object, Integer> transformer0 = MapTransformer.mapTransformer((Map<? super Object, ? extends Integer>) hashMap0);
-        SwitchTransformer<Object, Integer> switchTransformer0 = new SwitchTransformer<Object, Integer>(predicateArray0, transformerArray0, transformer0);
-        // Undeclared exception!
-        try {
-            TransformedMultiValuedMap.transformedMap((MultiValuedMap<Object, Integer>) linkedHashSetValuedLinkedHashMap0, (Transformer<? super Object, ?>) switchTransformer0, (Transformer<? super Integer, ? extends Integer>) transformer0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that the transformedMap() factory method throws a StackOverflowError
+     * when given a map that contains itself as a key and a transformer that
+     * performs lookups on that same map. This creates an infinite recursion
+     * during the initial transformation of the map's contents.
+     */
+    @Test(expected = StackOverflowError.class)
+    public void testTransformedMapWithRecursiveStructureThrowsStackOverflowError() {
+        // Arrange: Create a map and a transformer that will cause infinite recursion.
+
+        // 1. The map to be transformed. We use Object as the key type to allow
+        // the map to contain itself.
+        MultiValuedMap<Object, String> recursiveMap = new LinkedHashSetValuedLinkedHashMap<>();
+
+        // 2. Create the recursive dependency: the map contains itself as a key.
+        recursiveMap.put(recursiveMap, "some-value");
+
+        // 3. Create a transformer that looks up keys in the recursiveMap.
+        // When the factory method tries to transform the key 'recursiveMap', this
+        // transformer will call recursiveMap.asMap().get(recursiveMap), which
+        // leads to an infinite recursion via hashCode/equals method calls.
+        Transformer<Object, Object> keyTransformer = MapTransformer.mapTransformer(recursiveMap.asMap());
+
+        // The value transformer is not relevant to the error but is a required argument.
+        Transformer<String, String> valueTransformer = NOPTransformer.nopTransformer();
+
+        // Act: Attempt to create a transformed map from this recursive structure.
+        // The transformedMap() method immediately transforms existing elements,
+        // which will trigger the StackOverflowError.
+        TransformedMultiValuedMap.transformedMap(recursiveMap, keyTransformer, valueTransformer);
+
+        // Assert: The test passes if a StackOverflowError is thrown, as declared
+        // in the @Test(expected=...) annotation. No further assertions are needed.
     }
 }
