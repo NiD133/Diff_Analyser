@@ -1,18 +1,29 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RefinedSoundex_ESTestTest6 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex();
-        String string0 = refinedSoundex0.encode("");
-        assertEquals("", string0);
+    /**
+     * Tests that encoding a string containing only a single space results in an empty string.
+     * The Refined Soundex algorithm is designed for alphabetic characters and should
+     * ignore non-alphabetic input like spaces.
+     */
+    @Test
+    public void shouldReturnEmptyStringWhenEncodingSingleSpace() {
+        // Arrange
+        final RefinedSoundex soundex = new RefinedSoundex();
+        final String input = " ";
+        final String expectedEncoding = "";
+
+        // Act
+        final String actualEncoding = soundex.encode(input);
+
+        // Assert
+        assertEquals(expectedEncoding, actualEncoding);
     }
 }
