@@ -1,22 +1,28 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class QuotedPrintableCodec_ESTestTest62 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Contains tests for the static methods of the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        byte[] byteArray0 = QuotedPrintableCodec.encodeQuotedPrintable((BitSet) null, (byte[]) null);
-        assertNull(byteArray0);
+    /**
+     * Tests that the static {@code encodeQuotedPrintable} method correctly handles a null
+     * input byte array by returning null. The behavior is based on the method's
+     * implementation, which performs a null check on the byte array argument.
+     */
+    @Test
+    public void encodeQuotedPrintableShouldReturnNullForNullByteArray() {
+        // Arrange: Define a null byte array to be encoded.
+        // The BitSet argument can also be null, as the byte array is checked first.
+        byte[] nullInput = null;
+
+        // Act: Call the static encode method with the null input.
+        byte[] result = QuotedPrintableCodec.encodeQuotedPrintable(null, nullInput);
+
+        // Assert: Verify that the method returns null as expected.
+        assertNull("Encoding a null byte array should return null.", result);
     }
 }
