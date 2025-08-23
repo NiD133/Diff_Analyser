@@ -1,32 +1,31 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest3 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class, focusing on its
+ * interaction with data sets.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test2() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        DefaultTableXYDataset<ChronoLocalDate> defaultTableXYDataset0 = new DefaultTableXYDataset<ChronoLocalDate>();
-        // Undeclared exception!
-        try {
-            symbolicXYItemLabelGenerator0.generateToolTip(defaultTableXYDataset0, 1970, 1970);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that generateToolTip throws an IndexOutOfBoundsException when the
+     * dataset is empty and accessed with any series/item index. The exception
+     * is expected to originate from the dataset itself.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void generateToolTipWithEmptyDatasetShouldThrowIndexOutOfBoundsException() {
+        // Arrange: Create a generator and an empty dataset.
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+        XYDataset emptyDataset = new DefaultTableXYDataset();
+
+        // Act: Attempt to generate a tooltip for an item that does not exist.
+        // The series and item indices (0, 0) are out of bounds for an empty dataset.
+        generator.generateToolTip(emptyDataset, 0, 0);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
+        // The test will fail if an IndexOutOfBoundsException is not thrown.
     }
 }
