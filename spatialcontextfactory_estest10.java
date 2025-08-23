@@ -1,30 +1,39 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
+import java.lang.NoSuchFieldException;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest10 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        // Undeclared exception!
+    /**
+     * Tests that calling initField() with a field name that does not exist (like an empty string)
+     * throws an Error that wraps the underlying NoSuchFieldException from reflection.
+     */
+    @Test
+    public void initFieldWithNonExistentNameShouldThrowError() {
+        // Arrange: Create an instance of the factory and define an invalid field name.
+        SpatialContextFactory factory = new SpatialContextFactory();
+        String nonExistentFieldName = "";
+
+        // Act & Assert: Verify that the expected Error is thrown.
         try {
-            spatialContextFactory0.initField("");
-            fail("Expecting exception: Error");
+            factory.initField(nonExistentFieldName);
+            fail("Expected an Error to be thrown because the field name does not exist.");
         } catch (Error e) {
-            //
-            // java.lang.NoSuchFieldException:
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // Assert that the thrown error is not null.
+            assertNotNull("The caught error should not be null.", e);
+            
+            // Assert that the cause of the Error is the expected reflection exception.
+            // This confirms the method failed for the right reason.
+            Throwable cause = e.getCause();
+            assertTrue(
+                "The cause of the error should be a NoSuchFieldException.",
+                cause instanceof NoSuchFieldException
+            );
         }
     }
 }
