@@ -1,29 +1,32 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Vector;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class PatternOptionBuilderTestTest4 {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+class PatternOptionBuilderTest {
 
     @Test
-    void testExistingFilePatternFileNotExist() throws Exception {
+    @DisplayName("The '<' pattern should return a null object when the specified file does not exist")
+    void existingFilePatternShouldReturnNullForNonExistentFile() throws ParseException {
+        // ARRANGE
+        // The '<' pattern character creates an option that expects the value to be an existing file.
+        // If the file exists, getOptionObject() would return a FileInputStream.
         final Options options = PatternOptionBuilder.parsePattern("f<");
-        final CommandLineParser parser = new PosixParser();
-        final CommandLine line = parser.parse(options, new String[] { "-f", "non-existing.file" });
-        assertNull(line.getOptionObject("f"), "option f parsed");
+        final CommandLineParser parser = new DefaultParser();
+        final String[] args = {"-f", "non-existent.file"};
+
+        // ACT
+        // Parse the command line arguments.
+        final CommandLine cmd = parser.parse(options, args);
+
+        // ASSERT
+        // When the file does not exist, the parser should not throw an exception.
+        // Instead, the corresponding option object should be null.
+        assertNull(cmd.getOptionObject("f"), "Expected a null object because the file does not exist.");
     }
 }
