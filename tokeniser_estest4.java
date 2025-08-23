@@ -1,28 +1,38 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Tokeniser_ESTestTest4 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Tokeniser} class, focusing on entity unescaping.
+ */
+public class TokeniserTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Document document0 = xmlTreeBuilder0.parse(".A!r,Rq!l<z-vT9k", ".A!r,Rq!l<z-vT9k");
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        streamParser0.parseFragment("*S(.f;(4%%-%Rr", (Element) document0, "");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        String string0 = tokeniser0.unescapeEntities(true);
-        assertEquals("*S(.f;(4%%-%Rr", string0);
+    /**
+     * Verifies that unescapeEntities returns the original string unmodified when it
+     * contains no character entities.
+     */
+    @Test
+    public void unescapeEntitiesReturnsOriginalStringWhenNoEntitiesPresent() {
+        // Arrange
+        String inputWithNoEntities = "*S(.f;(4%%-%Rr";
+
+        // To test the Tokeniser's unescapeEntities method, we need to initialize it
+        // with a CharacterReader containing our input string. The standard way to do this
+        // is by initializing a TreeBuilder, which the Tokeniser will use to get the reader.
+        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+        Parser parser = new Parser(treeBuilder);
+        treeBuilder.initialiseParse(new StringReader(inputWithNoEntities), "", parser);
+        Tokeniser tokeniser = new Tokeniser(treeBuilder);
+
+        // Act
+        // The 'inAttribute' parameter (true) specifies the context for unescaping,
+        // though it doesn't alter the behavior for this specific input string.
+        String unescapedString = tokeniser.unescapeEntities(true);
+
+        // Assert
+        assertEquals("The string should be returned as-is because it contains no entities.",
+            inputWithNoEntities, unescapedString);
     }
 }
