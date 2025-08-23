@@ -1,23 +1,27 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest23 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        int int0 = FieldUtils.safeMultiply((-1), (-2147483647));
-        assertEquals(Integer.MAX_VALUE, int0);
+    @Test
+    public void safeMultiply_withBoundaryValuesResultingInMaxValue_doesNotOverflow() {
+        // This test case verifies a boundary condition for safe multiplication.
+        // The product of -1 and -Integer.MAX_VALUE should result in Integer.MAX_VALUE
+        // without throwing an ArithmeticException for overflow.
+
+        // Arrange
+        final int multiplicand = -1;
+        final int multiplier = -Integer.MAX_VALUE; // -2147483647
+
+        // Act
+        final int product = FieldUtils.safeMultiply(multiplicand, multiplier);
+
+        // Assert
+        assertEquals(Integer.MAX_VALUE, product);
     }
 }
