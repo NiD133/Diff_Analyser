@@ -1,24 +1,34 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class PhoneticEngine_ESTestTest3 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        NameType nameType0 = NameType.ASHKENAZI;
-        RuleType ruleType0 = RuleType.EXACT;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, true, (-516));
-        int int0 = phoneticEngine0.getMaxPhonemes();
-        assertEquals((-516), int0);
-        assertTrue(phoneticEngine0.isConcat());
+    /**
+     * Tests that the constructor correctly initializes the engine's properties
+     * and that the corresponding getters return the expected values.
+     */
+    @Test
+    public void constructorShouldSetPropertiesCorrectly() {
+        // Arrange
+        final NameType nameType = NameType.ASHKENAZI;
+        final RuleType ruleType = RuleType.EXACT;
+        final boolean shouldConcat = true;
+        final int expectedMaxPhonemes = -516; // The constructor currently accepts negative values.
+
+        // Act
+        final PhoneticEngine phoneticEngine = new PhoneticEngine(nameType, ruleType, shouldConcat, expectedMaxPhonemes);
+
+        // Assert
+        // Verify that the properties set in the constructor are returned by the getters.
+        assertEquals("The maxPhonemes property should match the value from the constructor.",
+                     expectedMaxPhonemes, phoneticEngine.getMaxPhonemes());
+        assertTrue("The concat property should match the value from the constructor.",
+                   phoneticEngine.isConcat());
     }
 }
