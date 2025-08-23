@@ -2,21 +2,29 @@ package org.mockito.internal.exceptions.stacktrace;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class StackTraceFilter_ESTestTest9 extends StackTraceFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link StackTraceFilter}.
+ */
+public class StackTraceFilterTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
-        StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[0];
-        StackTraceElement[] stackTraceElementArray1 = stackTraceFilter0.filter(stackTraceElementArray0, false);
-        stackTraceFilter0.findSourceFile(stackTraceElementArray1, "S-pOJA?<SA5#B9J&^;");
-        assertNotSame(stackTraceElementArray1, stackTraceElementArray0);
-        assertNotSame(stackTraceElementArray0, stackTraceElementArray1);
+    /**
+     * Verifies that the filter method returns a new, empty array instance
+     * when the input is an empty array, rather than returning the original instance.
+     * This ensures the method has no unexpected side effects on the input array.
+     */
+    @Test
+    public void filter_givenEmptyStackTrace_returnsNewEmptyArray() {
+        // Arrange
+        StackTraceFilter stackTraceFilter = new StackTraceFilter();
+        StackTraceElement[] emptyStackTrace = new StackTraceElement[0];
+
+        // Act
+        StackTraceElement[] filteredStackTrace = stackTraceFilter.filter(emptyStackTrace, false);
+
+        // Assert
+        assertNotNull("The filtered array should not be null", filteredStackTrace);
+        assertEquals("The filtered array should be empty", 0, filteredStackTrace.length);
+        assertNotSame("The filtered array should be a new instance", emptyStackTrace, filteredStackTrace);
     }
 }
