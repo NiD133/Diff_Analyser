@@ -1,47 +1,33 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
+import static org.junit.Assert.assertEquals;
+
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BritishCutoverChronology_ESTestTest56 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
-        LocalDate localDate0 = britishCutoverChronology0.getCutover();
-        assertNotNull(localDate0);
+    /**
+     * Tests that getCutover() returns the correct, documented cutover date.
+     * <p>
+     * The British calendar cutover occurred on September 14, 1752. This test
+     * verifies that the method returns this specific date, which is also
+     * exposed as a public constant.
+     */
+    @Test
+    public void getCutover_shouldReturnTheDefinedCutoverDate() {
+        // Arrange
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        LocalDate expectedCutoverDate = BritishCutoverChronology.CUTOVER;
+
+        // Act
+        LocalDate actualCutoverDate = chronology.getCutover();
+
+        // Assert
+        assertEquals("The getCutover() method should return the value of the public CUTOVER constant.",
+                     expectedCutoverDate, actualCutoverDate);
     }
 }
