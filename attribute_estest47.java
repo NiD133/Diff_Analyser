@@ -1,31 +1,28 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class Attribute_ESTestTest47 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Attribute attribute0 = new Attribute("data-data-2h'w0xmo/lju>^m", "actio", attributes0);
-        boolean boolean0 = attribute0.isDataAttribute();
-        assertEquals("actio", attribute0.getValue());
-        assertTrue(boolean0);
+    @Test
+    public void shouldCorrectlyIdentifyDataAttribute() {
+        // Arrange: An attribute is considered a "data attribute" if its key starts
+        // with the "data-" prefix. We create a representative example.
+        String dataKey = "data-user-id";
+        String value = "12345";
+        Attribute attribute = new Attribute(dataKey, value);
+
+        // Act: Check if the attribute is recognized as a data attribute.
+        boolean isDataAttribute = attribute.isDataAttribute();
+
+        // Assert: The method should return true, and the attribute's properties
+        // should remain unchanged.
+        assertTrue("Attribute with 'data-' prefix should be identified as a data attribute.", isDataAttribute);
+        assertEquals("The attribute's value should not be altered by the check.", value, attribute.getValue());
     }
 }
