@@ -1,34 +1,58 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.*;
 
 public class JsonIgnoreProperties_ESTestTest25 extends JsonIgnoreProperties_ESTest_scaffolding {
 
+    /**
+     * Tests that the {@code withoutIgnored()} method creates a new {@code Value}
+     * instance with an empty set of ignored properties, while preserving all other
+     * configuration flags from the original instance.
+     */
     @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[7];
-        String[] stringArray0 = new String[4];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        Set<String> set0 = jsonIgnoreProperties_Value0.findIgnoredForSerialization();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.construct(set0, true, false, true, false);
-        assertFalse(jsonIgnoreProperties_Value0.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertEquals(1, set0.size());
-        jsonIgnoreProperties_ValueArray0[3] = jsonIgnoreProperties_Value1;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_ValueArray0[3].withoutIgnored();
-        assertTrue(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertFalse(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value2.getMerge());
+    public void withoutIgnoredShouldClearIgnoredPropertiesAndPreserveOtherFlags() {
+        // Arrange: Create a Value instance with a specific configuration,
+        // including properties to be ignored and various flags set.
+        Set<String> initialIgnoredProperties = new HashSet<>(Arrays.asList("propA", "propB"));
+        boolean ignoreUnknown = true;
+        boolean allowGetters = false;
+        boolean allowSetters = true;
+        boolean merge = false;
+
+        JsonIgnoreProperties.Value originalValue = JsonIgnoreProperties.Value.construct(
+                initialIgnoredProperties,
+                ignoreUnknown,
+                allowGetters,
+                allowSetters,
+                merge
+        );
+
+        // Act: Call the method under test to create a new Value instance.
+        JsonIgnoreProperties.Value resultValue = originalValue.withoutIgnored();
+
+        // Assert: Verify the properties of the new Value instance.
+        // 1. The new instance should have no ignored properties.
+        assertTrue("The set of ignored properties should be empty after calling withoutIgnored()",
+                resultValue.getIgnored().isEmpty());
+
+        // 2. All other flags should be preserved from the original value.
+        assertEquals("The 'ignoreUnknown' flag should be preserved",
+                ignoreUnknown, resultValue.getIgnoreUnknown());
+        assertEquals("The 'allowGetters' flag should be preserved",
+                allowGetters, resultValue.getAllowGetters());
+        assertEquals("The 'allowSetters' flag should be preserved",
+                allowSetters, resultValue.getAllowSetters());
+        assertEquals("The 'merge' flag should be preserved",
+                merge, resultValue.getMerge());
+        
+        // 3. The original value should remain unchanged (confirming immutability).
+        assertEquals("The original value's ignored properties should not be modified",
+                initialIgnoredProperties, originalValue.getIgnored());
     }
 }
