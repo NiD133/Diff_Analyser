@@ -1,49 +1,31 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest28 extends CollectionBag_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CollectionBag} decorator.
+ */
+public class CollectionBagTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        // Undeclared exception!
-        try {
-            collectionBag0.add((Integer) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
-        }
+    /**
+     * Tests that an attempt to add a null element to a CollectionBag propagates
+     * the exception from the underlying decorated bag. In this case, the backing
+     * TreeBag does not support null elements.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testAddNullToBagBackedByTreeBagShouldThrowException() {
+        // Arrange: Create a TreeBag (which doesn't allow nulls) and
+        // decorate it with a CollectionBag.
+        final Bag<Integer> backingTreeBag = new TreeBag<>();
+        final Bag<Integer> collectionBag = new CollectionBag<>(backingTreeBag);
+
+        // Act: Attempt to add a null element.
+        // This action is expected to throw a NullPointerException because the
+        // backing TreeBag will reject the null.
+        collectionBag.add(null);
+
+        // Assert: The @Test(expected) annotation asserts that a
+        // NullPointerException was thrown.
     }
 }
