@@ -2,23 +2,39 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonSetter_ESTestTest14 extends JsonSetter_ESTest_scaffolding {
+/**
+ * This test suite focuses on the {@link JsonSetter.Value} class, specifically its
+ * factory methods for creating and modifying instances.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        JsonSetter jsonSetter0 = mock(JsonSetter.class, CALLS_REAL_METHODS);
-        doReturn((Nulls) null).when(jsonSetter0).contentNulls();
-        doReturn((Nulls) null).when(jsonSetter0).nulls();
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.from(jsonSetter0);
-        Nulls nulls0 = Nulls.SKIP;
-        JsonSetter.Value jsonSetter_Value1 = jsonSetter_Value0.withValueNulls(nulls0, nulls0);
-        assertEquals(Nulls.SKIP, jsonSetter_Value1.getValueNulls());
-        assertEquals(Nulls.SKIP, jsonSetter_Value1.getContentNulls());
+    /**
+     * Verifies that the `withValueNulls(Nulls, Nulls)` method correctly creates a new
+     * {@link JsonSetter.Value} instance with updated settings for both value and content nulls.
+     * It also ensures the original instance remains unchanged, confirming immutability.
+     */
+    @Test
+    public void withValueNulls_shouldUpdateBothValueAndContentNulls() {
+        // Arrange: Start with a default JsonSetter.Value instance.
+        JsonSetter.Value initialValue = JsonSetter.Value.empty();
+        final Nulls newNullsSetting = Nulls.SKIP;
+
+        // Act: Create a new instance by updating both value and content nulls settings.
+        JsonSetter.Value updatedValue = initialValue.withValueNulls(newNullsSetting, newNullsSetting);
+
+        // Assert: Verify that the new instance has the updated settings.
+        assertNotSame("A new instance should be returned to ensure immutability.", initialValue, updatedValue);
+
+        assertEquals("Value nulls should be updated to SKIP.",
+                newNullsSetting, updatedValue.getValueNulls());
+        assertEquals("Content nulls should be updated to SKIP.",
+                newNullsSetting, updatedValue.getContentNulls());
+
+        // Further assert that the original instance was not modified.
+        assertEquals("Original value nulls should remain DEFAULT.",
+                Nulls.DEFAULT, initialValue.getValueNulls());
+        assertEquals("Original content nulls should remain DEFAULT.",
+                Nulls.DEFAULT, initialValue.getContentNulls());
     }
 }
