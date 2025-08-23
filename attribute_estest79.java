@@ -1,30 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest79 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test78() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("_Tr_2_", "ope3n");
-        String string0 = attribute0.getKey();
-        assertEquals("ope3n", attribute0.getValue());
-        assertEquals("_Tr_2_", string0);
+    /**
+     * Verifies that getKey() returns the correct key for an Attribute
+     * created with the static factory method createFromEncoded().
+     */
+    @Test
+    public void getKeyShouldReturnCorrectKeyForAttributeCreatedFromEncoded() {
+        // Arrange: Define the expected key and value and create an Attribute instance.
+        String expectedKey = "_Tr_2_";
+        String expectedValue = "ope3n";
+        Attribute attribute = Attribute.createFromEncoded(expectedKey, expectedValue);
+
+        // Act: Call the method under test.
+        String actualKey = attribute.getKey();
+
+        // Assert: Verify that the key and value are what we expect.
+        assertEquals(expectedKey, actualKey);
+        assertEquals("The value should also be correctly set upon creation",
+            expectedValue, attribute.getValue());
     }
 }
