@@ -1,25 +1,18 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RefinedSoundex_ESTestTest15 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        RefinedSoundex refinedSoundex0 = null;
-        try {
-            refinedSoundex0 = new RefinedSoundex((char[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.language.RefinedSoundex", e);
-        }
+    /**
+     * Verifies that the constructor throws a NullPointerException when initialized with a null char array mapping.
+     * The constructor is expected to fail because it attempts to clone the provided array.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullCharArrayShouldThrowNullPointerException() {
+        new RefinedSoundex((char[]) null);
     }
 }
