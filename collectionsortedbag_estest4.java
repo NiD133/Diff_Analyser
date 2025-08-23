@@ -1,51 +1,35 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Locale;
+
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for the {@link CollectionSortedBag#add(Object)} method.
+ */
+// The original test class name is kept for context. 
+// In a real-world scenario, this would likely be part of a single CollectionSortedBagTest class.
 public class CollectionSortedBag_ESTestTest4 extends CollectionSortedBag_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        PriorityQueue<Locale.Category> priorityQueue0 = new PriorityQueue<Locale.Category>();
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        TreeBag<Locale.Category> treeBag0 = new TreeBag<Locale.Category>((Iterable<? extends Locale.Category>) priorityQueue0);
-        CollectionSortedBag<Locale.Category> collectionSortedBag0 = new CollectionSortedBag<Locale.Category>(treeBag0);
-        boolean boolean0 = collectionSortedBag0.add(locale_Category0);
-        assertTrue(collectionSortedBag0.contains(locale_Category0));
-        assertTrue(boolean0);
+    /**
+     * Tests that adding a new element to an empty CollectionSortedBag
+     * returns true and results in the element being present in the bag.
+     */
+    @Test
+    public void addShouldSucceedForNewElement() {
+        // Arrange
+        final SortedBag<Locale.Category> underlyingBag = new TreeBag<>();
+        final SortedBag<Locale.Category> decoratedBag = new CollectionSortedBag<>(underlyingBag);
+        final Locale.Category elementToAdd = Locale.Category.DISPLAY;
+
+        // Act
+        final boolean addResult = decoratedBag.add(elementToAdd);
+
+        // Assert
+        assertTrue("The add() method should return true to indicate the collection was modified.", addResult);
+        assertTrue("The bag should contain the element after it has been added.", decoratedBag.contains(elementToAdd));
     }
 }
