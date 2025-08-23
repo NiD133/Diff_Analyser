@@ -2,47 +2,72 @@ package org.mockito.internal.invocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.internal.invocation.TypeSafeMatching.matchesTypeSafe;
-import java.util.Date;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.internal.matchers.LessOrEqual;
-import org.mockito.internal.matchers.Null;
-import org.mockito.internal.matchers.StartsWith;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mockitousage.IMethods;
 
-public class TypeSafeMatchingTestTest9 {
-
-    private static final Object NOT_A_COMPARABLE = new Object();
+/**
+ * Tests for {@link TypeSafeMatching}.
+ */
+public class TypeSafeMatchingTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    public IMethods mock;
+    // A generic base class to test type resolution through inheritance.
+    private abstract static class GenericMatcher<T> implements ArgumentMatcher<T> {
+        // No implementation needed, just for establishing a generic type hierarchy.
+    }
+
+    // A concrete matcher implementation that inherits its argument type (Integer)
+    // from the generic superclass.
+    private static class IntegerMatcher extends GenericMatcher<Integer> {
+        private final AtomicBoolean wasInvoked;
+
+        IntegerMatcher(AtomicBoolean wasInvoked) {
+            this.wasInvoked = wasInvoked;
+        }
+
+        @Override
+        public boolean matches(Integer argument) {
+            wasInvoked.set(true);
+            // The return value is not important for this test.
+            return true;
+        }
+    }
 
     @Test
-    public void dontMatchesWithSubTypeExtendingGenericClass() {
-        final AtomicBoolean wasCalled = new AtomicBoolean();
-        abstract class GenericMatcher<T> implements ArgumentMatcher<T> {
-        }
-        class TestMatcher extends GenericMatcher<Integer> {
+    public void shouldCorrectlyMatchTypeWhenArgumentTypeIsDefinedInGenericSuperclass() {
+        // This test verifies that TypeSafeMatching can correctly determine an
+        // ArgumentMatcher's type even when it's defined in a generic superclass.
 
-            @Override
-            public boolean matches(Integer argument) {
-                wasCalled.set(true);
-                return true;
-            }
-        }
-        wasCalled.set(false);
-        matchesTypeSafe().apply(new TestMatcher(), 123);
-        assertThat(wasCalled.get()).isTrue();
-        wasCalled.set(false);
-        matchesTypeSafe().apply(new TestMatcher(), "");
-        assertThat(wasCalled.get()).isFalse();
+        // Arrange
+        final AtomicBoolean matcherInvoked = new AtomicBoolean(false);
+        final ArgumentMatcher<Integer> integerMatcher = new IntegerMatcher(matcherInvoked);
+
+        // Act: Apply the matcher with a compatible argument (Integer).
+        matchesTypeSafe().apply(integerMatcher, 123);
+
+        // Assert: The matcher should be invoked.
+        assertThat(matcherInvoked.get())
+            .as("Matcher should be invoked for a type-compatible argument")
+            .isTrue();
+
+        // --- Second scenario: incorrect type ---
+
+        // Arrange: Reset the flag for the next check.
+        matcherInvoked.set(false);
+
+        // Act: Apply the matcher with an incompatible argument (String).
+        matchesTypeSafe().apply(integerMatcher, "a string");
+
+        // Assert: The matcher should NOT be invoked due to the type mismatch.
+        assertThat(matcherInvoked.get())
+            .as("Matcher should not be invoked for a type-incompatible argument")
+            .isFalse();
     }
 }
