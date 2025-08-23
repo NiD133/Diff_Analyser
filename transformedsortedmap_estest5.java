@@ -1,45 +1,49 @@
 package org.apache.commons.collections4.map;
 
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.functors.ConstantTransformer;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TransformedSortedMap_ESTestTest5 extends TransformedSortedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        TreeMap<Integer, Integer> treeMap0 = new TreeMap<Integer, Integer>();
-        Integer integer0 = new Integer((-1));
-        Integer integer1 = new Integer(3152);
-        treeMap0.put(integer0, integer1);
-        ConstantTransformer<Integer, Integer> constantTransformer0 = new ConstantTransformer<Integer, Integer>(integer0);
-        TransformedSortedMap<Integer, Integer> transformedSortedMap0 = new TransformedSortedMap<Integer, Integer>(treeMap0, constantTransformer0, constantTransformer0);
-        SortedMap<Integer, Integer> sortedMap0 = transformedSortedMap0.subMap(integer0, integer1);
-        assertFalse(sortedMap0.isEmpty());
+/**
+ * Contains tests for the sub-map views of a {@link TransformedSortedMap}.
+ */
+public class TransformedSortedMap_ESTestTest5 {
+
+    /**
+     * Tests that the subMap() method returns a non-empty view when the
+     * specified range contains an element from the underlying map.
+     */
+    @Test
+    public void subMapShouldReturnNonEmptyViewForValidRange() {
+        // Arrange
+        final SortedMap<Integer, Integer> sourceMap = new TreeMap<>();
+        final Integer keyInMap = -1;
+        final Integer valueInMap = 3152;
+        sourceMap.put(keyInMap, valueInMap);
+
+        // A transformer is required by the constructor, but its transformation logic
+        // is not relevant for this test, as we only verify the subMap view's content.
+        final Transformer<Integer, Integer> dummyTransformer = ConstantTransformer.constantTransformer(null);
+
+        final TransformedSortedMap<Integer, Integer> transformedMap =
+                new TransformedSortedMap<>(sourceMap, dummyTransformer, dummyTransformer);
+
+        // Define a range that includes the key present in the map.
+        final Integer fromKey = -1;
+        final Integer toKey = 4000;
+
+        // Act
+        final SortedMap<Integer, Integer> subMap = transformedMap.subMap(fromKey, toKey);
+
+        // Assert
+        assertFalse("The subMap should not be empty as the range includes an element.", subMap.isEmpty());
+        assertEquals("The subMap should contain exactly one element.", 1, subMap.size());
+        assertEquals("The subMap's first key should match the key within the range.", keyInMap, subMap.firstKey());
     }
 }
