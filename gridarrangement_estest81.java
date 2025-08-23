@@ -1,33 +1,24 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class GridArrangement_ESTestTest81 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method in the {@link GridArrangement} class.
+ */
+public class GridArrangementEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test80() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(30, 30);
-        assertNotNull(gridArrangement0);
-        Object object0 = new Object();
-        assertNotNull(object0);
-        boolean boolean0 = gridArrangement0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing a GridArrangement
+     * instance with an object of a completely different type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentObjectType() {
+        // Arrange: Create an instance of GridArrangement and a generic Object.
+        GridArrangement gridArrangement = new GridArrangement(10, 20);
+        Object otherObject = new Object();
+
+        // Act & Assert: The equals method should return false as the types are incompatible.
+        assertFalse(gridArrangement.equals(otherObject));
     }
 }
