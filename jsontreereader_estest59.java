@@ -1,39 +1,51 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest59 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test058() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        jsonObject0.addProperty("Ql", "Ql");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        jsonTreeReader0.skipValue();
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextNull();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Expected NULL but was STRING at path $.<skipped>
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
-        }
+/**
+ * This test class contains tests for the JsonTreeReader.
+ * This specific test was improved for clarity and maintainability.
+ */
+public class JsonTreeReaderImprovedTest {
+
+    /**
+     * Verifies that calling nextNull() when the reader is positioned at a STRING token
+     * correctly throws an IllegalStateException.
+     */
+    @Test
+    public void nextNull_whenNextTokenIsString_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a JsonTreeReader for an object {"property": "value"}
+        // and advance it to be positioned at the string value.
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("property", "value");
+        JsonTreeReader reader = new JsonTreeReader(jsonObject);
+
+        reader.beginObject();
+        // The skipValue() method, when called after beginObject(), consumes the property name ("property"),
+        // leaving the reader positioned at the corresponding value ("value").
+        reader.skipValue();
+
+        // Act & Assert: Expect an IllegalStateException when trying to read a NULL
+        // because the current token is a STRING.
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            reader::nextNull
+        );
+
+        // Assert that the exception message clearly indicates the token type mismatch.
+        // The original path was "$.<skipped>", but we focus on the more critical part of the message.
+        String expectedMessagePrefix = "Expected NULL but was STRING";
+        String actualMessage = exception.getMessage();
+        
+        assertTrue(
+            "Exception message should indicate the token mismatch. Actual message: \"" + actualMessage + "\"",
+            actualMessage.startsWith(expectedMessagePrefix)
+        );
     }
 }
