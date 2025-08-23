@@ -1,28 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Attribute_ESTestTest11 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        boolean boolean0 = Attribute.isDataAttribute("data-data@X-");
-        assertTrue(boolean0);
+    /**
+     * Verifies that {@link Attribute#isDataAttribute(String)} correctly identifies
+     * an attribute key that starts with the "data-" prefix.
+     */
+    @Test
+    public void isDataAttributeReturnsTrueForAttributeStartingWithDataPrefix() {
+        // Arrange: A key that represents a valid data attribute.
+        // The only requirement is that the key starts with "data-" and has content after the prefix.
+        String validDataAttributeKey = "data-data@X-";
+
+        // Act: Call the method under test.
+        boolean isDataAttribute = Attribute.isDataAttribute(validDataAttributeKey);
+
+        // Assert: The method should return true.
+        assertTrue(
+            "Keys starting with 'data-' should be identified as data attributes.",
+            isDataAttribute
+        );
     }
 }
