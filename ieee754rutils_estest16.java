@@ -1,25 +1,23 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest16 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        double[] doubleArray0 = new double[7];
-        doubleArray0[0] = (double) (-1742.84F);
-        doubleArray0[1] = (-163.0);
-        doubleArray0[2] = (double) (-835.94F);
-        doubleArray0[3] = (double) (-1.0F);
-        doubleArray0[4] = (double) (-835.94F);
-        doubleArray0[5] = (double) (-1742.84F);
-        doubleArray0[6] = (double) (-1.0F);
-        double double0 = IEEE754rUtils.max(doubleArray0);
-        assertEquals((-1.0), double0, 0.01);
+    @Test
+    public void max_shouldReturnLargestValue_whenArrayContainsNegativeDoubles() {
+        // Arrange: Define an array of negative numbers where -1.0 is the maximum value.
+        final double[] numbers = {-1742.84, -163.0, -835.94, -1.0, -835.94, -1742.84, -1.0};
+        final double expectedMax = -1.0;
+
+        // Act: Call the max method with the array of negative numbers.
+        final double actualMax = IEEE754rUtils.max(numbers);
+
+        // Assert: The result should be the largest number in the array (the one closest to zero).
+        assertEquals(expectedMax, actualMax, 0.0);
     }
 }
