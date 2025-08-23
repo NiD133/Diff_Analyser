@@ -1,41 +1,31 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+import java.io.EOFException;
+import java.io.IOException;
+
+/**
+ * This test class contains tests for the RandomAccessFileOrArray class.
+ * This specific test focuses on the behavior of the readFully() method.
+ */
 public class RandomAccessFileOrArray_ESTestTest153 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test152() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.readShortLE();
-        try {
-            randomAccessFileOrArray0.readFully(byteArray0);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that readFully() throws an EOFException when attempting to read more bytes
+     * than are available in the underlying data source.
+     */
+    @Test(timeout = 4000, expected = EOFException.class)
+    public void readFully_whenNotEnoughBytesRemain_throwsEOFException() throws IOException {
+        // Arrange: Create a data source with 8 bytes.
+        byte[] sourceData = new byte[8];
+        RandomAccessFileOrArray accessor = new RandomAccessFileOrArray(sourceData);
+
+        // Act: Consume the first 2 bytes, which leaves only 6 bytes remaining in the source.
+        accessor.readShortLE();
+
+        // Assert: Attempting to read a full 8 bytes into the buffer should fail because
+        // only 6 are left. The method is expected to throw an EOFException.
+        accessor.readFully(sourceData);
     }
 }
