@@ -1,34 +1,38 @@
 package org.apache.commons.collections4.sequence;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequencesComparator_ESTestTest2 extends SequencesComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SequencesComparator} class.
+ */
+public class SequencesComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Object object0 = new Object();
-        linkedList0.add(object0);
-        linkedList0.add(object0);
-        LinkedList<Object> linkedList1 = new LinkedList<Object>();
-        linkedList0.add(object0);
-        linkedList0.add(object0);
-        linkedList1.add((Object) linkedList0);
-        SequencesComparator<Object> sequencesComparator0 = new SequencesComparator<Object>(linkedList0, linkedList1);
-        EditScript<Object> editScript0 = sequencesComparator0.getScript();
-        assertEquals(5, editScript0.getModifications());
+    /**
+     * Tests that the generated EditScript has the correct number of modifications
+     * when comparing two sequences that have no elements in common.
+     * <p>
+     * In this scenario, the total number of modifications should be the sum of the
+     * lengths of the two sequences (i.e., all elements from the first sequence
+     * are deleted, and all elements from the second sequence are inserted).
+     */
+    @Test
+    public void getScriptShouldReturnCorrectModificationCountForDisjointSequences() {
+        // Arrange: Create two distinct sequences with no common elements.
+        final List<String> sequenceA = Arrays.asList("A", "B", "C", "D");
+        final List<String> sequenceB = Collections.singletonList("E");
+
+        final SequencesComparator<String> comparator = new SequencesComparator<>(sequenceA, sequenceB);
+
+        // Act: Generate the edit script to transform sequenceA into sequenceB.
+        final EditScript<String> script = comparator.getScript();
+
+        // Assert: The total modifications should be 4 deletions and 1 insertion.
+        final int expectedModifications = sequenceA.size() + sequenceB.size(); // 4 + 1 = 5
+        assertEquals(expectedModifications, script.getModifications());
     }
 }
