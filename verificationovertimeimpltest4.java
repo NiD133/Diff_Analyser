@@ -2,34 +2,46 @@ package org.mockito.internal.verification;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.openMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.exceptions.base.MockitoAssertionError;
-import org.mockito.exceptions.verification.opentest4j.ArgumentsAreDifferent;
+import org.mockito.MockitoAnnotations;
 import org.mockito.verification.VerificationMode;
 
 public class VerificationOverTimeImplTestTest4 {
 
+    // These values are not relevant to this test's logic, so they are named to reflect that.
+    private static final long IRRELEVANT_POLLING_PERIOD = 10L;
+    private static final long IRRELEVANT_DURATION = 1000L;
+
     @Mock
     private VerificationMode delegate;
 
-    private VerificationOverTimeImpl impl;
+    private VerificationOverTimeImpl verificationOverTime;
 
     @Before
     public void setUp() {
-        openMocks(this);
-        impl = new VerificationOverTimeImpl(10, 1000, delegate, true);
+        MockitoAnnotations.openMocks(this);
+        // The 'true' flag configures the class for "timeout" style verification.
+        boolean returnOnSuccess = true;
+        verificationOverTime =
+                new VerificationOverTimeImpl(IRRELEVANT_POLLING_PERIOD, IRRELEVANT_DURATION, delegate, returnOnSuccess);
     }
 
+    /**
+     * Verifies that the polling mechanism only catches verification failures (AssertionError).
+     * Any other exception, like a RuntimeException, should not be handled by the polling
+     * logic and must be propagated immediately, as it indicates a setup or code issue
+     * rather than a verification-in-progress failure.
+     */
     @Test
-    public void should_not_wrap_other_exceptions() {
-        RuntimeException toBeThrown = new RuntimeException();
-        doThrow(toBeThrown).when(delegate).verify(null);
-        assertThatThrownBy(() -> {
-            impl.verify(null);
-        }).isEqualTo(toBeThrown);
+    public void shouldImmediatelyRethrowNonAssertionErrorFromDelegate() {
+        // Arrange
+        RuntimeException unexpectedException = new RuntimeException("Delegate failed unexpectedly");
+        doThrow(unexpectedException).when(delegate).verify(null);
+
+        // Act & Assert
+        assertThatThrownBy(() -> verificationOverTime.verify(null))
+            .isSameAs(unexpectedException);
     }
 }
