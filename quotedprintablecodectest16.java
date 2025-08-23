@@ -1,38 +1,54 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest16 {
+/**
+ * Tests for the QuotedPrintableCodec, focusing on soft line break handling and round-trip integrity.
+ */
+class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private QuotedPrintableCodec codec;
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        // Instantiate the codec for each test to ensure isolation.
+        codec = new QuotedPrintableCodec();
     }
 
     @Test
-    void testSoftLineBreakDecode() throws Exception {
-        final String qpdata = "If you believe that truth=3Dbeauty, then surely=20=\r\nmathematics is the most beautiful branch of philosophy.";
-        final String expected = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        assertEquals(expected, qpcodec.decode(qpdata));
-        final String encoded = qpcodec.encode(expected);
-        assertEquals(expected, qpcodec.decode(encoded));
+    @DisplayName("Decoding a string with a soft line break (=\\r\\n) should remove the break")
+    void shouldDecodeSoftLineBreak() throws DecoderException {
+        // Arrange: A soft line break is represented by "=\r\n" in Quoted-Printable encoding.
+        // It's used to wrap long lines without affecting the decoded content.
+        final String encodedTextWithSoftLineBreak = "If you believe that truth=3Dbeauty, then surely=20=\r\nmathematics is the most beautiful branch of philosophy.";
+        final String expectedDecodedText = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
+
+        // Act
+        final String actualDecodedText = codec.decode(encodedTextWithSoftLineBreak);
+
+        // Assert
+        assertEquals(expectedDecodedText, actualDecodedText,
+            "Soft line break '=\\r\\n' should be removed after decoding.");
+    }
+
+    @Test
+    @DisplayName("Encoding and then decoding a string should return the original string")
+    void shouldEncodeAndDecodeRoundTripSuccessfully() throws EncoderException, DecoderException {
+        // Arrange: A standard string to test the encode-decode cycle.
+        final String originalText = "If you believe that truth=beauty, then surely mathematics is the most beautiful branch of philosophy.";
+
+        // Act: Encode the original text and then decode it back.
+        final String encodedText = codec.encode(originalText);
+        final String roundTripText = codec.decode(encodedText);
+
+        // Assert: The result of the round trip should be identical to the original string.
+        assertEquals(originalText, roundTripText,
+            "Decoding an encoded string should restore it to its original form.");
     }
 }
