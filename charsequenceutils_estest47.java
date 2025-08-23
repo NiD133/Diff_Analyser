@@ -1,26 +1,23 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest47 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        // Undeclared exception!
-        try {
-            CharSequenceUtils.lastIndexOf((CharSequence) null, 1041, 0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.lang3.CharSequenceUtils", e);
-        }
+    /**
+     * Tests that CharSequenceUtils.lastIndexOf() throws a NullPointerException
+     * when the input CharSequence is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testLastIndexOfWithNullCharSequence() {
+        // The specific character and start index are irrelevant for this test case,
+        // as the NullPointerException should be thrown before they are used.
+        final int irrelevantChar = 'a';
+        final int irrelevantStartIndex = 0;
+
+        CharSequenceUtils.lastIndexOf(null, irrelevantChar, irrelevantStartIndex);
     }
 }
