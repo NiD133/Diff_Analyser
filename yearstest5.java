@@ -1,41 +1,56 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class YearsTestTest5 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
+/**
+ * Unit tests for the factory method {@link Years#yearsIn(ReadableInterval)}.
+ */
+public class YearsTest {
+
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void yearsIn_givenNullInterval_shouldReturnZero() {
+        // The yearsIn method should handle null input gracefully by returning zero.
+        assertEquals(Years.ZERO, Years.yearsIn(null));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void yearsIn_givenZeroLengthInterval_shouldReturnZero() {
+        // An interval with the same start and end time has a duration of zero years.
+        DateTime pointInTime = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+        Interval zeroLengthInterval = new Interval(pointInTime, pointInTime);
+        
+        assertEquals(Years.ZERO, Years.yearsIn(zeroLengthInterval));
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_yearsIn_RInterval() {
+    @Test
+    public void yearsIn_givenThreeYearInterval_shouldReturnThree() {
+        // Arrange: Create an interval that spans exactly three years.
         DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2009, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2012, 6, 9, 12, 0, 0, 0, PARIS);
-        assertEquals(0, Years.yearsIn((ReadableInterval) null).getYears());
-        assertEquals(3, Years.yearsIn(new Interval(start, end1)).getYears());
-        assertEquals(0, Years.yearsIn(new Interval(start, start)).getYears());
-        assertEquals(0, Years.yearsIn(new Interval(end1, end1)).getYears());
-        assertEquals(6, Years.yearsIn(new Interval(start, end2)).getYears());
+        DateTime end = new DateTime(2009, 6, 9, 12, 0, 0, 0, PARIS);
+        Interval threeYearInterval = new Interval(start, end);
+
+        // Act
+        Years result = Years.yearsIn(threeYearInterval);
+
+        // Assert
+        assertEquals(Years.THREE, result);
+    }
+
+    @Test
+    public void yearsIn_givenSixYearInterval_shouldReturnSix() {
+        // Arrange: Create an interval that spans exactly six years.
+        DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+        DateTime end = new DateTime(2012, 6, 9, 12, 0, 0, 0, PARIS);
+        Interval sixYearInterval = new Interval(start, end);
+
+        // Act
+        Years result = Years.yearsIn(sixYearInterval);
+
+        // Assert
+        assertEquals(6, result.getYears());
     }
 }
