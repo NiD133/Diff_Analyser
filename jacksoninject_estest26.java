@@ -1,25 +1,36 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
-public class JacksonInject_ESTestTest26 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its immutability and equality logic.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Object object0 = new Object();
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.forId(object0);
-        Boolean boolean0 = Boolean.FALSE;
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withUseInput(boolean0);
-        boolean boolean1 = jacksonInject_Value0.equals(jacksonInject_Value1);
-        assertFalse(jacksonInject_Value1.equals((Object) jacksonInject_Value0));
-        assertTrue(jacksonInject_Value1.hasId());
-        assertFalse(boolean1);
+    /**
+     * Verifies that two JacksonInject.Value instances are not considered equal
+     * if they have different 'useInput' properties.
+     */
+    @Test
+    public void testEquals_whenUseInputDiffers_shouldReturnFalse() {
+        // Arrange
+        Object id = new Object();
+        JacksonInject.Value baseValue = JacksonInject.Value.forId(id);
+
+        // Act: Create a new instance from the base one, but with a different 'useInput' value.
+        // The 'with...' methods should create a new, distinct object.
+        JacksonInject.Value modifiedValue = baseValue.withUseInput(Boolean.FALSE);
+
+        // Assert
+        // The two instances should not be equal because their 'useInput' property differs.
+        assertNotEquals(baseValue, modifiedValue);
+
+        // For completeness, ensure the equals contract is symmetrical.
+        assertNotEquals(modifiedValue, baseValue);
+
+        // Sanity check to ensure the ID was preserved in the new instance.
+        assertTrue(modifiedValue.hasId());
     }
 }
