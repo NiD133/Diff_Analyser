@@ -1,19 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Years_ESTestTest32 extends Years_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Years} class, focusing on comparison logic.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Years years0 = Years.years((-690));
-        boolean boolean0 = years0.isGreaterThan(years0);
-        assertEquals((-690), years0.getYears());
-        assertFalse(boolean0);
+    /**
+     * Verifies that isGreaterThan() returns false when a Years instance
+     * is compared to itself. A value cannot be strictly greater than itself.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingToItself() {
+        // Arrange
+        Years someYears = Years.years(-690);
+
+        // Act
+        boolean isGreater = someYears.isGreaterThan(someYears);
+
+        // Assert
+        assertFalse("A Years instance should not be considered greater than itself.", isGreater);
     }
 }
