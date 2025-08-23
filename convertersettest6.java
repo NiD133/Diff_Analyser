@@ -1,76 +1,52 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.ReadWritableDateTime;
-import org.joda.time.ReadWritableInstant;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class ConverterSetTestTest6 extends TestCase {
+/**
+ * Unit tests for the remove functionality of the {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    private static final Converter c1 = new Converter() {
+    // Descriptive constant names for the test converters
+    private static final Converter BOOLEAN_CONVERTER = new TestConverter(Boolean.class);
+    private static final Converter CHARACTER_CONVERTER = new TestConverter(Character.class);
+    private static final Converter BYTE_CONVERTER = new TestConverter(Byte.class);
+    private static final Converter SHORT_CONVERTER = new TestConverter(Short.class);
 
-        public Class getSupportedType() {
-            return Boolean.class;
-        }
-    };
+    @Test
+    public void remove_whenConverterExists_shouldReturnSmallerSetAndLeaveOriginalUnchanged() {
+        // Arrange: Create a set with four distinct converters.
+        Converter[] initialConverters = new Converter[] {
+            BOOLEAN_CONVERTER, CHARACTER_CONVERTER, BYTE_CONVERTER, SHORT_CONVERTER
+        };
+        ConverterSet originalSet = new ConverterSet(initialConverters);
+        int initialSize = originalSet.size();
 
-    private static final Converter c2 = new Converter() {
+        // Act: Remove an existing converter.
+        // The second parameter (removed) is null, as we don't need to capture the removed item.
+        ConverterSet newSet = originalSet.remove(BYTE_CONVERTER, null);
 
-        public Class getSupportedType() {
-            return Character.class;
-        }
-    };
-
-    private static final Converter c3 = new Converter() {
-
-        public Class getSupportedType() {
-            return Byte.class;
-        }
-    };
-
-    private static final Converter c4 = new Converter() {
-
-        public Class getSupportedType() {
-            return Short.class;
-        }
-    };
-
-    private static final Converter c4a = new Converter() {
-
-        public Class getSupportedType() {
-            return Short.class;
-        }
-    };
-
-    private static final Converter c5 = new Converter() {
-
-        public Class getSupportedType() {
-            return Integer.class;
-        }
-    };
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert: Verify the original set is immutable and the new set is smaller.
+        assertEquals("The original set should be immutable and its size should not change.",
+                     initialSize, originalSet.size());
+        assertEquals("The new set should contain one less converter.",
+                     initialSize - 1, newSet.size());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestConverterSet.class);
-    }
+    /**
+     * A simple, reusable implementation of Converter for testing purposes.
+     */
+    private static class TestConverter implements Converter {
+        private final Class<?> type;
 
-    //-----------------------------------------------------------------------
-    public void testRemoveNullRemoved1() {
-        Converter[] array = new Converter[] { c1, c2, c3, c4 };
-        ConverterSet set = new ConverterSet(array);
-        ConverterSet result = set.remove(c3, null);
-        assertEquals(4, set.size());
-        assertEquals(3, result.size());
+        TestConverter(Class<?> type) {
+            this.type = type;
+        }
+
+        @Override
+        public Class<?> getSupportedType() {
+            return type;
+        }
     }
 }
