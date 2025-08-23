@@ -1,34 +1,42 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest15 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        PointImpl pointImpl0 = new PointImpl((-1.0), Double.NaN, spatialContext0);
-        linkedList0.add((Point) pointImpl0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-1.0), spatialContext0);
-        Rectangle rectangle0 = bufferedLineString0.getBoundingBox();
-        assertEquals(1, linkedList0.size());
-        assertEquals(0.0, rectangle0.getMinX(), 0.01);
+import static org.junit.Assert.assertEquals;
+
+public class BufferedLineStringTest {
+
+    private final SpatialContext ctx = SpatialContext.GEO;
+
+    /**
+     * Tests that the bounding box of a BufferedLineString created from a single point
+     * with a negative buffer is simply the bounding box of that single point.
+     * A negative or zero buffer should result in a zero-width line.
+     */
+    @Test
+    public void getBoundingBox_withSinglePointAndNegativeBuffer_isCorrect() {
+        // Arrange
+        // A single point to define the line string.
+        Point point = ctx.makePoint(10, 20);
+        List<Point> points = Collections.singletonList(point);
+        double negativeBuffer = -5.0; // A negative buffer should be treated as zero.
+
+        // Act
+        // Create a BufferedLineString from the single point.
+        BufferedLineString lineWithSinglePoint = new BufferedLineString(points, negativeBuffer, ctx);
+        Rectangle boundingBox = lineWithSinglePoint.getBoundingBox();
+
+        // Assert
+        // The bounding box of a single-point, zero-buffer line is just the point itself.
+        assertEquals("minX should match point's x", 10.0, boundingBox.getMinX(), 0.0);
+        assertEquals("maxX should match point's x", 10.0, boundingBox.getMaxX(), 0.0);
+        assertEquals("minY should match point's y", 20.0, boundingBox.getMinY(), 0.0);
+        assertEquals("maxY should match point's y", 20.0, boundingBox.getMaxY(), 0.0);
     }
 }
