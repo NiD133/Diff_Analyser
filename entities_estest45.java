@@ -1,28 +1,25 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest45 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the inner enum {@link Entities.EscapeMode}.
+ */
+public class EntitiesEscapeModeTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        Entities.EscapeMode entities_EscapeMode0 = Entities.EscapeMode.extended;
-        String string0 = entities_EscapeMode0.nameForCodepoint(340);
-        assertEquals("Racute", string0);
+    @Test
+    public void nameForCodepointShouldReturnCorrectEntityNameInExtendedMode() {
+        // Arrange
+        // The codepoint 340 corresponds to the Unicode character 'Ŕ' (LATIN CAPITAL LETTER R WITH ACUTE).
+        final int codepoint = 340;
+        final String expectedEntityName = "Racute";
+        final Entities.EscapeMode escapeMode = Entities.EscapeMode.extended;
+
+        // Act
+        String actualEntityName = escapeMode.nameForCodepoint(codepoint);
+
+        // Assert
+        assertEquals("The entity name for codepoint 340 should be 'Racute'", expectedEntityName, actualEntityName);
     }
 }
