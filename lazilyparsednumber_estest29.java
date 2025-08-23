@@ -1,18 +1,28 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LazilyParsedNumber_ESTestTest29 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("-6");
-        float float0 = lazilyParsedNumber0.floatValue();
-        assertEquals((-6.0F), float0, 0.01F);
+    /**
+     * Verifies that the floatValue() method correctly converts a string
+     * representation of a negative integer into its float equivalent.
+     */
+    @Test
+    public void floatValue_whenInputIsNegativeInteger_returnsCorrectFloat() {
+        // Arrange
+        LazilyParsedNumber number = new LazilyParsedNumber("-6");
+        float expected = -6.0F;
+
+        // Act
+        float actual = number.floatValue();
+
+        // Assert
+        // A delta of 0.0F is used because the conversion from "-6" should be exact.
+        assertEquals(expected, actual, 0.0F);
     }
 }
