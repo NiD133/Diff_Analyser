@@ -1,36 +1,42 @@
 package org.jfree.data.general;
 
+import org.jfree.data.DefaultKeyedValuesDataset;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class DefaultPieDataset_ESTestTest27 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * This test suite contains tests for the DefaultPieDataset class, focusing on
+ * its equals() method behavior.
+ */
+public class DefaultPieDataset_ESTestTest27 {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        DefaultKeyedValuesDataset<Integer> defaultKeyedValuesDataset0 = new DefaultKeyedValuesDataset<Integer>();
-        Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
-        defaultKeyedValuesDataset0.setValue(integer0, (Number) integer0);
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>(defaultKeyedValuesDataset0);
-        assertEquals(1, defaultPieDataset0.getItemCount());
-        defaultPieDataset0.setValue(integer0, (-140.1353984740134));
-        boolean boolean0 = defaultKeyedValuesDataset0.equals(defaultPieDataset0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false after a DefaultPieDataset,
+     * created from a source, is modified. This ensures that the comparison is
+     * based on the dataset's current values.
+     */
+    @Test
+    public void equals_returnsFalse_afterModifyingDatasetCreatedFromSource() {
+        // Arrange: Create a source dataset and two identical PieDatasets from it.
+        DefaultKeyedValuesDataset<String> sourceDataset = new DefaultKeyedValuesDataset<>();
+        sourceDataset.setValue("Apples", 50.0);
+
+        // Create the dataset that we will subsequently modify.
+        DefaultPieDataset<String> pieDataset = new DefaultPieDataset<>(sourceDataset);
+        
+        // Create a second dataset from the same source to represent the original state for comparison.
+        DefaultPieDataset<String> originalStatePieDataset = new DefaultPieDataset<>(sourceDataset);
+
+        // Sanity check: The two pie datasets should be equal immediately after creation.
+        assertTrue("Datasets created from the same source should be equal initially.", 
+                   pieDataset.equals(originalStatePieDataset));
+
+        // Act: Modify the value for the "Apples" key in the first pie dataset.
+        pieDataset.setValue("Apples", 75.0);
+
+        // Assert: The modified dataset should no longer be equal to the dataset
+        // representing the original state.
+        assertFalse("A modified dataset should not be equal to its original state.", 
+                    pieDataset.equals(originalStatePieDataset));
     }
 }
