@@ -1,29 +1,29 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonParser_ESTestTest21 extends JsonParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonParser} class.
+ * This class focuses on testing the handling of invalid or null inputs.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        // Undeclared exception!
-        try {
-            jsonParser0.parse((JsonReader) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.JsonParser", e);
-        }
+    /**
+     * Verifies that the deprecated instance method {@code parse(JsonReader)} throws a
+     * {@code NullPointerException} when the provided {@code JsonReader} is null.
+     *
+     * This test ensures that the method's contract is upheld, even for deprecated APIs,
+     * to maintain backward compatibility.
+     */
+    @Test(expected = NullPointerException.class)
+    public void parseWithNullJsonReaderThrowsNullPointerException() {
+        JsonParser parser = new JsonParser();
+        JsonReader nullReader = null;
+
+        // The JsonParser() constructor and the parse(JsonReader) instance method are deprecated.
+        // The modern static equivalent is JsonParser.parseReader(JsonReader).
+        // We are calling the deprecated method here to ensure it fails as expected.
+        parser.parse(nullReader);
     }
 }
