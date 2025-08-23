@@ -1,24 +1,41 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest9 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        double[] doubleArray0 = new double[9];
-        doubleArray0[0] = (-1583.803774);
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        double double0 = atomicDoubleArray0.getAndSet(0, (-1710.836556));
-        assertEquals((-1583.803774), double0, 0.01);
+    @Test
+    public void getAndSet_returnsOldValueAndSetsNewValue() {
+        // Arrange
+        final double initialValue = -1583.803774;
+        final double newValue = -1710.836556;
+        final int indexToUpdate = 0;
+
+        double[] sourceArray = {initialValue, 10.0, 20.0};
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(sourceArray);
+
+        // Act
+        double returnedValue = atomicArray.getAndSet(indexToUpdate, newValue);
+
+        // Assert
+        // 1. Verify that the method returned the original value.
+        assertEquals(
+                "getAndSet should return the value before the update.",
+                initialValue,
+                returnedValue,
+                0.0);
+
+        // 2. Verify that the value in the array was updated to the new value.
+        double valueAfterUpdate = atomicArray.get(indexToUpdate);
+        assertEquals(
+                "The value in the array should be updated to the new value.",
+                newValue,
+                valueAfterUpdate,
+                0.0);
     }
 }
