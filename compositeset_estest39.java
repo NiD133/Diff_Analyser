@@ -1,60 +1,38 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
+/**
+ * This test class contains tests for the CompositeSet class.
+ * This specific test focuses on the toArray(T[] array) method.
+ */
 public class CompositeSet_ESTestTest39 extends CompositeSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Set<Object>[] setArray0 = (Set<Object>[]) Array.newInstance(Set.class, 0);
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>(setArray0);
-        assertEquals(0, setArray0.length);
-        assertNotNull(compositeSet0);
-        Object[] objectArray0 = compositeSet0.toArray((Object[]) setArray0);
-        assertEquals(0, setArray0.length);
-        assertEquals(0, objectArray0.length);
-        assertNotNull(objectArray0);
+    /**
+     * Tests that calling toArray(T[] array) on an empty CompositeSet
+     * with a zero-length array returns the same empty array instance.
+     * This adheres to the contract of java.util.Collection#toArray(T[]).
+     */
+    @Test
+    public void toArrayOnEmptySetWithEmptyArrayReturnsSameArray() {
+        // Arrange: Create an empty CompositeSet.
+        CompositeSet<Object> emptySet = new CompositeSet<>(new Set[0]);
+        Object[] destinationArray = new Object[0];
+
+        // Act: Call the toArray method with the pre-sized destination array.
+        Object[] resultArray = emptySet.toArray(destinationArray);
+
+        // Assert: Verify the behavior aligns with the Collection#toArray contract.
+        assertNotNull("The returned array should not be null.", resultArray);
+        assertEquals("The returned array should be empty.", 0, resultArray.length);
+
+        // The contract states that if the collection fits in the specified array,
+        // the array is returned. An empty collection fits in a zero-length array.
+        assertSame("The returned array should be the same instance as the one passed in.",
+                destinationArray, resultArray);
     }
 }
