@@ -1,25 +1,45 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
 import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest17 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Tests for {@link PhoneticEngine.PhonemeBuilder}.
+ */
+public class PhoneticEngine_PhonemeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        linkedHashSet0.add(">7=;2[R[bkK,");
-        Languages.LanguageSet languages_LanguageSet0 = Languages.LanguageSet.from(linkedHashSet0);
-        PhoneticEngine.PhonemeBuilder phoneticEngine_PhonemeBuilder0 = PhoneticEngine.PhonemeBuilder.empty(languages_LanguageSet0);
-        Rule.Phoneme rule_Phoneme0 = new Rule.Phoneme("O/,y)ptjgJDw~` r7b", languages_LanguageSet0);
-        phoneticEngine_PhonemeBuilder0.apply(rule_Phoneme0, 1);
-        assertEquals(1, rule_Phoneme0.size());
+    /**
+     * Tests that applying a phoneme expression to an empty PhonemeBuilder
+     * results in a builder containing that single phoneme.
+     */
+    @Test
+    public void applyShouldAppendPhonemeToEmptyBuilder() {
+        // Arrange
+        // 1. Define a language set. The PhonemeBuilder requires one.
+        Set<String> languageNames = Collections.singleton("any");
+        Languages.LanguageSet languageSet = Languages.LanguageSet.from(languageNames);
+
+        // 2. Create a PhonemeBuilder that starts with a single empty phoneme.
+        PhoneticEngine.PhonemeBuilder phonemeBuilder = PhoneticEngine.PhonemeBuilder.empty(languageSet);
+
+        // 3. Create the phoneme expression to be applied.
+        String phonemeText = "test-phoneme";
+        Rule.Phoneme phonemeToApply = new Rule.Phoneme(phonemeText, languageSet);
+        
+        // 4. Define the maximum number of phonemes to generate.
+        final int maxPhonemes = 10;
+
+        // Act
+        // Apply the phoneme expression. This should append the new phoneme text
+        // to the builder's initial empty phoneme.
+        phonemeBuilder.apply(phonemeToApply, maxPhonemes);
+
+        // Assert
+        // The builder should now contain the phoneme that was applied.
+        String expectedPhonemes = phonemeText;
+        assertEquals("The builder should contain the applied phoneme", expectedPhonemes, phonemeBuilder.makeString());
     }
 }
