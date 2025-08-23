@@ -1,22 +1,29 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IslamicChronology_ESTestTest39 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        boolean boolean0 = islamicChronology0.LEAP_YEAR_16_BASED.equals(islamicChronology0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that an IslamicChronology.LeapYearPatternType object is not
+     * considered equal to an IslamicChronology object, as they are different types.
+     * This tests the robustness of the LeapYearPatternType.equals() method.
+     */
+    @Test
+    public void leapYearPatternType_shouldNotBeEqualTo_chronologyInstance() {
+        // Arrange
+        IslamicChronology chronology = IslamicChronology.getInstance();
+        IslamicChronology.LeapYearPatternType leapYearPattern = IslamicChronology.LEAP_YEAR_16_BASED;
+
+        // Act
+        // The .equals() method is called on the LeapYearPatternType object.
+        boolean result = leapYearPattern.equals(chronology);
+
+        // Assert
+        assertFalse("A LeapYearPatternType should not be equal to an IslamicChronology instance.", result);
     }
 }
