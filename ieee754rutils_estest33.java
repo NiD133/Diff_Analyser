@@ -1,18 +1,27 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest33 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        float[] floatArray0 = new float[2];
-        float float0 = IEEE754rUtils.min(floatArray0);
-        assertEquals(0.0F, float0, 0.01F);
+    /**
+     * Tests that IEEE754rUtils.min() returns 0.0F for an array containing only zeros.
+     */
+    @Test
+    public void minFloatArray_shouldReturnZero_whenArrayContainsOnlyZeros() {
+        // Arrange: Create an array containing two zero values.
+        final float[] values = {0.0F, 0.0F};
+        final float expectedMinimum = 0.0F;
+
+        // Act: Call the method under test.
+        final float actualMinimum = IEEE754rUtils.min(values);
+
+        // Assert: Verify that the result is the expected minimum value.
+        // A delta of 0.0F is used for an exact comparison.
+        assertEquals(expectedMinimum, actualMinimum, 0.0F);
     }
 }
