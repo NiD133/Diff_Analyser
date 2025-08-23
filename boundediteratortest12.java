@@ -1,53 +1,71 @@
 package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class BoundedIteratorTestTest12<E> extends AbstractIteratorTest<E> {
+/**
+ * Tests for {@link BoundedIterator}.
+ * <p>
+ * This class focuses on specific behaviors of the BoundedIterator,
+ * complementing the inherited tests from {@link AbstractIteratorTest}.
+ * </p>
+ */
+public class BoundedIteratorTest<E> extends AbstractIteratorTest<E> {
 
-    /**
-     * Test array of size 7
-     */
-    private final String[] testArray = { "a", "b", "c", "d", "e", "f", "g" };
+    private static final String[] SOURCE_ARRAY = { "a", "b", "c", "d", "e", "f", "g" };
 
-    private List<E> testList;
+    private List<E> sourceList;
 
     @Override
     public Iterator<E> makeEmptyIterator() {
+        // BoundedIterator over an empty source, with arbitrary non-zero bounds.
         return new BoundedIterator<>(Collections.<E>emptyList().iterator(), 0, 10);
     }
 
     @Override
     public Iterator<E> makeObject() {
-        return new BoundedIterator<>(new ArrayList<>(testList).iterator(), 1, testList.size() - 1);
+        // Creates an iterator that is bounded to a sub-section of the source list.
+        // It will skip the first element and iterate over the next (size - 1) elements.
+        final int offset = 1;
+        final int maxElements = sourceList.size() - 1;
+        return new BoundedIterator<>(new ArrayList<>(sourceList).iterator(), offset, maxElements);
     }
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
-    public void setUp() throws Exception {
-        testList = Arrays.asList((E[]) testArray);
+    @SuppressWarnings("unchecked")
+    public void setUp() {
+        // This unchecked cast is necessary because generics are erased at runtime,
+        // and we cannot create a generic array new E[].
+        sourceList = Arrays.asList((E[]) SOURCE_ARRAY);
     }
 
-    /**
-     * Test the {@code remove()} method being called without
-     * {@code next()} being called first.
-     */
     @Test
-    void testRemoveWithoutCallingNext() {
-        final List<E> testListCopy = new ArrayList<>(testList);
-        final Iterator<E> iter = new BoundedIterator<>(testListCopy.iterator(), 1, 5);
-        final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> iter.remove());
-        assertEquals("remove() cannot be called before calling next()", thrown.getMessage());
+    @DisplayName("remove() should throw IllegalStateException if next() has not been called")
+    void removeShouldThrowExceptionWhenCalledBeforeNext() {
+        // Arrange
+        final List<E> listForTesting = new ArrayList<>(sourceList);
+        // Create an iterator with an offset, which advances the underlying iterator internally.
+        final Iterator<E> boundedIterator = new BoundedIterator<>(listForTesting.iterator(), 1, 5);
+
+        // Act & Assert
+        // The BoundedIterator's contract states that remove() is illegal before a call to next(),
+        // even if the underlying iterator was advanced during construction (due to the offset).
+        final IllegalStateException thrown = assertThrows(
+            IllegalStateException.class,
+            () -> boundedIterator.remove(),
+            "Calling remove() before next() should throw IllegalStateException."
+        );
+
+        assertEquals("remove() cannot be called before calling next()", thrown.getMessage(),
+            "The exception message should match the expected contract.");
     }
 }
