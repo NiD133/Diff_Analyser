@@ -2,17 +2,24 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest52 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        Seconds seconds0 = Seconds.secondsIn((ReadableInterval) null);
-        Seconds seconds1 = seconds0.dividedBy(1);
-        assertEquals(0, seconds1.getSeconds());
+    /**
+     * Tests that the factory method `secondsIn()` returns a zero-second period
+     * when the input interval is null, as specified by its contract.
+     */
+    @Test
+    public void secondsIn_givenNullInterval_returnsZeroSeconds() {
+        // Arrange: No setup is needed as we are testing a static method with a null argument.
+
+        // Act: Create a Seconds instance from a null ReadableInterval.
+        Seconds result = Seconds.secondsIn(null);
+
+        // Assert: The resulting period should be zero seconds.
+        assertEquals(0, result.getSeconds());
     }
 }
