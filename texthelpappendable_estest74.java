@@ -1,57 +1,39 @@
 package org.apache.commons.cli.help;
 
+import org.apache.commons.cli.help.TableDefinition;
+import org.apache.commons.cli.help.TextHelpAppendable;
+import org.apache.commons.cli.help.TextStyle;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
+
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest74 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Test suite for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test73() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        LinkedHashSet<List<String>> linkedHashSet0 = new LinkedHashSet<List<String>>();
-        Stack<TextStyle> stack0 = new Stack<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        stack0.add(textStyle0);
-        Vector<String> vector0 = new Vector<String>();
-        TableDefinition tableDefinition0 = TableDefinition.from("i.\"lAU7m)#3sFWC", stack0, vector0, linkedHashSet0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.adjustTableFormat(tableDefinition0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // Array index out of range: 0
-            //
-            verifyException("java.util.Vector", e);
-        }
+    /**
+     * Tests that adjustTableFormat throws an exception when the number of headers
+     * is less than the number of styles, leading to an out-of-bounds access attempt.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testAdjustTableFormatWithMismatchedHeadersAndStylesThrowsException() {
+        // Arrange: Create a TextHelpAppendable and a TableDefinition with a mismatch
+        // between the number of styles (1) and the number of headers (0).
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(new StringWriter());
+
+        List<TextStyle> styles = Collections.singletonList(TextStyle.DEFAULT);
+        List<String> emptyHeaders = Collections.emptyList();
+
+        TableDefinition tableDefinition = TableDefinition.from("Test Table", styles, emptyHeaders, Collections.emptySet());
+
+        // Act: Call the method under test. This is expected to throw an exception
+        // because it will likely try to access a header that does not exist.
+        helpAppendable.adjustTableFormat(tableDefinition);
+
+        // Assert: The test will pass if an ArrayIndexOutOfBoundsException is thrown,
+        // as declared by the @Test(expected=...) annotation.
     }
 }
