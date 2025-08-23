@@ -1,83 +1,44 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.Locale;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
+import org.joda.time.ReadablePartial;
 import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 
-public class StringConverterTestTest9 extends TestCase {
+/**
+ * Tests the {@link StringConverter#getPartialValues(ReadablePartial, Object, Chronology)} method.
+ */
+public class StringConverterGetPartialValuesTest extends TestCase {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+    /**
+     * Tests that a time string is correctly parsed into its constituent partial values
+     * based on a provided template.
+     */
+    public void testGetPartialValues_shouldParseTimeOfDayFromString() {
+        // Arrange
+        // The StringConverter uses the ReadablePartial argument as a template to determine
+        // which fields to parse. A TimeOfDay instance specifies that we are interested
+        // in hour, minute, second, and millisecond fields.
+        final ReadablePartial partialTemplate = new TimeOfDay();
+        final String timeString = "T03:04:05.006";
+        final Chronology chronology = ISOChronology.getInstance();
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+        // The expected values correspond to [hour, minute, second, millis] from the time string.
+        final int[] expectedValues = {3, 4, 5, 6};
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // Act
+        final int[] actualValues = StringConverter.INSTANCE.getPartialValues(
+            partialTemplate, timeString, chronology);
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testGetPartialValues() throws Exception {
-        TimeOfDay tod = new TimeOfDay();
-        int[] expected = new int[] { 3, 4, 5, 6 };
-        int[] actual = StringConverter.INSTANCE.getPartialValues(tod, "T03:04:05.006", ISOChronology.getInstance());
-        assertEquals(true, Arrays.equals(expected, actual));
+        // Assert
+        // Using Arrays.toString provides a clear failure message, which is helpful
+        // since JUnit 3's TestCase does not have a dedicated assertArrayEquals method.
+        assertEquals(
+            "The parsed partial values should match the expected time components.",
+            Arrays.toString(expectedValues),
+            Arrays.toString(actualValues)
+        );
     }
 }
