@@ -1,20 +1,26 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JacksonInject_ESTestTest20 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its properties and behavior.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.empty();
-        boolean boolean0 = jacksonInject_Value0.hasId();
-        assertFalse(boolean0);
+    /**
+     * Verifies that an empty {@link JacksonInject.Value} instance, created via the
+     * {@code empty()} factory method, correctly reports that it does not have an ID.
+     */
+    @Test
+    public void hasId_shouldReturnFalse_forEmptyValue() {
+        // Arrange: Create an empty JacksonInject.Value instance.
+        JacksonInject.Value emptyValue = JacksonInject.Value.empty();
+
+        // Act: Check if the instance has an ID.
+        boolean hasId = emptyValue.hasId();
+
+        // Assert: The result should be false, as an empty value has no ID.
+        assertFalse("An empty JacksonInject.Value should not have an ID.", hasId);
     }
 }
