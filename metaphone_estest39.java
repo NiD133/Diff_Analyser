@@ -1,19 +1,37 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest39 extends Metaphone_ESTest_scaffolding {
+/**
+ * Test cases for the Metaphone class, focusing on specific encoding rules.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("wr`hH");
-        assertEquals(4, metaphone0.getMaxCodeLen());
-        assertEquals("R", string0);
+    /**
+     * Tests that a word starting with "WR" is encoded as "R".
+     *
+     * <p>The Metaphone algorithm specifies that if a word begins with "WR", the 'W' is dropped.
+     * This test uses the input "wr`hH" to also verify that the implementation correctly handles:
+     * <ul>
+     *     <li>Case-insensitivity (by converting the input to uppercase).</li>
+     *     <li>Non-alphabetic characters (by ignoring them).</li>
+     * </ul>
+     * The test also confirms that the Metaphone object is initialized with the default maximum code length.
+     * </p>
+     */
+    @Test
+    public void shouldEncodeWordStartingWithWRAsR() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "wr`hH"; // This normalizes to "WRHH" before encoding
+        final String expectedCode = "R";
+
+        // Act
+        final String actualCode = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("Encoding for a word starting with 'WR' should be 'R'", expectedCode, actualCode);
+        assertEquals("The default max code length should be 4", 4, metaphone.getMaxCodeLen());
     }
 }
