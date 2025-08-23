@@ -1,30 +1,29 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest15 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
-        // Undeclared exception!
-        try {
-            optionFormatter0.getDescription();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.OptionFormatter", e);
-        }
+    /**
+     * Verifies that calling getDescription() on a formatter created with a null Option
+     * throws a NullPointerException, as the internal option object is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getDescriptionShouldThrowNullPointerExceptionWhenCreatedWithNullOption() {
+        // Arrange: Create a formatter from a null Option object.
+        // This is a valid, though unusual, state for the formatter.
+        OptionFormatter formatter = OptionFormatter.from(null);
+
+        // Act: Attempt to get the description. This should fail because it
+        // will try to access methods on the null internal Option object.
+        formatter.getDescription();
+
+        // Assert: The @Test(expected) annotation automatically verifies that a
+        // NullPointerException was thrown. The test fails if no exception or a
+        // different exception is thrown.
     }
 }
