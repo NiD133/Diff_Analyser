@@ -1,36 +1,35 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This test suite contains tests for the {@link DeviationRenderer} class.
+ * This specific test was improved for clarity from an auto-generated version.
+ */
 public class DeviationRenderer_ESTestTest5 extends DeviationRenderer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer(false, false);
-        deviationRenderer0.alpha = (-189.0F);
-        float float0 = deviationRenderer0.getAlpha();
-        assertEquals((-189.0F), float0, 0.01F);
+    /**
+     * Verifies that getAlpha() returns the exact value of the internal 'alpha' field.
+     *
+     * This test case specifically checks the getter's behavior when the field is set
+     * to a value outside the conventional range (0.0f to 1.0f) via direct field access.
+     * This ensures the getter simply returns the field's current state without any
+     * validation or modification.
+     */
+    @Test
+    public void getAlpha_shouldReturnTheRawValueFromAlphaField() {
+        // Arrange: Create a renderer and directly set its protected 'alpha' field
+        // to an unconventional negative value.
+        DeviationRenderer renderer = new DeviationRenderer(false, false);
+        float expectedAlpha = -189.0F;
+        renderer.alpha = expectedAlpha;
+
+        // Act: Call the getAlpha() method to retrieve the value.
+        float actualAlpha = renderer.getAlpha();
+
+        // Assert: The returned value should be identical to the value set on the field.
+        assertEquals("The getter should return the exact raw value of the alpha field.",
+                expectedAlpha, actualAlpha, 0.01F);
     }
 }
