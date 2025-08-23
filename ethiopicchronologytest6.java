@@ -1,85 +1,111 @@
 package org.joda.time.chrono;
 
+import static org.junit.Assert.assertSame;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class EthiopicChronologyTestTest6 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+/**
+ * This class tests the behavior of the withZone() method in EthiopicChronology.
+ * It verifies that the method correctly returns cached chronology instances for different time zones.
+ */
+public class EthiopicChronologyWithZoneTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
+    private DateTimeZone originalDefaultZone;
+    private Locale originalDefaultLocale;
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+    @Before
+    public void setUp() {
+        // Save original default time zone and locale
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultLocale = Locale.getDefault();
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
+        // Set a known default time zone for the tests
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    @After
+    public void tearDown() {
+        // Restore original default time zone and locale
+        DateTimeZone.setDefault(originalDefaultZone);
+        Locale.setDefault(originalDefaultLocale);
     }
 
-    public void testWithZone() {
-        assertSame(EthiopicChronology.getInstance(TOKYO), EthiopicChronology.getInstance(TOKYO).withZone(TOKYO));
-        assertSame(EthiopicChronology.getInstance(LONDON), EthiopicChronology.getInstance(TOKYO).withZone(LONDON));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstance(TOKYO).withZone(PARIS));
-        assertSame(EthiopicChronology.getInstance(LONDON), EthiopicChronology.getInstance(TOKYO).withZone(null));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstance().withZone(PARIS));
-        assertSame(EthiopicChronology.getInstance(PARIS), EthiopicChronology.getInstanceUTC().withZone(PARIS));
+    @Test
+    public void testWithZone_givenSameZone_returnsSameInstance() {
+        // Arrange
+        Chronology tokyoChronology = EthiopicChronology.getInstance(TOKYO);
+
+        // Act
+        Chronology result = tokyoChronology.withZone(TOKYO);
+
+        // Assert
+        assertSame("Calling withZone with the same zone should return the same instance", tokyoChronology, result);
+    }
+
+    @Test
+    public void testWithZone_givenDifferentZone_returnsCorrectCachedInstance() {
+        // Arrange
+        Chronology tokyoChronology = EthiopicChronology.getInstance(TOKYO);
+        Chronology expectedParisChronology = EthiopicChronology.getInstance(PARIS);
+
+        // Act
+        Chronology result = tokyoChronology.withZone(PARIS);
+
+        // Assert
+        assertSame("Calling withZone with a different zone should return the correct cached instance for that zone",
+                expectedParisChronology, result);
+    }
+
+    @Test
+    public void testWithZone_givenNullZone_returnsDefaultZoneInstance() {
+        // Arrange: The default zone is set to LONDON in setUp()
+        Chronology tokyoChronology = EthiopicChronology.getInstance(TOKYO);
+        Chronology expectedDefaultChronology = EthiopicChronology.getInstance(LONDON);
+
+        // Act
+        Chronology result = tokyoChronology.withZone(null);
+
+        // Assert
+        assertSame("Calling withZone(null) should return the instance for the default time zone",
+                expectedDefaultChronology, result);
+    }
+
+    @Test
+    public void testWithZone_onDefaultInstance_returnsCorrectCachedInstance() {
+        // Arrange: getInstance() uses the default zone, which is LONDON
+        Chronology defaultChronology = EthiopicChronology.getInstance();
+        Chronology expectedParisChronology = EthiopicChronology.getInstance(PARIS);
+
+        // Act
+        Chronology result = defaultChronology.withZone(PARIS);
+
+        // Assert
+        assertSame("Calling withZone on a default instance should return the correct cached instance",
+                expectedParisChronology, result);
+    }
+
+    @Test
+    public void testWithZone_onUTCInstance_returnsCorrectCachedInstance() {
+        // Arrange
+        Chronology utcChronology = EthiopicChronology.getInstanceUTC();
+        Chronology expectedParisChronology = EthiopicChronology.getInstance(PARIS);
+
+        // Act
+        Chronology result = utcChronology.withZone(PARIS);
+
+        // Assert
+        assertSame("Calling withZone on a UTC instance should return the correct cached instance",
+                expectedParisChronology, result);
     }
 }
