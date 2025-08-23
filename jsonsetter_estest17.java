@@ -1,20 +1,28 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JsonSetter_ESTestTest17 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on its "wither" methods.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Nulls nulls0 = Nulls.DEFAULT;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.construct(nulls0, nulls0);
-        JsonSetter.Value jsonSetter_Value1 = jsonSetter_Value0.withValueNulls((Nulls) null);
-        assertSame(jsonSetter_Value0, jsonSetter_Value1);
+    /**
+     * Tests that calling {@code withValueNulls(null)} returns the original instance.
+     * This confirms the optimization that avoids creating a new object when no
+     * actual change is requested.
+     */
+    @Test
+    public void withValueNulls_shouldReturnSameInstance_whenGivenNull() {
+        // Arrange: Create an initial JsonSetter.Value instance.
+        JsonSetter.Value originalValue = JsonSetter.Value.construct(Nulls.DEFAULT, Nulls.DEFAULT);
+
+        // Act: Call the method under test with a null argument.
+        JsonSetter.Value result = originalValue.withValueNulls(null);
+
+        // Assert: The method should return the exact same instance, not a new one.
+        assertSame("Expected the same instance to be returned when withValueNulls is called with null.",
+                originalValue, result);
     }
 }
