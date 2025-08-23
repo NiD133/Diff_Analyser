@@ -1,27 +1,39 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class JsonIgnoreProperties_ESTestTest8 extends JsonIgnoreProperties_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        String[] stringArray0 = new String[0];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withAllowSetters();
-        jsonIgnoreProperties_Value1.findIgnoredForSerialization();
-        assertTrue(jsonIgnoreProperties_Value1.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getMerge());
-        assertFalse(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
+    /**
+     * Verifies that the {@link JsonIgnoreProperties.Value#withAllowSetters()}
+     * method correctly creates a new, immutable instance with the 'allowSetters'
+     * property enabled, while leaving other properties unchanged.
+     */
+    @Test
+    public void withAllowSettersShouldCreateNewInstanceWithSettersAllowed() {
+        // Arrange: Create a default Value instance where 'allowSetters' is disabled.
+        JsonIgnoreProperties.Value initialValue = JsonIgnoreProperties.Value.empty();
+        assertFalse("Precondition: initialValue should have allowSetters disabled",
+                initialValue.getAllowSetters());
+
+        // Act: Call the method under test to create a new instance.
+        JsonIgnoreProperties.Value updatedValue = initialValue.withAllowSetters();
+
+        // Assert: Verify the properties of the new instance.
+        // 1. The primary property 'allowSetters' should now be true.
+        assertTrue("'allowSetters' should be enabled in the new instance",
+                updatedValue.getAllowSetters());
+
+        // 2. Other properties should retain their original default values.
+        assertFalse("'allowGetters' should remain disabled", updatedValue.getAllowGetters());
+        assertFalse("'ignoreUnknown' should remain disabled", updatedValue.getIgnoreUnknown());
+        assertTrue("'merge' should remain enabled by default", updatedValue.getMerge());
+
+        // 3. The original instance should remain unchanged (verifying immutability).
+        assertFalse("The original instance should not be mutated",
+                initialValue.getAllowSetters());
     }
 }
