@@ -1,35 +1,33 @@
 package org.jfree.chart.labels;
 
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ThaiBuddhistEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class IntervalCategoryItemLabelGenerator_ESTestTest2 extends IntervalCategoryItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link IntervalCategoryItemLabelGenerator} class, focusing on exception handling.
+ */
+public class IntervalCategoryItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        IntervalCategoryItemLabelGenerator intervalCategoryItemLabelGenerator0 = new IntervalCategoryItemLabelGenerator();
-        DefaultStatisticalCategoryDataset<ThaiBuddhistEra, ThaiBuddhistEra> defaultStatisticalCategoryDataset0 = new DefaultStatisticalCategoryDataset<ThaiBuddhistEra, ThaiBuddhistEra>();
-        ThaiBuddhistEra thaiBuddhistEra0 = ThaiBuddhistEra.BE;
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultStatisticalCategoryDataset0.add((Number) integer0, (Number) integer0, thaiBuddhistEra0, thaiBuddhistEra0);
-        // Undeclared exception!
-        try {
-            intervalCategoryItemLabelGenerator0.createItemArray(defaultStatisticalCategoryDataset0, 0, 1);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that createItemArray throws an IndexOutOfBoundsException when an invalid column index is provided.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void createItemArray_withInvalidColumnIndex_shouldThrowException() {
+        // Arrange: Set up the test objects and state.
+        IntervalCategoryItemLabelGenerator generator = new IntervalCategoryItemLabelGenerator();
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // Add a single data point, which creates one row (index 0) and one column (index 0).
+        dataset.addValue(100.0, "Row 1", "Column 1");
+
+        int validRowIndex = 0;
+        int invalidColumnIndex = 1; // This index is out of bounds for the dataset.
+
+        // Act: Call the method under test with invalid arguments.
+        // This call is expected to throw an IndexOutOfBoundsException.
+        generator.createItemArray(dataset, validRowIndex, invalidColumnIndex);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // This is handled by the @Test(expected = ...) annotation.
     }
 }
