@@ -1,18 +1,23 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest35 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        boolean boolean0 = iOCase0.checkEquals("", "");
-        assertTrue(boolean0);
+    /**
+     * Tests that IOCase.checkEquals() returns true when comparing two empty strings.
+     * This behavior should be consistent regardless of the case-sensitivity rule (SYSTEM, SENSITIVE, or INSENSITIVE).
+     */
+    @Test
+    public void checkEquals_withTwoEmptyStrings_shouldReturnTrue() {
+        // Arrange
+        IOCase systemCase = IOCase.SYSTEM;
+
+        // Act & Assert
+        assertTrue("Two empty strings should always be considered equal", systemCase.checkEquals("", ""));
     }
 }
