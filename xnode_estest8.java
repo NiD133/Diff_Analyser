@@ -1,32 +1,60 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.InputSource;
 
-public class XNode_ESTestTest8 extends XNode_ESTest_scaffolding {
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test007() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        DefaultHandler2 defaultHandler2_0 = new DefaultHandler2();
-        XPathParser xPathParser0 = new XPathParser((Document) null, false, properties0, defaultHandler2_0);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        String string0 = xNode0.getStringAttribute("", (String) null);
-        assertNull(string0);
+import static org.junit.Assert.assertNull;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Tests that getStringAttribute returns the provided default value (null)
+     * when the requested attribute does not exist on the XML node.
+     */
+    @Test
+    public void shouldReturnDefaultNullWhenAttributeIsMissing() throws Exception {
+        // Arrange
+        // 1. Create a standard DOM Node from a simple XML string.
+        //    This <user/> node has no attributes.
+        String xml = "<user/>";
+        Node domNode = buildNodeFromXML(xml);
+
+        // 2. The XNode requires an XPathParser and variables for its constructor.
+        //    For this specific test, they can be simple, default instances.
+        XPathParser xPathParser = new XPathParser(xml);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(xPathParser, domNode, variables);
+
+        String nonExistentAttributeName = "id";
+        String defaultValue = null;
+
+        // Act
+        String actualValue = xNode.getStringAttribute(nonExistentAttributeName, defaultValue);
+
+        // Assert
+        assertNull("getStringAttribute should return the default value (null) when the attribute does not exist.", actualValue);
+    }
+
+    /**
+     * Helper method to create a W3C DOM Node from an XML string.
+     * @param xml The XML string to parse.
+     * @return The root Node of the parsed document.
+     * @throws Exception if parsing fails.
+     */
+    private Node buildNodeFromXML(String xml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new InputSource(new StringReader(xml)));
+        return document.getDocumentElement();
     }
 }
