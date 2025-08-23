@@ -1,23 +1,34 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class JacksonInject_ESTestTest4 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its construction and property access.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Object object0 = new Object();
-        Boolean boolean0 = new Boolean(false);
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.construct(object0, boolean0, (Boolean) null);
-        Boolean boolean1 = jacksonInject_Value0.getOptional();
-        assertTrue(jacksonInject_Value0.hasId());
-        assertNull(boolean1);
+    /**
+     * Tests that when a {@link JacksonInject.Value} is constructed with a null 'optional'
+     * parameter, the {@code getOptional()} method correctly returns null.
+     */
+    @Test
+    public void getOptional_shouldReturnNull_whenConstructedWithNullOptional() {
+        // Arrange
+        Object injectionId = new Object();
+        Boolean useInputFlag = Boolean.FALSE;
+        
+        // Act
+        // Construct a Value instance where the 'optional' parameter is explicitly null.
+        JacksonInject.Value injectValue = JacksonInject.Value.construct(injectionId, useInputFlag, null);
+        Boolean actualOptional = injectValue.getOptional();
+
+        // Assert
+        // Verify that the ID was set correctly.
+        assertTrue("The constructed value should have an ID.", injectValue.hasId());
+        
+        // Verify that the 'optional' property is null, as provided during construction.
+        assertNull("getOptional() should return null when the instance was constructed with null.", actualOptional);
     }
 }
