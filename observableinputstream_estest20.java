@@ -1,51 +1,50 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest20 extends ObservableInputStream_ESTest_scaffolding {
+import org.apache.commons.io.IOExceptionList;
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        TimestampedObserver timestampedObserver0 = new TimestampedObserver();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(957);
-        ObservableInputStream.Observer[] observableInputStream_ObserverArray0 = new ObservableInputStream.Observer[1];
-        observableInputStream_ObserverArray0[0] = (ObservableInputStream.Observer) timestampedObserver0;
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(pipedInputStream0, observableInputStream_ObserverArray0);
+/**
+ * Tests for {@link ObservableInputStream}.
+ */
+public class ObservableInputStreamTest {
+
+    /**
+     * Tests that an IOException from the underlying stream during a single-byte
+     * read is caught, forwarded to observers, and then re-thrown wrapped in an
+     * {@link IOExceptionList}.
+     */
+    @Test
+    public void testReadOnFailingStreamPropagatesException() {
+        // Arrange: Create an input stream that is guaranteed to fail on read.
+        // An unconnected PipedInputStream serves this purpose.
+        final PipedInputStream failingStream = new PipedInputStream();
+        final ObservableInputStream.Observer observer = new ObservableInputStream.Observer() {
+            // A simple, anonymous observer for this test case.
+        };
+        final ObservableInputStream observableStream = new ObservableInputStream(failingStream, observer);
+
+        // Act & Assert
         try {
-            observableInputStream0.read();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // 1 exception(s): [org.evosuite.runtime.mock.java.lang.MockThrowable: IOException #0: Pipe not connected]
-            //
-            verifyException("org.apache.commons.io.IOExceptionList", e);
+            observableStream.read();
+            fail("Expected an IOException to be thrown.");
+        } catch (final IOException e) {
+            // The exception should be wrapped in an IOExceptionList.
+            assertTrue("Exception should be an instance of IOExceptionList.", e instanceof IOExceptionList);
+
+            // The list should contain the original exception from the failing stream.
+            final IOExceptionList exceptionList = (IOExceptionList) e;
+            final List<Throwable> causes = exceptionList.getCauseList();
+            assertEquals("There should be exactly one cause.", 1, causes.size());
+            assertTrue("The cause should be an IOException.", causes.get(0) instanceof IOException);
+            assertEquals("The cause should have the expected message.", "Pipe not connected", causes.get(0).getMessage());
         }
     }
 }
