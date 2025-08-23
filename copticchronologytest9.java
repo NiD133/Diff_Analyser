@@ -1,59 +1,37 @@
 package org.joda.time.chrono;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
 
-public class CopticChronologyTestTest9 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the properties of the date fields in CopticChronology.
+ * This includes field names, support, duration fields, and range duration fields.
+ */
+public class CopticChronologyFieldsTest extends TestCase {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
     private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    // A fixed point in time for consistent testing: June 9, 2002 (ISO)
+    private static final long TEST_TIME_NOW =
+            new DateTime(2002, 6, 9, 0, 0, ISO_UTC).getMillis();
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
     @Override
     protected void setUp() throws Exception {
+        // Set a fixed current time and default time zone to ensure tests are reproducible.
+        // CopticChronology.getInstance() uses the default time zone.
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
@@ -69,13 +47,14 @@ public class CopticChronologyTestTest9 extends TestCase {
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    public void testDateFields() {
-        final CopticChronology coptic = CopticChronology.getInstance();
+    /**
+     * Tests that the names of the date fields are as expected.
+     */
+    public void testFieldNames() {
+        CopticChronology coptic = CopticChronology.getInstance();
+
         assertEquals("era", coptic.era().getName());
         assertEquals("centuryOfEra", coptic.centuryOfEra().getName());
         assertEquals("yearOfCentury", coptic.yearOfCentury().getName());
@@ -88,18 +67,32 @@ public class CopticChronologyTestTest9 extends TestCase {
         assertEquals("dayOfYear", coptic.dayOfYear().getName());
         assertEquals("dayOfMonth", coptic.dayOfMonth().getName());
         assertEquals("dayOfWeek", coptic.dayOfWeek().getName());
-        assertEquals(true, coptic.era().isSupported());
-        assertEquals(true, coptic.centuryOfEra().isSupported());
-        assertEquals(true, coptic.yearOfCentury().isSupported());
-        assertEquals(true, coptic.yearOfEra().isSupported());
-        assertEquals(true, coptic.year().isSupported());
-        assertEquals(true, coptic.monthOfYear().isSupported());
-        assertEquals(true, coptic.weekyearOfCentury().isSupported());
-        assertEquals(true, coptic.weekyear().isSupported());
-        assertEquals(true, coptic.weekOfWeekyear().isSupported());
-        assertEquals(true, coptic.dayOfYear().isSupported());
-        assertEquals(true, coptic.dayOfMonth().isSupported());
-        assertEquals(true, coptic.dayOfWeek().isSupported());
+    }
+
+    /**
+     * Tests that all date-related fields are supported by the Coptic chronology.
+     */
+    public void testAllDateFieldsAreSupported() {
+        CopticChronology coptic = CopticChronology.getInstance();
+        List<DateTimeField> fields = Arrays.asList(
+                coptic.era(), coptic.centuryOfEra(), coptic.yearOfCentury(),
+                coptic.yearOfEra(), coptic.year(), coptic.monthOfYear(),
+                coptic.weekyearOfCentury(), coptic.weekyear(), coptic.weekOfWeekyear(),
+                coptic.dayOfYear(), coptic.dayOfMonth(), coptic.dayOfWeek()
+        );
+
+        for (DateTimeField field : fields) {
+            assertTrue("Field " + field.getName() + " should be supported", field.isSupported());
+        }
+    }
+
+    /**
+     * Tests that the duration field for each date field is correctly defined.
+     * The duration field represents the unit of the field (e.g., years for yearOfCentury).
+     */
+    public void testFieldDurationFields() {
+        CopticChronology coptic = CopticChronology.getInstance();
+
         assertEquals(coptic.eras(), coptic.era().getDurationField());
         assertEquals(coptic.centuries(), coptic.centuryOfEra().getDurationField());
         assertEquals(coptic.years(), coptic.yearOfCentury().getDurationField());
@@ -112,14 +105,24 @@ public class CopticChronologyTestTest9 extends TestCase {
         assertEquals(coptic.days(), coptic.dayOfYear().getDurationField());
         assertEquals(coptic.days(), coptic.dayOfMonth().getDurationField());
         assertEquals(coptic.days(), coptic.dayOfWeek().getDurationField());
-        assertEquals(null, coptic.era().getRangeDurationField());
+    }
+
+    /**
+     * Tests that the range duration field for each date field is correctly defined.
+     * The range duration field represents the larger time unit that the field is a part of
+     * (e.g., centuries for yearOfCentury).
+     */
+    public void testFieldRangeDurationFields() {
+        CopticChronology coptic = CopticChronology.getInstance();
+
+        assertNull(coptic.era().getRangeDurationField());
         assertEquals(coptic.eras(), coptic.centuryOfEra().getRangeDurationField());
         assertEquals(coptic.centuries(), coptic.yearOfCentury().getRangeDurationField());
         assertEquals(coptic.eras(), coptic.yearOfEra().getRangeDurationField());
-        assertEquals(null, coptic.year().getRangeDurationField());
+        assertNull(coptic.year().getRangeDurationField());
         assertEquals(coptic.years(), coptic.monthOfYear().getRangeDurationField());
         assertEquals(coptic.centuries(), coptic.weekyearOfCentury().getRangeDurationField());
-        assertEquals(null, coptic.weekyear().getRangeDurationField());
+        assertNull(coptic.weekyear().getRangeDurationField());
         assertEquals(coptic.weekyears(), coptic.weekOfWeekyear().getRangeDurationField());
         assertEquals(coptic.years(), coptic.dayOfYear().getRangeDurationField());
         assertEquals(coptic.months(), coptic.dayOfMonth().getRangeDurationField());
