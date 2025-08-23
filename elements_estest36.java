@@ -1,36 +1,36 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class Elements_ESTestTest36 extends Elements_ESTest_scaffolding {
+// The original class name is kept, but in a real-world scenario, 
+// it would be renamed to something more descriptive, like "ElementsHtmlMethodTest".
+public class Elements_ESTestTest36 {
 
-    @Test(timeout = 4000)
-    public void test035() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTAN5y");
-        Elements elements0 = document0.getAllElements();
-        String string0 = elements0.html();
-        assertEquals("<html>\n <head></head>\n <body></body>\n</html>\n<head></head>\n<body></body>\n\n", string0);
+    /**
+     * Tests that the html() method correctly concatenates the inner HTML of each element in the collection,
+     * separated by newlines.
+     */
+    @Test
+    public void htmlShouldReturnCombinedInnerHtmlOfAllElements() {
+        // Arrange: Create a document with multiple elements to select.
+        String html = "<div>" +
+                      "  <p>First paragraph</p>" +
+                      "  <p>Second paragraph</p>" +
+                      "  <p><b>Third</b> paragraph</p>" +
+                      "</div>";
+        Document doc = Jsoup.parse(html);
+        Elements paragraphs = doc.select("p");
+
+        // Act: Get the combined inner HTML of the selected paragraphs.
+        String combinedHtml = paragraphs.html();
+
+        // Assert: The result should be the inner HTML of each element, joined by a newline.
+        String expectedHtml = "First paragraph\n" +
+                              "Second paragraph\n" +
+                              "<b>Third</b> paragraph";
+        assertEquals(expectedHtml, combinedHtml);
     }
 }
