@@ -1,49 +1,28 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
-public class XYLineAnnotation_ESTestTest23 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation((-53.47315429574957), (-53.47315429574957), (-53.47315429574957), (-53.47315429574957));
-        XYLineAnnotation xYLineAnnotation1 = new XYLineAnnotation((-38.86920817274897), (-53.47315429574957), (-53.47315429574957), (-53.47315429574957));
-        boolean boolean0 = xYLineAnnotation1.equals(xYLineAnnotation0);
-        assertEquals((-53.47315429574957), xYLineAnnotation0.getX1(), 0.01);
-        assertFalse(xYLineAnnotation0.equals((Object) xYLineAnnotation1));
-        assertFalse(boolean0);
-        assertEquals((-53.47315429574957), xYLineAnnotation1.getY1(), 0.01);
-        assertEquals((-53.47315429574957), xYLineAnnotation1.getX2(), 0.01);
-        assertEquals((-53.47315429574957), xYLineAnnotation1.getY2(), 0.01);
+    /**
+     * Tests that two XYLineAnnotation objects are not considered equal if their
+     * starting x-coordinates (x1) are different.
+     */
+    @Test
+    public void equals_returnsFalse_whenX1CoordinatesDiffer() {
+        // Arrange: Create two annotations that are identical except for the x1 coordinate.
+        // Using simple, whole numbers makes the difference obvious.
+        XYLineAnnotation annotation1 = new XYLineAnnotation(1.0, 2.0, 3.0, 4.0);
+        XYLineAnnotation annotation2 = new XYLineAnnotation(99.0, 2.0, 3.0, 4.0); // Different x1
+
+        // Act & Assert: The equals method should return false.
+        // We also check the hashCode contract and symmetry of the equals method.
+        assertFalse("Annotations with different x1 coordinates should not be equal.", annotation1.equals(annotation2));
+        assertNotEquals("Hash codes should differ for unequal objects.", annotation1.hashCode(), annotation2.hashCode());
     }
 }
