@@ -1,35 +1,31 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
-public class Elements_ESTestTest29 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#nextAll(String)} method.
+ */
+public class ElementsNextAllTest {
 
-    @Test(timeout = 4000)
-    public void test028() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.nextAll((String) null);
-        assertNotSame(elements1, elements0);
+    /**
+     * Verifies that calling nextAll() with a null query on an empty Elements collection
+     * returns a new, empty collection rather than the original instance or null.
+     */
+    @Test
+    public void nextAllWithNullQueryOnEmptyElementsShouldReturnNewEmptyList() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act: Call the method under test with a null selector, which is an edge case.
+        Elements result = emptyElements.nextAll((String) null);
+
+        // Assert: The method should return a new, empty list, not the original instance.
+        // This ensures the method is non-destructive and safe to call even with edge case inputs.
+        assertNotNull("The result should not be null.", result);
+        assertNotSame("A new Elements instance should be returned.", emptyElements, result);
+        assertTrue("The resulting list should be empty.", result.isEmpty());
     }
 }
