@@ -3,75 +3,158 @@ package org.apache.commons.io.input;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class WindowsLineEndingInputStreamTestTest1 {
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+public class WindowsLineEndingInputStreamTest {
 
-    private String roundtripReadByte(final String msg) throws IOException {
-        return roundtripReadByte(msg, true);
-    }
-
-    private String roundtripReadByte(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            int i = 0;
-            while (i < buf.length) {
-                final int read = lf.read();
-                if (read < 0) {
-                    break;
-                }
-                buf[i++] = (byte) read;
+    /**
+     * A helper method to read all bytes from a WindowsLineEndingInputStream and return them as a String.
+     * This is more convenient than Apache Commons IOUtils.toString() for testing the byte-by-byte read() method.
+     */
+    private String readByteByByte(final InputStream stream) throws IOException {
+        final byte[] buffer = new byte[100]; // Ample buffer for test data
+        int i = 0;
+        while (i < buffer.length) {
+            final int b = stream.read();
+            if (b == -1) {
+                break;
             }
-            return new String(buf, 0, i, StandardCharsets.UTF_8);
+            buffer[i++] = (byte) b;
         }
+        return new String(buffer, 0, i, StandardCharsets.UTF_8);
     }
 
-    private String roundtripReadByteArray(final String msg) throws IOException {
-        return roundtripReadByteArray(msg, true);
-    }
-
-    private String roundtripReadByteArray(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
-        }
-    }
-
-    private String roundtripReadByteArrayIndex(final String msg) throws IOException {
-        return roundtripReadByteArrayIndex(msg, true);
-    }
-
-    private String roundtripReadByteArrayIndex(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf, 0, 100);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
-        }
-    }
-
-    @ParameterizedTest
+    @DisplayName("mark() should be unsupported")
+    @ParameterizedTest(name = "when ensureLineFeedAtEof = {0}")
     @ValueSource(booleans = { false, true })
-    void testMark(final boolean ensureLineFeedAtEndOfFile) {
-        assertThrows(UnsupportedOperationException.class, () -> new WindowsLineEndingInputStream(new NullInputStream(), true).mark(1));
+    void markThrowsUnsupportedOperationException(final boolean ensureLineFeedAtEof) {
+        // Arrange
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(new NullInputStream(), ensureLineFeedAtEof)) {
+            // Act & Assert
+            assertThrows(UnsupportedOperationException.class, () -> stream.mark(1),
+                "mark() should throw UnsupportedOperationException");
+        }
     }
 
-    @SuppressWarnings("resource")
-    @ParameterizedTest
+    @DisplayName("markSupported() should always be false")
+    @ParameterizedTest(name = "when ensureLineFeedAtEof = {0}")
     @ValueSource(booleans = { false, true })
-    void testMarkSupported(final boolean ensureLineFeedAtEndOfFile) {
-        assertFalse(new WindowsLineEndingInputStream(new NullInputStream(), true).markSupported());
+    void markSupportedReturnsFalse(final boolean ensureLineFeedAtEof) {
+        // Arrange
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(new NullInputStream(), ensureLineFeedAtEof)) {
+            // Act & Assert
+            assertFalse(stream.markSupported(), "markSupported() should return false");
+        }
+    }
+
+    // The following tests verify that input with correct Windows line endings (CRLF) is passed through unchanged.
+    // One set of tests ensures a CRLF is NOT added at the end, and the other set ensures it IS added.
+
+    @Test
+    void readByteByByte_withExistingCRLFAndEnsureEofDisabled_preservesCRLF() throws IOException {
+        // Arrange
+        final String input = "a\r\nbc";
+        final String expected = "a\r\nbc";
+
+        // Act
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder().setCharSequence(input).setCharset(StandardCharsets.UTF_8).get(), false)) {
+            final String result = readByteByByte(stream);
+            // Assert
+            assertEquals(expected, result);
+        }
     }
 
     @Test
-    void testInTheMiddleOfTheLine_Byte() throws Exception {
-        assertEquals("a\r\nbc\r\n", roundtripReadByte("a\r\nbc"));
+    void readIntoByteArray_withExistingCRLFAndEnsureEofDisabled_preservesCRLF() throws IOException {
+        // Arrange
+        final String input = "a\r\nbc";
+        final String expected = "a\r\nbc";
+
+        // Act
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder().setCharSequence(input).setCharset(StandardCharsets.UTF_8).get(), false)) {
+            final byte[] buffer = new byte[100];
+            final int bytesRead = stream.read(buffer);
+            final String result = new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
+            // Assert
+            assertEquals(expected, result);
+        }
+    }
+
+    @Test
+    void readIntoByteArrayWithOffset_withExistingCRLFAndEnsureEofDisabled_preservesCRLF() throws IOException {
+        // Arrange
+        final String input = "a\r\nbc";
+        final String expected = "a\r\nbc";
+
+        // Act
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder().setCharSequence(input).setCharset(StandardCharsets.UTF_8).get(), false)) {
+            final byte[] buffer = new byte[100];
+            final int bytesRead = stream.read(buffer, 0, buffer.length);
+            final String result = new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
+            // Assert
+            assertEquals(expected, result);
+        }
+    }
+
+    @Test
+    void readByteByByte_withExistingCRLFAndEnsureEofEnabled_preservesAndAddsCRLF() throws IOException {
+        // Arrange
+        final String input = "a\r\nbc";
+        final String expected = "a\r\nbc\r\n";
+
+        // Act
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder().setCharSequence(input).setCharset(StandardCharsets.UTF_8).get(), true)) {
+            final String result = readByteByByte(stream);
+            // Assert
+            assertEquals(expected, result);
+        }
+    }
+
+    @Test
+    void readIntoByteArray_withExistingCRLFAndEnsureEofEnabled_preservesAndAddsCRLF() throws IOException {
+        // Arrange
+        final String input = "a\r\nbc";
+        final String expected = "a\r\nbc\r\n";
+
+        // Act
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder().setCharSequence(input).setCharset(StandardCharsets.UTF_8).get(), true)) {
+            final byte[] buffer = new byte[100];
+            final int bytesRead = stream.read(buffer);
+            final String result = new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
+            // Assert
+            assertEquals(expected, result);
+        }
+    }
+
+    @Test
+    void readIntoByteArrayWithOffset_withExistingCRLFAndEnsureEofEnabled_preservesAndAddsCRLF() throws IOException {
+        // Arrange
+        final String input = "a\r\nbc";
+        final String expected = "a\r\nbc\r\n";
+
+        // Act
+        try (final WindowsLineEndingInputStream stream = new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder().setCharSequence(input).setCharset(StandardCharsets.UTF_8).get(), true)) {
+            final byte[] buffer = new byte[100];
+            final int bytesRead = stream.read(buffer, 0, buffer.length);
+            final String result = new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
+            // Assert
+            assertEquals(expected, result);
+        }
     }
 }
