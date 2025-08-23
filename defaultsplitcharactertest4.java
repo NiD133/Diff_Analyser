@@ -1,19 +1,34 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-public class DefaultSplitCharacterTestTest4 {
+/**
+ * This test suite evaluates the functionality of the DefaultSplitCharacter class.
+ */
+public class DefaultSplitCharacterTest {
 
-    private final String[] INPUT_TEXT = new String[] { "tha111-is one that should-be-splitted-right-herel-2018-12-18", "anddate format2 01-01-1920" };
-
-    private boolean isPsplitCharacter(int current, String text) {
-        return new DefaultSplitCharacter().isSplitCharacter(75, current, text.length() + 1, text.toCharArray(), null);
-    }
-
+    /**
+     * Verifies that getCurrentCharacter() correctly retrieves a character from the
+     * source character array at a given index when the PdfChunk array is null.
+     *
+     * This scenario tests the simplest path of the method, where it should directly
+     * access the character array without considering chunk-specific logic.
+     */
     @Test
-    public void hypenInsideTextTest() {
-        //checHyphenInsideText ex. 'some-text-here'
-        Assert.assertTrue(isPsplitCharacter(6, INPUT_TEXT[0]));
+    public void getCurrentCharacter_shouldReturnCharacterFromSourceArray_whenChunkArrayIsNull() {
+        // Arrange: Set up the test instance and input data.
+        // We instantiate the class directly to call the method under test.
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        char[] sourceCharacters = {'H', 'e', 'l', 'l', 'o'};
+        int characterIndex = 2; // The index for the second 'l'
+        char expectedCharacter = 'l';
+
+        // Act: Call the method being tested.
+        // The PdfChunk array is passed as null to test this specific execution path.
+        char retrievedCharacter = splitCharacter.getCurrentCharacter(characterIndex, sourceCharacters, null);
+
+        // Assert: Verify that the result matches the expected outcome.
+        assertEquals("The method should return the character at the specified index.", expectedCharacter, retrievedCharacter);
     }
 }
