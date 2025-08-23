@@ -1,30 +1,29 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
+/**
+ * Contains tests for the {@link BasicNodeSet} class.
+ */
+// Note: The original class name 'BasicNodeSet_ESTestTest3' and its scaffolding
+// parent are kept for context. A more conventional name would be 'BasicNodeSetTest'.
 public class BasicNodeSet_ESTestTest3 extends BasicNodeSet_ESTest_scaffolding {
 
+    /**
+     * Verifies that getValues() throws a NullPointerException if a null Pointer
+     * has been added to the set. This occurs because the method attempts to
+     * dereference the null pointer to extract its value.
+     */
     @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        basicNodeSet0.add((Pointer) null);
-        // Undeclared exception!
-        try {
-            basicNodeSet0.getValues();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.stream.ReferencePipeline$3$1", e);
-        }
+    public void getValuesShouldThrowNPEWhenSetContainsNullPointer() {
+        // Arrange: Create a node set and add a null Pointer.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+        nodeSet.add((Pointer) null);
+
+        // Act & Assert: Expect a NullPointerException when getValues() is called.
+        assertThrows(NullPointerException.class, () -> {
+            nodeSet.getValues();
+        });
     }
 }
