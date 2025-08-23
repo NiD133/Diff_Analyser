@@ -1,36 +1,31 @@
 package org.apache.ibatis.cache.decorators;
 
+import org.apache.ibatis.cache.decorators.SerializedCache.CustomObjectInputStream;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class SerializedCache_ESTestTest3 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for the inner class {@link CustomObjectInputStream}.
+ */
+public class SerializedCache_CustomObjectInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Enumeration<MockFileInputStream> enumeration0 = (Enumeration<MockFileInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        SerializedCache.CustomObjectInputStream serializedCache_CustomObjectInputStream0 = null;
-        try {
-            serializedCache_CustomObjectInputStream0 = new SerializedCache.CustomObjectInputStream(sequenceInputStream0);
-            fail("Expecting exception: EOFException");
-        } catch (Throwable e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.ObjectInputStream$PeekInputStream", e);
-        }
+    /**
+     * Verifies that the CustomObjectInputStream constructor throws an EOFException
+     * when provided with an empty input stream. This is the expected behavior
+     * because an ObjectInputStream requires a stream header, which is absent in an empty stream.
+     */
+    @Test(expected = EOFException.class)
+    public void constructorShouldThrowEOFExceptionForEmptyStream() throws IOException {
+        // Arrange: Create an empty input stream. This is the simplest way to
+        // represent a stream with no data.
+        InputStream emptyStream = new ByteArrayInputStream(new byte[0]);
+
+        // Act: Attempt to create the custom object input stream from the empty source.
+        // Assert: The @Test(expected) annotation asserts that an EOFException is thrown.
+        new CustomObjectInputStream(emptyStream);
     }
 }
