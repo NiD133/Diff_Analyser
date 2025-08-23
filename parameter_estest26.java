@@ -1,25 +1,47 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.mockito.Mockito.mock;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest26 extends Parameter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Invokable<Object, Annotation> invokable0 = (Invokable<Object, Annotation>) mock(Invokable.class, new ViolatedAssumptionAnswer());
-        Class<Annotation> class0 = Annotation.class;
-        TypeToken<Annotation> typeToken0 = TypeToken.of(class0);
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter(invokable0, 0, typeToken0, annotationArray0, invokable0);
-        Annotation[] annotationArray1 = parameter0.getAnnotationsByType(class0);
-        assertNotSame(annotationArray0, annotationArray1);
+    @Test
+    public void getAnnotationsByType_whenNoAnnotationsExist_returnsNewEmptyArray() {
+        // Arrange: Create a Parameter instance that has no annotations.
+        Invokable<?, ?> mockDeclaringInvokable = mock(Invokable.class);
+        TypeToken<?> parameterType = TypeToken.of(String.class);
+        Annotation[] emptyAnnotations = new Annotation[0];
+
+        // The Parameter constructor is package-private, so this test must reside
+        // in the same package.
+        Parameter parameter = new Parameter(
+                mockDeclaringInvokable,
+                0, // position
+                parameterType,
+                emptyAnnotations,
+                null // annotatedType
+        );
+
+        // Act: Request annotations of a specific type from the parameter.
+        Annotation[] foundAnnotations = parameter.getAnnotationsByType(Annotation.class);
+
+        // Assert: Verify that the result is a new, empty array.
+        assertNotNull("The returned array should not be null.", foundAnnotations);
+        assertEquals("The returned array should be empty.", 0, foundAnnotations.length);
+
+        // This is the key assertion: the method should return a new array instance
+        // to prevent modification of the Parameter's internal state.
+        assertNotSame(
+                "Should return a new array instance, not the internal one.",
+                emptyAnnotations,
+                foundAnnotations);
     }
 }
