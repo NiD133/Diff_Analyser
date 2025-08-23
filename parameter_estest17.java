@@ -1,22 +1,27 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertFalse;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest17 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
-        boolean boolean0 = parameter0.equals((Object) null);
-        assertFalse(boolean0);
+    /**
+     * The {@code equals} method should return false when the object is compared with null,
+     * as per the general contract of {@link Object#equals(Object)}.
+     */
+    @Test
+    public void equals_whenComparedWithNull_shouldReturnFalse() {
+        // Arrange: Create a Parameter instance. The specific constructor arguments are not
+        // relevant for this test, as any instance will do for a null comparison.
+        Annotation[] emptyAnnotations = new Annotation[0];
+        Parameter parameter = new Parameter(null, 0, null, emptyAnnotations, null);
+
+        // Act & Assert: Verify that the parameter is not equal to null.
+        assertFalse(parameter.equals(null));
     }
 }
