@@ -1,27 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest56 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its core functionalities.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("j");
-        int int0 = serializedString0.charLength();
-        assertEquals(1, int0);
+    /**
+     * Verifies that the charLength() method returns the correct character count
+     * of the original string.
+     */
+    @Test
+    public void charLengthShouldReturnLengthOfWrappedString() {
+        // Arrange
+        String originalString = "j";
+        SerializedString serializedString = new SerializedString(originalString);
+        int expectedLength = 1;
+
+        // Act
+        int actualLength = serializedString.charLength();
+
+        // Assert
+        assertEquals("The character length should match the original string's length.",
+                expectedLength, actualLength);
     }
 }
