@@ -1,23 +1,24 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest22 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} utility class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Validate.notEmptyParam("jZ#C5", "");
+    /**
+     * Verifies that {@link Validate#notEmptyParam(String, String)} does not throw an exception
+     * when provided with a non-empty string. This is the expected "happy path" behavior.
+     */
+    @Test
+    public void notEmptyParam_shouldNotThrowException_whenStringIsNotEmpty() {
+        // Arrange
+        String nonEmptyInput = "jZ#C5";
+        String parameterName = "testParam";
+
+        // Act & Assert
+        // The test succeeds if this method call completes without throwing an exception.
+        Validate.notEmptyParam(nonEmptyInput, parameterName);
     }
 }
