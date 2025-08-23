@@ -1,42 +1,59 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
 import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import javax.swing.text.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.util.Collections;
+import static org.junit.Assert.assertEquals;
 
-public class SimpleTextExtractionStrategy_ESTestTest1 extends SimpleTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SimpleTextExtractionStrategy} class.
+ */
+public class SimpleTextExtractionStrategyTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = new Matrix();
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        PdfAction pdfAction0 = new PdfAction();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfAction0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedHashSet0);
-        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
-        simpleTextExtractionStrategy0.appendTextChunk("Cp1257");
-        simpleTextExtractionStrategy0.renderText(textRenderInfo0);
-        assertEquals("Cp1257", simpleTextExtractionStrategy0.getResultantText());
+    /**
+     * Verifies that appendTextChunk correctly inserts text between rendering operations
+     * without adding extra spaces or newlines.
+     *
+     * This scenario simulates manually adding text after an initial piece of text has been
+     * rendered. A subsequent render call at the exact same position should not introduce
+     * any extra separators (like spaces or newlines), and the manually appended text
+     * should be preserved correctly in the final output.
+     */
+    @Test
+    public void appendTextChunk_shouldPreserveTextBetweenIdenticalRenders() {
+        // Arrange
+        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+        String manuallyAppendedText = "some custom text";
+
+        // Create a mock TextRenderInfo. The actual text content is empty, but it provides
+        // the necessary geometry and font information to the strategy. A font is required
+        // for the strategy to calculate text boundaries.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfAction());
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                new PdfString(""), // The rendered text is empty
+                graphicsState,
+                new Matrix(),
+                Collections.emptyList()
+        );
+
+        // Act
+        // 1. The first render call initializes the strategy's internal state (e.g., last text position).
+        strategy.renderText(textRenderInfo);
+
+        // 2. Manually append a text chunk. This is the core action under test.
+        strategy.appendTextChunk(manuallyAppendedText);
+
+        // 3. The second render call uses the same text info. The strategy should detect
+        //    that this text is at the same position as the previous one and therefore
+        //    not add a space or newline before rendering its (empty) content.
+        strategy.renderText(textRenderInfo);
+
+        // Assert
+        String expectedText = manuallyAppendedText;
+        String actualText = strategy.getResultantText();
+        assertEquals("The manually appended text should be the only content.", expectedText, actualText);
     }
 }
