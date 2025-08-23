@@ -1,22 +1,34 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest4 extends BCodec_ESTest_scaffolding {
+/**
+ * Provides tests for the {@link BCodec} class.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        String string0 = bCodec0.encode((String) null, (String) null);
-        assertNull(string0);
+    /**
+     * Tests that the encode method returns null when the input string is null,
+     * as specified by the method's contract.
+     */
+    @Test
+    public void encodeShouldReturnNullWhenInputStringIsNull() {
+        // Arrange
+        BCodec bCodec = new BCodec();
+        String nullString = null;
+        // The charset is irrelevant in this case, but we use a null charset name
+        // to match the original test's scenario.
+        String charsetName = null;
+
+        // Act
+        // The BCodec class has two overloaded encode methods:
+        // 1. encode(String, String)
+        // 2. encode(String, Charset)
+        // Using a typed variable for the null charset avoids ambiguity.
+        String result = bCodec.encode(nullString, charsetName);
+
+        // Assert
+        assertNull("Encoding a null string should return null.", result);
     }
 }
