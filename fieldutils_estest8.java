@@ -1,23 +1,27 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest8 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        int int0 = FieldUtils.safeToInt(2147483647L);
-        assertEquals(Integer.MAX_VALUE, int0);
+    /**
+     * Tests that safeToInt correctly converts a long value that is exactly
+     * at the upper boundary of the integer range (Integer.MAX_VALUE).
+     */
+    @Test
+    public void safeToInt_whenLongIsIntMaxValue_returnsIntMaxValue() {
+        // Arrange: Define the input value at the upper boundary of the int range.
+        // Using the constant Integer.MAX_VALUE makes the test's intent self-documenting.
+        long longAtIntMaxValue = Integer.MAX_VALUE;
+
+        // Act: Call the method under test.
+        int result = FieldUtils.safeToInt(longAtIntMaxValue);
+
+        // Assert: Verify that the conversion is correct and no exception is thrown.
+        assertEquals(Integer.MAX_VALUE, result);
     }
 }
