@@ -1,46 +1,24 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest32 extends W3CDom_ESTest_scaffolding {
+/**
+ * Tests for the {@link W3CDom#asString(org.w3c.dom.Document, Map)} method.
+ */
+public class W3CDomAsStringTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        HashMap<String, String> hashMap0 = W3CDom.OutputHtml();
-        // Undeclared exception!
-        try {
-            W3CDom.asString((org.w3c.dom.Document) null, (Map<String, String>) hashMap0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.W3CDom", e);
-        }
+    /**
+     * Verifies that calling asString with a null W3C Document throws a NullPointerException,
+     * as this is an invalid argument.
+     */
+    @Test(expected = NullPointerException.class)
+    public void asStringWithNullDocumentThrowsNullPointerException() {
+        // Arrange: Prepare a valid properties map. The content of the map is not
+        // relevant for this test, as the null document should be checked first.
+        Map<String, String> htmlOutputProperties = W3CDom.OutputHtml();
+
+        // Act & Assert: Calling asString with a null document should throw the exception.
+        W3CDom.asString(null, htmlOutputProperties);
     }
 }
