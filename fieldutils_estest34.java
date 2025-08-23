@@ -1,31 +1,35 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest34 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the utility methods in {@link FieldUtils}.
+ * This test focuses on the input validation of the getWrappedValue method.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that getWrappedValue() throws an IllegalArgumentException when the
+     * minimum value is equal to the maximum value, which constitutes an invalid range.
+     */
+    @Test
+    public void getWrappedValue_shouldThrowException_whenMinValueEqualsMaxValue() {
+        // Arrange: Define an invalid range where minValue is equal to maxValue.
+        // The method requires minValue to be strictly less than maxValue.
+        final int currentValue = 5;
+        final int wrapValue = 0;
+        final int minValue = 10;
+        final int maxValue = 10; // This creates the invalid range.
+
+        // Act & Assert
         try {
-            FieldUtils.getWrappedValue((-1610612735), (-1610612735), (-1610612735), (-1610612735));
-            fail("Expecting exception: IllegalArgumentException");
+            FieldUtils.getWrappedValue(currentValue, wrapValue, minValue, maxValue);
+            fail("Expected an IllegalArgumentException because minValue cannot be equal to maxValue.");
         } catch (IllegalArgumentException e) {
-            //
-            // MIN > MAX
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Assert that the correct exception message is thrown.
+            assertEquals("The exception message should indicate an invalid range.", "MIN > MAX", e.getMessage());
         }
     }
 }
