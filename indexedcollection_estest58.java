@@ -1,58 +1,50 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest58 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        IndexedCollection<Object, Object> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-        linkedList0.offer(indexedCollection0);
-        boolean boolean0 = indexedCollection0.containsAll(linkedList0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Contains tests for the {@link IndexedCollection} class, focusing on its behavior
+ * when the underlying collection is modified directly.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that containsAll() returns false for an element that was added
+     * directly to the underlying collection, bypassing the IndexedCollection decorator.
+     *
+     * This scenario causes the internal index to become out of sync with the
+     * decorated collection's actual content. The test confirms that the lookup,
+     * which relies on the stale index, fails as expected.
+     */
+    @Test
+    public void containsAllShouldReturnFalseWhenUnderlyingCollectionIsModifiedDirectly() {
+        // Arrange
+        // Use a transformer that maps any object to a null key.
+        final Transformer<Object, Object> keyTransformer = ConstantTransformer.nullTransformer();
+        final Collection<Object> underlyingList = new LinkedList<>();
+        final IndexedCollection<Object, Object> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(underlyingList, keyTransformer);
+
+        // Act
+        // Modify the underlying list directly. This is the crucial step that makes
+        // the IndexedCollection's internal index stale. The list now contains an
+        // element that the index is unaware of.
+        underlyingList.add(indexedCollection);
+
+        // Call containsAll() with the modified list. The method will use its
+        // (now stale) index to perform the check.
+        final boolean result = indexedCollection.containsAll(underlyingList);
+
+        // Assert
+        // The result must be false because the element added directly to the
+        // underlying list was never added to the index.
+        assertFalse("containsAll should return false for elements not known to the index", result);
     }
 }
