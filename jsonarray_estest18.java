@@ -1,24 +1,29 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest18 extends JsonArray_ESTest_scaffolding {
+/**
+ * This test class would typically contain all tests for the JsonArray class.
+ * This example focuses on refactoring a single, auto-generated test case for clarity.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Character character0 = new Character('6');
-        jsonArray0.add(character0);
-        char char0 = jsonArray0.getAsCharacter();
-        assertEquals('6', char0);
+    /**
+     * Verifies that getAsCharacter() correctly returns the primitive char
+     * when the JsonArray contains a single character element.
+     */
+    @Test
+    public void getAsCharacter_whenArrayContainsSingleCharacter_returnsTheCharacter() {
+        // Arrange: Create a JsonArray and add a single character to it.
+        JsonArray jsonArray = new JsonArray();
+        char expectedCharacter = '6';
+        jsonArray.add(expectedCharacter); // Autoboxing converts char to Character
+
+        // Act: Call the method under test.
+        char actualCharacter = jsonArray.getAsCharacter();
+
+        // Assert: Verify that the returned character is the one we added.
+        assertEquals(expectedCharacter, actualCharacter);
     }
 }
