@@ -1,17 +1,23 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest44 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        boolean boolean0 = IOCase.isCaseSensitive((IOCase) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that the static method {@code IOCase.isCaseSensitive(IOCase)} correctly
+     * handles a null input by returning false.
+     */
+    @Test
+    public void isCaseSensitive_withNullInput_shouldReturnFalse() {
+        // The isCaseSensitive method is designed to be null-safe.
+        // According to its Javadoc, it should return false if the input is null.
+        boolean result = IOCase.isCaseSensitive(null);
+
+        assertFalse("isCaseSensitive(null) should return false", result);
     }
 }
