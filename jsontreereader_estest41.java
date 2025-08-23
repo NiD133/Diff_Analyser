@@ -1,39 +1,37 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest41 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeReader} focusing on its behavior when the underlying JSON structure
+ * is modified during iteration.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test040() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        Double double0 = new Double(3440.6248330090357);
-        jsonTreeReader0.beginArray();
-        jsonArray0.add((Number) double0);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.beginArray();
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayList$Itr", e);
-        }
+    /**
+     * Verifies that modifying a JsonArray while a JsonTreeReader is iterating over it
+     * results in a ConcurrentModificationException. This is the expected behavior for
+     * Java collections and their iterators.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void modifyingArrayWhileReadingThrowsConcurrentModificationException() throws IOException {
+        // Arrange: Create a reader for an empty JSON array.
+        JsonArray jsonArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(jsonArray);
+
+        // Start reading the array. This action creates an internal iterator over the array's elements.
+        reader.beginArray();
+
+        // Act: Modify the underlying JsonArray *after* the reader has started processing it.
+        // This invalidates the internal iterator.
+        jsonArray.add("a new element");
+
+        // Assert: The next attempt to read from the array will fail.
+        // The hasNext() call uses the invalid iterator, which is expected to throw
+        // a ConcurrentModificationException. The @Test(expected=...) annotation handles the assertion.
+        reader.hasNext();
     }
 }
