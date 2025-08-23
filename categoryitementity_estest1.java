@@ -1,37 +1,35 @@
 package org.jfree.chart.entity;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import javax.swing.JLayeredPane;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryItemEntity_ESTestTest1 extends CategoryItemEntity_ESTest_scaffolding {
+import java.awt.Rectangle;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        DefaultMultiValueCategoryDataset<Integer, Integer> defaultMultiValueCategoryDataset0 = new DefaultMultiValueCategoryDataset<Integer, Integer>();
-        CategoryItemEntity<Integer, Integer> categoryItemEntity0 = new CategoryItemEntity<Integer, Integer>(defaultCaret0, "N`", "N`", defaultMultiValueCategoryDataset0, (Integer) 0, (Integer) 0);
-        categoryItemEntity0.setRowKey((Integer) null);
-        Integer integer0 = categoryItemEntity0.getRowKey();
-        assertNull(integer0);
+import static org.junit.Assert.assertNull;
+
+/**
+ * Tests for the {@link CategoryItemEntity} class, focusing on its property setters and getters.
+ */
+public class CategoryItemEntityTest {
+
+    /**
+     * Verifies that the row key can be set to null and the getter will subsequently return null.
+     * This tests the actual behavior, even though the method's Javadoc suggests null is not permitted.
+     */
+    @Test
+    public void setRowKey_whenSetToNull_getterReturnsNull() {
+        // Arrange: Create a CategoryItemEntity instance with standard initial values.
+        Rectangle area = new Rectangle(10, 20, 30, 40);
+        CategoryDataset<Integer, Integer> dataset = new DefaultMultiValueCategoryDataset<>();
+        CategoryItemEntity<Integer, Integer> entity = new CategoryItemEntity<>(
+                area, "Test ToolTip", "http://test.url", dataset, 1, 1);
+
+        // Act: Set the row key to null.
+        entity.setRowKey(null);
+
+        // Assert: Verify that the retrieved row key is now null.
+        Integer retrievedRowKey = entity.getRowKey();
+        assertNull("The row key should be null after being explicitly set to null.", retrievedRowKey);
     }
 }
