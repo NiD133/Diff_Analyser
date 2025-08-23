@@ -1,34 +1,32 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest10 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeAdapter} class, focusing on its public API contracts.
+ */
+class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        // Undeclared exception!
-        try {
-            gson_FutureTypeAdapter0.toJson((Writer) null, (Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // out == null
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Test
+    void toJson_whenWriterIsNull_throwsNullPointerException() {
+        // Arrange: Create a concrete instance of the abstract TypeAdapter.
+        // Gson.FutureTypeAdapter is a convenient, accessible implementation for this test.
+        TypeAdapter<Object> typeAdapter = new Gson.FutureTypeAdapter<>();
+        Object valueToWrite = "some-value";
+
+        // Act & Assert: Verify that calling toJson with a null Writer throws a NullPointerException.
+        // The TypeAdapter.toJson method delegates to a new JsonWriter, which is where
+        // the null check for the writer is performed.
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            typeAdapter.toJson((Writer) null, valueToWrite);
+        });
+
+        // Further assert that the exception message is as expected, confirming the
+        // source of the error.
+        assertEquals("out == null", exception.getMessage());
     }
 }
