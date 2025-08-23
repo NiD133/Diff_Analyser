@@ -1,25 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest25 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(54L, 54L);
-        long long0 = utcInstant0.getNanoOfDay();
-        assertEquals(54L, long0);
-        assertEquals(54L, utcInstant0.getModifiedJulianDay());
+    @Test
+    public void ofModifiedJulianDay_gettersReturnCorrectValues() {
+        // Arrange: Define the input values for creating a UtcInstant.
+        long expectedModifiedJulianDay = 54L;
+        long expectedNanoOfDay = 54L;
+
+        // Act: Create the UtcInstant and retrieve its properties.
+        UtcInstant utcInstant = UtcInstant.ofModifiedJulianDay(expectedModifiedJulianDay, expectedNanoOfDay);
+        long actualModifiedJulianDay = utcInstant.getModifiedJulianDay();
+        long actualNanoOfDay = utcInstant.getNanoOfDay();
+
+        // Assert: Verify that the retrieved properties match the initial values.
+        assertEquals("Modified Julian Day should match the value provided at creation",
+                expectedModifiedJulianDay, actualModifiedJulianDay);
+        assertEquals("Nano of day should match the value provided at creation",
+                expectedNanoOfDay, actualNanoOfDay);
     }
 }
