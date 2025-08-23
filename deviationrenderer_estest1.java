@@ -1,38 +1,31 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
+/**
+ * Tests for the equals() method in the {@link DeviationRenderer} class.
+ */
 public class DeviationRenderer_ESTestTest1 extends DeviationRenderer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer();
-        DeviationRenderer deviationRenderer1 = (DeviationRenderer) deviationRenderer0.clone();
-        assertEquals(0.5F, deviationRenderer1.getAlpha(), 0.01F);
-        deviationRenderer1.alpha = (-212.571F);
-        boolean boolean0 = deviationRenderer0.equals(deviationRenderer1);
-        assertFalse(boolean0);
+    /**
+     * Tests that two DeviationRenderer instances are not considered equal if their
+     * 'alpha' property is different.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenAlphaIsDifferent() throws CloneNotSupportedException {
+        // Arrange
+        DeviationRenderer renderer1 = new DeviationRenderer();
+        DeviationRenderer renderer2 = (DeviationRenderer) renderer1.clone();
+
+        // Pre-condition check: ensure the cloned renderer is equal to the original
+        assertEquals(renderer1, renderer2);
+
+        // Act: Modify the alpha property of the second renderer
+        renderer2.setAlpha(0.8f);
+
+        // Assert: The two renderers should no longer be equal
+        assertNotEquals(renderer1, renderer2);
     }
 }
