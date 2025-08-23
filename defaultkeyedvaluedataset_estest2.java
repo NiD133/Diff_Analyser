@@ -2,29 +2,28 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
 
-public class DefaultKeyedValueDataset_ESTestTest2 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        MockDate mockDate0 = new MockDate(0, 1, 0);
-        OHLCDataItem oHLCDataItem0 = new OHLCDataItem(mockDate0, (-1.0), (-1.0), 0.0, 0.0, 0.0);
-        byte[] byteArray0 = new byte[5];
-        byteArray0[3] = (byte) (-53);
-        BigInteger bigInteger0 = new BigInteger(byteArray0);
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset(oHLCDataItem0, bigInteger0);
-        Number number0 = defaultKeyedValueDataset0.getValue();
-        assertSame(bigInteger0, number0);
+    /**
+     * Verifies that getValue() returns the same value object that was provided
+     * to the constructor.
+     */
+    @Test
+    public void getValue_whenDatasetIsConstructedWithValue_returnsTheSameValue() {
+        // Arrange: Define a simple key and a numeric value.
+        Comparable<String> key = "Sample Key";
+        Number expectedValue = 123.45;
+
+        // Act: Create the dataset using the constructor that accepts a key and a value.
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset(key, expectedValue);
+        Number actualValue = dataset.getValue();
+
+        // Assert: The retrieved value should be the exact same instance as the one provided.
+        assertSame("The value returned by getValue() should be the same object " +
+                   "provided at construction.", expectedValue, actualValue);
     }
 }
