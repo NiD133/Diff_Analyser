@@ -1,35 +1,30 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Elements_ESTestTest21 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#remove()} method.
+ */
+public class ElementsRemoveTest {
 
-    @Test(timeout = 4000)
-    public void test020() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.remove();
-        assertSame(elements1, elements0);
+    /**
+     * Verifies that calling remove() on an empty Elements collection returns the same instance,
+     * ensuring that method chaining is supported even in this edge case.
+     */
+    @Test
+    public void removeOnEmptyListShouldReturnSameInstanceForChaining() {
+        // Arrange: Create an empty list of elements.
+        Elements emptyElements = new Elements();
+
+        // Act: Call the remove() method.
+        Elements result = emptyElements.remove();
+
+        // Assert: The returned object should be the same instance as the original.
+        assertSame(
+            "The remove() method should return the same instance for fluent chaining.",
+            emptyElements,
+            result
+        );
     }
 }
