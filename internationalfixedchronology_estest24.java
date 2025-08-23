@@ -1,59 +1,46 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest24 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = InternationalFixedChronology.INSTANCE;
-        Instant instant0 = MockInstant.now();
-        Period period0 = Period.ofDays((-2106965087));
-        Instant instant1 = MockInstant.minus(instant0, (TemporalAmount) period0);
-        ZoneOffset zoneOffset0 = ZoneOffset.MIN;
-        // Undeclared exception!
-        try {
-            internationalFixedChronology0.zonedDateTime(instant1, (ZoneId) zoneOffset0);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Unable to obtain ChronoLocalDateTime from TemporalAccessor: class java.time.LocalDateTime
-            //
-            verifyException("java.time.chrono.Chronology", e);
-        }
+/**
+ * Tests for {@link InternationalFixedChronology}.
+ * This class focuses on edge cases and exception handling.
+ */
+public class InternationalFixedChronologyTest {
+
+    /**
+     * Tests that creating a ZonedDateTime from an Instant that is outside the
+     * chronology's maximum supported year throws a DateTimeException.
+     * The InternationalFixedChronology supports years from 1 to 1,000,000.
+     */
+    @Test
+    public void zonedDateTime_whenInstantIsBeyondMaxSupportedYear_throwsDateTimeException() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        ZoneId utc = ZoneOffset.UTC;
+
+        // The maximum supported year is 1,000,000.
+        // Create an Instant corresponding to a year just outside this range (1,000,001)
+        // to test the upper boundary.
+        Instant outOfRangeInstant = ZonedDateTime.of(1_000_001, 1, 1, 0, 0, 0, 0, utc).toInstant();
+
+        // Act & Assert
+        DateTimeException exception = assertThrows(
+                DateTimeException.class,
+                () -> chronology.zonedDateTime(outOfRangeInstant, utc)
+        );
+
+        // Verify that the exception message indicates an out-of-range value.
+        // This confirms the exception was thrown for the correct reason.
+        assertTrue(exception.getMessage().contains("EpochDay"));
     }
 }
