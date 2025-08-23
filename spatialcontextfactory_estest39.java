@@ -1,24 +1,39 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-public class SpatialContextFactory_ESTestTest39 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Test for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("distCalculator", "lawofcosines");
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        assertFalse(spatialContext0.isNormWrapLongitude());
+    /**
+     * Tests that when a SpatialContext is created with a specific configuration
+     * for one property (like 'distCalculator'), other properties that are not
+     * explicitly set will correctly fall back to their default values.
+     */
+    @Test
+    public void makeSpatialContext_whenOnePropertyIsSet_shouldUseDefaultsForOthers() {
+        // Arrange: Create configuration specifying only the distance calculator.
+        // The 'normWrapLongitude' property is left unset to test its default behavior.
+        Map<String, String> config = new HashMap<>();
+        config.put("distCalculator", "lawofcosines");
+        
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act: Create the SpatialContext using the factory.
+        SpatialContext context = SpatialContextFactory.makeSpatialContext(config, classLoader);
+
+        // Assert: Verify the context was created and that 'normWrapLongitude'
+        // has its expected default value of false.
+        assertNotNull("The created context should not be null.", context);
+        assertFalse(
+            "Expected normWrapLongitude to be its default value (false) when not specified.",
+            context.isNormWrapLongitude()
+        );
     }
 }
