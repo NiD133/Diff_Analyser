@@ -1,26 +1,50 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class JsonTypeInfo_ESTestTest13 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonTypeInfo.Value} class.
+ * This test focuses on the construction of a {@code JsonTypeInfo.Value} instance
+ * and the behavior of the {@code isEnabled} static helper method.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.MINIMAL_CLASS;
-        JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
-        Class<Object> class0 = Object.class;
-        Boolean boolean0 = Boolean.valueOf("@2LLQRbW9{J2*\"1GY");
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "@2LLQRbW9{J2*\"1GY", class0, false, boolean0);
-        boolean boolean1 = JsonTypeInfo.Value.isEnabled(jsonTypeInfo_Value0);
-        assertFalse(jsonTypeInfo_Value0.getIdVisible());
-        assertEquals("@2LLQRbW9{J2*\"1GY", jsonTypeInfo_Value0.getPropertyName());
-        assertTrue(boolean1);
+    /**
+     * Verifies that {@link JsonTypeInfo.Value#isEnabled(JsonTypeInfo.Value)} returns true
+     * for a configuration where polymorphic type handling is active (i.e., the type ID is not {@code NONE}).
+     * This test also confirms that the constructor correctly initializes the object's properties.
+     */
+    @Test
+    public void isEnabledShouldReturnTrueWhenConstructedWithActiveTypeId() {
+        // Arrange: Define a configuration for polymorphic type handling.
+        final JsonTypeInfo.Id idType = JsonTypeInfo.Id.MINIMAL_CLASS;
+        final JsonTypeInfo.As inclusion = JsonTypeInfo.As.WRAPPER_OBJECT;
+        final String propertyName = "custom-type-property";
+        final Class<?> defaultImpl = Object.class;
+        final boolean idVisible = false;
+        // The original test used Boolean.valueOf("some_random_string"), which evaluates to false.
+        // We use 'false' directly for clarity.
+        final Boolean requireTypeIdForSubtypes = false;
+
+        // Act: Construct the JsonTypeInfo.Value and check if it's considered enabled.
+        JsonTypeInfo.Value typeInfoValue = JsonTypeInfo.Value.construct(
+                idType,
+                inclusion,
+                propertyName,
+                defaultImpl,
+                idVisible,
+                requireTypeIdForSubtypes
+        );
+        boolean isEnabled = JsonTypeInfo.Value.isEnabled(typeInfoValue);
+
+        // Assert: Verify that type handling is enabled and properties are set correctly.
+        assertTrue("isEnabled() should be true because the IdType is not NONE.", isEnabled);
+        assertEquals("Property name should be correctly set.",
+                     propertyName, typeInfoValue.getPropertyName());
+        assertFalse("idVisible flag should be correctly set.",
+                    typeInfoValue.getIdVisible());
     }
 }
