@@ -1,38 +1,24 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class CountingPathVisitor_ESTestTest21 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CountingPathVisitor} class.
+ * Note: This file was refactored from an auto-generated test suite.
+ */
+public class CountingPathVisitorTest { // Renamed from CountingPathVisitor_ESTestTest21
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withLongCounters();
-        boolean boolean0 = countingPathVisitor0.equals(countingPathVisitor0);
-        assertTrue(boolean0);
+    /**
+     * Tests that the equals() method is reflexive, meaning an object is always
+     * equal to itself.
+     */
+    @Test
+    public void testEquals_withSameInstance_shouldReturnTrue() {
+        // Arrange: Create an instance of the visitor.
+        CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
+
+        // Act & Assert: Verify that the object is equal to itself.
+        assertTrue("An object should always be equal to itself.", visitor.equals(visitor));
     }
 }
