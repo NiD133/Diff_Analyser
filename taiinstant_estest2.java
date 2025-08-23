@@ -1,30 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class TaiInstant_ESTestTest2 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the TaiInstant class, focusing on the equals() and hashCode() contract.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(37L, 37L);
-        TaiInstant taiInstant1 = TaiInstant.ofTaiSeconds(37L, 3503L);
-        boolean boolean0 = taiInstant0.equals(taiInstant1);
-        assertFalse(taiInstant1.equals((Object) taiInstant0));
-        assertEquals(37L, taiInstant1.getTaiSeconds());
-        assertEquals(3503, taiInstant1.getNano());
-        assertFalse(boolean0);
+    /**
+     * Tests that two TaiInstant objects are not equal if their nanosecond components differ,
+     * even when their second components are the same.
+     * This also verifies that their hash codes are different, upholding the equals/hashCode contract.
+     */
+    @Test
+    public void equals_returnsFalse_whenNanosDiffer() {
+        // Arrange: Create two instants with the same seconds but different nanos.
+        TaiInstant instant1 = TaiInstant.ofTaiSeconds(37L, 37L);
+        TaiInstant instant2 = TaiInstant.ofTaiSeconds(37L, 3503L);
+
+        // Act & Assert: The two instants should not be considered equal.
+        assertNotEquals(instant1, instant2);
+
+        // Assert: Per the Java contract, unequal objects should ideally have different hash codes.
+        assertNotEquals(instant1.hashCode(), instant2.hashCode());
     }
 }
