@@ -1,29 +1,33 @@
 package com.google.common.hash;
 
+import static org.junit.Assert.assertThrows;
+
+import com.google.common.hash.Crc32cHashFunction.Crc32cHasher;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AbstractStreamingHasher_ESTestTest12 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for {@link AbstractStreamingHasher}.
+ *
+ * <p>This test focuses on the input validation of the {@code putBytes} method.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        // Undeclared exception!
-        try {
-            crc32cHashFunction_Crc32cHasher0.putBytes((byte[]) null, 703, 703);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.HeapByteBuffer", e);
-        }
+    @Test
+    public void putBytes_givenNullArray_throwsNullPointerException() {
+        // Arrange: Create a concrete instance of the abstract class under test.
+        // Crc32cHasher is a simple, available implementation.
+        Hasher hasher = new Crc32cHasher();
+        byte[] nullInput = null;
+        
+        // The specific offset and length values do not matter when the input array is null.
+        int offset = 703;
+        int length = 703;
+
+        // Act & Assert: Verify that calling putBytes with a null array throws a NullPointerException.
+        // This is the expected behavior because the underlying implementation delegates to
+        // ByteBuffer.wrap(), which does not accept null for the array parameter.
+        assertThrows(
+                NullPointerException.class,
+                () -> hasher.putBytes(nullInput, offset, length));
     }
 }
