@@ -1,30 +1,33 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IslamicChronology_ESTestTest31 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link IslamicChronology}.
+ * This focuses on behavior when the chronology is constructed with invalid parameters.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance();
-        IslamicChronology islamicChronology0 = new IslamicChronology(copticChronology0, copticChronology0, (IslamicChronology.LeapYearPatternType) null);
-        // Undeclared exception!
-        try {
-            islamicChronology0.getDayOfMonth(1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to perform a date calculation throws a NullPointerException
+     * if the IslamicChronology was constructed with a null LeapYearPatternType.
+     *
+     * The getDayOfMonth() method internally depends on the leap year pattern to determine
+     * the structure of the calendar. A null pattern makes these calculations impossible,
+     * leading to the expected exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getDayOfMonth_whenConstructedWithNullLeapYearPattern_throwsNullPointerException() {
+        // Arrange: Create an IslamicChronology instance with a null leap year pattern.
+        // The base chronology and param object are arbitrary non-null values required by the constructor.
+        Chronology baseChronology = CopticChronology.getInstance();
+        IslamicChronology.LeapYearPatternType nullPattern = null;
+
+        IslamicChronology islamicChronology = new IslamicChronology(baseChronology, new Object(), nullPattern);
+
+        // Act: Call a method that relies on the leap year pattern.
+        // This is expected to fail and throw a NullPointerException.
+        islamicChronology.getDayOfMonth(1L);
     }
 }
