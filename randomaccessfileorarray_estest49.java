@@ -1,44 +1,46 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+import java.io.EOFException;
+import java.io.IOException;
+
+/**
+ * This class contains tests for the RandomAccessFileOrArray class.
+ * This particular test was improved for clarity from an auto-generated version.
+ */
 public class RandomAccessFileOrArray_ESTestTest49 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test048() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) (-63));
-        randomAccessFileOrArray0.readDouble();
-        randomAccessFileOrArray0.skipBytes(1);
-        randomAccessFileOrArray0.readBoolean();
-        try {
-            randomAccessFileOrArray0.readShortLE();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that an EOFException is thrown when attempting to read beyond the end of the data source.
+     * The test first positions the read pointer exactly at the end of the source data through a series
+     * of read and skip operations before attempting the final, failing read.
+     *
+     * @throws IOException if an I/O error occurs during the setup phase.
+     */
+    @Test(timeout = 4000, expected = EOFException.class)
+    public void readShortLE_whenAtEndOfData_throwsEOFException() throws IOException {
+        // Arrange: Create a 9-byte data source and a reader. Then, consume all 9 bytes
+        // to position the internal pointer at the very end.
+        byte[] sourceData = new byte[9];
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(sourceData);
+
+        // The sequence below is designed to consume exactly 9 bytes of data.
+        // 1. A pushed-back byte is consumed first, followed by 7 bytes from the array.
+        reader.pushBack((byte) -63);
+        reader.readDouble(); // Consumes 8 bytes total (1 pushed-back + 7 from array). Pointer is at index 7.
+
+        // 2. Skip one more byte from the array.
+        reader.skipBytes(1); // Pointer is now at index 8.
+
+        // 3. Read the final byte from the array.
+        reader.readBoolean(); // Consumes 1 byte. Pointer is now at index 9, which is the end of the data.
+
+        // Act: Attempt to read a short (2 bytes) when no bytes are left.
+        // This action is expected to throw an EOFException.
+        reader.readShortLE();
+
+        // Assert: The 'expected = EOFException.class' annotation on the @Test
+        // handles the assertion, failing the test if the expected exception is not thrown.
     }
 }
