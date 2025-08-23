@@ -1,27 +1,36 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
+
+import java.util.Collections;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest4 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        spatialContextFactory0.init(hashMap0, classLoader0);
-        spatialContextFactory0.initWorldBounds();
-        assertFalse(spatialContextFactory0.hasFormatConfig);
-        assertFalse(spatialContextFactory0.normWrapLongitude);
-        assertTrue(spatialContextFactory0.geo);
+/**
+ * Test suite for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
+
+    /**
+     * Verifies that a SpatialContextFactory instance is configured with its default
+     * values when initialized with an empty arguments map.
+     */
+    @Test
+    public void factoryShouldHaveDefaultSettingsWhenInitializedWithEmptyArgs() {
+        // Arrange: Create a factory and an empty configuration map.
+        SpatialContextFactory factory = new SpatialContextFactory();
+        Map<String, String> emptyArgs = Collections.emptyMap();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act: Initialize the factory with the empty configuration.
+        factory.init(emptyArgs, classLoader);
+        factory.initWorldBounds();
+
+        // Assert: Verify that the factory's properties retain their default values.
+        assertTrue("The 'geo' property should default to true.", factory.geo);
+        assertFalse("The 'normWrapLongitude' property should default to false.", factory.normWrapLongitude);
+        assertFalse("The 'hasFormatConfig' property should default to false.", factory.hasFormatConfig);
     }
 }
