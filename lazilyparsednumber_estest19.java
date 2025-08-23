@@ -1,22 +1,19 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest19 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber((String) null);
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.doubleValue();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    @Test(expected = NullPointerException.class)
+    public void doubleValue_whenConstructedWithNull_throwsNullPointerException() {
+        // Arrange: Create an instance with a null string, which is an invalid state.
+        LazilyParsedNumber number = new LazilyParsedNumber(null);
+
+        // Act: Attempt to get the double value, which triggers parsing of the null string.
+        // The @Test(expected=...) annotation will assert that a NullPointerException is thrown.
+        number.doubleValue();
     }
 }
