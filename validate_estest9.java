@@ -1,33 +1,37 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest9 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for {@link Validate}.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        // Undeclared exception!
+    /**
+     * Tests that Validate.fail() propagates a FormatFlagsConversionMismatchException
+     * when provided with a message string that contains an invalid format specifier.
+     * This ensures that underlying formatting errors are not masked.
+     */
+    @Test
+    public void failWithIncompatibleFormatFlagThrowsException() {
+        // Arrange: Define an invalid format string and corresponding arguments.
+        // The '+' flag is incompatible with the 'b' (boolean) conversion specifier.
+        String invalidFormatMessage = "Invalid boolean flag: %+b";
+        Object[] args = { true }; // An argument is required to trigger this specific exception.
+
         try {
-            Validate.fail("gu?%+BkAQ5QsJ", objectArray0);
-            fail("Expecting exception: FormatFlagsConversionMismatchException");
+            // Act: Call the method under test.
+            Validate.fail(invalidFormatMessage, args);
+
+            // Assert: The test should fail if the expected exception is not thrown.
+            fail("Expected a FormatFlagsConversionMismatchException to be thrown.");
         } catch (FormatFlagsConversionMismatchException e) {
-            //
-            // Conversion = b, Flags = +
-            //
-            verifyException("java.util.Formatter$FormatSpecifier", e);
+            // Assert: Verify that the correct exception was caught and that its message
+            // confirms the failure occurred for the expected reason.
+            assertEquals("Conversion = b, Flags = +", e.getMessage());
         }
     }
 }
