@@ -1,25 +1,20 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest19 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash32((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that calling hash32 with a null String input correctly
+     * throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void hash32ShouldThrowNullPointerExceptionForNullStringInput() {
+        // This call is expected to throw a NullPointerException.
+        // The @Test(expected=...) annotation handles the assertion.
+        MurmurHash2.hash32((String) null);
     }
 }
