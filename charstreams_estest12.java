@@ -1,55 +1,42 @@
 package com.google.common.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
+import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
 
-public class CharStreams_ESTestTest12 extends CharStreams_ESTest_scaffolding {
+/**
+ * This test class has been improved to verify the behavior of the CharStreams.skipFully method,
+ * specifically when the underlying Reader throws an unchecked exception.
+ */
+public class CharStreams_ESTestTest12 {
 
+    /**
+     * Tests that CharStreams.skipFully propagates an ArrayIndexOutOfBoundsException
+     * thrown by the underlying Reader.
+     */
     @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0, (byte) (-39), (byte) 109);
-        Charset charset0 = Charset.defaultCharset();
-        InputStreamReader inputStreamReader0 = new InputStreamReader(byteArrayInputStream0, charset0);
-        // Undeclared exception!
+    public void skipFully_whenReaderThrowsUncheckedException_propagatesException() {
+        // Arrange: Create a Reader that is backed by a misconfigured ByteArrayInputStream.
+        // The stream is set up with a negative offset, which will cause its read() method
+        // to throw an ArrayIndexOutOfBoundsException.
+        byte[] dummyData = new byte[10];
+        int invalidOffset = -1;
+        int length = 20; // This length is also out of bounds, but the negative offset is checked first.
+        ByteArrayInputStream faultyInputStream = new ByteArrayInputStream(dummyData, invalidOffset, length);
+        Reader faultyReader = new InputStreamReader(faultyInputStream, Charset.defaultCharset());
+
+        // Act & Assert: Call skipFully and assert that it propagates the expected exception from the underlying stream.
         try {
-            CharStreams.skipFully(inputStreamReader0, (byte) 1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.ByteArrayInputStream", e);
+            CharStreams.skipFully(faultyReader, 1L);
+            fail("Expected an ArrayIndexOutOfBoundsException to be thrown due to the invalid stream configuration.");
+        } catch (ArrayIndexOutOfBoundsException expected) {
+            // This is the expected behavior. The exception from the underlying stream is correctly propagated.
+        } catch (IOException e) {
+            fail("An unexpected IOException was thrown, but an ArrayIndexOutOfBoundsException was expected. " + e.getMessage());
         }
     }
 }
