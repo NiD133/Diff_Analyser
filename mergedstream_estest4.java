@@ -1,39 +1,51 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest4 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream(2914);
-        byte[] byteArray0 = new byte[8];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, 1, 2914);
-        long long0 = mergedStream0.skip(1);
-        assertEquals(1L, long0);
+/**
+ * Contains tests for the {@link MergedStream} class.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Tests that the skip() method correctly advances the stream's position
+     * when the requested number of bytes to skip is fully contained within the
+     * initial prefix buffer.
+     */
+    @Test
+    public void shouldSkipBytesEntirelyWithinPrefixBuffer() throws Exception {
+        // Arrange
+        // 1. Define a prefix buffer with known content. This buffer is "pushed back"
+        //    and should be read first by the MergedStream.
+        byte[] prefixBuffer = new byte[]{10, 20, 30, 40, 50};
+
+        // 2. The underlying stream is not used in this scenario, so an empty one is sufficient.
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]);
+
+        // 3. IOContext is a required parameter, so we create a default instance for the test.
+        IOContext ioContext = new IOContext(new BufferRecycler(), null, false);
+
+        // 4. Create the MergedStream, configured to read from the start of our prefix buffer.
+        MergedStream mergedStream = new MergedStream(ioContext, underlyingStream, prefixBuffer, 0, prefixBuffer.length);
+
+        // Act
+        // Skip a number of bytes that is smaller than the total size of the prefix buffer.
+        long bytesToSkip = 3L;
+        long actualBytesSkipped = mergedStream.skip(bytesToSkip);
+
+        // Assert
+        // Verify that the number of skipped bytes returned by the method is correct.
+        assertEquals(bytesToSkip, actualBytesSkipped);
+
+        // For more robust verification, check the stream's state. After skipping the first 3 bytes
+        // (10, 20, 30), the next byte read from the stream should be the 4th byte (40).
+        int nextByte = mergedStream.read();
+        assertEquals(40, nextByte);
     }
 }
