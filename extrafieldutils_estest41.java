@@ -1,17 +1,24 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class ExtraFieldUtils_ESTestTest41 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        ExtraFieldUtils extraFieldUtils0 = new ExtraFieldUtils();
+    /**
+     * Tests that the ExtraFieldUtils class can be instantiated.
+     * This is primarily for code coverage, as it is a utility class
+     * with static methods.
+     */
+    @Test
+    public void testInstantiation() {
+        // Act: Create an instance of the utility class.
+        final ExtraFieldUtils extraFieldUtils = new ExtraFieldUtils();
+
+        // Assert: The instance should be successfully created.
+        assertNotNull("A new instance of ExtraFieldUtils should not be null.", extraFieldUtils);
     }
 }
