@@ -1,28 +1,43 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class IntervalCategoryToolTipGenerator_ESTestTest9 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link IntervalCategoryToolTipGenerator} class.
+ */
+public class IntervalCategoryToolTipGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        double[][] doubleArray0 = new double[8][4];
-        DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
-        Object[] objectArray0 = intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 0, 0);
-        assertEquals(5, objectArray0.length);
+    /**
+     * Verifies that the createItemArray method returns an array with 5 elements
+     * when used with an IntervalCategoryDataset. This size is required to populate
+     * the default tooltip format string.
+     */
+    @Test
+    public void createItemArray_withIntervalDataset_returnsArrayOfFiveElements() {
+        // Arrange
+        // Create a minimal 1x1 dataset with interval values.
+        double[][] startValues = {{10.0}};
+        double[][] endValues = {{20.0}};
+        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(startValues, endValues);
+
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+        int row = 0;
+        int column = 0;
+
+        // Act
+        Object[] items = generator.createItemArray(dataset, row, column);
+
+        // Assert
+        // The generated array should contain 5 elements to match the format string placeholders:
+        // {0}: Series Key
+        // {1}: Category Key
+        // {2}: Value (the interval end value)
+        // {3}: Interval Start Value
+        // {4}: Interval End Value
+        final int expectedArraySize = 5;
+        assertEquals("The item array should have 5 elements for an interval dataset.",
+                expectedArraySize, items.length);
     }
 }
