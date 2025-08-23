@@ -1,27 +1,35 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class QueryParser_ESTestTest13 extends QueryParser_ESTest_scaffolding {
+/**
+ * Contains tests for invalid query handling in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that parsing a query with a dangling meta-character ('?')
+     * throws an IllegalStateException. The '?' is not a valid character
+     * in a pseudo-selector name and should be rejected by the parser.
+     */
+    @Test
+    public void parseShouldThrowExceptionForDanglingMetaCharacter() {
+        // Arrange: Define an invalid CSS query with a '?' character, which is a dangling meta-character.
+        String invalidQuery = ":matches?holeText(1s)";
+
         try {
-            QueryParser.parse(":matches?holeText(1s)");
-            fail("Expecting exception: IllegalStateException");
+            // Act: Attempt to parse the invalid query.
+            QueryParser.parse(invalidQuery);
+            fail("Expected an IllegalStateException to be thrown due to the dangling meta-character.");
         } catch (IllegalStateException e) {
-            //
-            // Dangling meta character '?' near index 0
-            // ?
-            // ^
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Assert: Verify that the exception message correctly identifies the error.
+            String expectedErrorMessage = "Dangling meta character '?' near index 0";
+            assertTrue(
+                "Exception message should clearly indicate the dangling meta-character error.",
+                e.getMessage().contains(expectedErrorMessage)
+            );
         }
     }
 }
