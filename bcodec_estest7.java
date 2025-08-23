@@ -1,24 +1,34 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class BCodec_ESTestTest7 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for the BCodec class, focusing on byte-level encoding and decoding.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        byte[] byteArray0 = new byte[6];
-        byte[] byteArray1 = bCodec0.doDecoding(byteArray0);
-        byte[] byteArray2 = bCodec0.doEncoding(byteArray1);
-        assertNotSame(byteArray2, byteArray0);
+    /**
+     * Tests that decoding invalid Base64 data, followed by re-encoding the result,
+     * produces an empty byte array. The default BCodec is lenient and should not throw
+     * an exception for invalid input.
+     */
+    @Test
+    public void decodeInvalidDataThenEncodeShouldProduceEmptyArray() {
+        // Arrange
+        // A byte array of zeros is not valid Base64 data.
+        final byte[] invalidBase64Input = new byte[6];
+        final BCodec bCodec = new BCodec(); // Uses lenient decoding by default.
+
+        // Act
+        // In lenient mode, decoding invalid data results in an empty array.
+        final byte[] decodedBytes = bCodec.doDecoding(invalidBase64Input);
+        // Re-encoding the (empty) result.
+        final byte[] reEncodedBytes = bCodec.doEncoding(decodedBytes);
+
+        // Assert
+        final byte[] expectedEmptyArray = new byte[0];
+        assertArrayEquals("Decoding invalid Base64 should yield an empty byte array", expectedEmptyArray, decodedBytes);
+        assertArrayEquals("Encoding an empty byte array should also yield an empty byte array", expectedEmptyArray, reEncodedBytes);
     }
 }
