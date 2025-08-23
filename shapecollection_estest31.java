@@ -1,33 +1,34 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest31 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Vector<JtsPoint> vector0 = new Vector<JtsPoint>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(vector0, spatialContext0);
-        boolean boolean0 = ShapeCollection.computeMutualDisjoint(shapeCollection0);
-        assertTrue(boolean0);
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for the {@link ShapeCollection} class.
+ * This class contains the refactored version of an auto-generated test.
+ */
+public class ShapeCollection_ESTestTest31 {
+
+    /**
+     * Tests that {@link ShapeCollection#computeMutualDisjoint(List)} returns true
+     * for an empty collection of shapes. An empty set of shapes is trivially disjoint.
+     */
+    @Test
+    public void computeMutualDisjoint_withEmptyCollection_shouldReturnTrue() {
+        // Arrange: Create an empty collection of shapes.
+        // Note: The ShapeCollection constructor requires a list that implements RandomAccess.
+        List<Shape> emptyShapes = new ArrayList<>();
+        ShapeCollection<Shape> emptyCollection = new ShapeCollection<>(emptyShapes, SpatialContext.GEO);
+
+        // Act: Call the method under test.
+        boolean isDisjoint = ShapeCollection.computeMutualDisjoint(emptyCollection);
+
+        // Assert: Verify that the result is true.
+        assertTrue("An empty collection of shapes should be considered mutually disjoint.", isDisjoint);
     }
 }
