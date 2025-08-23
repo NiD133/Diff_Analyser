@@ -1,34 +1,19 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Entities_ESTestTest8 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Entities} class, focusing on exception handling.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        // Undeclared exception!
-        try {
-            Entities.unescape((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling {@link Entities#unescape(String)} with a null input
+     * correctly throws a {@link NullPointerException}. This is the expected behavior
+     * for methods that do not explicitly support null arguments.
+     */
+    @Test(expected = NullPointerException.class)
+    public void unescapeWithNullInputShouldThrowNullPointerException() {
+        Entities.unescape(null);
     }
 }
