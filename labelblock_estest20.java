@@ -1,40 +1,32 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-public class LabelBlock_ESTestTest20 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Tests for the equality logic in the {@link LabelBlock} class.
+ */
+public class LabelBlockEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        LabelBlock labelBlock1 = new LabelBlock("");
-        assertTrue(labelBlock1.equals((Object) labelBlock0));
-        labelBlock1.setToolTipText("");
-        boolean boolean0 = labelBlock0.equals(labelBlock1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method correctly distinguishes between two
+     * LabelBlock objects when their toolTipText property differs.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenToolTipTextIsDifferent() {
+        // Arrange: Create two LabelBlock instances that are otherwise identical.
+        // By default, their toolTipText is null.
+        LabelBlock block1 = new LabelBlock("Test Label");
+        LabelBlock block2 = new LabelBlock("Test Label");
+
+        // Assert that the blocks are equal to begin with. This is a sanity check.
+        assertEquals(block1, block2);
+
+        // Act: Modify the toolTipText of one block, making it different from the other.
+        block2.setToolTipText("A new tooltip");
+
+        // Assert: The blocks should no longer be considered equal.
+        assertNotEquals(block1, block2);
     }
 }
