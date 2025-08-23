@@ -1,56 +1,39 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
-public class JulianChronology_ESTestTest43 extends JulianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        JulianDate julianDate0 = julianChronology0.dateNow(clock0);
-        assertEquals(JulianEra.AD, julianDate0.getEra());
+/**
+ * Tests for {@link JulianChronology#dateNow(Clock)}.
+ */
+public class JulianChronologyTest {
+
+    /**
+     * Tests that dateNow(Clock) returns the correct JulianDate for a given fixed instant.
+     * This ensures the method correctly converts the instant provided by the clock
+     * into the corresponding date in the Julian calendar system.
+     */
+    @Test
+    public void dateNow_withFixedClock_returnsCorrectJulianDate() {
+        // Arrange: Set up a fixed clock for a specific instant.
+        // The Gregorian date is 2014-02-15 UTC.
+        // The corresponding Julian date is 2014-02-02.
+        final JulianChronology chronology = JulianChronology.INSTANCE;
+        final Instant fixedInstant = LocalDateTime.of(2014, 2, 15, 12, 30, 0).toInstant(ZoneOffset.UTC);
+        final Clock fixedClock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
+        
+        JulianDate expectedDate = JulianDate.of(2014, 2, 2);
+
+        // Act: Get the current date from the chronology using the fixed clock.
+        JulianDate actualDate = chronology.dateNow(fixedClock);
+
+        // Assert: The returned date must match the expected Julian date.
+        assertEquals("The date should be correctly converted from the clock's instant", expectedDate, actualDate);
     }
 }
