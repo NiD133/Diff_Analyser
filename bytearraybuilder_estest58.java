@@ -1,18 +1,30 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest58 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(131050);
-        byteArrayBuilder0.appendThreeBytes((-2057));
-        assertEquals(3, byteArrayBuilder0.getCurrentSegmentLength());
+    /**
+     * Verifies that calling {@link ByteArrayBuilder#appendThreeBytes(int)}
+     * correctly increases the current segment's length by exactly 3.
+     */
+    @Test
+    public void appendThreeBytesShouldAdvancePointerByThree() {
+        // Arrange: Create a ByteArrayBuilder. The default initial capacity is sufficient.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        assertEquals("Builder should be empty upon creation", 0, builder.getCurrentSegmentLength());
+
+        // Act: Append three bytes to the builder. The specific integer value is not
+        // relevant to this test, as we are only checking the length.
+        builder.appendThreeBytes(0x123456);
+
+        // Assert: The length of the current segment should now be 3.
+        int expectedLength = 3;
+        assertEquals("After appending three bytes, the segment length should be 3",
+                expectedLength, builder.getCurrentSegmentLength());
     }
 }
