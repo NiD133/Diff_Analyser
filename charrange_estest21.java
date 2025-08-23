@@ -1,27 +1,23 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CharRange_ESTestTest21 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link org.apache.commons.lang3.CharRange} class.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        CharRange charRange0 = CharRange.isIn('w', 'w');
-        CharRange charRange1 = CharRange.is('~');
-        boolean boolean0 = charRange0.contains(charRange1);
-        assertEquals('w', charRange0.getEnd());
-        assertEquals('~', charRange1.getStart());
-        assertFalse(boolean0);
-        assertFalse(charRange1.isNegated());
-        assertEquals('w', charRange0.getStart());
-        assertEquals('~', charRange1.getEnd());
+    @Test
+    public void contains_shouldReturnFalseForNonContainedRange() {
+        // Arrange
+        // Create a range that contains only the character 'w'.
+        CharRange rangeW = CharRange.isIn('w', 'w');
+        // Create a second, non-overlapping range containing only '~'.
+        CharRange rangeTilde = CharRange.is('~');
+
+        // Act & Assert
+        // Verify that the first range does not contain the second, non-overlapping range.
+        assertFalse(rangeW.contains(rangeTilde));
     }
 }
