@@ -1,31 +1,29 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ConstructorUtils_ESTestTest10 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.reflect.ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 1);
-        Class<Object> class0 = Object.class;
-        try {
-            ConstructorUtils.invokeConstructor(class0, (Object[]) classArray0);
-            fail("Expecting exception: NoSuchMethodException");
-        } catch (NoSuchMethodException e) {
-            //
-            // No such accessible constructor on object: java.lang.Object
-            //
-            verifyException("org.apache.commons.lang3.reflect.ConstructorUtils", e);
-        }
+    /**
+     * Tests that invokeConstructor throws NoSuchMethodException when called with arguments
+     * that do not match any existing constructor signature.
+     */
+    @Test(expected = NoSuchMethodException.class)
+    public void invokeConstructorWithMismatchedArgumentsShouldThrowNoSuchMethodException()
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        // Arrange: The java.lang.Object class only has a public no-argument constructor.
+        // We will try to invoke a constructor that takes a single argument.
+        final Class<Object> classToInstantiate = Object.class;
+        final Object[] constructorArgs = new Object[]{ "an-argument" };
+
+        // Act: Attempt to call a constructor on Object.class with an argument.
+        // This should fail because no constructor matches the provided argument type (String).
+        ConstructorUtils.invokeConstructor(classToInstantiate, constructorArgs);
+
+        // Assert: The test expects a NoSuchMethodException, which is declared in the @Test annotation.
     }
 }
