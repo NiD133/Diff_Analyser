@@ -1,24 +1,34 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for the {@link Tokeniser} class, focusing on specific initialization scenarios.
+ *
+ * Note: The original class name and inheritance were artifacts of a test generation tool.
+ * In a full refactoring, this class would be integrated into a more cohesively named test suite for Tokeniser.
+ */
 public class Tokeniser_ESTestTest38 extends Tokeniser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("~q|K}QnrD6s{{tpV-~", "~q|K}QnrD6s{{tpV-~");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        tokeniser0.createTempBuffer();
+    /**
+     * Verifies that createTempBuffer() can be called without throwing an exception after the Tokeniser is initialized.
+     * This serves as a basic smoke test for the method's initialization logic.
+     */
+    @Test
+    public void createTempBufferShouldNotThrowExceptionAfterInitialization() {
+        // Arrange: Create a Tokeniser instance.
+        // A Tokeniser requires a TreeBuilder to be instantiated. The parse() call
+        // initializes the builder's internal state (like the CharacterReader), which the
+        // Tokeniser's constructor depends on. The specific content being parsed is not
+        // relevant for this test.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        xmlTreeBuilder.parse("<root/>", "http://example.com/");
+        Tokeniser tokeniser = new Tokeniser(xmlTreeBuilder);
+
+        // Act: Call the method under test.
+        tokeniser.createTempBuffer();
+
+        // Assert: The test passes if no exception is thrown.
+        // No explicit assertions are needed for this type of "does not throw" test.
     }
 }
