@@ -1,18 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest17 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Years years0 = Years.years((-690));
-        int int0 = years0.getYears();
-        assertEquals((-690), int0);
+    @Test
+    public void getYears_shouldReturnTheValuePassedToFactory() {
+        // Arrange
+        final int expectedYears = -690;
+        Years years = Years.years(expectedYears);
+
+        // Act
+        int actualYears = years.getYears();
+
+        // Assert
+        assertEquals("The number of years should match the value used for creation.",
+                expectedYears, actualYears);
     }
 }
