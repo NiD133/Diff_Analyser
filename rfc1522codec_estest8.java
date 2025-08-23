@@ -1,31 +1,38 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.apache.commons.codec.EncoderException;
+import org.junit.Test;
 
-public class RFC1522Codec_ESTestTest8 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Test suite for the RFC1522Codec class, focusing on encoding behavior.
+ */
+public class RFC1522CodecTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        // Undeclared exception!
+    /**
+     * Verifies that encodeText() throws an UnsupportedCharsetException when provided
+     * with a charset name that is not supported by the Java runtime.
+     */
+    @Test
+    public void encodeTextWithInvalidCharsetShouldThrowUnsupportedCharsetException() throws EncoderException {
+        // Arrange: Create a codec instance and define test data, including an
+        // obviously invalid charset name.
+        final BCodec codec = new BCodec();
+        final String textToEncode = "This is some test text.";
+        final String invalidCharsetName = "non-existent-charset-123";
+
+        // Act & Assert: Attempt to encode with the invalid charset and verify that the
+        // correct exception is thrown.
         try {
-            bCodec0.encodeText("org.apache.commons.codec.net.RFC1522Codec", "org.apache.commons.codec.net.RFC1522Codec");
-            fail("Expecting exception: UnsupportedCharsetException");
-        } catch (UnsupportedCharsetException e) {
-            //
-            // org.apache.commons.codec.net.RFC1522Codec
-            //
-            verifyException("java.nio.charset.Charset", e);
+            codec.encodeText(textToEncode, invalidCharsetName);
+            fail("Expected an UnsupportedCharsetException to be thrown, but it was not.");
+        } catch (final UnsupportedCharsetException e) {
+            // This is the expected outcome.
+            // Additionally, verify that the exception correctly reports the invalid charset name.
+            assertEquals("The exception should contain the invalid charset name.", invalidCharsetName, e.getCharsetName());
         }
     }
 }
