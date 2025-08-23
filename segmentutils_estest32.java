@@ -1,16 +1,26 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class SegmentUtils_ESTestTest32 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentUtils} utility class.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        SegmentUtils segmentUtils0 = new SegmentUtils();
+    /**
+     * Verifies that the SegmentUtils utility class can be instantiated without errors.
+     * <p>
+     * This test is primarily for achieving full code coverage, as utility classes
+     * with private or default constructors are often instantiated this way in tests.
+     * </p>
+     */
+    @Test
+    public void shouldInstantiateSuccessfully() {
+        // Act: Attempt to create an instance of the utility class.
+        final SegmentUtils segmentUtils = new SegmentUtils();
+
+        // Assert: Ensure the instance is not null.
+        assertNotNull("The SegmentUtils instance should not be null.", segmentUtils);
     }
 }
