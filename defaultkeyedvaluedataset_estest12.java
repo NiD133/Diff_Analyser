@@ -1,26 +1,28 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultKeyedValueDataset_ESTestTest12 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        DefaultKeyedValueDataset defaultKeyedValueDataset1 = new DefaultKeyedValueDataset(defaultKeyedValueDataset0);
-        boolean boolean0 = defaultKeyedValueDataset1.equals(defaultKeyedValueDataset0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two empty datasets are considered equal, especially when
+     * one is constructed by wrapping the other.
+     */
+    @Test
+    public void equals_shouldReturnTrueForTwoLogicallyEmptyDatasets() {
+        // Arrange: Create two datasets that are both logically empty.
+        DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset();
+        DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset(dataset1);
+
+        // Assert: The two datasets should be considered equal.
+        // This also verifies that their hash codes are equal, as required by the
+        // equals() and hashCode() contract.
+        assertEquals(dataset1, dataset2);
+        assertEquals("Hash codes of equal objects must be equal.", 
+                     dataset1.hashCode(), dataset2.hashCode());
     }
 }
