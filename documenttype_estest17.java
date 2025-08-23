@@ -1,23 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentType_ESTestTest17 extends DocumentType_ESTest_scaffolding {
+/**
+ * Tests for the {@link DocumentType} class.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        DocumentType documentType0 = new DocumentType("", "", "");
-        String string0 = documentType0.outerHtml();
-        assertEquals("<!doctype>", string0);
-        assertEquals("#doctype", documentType0.nodeName());
+    /**
+     * Verifies that the outer HTML of a DocumentType with empty name, publicId, and systemId
+     * is rendered as a minimal, standard doctype tag.
+     */
+    @Test
+    public void outerHtmlForEmptyDoctypeIsMinimal() {
+        // Arrange: Create a DocumentType with empty attributes.
+        DocumentType docType = new DocumentType("", "", "");
+
+        // Act: Generate the outer HTML for the doctype.
+        String actualHtml = docType.outerHtml();
+
+        // Assert: The output should be the simplest possible doctype declaration.
+        assertEquals("<!doctype>", actualHtml);
+        
+        // Also assert that the node name is correct, as a basic sanity check.
+        assertEquals("#doctype", docType.nodeName());
     }
 }
