@@ -1,33 +1,27 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link JsonTreeWriter} focusing on state validation.
+ */
+// The original test class name and inheritance are kept for consistency.
 public class JsonTreeWriter_ESTestTest57 extends JsonTreeWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.endArray();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that calling endArray() when the current context is an object
+     * throws an IllegalStateException. This ensures the writer enforces a valid
+     * JSON structure by preventing mismatched begin/end calls.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void endArray_whenInObjectContext_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a writer and open an object context.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginObject();
+
+        // Act: Attempt to close an array, which is an invalid state transition.
+        // The @Test(expected=...) annotation will assert that an IllegalStateException is thrown.
+        writer.endArray();
     }
 }
