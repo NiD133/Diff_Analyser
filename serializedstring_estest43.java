@@ -1,28 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest43 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on edge cases.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        SerializedString serializedString0 = new SerializedString(", coipied ");
-        char[] charArray0 = new char[2];
-        int int0 = serializedString0.appendUnquoted(charArray0, (-1));
-        assertEquals((-1), int0);
+    /**
+     * Verifies that the appendUnquoted() method correctly handles an invalid (negative)
+     * offset by returning -1, indicating that no characters were appended. This is the
+     * expected behavior for invalid buffer offsets.
+     */
+    @Test
+    public void appendUnquoted_shouldReturnNegativeOne_whenOffsetIsNegative() {
+        // Arrange: Create a SerializedString, a destination buffer, and an invalid offset.
+        SerializedString serializedString = new SerializedString("some-test-string");
+        char[] destinationBuffer = new char[20];
+        int invalidOffset = -1;
+
+        // Act: Attempt to append the string's characters to the buffer with the invalid offset.
+        int charsAppended = serializedString.appendUnquoted(destinationBuffer, invalidOffset);
+
+        // Assert: The method should return -1 to signal that the operation failed due to
+        // the invalid offset, rather than throwing an exception.
+        assertEquals("Expected -1 for a negative offset", -1, charsAppended);
     }
 }
