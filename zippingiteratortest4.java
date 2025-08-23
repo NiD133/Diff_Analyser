@@ -1,20 +1,22 @@
 package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.collections4.IteratorUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ZippingIteratorTestTest4 extends AbstractIteratorTest<Integer> {
+/**
+ * Tests the ZippingIterator with iterators of uneven lengths to ensure it
+ * correctly interleaves elements until all iterators are exhausted.
+ */
+public class ZippingIteratorUnevenLengthTest extends AbstractIteratorTest<Integer> {
 
-    private ArrayList<Integer> evens;
-
-    private ArrayList<Integer> odds;
-
-    private ArrayList<Integer> fib;
+    private List<Integer> evens;
+    private List<Integer> odds;
+    private List<Integer> fibonacci;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -24,90 +26,62 @@ public class ZippingIteratorTestTest4 extends AbstractIteratorTest<Integer> {
 
     @Override
     public ZippingIterator<Integer> makeObject() {
-        return new ZippingIterator<>(evens.iterator(), odds.iterator(), fib.iterator());
+        // The order here is different from the specific test case below,
+        // which is intentional to cover different scenarios.
+        return new ZippingIterator<>(evens.iterator(), odds.iterator(), fibonacci.iterator());
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         evens = new ArrayList<>();
         odds = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            if (0 == i % 2) {
+            if (i % 2 == 0) {
                 evens.add(i);
             } else {
                 odds.add(i);
             }
         }
-        fib = new ArrayList<>();
-        fib.add(1);
-        fib.add(1);
-        fib.add(2);
-        fib.add(3);
-        fib.add(5);
-        fib.add(8);
-        fib.add(13);
-        fib.add(21);
+
+        // The first 8 Fibonacci numbers (F_1 to F_8)
+        fibonacci = List.of(1, 1, 2, 3, 5, 8, 13, 21);
     }
 
+    /**
+     * Tests that the ZippingIterator correctly interleaves elements from three
+     * iterators of different lengths, continuing until all are exhausted.
+     */
     @Test
-    void testIterateFibEvenOdd() {
-        final ZippingIterator<Integer> iter = new ZippingIterator<>(fib.iterator(), evens.iterator(), odds.iterator());
-        // fib    1
-        assertEquals(Integer.valueOf(1), iter.next());
-        // even   0
-        assertEquals(Integer.valueOf(0), iter.next());
-        // odd    1
-        assertEquals(Integer.valueOf(1), iter.next());
-        // fib    1
-        assertEquals(Integer.valueOf(1), iter.next());
-        // even   2
-        assertEquals(Integer.valueOf(2), iter.next());
-        // odd    3
-        assertEquals(Integer.valueOf(3), iter.next());
-        // fib    2
-        assertEquals(Integer.valueOf(2), iter.next());
-        // even   4
-        assertEquals(Integer.valueOf(4), iter.next());
-        // odd    5
-        assertEquals(Integer.valueOf(5), iter.next());
-        // fib    3
-        assertEquals(Integer.valueOf(3), iter.next());
-        // even   6
-        assertEquals(Integer.valueOf(6), iter.next());
-        // odd    7
-        assertEquals(Integer.valueOf(7), iter.next());
-        // fib    5
-        assertEquals(Integer.valueOf(5), iter.next());
-        // even   8
-        assertEquals(Integer.valueOf(8), iter.next());
-        // odd    9
-        assertEquals(Integer.valueOf(9), iter.next());
-        // fib    8
-        assertEquals(Integer.valueOf(8), iter.next());
-        // even  10
-        assertEquals(Integer.valueOf(10), iter.next());
-        // odd   11
-        assertEquals(Integer.valueOf(11), iter.next());
-        // fib   13
-        assertEquals(Integer.valueOf(13), iter.next());
-        // even  12
-        assertEquals(Integer.valueOf(12), iter.next());
-        // odd   13
-        assertEquals(Integer.valueOf(13), iter.next());
-        // fib   21
-        assertEquals(Integer.valueOf(21), iter.next());
-        // even  14
-        assertEquals(Integer.valueOf(14), iter.next());
-        // odd   15
-        assertEquals(Integer.valueOf(15), iter.next());
-        // even  16
-        assertEquals(Integer.valueOf(16), iter.next());
-        // odd   17
-        assertEquals(Integer.valueOf(17), iter.next());
-        // even  18
-        assertEquals(Integer.valueOf(18), iter.next());
-        // odd   19
-        assertEquals(Integer.valueOf(19), iter.next());
-        assertFalse(iter.hasNext());
+    void testZippingWithThreeUnevenLengthIterators() {
+        // Arrange
+        // The ZippingIterator should interleave elements by cycling through the non-exhausted
+        // iterators. The expected sequence is constructed by hand to verify this behavior.
+        final List<Integer> expected = List.of(
+            // Rounds 1-8: All three iterators (fibonacci, evens, odds) are active.
+            // fib, even, odd
+            1,   0,   1,
+            1,   2,   3,
+            2,   4,   5,
+            3,   6,   7,
+            5,   8,   9,
+            8,  10,  11,
+            13,  12,  13,
+            21,  14,  15,
+
+            // The 'fibonacci' iterator is now exhausted.
+            // Rounds 9-10: The iterator cycles between the remaining 'evens' and 'odds'.
+            // even, odd
+            16, 17,
+            18, 19
+        );
+
+        final ZippingIterator<Integer> zippingIterator =
+            new ZippingIterator<>(fibonacci.iterator(), evens.iterator(), odds.iterator());
+
+        // Act
+        final List<Integer> actual = IteratorUtils.toList(zippingIterator);
+
+        // Assert
+        assertEquals(expected, actual, "The zipped list of elements should match the expected interleaved sequence.");
     }
 }
