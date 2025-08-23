@@ -1,29 +1,33 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest50 extends Uncheck_ESTest_scaffolding {
+import java.io.IOException;
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        IOIntConsumer iOIntConsumer0 = mock(IOIntConsumer.class, new ViolatedAssumptionAnswer());
-        Uncheck.accept(iOIntConsumer0, 111);
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
+
+    /**
+     * Tests that {@link Uncheck#accept(IOIntConsumer, int)} correctly delegates
+     * the call to the provided consumer when no exception is thrown.
+     */
+    @Test
+    public void acceptWithIntConsumerShouldDelegateCall() throws IOException {
+        // Arrange: Create a mock IOIntConsumer and define the input value.
+        final IOIntConsumer mockConsumer = mock(IOIntConsumer.class);
+        final int testValue = 111;
+
+        // Act: Call the method under test.
+        Uncheck.accept(mockConsumer, testValue);
+
+        // Assert: Verify that the mock consumer's 'accept' method was called
+        // exactly once with the correct value.
+        verify(mockConsumer, times(1)).accept(testValue);
     }
 }
