@@ -1,62 +1,63 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InstantiateFactory;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedBag_ESTestTest2 extends TransformedBag_ESTest_scaffolding {
+import java.util.Comparator;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn(0, 0, 0, 0).when(comparator0).compare(any(), any());
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>(comparator0);
-        SynchronizedSortedBag<Integer> synchronizedSortedBag0 = new SynchronizedSortedBag<Integer>(treeBag0);
-        ConstantTransformer<Object, Integer> constantTransformer0 = new ConstantTransformer<Object, Integer>((Integer) null);
-        TransformedSortedBag<Integer> transformedSortedBag0 = new TransformedSortedBag<Integer>(synchronizedSortedBag0, constantTransformer0);
-        Integer integer0 = new Integer(862);
-        synchronizedSortedBag0.add(integer0);
-        HashBag<Object> hashBag0 = new HashBag<Object>();
-        boolean boolean0 = transformedSortedBag0.remove((Object) hashBag0, 3791);
-        assertFalse(synchronizedSortedBag0.contains(0));
-        assertTrue(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Contains tests for the {@link TransformedBag} class, focusing on its interaction
+ * with the decorated bag's behavior.
+ */
+public class TransformedBag_ESTestTest2 {
+
+    /**
+     * Tests that TransformedBag.remove(object, nCopies) correctly delegates to the
+     * underlying bag, which may use a custom comparator to find and remove elements.
+     * In this case, the remove operation succeeds even with an object of a different
+     * type because the underlying TreeBag's comparator considers them equal.
+     */
+    @Test
+    public void testRemoveUsesUnderlyingBagComparatorForElementMatching() {
+        // Arrange
+
+        // 1. Create a comparator that considers all objects to be equal.
+        // This is the key to testing that the remove operation depends on the
+        // underlying bag's equality definition, not standard .equals().
+        @SuppressWarnings("unchecked")
+        final Comparator<Object> allEqualComparator = mock(Comparator.class);
+        doReturn(0).when(allEqualComparator).compare(any(), any());
+
+        // 2. Set up the bags. The TransformedBag will decorate a TreeBag
+        // that uses our custom "all-equal" comparator.
+        final TreeBag<Integer> underlyingBag = new TreeBag<>(allEqualComparator);
+        final Transformer<Object, Integer> transformer = new ConstantTransformer<>(null);
+        final TransformedBag<Integer> transformedBag = new TransformedSortedBag<>(underlyingBag, transformer);
+
+        // 3. Add an element directly to the underlying bag to bypass the transformer.
+        final Integer elementInBag = 100;
+        underlyingBag.add(elementInBag);
+        assertEquals("Precondition: The bag should contain one element.", 1, underlyingBag.size());
+
+        // 4. Define the object to remove. It is a different type and value,
+        // but the comparator will report it as equal to elementInBag.
+        final Object objectToRemove = "a different object";
+        final int copiesToRemove = 5; // A number greater than the count in the bag.
+
+        // Act
+        // Attempt to remove the object. The TransformedBag delegates this to the
+        // TreeBag, which uses the allEqualComparator to find and remove elementInBag.
+        final boolean wasModified = transformedBag.remove(objectToRemove, copiesToRemove);
+
+        // Assert
+        assertTrue("The remove operation should report that the bag was modified.", wasModified);
+        assertTrue("The bag should be empty after the element is removed.", underlyingBag.isEmpty());
     }
 }
