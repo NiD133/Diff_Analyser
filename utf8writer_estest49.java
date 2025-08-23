@@ -1,40 +1,36 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest49 extends UTF8Writer_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link UTF8Writer} class.
+ */
+public class UTF8WriterTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        uTF8Writer0.close();
-        uTF8Writer0.close();
-        assertEquals((-56613888), UTF8Writer.SURROGATE_BASE);
+    /**
+     * Verifies that calling close() multiple times on a UTF8Writer is an
+     * idempotent operation and does not throw an exception. This behavior
+     * aligns with the contract of {@link java.io.Writer#close()}.
+     */
+    @Test
+    public void callingCloseMultipleTimesShouldNotThrowException() throws IOException {
+        // Arrange: Create a UTF8Writer with a minimal IOContext and an in-memory stream.
+        // A null ContentReference is acceptable as it's not used in the close() logic.
+        IOContext ioContext = new IOContext(new BufferRecycler(), /* contentReference */ null, /* recycling */ false);
+        OutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer writer = new UTF8Writer(ioContext, outputStream);
+
+        // Act: Close the writer twice. The first call closes the stream,
+        // and the second call should be ignored.
+        writer.close();
+        writer.close();
+
+        // Assert: The test passes if no exception is thrown during the second call to close().
+        // This implicitly verifies the idempotency of the close() method.
     }
 }
