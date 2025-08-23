@@ -1,28 +1,25 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest75 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        boolean boolean0 = StringUtil.isWhitespace(12);
-        assertTrue(boolean0);
+    @Test
+    public void isWhitespace_shouldReturnTrue_forFormFeedCharacter() {
+        // The HTML specification defines the Form Feed character (code point 12) as whitespace.
+        // This test verifies that our utility method adheres to that definition.
+
+        // Arrange
+        int formFeedCodePoint = '\f'; // '\f' has the integer value 12
+
+        // Act
+        boolean result = StringUtil.isWhitespace(formFeedCodePoint);
+
+        // Assert
+        assertTrue("The Form Feed character should be considered whitespace.", result);
     }
 }
