@@ -1,27 +1,24 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest45 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test class for the equals method of {@link TaiInstant}.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        boolean boolean0 = taiInstant0.equals(taiInstant0);
-        assertEquals(0, taiInstant0.getNano());
-        assertTrue(boolean0);
+    /**
+     * Tests the reflexive property of the equals method, ensuring an instance is equal to itself.
+     */
+    @Test
+    public void equals_whenComparedToItself_returnsTrue() {
+        // Arrange: Create an instance of TaiInstant.
+        // Using the TAI epoch (0 seconds, 0 nanoseconds) as a simple, clear example.
+        TaiInstant instant = TaiInstant.ofTaiSeconds(0L, 0L);
+
+        // Act & Assert: An object must be equal to itself.
+        // assertEquals uses the .equals() method for comparison and provides a clear failure message.
+        assertEquals(instant, instant);
     }
 }
