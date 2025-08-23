@@ -1,28 +1,48 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest5 extends TypeAdapter_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        JsonNull jsonNull0 = JsonNull.INSTANCE;
-        Object object0 = typeAdapter0.fromJsonTree(jsonNull0);
-        assertNull(object0);
+/**
+ * Test suite for the {@link TypeAdapter} class, focusing on specific utility methods.
+ */
+public class TypeAdapterTest {
+
+    /**
+     * Verifies that a null-safe adapter, when deserializing a {@link JsonNull} element
+     * via {@link TypeAdapter#fromJsonTree(JsonElement)}, correctly returns a null object
+     * without delegating to the original (wrapped) adapter.
+     */
+    @Test
+    public void fromJsonTree_withNullSafeAdapterAndJsonNull_returnsNull() {
+        // Arrange: Create a delegate adapter that fails if its read method is ever called.
+        // This ensures the nullSafe() wrapper is handling the null case itself.
+        TypeAdapter<Object> delegateAdapter = new TypeAdapter<Object>() {
+            @Override
+            public void write(JsonWriter out, Object value) {
+                fail("write() should not be called on the delegate adapter.");
+            }
+
+            @Override
+            public Object read(JsonReader in) {
+                fail("read() should not be called by the nullSafe adapter for a null input.");
+                return null; // Unreachable code
+            }
+        };
+
+        // Create the null-safe adapter, which is the object under test.
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+        JsonElement jsonNullInput = JsonNull.INSTANCE;
+
+        // Act: Attempt to deserialize a JsonNull instance.
+        Object result = nullSafeAdapter.fromJsonTree(jsonNullInput);
+
+        // Assert: The result should be null, and the test should pass without the delegate's
+        // read() method being called (which would have triggered a fail()).
+        assertNull("The result of deserializing JsonNull should be a null object.", result);
     }
 }
