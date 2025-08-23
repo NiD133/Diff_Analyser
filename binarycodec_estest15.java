@@ -1,25 +1,31 @@
 package org.apache.commons.codec.binary;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BinaryCodec_ESTestTest15 extends BinaryCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BinaryCodec binaryCodec0 = new BinaryCodec();
+/**
+ * Tests for {@link BinaryCodec}.
+ */
+public class BinaryCodecTest {
+
+    @Test
+    public void decode_withUnsupportedObjectType_shouldThrowDecoderException() {
+        // Arrange
+        BinaryCodec binaryCodec = new BinaryCodec();
+        // The decode(Object) method expects a byte[], char[], or String.
+        // We pass a generic Object to test the invalid input path.
+        Object invalidInput = new Object();
+
+        // Act & Assert
         try {
-            binaryCodec0.decode((Object) binaryCodec0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // argument not a byte array
-            //
-            verifyException("org.apache.commons.codec.binary.BinaryCodec", e);
+            binaryCodec.decode(invalidInput);
+            fail("Expected a DecoderException to be thrown for an unsupported input type.");
+        } catch (DecoderException e) {
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("argument not a byte array", e.getMessage());
         }
     }
 }
