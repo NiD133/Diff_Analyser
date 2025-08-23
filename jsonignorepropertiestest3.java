@@ -1,30 +1,58 @@
 package com.fasterxml.jackson.annotation;
 
-import java.util.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonIgnorePropertiesTestTest3 {
+/**
+ * Tests for the {@link JsonIgnoreProperties.Value} class, focusing on its factory methods.
+ */
+class JsonIgnorePropertiesValueTest {
 
-    private final JsonIgnoreProperties.Value EMPTY = JsonIgnoreProperties.Value.empty();
-
-    private Set<String> _set(String... args) {
-        return new LinkedHashSet<String>(Arrays.asList(args));
-    }
-
+    // A dummy class annotated with @JsonIgnoreProperties for testing purposes.
+    // It specifies two properties to ignore ("foo", "bar") and sets ignoreUnknown to true.
     @JsonIgnoreProperties(value = { "foo", "bar" }, ignoreUnknown = true)
-    private final static class Bogus {
+    private static final class AnnotatedClass {
     }
 
     @Test
-    public void testFromAnnotation() throws Exception {
-        JsonIgnoreProperties.Value v = JsonIgnoreProperties.Value.from(Bogus.class.getAnnotation(JsonIgnoreProperties.class));
-        assertNotNull(v);
-        assertFalse(v.getMerge());
-        assertFalse(v.getAllowGetters());
-        assertFalse(v.getAllowSetters());
-        Set<String> ign = v.getIgnored();
-        assertEquals(2, v.getIgnored().size());
-        assertEquals(_set("foo", "bar"), ign);
+    @DisplayName("Value.from() should correctly create an instance from an annotation")
+    void from_shouldCreateValueFromAnnotation() {
+        // Arrange
+        JsonIgnoreProperties annotation = AnnotatedClass.class.getAnnotation(JsonIgnoreProperties.class);
+        Set<String> expectedIgnoredProperties = asSet("foo", "bar");
+
+        // Act
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.from(annotation);
+
+        // Assert
+        assertNotNull(value, "Value object should not be null");
+
+        // Group assertions for properties explicitly set in the annotation
+        assertAll("Properties from annotation should be correctly set",
+            () -> assertEquals(expectedIgnoredProperties, value.getIgnored(),
+                    "Ignored properties should match the 'value' attribute of the annotation"),
+            () -> assertTrue(value.getIgnoreUnknown(),
+                    "ignoreUnknown should match the 'ignoreUnknown' attribute of the annotation")
+        );
+
+        // Group assertions for properties not present in the annotation, which should have default values
+        assertAll("Properties not in annotation should have defaults",
+            () -> assertFalse(value.getAllowGetters(), "allowGetters should default to false"),
+            () -> assertFalse(value.getAllowSetters(), "allowSetters should default to false"),
+            () -> assertFalse(value.getMerge(), "merge should be false when created from an annotation")
+        );
+    }
+
+    /**
+     * Helper method to create a Set from a var-args array of strings.
+     */
+    private static Set<String> asSet(String... items) {
+        return new LinkedHashSet<>(Arrays.asList(items));
     }
 }
