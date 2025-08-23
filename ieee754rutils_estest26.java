@@ -1,25 +1,20 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest26 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        // Undeclared exception!
-        try {
-            IEEE754rUtils.min((double[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // array
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the min(double...) method throws a NullPointerException when
+     * the input array is null, as specified by its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void minDoubleArray_shouldThrowNullPointerException_forNullInput() {
+        // The varargs method is equivalent to a method accepting an array.
+        // We pass a null array to trigger the expected exception.
+        IEEE754rUtils.min((double[]) null);
     }
 }
