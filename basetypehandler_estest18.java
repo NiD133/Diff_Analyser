@@ -1,24 +1,32 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class BaseTypeHandler_ESTestTest18 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for the abstract BaseTypeHandler class.
+ * A concrete implementation, ClobTypeHandler, is used to instantiate and test
+ * the base class's functionality.
+ */
+public class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        ClobTypeHandler clobTypeHandler0 = new ClobTypeHandler();
-        clobTypeHandler0.setConfiguration((Configuration) null);
+    /**
+     * Verifies that the deprecated setConfiguration method can be called with a null
+     * argument without throwing a NullPointerException.
+     *
+     * This test ensures that the handler remains robust even when a configuration
+     * is not provided, which is relevant for backward compatibility.
+     */
+    @Test
+    public void shouldAcceptNullConfigurationWithoutException() {
+        // Arrange: Create an instance of a concrete TypeHandler.
+        BaseTypeHandler<?> handler = new ClobTypeHandler();
+
+        // Act: Call the method under test with a null argument.
+        // The test will fail if this line throws any unexpected exception.
+        handler.setConfiguration(null);
+
+        // Assert: No exception was thrown.
+        // The primary goal is to ensure the method call completes successfully.
+        // An explicit assertion is not needed as the test would fail upon exception.
     }
 }
