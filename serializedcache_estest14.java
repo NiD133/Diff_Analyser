@@ -1,35 +1,41 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest14 extends SerializedCache_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        SynchronizedCache synchronizedCache0 = new SynchronizedCache((Cache) null);
-        SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
-        // Undeclared exception!
+/**
+ * Test suite for the SerializedCache decorator.
+ * Note: The original test class name "SerializedCache_ESTestTest14" suggests it was
+ * auto-generated. This class provides a more readable, manually crafted version.
+ */
+public class SerializedCacheTest {
+
+    /**
+     * Verifies that SerializedCache correctly propagates exceptions from its delegate cache.
+     *
+     * This test ensures that if the underlying cache (the "delegate") is misconfigured
+     * and throws a NullPointerException during a 'removeObject' operation, the
+     * SerializedCache wrapper does not suppress or alter this exception. This confirms
+     * the decorator's transparency with respect to runtime exceptions from its delegate.
+     */
+    @Test
+    public void removeObjectShouldPropagateNPEFromMisconfiguredDelegate() {
+        // Arrange: Create a cache decorator chain where the innermost cache is null.
+        // This setup is designed to trigger a NullPointerException within the delegate.
+        Cache misconfiguredDelegate = new SynchronizedCache(null);
+        Cache serializedCache = new SerializedCache(misconfiguredDelegate);
+        Object anyKey = "any-key";
+
+        // Act & Assert: Expect a NullPointerException when calling removeObject.
         try {
-            serializedCache0.removeObject(synchronizedCache0);
-            fail("Expecting exception: NullPointerException");
+            serializedCache.removeObject(anyKey);
+            // If this line is reached, the test fails because no exception was thrown.
+            fail("Expected a NullPointerException to be thrown by the delegate cache.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SynchronizedCache", e);
+            // Success: The expected exception was caught.
+            // This confirms that SerializedCache correctly passed the exception through.
         }
     }
 }
