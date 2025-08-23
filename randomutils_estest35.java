@@ -1,19 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomUtils_ESTestTest35 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        float float0 = RandomUtils.nextFloat(1.0F, 1.0F);
-        assertEquals(1.0F, float0, 0.01F);
+    /**
+     * Tests that {@code nextFloat} returns the boundary value when the start and end bounds are identical.
+     * This is an edge case where the range of possible random values is zero.
+     */
+    @Test
+    public void testNextFloat_shouldReturnBound_whenStartAndEndBoundsAreEqual() {
+        // Arrange
+        final float equalBound = 1.0F;
+
+        // Act
+        // Call the method with the same value for the start and end of the range.
+        final float result = RandomUtils.nextFloat(equalBound, equalBound);
+
+        // Assert
+        // The result must be exactly the boundary value, as it's the only possible outcome.
+        assertEquals(equalBound, result, 0.0F);
     }
 }
