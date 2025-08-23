@@ -1,20 +1,31 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest12 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the Seconds class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Days days0 = Days.FIVE;
-        Seconds seconds0 = days0.toStandardSeconds();
-        Days days1 = seconds0.toStandardDays();
-        assertEquals(432000, seconds0.getSeconds());
-        assertEquals(5, days1.getDays());
+    /**
+     * Tests the round-trip conversion from Days to Seconds and back to Days.
+     * This verifies that `toStandardDays()` correctly reverses the `toStandardSeconds()` conversion.
+     */
+    @Test
+    public void toStandardDays_shouldRevertConversionFromDays() {
+        // Arrange
+        Days originalDays = Days.FIVE;
+        int expectedSeconds = 5 * 24 * 60 * 60; // 432,000 seconds in 5 days
+
+        // Act
+        Seconds seconds = originalDays.toStandardSeconds();
+        Days resultDays = seconds.toStandardDays();
+
+        // Assert
+        assertEquals("The number of seconds should match the standard conversion from 5 days",
+                expectedSeconds, seconds.getSeconds());
+        assertEquals("Converting back to days should yield the original value",
+                originalDays, resultDays);
     }
 }
