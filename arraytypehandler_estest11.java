@@ -1,38 +1,53 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.sql.Array;
 import java.sql.CallableStatement;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Time;
+import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.junit.runner.RunWith;
 
-public class ArrayTypeHandler_ESTestTest11 extends ArrayTypeHandler_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ArrayTypeHandler arrayTypeHandler0 = new ArrayTypeHandler();
-        Instant instant0 = MockInstant.ofEpochSecond((long) (-1314), 0L);
-        Timestamp timestamp0 = Timestamp.from(instant0);
-        Array array0 = mock(Array.class, new ViolatedAssumptionAnswer());
-        doReturn(timestamp0).when(array0).getArray();
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn(array0).when(callableStatement0).getArray(anyInt());
-        Timestamp timestamp1 = (Timestamp) arrayTypeHandler0.getNullableResult(callableStatement0, (-1314));
-        assertEquals(0, timestamp1.getNanos());
+/**
+ * This class contains tests for the ArrayTypeHandler.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
+public class ArrayTypeHandler_ESTestTest11 { // The class name is kept for consistency with the original test suite structure.
+
+    /**
+     * Verifies that getNullableResult correctly extracts an object from a SQL Array
+     * when retrieved from a CallableStatement by column index.
+     */
+    @Test
+    public void shouldReturnArrayContentWhenGettingResultFromCallableStatement() throws SQLException {
+        // Arrange
+        ArrayTypeHandler arrayTypeHandler = new ArrayTypeHandler();
+        final int anyColumnIndex = 1;
+
+        // 1. Define the expected data to be returned by the SQL Array.
+        // Using a standard Timestamp is more readable than building it from an Instant.
+        Timestamp expectedTimestamp = Timestamp.valueOf("2024-01-15 10:30:00.123456789");
+
+        // 2. Mock the java.sql.Array to return the expected Timestamp.
+        // The type handler should call array.getArray() to extract the content.
+        Array mockSqlArray = mock(Array.class);
+        when(mockSqlArray.getArray()).thenReturn(expectedTimestamp);
+
+        // 3. Mock the CallableStatement to return the mock SQL Array for our column index.
+        CallableStatement mockCallableStatement = mock(CallableStatement.class);
+        when(mockCallableStatement.getArray(anyColumnIndex)).thenReturn(mockSqlArray);
+
+        // Act
+        // The getNullableResult method should orchestrate the calls to get the final object.
+        Object actualResult = arrayTypeHandler.getNullableResult(mockCallableStatement, anyColumnIndex);
+
+        // Assert
+        // Verify that the returned object is of the correct type and value.
+        assertTrue("The result should be an instance of Timestamp.", actualResult instanceof Timestamp);
+        assertEquals("The returned timestamp should match the expected one.", expectedTimestamp, actualResult);
     }
 }
