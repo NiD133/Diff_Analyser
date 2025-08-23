@@ -1,37 +1,26 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest15 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    // Test case for the toStandardWeeks() method.
+    @Test
+    public void toStandardWeeks_forDurationOfTwoWeeks_returnsTwoWeeks() {
+        // Arrange: Create a Seconds instance representing the duration of two standard weeks.
+        // Using the library's constant for seconds in a week makes the setup clear and robust.
+        final int twoWeeksInSeconds = 2 * DateTimeConstants.SECONDS_PER_WEEK;
+        Seconds seconds = Seconds.seconds(twoWeeksInSeconds);
+        Weeks expectedWeeks = Weeks.weeks(2);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Convert the Seconds object to Weeks.
+        Weeks actualWeeks = seconds.toStandardWeeks();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToStandardWeeks() {
-        Seconds test = Seconds.seconds(60 * 60 * 24 * 7 * 2);
-        Weeks expected = Weeks.weeks(2);
-        assertEquals(expected, test.toStandardWeeks());
+        // Assert: The result should be a Weeks object with the value 2.
+        assertEquals(expectedWeeks, actualWeeks);
     }
 }
