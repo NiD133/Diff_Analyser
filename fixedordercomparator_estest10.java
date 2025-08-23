@@ -1,37 +1,36 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest10 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Tests for {@link FixedOrderComparator} focusing on edge cases during construction.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Object[] objectArray0 = new Object[9];
-        objectArray0[5] = (Object) linkedList0;
-        linkedList0.add(objectArray0[5]);
-        FixedOrderComparator<Object> fixedOrderComparator0 = null;
-        try {
-            fixedOrderComparator0 = new FixedOrderComparator<Object>(objectArray0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that the constructor throws a StackOverflowError when given a list
+     * that contains itself.
+     * <p>
+     * The constructor iterates through the provided items to populate an internal
+     * HashMap. This process involves calling {@code hashCode()} on each item. For a
+     * collection, its hashCode is derived from its elements' hashCodes. If a list
+     * contains itself, calculating its hashCode results in an infinite recursion,
+     * which correctly triggers a {@link StackOverflowError}.
+     */
+    @Test(expected = StackOverflowError.class)
+    public void constructorShouldThrowStackOverflowErrorForCircularReferenceInItems() {
+        // Arrange: Create a list that directly contains itself, forming a circular reference.
+        final List<Object> listContainingItself = new LinkedList<>();
+        listContainingItself.add(listContainingItself);
+
+        // An array containing the problematic list.
+        final Object[] itemsWithCircularReference = {"item1", "item2", listContainingItself};
+
+        // Act & Assert:
+        // Instantiating the comparator with this array should cause a StackOverflowError.
+        new FixedOrderComparator<>(itemsWithCircularReference);
     }
 }
