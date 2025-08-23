@@ -1,20 +1,29 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonSetter_ESTestTest30 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on its core functionality.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Nulls nulls0 = Nulls.DEFAULT;
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.construct(nulls0, nulls0);
-        Class<JsonSetter> class0 = jsonSetter_Value0.valueFor();
-        assertEquals(9729, class0.getModifiers());
+    /**
+     * Tests that the {@link JsonSetter.Value#valueFor()} method correctly returns
+     * the {@link JsonSetter} annotation class.
+     */
+    @Test
+    public void valueFor_shouldReturnJsonSetterAnnotationClass() {
+        // Arrange: Create a default instance of JsonSetter.Value.
+        // The specific configuration of the instance does not affect the outcome of valueFor().
+        JsonSetter.Value jsonSetterValue = JsonSetter.Value.empty();
+
+        // Act: Call the method under test.
+        Class<JsonSetter> annotationType = jsonSetterValue.valueFor();
+
+        // Assert: Verify that the returned class is exactly JsonSetter.class.
+        // This is a more direct and readable check than asserting on the integer
+        // value of the class modifiers.
+        assertEquals(JsonSetter.class, annotationType);
     }
 }
