@@ -1,28 +1,39 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.EOFException;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class NullReader_ESTestTest13 extends NullReader_ESTest_scaffolding {
+/**
+ * Tests for {@link NullReader}.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        NullReader nullReader0 = new NullReader(7L, true, true);
-        nullReader0.skip(7L);
+    /**
+     * Tests that read() throws an EOFException if the reader is configured to do so
+     * and the end of the stream has been reached.
+     */
+    @Test
+    public void testReadThrowsEOFExceptionWhenPastEndAndConfiguredToThrow() throws IOException {
+        // Arrange: Create a NullReader of a fixed size, configured to throw an
+        // exception when the end of the file (EOF) is reached.
+        // Constructor args are: size, markSupported, throwEofException.
+        final long size = 7L;
+        final NullReader reader = new NullReader(size, true, true);
+
+        // Act: Skip all the characters to reach the end of the emulated stream.
+        long skipped = reader.skip(size);
+        assertEquals("Should have skipped all characters to reach the end", size, skipped);
+
+        // Assert: Attempting to read past the end should throw the configured exception.
         try {
-            nullReader0.read();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.NullReader", e);
+            reader.read();
+            fail("Expected an EOFException to be thrown when reading past the end of the stream.");
+        } catch (final EOFException e) {
+            // This is the expected behavior. The test passes.
         }
     }
 }
