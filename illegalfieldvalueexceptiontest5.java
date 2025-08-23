@@ -1,37 +1,46 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.JulianChronology;
-import org.joda.time.field.FieldUtils;
-import org.joda.time.field.SkipDateTimeField;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class IllegalFieldValueExceptionTestTest5 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Tests for {@link IllegalFieldValueException}.
+ */
+class IllegalFieldValueExceptionTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestIllegalFieldValueException.class);
-    }
+    @Test
+    @DisplayName("Setting the year to 0 in a Julian calendar should throw an IllegalFieldValueException with correct details")
+    void setJulianYearToZero_shouldThrowException() {
+        // The Julian calendar does not have a year 0. It transitions directly
+        // from 1 BC to 1 AD. Attempting to set the year to 0 is an invalid operation.
 
-    public void testJulianYearZero() {
-        DateTime dt = new DateTime(JulianChronology.getInstanceUTC());
-        try {
-            dt.year().setCopy(0);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.year(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("year", e.getFieldName());
-            assertEquals(new Integer(0), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("0", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
+        // Arrange
+        DateTime dateTimeInJulianCalendar = new DateTime(JulianChronology.getInstanceUTC());
+        final int illegalYearValue = 0;
+
+        // Act & Assert: Verify that the expected exception is thrown.
+        IllegalFieldValueException thrown = assertThrows(
+                IllegalFieldValueException.class,
+                () -> dateTimeInJulianCalendar.year().setCopy(illegalYearValue),
+                "Setting the Julian year to 0 should throw an IllegalFieldValueException."
+        );
+
+        // Assert: Verify that the exception contains the correct details about the failure.
+        assertAll("Exception properties",
+                () -> assertEquals(DateTimeFieldType.year(), thrown.getDateTimeFieldType(), "The field type should be 'year'."),
+                () -> assertNull(thrown.getDurationFieldType(), "The duration field type should be null as it's a DateTimeField."),
+                () -> assertEquals("year", thrown.getFieldName(), "The field name should be 'year'."),
+                () -> assertEquals(illegalYearValue, thrown.getIllegalNumberValue(), "The illegal number value should be 0."),
+                () -> assertNull(thrown.getIllegalStringValue(), "The illegal string value should be null as a number was provided."),
+                () -> assertEquals(String.valueOf(illegalYearValue), thrown.getIllegalValueAsString(), "The illegal value as a string should be '0'."),
+                () -> assertNull(thrown.getLowerBound(), "The lower bound should be null for this type of error."),
+                () -> assertNull(thrown.getUpperBound(), "The upper bound should be null for this type of error.")
+        );
     }
 }
