@@ -1,46 +1,40 @@
 package org.joda.time.format;
 
+import org.joda.time.ReadablePeriod;
+import org.joda.time.Weeks;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
+
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class PeriodFormatter_ESTestTest16 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter((PeriodPrinter) null, periodFormatterBuilder_Literal0);
-        PipedWriter pipedWriter0 = new PipedWriter();
-        Weeks weeks0 = Weeks.TWO;
-        // Undeclared exception!
+    /**
+     * Tests that calling printTo() on a formatter that was not configured with a
+     * printer throws an UnsupportedOperationException.
+     */
+    @Test
+    public void printTo_whenFormatterCannotPrint_throwsUnsupportedOperationException() {
+        // Arrange: Create a formatter that can only parse, not print.
+        // The PeriodFormatter is given a null printer and a dummy parser.
+        PeriodParser dummyParser = PeriodFormatterBuilder.Literal.EMPTY;
+        PeriodFormatter formatterWithoutPrinter = new PeriodFormatter(null, dummyParser);
+
+        Writer writer = new StringWriter();
+        ReadablePeriod periodToPrint = Weeks.TWO;
+
+        // Act & Assert
         try {
-            periodFormatter0.printTo((Writer) pipedWriter0, (ReadablePeriod) weeks0);
-            fail("Expecting exception: UnsupportedOperationException");
+            formatterWithoutPrinter.printTo(writer, periodToPrint);
+            fail("Expected an UnsupportedOperationException to be thrown.");
         } catch (UnsupportedOperationException e) {
-            //
-            // Printing not supported
-            //
-            verifyException("org.joda.time.format.PeriodFormatter", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("Printing not supported", e.getMessage());
+        } catch (Exception e) {
+            fail("Caught unexpected exception: " + e.getClass().getName());
         }
     }
 }
