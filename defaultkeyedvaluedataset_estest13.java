@@ -1,27 +1,30 @@
 package org.jfree.data.general;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
 import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This test class focuses on the equals() method of the DefaultKeyedValueDataset class.
+ * The original test class name, DefaultKeyedValueDataset_ESTestTest13, is kept for context.
+ */
 public class DefaultKeyedValueDataset_ESTestTest13 extends DefaultKeyedValueDataset_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        SpreadsheetDate spreadsheetDate0 = new SpreadsheetDate(379);
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset(spreadsheetDate0, 2);
-        DefaultKeyedValueDataset defaultKeyedValueDataset1 = new DefaultKeyedValueDataset(spreadsheetDate0, 3);
-        boolean boolean0 = defaultKeyedValueDataset0.equals(defaultKeyedValueDataset1);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false for two datasets
+     * that share the same key but have different values.
+     */
+    @Test
+    public void equals_withSameKeyAndDifferentValue_shouldReturnFalse() {
+        // Arrange: Create two datasets with the same key but different numerical values.
+        SpreadsheetDate commonKey = new SpreadsheetDate(379);
+        DefaultKeyedValueDataset dataset1 = new DefaultKeyedValueDataset(commonKey, 2);
+        DefaultKeyedValueDataset dataset2 = new DefaultKeyedValueDataset(commonKey, 3);
+
+        // Act: Compare the two datasets for equality.
+        boolean areEqual = dataset1.equals(dataset2);
+
+        // Assert: The datasets should not be considered equal.
+        assertFalse("Datasets with the same key but different values should not be equal.", areEqual);
     }
 }
