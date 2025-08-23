@@ -1,56 +1,34 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CompositeSet_ESTestTest87 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test86() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        Set<Integer> set0 = compositeSet0.toSet();
-        assertEquals(0, set0.size());
+    /**
+     * Tests that calling toSet() on a CompositeSet initialized with a single
+     * empty set results in a new, empty set.
+     */
+    @Test
+    public void testToSetOnCompositeWithEmptyComponentSetReturnsEmptySet() {
+        // Arrange: Create a CompositeSet containing one empty set.
+        final Set<Integer> componentSet = new HashSet<>();
+        final CompositeSet<Integer> compositeSet = new CompositeSet<>(componentSet);
+
+        // Act: Call the toSet() method.
+        final Set<Integer> resultSet = compositeSet.toSet();
+
+        // Assert: Verify the returned set is a new, empty set.
+        assertNotNull("The returned set should not be null.", resultSet);
+        assertTrue("The returned set should be empty.", resultSet.isEmpty());
+        assertNotSame("The returned set should be a new instance, not the component set.", componentSet, resultSet);
     }
 }
