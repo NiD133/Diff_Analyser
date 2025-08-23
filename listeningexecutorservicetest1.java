@@ -1,97 +1,65 @@
 package com.google.common.util.concurrent;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
-import static com.google.common.util.concurrent.Futures.immediateFuture;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ListeningExecutorServiceTestTest1 extends TestCase {
+/**
+ * Tests for the default methods in {@link ListeningExecutorService} that accept a {@link Duration}.
+ */
+@ExtendWith(MockitoExtension.class)
+class ListeningExecutorServiceTest {
 
-    private Collection<? extends Callable<?>> recordedTasks;
+  @Mock
+  private ListeningExecutorService executorService;
 
-    private long recordedTimeout;
+  @Test
+  @DisplayName("invokeAny() with a Duration should delegate to the TimeUnit-based overload")
+  void invokeAny_withDuration_delegatesToTimeUnitOverload() throws Exception {
+    // Arrange
+    Set<Callable<String>> tasks = Collections.singleton(() -> "success");
+    Duration timeout = Duration.ofSeconds(7);
+    String expectedResult = "success";
 
-    private TimeUnit recordedTimeUnit;
+    // We need to test the default interface method.
+    // 1. Tell Mockito to call the real `invokeAny(Duration)` default method.
+    when(executorService.invokeAny(any(), any(Duration.class))).thenCallRealMethod();
+    // 2. Stub the underlying `invokeAny(long, TimeUnit)` method that the default method calls.
+    when(executorService.invokeAny(any(), any(long.class), any(TimeUnit.class)))
+        .thenReturn(expectedResult);
 
-    private final ListeningExecutorService executorService = new FakeExecutorService();
+    // Act
+    String actualResult = executorService.invokeAny(tasks, timeout);
 
-    private class FakeExecutorService extends AbstractListeningExecutorService {
+    // Assert
+    assertThat(actualResult).isEqualTo(expectedResult);
 
-        @Override
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            recordedTasks = tasks;
-            recordedTimeout = timeout;
-            recordedTimeUnit = unit;
-            try {
-                return tasks.iterator().next().call();
-            } catch (Exception e) {
-                throw new ExecutionException(e);
-            }
-        }
+    // Verify that the default method correctly delegated the call to the TimeUnit-based overload
+    // with the timeout converted to nanoseconds.
+    ArgumentCaptor<Collection<? extends Callable<String>>> tasksCaptor =
+        ArgumentCaptor.forClass(Collection.class);
+    ArgumentCaptor<Long> timeoutCaptor = ArgumentCaptor.forClass(Long.class);
+    ArgumentCaptor<TimeUnit> unitCaptor = ArgumentCaptor.forClass(TimeUnit.class);
 
-        @Override
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
-            recordedTasks = tasks;
-            recordedTimeout = timeout;
-            recordedTimeUnit = unit;
-            try {
-                return Collections.singletonList(immediateFuture(tasks.iterator().next().call()));
-            } catch (Exception e) {
-                return Collections.singletonList(immediateFailedFuture(e));
-            }
-        }
+    verify(executorService)
+        .invokeAny(tasksCaptor.capture(), timeoutCaptor.capture(), unitCaptor.capture());
 
-        @Override
-        public boolean awaitTermination(long timeout, TimeUnit unit) {
-            recordedTimeout = timeout;
-            recordedTimeUnit = unit;
-            return true;
-        }
-
-        @Override
-        public void execute(Runnable runnable) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void shutdown() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<Runnable> shutdownNow() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean isShutdown() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean isTerminated() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    public void testInvokeAny() throws Exception {
-        Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAny");
-        String result = executorService.invokeAny(tasks, Duration.ofSeconds(7));
-        assertThat(result).isEqualTo("invokeAny");
-        assertThat(recordedTasks).isSameInstanceAs(tasks);
-        assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-        assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofSeconds(7));
-    }
+    assertThat(tasksCaptor.getValue()).isSameInstanceAs(tasks);
+    assertThat(timeoutCaptor.getValue()).isEqualTo(timeout.toNanos());
+    assertThat(unitCaptor.getValue()).isEqualTo(TimeUnit.NANOSECONDS);
+  }
 }
