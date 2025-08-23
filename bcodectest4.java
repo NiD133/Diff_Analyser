@@ -1,43 +1,39 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.CodecPolicy;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class BCodecTestTest4 {
+/**
+ * Tests for {@link BCodec}, focusing on the RFC 1522 "B" encoding scheme.
+ */
+class BCodecTest {
 
-    private static final String[] BASE64_IMPOSSIBLE_CASES = { // Require the RFC 1522 "encoded-word" header
-    "=?ASCII?B?ZE==?=", "=?ASCII?B?ZmC=?=", "=?ASCII?B?Zm9vYE==?=", "=?ASCII?B?Zm9vYmC=?=", "=?ASCII?B?AB==?=" };
+    private BCodec codec;
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        this.codec = new BCodec();
     }
 
     @Test
-    void testBasicEncodeDecode() throws Exception {
-        final BCodec bcodec = new BCodec();
-        final String plain = "Hello there";
-        final String encoded = bcodec.encode(plain);
-        assertEquals("=?UTF-8?B?SGVsbG8gdGhlcmU=?=", encoded, "Basic B encoding test");
-        assertEquals(plain, bcodec.decode(encoded), "Basic B decoding test");
+    @DisplayName("Should perform a basic round-trip (encode and decode) for a simple ASCII string")
+    void shouldEncodeAndDecodeBasicAsciiString() throws EncoderException, DecoderException {
+        // Arrange
+        final String originalString = "Hello there";
+        // The expected format is defined by RFC 1522: =?charset?encoding?encoded-text?=
+        final String expectedEncodedString = "=?UTF-8?B?SGVsbG8gdGhlcmU=?=";
+
+        // Act
+        final String actualEncodedString = codec.encode(originalString);
+        final String decodedString = codec.decode(actualEncodedString);
+
+        // Assert
+        assertEquals(expectedEncodedString, actualEncodedString, "Encoding should produce a valid RFC 1522 encoded-word");
+        assertEquals(originalString, decodedString, "Decoding should return the original string");
     }
 }
