@@ -1,21 +1,25 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertSame;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest3 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.ordered(locale_Category0, locale_Category0);
-        Locale.Category locale_Category1 = endpointPair0.target();
-        assertSame(locale_Category1, locale_Category0);
+    @Test
+    public void target_forOrderedSelfLoop_returnsSameNode() {
+        // Arrange: Create an ordered EndpointPair representing a self-loop,
+        // where the source and target are the same node.
+        String node = "A";
+        EndpointPair<String> selfLoopPair = EndpointPair.ordered(node, node);
+
+        // Act: Retrieve the target node from the pair.
+        String targetNode = selfLoopPair.target();
+
+        // Assert: The retrieved target node should be the exact same instance
+        // as the original node.
+        assertSame("The target of a self-loop should be the node itself.", node, targetNode);
     }
 }
