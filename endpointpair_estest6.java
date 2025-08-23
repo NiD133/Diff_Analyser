@@ -1,23 +1,25 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest6 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        GraphBuilder<Object> graphBuilder0 = GraphBuilder.undirected();
-        StandardMutableGraph<Integer> standardMutableGraph0 = new StandardMutableGraph<Integer>(graphBuilder0);
-        Integer integer0 = new Integer(0);
-        EndpointPair<Integer> endpointPair0 = EndpointPair.of((Graph<?>) standardMutableGraph0, integer0, integer0);
-        boolean boolean0 = endpointPair0.isOrdered();
-        assertFalse(boolean0);
+    @Test
+    public void isOrdered_forPairFromUndirectedGraph_returnsFalse() {
+        // Arrange: Create an EndpointPair from an undirected graph. The factory method
+        // EndpointPair.of() should create an unordered pair in this context.
+        Graph<String> undirectedGraph = GraphBuilder.undirected().build();
+        EndpointPair<String> endpointPair = EndpointPair.of(undirectedGraph, "A", "B");
+
+        // Act: Check if the pair is ordered.
+        boolean isOrdered = endpointPair.isOrdered();
+
+        // Assert: The pair should be unordered because it came from an undirected graph.
+        assertFalse("EndpointPair from an undirected graph should not be ordered", isOrdered);
     }
 }
