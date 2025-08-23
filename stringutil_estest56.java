@@ -1,28 +1,29 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest56 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil#resolve(String, String)} method.
+ */
+public class StringUtilResolveTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        String string0 = StringUtil.resolve("l:h06g#USh|", "l:h06g#USh|");
-        assertEquals("l:h06g#USh|", string0);
+    /**
+     * Tests that if the relative URL argument is already an absolute URL (i.e., it contains a protocol scheme),
+     * the method should return it unchanged, ignoring the base URL.
+     */
+    @Test
+    public void resolveShouldReturnAbsoluteUrlUnchanged() {
+        // Arrange
+        String baseUrl = "https://example.com/some/path";
+        // The following string is treated as an absolute URL because it starts with "l:",
+        // which is parsed as a valid URI scheme.
+        String absoluteUrl = "l:h06g#US h|";
+
+        // Act
+        String resolvedUrl = StringUtil.resolve(baseUrl, absoluteUrl);
+
+        // Assert
+        assertEquals("The absolute URL should be returned as-is.", absoluteUrl, resolvedUrl);
     }
 }
