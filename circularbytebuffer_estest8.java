@@ -1,27 +1,29 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest8 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CircularByteBuffer} class, focusing on exception-throwing behavior.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            circularByteBuffer0.peek(byteArray0, (byte) 0, (-3297));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: 0
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
-        }
+    /**
+     * Verifies that the peek() method correctly throws an IllegalArgumentException
+     * when provided with a negative length argument.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void peekShouldThrowIllegalArgumentExceptionWhenLengthIsNegative() {
+        // Arrange: Create a buffer and define the invalid arguments for the peek method.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] anyTargetBuffer = new byte[10];
+        final int anyOffset = 0;
+        final int negativeLength = -1;
+
+        // Act: Call the peek method with a negative length.
+        // This action is expected to throw the exception.
+        buffer.peek(anyTargetBuffer, anyOffset, negativeLength);
+
+        // Assert: The test passes if an IllegalArgumentException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
