@@ -1,9 +1,7 @@
 package org.apache.commons.collections4.set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -47,15 +45,27 @@ public class CompositeSetTestTest5<E> extends AbstractSetTest<E> {
         return set;
     }
 
+    /**
+     * Tests that addComposited throws an IllegalArgumentException if a collision
+     * occurs and the configured SetMutator does not resolve it.
+     */
     @Test
     @SuppressWarnings("unchecked")
-    void testFailedCollisionResolution() {
-        final Set<E> one = buildOne();
-        final Set<E> two = buildTwo();
-        final CompositeSet<E> set = new CompositeSet<>(one, two);
-        set.setMutator(new SetMutator<E>() {
+    void addCompositedShouldThrowExceptionForCollidingSetWhenMutatorDoesNotResolve() {
+        // Arrange
+        final Set<E> set1 = buildOne(); // Contains "1", "2"
+        final Set<E> set2 = buildTwo(); // Contains "3", "4"
+        final CompositeSet<E> compositeSet = new CompositeSet<>(set1, set2);
 
+        // Define a mutator that intentionally does nothing to resolve collisions.
+        final SetMutator<E> noOpCollisionResolver = new SetMutator<E>() {
             private static final long serialVersionUID = 1L;
+
+            @Override
+            public void resolveCollision(final CompositeSet<E> comp, final Set<E> existing,
+                                         final Set<E> added, final Collection<E> intersects) {
+                // This mutator intentionally leaves the collision unresolved.
+            }
 
             @Override
             public boolean add(final CompositeSet<E> composite, final List<Set<E>> collections, final E obj) {
@@ -63,17 +73,20 @@ public class CompositeSetTestTest5<E> extends AbstractSetTest<E> {
             }
 
             @Override
-            public boolean addAll(final CompositeSet<E> composite, final List<Set<E>> collections, final Collection<? extends E> coll) {
+            public boolean addAll(final CompositeSet<E> composite, final List<Set<E>> collections,
+                                  final Collection<? extends E> coll) {
                 throw new UnsupportedOperationException();
             }
+        };
+        compositeSet.setMutator(noOpCollisionResolver);
 
-            @Override
-            public void resolveCollision(final CompositeSet<E> comp, final Set<E> existing, final Set<E> added, final Collection<E> intersects) {
-                //noop
-            }
-        });
-        final HashSet<E> three = new HashSet<>();
-        three.add((E) "1");
-        assertThrows(IllegalArgumentException.class, () -> set.addComposited(three), "IllegalArgumentException should have been thrown");
+        // Create a new set that collides with an existing set in the composite ("1" is in set1).
+        final Set<E> collidingSet = new HashSet<>();
+        collidingSet.add((E) "1");
+
+        // Act & Assert
+        // An IllegalArgumentException is expected because the no-op mutator failed to
+        // remove the intersecting element from the new set.
+        assertThrows(IllegalArgumentException.class, () -> compositeSet.addComposited(collidingSet));
     }
 }
