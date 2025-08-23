@@ -1,42 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class RandomAccessFileOrArray_ESTestTest97 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArray_ESTestTest97 {
 
-    @Test(timeout = 4000)
-    public void test096() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray instance
+     * after it has been closed results in an IllegalStateException.
+     */
+    @Test
+    public void readAfterCloseThrowsIllegalStateException() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray from a byte array and then close it.
+        byte[] buffer = new byte[1]; // The buffer content is irrelevant for this test.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(buffer);
+        fileOrArray.close();
+
+        // Act & Assert: Attempt to read from the closed instance and verify the exception.
         try {
-            randomAccessFileOrArray0.read(byteArray0);
-            fail("Expecting exception: IllegalStateException");
+            fileOrArray.read(buffer);
+            fail("Expected an IllegalStateException to be thrown when reading from a closed source.");
         } catch (IllegalStateException e) {
-            //
-            // Already closed
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("Already closed", e.getMessage());
         }
     }
 }
