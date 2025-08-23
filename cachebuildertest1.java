@@ -1,65 +1,118 @@
 package org.apache.ibatis.mapping;
 
-import static com.googlecode.catchexception.apis.BDDCatchException.caughtException;
-import static com.googlecode.catchexception.apis.BDDCatchException.when;
-import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.reflect.Field;
 import org.apache.ibatis.builder.InitializingObject;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class CacheBuilderTestTest1 {
+/**
+ * Tests for the {@link CacheBuilder} class, focusing on its handling
+ * of cache implementations that require initialization.
+ */
+@DisplayName("CacheBuilder")
+class CacheBuilderTest {
 
-    @SuppressWarnings("unchecked")
-    private <T> T unwrap(Cache cache) {
-        Field field;
-        try {
-            field = cache.getClass().getDeclaredField("delegate");
-        } catch (NoSuchFieldException e) {
-            throw new IllegalStateException(e);
-        }
-        try {
-            field.setAccessible(true);
-            return (T) field.get(cache);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            field.setAccessible(false);
-        }
-    }
+  private static final String CACHE_ID = "test-cache";
+  private CacheBuilder builder;
 
-    private static class InitializingCache extends PerpetualCache implements InitializingObject {
+  @BeforeEach
+  void setUp() {
+    builder = new CacheBuilder(CACHE_ID);
+  }
 
-        private boolean initialized;
+  @Nested
+  @DisplayName("when building a cache that implements InitializingObject")
+  class WhenBuildingInitializableCache {
 
-        public InitializingCache(String id) {
-            super(id);
-        }
+    @Test
+    @DisplayName("should call the initialize() method upon successful creation")
+    void shouldCallInitializeOnSuccessfulCreation() {
+      // Arrange
+      builder.implementation(InitializableCache.class);
 
-        @Override
-        public void initialize() {
-            this.initialized = true;
-        }
-    }
+      // Act
+      Cache cache = builder.build();
 
-    private static class InitializingFailureCache extends PerpetualCache implements InitializingObject {
-
-        public InitializingFailureCache(String id) {
-            super(id);
-        }
-
-        @Override
-        public void initialize() {
-            throw new IllegalStateException("error");
-        }
+      // Assert
+      InitializableCache underlyingCache = getUnderlyingCacheImplementation(cache);
+      assertThat(underlyingCache.isInitialized()).isTrue();
     }
 
     @Test
-    void initializing() {
-        InitializingCache cache = unwrap(new CacheBuilder("test").implementation(InitializingCache.class).build());
-        Assertions.assertThat(cache.initialized).isTrue();
+    @DisplayName("should throw CacheException if initialize() method fails")
+    void shouldThrowCacheExceptionWhenInitializationFails() {
+      // Arrange
+      builder.implementation(FailingInitializableCache.class);
+
+      // Act & Assert
+      assertThatThrownBy(() -> builder.build())
+          .isInstanceOf(CacheException.class)
+          .hasMessageContaining("Failed to initialize cache " + CACHE_ID)
+          .hasRootCauseInstanceOf(IllegalStateException.class)
+          .hasRootCauseMessage("Initialization failed");
     }
+  }
+
+  // --- Helper Classes for Testing ---
+
+  /**
+   * A test cache implementation that tracks if its initialize() method has been called.
+   */
+  static class InitializableCache extends PerpetualCache implements InitializingObject {
+    private boolean initialized = false;
+
+    public InitializableCache(String id) {
+      super(id);
+    }
+
+    @Override
+    public void initialize() {
+      this.initialized = true;
+    }
+
+    public boolean isInitialized() {
+      return initialized;
+    }
+  }
+
+  /**
+   * A test cache implementation whose initialize() method always throws an exception.
+   */
+  static class FailingInitializableCache extends PerpetualCache implements InitializingObject {
+    public FailingInitializableCache(String id) {
+      super(id);
+    }
+
+    @Override
+    public void initialize() {
+      throw new IllegalStateException("Initialization failed");
+    }
+  }
+
+  /**
+   * The CacheBuilder wraps the base cache implementation with decorators.
+   * This helper uses reflection to access the underlying (delegate) cache
+   * instance to verify its state.
+   *
+   * @param cache The potentially decorated cache instance.
+   * @return The unwrapped, underlying cache implementation.
+   */
+  @SuppressWarnings("unchecked")
+  private <T> T getUnderlyingCacheImplementation(Cache cache) {
+    try {
+      Field delegateField = cache.getClass().getDeclaredField("delegate");
+      delegateField.setAccessible(true);
+      return (T) delegateField.get(cache);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw new IllegalStateException("Failed to get 'delegate' field from cache for testing", e);
+    }
+  }
 }
