@@ -1,21 +1,37 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest11 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer(4);
-        char[] charArray0 = new char[2];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        int int0 = CharSequenceUtils.lastIndexOf(charBuffer0, stringBuffer0, 4);
-        assertEquals(2, int0);
+    /**
+     * Tests that lastIndexOf returns the length of the CharSequence when
+     * searching for an empty string with a starting index greater than the sequence's length.
+     *
+     * <p>This behavior is consistent with {@link String#lastIndexOf(String, int)}, which
+     * returns the start index for an empty search string, but our utility method
+     * clamps an out-of-bounds start index to the sequence's length.</p>
+     */
+    @Test
+    public void lastIndexOf_withEmptySearchStringAndStartIndexOutOfBounds_shouldReturnSequenceLength() {
+        // Arrange
+        final CharSequence textToSearch = CharBuffer.wrap("ab"); // A sequence of length 2
+        final CharSequence emptySearchString = "";
+        final int startIndex = 4; // An index greater than the length of textToSearch
+        
+        final int expectedIndex = textToSearch.length(); // Expect the result to be clamped to the length (2)
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(textToSearch, emptySearchString, startIndex);
+
+        // Assert
+        assertEquals("Searching for an empty string with a start index > length should return the length",
+                expectedIndex, actualIndex);
     }
 }
