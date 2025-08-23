@@ -1,20 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
+// Note: The class name and inheritance are preserved from the original EvoSuite-generated test.
+// In a typical, human-written test suite, this test would be part of a class like "RandomUtilsTest".
 public class RandomUtils_ESTestTest28 extends RandomUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.insecure();
-        long long0 = randomUtils0.randomLong();
-        //  // Unstable assertion: assertEquals(1269890049322263769L, long0);
+    /**
+     * Tests that calling randomLong() on an "insecure" RandomUtils instance
+     * returns a non-negative value, as per the method's contract.
+     *
+     * The no-argument randomLong() is documented to return a value in the range
+     * [0, Long.MAX_VALUE). This test verifies the lower bound of that range.
+     * A specific random value cannot be asserted, but its properties can be.
+     */
+    @Test
+    public void testInsecureRandomLongReturnsNonNegativeValue() {
+        // Arrange: Obtain an insecure random number generator instance.
+        RandomUtils randomUtils = RandomUtils.insecure();
+
+        // Act: Generate a random long value.
+        long result = randomUtils.randomLong();
+
+        // Assert: The generated value must be non-negative.
+        assertTrue("The random long should be non-negative, but was " + result, result >= 0);
     }
 }
