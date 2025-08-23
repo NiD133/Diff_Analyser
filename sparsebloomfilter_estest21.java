@@ -1,23 +1,39 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest21 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for {@link SparseBloomFilter} focusing on edge cases with extremely large shapes.
+ */
+public class SparseBloomFilterLargeShapeTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Shape shape0 = Shape.fromKM(2147483639, 2147483639);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
-        sparseBloomFilter0.merge((BitMapExtractor) sparseBloomFilter0);
+    /**
+     * Tests that attempting to merge a SparseBloomFilter with a shape near the maximum
+     * integer size throws an OutOfMemoryError.
+     *
+     * <p>The merge operation, when using a BitMapExtractor, may require creating an
+     * internal bitmap representation of the filter. For a filter with a number of bits
+     * approaching {@code Integer.MAX_VALUE}, the memory required for this bitmap
+     * (approx. 256MB) is expected to exceed the typical heap size allocated for a test
+     * environment, leading to an {@code OutOfMemoryError}.</p>
+     */
+    @Test
+    public void mergeWithBitMapExtractorUsingHugeShapeShouldThrowOutOfMemoryError() {
+        // Arrange: Create a shape with a number of bits and hash functions close to Integer.MAX_VALUE.
+        // This value (2,147,483,639) is chosen to be large enough to trigger memory issues.
+        final int nearIntegerMaxValue = 2_147_483_639;
+        Shape hugeShape = Shape.fromKM(nearIntegerMaxValue, nearIntegerMaxValue);
+        SparseBloomFilter filter = new SparseBloomFilter(hugeShape);
+
+        // Act & Assert: Attempt the merge and verify that it throws an OutOfMemoryError.
+        try {
+            // The merge operation requires processing the filter's bitmap, which is too large.
+            filter.merge((BitMapExtractor) filter);
+            fail("Expected an OutOfMemoryError, but no exception was thrown.");
+        } catch (final OutOfMemoryError expected) {
+            // This is the expected outcome. The test passes.
+        }
     }
 }
