@@ -1,30 +1,29 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest61 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        String[] stringArray0 = new String[1];
-        stringArray0[0] = "             ";
-        boolean boolean0 = StringUtil.inSorted("{3f\"nUAQw7TH,Y-", stringArray0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that inSorted returns false when the search term ("needle")
+     * is not present in the sorted array ("haystack").
+     */
+    @Test
+    public void inSortedShouldReturnFalseWhenNeedleIsNotPresent() {
+        // Arrange
+        // A sorted array (haystack) containing a single whitespace string.
+        String[] haystack = {"             "};
+        // A string (needle) that is not in the haystack.
+        String needle = "{3 f\"nUAQw7TH,Y-";
+
+        // Act
+        boolean isPresent = StringUtil.inSorted(needle, haystack);
+
+        // Assert
+        assertFalse("Expected the needle to not be found in the haystack.", isPresent);
     }
 }
