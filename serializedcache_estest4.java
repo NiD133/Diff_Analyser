@@ -1,27 +1,37 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest4 extends SerializedCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        serializedCache0.clear();
-        assertEquals("", serializedCache0.getId());
+/**
+ * Test suite for the {@link SerializedCache} decorator.
+ */
+public class SerializedCacheTest {
+
+    /**
+     * Verifies that the clear() operation does not have the unintended side effect
+     * of modifying the cache's ID. The ID is delegated to the underlying cache
+     * and should remain constant.
+     */
+    @Test
+    public void clear_shouldNotChangeCacheId() {
+        // Arrange: Create a SerializedCache that wraps a PerpetualCache with a specific ID.
+        String expectedId = "user-cache";
+        Cache delegateCache = new PerpetualCache(expectedId);
+        Cache serializedCache = new SerializedCache(delegateCache);
+
+        // Sanity check to ensure the ID is correct before the main action.
+        assertEquals("Precondition failed: Initial cache ID is incorrect.",
+                expectedId, serializedCache.getId());
+
+        // Act: Clear the cache. This operation should be delegated to the underlying cache.
+        serializedCache.clear();
+
+        // Assert: Verify that the cache's ID remains unchanged after being cleared.
+        assertEquals("The cache ID should not be affected by the clear operation.",
+                expectedId, serializedCache.getId());
     }
 }
