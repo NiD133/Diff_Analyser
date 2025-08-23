@@ -1,54 +1,51 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest28 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        PaxDate paxDate0 = PaxDate.ofEpochDay(719162L);
-        ChronoUnit chronoUnit0 = ChronoUnit.CENTURIES;
-        PaxDate paxDate1 = paxDate0.minus(719162L, (TemporalUnit) chronoUnit0);
-        // Undeclared exception!
+/**
+ * Tests for {@link Symmetry454Chronology}.
+ * This test focuses on handling invalid temporal values.
+ */
+public class Symmetry454ChronologyTest {
+
+    /**
+     * Tests that creating a date from a TemporalAccessor fails when its epoch-day
+     * value is below the minimum supported by the Symmetry454 calendar system.
+     */
+    @Test
+    public void dateFromTemporalAccessor_whenEpochDayIsBelowMinimum_throwsException() {
+        // Arrange: Set up the test case.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+
+        // The valid range for EpochDay in Symmetry454Chronology is known to be
+        // [-365961480, 364523156] from the implementation and previous test runs.
+        // We will test the lower boundary condition.
+        long minValidEpochDay = -365961480L;
+        long outOfRangeEpochDay = minValidEpochDay - 1;
+
+        // Create a standard TemporalAccessor (a LocalDate) with an epoch day value
+        // that is just outside the supported range.
+        TemporalAccessor dateWithEpochDayOutOfRange = LocalDate.ofEpochDay(outOfRangeEpochDay);
+
+        // Act & Assert: Execute the method and verify the outcome.
         try {
-            symmetry454Chronology0.date((TemporalAccessor) paxDate1);
-            fail("Expecting exception: DateTimeException");
+            chronology.date(dateWithEpochDayOutOfRange);
+            fail("Expected DateTimeException was not thrown for an epoch day below the minimum.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for EpochDay (valid values -365961480 - 364523156): -26266133510
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // The exception was thrown as expected.
+            // For completeness, we can check if the message is informative.
+            String expectedMessageContent = "Invalid value for EpochDay";
+            assertTrue(
+                "The exception message should explain the error.",
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
