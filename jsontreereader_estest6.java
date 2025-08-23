@@ -1,29 +1,31 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest6 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonTreeReader} class.
+ * This class demonstrates a refactored, more understandable version of an auto-generated test.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test005() throws Throwable {
-        Long long0 = new Long(0L);
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(long0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        double double0 = jsonTreeReader0.nextDouble();
-        assertEquals(0.0, double0, 0.01);
+    /**
+     * Tests that calling {@link JsonTreeReader#nextDouble()} on a reader
+     * created from a {@link JsonPrimitive} containing a long value
+     * correctly returns the equivalent double value.
+     */
+    @Test
+    public void nextDouble_forLongPrimitive_returnsEquivalentDouble() throws IOException {
+        // Arrange: Create a JsonTreeReader with a JsonPrimitive holding the long value 0.
+        JsonPrimitive jsonPrimitive = new JsonPrimitive(0L);
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(jsonPrimitive);
+
+        // Act: Read the value as a double.
+        double result = jsonTreeReader.nextDouble();
+
+        // Assert: The result should be the double equivalent of the original long.
+        assertEquals(0.0, result, 0.0);
     }
 }
