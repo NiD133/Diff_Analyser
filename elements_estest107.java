@@ -1,36 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest107 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test106() throws Throwable {
-        Document document0 = Document.createShell("Only http & https protocols supported");
-        Elements elements0 = document0.getAllElements();
-        Element element0 = elements0.last();
-        assertTrue(element0.isBlock());
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that the last() method correctly retrieves the last element from a collection.
+     * For a basic shell document created with Document.createShell(), the element list is
+     * [html, head, title, body], so the last element should be the 'body' tag.
+     */
+    @Test
+    public void lastShouldReturnTheFinalElementInTheList() {
+        // Arrange: Create a basic HTML document and get all its elements.
+        Document doc = Document.createShell("https://example.com");
+        Elements allElements = doc.getAllElements();
+
+        // Act: Get the last element from the collection.
+        Element lastElement = allElements.last();
+
+        // Assert: Verify that the retrieved element is indeed the <body> tag.
+        assertNotNull("The last element should not be null.", lastElement);
+        assertEquals("The tag name of the last element should be 'body'.", "body", lastElement.tagName());
+        assertTrue("The <body> element is expected to be a block-level element.", lastElement.isBlock());
     }
 }
