@@ -1,26 +1,28 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTreeWriter_ESTestTest32 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonTreeWriter} class.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setSerializeNulls(false);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
-        JsonWriter jsonWriter1 = jsonWriter0.endObject();
-        assertFalse(jsonWriter1.getSerializeNulls());
+    /**
+     * Verifies that the `serializeNulls` setting is preserved after
+     * writing a complete JSON object.
+     */
+    @Test
+    public void serializeNullsSettingShouldBePreservedAfterWritingObject() throws IOException {
+        // Arrange: Create a writer and configure it to not serialize nulls.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.setSerializeNulls(false);
+
+        // Act: Write an empty JSON object. The fluent API should return the same writer instance.
+        writer.beginObject().endObject();
+
+        // Assert: The original setting should remain unchanged.
+        assertFalse("The serializeNulls setting should be preserved", writer.getSerializeNulls());
     }
 }
