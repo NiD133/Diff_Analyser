@@ -1,52 +1,38 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+/**
+ * This test class contains tests for the Symmetry454Chronology class.
+ * The original test class name is kept to match the input, but in a real-world scenario,
+ * it would be renamed to something more descriptive, like Symmetry454ChronologyTest.
+ */
 public class Symmetry454Chronology_ESTestTest27 extends Symmetry454Chronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        IsoEra isoEra0 = IsoEra.CE;
-        // Undeclared exception!
-        try {
-            symmetry454Chronology0.date((TemporalAccessor) isoEra0);
-            fail("Expecting exception: UnsupportedTemporalTypeException");
-        } catch (UnsupportedTemporalTypeException e) {
-            //
-            // Unsupported field: EpochDay
-            //
-            verifyException("java.time.chrono.Era", e);
-        }
+    /**
+     * Tests that attempting to create a Symmetry454Date from a TemporalAccessor
+     * that only represents an Era throws an exception. An Era alone does not provide
+     * enough information (specifically, the EPOCH_DAY field) to construct a complete date.
+     */
+    @Test
+    public void date_fromTemporalAccessorContainingOnlyEra_throwsException() {
+        // Arrange: Get the chronology instance and create a TemporalAccessor that only holds Era info.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        TemporalAccessor eraOnlyAccessor = IsoEra.CE;
+
+        // Act & Assert: Verify that calling date() with this accessor throws the expected exception.
+        UnsupportedTemporalTypeException exception = assertThrows(
+                UnsupportedTemporalTypeException.class,
+                () -> chronology.date(eraOnlyAccessor)
+        );
+
+        // Further Assert: Check the exception message to confirm it failed for the correct reason.
+        assertEquals("Unsupported field: EpochDay", exception.getMessage());
     }
 }
