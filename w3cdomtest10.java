@@ -1,11 +1,8 @@
 package org.jsoup.helper;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.integration.ParseTest;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,36 +11,212 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Stream;
-import static org.jsoup.TextUtil.normalizeSpaces;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class W3CDomTestTest10 {
+/**
+ * Tests for W3CDom focusing on security (entity expansion) and XML namespace handling.
+ */
+public class W3CDomSecurityAndNamespaceTest {
 
-    private static Document parseXml(String xml, boolean nameSpaceAware) {
+    /**
+     * Provides HTML and XML parsers for parameterized tests.
+     */
+    private static Stream<Arguments> parserProvider() {
+        return Stream.of(
+            Arguments.of(Parser.htmlParser()),
+            Arguments.of(Parser.xmlParser())
+        );
+    }
+
+    /**
+     * Verifies that the W3C converter does not expand XML entities, protecting against "Billion Laughs" style attacks.
+     * Jsoup itself does not parse entities in the doctype, so this test confirms that behavior is maintained
+     * through the W3C conversion process.
+     *
+     * @param parser The Jsoup parser to use (HTML or XML).
+     */
+    @ParameterizedTest
+    @MethodSource("parserProvider")
+    @DisplayName("Billion Laughs attack should not cause entity expansion")
+    void billionLaughsAttackDoesNotCauseEntityExpansion(Parser parser) {
+        // Arrange
+        String billionLaughsXml =
+            "<?xml version=\"1.0\"?>\n" +
+            "<!DOCTYPE lolz [\n" +
+            " <!ENTITY lol \"lol\">\n" +
+            " <!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">\n" +
+            "]>\n" +
+            "<html><body><p>&lol1;</p></body></html>";
+
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughsXml, parser);
+
+        // Act
+        W3CDom w3cDom = new W3CDom();
+        Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+        String resultString = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
+        NodeList pElements = w3cDoc.getElementsByTagName("p");
+
+        // Assert
+        assertNotNull(w3cDoc);
+        assertEquals(1, pElements.getLength());
+        // Check that the entity is not expanded in the DOM text content
+        assertEquals("&lol1;", pElements.item(0).getTextContent());
+        // Check that the serialized string contains the escaped entity, not the expanded text
+        assertFalse(resultString.contains("lololol"));
+        assertTrue(resultString.contains("&amp;lol1;"));
+    }
+
+    /**
+     * Tests that an XPath query using `local-name()` can find an element in a document
+     * that has a default HTML namespace.
+     */
+    @Test
+    @DisplayName("XPath with local-name() should find element in default HTML namespace")
+    void xpathWithLocalNameFindsElementInDefaultNamespace() throws XPathExpressionException {
+        // Arrange
+        String html = "<html><body><div>hello</div></body></html>";
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
+
+        // Act
+        NodeList nodeList = xpath(w3cDoc, "//*[local-name()='body']");
+
+        // Assert
+        assertEquals(1, nodeList.getLength());
+        Node body = nodeList.item(0);
+        assertEquals("body", body.getLocalName());
+        assertEquals("http://www.w3.org/1999/xhtml", body.getNamespaceURI());
+    }
+
+    /**
+     * Verifies that a simple XPath query (e.g., "//body") fails to find an element
+     * when the document has an explicit namespace and the query is not namespace-aware.
+     */
+    @Test
+    @DisplayName("XPath without namespace should fail on an explicitly namespaced document")
+    void xpathWithoutNamespaceFailsOnExplicitlyNamespacedDocument() throws XPathExpressionException {
+        // Arrange
+        String html = "<html xmlns='http://www.w3.org/1999/xhtml'><body id='One'><div>hello</div></body></html>";
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
+
+        // Act
+        NodeList nodeList = xpath(w3cDoc, "//body");
+
+        // Assert
+        assertEquals(0, nodeList.getLength());
+    }
+
+    /**
+     * Confirms that an XPath query using `local-name()` successfully finds an element
+     * in a document with an explicit namespace declaration.
+     */
+    @Test
+    @DisplayName("XPath with local-name() should find element in an explicit namespace")
+    void xpathWithLocalNameFindsElementInExplicitNamespace() throws XPathExpressionException {
+        // Arrange
+        String html = "<html xmlns='http://www.w3.org/1999/xhtml'><body id='One'><div>hello</div></body></html>";
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html);
+        Document w3cDoc = new W3CDom().fromJsoup(jsoupDoc);
+
+        // Act
+        NodeList nodeList = xpath(w3cDoc, "//*[local-name()='body']");
+
+        // Assert
+        assertEquals(1, nodeList.getLength());
+        Node body = nodeList.item(0);
+        assertEquals("body", body.getLocalName());
+        assertEquals("http://www.w3.org/1999/xhtml", body.getNamespaceURI());
+        assertNull(body.getPrefix());
+    }
+
+    /**
+     * Tests that after serializing a namespaced document and re-parsing it as
+     * namespace-unaware, a simple XPath query can find elements.
+     */
+    @Test
+    @DisplayName("XPath should work on a serialized document parsed as namespace-unaware")
+    void xpathWorksOnSerializedDocParsedAsNamespaceUnaware() throws XPathExpressionException {
+        // Arrange
+        String html = "<html xmlns='http://www.w3.org/1999/xhtml'><body><div>hello</div></body></html>";
+        Document w3cDocWithNs = new W3CDom().fromJsoup(Jsoup.parse(html));
+        String xmlString = W3CDom.asString(w3cDocWithNs);
+        Document w3cDocWithoutNs = parseXml(xmlString, false); // Parse as namespace-unaware
+
+        // Act
+        NodeList nodeList = xpath(w3cDocWithoutNs, "//body");
+
+        // Assert
+        assertEquals(1, nodeList.getLength());
+        Node body = nodeList.item(0);
+        assertEquals("body", body.getNodeName());
+        assertNull(body.getNamespaceURI());
+        assertNull(body.getPrefix());
+    }
+
+    /**
+     * Verifies that if a serialized document (where xmlns is just an attribute) is
+     * re-parsed with a namespace-aware parser, a simple XPath query will not find
+     * the namespaced element.
+     */
+    @Test
+    @DisplayName("XPath should fail on a serialized document re-parsed as namespace-aware")
+    void xpathFailsOnSerializedDocParsedAsNamespaceAware() throws XPathExpressionException {
+        // Arrange
+        String html = "<html xmlns='http://www.w3.org/1999/xhtml'><body><div>hello</div></body></html>";
+        Document w3cDocWithNs = new W3CDom().fromJsoup(Jsoup.parse(html));
+        String xmlString = W3CDom.asString(w3cDocWithNs);
+        Document w3cDocAware = parseXml(xmlString, true); // Re-parse as namespace-aware
+
+        // Act
+        NodeList nodeList = xpath(w3cDocAware, "//body");
+
+        // Assert
+        assertEquals(0, nodeList.getLength());
+    }
+
+    // --- HELPER METHODS ---
+
+    /**
+     * Executes an XPath query on a W3C Document and returns the resulting nodes.
+     *
+     * @param w3cDoc The W3C Document to query.
+     * @param query  The XPath query string.
+     * @return A NodeList containing the matched nodes.
+     */
+    private NodeList xpath(Document w3cDoc, String query) throws XPathExpressionException {
+        XPathExpression xpath = XPathFactory.newInstance().newXPath().compile(query);
+        // Use NODESET to get a list of matching nodes.
+        return (NodeList) xpath.evaluate(w3cDoc, XPathConstants.NODESET);
+    }
+
+    /**
+     * Parses an XML string into a W3C Document, with an option to control namespace awareness.
+     *
+     * @param xml            The XML string to parse.
+     * @param namespaceAware True to enable namespace awareness, false otherwise.
+     * @return The parsed W3C Document.
+     */
+    private static Document parseXml(String xml, boolean namespaceAware) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(nameSpaceAware);
+            factory.setNamespaceAware(namespaceAware);
             DocumentBuilder builder = factory.newDocumentBuilder();
+            // Suppress DTD validation for legacy compatibility doctypes
             builder.setEntityResolver((publicId, systemId) -> {
-                if (systemId.contains("about:legacy-compat")) {
-                    // <!doctype html>
+                if (systemId != null && systemId.contains("about:legacy-compat")) {
                     return new InputSource(new StringReader(""));
                 } else {
                     return null;
@@ -53,82 +226,7 @@ public class W3CDomTestTest10 {
             dom.normalizeDocument();
             return dom;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Error parsing XML", e);
         }
-    }
-
-    private NodeList xpath(Document w3cDoc, String query) throws XPathExpressionException {
-        XPathExpression xpath = XPathFactory.newInstance().newXPath().compile(query);
-        return ((NodeList) xpath.evaluate(w3cDoc, XPathConstants.NODE));
-    }
-
-    private String output(String in, boolean modeHtml) {
-        org.jsoup.nodes.Document jdoc = Jsoup.parse(in);
-        Document w3c = W3CDom.convert(jdoc);
-        Map<String, String> properties = modeHtml ? W3CDom.OutputHtml() : W3CDom.OutputXml();
-        return normalizeSpaces(W3CDom.asString(w3c, properties));
-    }
-
-    private void assertEqualsIgnoreCase(String want, String have) {
-        assertEquals(want.toLowerCase(Locale.ROOT), have.toLowerCase(Locale.ROOT));
-    }
-
-    @ParameterizedTest
-    @MethodSource("parserProvider")
-    void doesNotExpandEntities(Parser parser) {
-        // Tests that the billion laughs attack doesn't expand entities; also for XXE
-        // Not impacted because jsoup doesn't parse the entities within the doctype, and so won't get to the w3c.
-        // Added to confirm, and catch if that ever changes
-        String billionLaughs = "<?xml version=\"1.0\"?>\n" + "<!DOCTYPE lolz [\n" + " <!ENTITY lol \"lol\">\n" + " <!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">\n" + "]>\n" + "<html><body><p>&lol1;</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughs, parser);
-        W3CDom w3cDom = new W3CDom();
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
-        assertNotNull(w3cDoc);
-        // select the p and make sure it's unexpanded
-        NodeList p = w3cDoc.getElementsByTagName("p");
-        assertEquals(1, p.getLength());
-        assertEquals("&lol1;", p.item(0).getTextContent());
-        // Check the string
-        String string = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertFalse(string.contains("lololol"));
-        assertTrue(string.contains("&amp;lol1;"));
-    }
-
-    private static Stream<Arguments> parserProvider() {
-        return Stream.of(Arguments.of(Parser.htmlParser()), Arguments.of(Parser.xmlParser()));
-    }
-
-    @Test
-    public void xmlnsXpathTest() throws XPathExpressionException {
-        W3CDom w3c = new W3CDom();
-        String html = "<html><body><div>hello</div></body></html>";
-        Document dom = w3c.fromJsoup(Jsoup.parse(html));
-        // namespace aware; HTML namespace is default
-        NodeList nodeList = xpath(dom, "//*[local-name()=\"body\"]");
-        assertEquals("div", nodeList.item(0).getLocalName());
-        // default output is namespace aware, so query needs to be as well
-        html = "<html xmlns='http://www.w3.org/1999/xhtml'><body id='One'><div>hello</div></body></html>";
-        dom = w3c.fromJsoup(Jsoup.parse(html));
-        nodeList = xpath(dom, "//body");
-        // no matches
-        assertNull(nodeList);
-        dom = w3c.fromJsoup(Jsoup.parse(html));
-        nodeList = xpath(dom, "//*[local-name()=\"body\"]");
-        assertNotNull(nodeList);
-        assertEquals(1, nodeList.getLength());
-        assertEquals("div", nodeList.item(0).getLocalName());
-        assertEquals("http://www.w3.org/1999/xhtml", nodeList.item(0).getNamespaceURI());
-        assertNull(nodeList.item(0).getPrefix());
-        // get rid of the name space awareness
-        String xml = w3c.asString(dom);
-        dom = parseXml(xml, false);
-        Node item = (Node) xpath(dom, "//body");
-        assertEquals("body", item.getNodeName());
-        assertNull(item.getNamespaceURI());
-        assertNull(item.getPrefix());
-        // put back, will get zero
-        dom = parseXml(xml, true);
-        nodeList = xpath(dom, "//body");
-        assertNull(nodeList);
     }
 }
