@@ -1,46 +1,57 @@
 package org.mockito.internal.util.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import java.util.HashSet;
+
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class HashCodeAndEqualsSafeSetTestTest17 {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
     @Rule
-    public MockitoRule r = MockitoJUnit.rule();
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private UnmockableHashCodeAndEquals mock1;
+    private MockWithBrokenContracts problematicMock;
 
-    private static class UnmockableHashCodeAndEquals {
-
+    // This helper class simulates an object where hashCode() and equals() are final
+    // and throw exceptions. This is the exact scenario HashCodeAndEqualsSafeSet
+    // is designed to handle, as standard collections would fail.
+    private static class MockWithBrokenContracts {
         @Override
         public final int hashCode() {
-            throw new NullPointerException("I'm failing on hashCode and I don't care");
+            throw new UnsupportedOperationException("Intentionally broken hashCode()");
         }
 
         @Override
         public final boolean equals(Object obj) {
-            throw new NullPointerException("I'm failing on equals and I don't care");
+            throw new UnsupportedOperationException("Intentionally broken equals()");
         }
     }
 
+    /**
+     * Verifies that the iterator's remove() method works correctly
+     * even for elements with broken hashCode() and equals() methods.
+     */
     @Test
-    public void removeByIterator() throws Exception {
-        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
+    public void shouldRemoveElementUsingIterator() {
+        // Arrange: Create a set containing a single mock that would break a standard HashSet.
+        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(problematicMock);
         Iterator<Object> iterator = set.iterator();
+
+        // Act: Advance the iterator and remove the element.
+        // This should succeed without throwing an exception.
         iterator.next();
         iterator.remove();
+
+        // Assert: The set should be empty after the element is removed.
         assertThat(set).isEmpty();
     }
 }
