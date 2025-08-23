@@ -1,24 +1,42 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-public class MultiFilteredRenderListener_ESTestTest10 extends MultiFilteredRenderListener_ESTest_scaffolding {
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-    @Test(timeout = 4000)
-    public void test9() throws Throwable {
-        MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-        LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-        RenderFilter[] renderFilterArray0 = new RenderFilter[3];
-        multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-        multiFilteredRenderListener0.beginTextBlock();
+/**
+ * Unit tests for the {@link MultiFilteredRenderListener} class.
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class MultiFilteredRenderListenerTest {
+
+    /**
+     * Verifies that when beginTextBlock() is called, it delegates the call
+     * to all attached render listeners.
+     */
+    @Test
+    public void beginTextBlock_delegatesCallToAttachedListener() {
+        // Arrange
+        // 1. Create a mock RenderListener to act as a delegate.
+        RenderListener delegateListener = mock(RenderListener.class);
+
+        // 2. Create the MultiFilteredRenderListener instance to be tested.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        
+        // 3. Attach the delegate listener. The filters are not used by the beginTextBlock()
+        //    method, so an empty array is sufficient for this test.
+        multiListener.attachRenderListener(delegateListener, new RenderFilter[0]);
+
+        // Act
+        // Call the method under test.
+        multiListener.beginTextBlock();
+
+        // Assert
+        // Verify that the beginTextBlock() method was called on the delegate listener exactly once.
+        verify(delegateListener, times(1)).beginTextBlock();
     }
 }
