@@ -1,45 +1,48 @@
 package org.jfree.chart.title;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.RectangleConstraint;
 import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for the {@link ShortTextTitle} class.
+ *
+ * This refactored test retains the original's scaffolding (`ShortTextTitle_ESTest_scaffolding`)
+ * as it may contain necessary setup from the test generation tool.
+ */
 public class ShortTextTitle_ESTestTest6 extends ShortTextTitle_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BufferedImage bufferedImage0 = new BufferedImage(10, 10, 10);
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle("org.jfree.chart.legend.LegendTitle");
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        Size2D size2D0 = shortTextTitle0.arrangeFN(graphics2D0, 0.08);
-        assertEquals("Size2D[width=0.0, height=0.0]", size2D0.toString());
+    /**
+     * Verifies that arrangeFN() returns a size of (0, 0) when the provided
+     * fixed width is too small to display the full title text. A ShortTextTitle
+     * is designed to render only if its entire text can fit without wrapping.
+     */
+    @Test
+    public void arrangeWithInsufficientFixedWidthShouldReturnZeroSize() {
+        // Arrange
+        // A long title that will require more space than the constrained width.
+        ShortTextTitle title = new ShortTextTitle("This is a very long title that will not fit");
+
+        // A graphics context is required for font metrics calculation.
+        // The image dimensions are arbitrary as we only need the context.
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+
+        // A width constraint that is clearly too small for the title text.
+        final double insufficientWidth = 1.0;
+
+        // Act
+        // The arrangeFN method calculates the required size for a fixed width.
+        Size2D arrangedSize = title.arrangeFN(g2, insufficientWidth);
+
+        // Assert
+        // Since the text does not fit within the constrained width, the title
+        // should report a size of zero to indicate it should not be drawn.
+        assertEquals("Width should be 0.0 when text does not fit", 0.0, arrangedSize.getWidth(), 0.0);
+        assertEquals("Height should be 0.0 when text does not fit", 0.0, arrangedSize.getHeight(), 0.0);
     }
 }
