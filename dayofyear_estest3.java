@@ -1,49 +1,41 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest3 extends DayOfYear_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ZoneOffset zoneOffset0 = ZoneOffset.MAX;
-        DayOfYear dayOfYear0 = DayOfYear.now((ZoneId) zoneOffset0);
-        TemporalQuery<ChronoField> temporalQuery0 = (TemporalQuery<ChronoField>) mock(TemporalQuery.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(temporalQuery0).queryFrom(any(java.time.temporal.TemporalAccessor.class));
-        dayOfYear0.query(temporalQuery0);
-        assertEquals(46, dayOfYear0.getValue());
+/**
+ * Unit tests for the query() method in {@link DayOfYear}.
+ */
+public class DayOfYearQueryTest {
+
+    @Test
+    public void query_delegatesToTemporalQueryAndReturnsResult() {
+        // This test verifies that the query(TemporalQuery) method correctly
+        // delegates the call to the query's queryFrom() method and returns its result.
+
+        // Arrange
+        DayOfYear dayOfYear = DayOfYear.of(46);
+        String expectedResult = "TestQueryResult";
+
+        // Mock the TemporalQuery functional interface
+        @SuppressWarnings("unchecked")
+        TemporalQuery<String> mockQuery = (TemporalQuery<String>) mock(TemporalQuery.class);
+        when(mockQuery.queryFrom(dayOfYear)).thenReturn(expectedResult);
+
+        // Act
+        String actualResult = dayOfYear.query(mockQuery);
+
+        // Assert
+        // 1. Check that the result from the query is returned correctly.
+        assertEquals(expectedResult, actualResult);
+
+        // 2. Verify that the queryFrom method was called exactly once with the correct DayOfYear instance.
+        verify(mockQuery, times(1)).queryFrom(dayOfYear);
     }
 }
