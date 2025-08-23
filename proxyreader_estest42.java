@@ -1,24 +1,56 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
-import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.io.Reader;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest42 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for {@link ProxyReader}.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
-        taggedReader0.close();
+    /**
+     * A simple Reader implementation that tracks whether its close() method has been called.
+     * This is used to verify that the proxy correctly delegates the close operation.
+     */
+    private static class CloseTrackerReader extends Reader {
+        private boolean isClosed;
+
+        @Override
+        public void close() {
+            this.isClosed = true;
+        }
+
+        public boolean isClosed() {
+            return isClosed;
+        }
+
+        @Override
+        public int read(final char[] cbuf, final int off, final int len) {
+            // Not needed for this test.
+            return -1;
+        }
+    }
+
+    /**
+     * Tests that calling close() on the ProxyReader also closes the underlying delegate reader.
+     */
+    @Test
+    public void testCloseDelegatesToUnderlyingReader() throws IOException {
+        // Arrange: Create a reader that can track if it has been closed,
+        // and wrap it in a ProxyReader.
+        final CloseTrackerReader underlyingReader = new CloseTrackerReader();
+        // Since ProxyReader is abstract, we use a simple concrete implementation for the test.
+        final ProxyReader proxyReader = new ProxyReader(underlyingReader) {
+            // No additional implementation needed for this test case.
+        };
+
+        // Act: Close the proxy reader.
+        proxyReader.close();
+
+        // Assert: Verify that the underlying reader was also closed.
+        assertTrue("Expected close() to be called on the underlying reader", underlyingReader.isClosed());
     }
 }
