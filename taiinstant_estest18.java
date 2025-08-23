@@ -1,27 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for {@link TaiInstant}.
+ * This focuses on the conversion between {@link TaiInstant} and {@link UtcInstant}.
+ */
 public class TaiInstant_ESTestTest18 extends TaiInstant_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        UtcInstant utcInstant0 = taiInstant0.toUtcInstant();
-        TaiInstant taiInstant1 = TaiInstant.of(utcInstant0);
-        assertEquals(0, taiInstant1.getNano());
+    /**
+     * Tests that converting a TaiInstant to a UtcInstant and back again
+     * results in the original TaiInstant. This verifies a lossless round-trip conversion.
+     */
+    @Test
+    public void of_fromUtcInstant_roundTripConversionIsLossless() {
+        // Arrange: Create an initial TaiInstant at the TAI epoch.
+        TaiInstant originalTaiInstant = TaiInstant.ofTaiSeconds(0L, 0L);
+
+        // Act: Convert to UtcInstant and then back to TaiInstant.
+        UtcInstant intermediateUtcInstant = originalTaiInstant.toUtcInstant();
+        TaiInstant roundTripTaiInstant = TaiInstant.of(intermediateUtcInstant);
+
+        // Assert: The final TaiInstant should be equal to the original.
+        assertEquals(originalTaiInstant, roundTripTaiInstant);
     }
 }
