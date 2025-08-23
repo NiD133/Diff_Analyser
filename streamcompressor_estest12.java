@@ -1,44 +1,28 @@
 package org.apache.commons.compress.archivers.zip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
 import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StreamCompressor_ESTestTest12 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StreamCompressor streamCompressor0 = StreamCompressor.create(8, (ScatterGatherBackingStore) null);
-        // Undeclared exception!
-        try {
-            streamCompressor0.writeCounted((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.StreamCompressor", e);
-        }
+/**
+ * Unit tests for the {@link StreamCompressor} class.
+ */
+public class StreamCompressorTest {
+
+    /**
+     * Verifies that calling writeCounted(byte[]) with a null array
+     * throws a NullPointerException, as this is an invalid argument.
+     */
+    @Test
+    public void writeCountedWithNullArrayShouldThrowNullPointerException() {
+        // Arrange: Create a StreamCompressor instance. The specific type or
+        // compression level is not relevant for this test, as the null check
+        // should occur before any compression logic.
+        final int anyValidCompressionLevel = 8;
+        StreamCompressor streamCompressor = StreamCompressor.create(anyValidCompressionLevel, (ScatterGatherBackingStore) null);
+
+        // Act & Assert: Expect a NullPointerException when the method is called with null.
+        assertThrows(NullPointerException.class, () -> streamCompressor.writeCounted((byte[]) null));
     }
 }
