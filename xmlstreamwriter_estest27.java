@@ -1,38 +1,30 @@
 package org.apache.commons.io.output;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlStreamWriter_ESTestTest27 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link XmlStreamWriter.Builder}.
+ */
+public class XmlStreamWriterBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        XmlStreamWriter.Builder xmlStreamWriter_Builder0 = XmlStreamWriter.builder();
-        // Undeclared exception!
-        try {
-            xmlStreamWriter_Builder0.get();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // origin == null
-            //
-            verifyException("org.apache.commons.io.build.AbstractOriginSupplier", e);
-        }
+    @Test
+    public void getShouldThrowIllegalStateExceptionWhenNoOutputIsSet() throws IOException {
+        // Arrange: Create a builder without specifying an output destination (the "origin").
+        final XmlStreamWriter.Builder builder = XmlStreamWriter.builder();
+
+        // Act & Assert: Verify that calling get() on the builder throws an IllegalStateException
+        // because no output origin (like a File or OutputStream) has been configured.
+        final IllegalStateException thrown = assertThrows(
+            "Building a writer requires an output origin.",
+            IllegalStateException.class,
+            builder::get
+        );
+
+        // Assert: Check the exception message for correctness.
+        assertEquals("origin == null", thrown.getMessage());
     }
 }
