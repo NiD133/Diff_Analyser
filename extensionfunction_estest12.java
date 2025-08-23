@@ -1,48 +1,57 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
 import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
 import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ExtensionFunction_ESTestTest12 extends ExtensionFunction_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Expression[] expressionArray0 = new Expression[0];
-        ExtensionFunction extensionFunction0 = new ExtensionFunction((QName) null, expressionArray0);
-        JXPathContextReferenceImpl jXPathContextReferenceImpl0 = mock(JXPathContextReferenceImpl.class, new ViolatedAssumptionAnswer());
-        doReturn((Function) null).when(jXPathContextReferenceImpl0).getFunction(any(org.apache.commons.jxpath.ri.QName.class), any(java.lang.Object[].class));
-        doReturn((NamespaceResolver) null).when(jXPathContextReferenceImpl0).getNamespaceResolver();
-        VariablePointer variablePointer0 = new VariablePointer((QName) null);
-        RootContext rootContext0 = new RootContext(jXPathContextReferenceImpl0, variablePointer0);
-        // Undeclared exception!
+/**
+ * Test suite for the {@link ExtensionFunction} class.
+ */
+public class ExtensionFunctionTest {
+
+    /**
+     * Tests that computeValue() throws a RuntimeException when the JXPathContext
+     * cannot find the specified function. This simulates a scenario where a function
+     * is called in an XPath expression but is not registered with the context.
+     */
+    @Test
+    public void computeValueShouldThrowExceptionWhenFunctionIsNotFound() {
+        // Arrange: Set up an ExtensionFunction and a mock context that
+        // simulates the function not being found.
+        Expression[] noArguments = new Expression[0];
+        // The function name is intentionally null to match the original test's scenario,
+        // which leads to the specific "null[]" message.
+        QName functionName = null;
+        ExtensionFunction extensionFunction = new ExtensionFunction(functionName, noArguments);
+
+        // Mock the JXPathContext to always return null when getFunction is called.
+        JXPathContextReferenceImpl mockJXPathContext = mock(JXPathContextReferenceImpl.class);
+        when(mockJXPathContext.getFunction(any(QName.class), any(Object[].class)))
+                .thenReturn(null);
+
+        // Create the evaluation context required to call computeValue.
+        VariablePointer rootPointer = new VariablePointer(new QName("root"));
+        EvalContext evalContext = new RootContext(mockJXPathContext, rootPointer);
+
+        // Act & Assert: Verify that calling computeValue throws a RuntimeException
+        // with a specific message indicating the function was not found.
         try {
-            extensionFunction0.computeValue(rootContext0);
-            fail("Expecting exception: RuntimeException");
+            extensionFunction.computeValue(evalContext);
+            fail("Expected a RuntimeException to be thrown because the function does not exist.");
         } catch (RuntimeException e) {
-            //
-            // No such function: null[]
-            //
-            verifyException("org.apache.commons.jxpath.ri.compiler.ExtensionFunction", e);
+            // The expected message format is "No such function: <functionName>[]"
+            // In this specific test case, the function name is null.
+            assertEquals("No such function: null[]", e.getMessage());
         }
     }
 }
