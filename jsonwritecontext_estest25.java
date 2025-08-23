@@ -2,35 +2,43 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest25 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on context management.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildArrayContext();
-        JsonWriteContext jsonWriteContext2 = jsonWriteContext1.createChildArrayContext();
-        JsonWriteContext jsonWriteContext3 = jsonWriteContext2.clearAndGetParent();
-        assertNotNull(jsonWriteContext3);
-        assertEquals(2, jsonWriteContext2.getNestingDepth());
-        assertEquals(0, jsonWriteContext3.getEntryCount());
-        assertEquals("Array", jsonWriteContext3.typeDesc());
-        assertTrue(jsonWriteContext0.inRoot());
-        assertEquals(1, jsonWriteContext3.getNestingDepth());
+    /**
+     * Tests that calling clearAndGetParent() on a deeply nested context
+     * successfully returns its direct parent with its state intact.
+     */
+    @Test
+    public void clearAndGetParent_onNestedContext_returnsDirectParent() {
+        // Arrange: Create a nested context structure: root -> array -> array
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+        JsonWriteContext parentArrayContext = rootContext.createChildArrayContext();
+        JsonWriteContext childArrayContext = parentArrayContext.createChildArrayContext();
+
+        // Sanity check the initial state
+        assertEquals(2, childArrayContext.getNestingDepth());
+        assertTrue(rootContext.inRoot());
+
+        // Act: Clear the innermost context and get its parent
+        JsonWriteContext returnedParentContext = childArrayContext.clearAndGetParent();
+
+        // Assert: Verify the returned object is the correct parent instance and its state is as expected.
+        assertNotNull("The returned context should not be null", returnedParentContext);
+        assertSame("Should return the exact same instance as the direct parent",
+                parentArrayContext, returnedParentContext);
+
+        // Verify the state of the returned parent context
+        assertEquals("Parent's type should be 'Array'", "Array", returnedParentContext.typeDesc());
+        assertEquals("Parent's nesting depth should be 1", 1, returnedParentContext.getNestingDepth());
+        assertEquals("Parent's entry count should be 0, as no values were written",
+                0, returnedParentContext.getEntryCount());
+
+        // For completeness, confirm the original child context's immutable properties are unchanged.
+        assertEquals("Original child's nesting depth should remain 2",
+                2, childArrayContext.getNestingDepth());
     }
 }
