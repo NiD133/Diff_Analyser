@@ -1,17 +1,27 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest19 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        float float0 = IEEE754rUtils.max(1.0F, 1190.8F);
-        assertEquals(1190.8F, float0, 0.01F);
+    /**
+     * Tests that max(float, float) returns the second argument when it is the larger value.
+     */
+    @Test
+    public void maxFloat_shouldReturnSecondArgument_whenItIsLarger() {
+        // Arrange
+        final float smallerValue = 1.0F;
+        final float largerValue = 1190.8F;
+        final float expectedMax = 1190.8F;
+
+        // Act
+        final float actualMax = IEEE754rUtils.max(smallerValue, largerValue);
+
+        // Assert
+        assertEquals(expectedMax, actualMax, 0.0f);
     }
 }
