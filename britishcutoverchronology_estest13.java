@@ -1,55 +1,41 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest13 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        // Undeclared exception!
-        try {
-            britishCutoverChronology0.zonedDateTime((TemporalAccessor) britishCutoverChronology0.CUTOVER);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Unable to obtain ChronoZonedDateTime from TemporalAccessor: class java.time.LocalDate
-            //
-            verifyException("java.time.chrono.Chronology", e);
-        }
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Tests that zonedDateTime() throws an exception when the provided temporal
+     * accessor lacks the necessary time and zone information.
+     */
+    @Test
+    public void zonedDateTime_whenTemporalAccessorLacksTimeAndZone_throwsException() {
+        // Arrange
+        // The BritishCutoverChronology.CUTOVER is a LocalDate, which is a TemporalAccessor.
+        // A LocalDate does not contain time or time-zone information.
+        TemporalAccessor partialTemporal = BritishCutoverChronology.CUTOVER;
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+
+        // Act & Assert
+        // Attempting to create a ZonedDateTime from a LocalDate should fail because
+        // crucial information (time, zone) is missing.
+        DateTimeException thrown = assertThrows(
+            DateTimeException.class,
+            () -> chronology.zonedDateTime(partialTemporal)
+        );
+
+        // Verify the exception message for more precise feedback.
+        assertTrue(
+            "The exception message should indicate the conversion failure.",
+            thrown.getMessage().contains("Unable to obtain ChronoZonedDateTime from TemporalAccessor")
+        );
     }
 }
