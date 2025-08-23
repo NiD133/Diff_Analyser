@@ -1,42 +1,22 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest91 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the constructor of the {@link Elements} class.
+ */
+public class ElementsConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test090() throws Throwable {
-        Elements elements0 = null;
-        try {
-            elements0 = new Elements((Element[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Verifies that the varargs constructor throws a NullPointerException
+     * when a null array is passed as an argument. The underlying implementation
+     * relies on Arrays.asList(), which does not permit null array references.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionForNullArray() {
+        // Attempt to create an Elements object with a null varargs array,
+        // which is expected to throw a NullPointerException.
+        new Elements((Element[]) null);
     }
 }
