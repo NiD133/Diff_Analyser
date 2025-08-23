@@ -1,51 +1,67 @@
 package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class BoundedIteratorTestTest5<E> extends AbstractIteratorTest<E> {
+/**
+ * Tests the constructor of {@link BoundedIterator}, particularly its argument validation.
+ * <p>
+ * This class also provides a concrete implementation for {@link AbstractIteratorTest}
+ * to verify the general iterator contract of {@link BoundedIterator}.
+ * </p>
+ *
+ * @param <E> the type of element in the iterator.
+ */
+public class BoundedIteratorConstructorTest<E> extends AbstractIteratorTest<E> {
 
-    /**
-     * Test array of size 7
-     */
-    private final String[] testArray = { "a", "b", "c", "d", "e", "f", "g" };
+    private final String[] sourceArray = {"a", "b", "c", "d", "e", "f", "g"};
 
-    private List<E> testList;
+    private List<E> sourceList;
 
     @Override
     public Iterator<E> makeEmptyIterator() {
+        // A BoundedIterator over an empty iterator should also be empty.
         return new BoundedIterator<>(Collections.<E>emptyList().iterator(), 0, 10);
     }
 
     @Override
     public Iterator<E> makeObject() {
-        return new BoundedIterator<>(new ArrayList<>(testList).iterator(), 1, testList.size() - 1);
+        // Creates a BoundedIterator that skips the first element and includes the rest.
+        final long offset = 1;
+        final long maxElements = sourceList.size() - offset;
+        return new BoundedIterator<>(new ArrayList<>(sourceList).iterator(), offset, maxElements);
     }
 
     @SuppressWarnings("unchecked")
     @BeforeEach
-    public void setUp() throws Exception {
-        testList = Arrays.asList((E[]) testArray);
+    public void setUp() {
+        sourceList = Arrays.asList((E[]) sourceArray);
     }
 
     /**
-     * Test the case if a negative {@code offset} is passed to the
-     * constructor. {@link IllegalArgumentException} is expected.
+     * Tests that the constructor throws an IllegalArgumentException
+     * when the offset parameter is negative.
      */
     @Test
-    void testNegativeOffset() {
-        final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> new BoundedIterator<>(testList.iterator(), -1, 4));
+    void constructorShouldThrowExceptionWhenOffsetIsNegative() {
+        final long negativeOffset = -1;
+        final long anyValidMax = 4;
+        // The content of the iterator is irrelevant for this constructor check.
+        final Iterator<E> dummyIterator = Collections.emptyIterator();
+
+        final IllegalArgumentException thrown = assertThrows(
+            IllegalArgumentException.class,
+            () -> new BoundedIterator<>(dummyIterator, negativeOffset, anyValidMax)
+        );
+
         assertEquals("Offset parameter must not be negative.", thrown.getMessage());
     }
 }
