@@ -1,38 +1,25 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class SecondsTestTest27 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+    @Test
+    public void whenAddingToLocalDateTime_thenDateTimeIsCorrectlyAdvanced() {
+        // Arrange
+        final Seconds secondsPeriod = Seconds.seconds(26);
+        final LocalDateTime startDateTime = new LocalDateTime(2006, 6, 1, 0, 0, 0, 0);
+        final LocalDateTime expectedDateTime = new LocalDateTime(2006, 6, 1, 0, 0, 26, 0);
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
+        // Act
+        final LocalDateTime actualDateTime = startDateTime.plus(secondsPeriod);
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testAddToLocalDate() {
-        Seconds test = Seconds.seconds(26);
-        LocalDateTime date = new LocalDateTime(2006, 6, 1, 0, 0, 0, 0);
-        LocalDateTime expected = new LocalDateTime(2006, 6, 1, 0, 0, 26, 0);
-        assertEquals(expected, date.plus(test));
+        // Assert
+        assertEquals(expectedDateTime, actualDateTime);
     }
 }
