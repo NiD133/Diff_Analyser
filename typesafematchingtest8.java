@@ -2,41 +2,52 @@ package org.mockito.internal.invocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.internal.invocation.TypeSafeMatching.matchesTypeSafe;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.junit.Rule;
+
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.internal.matchers.LessOrEqual;
-import org.mockito.internal.matchers.Null;
-import org.mockito.internal.matchers.StartsWith;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockitousage.IMethods;
 
-public class TypeSafeMatchingTestTest8 {
+/**
+ * Tests for {@link TypeSafeMatching}.
+ * This class focuses on scenarios involving generic types.
+ */
+public class TypeSafeMatchingTest {
 
-    private static final Object NOT_A_COMPARABLE = new Object();
+    // A helper abstract class that provides a generic base for argument matchers.
+    // This mimics a common user pattern of creating custom, reusable matchers.
+    private abstract static class BaseGenericMatcher<T> implements ArgumentMatcher<T> {
+        // The 'matches' method is left for the concrete implementation.
+    }
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
+    // A concrete implementation for matching Integers. The generic type is defined
+    // by extending the base class, which is the scenario under test.
+    private static class IntegerMatcher extends BaseGenericMatcher<Integer> {
+        @Override
+        public boolean matches(Integer argument) {
+            // The return value is not important for this test. We are only verifying
+            // that TypeSafeMatching correctly identifies the argument type and calls this method.
+            return true;
+        }
+    }
 
-    @Mock
-    public IMethods mock;
-
+    /**
+     * Verifies that TypeSafeMatching can correctly determine the argument type
+     * for an ArgumentMatcher that specifies its generic type through a superclass.
+     *
+     * <p>The System Under Test must inspect the class hierarchy to find the concrete
+     * type {@code Integer} which replaces the generic type {@code T} from the superclass.
+     */
     @Test
-    public void matchesWithSubTypeExtendingGenericClass() {
-        abstract class GenericMatcher<T> implements ArgumentMatcher<T> {
-        }
-        class TestMatcher extends GenericMatcher<Integer> {
+    public void shouldInferArgumentTypeFromGenericSuperclass() {
+        // Arrange
+        ArgumentMatcher<Integer> integerMatcher = new IntegerMatcher();
+        Integer validArgument = 123;
 
-            @Override
-            public boolean matches(Integer argument) {
-                return true;
-            }
-        }
-        boolean match = matchesTypeSafe().apply(new TestMatcher(), 123);
-        assertThat(match).isTrue();
+        // Act
+        // The 'apply' method should correctly identify that 'integerMatcher' expects an Integer
+        // and that 'validArgument' is a compatible instance, leading to a successful match.
+        boolean isMatch = matchesTypeSafe().apply(integerMatcher, validArgument);
+
+        // Assert
+        assertThat(isMatch).isTrue();
     }
 }
