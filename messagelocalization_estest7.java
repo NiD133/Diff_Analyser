@@ -1,21 +1,28 @@
 package com.itextpdf.text.error_messages;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MessageLocalization_ESTestTest7 extends MessageLocalization_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MessageLocalization} class.
+ */
+public class MessageLocalizationTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        String string0 = MessageLocalization.getMessage("#you.can.t.add.a.1.to.a.section");
-        assertNotNull(string0);
-        assertEquals("No message found for #you.can.t.add.a.1.to.a.section", string0);
+    /**
+     * Verifies that getMessage() returns a default "not found" message
+     * when the requested message key does not exist in the resource files.
+     */
+    @Test
+    public void getMessage_withNonExistentKey_returnsNotFoundMessage() {
+        // Arrange: Define a key that is not expected to exist and the corresponding
+        // default message that the system should return.
+        String nonExistentKey = "this.key.does.not.exist";
+        String expectedMessage = "No message found for " + nonExistentKey;
+
+        // Act: Request the message for the non-existent key.
+        String actualMessage = MessageLocalization.getMessage(nonExistentKey);
+
+        // Assert: Verify that the returned message is the expected "not found" message.
+        assertEquals(expectedMessage, actualMessage);
     }
 }
