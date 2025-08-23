@@ -1,23 +1,30 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GregorianChronology_ESTestTest14 extends GregorianChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link GregorianChronology}.
+ */
+public class GregorianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-        int int0 = gregorianChronology0.getMaxYear();
-        assertEquals(292278993, int0);
+    /**
+     * Verifies that getMaxYear() returns the documented constant maximum year value.
+     * The GregorianChronology is designed to support a specific range of years,
+     * and this test ensures the upper bound is correctly reported.
+     */
+    @Test
+    public void testGetMaxYearReturnsCorrectValue() {
+        // Arrange
+        // This is the documented maximum year for the GregorianChronology.
+        final int EXPECTED_MAX_YEAR = 292278993;
+        GregorianChronology chronology = GregorianChronology.getInstance();
+
+        // Act
+        int actualMaxYear = chronology.getMaxYear();
+
+        // Assert
+        assertEquals("The maximum year should match the constant value.",
+                     EXPECTED_MAX_YEAR, actualMaxYear);
     }
 }
