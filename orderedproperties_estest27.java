@@ -1,52 +1,30 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class OrderedProperties_ESTestTest27 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests for {@link OrderedProperties}.
+ */
+// The original test class name "OrderedProperties_ESTestTest27" was replaced
+// with a more conventional name.
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Integer integer0 = new Integer(0);
-        boolean boolean0 = orderedProperties0.remove((Object) integer0, (Object) orderedProperties0);
-        assertFalse(boolean0);
+    /**
+     * Tests that remove(key, value) returns false when the key-value pair
+     * does not exist in the properties.
+     */
+    @Test
+    public void removeKeyValuePairShouldReturnFalseWhenKeyIsAbsent() {
+        // Arrange: Create an empty OrderedProperties instance.
+        final OrderedProperties properties = new OrderedProperties();
+        final String nonExistentKey = "non.existent.key";
+        final String anyValue = "anyValue";
+
+        // Act: Attempt to remove a key-value pair that is not present.
+        final boolean wasRemoved = properties.remove(nonExistentKey, anyValue);
+
+        // Assert: The remove method should return false, indicating nothing was removed.
+        assertFalse("remove(key, value) should return false for a non-existent key.", wasRemoved);
     }
 }
