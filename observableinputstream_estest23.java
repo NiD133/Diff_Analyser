@@ -1,54 +1,58 @@
 package org.apache.commons.io.input;
 
+import org.apache.commons.io.IOExceptionList;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest23 extends ObservableInputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Enumeration<ObjectInputStream> enumeration0 = (Enumeration<ObjectInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        ObservableInputStream.Observer[] observableInputStream_ObserverArray0 = new ObservableInputStream.Observer[1];
-        TimestampedObserver timestampedObserver0 = new TimestampedObserver();
-        observableInputStream_ObserverArray0[0] = (ObservableInputStream.Observer) timestampedObserver0;
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(sequenceInputStream0, observableInputStream_ObserverArray0);
-        MockIOException mockIOException0 = new MockIOException("");
+/**
+ * Contains improved tests for the {@link ObservableInputStream} class.
+ */
+public class ObservableInputStreamTest {
+
+    /**
+     * Tests that when an observer's error() method throws an exception,
+     * the noteError() method catches it and re-throws it wrapped in an
+     * {@link IOExceptionList}.
+     */
+    @Test
+    public void noteErrorShouldNotifyObserverAndPropagateObserverException() throws IOException {
+        // Arrange
+        // 1. Create a mock observer that throws a specific exception when its
+        //    error() method is invoked. This allows us to control and verify the
+        //    behavior during the error notification.
+        final ObservableInputStream.Observer observer = mock(ObservableInputStream.Observer.class);
+        final IOException observerException = new IOException("Observer failed on error");
+        final IOException sourceException = new IOException("Original stream error");
+
+        // Configure the mock to throw our custom exception when its error() method is called.
+        doThrow(observerException).when(observer).error(sourceException);
+
+        // 2. Create the ObservableInputStream with an empty underlying stream and the mock observer.
+        //    The underlying stream's content is not relevant for this test.
+        final ObservableInputStream stream = new ObservableInputStream(new ByteArrayInputStream(new byte[0]), observer);
+
+        // Act & Assert
         try {
-            observableInputStream0.noteError(mockIOException0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // 1 exception(s): [org.evosuite.runtime.mock.java.lang.MockThrowable: MockIOException #0: ]
-            //
-            verifyException("org.apache.commons.io.IOExceptionList", e);
+            // Call the method under test. We expect this to throw an exception.
+            stream.noteError(sourceException);
+            fail("Expected an IOExceptionList to be thrown because the observer throws an exception.");
+        } catch (final IOExceptionList e) {
+            // Assert that the observer's error() method was called with the original exception.
+            verify(observer).error(sourceException);
+
+            // Assert that the caught exception list contains the exception thrown by our mock observer.
+            final List<Throwable> causes = e.getCauseList();
+            assertEquals("The exception list should contain exactly one cause.", 1, causes.size());
+            assertEquals("The cause should be the exception thrown by the observer.", observerException, causes.get(0));
         }
     }
 }
