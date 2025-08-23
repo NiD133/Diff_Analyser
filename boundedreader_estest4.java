@@ -1,24 +1,38 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BoundedReader_ESTestTest4 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1805);
-        int int0 = boundedReader0.read();
-        boundedReader0.mark(1268);
-        int int1 = boundedReader0.read();
-        assertTrue(int1 == int0);
+    /**
+     * Tests that reading from an empty underlying reader consistently returns EOF,
+     * even after a mark has been set. The BoundedReader should correctly
+     * propagate the EOF signal from the exhausted source.
+     */
+    @Test
+    public void testReadFromEmptyReaderConsistentlyReturnsEof() throws IOException {
+        // Arrange: Create a BoundedReader with an empty underlying source.
+        // The max character limit is irrelevant here as the source is already empty.
+        final int anyMaxCharLimit = 100;
+        final StringReader emptySourceReader = new StringReader("");
+        final BoundedReader boundedReader = new BoundedReader(emptySourceReader, anyMaxCharLimit);
+
+        // Act & Assert: The first read should immediately return EOF.
+        assertEquals("First read on an empty reader should return EOF.", EOF, boundedReader.read());
+
+        // Arrange a subsequent action: mark the current position (which is the end of the stream).
+        final int anyReadAheadLimit = 10;
+        boundedReader.mark(anyReadAheadLimit);
+
+        // Act & Assert: Reading again after the mark should still return EOF.
+        assertEquals("Read after marking at EOF should also return EOF.", EOF, boundedReader.read());
     }
 }
