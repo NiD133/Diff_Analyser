@@ -1,56 +1,32 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class CompositeSet_ESTestTest72 extends CompositeSet_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CompositeSet} class.
+ * This is a refactored version of a single, auto-generated test case.
+ */
+public class CompositeSetTest {
 
-    @Test(timeout = 4000)
-    public void test71() throws Throwable {
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>();
-        compositeSet0.clear();
-        boolean boolean0 = compositeSet0.retainAll((Collection<?>) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that calling {@code retainAll(null)} on an empty CompositeSet
+     * returns false, indicating that the set was not modified.
+     *
+     * <p>Note: The general contract of {@link java.util.Collection#retainAll(java.util.Collection)}
+     * is to throw a NullPointerException if the provided collection is null.
+     * This test verifies that CompositeSet deviates from that contract by returning
+     * false instead of throwing an exception.</p>
+     */
+    @Test
+    public void retainAllWithNullCollectionOnEmptySetShouldReturnFalse() {
+        // Arrange: Create an empty CompositeSet.
+        final CompositeSet<Object> compositeSet = new CompositeSet<>();
+
+        // Act: Call retainAll with a null collection.
+        final boolean wasModified = compositeSet.retainAll(null);
+
+        // Assert: The set should not have been modified, so the method should return false.
+        assertFalse("retainAll(null) on an empty set should return false.", wasModified);
     }
 }
