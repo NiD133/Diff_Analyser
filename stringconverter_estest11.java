@@ -1,57 +1,32 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StringConverter_ESTestTest11 extends StringConverter_ESTest_scaffolding {
+/**
+ * This test class focuses on verifying the behavior of the StringConverter.
+ */
+public class StringConverterTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstance(dateTimeZone0);
-        LocalDate localDate0 = new LocalDate((Chronology) gregorianChronology0);
-        // Undeclared exception!
-        try {
-            stringConverter0.getPartialValues((ReadablePartial) localDate0, (Object) "org/joda/time/tz/data", (Chronology) gregorianChronology0, (DateTimeFormatter) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
-        }
+    /**
+     * Tests that getPartialValues throws a NullPointerException when the provided
+     * DateTimeFormatter is null. The converter should not attempt to parse the
+     * string if it doesn't have a valid formatter to use.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getPartialValues_whenFormatterIsNull_throwsNullPointerException() {
+        // Arrange
+        StringConverter converter = StringConverter.INSTANCE;
+        ReadablePartial partialTemplate = new LocalDate();
+        Chronology chronology = ISOChronology.getInstanceUTC();
+        String anyString = "2023-10-27"; // The actual string content is irrelevant for this test.
+
+        // Act: Attempt to get partial values using a null formatter.
+        // The @Test(expected) annotation handles the assertion, expecting a NullPointerException.
+        converter.getPartialValues(partialTemplate, anyString, chronology, (DateTimeFormatter) null);
     }
 }
