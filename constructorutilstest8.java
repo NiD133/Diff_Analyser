@@ -1,141 +1,58 @@
 package org.apache.commons.lang3.reflect;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang3.AbstractLangTest;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ConstructorUtilsTestTest8 extends AbstractLangTest {
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-    private final Map<Class<?>, Class<?>[]> classCache;
+/**
+ * Tests the varargs constructor invocation features of {@link ConstructorUtils},
+ * specifically focusing on scenarios involving type coercion like unboxing.
+ */
+class ConstructorUtilsInvokeConstructorVarargsTest {
 
-    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
-        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
-    }
+    /**
+     * A helper class with a specific varargs constructor used to verify that
+     * ConstructorUtils can correctly identify and invoke it even when
+     * argument types require unboxing.
+     */
+    public static class VarargsUnboxingTestBean {
 
-    @BeforeEach
-    public void setUp() {
-        classCache.clear();
-    }
+        final String[] processedVarArgs;
 
-    private Class<?>[] singletonArray(final Class<?> c) {
-        Class<?>[] result = classCache.get(c);
-        if (result == null) {
-            result = new Class[] { c };
-            classCache.put(c, result);
-        }
-        return result;
-    }
-
-    private String toString(final Class<?>[] c) {
-        return Arrays.asList(c).toString();
-    }
-
-    private static class BaseClass {
-    }
-
-    static class PrivateClass {
-
-        @SuppressWarnings("unused")
-        public static class PublicInnerClass {
-
-            public PublicInnerClass() {
-            }
-        }
-
-        @SuppressWarnings("unused")
-        public PrivateClass() {
-        }
-    }
-
-    private static final class SubClass extends BaseClass {
-    }
-
-    public static class TestBean {
-
-        private final String toString;
-
-        final String[] varArgs;
-
-        public TestBean() {
-            toString = "()";
-            varArgs = null;
-        }
-
-        public TestBean(final BaseClass bc, final String... s) {
-            toString = "(BaseClass, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final double d) {
-            toString = "(double)";
-            varArgs = null;
-        }
-
-        public TestBean(final int i) {
-            toString = "(int)";
-            varArgs = null;
-        }
-
-        public TestBean(final Integer i) {
-            toString = "(Integer)";
-            varArgs = null;
-        }
-
-        public TestBean(final Integer first, final int... args) {
-            toString = "(Integer, String...)";
-            varArgs = new String[args.length];
+        /**
+         * This constructor is the target for the test. It takes a fixed Integer
+         * and a variable number of primitive ints.
+         */
+        public VarargsUnboxingTestBean(final Integer first, final int... args) {
+            // Convert the varargs to strings to easily verify them later.
+            processedVarArgs = new String[args.length];
             for (int i = 0; i < args.length; ++i) {
-                varArgs[i] = Integer.toString(args[i]);
+                processedVarArgs[i] = Integer.toString(args[i]);
             }
-        }
-
-        public TestBean(final Integer i, final String... s) {
-            toString = "(Integer, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final Object o) {
-            toString = "(Object)";
-            varArgs = null;
-        }
-
-        public TestBean(final String s) {
-            toString = "(String)";
-            varArgs = null;
-        }
-
-        public TestBean(final String... s) {
-            toString = "(String...)";
-            varArgs = s;
-        }
-
-        @Override
-        public String toString() {
-            return toString;
-        }
-
-        void verify(final String str, final String[] args) {
-            assertEquals(str, toString);
-            assertArrayEquals(args, varArgs);
         }
     }
 
     @Test
-    void testVarArgsUnboxing() throws Exception {
-        final TestBean testBean = ConstructorUtils.invokeConstructor(TestBean.class, Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3));
-        assertArrayEquals(new String[] { "2", "3" }, testBean.varArgs);
+    @DisplayName("invokeConstructor should select a varargs constructor that requires unboxing for its arguments")
+    void invokeConstructor_shouldSelectVarargsConstructor_whenUnboxingIsRequired() throws Exception {
+        // Arrange
+        // The target constructor is VarargsUnboxingTestBean(Integer, int...).
+        // We pass three Integers. The reflection utility should match this by
+        // unboxing the second and third Integers to ints for the varargs parameter.
+        final Integer firstArg = 1;
+        final Integer varArg1 = 2;
+        final Integer varArg2 = 3;
+        final String[] expectedProcessedVarArgs = {"2", "3"};
+
+        // Act
+        final VarargsUnboxingTestBean bean = ConstructorUtils.invokeConstructor(
+            VarargsUnboxingTestBean.class, firstArg, varArg1, varArg2);
+
+        // Assert
+        assertNotNull(bean, "The constructor should have been invoked successfully.");
+        assertArrayEquals(expectedProcessedVarArgs, bean.processedVarArgs,
+            "The varargs arguments should be correctly processed after unboxing.");
     }
 }
