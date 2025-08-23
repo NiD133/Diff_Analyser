@@ -1,28 +1,48 @@
 package org.locationtech.spatial4j.shape.impl;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest6 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandRange((-388.0), 1.0, (-388.0), (-2148.3));
-        double double0 = bBoxCalculator0.getMinX();
-        assertEquals((-388.0), bBoxCalculator0.getMinY(), 0.01);
-        assertEquals((-388.0), double0, 0.01);
+/**
+ * Unit tests for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    private BBoxCalculator bboxCalculator;
+
+    @Before
+    public void setUp() {
+        // Using SpatialContext.GEO is a standard way to get a geodetic context.
+        SpatialContext spatialContext = SpatialContext.GEO;
+        bboxCalculator = new BBoxCalculator(spatialContext);
+    }
+
+    /**
+     * Tests that calling expandRange on an empty calculator correctly sets the initial
+     * bounding box coordinates. This test also covers the edge case where the provided
+     * minimum Y is greater than the maximum Y.
+     */
+    @Test
+    public void expandRange_withFirstRectangle_shouldSetInitialBounds() {
+        // Arrange: The BBoxCalculator is initialized in setUp() to an empty state.
+        // (minX, maxX, minY, maxY are at their respective infinities)
+        double minX = -388.0;
+        double maxX = 1.0;
+        double minY = -388.0;
+        // Note: Using a maxY value smaller than minY to test how the calculator handles it.
+        double maxY = -2148.3;
+        double delta = 0.01;
+
+        // Act: Expand the bounding box with a single rectangle's coordinates.
+        bboxCalculator.expandRange(minX, maxX, minY, maxY);
+
+        // Assert: The calculator's bounds should now match the provided coordinates.
+        assertEquals("Initial minX should be set", minX, bboxCalculator.getMinX(), delta);
+        assertEquals("Initial maxX should be set", maxX, bboxCalculator.getMaxX(), delta);
+        assertEquals("Initial minY should be set", minY, bboxCalculator.getMinY(), delta);
+        assertEquals("Initial maxY should be set", maxY, bboxCalculator.getMaxY(), delta);
     }
 }
