@@ -1,45 +1,37 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
 import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ObservableInputStream_ESTestTest9 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Test suite for the ObservableInputStream class.
+ */
+public class ObservableInputStreamTest {
 
+    /**
+     * Tests that calling read(byte[], int, int) with a length of zero
+     * returns zero, as specified by the java.io.InputStream contract.
+     * This should happen regardless of whether the underlying stream has data.
+     */
     @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        StringWriter stringWriter0 = new StringWriter();
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        ObservableInputStream.Builder observableInputStream_Builder0 = new ObservableInputStream.Builder();
-        observableInputStream_Builder0.setCharSequence(stringBuffer0);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(observableInputStream_Builder0);
-        byte[] byteArray0 = new byte[2];
-        int int0 = observableInputStream0.read(byteArray0, 0, (int) (byte) 0);
-        assertEquals(0, int0);
+    public void testReadWithZeroLengthShouldReturnZero() throws IOException {
+        // Arrange: Set up an ObservableInputStream. The source is empty, but any
+        // source would suffice since a zero-length read should not access it.
+        StringWriter emptySource = new StringWriter();
+        ObservableInputStream.Builder builder = new ObservableInputStream.Builder();
+        builder.setCharSequence(emptySource.getBuffer());
+        ObservableInputStream inputStream = new ObservableInputStream(builder);
+
+        byte[] buffer = new byte[2];
+
+        // Act: Attempt to read zero bytes from the stream.
+        int bytesRead = inputStream.read(buffer, 0, 0);
+
+        // Assert: The read method should return 0, confirming it adheres to the
+        // InputStream contract for a zero-length read.
+        assertEquals("Reading zero bytes should return 0.", 0, bytesRead);
     }
 }
