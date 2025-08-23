@@ -1,30 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest12 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class.
+ * Note: The original test class name "Attribute_ESTestTest12" and its base class
+ * are artifacts of a test generation tool. A more conventional name is used here.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Attribute attribute0 = new Attribute("bokmyj\"!bh4db:", (String) null, attributes0);
-        String string0 = attribute0.getValue();
-        assertEquals("", string0);
+    /**
+     * Verifies that getValue() returns an empty string for an attribute initialized with a null value.
+     * This is the defined behavior for attributes that are present but have no assigned value,
+     * such as boolean attributes in HTML.
+     */
+    @Test
+    public void getValueShouldReturnEmptyStringWhenAttributeValueIsNull() {
+        // Arrange: Create an attribute with a key but a null value.
+        // Using a common boolean attribute name like "disabled" makes the test case more realistic.
+        Attribute attributeWithNullValue = new Attribute("disabled", null);
+
+        // Act: Call the method under test.
+        String actualValue = attributeWithNullValue.getValue();
+
+        // Assert: The returned value should be an empty string, not null.
+        assertEquals("", actualValue);
     }
 }
