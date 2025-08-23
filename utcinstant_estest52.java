@@ -1,25 +1,26 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest52 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant utcInstant1 = UtcInstant.parse("1858-11-17T00:00:00Z");
-        boolean boolean0 = utcInstant1.equals(utcInstant0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that a UtcInstant created for the Modified Julian Day epoch (MJD 0)
+     * is equal to an instance created by parsing its standard string representation.
+     */
+    @Test
+    public void ofModifiedJulianDay_forEpoch_isEqualToParsedEpochString() {
+        // Arrange
+        // The Modified Julian Day epoch corresponds to 1858-11-17T00:00:00Z.
+        UtcInstant instantFromMjd = UtcInstant.ofModifiedJulianDay(0L, 0L);
+        UtcInstant instantFromParsedString = UtcInstant.parse("1858-11-17T00:00:00Z");
+
+        // Assert
+        // The two instances should represent the same point in time and thus be equal.
+        assertEquals(instantFromMjd, instantFromParsedString);
     }
 }
