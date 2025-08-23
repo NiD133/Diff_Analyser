@@ -1,32 +1,32 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class StandardEntityCollection_ESTestTest6 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Tests for the {@link StandardEntityCollection} class, focusing on exception handling.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        // Undeclared exception!
+    /**
+     * Verifies that the add() method throws an IllegalArgumentException
+     * when a null entity is passed as an argument. This is the expected behavior
+     * as collections should not contain null entities.
+     */
+    @Test
+    public void add_whenAddingNull_shouldThrowIllegalArgumentException() {
+        // Arrange: Create an empty entity collection.
+        StandardEntityCollection collection = new StandardEntityCollection();
+        String expectedErrorMessage = "Null 'entity' argument.";
+
+        // Act & Assert: Attempt to add a null entity and verify the exception.
         try {
-            standardEntityCollection0.add((ChartEntity) null);
-            fail("Expecting exception: IllegalArgumentException");
+            collection.add(null);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'entity' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
