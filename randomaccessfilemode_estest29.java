@@ -1,40 +1,32 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
+import static org.junit.Assert.assertThrows;
+
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.Paths;
 import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class RandomAccessFileMode_ESTestTest29 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for {@link RandomAccessFileMode}.
+ * This class contains the refactored test case.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        MockFile mockFile0 = new MockFile("VjDO;0I0)G");
-        Path path0 = mockFile0.toPath();
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-        // Undeclared exception!
-        try {
-            randomAccessFileMode0.accept(path0, (IOConsumer<RandomAccessFile>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-        }
+    /**
+     * Tests that {@link RandomAccessFileMode#accept(Path, IOConsumer)} throws a
+     * {@link NullPointerException} when the provided consumer is null.
+     */
+    @Test
+    public void acceptShouldThrowNullPointerExceptionWhenConsumerIsNull() {
+        // Arrange
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+        // The path can point to a non-existent file, as the null check for the
+        // consumer should happen before any file I/O.
+        final Path path = Paths.get("test-file.txt");
+
+        // Act & Assert
+        // The call is expected to throw a NullPointerException because the consumer is null.
+        assertThrows(NullPointerException.class, () -> mode.accept(path, null));
     }
 }
