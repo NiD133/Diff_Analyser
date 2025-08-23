@@ -1,48 +1,34 @@
 package org.apache.commons.collections4.bag;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CollectionSortedBag_ESTestTest39 extends CollectionSortedBag_ESTest_scaffolding {
+/**
+ * Test suite for {@link CollectionSortedBag}.
+ */
+public class CollectionSortedBagTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        TreeBag<Object> treeBag0 = new TreeBag<Object>();
-        CollectionSortedBag<Object> collectionSortedBag0 = new CollectionSortedBag<Object>(treeBag0);
-        boolean boolean0 = collectionSortedBag0.removeAll((Collection<?>) null);
-        assertFalse(boolean0);
+    @Test
+    public void removeAllWithNullCollectionShouldReturnFalseAndNotModifyBag() {
+        // Arrange
+        // Create an empty bag and its decorator
+        final TreeBag<Object> backingBag = new TreeBag<>();
+        final CollectionSortedBag<Object> decoratedBag = new CollectionSortedBag<>(backingBag);
+
+        // Act
+        // Attempt to remove a null collection of elements.
+        // The contract for Collection.removeAll() suggests a NullPointerException,
+        // but the implementation in AbstractMapBag (a superclass of TreeBag)
+        // explicitly handles null by returning false.
+        final boolean wasModified = decoratedBag.removeAll((Collection<?>) null);
+
+        // Assert
+        // The operation should report that the bag was not modified.
+        assertFalse("removeAll(null) should return false", wasModified);
+        // Verify that the bag remains unchanged (and empty in this case).
+        assertTrue("The bag should not be modified by removing a null collection", decoratedBag.isEmpty());
     }
 }
