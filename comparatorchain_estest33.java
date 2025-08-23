@@ -1,34 +1,25 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class ComparatorChain_ESTestTest33 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ComparatorChain}.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        LinkedList<Comparator<Object>> linkedList0 = new LinkedList<Comparator<Object>>();
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>(linkedList0);
-        boolean boolean0 = comparatorChain0.equals(comparatorChain0);
-        assertTrue(boolean0);
+    /**
+     * Tests the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void testEquals_returnsTrue_forSameInstance() {
+        // Arrange: Create an empty comparator chain.
+        // The no-arg constructor is used for simplicity.
+        final ComparatorChain<Object> chain = new ComparatorChain<>();
+
+        // Act & Assert: Verify that the instance is equal to itself.
+        // This fulfills the reflexive contract of Object.equals().
+        assertTrue("An instance of ComparatorChain should be equal to itself.", chain.equals(chain));
     }
 }
