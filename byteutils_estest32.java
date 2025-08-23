@@ -1,42 +1,38 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ByteUtils_ESTestTest32 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(DataInput, int)} throws an
+     * IllegalArgumentException when the requested read length is greater than 8.
+     * A long value can hold at most 8 bytes.
+     */
+    @Test
+    public void fromLittleEndianWithDataInputThrowsIfLengthIsTooLarge() {
+        // Arrange: Define a length that is too large to be read into a long.
+        final int invalidLength = 9; // Max allowed is 8.
+        final DataInput nullDataInput = null; // The input is not used before the length check.
+        final String expectedErrorMessage = "Can't read more than eight bytes into a long value";
+
+        // Act & Assert: Call the method and verify that it throws the correct exception.
         try {
-            ByteUtils.fromLittleEndian((DataInput) null, 1302);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Can't read more than eight bytes into a long value
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
+            ByteUtils.fromLittleEndian(nullDataInput, invalidLength);
+            fail("Expected an IllegalArgumentException because the length is greater than 8.");
+        } catch (final IllegalArgumentException e) {
+            // This is the expected outcome.
+            assertEquals(expectedErrorMessage, e.getMessage());
+        } catch (final Exception e) {
+            // Fail the test if any other unexpected exception is thrown.
+            fail("Caught an unexpected exception: " + e);
         }
     }
 }
