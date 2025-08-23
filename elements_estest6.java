@@ -1,36 +1,40 @@
 package org.jsoup.select;
 
+import org.jsoup.select.NodeVisitor;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest6 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
-    @Test(timeout = 4000)
-    public void test005() throws Throwable {
-        Elements elements0 = new Elements();
-        NodeVisitor nodeVisitor0 = mock(NodeVisitor.class, new ViolatedAssumptionAnswer());
-        Elements elements1 = elements0.traverse(nodeVisitor0);
-        assertTrue(elements1.isEmpty());
+/**
+ * Test suite for the {@link Elements} class.
+ * This specific test focuses on the traverse() method.
+ */
+public class Elements_ESTestTest6 { // Original class name kept for context
+
+    /**
+     * Verifies that calling traverse() on an empty Elements collection
+     * does not interact with the visitor and returns the same empty collection instance.
+     */
+    @Test
+    public void traverseOnEmptyElementsShouldDoNothingAndReturnSameInstance() {
+        // Arrange: Create an empty Elements collection and a mock NodeVisitor.
+        Elements emptyElements = new Elements();
+        NodeVisitor mockVisitor = mock(NodeVisitor.class);
+
+        // Act: Call the traverse method on the empty collection.
+        Elements resultElements = emptyElements.traverse(mockVisitor);
+
+        // Assert: Verify the behavior is correct.
+        // 1. The method should return the same instance to allow for method chaining.
+        assertSame("traverse() should return the same instance for chaining.", emptyElements, resultElements);
+        
+        // 2. The collection should remain empty.
+        assertTrue("The Elements collection should remain empty.", resultElements.isEmpty());
+
+        // 3. The visitor's methods should never be called, as there are no nodes to visit.
+        verifyNoInteractions(mockVisitor);
     }
 }
