@@ -1,18 +1,27 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest25 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} class.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        boolean boolean0 = iOCase0.checkRegionMatches((String) null, 493, (String) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that checkRegionMatches returns false when both string inputs are null.
+     * This behavior should be consistent regardless of the case-sensitivity rule.
+     */
+    @Test
+    public void checkRegionMatchesShouldReturnFalseWhenBothStringsAreNull() {
+        // Arrange
+        final IOCase ioCase = IOCase.SYSTEM; // The specific IOCase shouldn't matter for null inputs.
+        final int arbitraryStartIndex = 0;
+
+        // Act
+        final boolean matches = ioCase.checkRegionMatches(null, arbitraryStartIndex, null);
+
+        // Assert
+        assertFalse("checkRegionMatches should return false when both the string to check and the search string are null.", matches);
     }
 }
