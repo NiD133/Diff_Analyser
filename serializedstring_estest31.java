@@ -1,29 +1,50 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest31 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on UTF-8 operations.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        SerializedString serializedString0 = new SerializedString(" ");
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(3669);
-        int int0 = serializedString0.putUnquotedUTF8(byteBuffer0);
-        assertEquals(3668, byteBuffer0.remaining());
-        assertEquals(1, int0);
+    /**
+     * Verifies that putUnquotedUTF8() correctly writes the string's byte representation
+     * into a ByteBuffer and returns the number of bytes written.
+     */
+    @Test
+    public void putUnquotedUTF8_shouldWriteBytesToBufferAndReturnLength() {
+        // Arrange
+        String originalString = " ";
+        SerializedString serializedString = new SerializedString(originalString);
+        
+        int bufferCapacity = 100;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferCapacity);
+        
+        int expectedBytesWritten = originalString.getBytes(StandardCharsets.UTF_8).length; // Should be 1 for a space
+
+        // Act
+        int actualBytesWritten = serializedString.putUnquotedUTF8(byteBuffer);
+
+        // Assert
+        // 1. Check if the method returns the correct number of bytes written.
+        assertEquals("Should return the number of bytes written.",
+                expectedBytesWritten, actualBytesWritten);
+
+        // 2. Check if the buffer's remaining capacity was updated correctly.
+        assertEquals("Buffer's remaining capacity should be reduced by bytes written.",
+                bufferCapacity - expectedBytesWritten, byteBuffer.remaining());
+
+        // 3. Verify the actual content written to the buffer.
+        byteBuffer.flip(); // Prepare the buffer for reading
+        byte[] contentWritten = new byte[actualBytesWritten];
+        byteBuffer.get(contentWritten);
+        
+        byte[] expectedContent = originalString.getBytes(StandardCharsets.UTF_8);
+        assertArrayEquals("The buffer should contain the correct UTF-8 bytes.",
+                expectedContent, contentWritten);
     }
 }
