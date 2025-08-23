@@ -1,51 +1,37 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
 import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest13 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams#skipFully(java.io.Reader, long)}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader(1390);
+    /**
+     * Verifies that skipFully propagates an IOException thrown by the underlying reader.
+     * This is tested by attempting to skip characters from a PipedReader that has not been
+     * connected to a PipedWriter.
+     */
+    @Test
+    public void skipFully_onUnconnectedReader_throwsIOException() {
+        // Arrange: Create a PipedReader that is not connected to a PipedWriter.
+        // Any attempt to read from it will throw an IOException.
+        PipedReader unconnectedReader = new PipedReader();
+        final long charsToSkip = 100L;
+
+        // Act & Assert
         try {
-            CharStreams.skipFully(pipedReader0, 1390);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedReader", e);
+            CharStreams.skipFully(unconnectedReader, charsToSkip);
+            fail("Expected an IOException to be thrown when skipping on an unconnected reader.");
+        } catch (IOException expected) {
+            // This is the expected behavior from PipedReader. We assert the message
+            // to confirm that the correct exception was propagated.
+            assertEquals("Pipe not connected", expected.getMessage());
         }
     }
 }
