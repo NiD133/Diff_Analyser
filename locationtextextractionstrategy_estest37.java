@@ -1,34 +1,31 @@
 package com.itextpdf.text.pdf.parser;
 
+import com.itextpdf.text.pdf.parser.LocationTextExtractionStrategy.TextChunk;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocationTextExtractionStrategy_ESTestTest37 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LocationTextExtractionStrategy.TextChunk} inner class.
+ */
+public class LocationTextExtractionStrategyTextChunkTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        ImageRenderInfo imageRenderInfo0 = ImageRenderInfo.createForXObject(graphicsState0, (PdfIndirectReference) null, pdfDictionary0);
-        Vector vector0 = imageRenderInfo0.getStartPoint();
-        LocationTextExtractionStrategy.TextChunk locationTextExtractionStrategy_TextChunk0 = new LocationTextExtractionStrategy.TextChunk("", vector0, vector0, 1114.7446F);
-        float float0 = locationTextExtractionStrategy_TextChunk0.getCharSpaceWidth();
-        assertEquals(1114.7446F, float0, 0.01F);
+    /**
+     * Verifies that the getCharSpaceWidth method correctly returns the value
+     * provided to the TextChunk constructor.
+     */
+    @Test
+    public void getCharSpaceWidth_shouldReturnValueFromConstructor() {
+        // Arrange: Set up the test data and the object under test.
+        Vector startLocation = new Vector(0, 0, 0);
+        Vector endLocation = new Vector(0, 0, 0);
+        float expectedCharSpaceWidth = 1114.74F;
+
+        TextChunk textChunk = new TextChunk("", startLocation, endLocation, expectedCharSpaceWidth);
+
+        // Act: Call the method being tested.
+        float actualCharSpaceWidth = textChunk.getCharSpaceWidth();
+
+        // Assert: Verify the result is as expected.
+        assertEquals(expectedCharSpaceWidth, actualCharSpaceWidth, 0.01F);
     }
 }
