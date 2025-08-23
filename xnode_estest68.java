@@ -1,32 +1,46 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest68 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.List;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test067() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        iIOMetadataNode0.appendChild(iIOMetadataNode0);
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        List<XNode> list0 = xNode0.getChildren();
-        assertEquals(1, list0.size());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getChildren() correctly returns a list of XNode objects
+     * representing the direct children of the underlying DOM node.
+     */
+    @Test
+    public void getChildrenShouldReturnListOfChildNodes() {
+        // Arrange: Create a parent DOM node with one child.
+        Node parentNode = new IIOMetadataNode("parent");
+        Node childNode = new IIOMetadataNode("child");
+        parentNode.appendChild(childNode);
+
+        // The XPathParser and variables are required for the XNode constructor,
+        // but are not directly used by the getChildren() method in this scenario.
+        Properties variables = new Properties();
+        XPathParser xPathParser = new XPathParser((Document) null, false, variables);
+        XNode parentXNode = new XNode(xPathParser, parentNode, variables);
+
+        // Act: Retrieve the children from the parent XNode.
+        List<XNode> children = parentXNode.getChildren();
+
+        // Assert: Verify that the returned list contains the expected child.
+        assertNotNull("The children list should not be null.", children);
+        assertEquals("The parent node should have exactly one child.", 1, children.size());
+
+        XNode resultChildXNode = children.get(0);
+        assertEquals("The child node's name should match.", "child", resultChildXNode.getName());
     }
 }
