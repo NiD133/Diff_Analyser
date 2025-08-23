@@ -1,36 +1,57 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest21 extends BufferedLine_ESTest_scaffolding {
+/**
+ * Tests for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(2115.863165, 2115.863165, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 2115.863165, spatialContext0);
-        // Undeclared exception!
-        try {
-            bufferedLine0.getBuffered((-1304.935812), spatialContext0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // maxY must be >= minY: 1304.935812 to 90.0
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.ShapeFactoryImpl", e);
-        }
+    /**
+     * Tests that creating a new buffered line from an existing one throws an exception
+     * when the geometry becomes invalid.
+     *
+     * This scenario tests a specific edge case:
+     * 1. A base BufferedLine is created using coordinates far outside the valid geographic range (e.g., latitude > 90).
+     * 2. The getBuffered() method is called with a negative buffer distance.
+     *
+     * This combination causes the internal bounding box calculation for the new shape
+     * to produce a minimum latitude that is greater than the maximum latitude after being
+     * clipped by the world boundaries, leading to a RuntimeException.
+     */
+    @Test(expected = RuntimeException.class)
+    public void getBufferedWithNegativeDistanceOnOutOfBoundsLineThrowsException() {
+        // Arrange
+        // Use the geographic context, which has world boundaries of latitude -90 to 90.
+        SpatialContext geoContext = SpatialContext.GEO;
+
+        // Create a point with a latitude well outside the valid geographic range.
+        // The line will be a zero-length line (effectively a point) at this location.
+        Point outOfBoundsPoint = new PointImpl(0, 200, geoContext);
+
+        // Create the initial buffered line. The constructor clips the bounding box, so this succeeds.
+        double initialBuffer = 200.0;
+        BufferedLine lineAtOutOfBoundsPoint = new BufferedLine(outOfBoundsPoint, outOfBoundsPoint, initialBuffer, geoContext);
+
+        // Define a negative buffer that will shrink the original buffer.
+        // The resulting buffer size (200 - 150 = 50) is still positive.
+        double negativeBuffer = -150.0;
+
+        // Act
+        // Attempt to create a new, smaller buffered line from the original.
+        // This is expected to throw a RuntimeException during the new shape's internal setup.
+        //
+        // Why it fails:
+        //  - The new buffer size is calculated as: 200.0 (initial) - 150.0 (negative) = 50.0.
+        //  - The new shape's bounding box minimum Y is calculated as: point.getY() - new_buffer = 200.0 - 50.0 = 150.0.
+        //  - The context then clips this to the world's valid latitude range. The resulting minimum Y becomes
+        //    max(-90, 150.0), which is 150.0. The maximum Y becomes min(90, 200.0 + 50.0), which is 90.0.
+        //  - This results in an attempt to create a rectangle where minY (150.0) > maxY (90.0), which is invalid.
+        lineAtOutOfBoundsPoint.getBuffered(negativeBuffer, geoContext);
+
+        // Assert (implicit)
+        // The test passes if a RuntimeException is thrown, as specified by the @Test annotation.
     }
 }
