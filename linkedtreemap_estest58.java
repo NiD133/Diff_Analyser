@@ -2,25 +2,30 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest58 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test class contains tests for the LinkedTreeMap class.
+ * This particular test focuses on the behavior of the get() method with a null key.
+ */
+public class LinkedTreeMap_ESTestTest58 { // Retaining original class name for context
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        Comparator<LinkedTreeMap<Integer, Integer>> comparator0 = (Comparator<LinkedTreeMap<Integer, Integer>>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap0 = new LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer>(comparator0, false);
-        linkedTreeMap0.get((Object) null);
-        assertEquals(0, linkedTreeMap0.size());
+    /**
+     * Verifies that calling get() with a null key on an empty map
+     * returns null and does not alter the map's state.
+     */
+    @Test
+    public void get_whenKeyIsNullOnEmptyMap_returnsNullAndDoesNotModifyMap() {
+        // Arrange: Create an empty LinkedTreeMap.
+        // A simple key-value type (String, Integer) is used for clarity.
+        // The default constructor is sufficient as the behavior for get(null)
+        // is independent of the comparator.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+
+        // Act: Attempt to retrieve a value using a null key.
+        Integer value = map.get(null);
+
+        // Assert: Verify the behavior is correct.
+        assertNull("The get(null) method should always return null.", value);
+        assertEquals("The map's size should remain 0.", 0, map.size());
     }
 }
