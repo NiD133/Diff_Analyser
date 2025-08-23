@@ -1,46 +1,75 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest35 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * Contains tests for the {@link UTF8Writer} class, focusing on edge cases
+ * like handling of malformed Unicode sequences.
+ */
+public class UTF8WriterTest {
+
+    /**
+     * Tests that writing a character that is not a low surrogate immediately after
+     * writing a high surrogate results in an IOException. This verifies the correct
+     * handling of broken or illegal surrogate pairs.
+     */
     @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.rawReference(true, (Object) null);
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, (StreamWriteConstraints) null, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        uTF8Writer0.write(56319);
+    public void shouldThrowIOExceptionWhenHighSurrogateIsFollowedByNonLowSurrogate() {
+        // Arrange
+        // A high surrogate is the first character in a two-character sequence
+        // used to represent Unicode code points beyond the Basic Multilingual Plane.
+        // 0xDBFF is the last valid high surrogate.
+        final int highSurrogate = 0xDBFF;
+
+        // This character is not a valid low surrogate, which should cause an error.
+        final String subsequentInvalidChar = "c";
+
+        // Set up the necessary context and a writer that writes to an in-memory buffer.
+        IOContext ioContext = createIOContext();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, outputStream);
+
         try {
-            uTF8Writer0.write("com.fasterxml.jackson.core.io.IOContext");
-            fail("Expecting exception: IOException");
+            // Act
+            // 1. Write the high surrogate. It gets buffered, awaiting the low surrogate.
+            utf8Writer.write(highSurrogate);
+
+            // 2. Attempt to write a character that cannot legally follow a high surrogate.
+            utf8Writer.write(subsequentInvalidChar);
+
+            // Assert: If we reach here, the test fails because no exception was thrown.
+            fail("Expected an IOException for a broken surrogate pair, but none was thrown.");
+
         } catch (IOException e) {
-            //
-            // Broken surrogate pair: first char 0xdbff, second 0x63; illegal combination
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            // Assert: Verify the exception is the one we expect.
+            // The message should clearly state the illegal combination of characters.
+            // 0x63 is the hexadecimal representation of the character 'c'.
+            String expectedMessage = "Broken surrogate pair: first char 0xdbff, second 0x63; illegal combination";
+            assertEquals(expectedMessage, e.getMessage());
         }
+    }
+
+    /**
+     * Helper method to create a default IOContext for tests.
+     */
+    private IOContext createIOContext() {
+        return new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.rawReference(false, null),
+                true
+        );
     }
 }
