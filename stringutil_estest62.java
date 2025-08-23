@@ -1,30 +1,28 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest62 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        String[] stringArray0 = new String[8];
-        stringArray0[0] = "";
-        boolean boolean0 = StringUtil.in("", stringArray0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that StringUtil.in() correctly returns true when the target string
+     * is present in the provided array.
+     */
+    @Test
+    public void inShouldReturnTrueWhenStringIsPresentInArray() {
+        // Arrange: Define the array to be searched (the "haystack") and the
+        // string to find (the "needle").
+        String[] haystack = {"alpha", "beta", "", "gamma"};
+        String needle = "";
+
+        // Act: Call the method under test.
+        boolean isFound = StringUtil.in(needle, haystack);
+
+        // Assert: Verify that the string was found.
+        assertTrue("Expected 'in' to return true for a string present in the array.", isFound);
     }
 }
