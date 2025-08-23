@@ -1,19 +1,30 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Soundex_ESTestTest2 extends Soundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link Soundex} class.
+ */
+public class SoundexTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Soundex soundex0 = new Soundex();
-        soundex0.setMaxLength((-2841));
-        int int0 = soundex0.getMaxLength();
-        assertEquals((-2841), int0);
+    /**
+     * Tests the behavior of the deprecated setMaxLength/getMaxLength methods.
+     * The test confirms that the property can be set to a negative value,
+     * which reflects the current behavior of this deprecated feature.
+     */
+    @Test
+    @SuppressWarnings("deprecation") // Intentionally testing deprecated methods
+    public void shouldSetAndGetNegativeValueForDeprecatedMaxLength() {
+        // Arrange
+        final Soundex soundex = new Soundex();
+        final int negativeLength = -2841;
+
+        // Act
+        soundex.setMaxLength(negativeLength);
+        final int actualLength = soundex.getMaxLength();
+
+        // Assert
+        assertEquals("The retrieved max length should match the set value.", negativeLength, actualLength);
     }
 }
