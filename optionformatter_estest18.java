@@ -1,23 +1,28 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest18 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Option option0 = new Option((String) null, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.toOptional("");
-        assertEquals("", string0);
+    @Test
+    public void toOptionalShouldReturnEmptyStringForEmptyInput() {
+        // Arrange
+        // A dummy option is required to create a formatter instance,
+        // but its properties do not affect the toOptional() method.
+        final Option dummyOption = new Option(null, "dummy");
+        final OptionFormatter formatter = OptionFormatter.from(dummyOption);
+        final String emptyInput = "";
+
+        // Act
+        final String result = formatter.toOptional(emptyInput);
+
+        // Assert
+        assertEquals("The toOptional method should return an empty string when the input is empty.", "", result);
     }
 }
