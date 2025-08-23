@@ -1,17 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest58 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on its number-to-string
+ * conversion capabilities.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        String string0 = NumberOutput.toString(1.0F, true);
-        assertEquals("1.0", string0);
+    /**
+     * Verifies that the {@code toString(float, boolean)} method correctly formats a
+     * whole number float (e.g., 1.0F) when the 'useFastWriter' option is enabled.
+     * The expected result should retain the decimal part, like "1.0".
+     */
+    @Test
+    public void toStringWithFastWriterShouldCorrectlyFormatWholeNumberFloat() {
+        // Arrange: Define the input value and the expected string output.
+        float inputValue = 1.0F;
+        boolean useFastWriter = true;
+        String expectedOutput = "1.0";
+
+        // Act: Call the method under test.
+        String actualOutput = NumberOutput.toString(inputValue, useFastWriter);
+
+        // Assert: Verify that the actual output matches the expected value.
+        assertEquals(expectedOutput, actualOutput);
     }
 }
