@@ -1,23 +1,31 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class OptionFormatter_ESTestTest29 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Option option0 = new Option("?Wf", "?Wf");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getBothOpt();
-        assertEquals("-?Wf", string0);
+    /**
+     * Tests that getBothOpt() correctly formats an option that only has a short name defined.
+     * The expected output is the short name prefixed with the default hyphen.
+     */
+    @Test
+    public void getBothOptShouldReturnPrefixedShortOptWhenOnlyShortOptIsDefined() {
+        // Arrange: Create an option that has a short name but no long name.
+        Option optionWithOnlyShortName = new Option("v", "Enable verbose mode");
+        OptionFormatter formatter = OptionFormatter.from(optionWithOnlyShortName);
+        
+        String expectedFormattedString = "-v";
+
+        // Act: Get the formatted string for the option.
+        String actualFormattedString = formatter.getBothOpt();
+
+        // Assert: Verify that the output is the correctly prefixed short option.
+        assertEquals("Expected only the prefixed short option when no long option is present.",
+                expectedFormattedString, actualFormattedString);
     }
 }
