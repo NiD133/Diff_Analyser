@@ -3,77 +3,54 @@ package org.apache.commons.io.function;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest19 {
+/**
+ * Tests {@link Uncheck#run(IORunnable)}.
+ */
+// Renamed from UncheckTestTest19 for clarity
+public class UncheckRunTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
+    /**
+     * Tests that {@link Uncheck#run(IORunnable)} executes a runnable that does not
+     * throw an exception and completes normally.
+     */
+    @Test
+    public void testRun_whenRunnableSucceeds_completesNormally() {
+        // Arrange: A flag to verify that the runnable was indeed executed.
+        final AtomicBoolean executed = new AtomicBoolean(false);
+        final IORunnable successfulRunnable = () -> executed.set(true);
 
-    private static final String CAUSE_MESSAGE = "CauseMessage";
+        // Act: Execute the runnable using the Uncheck utility.
+        Uncheck.run(successfulRunnable);
 
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+        // Assert: The flag should be true, confirming execution.
+        assertTrue(executed.get(), "The runnable should have been executed.");
     }
 
     /**
-     * Tests {@link Uncheck#run(IORunnable)}.
+     * Tests that {@link Uncheck#run(IORunnable)} correctly wraps a thrown
+     * {@link IOException} into an {@link UncheckedIOException}.
      */
     @Test
-    void testRun() {
-        final ByteArrayInputStream stream = newInputStream();
-        Uncheck.run(() -> stream.skip(1));
-        assertEquals('b', Uncheck.get(stream::read).intValue());
-        //
-        assertThrows(UncheckedIOException.class, () -> Uncheck.run(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.run(TestConstants.THROWING_IO_RUNNABLE));
-        Uncheck.run(() -> TestUtils.compareAndSetThrowsIO(ref1, "new1"));
-        assertEquals("new1", ref1.get());
+    public void testRun_whenRunnableThrowsIOException_throwsUncheckedIOException() {
+        // Arrange: A specific IOException to be thrown by the runnable.
+        final IOException expectedCause = new IOException("Test I/O failure");
+        final IORunnable failingRunnable = () -> {
+            throw expectedCause;
+        };
+
+        // Act & Assert: Verify that Uncheck.run throws UncheckedIOException
+        // and that the cause is the original IOException.
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.run(failingRunnable);
+        });
+
+        assertEquals(expectedCause, thrown.getCause(), "The cause of the UncheckedIOException should be the original IOException.");
     }
 }
