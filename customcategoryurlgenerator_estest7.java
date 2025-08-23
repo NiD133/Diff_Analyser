@@ -1,26 +1,38 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest7 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        List<String> list0 = List.of("2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "2p8~6Bu{q8c&Ro)", "", "");
-        customCategoryURLGenerator0.addURLSeries(list0);
-        int int0 = customCategoryURLGenerator0.getURLCount(0);
-        assertEquals(6, int0);
+    /**
+     * Verifies that getURLCount() returns the correct number of URLs
+     * for a specific series that has been added.
+     */
+    @Test
+    public void getURLCount_shouldReturnCorrectSizeForAddedSeries() {
+        // Arrange: Create a URL generator and add a list of URLs as the first series.
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        List<String> urlSeries = List.of(
+            "details.html?id=1",
+            "details.html?id=2",
+            "details.html?id=3",
+            "details.html?id=4",
+            "details.html?id=5",
+            "details.html?id=6"
+        );
+        generator.addURLSeries(urlSeries);
+
+        // Act: Get the URL count for the first series (at index 0).
+        int actualUrlCount = generator.getURLCount(0);
+
+        // Assert: The returned count should match the size of the list that was added.
+        int expectedUrlCount = urlSeries.size();
+        assertEquals(expectedUrlCount, actualUrlCount);
     }
 }
