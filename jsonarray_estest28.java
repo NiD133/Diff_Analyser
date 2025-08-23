@@ -1,29 +1,27 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest28 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
-        try {
-            jsonArray0.remove((-1));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling remove() with a negative index throws an 
+     * ArrayIndexOutOfBoundsException, as the operation is delegated to an
+     * underlying ArrayList which enforces this boundary check.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void remove_withNegativeIndex_shouldThrowArrayIndexOutOfBoundsException() {
+        // Arrange: Create an empty JsonArray instance.
+        JsonArray jsonArray = new JsonArray();
+
+        // Act: Attempt to remove an element at an invalid, negative index.
+        // This action is expected to throw the exception.
+        jsonArray.remove(-1);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // This is handled declaratively by the @Test(expected=...) annotation.
     }
 }
