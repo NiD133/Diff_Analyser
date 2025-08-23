@@ -1,76 +1,80 @@
 package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest12 {
+/**
+ * Tests for {@link Uncheck#get(IOSupplier)}.
+ */
+@DisplayName("Uncheck.get(IOSupplier)")
+class UncheckGetTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
+    private static final byte[] TEST_BYTES = {'a', 'b'};
 
-    private static final String CAUSE_MESSAGE = "CauseMessage";
+    /**
+     * Tests that Uncheck.get() returns the value from the supplier when no exception is thrown.
+     */
+    @Test
+    @DisplayName("Should return the supplier's result on success")
+    void shouldReturnSuppliersResultOnSuccess() {
+        // Arrange: An IOSupplier that successfully reads a byte from an input stream.
+        final IOSupplier<Integer> successfulSupplier = () -> new ByteArrayInputStream(TEST_BYTES).read();
 
-    private static final String CUSTOM_MESSAGE = "Custom message";
+        // Act: Call Uncheck.get() with the successful supplier.
+        final int result = Uncheck.get(successfulSupplier);
 
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+        // Assert: The result should be the first byte from the stream.
+        assertEquals('a', result);
     }
 
     /**
-     * Tests {@link Uncheck#get(IOSupplier)}.
+     * Tests that Uncheck.get() wraps an IOException in an UncheckedIOException.
      */
     @Test
-    void testGet() {
-        assertEquals('a', Uncheck.get(() -> newInputStream().read()).intValue());
-        assertThrows(UncheckedIOException.class, () -> Uncheck.get(() -> {
-            throw new IOException();
-        }));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.get(TestConstants.THROWING_IO_SUPPLIER));
-        assertEquals("new1", Uncheck.get(() -> TestUtils.compareAndSetThrowsIO(ref1, "new1")));
-        assertEquals("new1", ref1.get());
+    @DisplayName("Should throw UncheckedIOException when the supplier throws an IOException")
+    void shouldThrowUncheckedIOExceptionOnFailure() {
+        // Arrange: An IOSupplier that is designed to fail by throwing an IOException.
+        final IOException cause = new IOException("Test I/O failure");
+        final IOSupplier<?> failingSupplier = () -> {
+            throw cause;
+        };
+
+        // Act & Assert: Verify that calling Uncheck.get() throws an UncheckedIOException
+        // and that the original IOException is the cause.
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.get(failingSupplier);
+        });
+        assertSame(cause, thrown.getCause(), "The cause of the UncheckedIOException should be the original IOException.");
+    }
+
+    /**
+     * Tests that Uncheck.get() correctly executes a supplier that has side effects.
+     */
+    @Test
+    @DisplayName("Should correctly execute a supplier with side effects")
+    void shouldExecuteSupplierWithSideEffects() {
+        // Arrange: An AtomicReference to observe the side effect and an IOSupplier that modifies it.
+        final AtomicReference<String> sideEffectState = new AtomicReference<>("initial");
+        final String expectedValue = "updated";
+        final IOSupplier<String> supplierWithSideEffect = () -> {
+            sideEffectState.set(expectedValue);
+            return expectedValue;
+        };
+
+        // Act: Call Uncheck.get() with the supplier.
+        final String result = Uncheck.get(supplierWithSideEffect);
+
+        // Assert: The returned value and the side effect are both correct.
+        assertEquals(expectedValue, result, "The method should return the value from the supplier.");
+        assertEquals(expectedValue, sideEffectState.get(), "The supplier's side effect should have been executed.");
     }
 }
