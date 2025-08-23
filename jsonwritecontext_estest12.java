@@ -2,31 +2,32 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest12 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on the state of a root context.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.getParent();
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
-        assertNull(jsonWriteContext1);
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertTrue(jsonWriteContext0.inRoot());
+    /**
+     * Verifies that a newly created root context has the expected initial state:
+     * <ul>
+     *     <li>It is correctly identified as a root context.</li>
+     *     <li>Its parent is null.</li>
+     *     <li>Its nesting depth and entry count are zero.</li>
+     * </ul>
+     */
+    @Test
+    public void createRootContext_shouldHaveNullParentAndZeroDepth() {
+        // Arrange: Create a new root context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+
+        // Act: Attempt to retrieve the parent of the root context.
+        JsonWriteContext parentContext = rootContext.getParent();
+
+        // Assert: Verify the initial state of the root context.
+        assertTrue("A newly created context should be identified as the root", rootContext.inRoot());
+        assertNull("The parent of a root context should be null", parentContext);
+        assertEquals("The nesting depth of a root context should be 0", 0, rootContext.getNestingDepth());
+        assertEquals("The initial entry count of a root context should be 0", 0, rootContext.getEntryCount());
     }
 }
