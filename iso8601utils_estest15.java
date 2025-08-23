@@ -1,31 +1,50 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class ISO8601Utils_ESTestTest15 extends ISO8601Utils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition((-2016));
+/**
+ * Test suite for the {@link ISO8601Utils} class.
+ */
+public class ISO8601UtilsTest {
+
+    /**
+     * Verifies that calling parse() with a null input string results in a ParseException.
+     * The internal parsing logic is expected to fail with a NumberFormatException when
+     * it attempts to process the null string, which is then wrapped in a ParseException.
+     */
+    @Test
+    public void parse_withNullInputString_shouldThrowParseException() {
+        // Arrange
+        String nullDateString = null;
+        ParsePosition position = new ParsePosition(0);
+
+        // Act & Assert
         try {
-            ISO8601Utils.parse((String) null, parsePosition0);
-            fail("Expecting exception: ParseException");
+            ISO8601Utils.parse(nullDateString, position);
+            fail("A ParseException was expected for null input, but was not thrown.");
         } catch (ParseException e) {
-            //
-            // Failed to parse date [null]: (java.lang.NumberFormatException)
-            //
-            verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
+            // Verify the exception message clearly indicates the failure.
+            String expectedMessagePrefix = "Failed to parse date [null]";
+            assertTrue(
+                "Exception message should start with: '" + expectedMessagePrefix + "'",
+                e.getMessage().startsWith(expectedMessagePrefix)
+            );
+
+            // Verify the underlying cause of the parsing failure.
+            Throwable cause = e.getCause();
+            assertNotNull("The ParseException should have an underlying cause.", cause);
+            assertEquals(
+                "The cause of the failure should be a NumberFormatException.",
+                NumberFormatException.class,
+                cause.getClass()
+            );
         }
     }
 }
