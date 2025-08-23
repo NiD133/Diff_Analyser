@@ -1,34 +1,19 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Entities_ESTestTest20 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities#unescape(String, boolean)} method.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        // Undeclared exception!
-        try {
-            Entities.unescape((String) null, false);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling unescape with a null input string throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void unescapeWithNullInputShouldThrowNullPointerException() {
+        // The 'strict' parameter (false in this case) is irrelevant;
+        // the method should perform a null check before any other processing.
+        Entities.unescape(null, false);
     }
 }
