@@ -1,18 +1,25 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest15 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Seconds seconds0 = Seconds.ZERO;
-        Seconds seconds1 = seconds0.plus(seconds0);
-        assertEquals(0, seconds1.getSeconds());
+    /**
+     * Tests that adding zero seconds to zero seconds results in zero seconds.
+     */
+    @Test
+    public void plus_whenAddingZeroToZero_thenResultIsZero() {
+        // Arrange
+        Seconds zero = Seconds.ZERO;
+
+        // Act
+        Seconds result = zero.plus(zero);
+
+        // Assert
+        assertEquals(Seconds.ZERO, result);
     }
 }
