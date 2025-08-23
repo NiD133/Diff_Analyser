@@ -1,31 +1,38 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CodecEncoding_ESTestTest4 extends CodecEncoding_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        Codec codec0 = CodecEncoding.getCodec(0, pipedInputStream0, (Codec) null);
-        assertNull(codec0);
+/**
+ * This test class focuses on the behavior of the CodecEncoding.getCodec() method.
+ */
+public class CodecEncodingTest {
+
+    /**
+     * Tests that getCodec() returns the default codec when the encoding value is 0.
+     * <p>
+     * According to the Pack200 specification, an encoding value of 0 is a special
+     * case that signifies "use the default codec for this band". This test verifies
+     * that behavior by passing null as the default codec and asserting that null is returned.
+     * </p>
+     */
+    @Test
+    public void getCodecWithValueZeroShouldReturnTheProvidedDefaultCodec() throws Exception {
+        // Arrange: A value of 0 indicates that the default codec should be used.
+        final int encodingValue = 0;
+        final Codec defaultCodec = null;
+        // The input stream is not used for this encoding value, but the method requires it.
+        // An empty stream is sufficient and simpler than using piped streams.
+        final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+
+        // Act: Call the method under test.
+        final Codec result = CodecEncoding.getCodec(encodingValue, inputStream, defaultCodec);
+
+        // Assert: The result should be the same as the default codec provided.
+        assertNull("When the encoding value is 0, the method should return the provided default codec.", result);
     }
 }
