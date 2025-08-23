@@ -1,43 +1,63 @@
 package org.mockito.internal.util.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class HashCodeAndEqualsSafeSetTestTest14 {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
     @Rule
-    public MockitoRule r = MockitoJUnit.rule();
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private UnmockableHashCodeAndEquals mock1;
+    // Descriptive name for the mock, clarifying its role in the test.
+    private MockWithBrokenEqualsAndHashCode mockWithBrokenMethods;
 
-    private static class UnmockableHashCodeAndEquals {
-
+    /**
+     * A helper class that simulates an object where `hashCode()` and `equals()`
+     * are final and throw exceptions. This is the primary use case for
+     * {@link HashCodeAndEqualsSafeSet}, which must handle such objects gracefully
+     * without throwing exceptions.
+     */
+    private static class MockWithBrokenEqualsAndHashCode {
         @Override
         public final int hashCode() {
-            throw new NullPointerException("I'm failing on hashCode and I don't care");
+            throw new UnsupportedOperationException("This hashCode() method is intentionally broken.");
         }
 
         @Override
         public final boolean equals(Object obj) {
-            throw new NullPointerException("I'm failing on equals and I don't care");
+            throw new UnsupportedOperationException("This equals() method is intentionally broken.");
         }
     }
 
+    /**
+     * Verifies that the {@link HashCodeAndEqualsSafeSet#equals(Object)} method returns false
+     * when comparing two sets with different contents.
+     * <p>
+     * Crucially, this test ensures the comparison does not fail even when the set's elements
+     * have `equals()` or `hashCode()` methods that throw exceptions.
+     */
     @Test
-    public void isNotEqualWhenContentIsDifferent() {
-        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of(mock1);
-        assertThat(set).isNotEqualTo(HashCodeAndEqualsSafeSet.of());
+    public void shouldBeUnequalForSetsWithDifferentContent() {
+        // Arrange
+        HashCodeAndEqualsSafeSet setWithElement = HashCodeAndEqualsSafeSet.of(mockWithBrokenMethods);
+        HashCodeAndEqualsSafeSet emptySet = HashCodeAndEqualsSafeSet.of();
+
+        // Act & Assert
+        // The `equals` implementation of HashCodeAndEqualsSafeSet should correctly
+        // identify the sets as different without throwing an exception from the problematic element.
+        assertThat(setWithElement).isNotEqualTo(emptySet);
+
+        // Also verify the equals contract is symmetrical.
+        assertThat(emptySet).isNotEqualTo(setWithElement);
     }
 }
