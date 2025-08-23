@@ -1,25 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class PatternOptionBuilder_ESTestTest31 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        // Undeclared exception!
+    @Test
+    public void parsePatternShouldThrowExceptionForInvalidOptionName() {
+        // GIVEN a pattern string that includes an invalid character for an option name.
+        // The '=' character is not a valid option name.
+        final String invalidPattern = "a=b";
+
         try {
-            PatternOptionBuilder.parsePattern("4K<:s%L=GX$");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal option name '='.
-            //
-            verifyException("org.apache.commons.cli.OptionValidator", e);
+            // WHEN parsing the pattern
+            PatternOptionBuilder.parsePattern(invalidPattern);
+            fail("Expected an IllegalArgumentException to be thrown.");
+        } catch (final IllegalArgumentException e) {
+            // THEN an exception is thrown with a message indicating the invalid character.
+            assertEquals("Illegal option name '='.", e.getMessage());
         }
     }
 }
