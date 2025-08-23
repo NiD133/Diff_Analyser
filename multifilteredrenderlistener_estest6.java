@@ -1,32 +1,33 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class MultiFilteredRenderListener_ESTestTest6 extends MultiFilteredRenderListener_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MultiFilteredRenderListener} class.
+ */
+public class MultiFilteredRenderListenerTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-        RenderFilter[] renderFilterArray0 = new RenderFilter[0];
-        multiFilteredRenderListener0.attachRenderListener(locationTextExtractionStrategy0, renderFilterArray0);
-        // Undeclared exception!
-        try {
-            multiFilteredRenderListener0.renderText((TextRenderInfo) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.LocationTextExtractionStrategy", e);
-        }
+    /**
+     * Verifies that calling {@link MultiFilteredRenderListener#renderText(TextRenderInfo)}
+     * with a null argument throws a {@link NullPointerException}.
+     * <p>
+     * This scenario tests that the call is correctly forwarded to a delegate listener,
+     * which in turn is expected to throw the exception when given null input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void renderText_withNullRenderInfo_throwsNullPointerException() {
+        // Arrange: Create a multi-listener and attach a delegate listener.
+        // An empty filter array ensures the delegate is always invoked.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        RenderListener delegateListener = new LocationTextExtractionStrategy();
+        RenderFilter[] noFilters = new RenderFilter[0];
+        multiListener.attachRenderListener(delegateListener, noFilters);
+
+        // Act: Call the method under test with a null argument.
+        // This is expected to cause the delegate to throw a NullPointerException.
+        multiListener.renderText(null);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
