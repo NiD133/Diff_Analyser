@@ -1,27 +1,41 @@
 package org.mockito.internal.invocation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
-import org.mockito.internal.matchers.CapturingMatcher;
-import org.mockito.internal.matchers.CompareEqual;
 import org.mockito.internal.matchers.GreaterOrEqual;
-import org.mockito.internal.matchers.Not;
-import org.mockito.internal.matchers.NotNull;
 
-public class TypeSafeMatching_ESTestTest5 extends TypeSafeMatching_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        ArgumentMatcherAction argumentMatcherAction0 = TypeSafeMatching.matchesTypeSafe();
-        Integer integer0 = new Integer(781);
-        GreaterOrEqual<Integer> greaterOrEqual0 = new GreaterOrEqual<Integer>(integer0);
-        Object object0 = new Object();
-        boolean boolean0 = argumentMatcherAction0.apply(greaterOrEqual0, object0);
-        assertFalse(boolean0);
+/**
+ * Tests for {@link TypeSafeMatching}.
+ */
+public class TypeSafeMatchingTest {
+
+    /**
+     * Verifies that the TypeSafeMatching action correctly identifies when an argument's
+     * type is incompatible with the matcher's expected generic type.
+     *
+     * The `apply` method should return `false` in this scenario, preventing a potential
+     * ClassCastException that would occur if the matcher's `matches` method were called directly.
+     */
+    @Test
+    public void shouldReturnFalseWhenArgumentTypeIsIncompatibleWithMatcherType() {
+        // Arrange
+        // The action under test, which performs a type-safe check.
+        ArgumentMatcherAction typeSafeMatching = TypeSafeMatching.matchesTypeSafe();
+
+        // A matcher that is parameterized to only accept Integers.
+        ArgumentMatcher<Integer> integerMatcher = new GreaterOrEqual<>(100);
+
+        // An argument of a type (Object) that is not an Integer.
+        Object incompatibleArgument = new Object();
+
+        // Act
+        // Apply the type-safe matching logic.
+        boolean isMatch = typeSafeMatching.apply(integerMatcher, incompatibleArgument);
+
+        // Assert
+        // The result must be false because a plain Object cannot be safely passed to a matcher for Integers.
+        assertFalse("Expected type-safe matching to fail for an incompatible argument type", isMatch);
     }
 }
