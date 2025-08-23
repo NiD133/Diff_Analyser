@@ -2,22 +2,24 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class DocumentType_ESTestTest2 extends DocumentType_ESTest_scaffolding {
+/**
+ * Tests for the {@link DocumentType} class.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        DocumentType documentType0 = new DocumentType("", "", "");
-        String string0 = documentType0.systemId();
-        assertEquals("#doctype", documentType0.nodeName());
-        assertEquals("", string0);
+    @Test
+    public void constructorWithEmptyStringsSetsPropertiesCorrectly() {
+        // Arrange: Define empty strings for the doctype's name, publicId, and systemId.
+        String name = "";
+        String publicId = "";
+        String systemId = "";
+
+        // Act: Create a new DocumentType instance.
+        DocumentType docType = new DocumentType(name, publicId, systemId);
+
+        // Assert: Verify that the properties of the newly created object are set as expected.
+        assertEquals("The systemId should be the empty string that was provided.", "", docType.systemId());
+        assertEquals("The nodeName for a DocumentType should always be '#doctype'.", "#doctype", docType.nodeName());
     }
 }
