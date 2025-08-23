@@ -1,31 +1,34 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest33 extends JsonArray_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonArray} focusing on its convenience getter methods.
+ */
+public class JsonArrayGetterTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Number) null);
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsInt();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
-        }
+    /**
+     * Verifies that calling getAsInt() on a JsonArray containing a single JsonNull element
+     * throws an UnsupportedOperationException. This is the expected behavior because a JSON
+     * null value cannot be converted to a primitive integer.
+     */
+    @Test
+    public void getAsInt_whenArrayContainsSingleJsonNull_throwsUnsupportedOperationException() {
+        // Arrange: Create a JsonArray and add a null value.
+        // The JsonArray class converts null inputs into JsonNull elements internally.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((Number) null);
+
+        // Act & Assert: Verify that calling getAsInt() throws the expected exception.
+        UnsupportedOperationException exception = assertThrows(
+            UnsupportedOperationException.class,
+            () -> jsonArray.getAsInt()
+        );
+
+        // The exception originates from JsonNull and its message is expected to be "JsonNull".
+        assertEquals("JsonNull", exception.getMessage());
     }
 }
