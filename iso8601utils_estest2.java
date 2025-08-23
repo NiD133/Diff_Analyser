@@ -1,24 +1,37 @@
 package com.google.gson.internal.bind.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.ParseException;
-import java.text.ParsePosition;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Calendar;
 import java.util.Date;
-import java.util.SimpleTimeZone;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ISO8601Utils_ESTestTest2 extends ISO8601Utils_ESTest_scaffolding {
+/**
+ * Tests for {@link ISO8601Utils}.
+ */
+public class ISO8601UtilsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        MockDate mockDate0 = new MockDate((-2147483646), (-2147483646), (-2147483646), (-2147483646), (-2147483646));
-        String string0 = ISO8601Utils.format((Date) mockDate0);
-        assertEquals("208737754-05-17T20:36:25Z", string0);
+    @Test
+    public void format_withFarFutureDate_returnsCorrectISO8601String() {
+        // Arrange
+        // The target date is 208,737,754-05-17T20:36:25Z.
+        // This specific date was derived from an auto-generated test case that used
+        // large negative values in the Date constructor, causing calendar rollovers.
+        // We construct the date explicitly here for better test clarity and maintainability.
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        Calendar calendar = new GregorianCalendar(utc);
+        calendar.set(208737754, Calendar.MAY, 17, 20, 36, 25);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date farFutureDate = calendar.getTime();
+
+        String expectedDateString = "208737754-05-17T20:36:25Z";
+
+        // Act
+        String actualDateString = ISO8601Utils.format(farFutureDate);
+
+        // Assert
+        assertEquals(expectedDateString, actualDateString);
     }
 }
