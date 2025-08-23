@@ -2,47 +2,48 @@ package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest11 extends MergedStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MergedStream} class, focusing on its read behavior
+ * when delegating to the underlying input stream.
+ */
+public class MergedStream_ESTestTest11 {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[12];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, 1, 1);
-        mergedStream0.read(byteArray0);
-        // Undeclared exception!
+    /**
+     * Tests that a call to {@code MergedStream.read(byte[], int, int)} with invalid
+     * arguments (a negative offset) correctly propagates the {@link IndexOutOfBoundsException}
+     * from the underlying stream when the MergedStream's internal buffer is exhausted.
+     */
+    @Test
+    public void readWithNegativeOffset_whenBufferExhausted_propagatesExceptionFromUnderlyingStream() throws IOException {
+        // Arrange: Set up a MergedStream with an exhausted internal buffer to ensure
+        // it delegates read operations to the underlying stream.
+        byte[] prefixBuffer = new byte[16];
+        int bufferStart = 8;
+        int bufferEnd = 8; // A start equal to end signifies an empty/exhausted buffer segment.
+
+        // Use a simple, predictable stream as the underlying source.
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]);
+
+        // The IOContext is not relevant to this test's logic, so null is acceptable.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, prefixBuffer, bufferStart, bufferEnd);
+
+        byte[] targetBuffer = new byte[10];
+        int invalidOffset = -1; // A negative offset is invalid per the InputStream#read contract.
+        int lengthToRead = 0;
+
+        // Act & Assert: Attempt to read with the invalid offset and verify that the
+        // expected exception is thrown.
         try {
-            mergedStream0.read(byteArray0, (-794), 0);
-            fail("Expecting exception: IndexOutOfBoundsException");
+            mergedStream.read(targetBuffer, invalidOffset, lengthToRead);
+            fail("Expected an IndexOutOfBoundsException due to the negative offset, but none was thrown.");
         } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.PipedInputStream", e);
+            // This is the expected outcome. The MergedStream correctly upholds the
+            // InputStream contract by propagating the exception from the delegate.
         }
     }
 }
