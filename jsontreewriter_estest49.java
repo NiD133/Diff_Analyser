@@ -1,26 +1,30 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
+import static org.junit.Assert.assertSame;
+
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest49 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTreeWriter} class.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        Strictness strictness0 = Strictness.LENIENT;
-        jsonTreeWriter0.setStrictness(strictness0);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value((-42.784203F));
-        assertSame(jsonWriter0, jsonTreeWriter0);
+    /**
+     * Verifies that the {@code value(float)} method returns the same writer instance,
+     * which is a common pattern for enabling method chaining (fluent API).
+     */
+    @Test
+    public void valueFloat_returnsSameWriterInstanceForChaining() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act
+        JsonWriter returnedWriter = writer.value(-42.784203F);
+
+        // Assert
+        // The method should return 'this' to allow for fluent method calls.
+        assertSame("The writer instance returned should be the same as the original.", writer, returnedWriter);
     }
 }
