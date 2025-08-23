@@ -1,56 +1,41 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.joda.time.DurationField;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class IslamicChronologyTestTest8 extends TestCase {
+import java.util.Locale;
+import java.util.TimeZone;
 
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the duration fields of the IslamicChronology.
+ * This test focuses on properties like name, support, and precision of fields
+ * such as years, months, days, hours, etc.
+ */
+public class IslamicChronologyDurationFieldTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    private static final Chronology ISLAMIC_CHRONOLOGY_UTC = IslamicChronology.getInstanceUTC();
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+    // A fixed point in time for consistent test results: 2002-06-09
+    private static final long TEST_TIME_NOW = new DateTime(2002, 6, 9, 0, 0, 0, 0).getMillis();
 
-    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() {
+        // Fix the current time and default zone to ensure tests are repeatable.
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
@@ -60,20 +45,18 @@ public class IslamicChronologyTestTest8 extends TestCase {
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() {
+        // Restore original system state
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    //-----------------------------------------------------------------------
-    public void testDurationFields() {
-        final IslamicChronology islamic = IslamicChronology.getInstance();
+    @Test
+    public void testDurationFieldNames() {
+        Chronology islamic = IslamicChronology.getInstance();
         assertEquals("eras", islamic.eras().getName());
         assertEquals("centuries", islamic.centuries().getName());
         assertEquals("years", islamic.years().getName());
@@ -86,53 +69,87 @@ public class IslamicChronologyTestTest8 extends TestCase {
         assertEquals("minutes", islamic.minutes().getName());
         assertEquals("seconds", islamic.seconds().getName());
         assertEquals("millis", islamic.millis().getName());
-        assertEquals(false, islamic.eras().isSupported());
-        assertEquals(true, islamic.centuries().isSupported());
-        assertEquals(true, islamic.years().isSupported());
-        assertEquals(true, islamic.weekyears().isSupported());
-        assertEquals(true, islamic.months().isSupported());
-        assertEquals(true, islamic.weeks().isSupported());
-        assertEquals(true, islamic.days().isSupported());
-        assertEquals(true, islamic.halfdays().isSupported());
-        assertEquals(true, islamic.hours().isSupported());
-        assertEquals(true, islamic.minutes().isSupported());
-        assertEquals(true, islamic.seconds().isSupported());
-        assertEquals(true, islamic.millis().isSupported());
-        assertEquals(false, islamic.centuries().isPrecise());
-        assertEquals(false, islamic.years().isPrecise());
-        assertEquals(false, islamic.weekyears().isPrecise());
-        assertEquals(false, islamic.months().isPrecise());
-        assertEquals(false, islamic.weeks().isPrecise());
-        assertEquals(false, islamic.days().isPrecise());
-        assertEquals(false, islamic.halfdays().isPrecise());
-        assertEquals(true, islamic.hours().isPrecise());
-        assertEquals(true, islamic.minutes().isPrecise());
-        assertEquals(true, islamic.seconds().isPrecise());
-        assertEquals(true, islamic.millis().isPrecise());
-        final IslamicChronology islamicUTC = IslamicChronology.getInstanceUTC();
-        assertEquals(false, islamicUTC.centuries().isPrecise());
-        assertEquals(false, islamicUTC.years().isPrecise());
-        assertEquals(false, islamicUTC.weekyears().isPrecise());
-        assertEquals(false, islamicUTC.months().isPrecise());
-        assertEquals(true, islamicUTC.weeks().isPrecise());
-        assertEquals(true, islamicUTC.days().isPrecise());
-        assertEquals(true, islamicUTC.halfdays().isPrecise());
-        assertEquals(true, islamicUTC.hours().isPrecise());
-        assertEquals(true, islamicUTC.minutes().isPrecise());
-        assertEquals(true, islamicUTC.seconds().isPrecise());
-        assertEquals(true, islamicUTC.millis().isPrecise());
-        final DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
-        final IslamicChronology islamicGMT = IslamicChronology.getInstance(gmt);
-        assertEquals(false, islamicGMT.centuries().isPrecise());
-        assertEquals(false, islamicGMT.years().isPrecise());
-        assertEquals(false, islamicGMT.weekyears().isPrecise());
-        assertEquals(false, islamicGMT.months().isPrecise());
-        assertEquals(true, islamicGMT.weeks().isPrecise());
-        assertEquals(true, islamicGMT.days().isPrecise());
-        assertEquals(true, islamicGMT.halfdays().isPrecise());
-        assertEquals(true, islamicGMT.hours().isPrecise());
-        assertEquals(true, islamicGMT.minutes().isPrecise());
-        assertEquals(true, islamicGMT.seconds().isPrecise());
-        assertEquals(true, islamicGMT.millis().isPrecise());
+    }
+
+    @Test
+    public void testDurationFieldSupported() {
+        Chronology islamic = IslamicChronology.getInstance();
+        assertFalse("Eras field should not be supported", islamic.eras().isSupported());
+        assertTrue("Centuries field should be supported", islamic.centuries().isSupported());
+        assertTrue("Years field should be supported", islamic.years().isSupported());
+        assertTrue("Weekyears field should be supported", islamic.weekyears().isSupported());
+        assertTrue("Months field should be supported", islamic.months().isSupported());
+        assertTrue("Weeks field should be supported", islamic.weeks().isSupported());
+        assertTrue("Days field should be supported", islamic.days().isSupported());
+        assertTrue("Halfdays field should be supported", islamic.halfdays().isSupported());
+        assertTrue("Hours field should be supported", islamic.hours().isSupported());
+        assertTrue("Minutes field should be supported", islamic.minutes().isSupported());
+        assertTrue("Seconds field should be supported", islamic.seconds().isSupported());
+        assertTrue("Millis field should be supported", islamic.millis().isSupported());
+    }
+
+    @Test
+    public void testDurationFieldPrecisionInZoneWithDST() {
+        // For a zone with Daylight Saving Time (like London), date-based fields are imprecise
+        // because the length of a day can vary (e.g., 23 or 25 hours).
+        Chronology islamic = IslamicChronology.getInstance(LONDON);
+
+        // Date-based fields are imprecise
+        assertFalse(islamic.centuries().isPrecise());
+        assertFalse(islamic.years().isPrecise());
+        assertFalse(islamic.weekyears().isPrecise());
+        assertFalse(islamic.months().isPrecise());
+        assertFalse(islamic.weeks().isPrecise());
+        assertFalse(islamic.days().isPrecise());
+        assertFalse(islamic.halfdays().isPrecise());
+
+        // Time-based fields are always precise
+        assertTrue(islamic.hours().isPrecise());
+        assertTrue(islamic.minutes().isPrecise());
+        assertTrue(islamic.seconds().isPrecise());
+        assertTrue(islamic.millis().isPrecise());
+    }
+
+    @Test
+    public void testDurationFieldPrecisionInUTC() {
+        // In UTC, there is no Daylight Saving, so a day is always exactly 24 hours.
+        // This makes date-based fields (days, weeks) precise.
+        // Larger fields (months, years) are still imprecise due to variable lengths.
+        Chronology islamicUTC = ISLAMIC_CHRONOLOGY_UTC;
+
+        // Larger, variable-length fields are imprecise
+        assertFalse(islamicUTC.centuries().isPrecise());
+        assertFalse(islamicUTC.years().isPrecise());
+        assertFalse(islamicUTC.weekyears().isPrecise());
+        assertFalse(islamicUTC.months().isPrecise());
+
+        // Fields with a fixed millisecond duration are precise in UTC
+        assertTrue(islamicUTC.weeks().isPrecise());
+        assertTrue(islamicUTC.days().isPrecise());
+        assertTrue(islamicUTC.halfdays().isPrecise());
+        assertTrue(islamicUTC.hours().isPrecise());
+        assertTrue(islamicUTC.minutes().isPrecise());
+        assertTrue(islamicUTC.seconds().isPrecise());
+        assertTrue(islamicUTC.millis().isPrecise());
+    }
+
+    @Test
+    public void testDurationFieldPrecisionInFixedOffsetZone() {
+        // Any fixed-offset zone (like GMT) behaves like UTC regarding field precision.
+        DateTimeZone gmt = DateTimeZone.forID("Etc/GMT");
+        Chronology islamicGMT = IslamicChronology.getInstance(gmt);
+
+        assertFalse(islamicGMT.centuries().isPrecise());
+        assertFalse(islamicGMT.years().isPrecise());
+        assertFalse(islamicGMT.weekyears().isPrecise());
+        assertFalse(islamicGMT.months().isPrecise());
+
+        assertTrue(islamicGMT.weeks().isPrecise());
+        assertTrue(islamicGMT.days().isPrecise());
+        assertTrue(islamicGMT.halfdays().isPrecise());
+        assertTrue(islamicGMT.hours().isPrecise());
+        assertTrue(islamicGMT.minutes().isPrecise());
+        assertTrue(islamicGMT.seconds().isPrecise());
+        assertTrue(islamicGMT.millis().isPrecise());
     }
 }
