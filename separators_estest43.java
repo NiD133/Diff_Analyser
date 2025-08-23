@@ -1,23 +1,52 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Separators_ESTestTest43 extends Separators_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Separators} class.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.AFTER;
-        Separators separators0 = new Separators("IS:B2Ea", 'V', separators_Spacing0, '9', separators_Spacing0, '9', separators_Spacing0);
-        char char0 = separators0.getObjectEntrySeparator();
-        assertEquals('V', separators0.getObjectFieldValueSeparator());
-        assertEquals(" ", separators0.getObjectEmptySeparator());
-        assertEquals('9', char0);
-        assertEquals(" ", separators0.getArrayEmptySeparator());
-        assertEquals('9', separators0.getArrayValueSeparator());
-        assertEquals("IS:B2Ea", separators0.getRootSeparator());
+    /**
+     * Verifies that the constructor correctly initializes all separator properties,
+     * including using the default values for empty object/array separators which are
+     * not specified in this deprecated constructor signature.
+     */
+    @Test
+    public void constructorWithSpacingShouldSetSeparatorsAndUseDefaultsForEmpty() {
+        // Arrange
+        final String expectedRootSeparator = "IS:B2Ea";
+        final char expectedObjectFieldValueSeparator = 'V';
+        final char expectedObjectEntrySeparator = '9';
+        final char expectedArrayValueSeparator = '9';
+        final Separators.Spacing spacing = Separators.Spacing.AFTER;
+
+        // Act
+        // This test uses a deprecated constructor to ensure backward compatibility.
+        Separators separators = new Separators(
+            expectedRootSeparator,
+            expectedObjectFieldValueSeparator, spacing,
+            expectedObjectEntrySeparator, spacing,
+            expectedArrayValueSeparator, spacing
+        );
+
+        // Assert
+        // Check that all values, including the implicitly set defaults, are correct.
+        assertEquals("Root separator should match the constructor argument",
+            expectedRootSeparator, separators.getRootSeparator());
+
+        assertEquals("Object field-value separator should match the constructor argument",
+            expectedObjectFieldValueSeparator, separators.getObjectFieldValueSeparator());
+        assertEquals("Object entry separator should match the constructor argument",
+            expectedObjectEntrySeparator, separators.getObjectEntrySeparator());
+        assertEquals("Array value separator should match the constructor argument",
+            expectedArrayValueSeparator, separators.getArrayValueSeparator());
+
+        // This constructor uses default values for empty separators.
+        assertEquals("Empty object separator should be the default space",
+            " ", separators.getObjectEmptySeparator());
+        assertEquals("Empty array separator should be the default space",
+            " ", separators.getArrayEmptySeparator());
     }
 }
