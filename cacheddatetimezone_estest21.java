@@ -1,28 +1,35 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest21 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-        // Undeclared exception!
-        try {
-            dateTimeZone0.hashCode();
-            //  fail("Expecting exception: IllegalArgumentException");
-            // Unstable assertion
-        } catch (IllegalArgumentException e) {
-        }
+/**
+ * Tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that the hashCode of a CachedDateTimeZone is the same as the hashCode
+     * of the original zone it wraps.
+     */
+    @Test
+    public void hashCode_shouldBeSameAsUncachedZone() {
+        // Arrange: Create a standard, non-fixed time zone.
+        // "America/New_York" is a good example of a complex time zone that would benefit from caching.
+        DateTimeZone originalZone = DateTimeZone.forID("America/New_York");
+
+        // Act: Wrap the original zone with a CachedDateTimeZone using the factory method.
+        DateTimeZone cachedZone = CachedDateTimeZone.forZone(originalZone);
+
+        // Assert: The hashCode of the cached zone should delegate to the original zone's hashCode.
+        // This confirms the decorator correctly preserves the hash code contract.
+        assertEquals(originalZone.hashCode(), cachedZone.hashCode());
+
+        // Further assert that we are indeed testing a decorator, not the original object itself.
+        assertNotSame("The factory method should return a new CachedDateTimeZone instance",
+                      originalZone, cachedZone);
     }
 }
