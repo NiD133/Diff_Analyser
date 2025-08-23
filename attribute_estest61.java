@@ -1,31 +1,39 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Attribute_ESTestTest61 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        Document.OutputSettings document_OutputSettings1 = document_OutputSettings0.syntax(document_OutputSettings_Syntax0);
-        Attribute.html("-Gkt9'/sI", "autofocus", (QuietAppendable) null, document_OutputSettings1);
-        assertEquals(Entities.EscapeMode.xhtml, document_OutputSettings1.escapeMode());
+/**
+ * Tests for the static Attribute.html() rendering method.
+ */
+public class Attribute_ESTestTest61 {
+
+    /**
+     * Tests that a boolean attribute, when rendered in XML syntax mode, is not collapsed
+     * but is instead output with an empty value. For example, 'autofocus' becomes 'autofocus=""'.
+     * This contrasts with HTML syntax, where it would be a collapsed name-only attribute.
+     */
+    @Test
+    public void booleanAttributeInXmlModeIsRenderedWithValue() {
+        // Arrange: Set up output settings for XML syntax.
+        Document.OutputSettings settings = new Document.OutputSettings();
+        settings.syntax(Document.OutputSettings.Syntax.xml);
+
+        // A StringBuilder will capture the output from the html() method.
+        StringBuilder accumulator = new StringBuilder();
+        // QuietAppendable is a jsoup internal class that wraps our StringBuilder.
+        QuietAppendable quietAppendable = new QuietAppendable(accumulator);
+
+        String booleanAttributeKey = "autofocus";
+
+        // Act: Render the attribute using the static html() method.
+        // We test with a null value, which is a common representation for boolean attributes.
+        Attribute.html(booleanAttributeKey, null, quietAppendable, settings);
+
+        // Assert: Verify the attribute is rendered as key="", with a leading space.
+        // The leading space is intentional, as attributes are appended after an element name.
+        assertEquals(" autofocus=\"\"", accumulator.toString());
     }
 }
