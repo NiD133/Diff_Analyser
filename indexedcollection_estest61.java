@@ -1,58 +1,46 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest61 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Predicate<Integer> predicate0 = NotNullPredicate.notNullPredicate();
-        ConstantTransformer<Integer, Predicate<Integer>> constantTransformer0 = new ConstantTransformer<Integer, Predicate<Integer>>(predicate0);
-        IndexedCollection<Predicate<Integer>, Integer> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Integer>) linkedList0, (Transformer<Integer, Predicate<Integer>>) constantTransformer0);
-        boolean boolean0 = indexedCollection0.addAll(linkedList0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for the {@link IndexedCollection} class.
+ * This class focuses on improving a single, auto-generated test case for clarity.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that calling addAll() with an empty collection does not modify the
+     * IndexedCollection and returns false, as per the Collection.addAll() contract.
+     */
+    @Test
+    public void addAllWithEmptyCollectionShouldReturnFalseAndNotModifyCollection() {
+        // Arrange
+        // Create an empty collection decorated with an index.
+        final Collection<Integer> baseCollection = new LinkedList<>();
+
+        // A simple transformer that assigns a constant key to all elements.
+        // The specific transformer logic is not important for this test.
+        final Transformer<Integer, String> keyTransformer = ConstantTransformer.constantTransformer("KEY");
+
+        final IndexedCollection<String, Integer> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(baseCollection, keyTransformer);
+
+        // Act
+        // Attempt to add an empty collection.
+        final boolean wasModified = indexedCollection.addAll(Collections.emptyList());
+
+        // Assert
+        // The addAll method should return false because the collection was not changed.
+        assertFalse("addAll() should return false when the input collection is empty.", wasModified);
+        assertTrue("The collection should remain empty after adding an empty collection.", indexedCollection.isEmpty());
     }
 }
