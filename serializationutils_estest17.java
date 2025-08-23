@@ -1,31 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class SerializationUtils_ESTestTest17 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.SerializationUtils}.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Integer integer0 = new Integer((byte) 114);
-        Integer integer1 = SerializationUtils.clone(integer0);
-        assertTrue(integer1.equals((Object) integer0));
+    /**
+     * Tests that cloning a serializable object results in a new object
+     * that is equal in value but is not the same instance.
+     */
+    @Test
+    public void clone_withSerializableObject_returnsEqualButNotSameInstance() {
+        // Arrange: Create a serializable object to be cloned.
+        final Integer original = 114;
+
+        // Act: Clone the object using the utility method.
+        final Integer cloned = SerializationUtils.clone(original);
+
+        // Assert: Verify the properties of the cloned object.
+        // 1. The cloned object should have the same value as the original.
+        assertEquals(original, cloned);
+        
+        // 2. The cloned object should be a different instance from the original.
+        assertNotSame(original, cloned);
     }
 }
