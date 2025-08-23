@@ -1,22 +1,29 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IslamicChronology_ESTestTest48 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance();
-        long long0 = islamicChronology0.getYearDifference((-2966L), (-2966L));
-        assertEquals(0L, long0);
+    /**
+     * Tests that the year difference between two identical millisecond instants is zero.
+     */
+    @Test
+    public void getYearDifference_withSameInstant_returnsZero() {
+        // Arrange
+        IslamicChronology islamicChronology = IslamicChronology.getInstance();
+        
+        // The specific instant in time does not matter for this test,
+        // only that the minuend and subtrahend are identical.
+        long anInstant = -2966L;
+
+        // Act
+        long yearDifference = islamicChronology.getYearDifference(anInstant, anInstant);
+
+        // Assert
+        assertEquals("The year difference between an instant and itself must be 0.", 0L, yearDifference);
     }
 }
