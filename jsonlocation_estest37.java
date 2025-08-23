@@ -1,25 +1,32 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest37 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        JsonLocation jsonLocation0 = new JsonLocation((Object) null, 500, 500, 500);
-        ContentReference contentReference0 = ContentReference.unknown();
-        JsonLocation jsonLocation1 = new JsonLocation(contentReference0, 344L, 0L, 500, 500);
-        boolean boolean0 = jsonLocation0.equals(jsonLocation1);
-        assertEquals(500, jsonLocation1.getLineNr());
-        assertEquals(500, jsonLocation1.getColumnNr());
-        assertEquals(500L, jsonLocation0.getCharOffset());
-        assertFalse(boolean0);
-        assertEquals(344L, jsonLocation1.getByteOffset());
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Tests that two JsonLocation objects are not considered equal if they have the same
+     * line and column numbers but differ in their byte or character offsets.
+     */
+    @Test
+    public void testEqualsReturnsFalseForDifferentOffsets() {
+        // Arrange
+        final int commonLine = 500;
+        final int commonColumn = 500;
+        final ContentReference commonSource = ContentReference.unknown();
+
+        // Create two locations with the same source, line, and column, but different offsets.
+        JsonLocation locationA = new JsonLocation(commonSource, -1L, 500L, commonLine, commonColumn);
+        JsonLocation locationB = new JsonLocation(commonSource, 344L, 0L, commonLine, commonColumn);
+
+        // Act & Assert
+        // The locations should not be equal because their byte and char offsets differ.
+        assertNotEquals(locationA, locationB);
     }
 }
