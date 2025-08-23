@@ -1,26 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest7 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for {@link ProxyReader}.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        char[] charArray0 = new char[1];
-        int int0 = taggedReader0.read(charArray0, 0, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that calling read(char[], int, int) with a length of zero
+     * correctly returns zero, as specified by the java.io.Reader contract.
+     * This ensures the proxy correctly delegates the call without altering behavior.
+     */
+    @Test
+    public void readWithZeroLengthShouldReturnZero() throws IOException {
+        // Arrange: Create a proxy reader with some underlying data.
+        // We use TaggedReader as a concrete implementation of the abstract ProxyReader.
+        final char[] buffer = new char[10];
+        try (Reader proxyReader = new TaggedReader(new StringReader("test data"))) {
+
+            // Act: Attempt to read 0 characters into the buffer.
+            final int charsRead = proxyReader.read(buffer, 0, 0);
+
+            // Assert: The number of characters read should be 0.
+            assertEquals("Reading zero characters should return 0", 0, charsRead);
+        }
     }
 }
