@@ -1,25 +1,34 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QuotedPrintableCodec_ESTestTest10 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Test suite for the QuotedPrintableCodec class, focusing on understandability.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(true);
-        Charset charset0 = Charset.defaultCharset();
-        String string0 = quotedPrintableCodec0.encode("5-W&+N>@GrPC$hDz.$", charset0);
-        assertEquals("5-W&+N>@GrPC$hDz.$", string0);
-        assertNotNull(string0);
+    /**
+     * Tests that encoding a string containing only printable characters
+     * (as defined by RFC 1521) results in the original, unchanged string,
+     * even when using the strict codec.
+     */
+    @Test
+    public void testEncodeStringWithOnlyPrintableCharsReturnsOriginalStringInStrictMode() {
+        // Arrange
+        // The 'strict=true' constructor enables encoding that adheres to all rules of RFC 1521.
+        // For a short string of printable characters, no encoding should occur.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(true);
+        final String plainText = "5-W&+N>@GrPC$hDz.$";
+        final Charset charset = Charset.defaultCharset();
+
+        // Act
+        final String encodedText = codec.encode(plainText, charset);
+
+        // Assert
+        // The encoded string should be identical to the original because all its characters
+        // are considered "printable" and do not require Quoted-Printable encoding.
+        assertEquals(plainText, encodedText);
     }
 }
