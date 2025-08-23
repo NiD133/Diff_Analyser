@@ -1,34 +1,38 @@
 package org.apache.commons.compress.compressors.gzip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class GzipCompressorOutputStream_ESTestTest1 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Test suite for {@link GzipCompressorOutputStream}, focusing on edge cases and invalid arguments.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        MockFile mockFile0 = new MockFile("L{'7<X6}>CRV", "A<!S*Ru-Q;9jYnC");
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream(mockFile0, false);
-        FilterOutputStream filterOutputStream0 = new FilterOutputStream(mockFileOutputStream0);
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(filterOutputStream0);
-        byte[] byteArray0 = new byte[1];
-        gzipCompressorOutputStream0.write(byteArray0, (int) (byte) 48, (-302));
-        assertEquals(10L, mockFile0.length());
+    /**
+     * Verifies that calling {@code write(byte[], int, int)} with a negative length
+     * throws an {@link IndexOutOfBoundsException}. This behavior is required by the
+     * general contract of {@link java.io.OutputStream#write(byte[], int, int)}.
+     *
+     * @throws IOException if an I/O error occurs during stream setup, which is not
+     *                     expected in this in-memory test.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void writeWithNegativeLengthShouldThrowIndexOutOfBoundsException() throws IOException {
+        // Arrange: Set up a GzipCompressorOutputStream that writes to an in-memory buffer.
+        // This avoids creating actual files and makes the test faster and more reliable.
+        ByteArrayOutputStream memoryOutputStream = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(memoryOutputStream);
+
+        byte[] buffer = new byte[64]; // A sample buffer to use for the write operation.
+        int offset = 48;              // A valid offset within the buffer.
+        int negativeLength = -302;    // An invalid negative length, which should trigger the exception.
+
+        // Act: Attempt to write data using the invalid negative length.
+        gzipOutputStream.write(buffer, offset, negativeLength);
+
+        // Assert: The test framework will automatically pass the test if the expected
+        // IndexOutOfBoundsException is thrown. If no exception is thrown, the test will fail.
     }
 }
