@@ -1,52 +1,52 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
 import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
 import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.evosuite.runtime.EvoAssertions.verifyException;
+import static org.junit.Assert.fail;
 
 public class CollectionBag_ESTestTest22 extends CollectionBag_ESTest_scaffolding {
 
+    /**
+     * Tests that CollectionBag.add() propagates exceptions thrown by the underlying
+     * decorated bag's transformer.
+     */
     @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        TreeBag<Predicate<Object>> treeBag0 = new TreeBag<Predicate<Object>>();
-        Predicate<Object> predicate0 = FalsePredicate.falsePredicate();
-        IfTransformer<Object, Predicate<Object>> ifTransformer0 = new IfTransformer<Object, Predicate<Object>>(predicate0, (Transformer<? super Object, ? extends Predicate<Object>>) null, (Transformer<? super Object, ? extends Predicate<Object>>) null);
-        Bag<Predicate<Object>> bag0 = TransformedBag.transformedBag((Bag<Predicate<Object>>) treeBag0, (Transformer<? super Predicate<Object>, ? extends Predicate<Object>>) ifTransformer0);
-        SynchronizedBag<Predicate<Object>> synchronizedBag0 = new SynchronizedBag<Predicate<Object>>(bag0, predicate0);
-        CollectionBag<Predicate<Object>> collectionBag0 = new CollectionBag<Predicate<Object>>(synchronizedBag0);
-        // Undeclared exception!
+    public void testAddWithCountPropagatesExceptionFromUnderlyingTransformer() {
+        // Arrange: Set up a CollectionBag that decorates a TransformedBag.
+        // The TransformedBag is configured with a transformer designed to throw a
+        // NullPointerException when an element is processed.
+
+        final Bag<Predicate<Object>> baseBag = new TreeBag<>();
+        final Predicate<Object> alwaysFalsePredicate = FalsePredicate.falsePredicate();
+
+        // This transformer uses a predicate that always returns false. When the predicate is
+        // false, it attempts to use the 'false' transformer, which we have set to null.
+        // This will cause a NullPointerException when transform() is called.
+        final Transformer<Predicate<Object>, Predicate<Object>> npeThrowingTransformer =
+                new IfTransformer<>(alwaysFalsePredicate, null, null);
+
+        final Bag<Predicate<Object>> transformedBag =
+                TransformedBag.transformedBag(baseBag, npeThrowingTransformer);
+
+        // The CollectionBag under test decorates the problematic TransformedBag.
+        final CollectionBag<Predicate<Object>> collectionBag = new CollectionBag<>(transformedBag);
+
+        final Predicate<Object> elementToAdd = FalsePredicate.falsePredicate();
+
+        // Act & Assert: Verify that calling add() on the CollectionBag propagates the NPE.
         try {
-            collectionBag0.add(predicate0, 0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // Even with a count of 0, TransformedBag still applies the transformer to the object.
+            collectionBag.add(elementToAdd, 0);
+            fail("Expected a NullPointerException to be thrown by the underlying transformer.");
+        } catch (final NullPointerException e) {
+            // The exception is expected to originate from the IfTransformer trying to
+            // invoke the null 'false' transformer.
             verifyException("org.apache.commons.collections4.functors.IfTransformer", e);
         }
     }
