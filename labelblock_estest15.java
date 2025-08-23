@@ -1,45 +1,34 @@
 package org.jfree.chart.block;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest15 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class, focusing on constructor validation.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Color color0 = Color.GREEN;
-        LabelBlock labelBlock0 = null;
-        try {
-            labelBlock0 = new LabelBlock("The 'item' index is out of bounds.", (Font) null, color0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'font' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException
+     * when the 'font' argument is null.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForNullFont() {
+        // Arrange: Define expectations for the exception
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Null 'font' argument.");
+
+        // Act: Attempt to create a LabelBlock with a null font
+        String text = "Test Label";
+        Paint paint = Color.GREEN;
+        new LabelBlock(text, null, paint);
     }
 }
