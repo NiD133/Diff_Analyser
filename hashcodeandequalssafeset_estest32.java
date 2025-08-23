@@ -1,31 +1,47 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest32 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Vector<Object> vector0 = new Vector<Object>();
-        vector0.add((Object) null);
-        Object[] objectArray0 = hashCodeAndEqualsSafeSet0.toArray();
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet1 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) vector0);
-        Object[] objectArray1 = hashCodeAndEqualsSafeSet1.toArray(objectArray0);
-        assertEquals(1, objectArray1.length);
+/**
+ * This test class focuses on the behavior of the HashCodeAndEqualsSafeSet,
+ * particularly its array conversion methods.
+ */
+public class HashCodeAndEqualsSafeSetTest {
+
+    /**
+     * This test verifies that the toArray(T[] a) method correctly creates and returns a new array
+     * when the provided array is too small to hold the set's elements.
+     *
+     * According to the Collection#toArray(T[] a) contract, if the provided array's length
+     * is less than the collection's size, a new array of the same runtime type is allocated
+     * and returned.
+     */
+    @Test
+    public void toArrayWithPreallocatedArraySmallerThanSetShouldReturnNewArray() {
+        // Arrange
+        // Create a set containing a single null element.
+        List<Object> sourceCollection = Collections.singletonList(null);
+        HashCodeAndEqualsSafeSet setWithNull = HashCodeAndEqualsSafeSet.of(sourceCollection);
+
+        // Create a pre-allocated array that is smaller than the set (it's empty).
+        Object[] tooSmallArray = new Object[0];
+        Object[] expectedArray = {null};
+
+        // Act
+        // Call toArray() with the undersized array.
+        Object[] resultArray = setWithNull.toArray(tooSmallArray);
+
+        // Assert
+        // The method should return a new array containing the set's elements.
+        assertArrayEquals("The returned array should contain the set's elements.", expectedArray, resultArray);
+
+        // Also, verify that a new array instance was created, as per the contract.
+        assertNotSame("A new array instance should have been created.", tooSmallArray, resultArray);
     }
 }
