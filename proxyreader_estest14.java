@@ -1,26 +1,33 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.PipedReader;
+import static org.junit.Assert.assertTrue;
+
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.apache.commons.io.output.NullWriter;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest14 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for {@link ProxyReader}.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
-        CharArrayWriter charArrayWriter0 = new CharArrayWriter(1018);
-        TeeReader teeReader0 = new TeeReader(stringReader0, charArrayWriter0);
-        boolean boolean0 = teeReader0.markSupported();
-        assertTrue(boolean0);
+    /**
+     * Tests that the markSupported() method correctly delegates to the underlying reader.
+     * A StringReader is used as the delegate because it is known to support marking.
+     */
+    @Test
+    public void markSupportedShouldDelegateToUnderlyingReader() {
+        // Arrange: Create a proxy reader with an underlying reader that supports marking.
+        // TeeReader is a concrete subclass of ProxyReader.
+        // StringReader is a reader that is known to return true for markSupported().
+        final Reader underlyingReader = new StringReader("test data");
+        final Reader proxyReader = new TeeReader(underlyingReader, NullWriter.INSTANCE);
+
+        // Act: Call markSupported() on the proxy reader.
+        final boolean isMarkSupported = proxyReader.markSupported();
+
+        // Assert: The result should be true, as the call is delegated to the StringReader.
+        assertTrue("markSupported() should be delegated to the underlying reader.", isMarkSupported);
     }
 }
