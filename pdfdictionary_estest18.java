@@ -1,36 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class PdfDictionary_ESTestTest18 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Test suite focusing on the behavior of the PdfDictionary class under exceptional conditions.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        pdfDictionary0.hashMap = null;
-        // Undeclared exception!
-        try {
-            pdfDictionary0.getKeys();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.PdfDictionary", e);
-        }
+    /**
+     * Verifies that getKeys() throws a NullPointerException if the internal
+     * map has been set to null.
+     *
+     * <p>This is a white-box test that simulates an invalid internal state.
+     * The public API of PdfDictionary ensures its internal map is always initialized,
+     * but this test ensures robustness against unexpected states that could arise,
+     * for example, through reflection.</p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void getKeysShouldThrowNullPointerExceptionWhenInternalMapIsNull() {
+        // Arrange: Create a PdfDictionary and manually set its internal state to be invalid.
+        // The 'hashMap' field is protected, allowing this direct manipulation in the test.
+        PdfDictionary dictionary = new PdfDictionary();
+        dictionary.hashMap = null;
+
+        // Act: Call the method under test. This is expected to throw the exception.
+        dictionary.getKeys();
+
+        // Assert: The test succeeds if a NullPointerException is thrown, as declared
+        // by the @Test(expected = ...) annotation. No further assertions are needed.
     }
 }
