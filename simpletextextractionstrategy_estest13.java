@@ -1,32 +1,26 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import javax.swing.text.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SimpleTextExtractionStrategy_ESTestTest13 extends SimpleTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SimpleTextExtractionStrategy} class.
+ */
+public class SimpleTextExtractionStrategyTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        SimpleTextExtractionStrategy simpleTextExtractionStrategy0 = new SimpleTextExtractionStrategy();
-        String string0 = simpleTextExtractionStrategy0.getResultantText();
-        assertEquals("", string0);
+    /**
+     * Verifies that a newly created SimpleTextExtractionStrategy instance
+     * returns an empty string before any text has been processed.
+     */
+    @Test
+    public void getResultantText_onNewInstance_returnsEmptyString() {
+        // Arrange: Create a new instance of the text extraction strategy.
+        SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+        // Act: Get the resultant text without processing any input.
+        String resultantText = strategy.getResultantText();
+
+        // Assert: The returned text should be empty.
+        assertEquals("The initial text from a new strategy should be empty.", "", resultantText);
     }
 }
