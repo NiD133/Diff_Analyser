@@ -2,61 +2,37 @@ package org.jfree.chart.block;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.jfree.chart.util.Size2D;
 
-public class GridArrangement_ESTestTest21 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GridArrangement} class, focusing on edge cases.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(0, 0);
-        assertNotNull(gridArrangement0);
-        ColumnArrangement columnArrangement0 = new ColumnArrangement();
-        assertNotNull(columnArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer(columnArrangement0);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        Size2D size2D0 = gridArrangement0.arrangeNF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals("Size2D[width=NaN, height=NaN]", size2D0.toString());
-        assertEquals(Double.NaN, size2D0.getWidth(), 0.01);
-        assertEquals(Double.NaN, size2D0.getHeight(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(Double.NaN, size2D0.width, 0.01);
-        assertEquals(Double.NaN, size2D0.height, 0.01);
+    /**
+     * Verifies that arranging an empty container with a 0x0 grid results in a size
+     * with NaN (Not-a-Number) dimensions. This is an edge case where the grid has
+     * no cells to arrange, leading to an undefined size.
+     */
+    @Test
+    public void arrangeWithZeroByZeroGridAndEmptyContainerShouldReturnNaNSize() {
+        // Arrange: Create a 0x0 grid, an empty container, and a "NONE" constraint,
+        // which imposes no restrictions on size.
+        GridArrangement gridArrangement = new GridArrangement(0, 0);
+        BlockContainer emptyContainer = new BlockContainer();
+        RectangleConstraint noConstraint = RectangleConstraint.NONE;
+        Graphics2D g2 = null; // The graphics context is not used in this scenario.
+
+        // Act: Attempt to arrange the empty container using the 0x0 grid.
+        // The protected method arrangeNF is called directly to isolate the test.
+        Size2D arrangedSize = gridArrangement.arrangeNF(emptyContainer, g2, noConstraint);
+
+        // Assert: The resulting size should have NaN for both width and height,
+        // as arranging a grid with no cells is an undefined operation.
+        assertEquals("Width should be NaN for a 0x0 grid arrangement",
+                Double.NaN, arrangedSize.getWidth(), 0.0);
+        assertEquals("Height should be NaN for a 0x0 grid arrangement",
+                Double.NaN, arrangedSize.getHeight(), 0.0);
     }
 }
