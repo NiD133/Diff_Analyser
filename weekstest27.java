@@ -1,38 +1,28 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-public class WeeksTestTest27 extends TestCase {
+/**
+ * Test cases for the Weeks class.
+ */
+public class WeeksTest extends TestCase {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that adding a Weeks period to a LocalDate correctly calculates the new date.
+     */
+    public void testPlus_addsWeeksToLocalDate() {
+        // Arrange: Set up the initial state and expected outcome.
+        // Using the expressive constant provided by the Weeks class.
+        final Weeks weeksToAdd = Weeks.THREE;
+        final LocalDate startDate = new LocalDate(2006, 6, 1);
+        
+        // The expected date is 3 weeks (21 days) after the start date.
+        final LocalDate expectedDate = new LocalDate(2006, 6, 22);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Perform the action under test.
+        final LocalDate actualDate = startDate.plus(weeksToAdd);
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testAddToLocalDate() {
-        Weeks test = Weeks.weeks(3);
-        LocalDate date = new LocalDate(2006, 6, 1);
-        LocalDate expected = new LocalDate(2006, 6, 22);
-        assertEquals(expected, date.plus(test));
+        // Assert: Verify the action produced the correct result.
+        assertEquals(expectedDate, actualDate);
     }
 }
