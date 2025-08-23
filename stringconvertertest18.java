@@ -1,123 +1,42 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class StringConverterTestTest18 extends TestCase {
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+/**
+ * Tests the behavior of {@link StringConverter#getDurationMillis(Object)} for invalid inputs.
+ */
+class StringConverterGetDurationMillisTest {
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Provides a stream of invalid ISO 8601 duration strings.
+     * Each string is expected to cause an IllegalArgumentException when parsed.
+     *
+     * @return a stream of invalid duration strings.
+     */
+    private static Stream<String> invalidDurationStringProvider() {
+        return Stream.of(
+            "P2Y6M9DXYZ", // Contains invalid characters 'XYZ' at the end.
+            "PTS",        // Missing 'T' separator before time components.
+            "XT0S",       // Must start with 'P'.
+            "PX0S",       // 'X' is not a valid period designator.
+            "PT0X",       // 'X' is not a valid time unit designator (expected H, M, or S).
+            "PTXS",       // 'X' is not a valid number for a time unit.
+            "PT0.0.0S",   // Multiple decimal points are not allowed.
+            "PT0-00S",    // A hyphen is not allowed within a number.
+            "PT-.001S"    // A negative sign is only allowed at the very start of the string.
+        );
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testGetDurationMillis_Object2() throws Exception {
-        try {
-            StringConverter.INSTANCE.getDurationMillis("P2Y6M9DXYZ");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PTS");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("XT0S");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PX0S");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PT0X");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PTXS");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PT0.0.0S");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PT0-00S");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            StringConverter.INSTANCE.getDurationMillis("PT-.001S");
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
+    @ParameterizedTest
+    @MethodSource("invalidDurationStringProvider")
+    void getDurationMillis_whenInputIsInvalid_throwsIllegalArgumentException(String invalidDurationString) {
+        // Asserts that parsing an invalid duration string throws an IllegalArgumentException.
+        assertThrows(IllegalArgumentException.class, () -> {
+            StringConverter.INSTANCE.getDurationMillis(invalidDurationString);
+        });
     }
 }
