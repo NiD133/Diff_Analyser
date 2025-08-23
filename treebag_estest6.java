@@ -1,31 +1,32 @@
 package org.apache.commons.collections4.bag;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class TreeBag_ESTestTest6 extends TreeBag_ESTest_scaffolding {
+/**
+ * This test suite contains tests for the {@link TreeBag} class.
+ * The original test class name 'TreeBag_ESTestTest6' is kept for context,
+ * but would ideally be renamed to something more descriptive, like 'TreeBagTest'.
+ */
+public class TreeBag_ESTestTest6 { // Note: Scaffolding dependency removed for clarity.
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        LinkedList<Boolean> linkedList0 = new LinkedList<Boolean>();
-        TreeBag<Boolean> treeBag0 = new TreeBag<Boolean>((Collection<? extends Boolean>) linkedList0);
-        Comparator<? super Boolean> comparator0 = treeBag0.comparator();
-        assertNull(comparator0);
+    /**
+     * Tests that the comparator() method returns null when the TreeBag is
+     * constructed without a specific comparator, indicating it uses
+     * the natural ordering of its elements.
+     */
+    @Test
+    public void comparatorShouldReturnNullWhenUsingNaturalOrdering() {
+        // Arrange: Create a TreeBag using the default constructor. This constructor
+        // sets up the bag to use the natural ordering of its elements.
+        final TreeBag<String> bag = new TreeBag<>();
+
+        // Act: Retrieve the comparator from the bag.
+        final Comparator<? super String> comparator = bag.comparator();
+
+        // Assert: The comparator should be null, as per the contract for
+        // collections that are sorted by the elements' natural ordering.
+        assertNull("The comparator should be null when natural ordering is used.", comparator);
     }
 }
