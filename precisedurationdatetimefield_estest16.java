@@ -1,41 +1,58 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class contains the improved test case.
+ * The original test was part of a larger, auto-generated suite.
+ */
 public class PreciseDurationDateTimeField_ESTestTest16 extends PreciseDurationDateTimeField_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
-        MillisDurationField millisDurationField0 = (MillisDurationField) MillisDurationField.INSTANCE;
-        JulianChronology julianChronology0 = JulianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-        int int0 = preciseDateTimeField0.getMaximumValueForSet((-3870L), (-2146901673));
-        assertEquals(86399999, int0);
+    /**
+     * Tests that getMaximumValueForSet returns the correct maximum value,
+     * which is determined by the field's range duration, not its input parameters.
+     * The maximum value for a field is the total number of its units that fit
+     * into its range, minus one (because the minimum value is 0).
+     */
+    @Test
+    public void getMaximumValueForSet_shouldReturnMaximumValueBasedOnRangeDuration() {
+        // Arrange
+        // 1. Define a "millisecond of day" field for the test.
+        // This makes the test's purpose concrete and easy to reason about.
+        DateTimeFieldType milliOfDayType = DateTimeFieldType.millisOfDay();
+
+        // 2. The field's unit is one millisecond.
+        DurationField unitField = MillisDurationField.INSTANCE;
+
+        // 3. The field's range is one day. Using a standard UTC chronology is simpler
+        // and clearer than the original test's ZonedJulianChronology.
+        DurationField rangeField = GregorianChronology.getInstanceUTC().days();
+
+        // 4. Instantiate the field under test.
+        // Note: The original test used `PreciseDateTimeField`, a non-public concrete
+        // implementation of the abstract PreciseDurationDateTimeField.
+        PreciseDateTimeField milliOfDayField = new PreciseDateTimeField(milliOfDayType, unitField, rangeField);
+
+        // 5. Calculate the expected maximum value. For "millisecond of day", this is
+        // the number of milliseconds in a day minus one.
+        int expectedMaximumValue = DateTimeConstants.MILLIS_PER_DAY - 1;
+
+        // The implementation of getMaximumValueForSet in this class does not use its
+        // parameters. We use 0L and 0 to signify that their specific values are not important.
+        long arbitraryInstant = 0L;
+        int arbitraryValue = 0;
+
+        // Act
+        int actualMaximumValue = milliOfDayField.getMaximumValueForSet(arbitraryInstant, arbitraryValue);
+
+        // Assert
+        assertEquals("Maximum value should be the number of milliseconds in a day minus one",
+                expectedMaximumValue, actualMaximumValue);
     }
 }
