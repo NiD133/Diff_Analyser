@@ -1,25 +1,36 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.mockito.Mockito.mock;
 
-public class ConverterSet_ESTestTest31 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Test suite for the {@link ConverterSet} class.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Converter[] converterArray0 = new Converter[7];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        converterSet0.copyInto(converterArray0);
-        assertEquals(7, converterArray0.length);
+    /**
+     * Tests that the copyInto method correctly copies all converters from the set
+     * into a destination array.
+     */
+    @Test
+    public void copyInto_shouldCopyAllConvertersIntoProvidedArray() {
+        // Arrange: Create a set with a known collection of mock converters.
+        // Using a mix of mocks and nulls provides a more robust test case.
+        Converter converter1 = mock(Converter.class);
+        Converter converter2 = mock(Converter.class);
+        Converter[] sourceConverters = {converter1, null, converter2};
+        
+        ConverterSet converterSet = new ConverterSet(sourceConverters);
+        
+        // Create a destination array of the correct size to copy into.
+        Converter[] destinationArray = new Converter[sourceConverters.length];
+
+        // Act: Call the method under test.
+        converterSet.copyInto(destinationArray);
+
+        // Assert: Verify that the destination array now contains the exact same
+        // converters in the same order as the source array.
+        assertArrayEquals(sourceConverters, destinationArray);
     }
 }
