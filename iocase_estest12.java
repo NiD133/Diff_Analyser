@@ -1,25 +1,32 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IOCase_ESTestTest12 extends IOCase_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        // Undeclared exception!
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
+
+    /**
+     * Verifies that IOCase.forName() throws an IllegalArgumentException
+     * when provided with a name that does not correspond to any defined IOCase constant.
+     */
+    @Test
+    public void forName_whenGivenInvalidName_throwsIllegalArgumentException() {
+        // Arrange: Define an input string that is not a valid IOCase name.
+        final String invalidName = "InvalidCaseName";
+
         try {
-            IOCase.forName("7VKlZdfe6fjn*5");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal IOCase name: 7VKlZdfe6fjn*5
-            //
-            verifyException("org.apache.commons.io.IOCase", e);
+            // Act: Attempt to retrieve an IOCase with the invalid name.
+            IOCase.forName(invalidName);
+            fail("Expected an IllegalArgumentException to be thrown for an invalid name.");
+        } catch (final IllegalArgumentException e) {
+            // Assert: Check that the exception message is correct and informative.
+            final String expectedMessage = "Illegal IOCase name: " + invalidName;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
