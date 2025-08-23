@@ -1,41 +1,45 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import java.util.zip.ZipEntry;
 
-public class StreamCompressor_ESTestTest6 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        byte[] byteArray0 = new byte[2];
-        long long0 = streamCompressor0.write(byteArray0, 0, 0, 1213);
-        assertEquals(0L, streamCompressor0.getTotalBytesWritten());
-        assertEquals(0L, streamCompressor0.getBytesRead());
-        assertEquals(0L, long0);
+/**
+ * Contains tests for the {@link StreamCompressor} class.
+ * Note: The original test class name and inheritance from a scaffolding class
+ * were removed for clarity and to create a minimal, self-contained example.
+ */
+public class StreamCompressorTest {
+
+    /**
+     * Verifies that calling the write() method with a length of zero
+     * results in no data being written and all internal counters remaining unchanged.
+     */
+    @Test
+    public void writeWithZeroLengthShouldHaveNoEffect() throws IOException {
+        // Arrange
+        // Use a ByteArrayOutputStream as a simple in-memory sink for the compressed data.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(outputStream);
+        byte[] buffer = new byte[10]; // The buffer content and size are irrelevant for this test.
+
+        // Act
+        // Attempt to write zero bytes from the buffer.
+        long bytesWritten = streamCompressor.write(buffer, 0, 0, ZipEntry.DEFLATED);
+
+        // Assert
+        // 1. The method should report that zero bytes were written.
+        assertEquals("Return value for a zero-length write should be 0", 0L, bytesWritten);
+
+        // 2. Internal counters should remain at their initial state.
+        assertEquals("Total bytes written counter should be 0", 0L, streamCompressor.getTotalBytesWritten());
+        assertEquals("Bytes read counter should be 0", 0L, streamCompressor.getBytesRead());
+
+        // 3. The underlying output stream should be empty.
+        assertEquals("Underlying output stream should not be written to", 0, outputStream.size());
     }
 }
