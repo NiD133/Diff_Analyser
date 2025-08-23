@@ -1,52 +1,59 @@
 package com.google.common.net;
 
 import static com.google.common.truth.Truth.assertThat;
-import com.google.common.collect.ImmutableList;
-import com.google.common.testing.EqualsTester;
-import com.google.common.testing.NullPointerTester;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.text.ParseException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class HostSpecifierTestTest2 extends TestCase {
+/**
+ * Tests for invalid inputs to {@link HostSpecifier}.
+ */
+class HostSpecifierInvalidInputTest {
 
-    private static final ImmutableList<String> GOOD_IPS = ImmutableList.of("1.2.3.4", "2001:db8::1", "[2001:db8::1]");
-
-    private static final ImmutableList<String> BAD_IPS = ImmutableList.of("1.2.3", "2001:db8::1::::::0", "[2001:db8::1", "[::]:80");
-
-    private static final ImmutableList<String> GOOD_DOMAINS = ImmutableList.of("com", "google.com", "foo.co.uk");
-
-    private static final ImmutableList<String> BAD_DOMAINS = ImmutableList.of("foo.blah", "", "[google.com]");
-
-    private static HostSpecifier spec(String specifier) {
-        return HostSpecifier.fromValid(specifier);
+    private static Stream<String> invalidIpAddresses() {
+        return Stream.of(
+                "1.2.3",             // Not a valid IPv4 address
+                "2001:db8::1::::::0",  // Too many parts in IPv6 address
+                "[2001:db8::1",       // Mismatched brackets
+                "[::]:80"            // Port is not allowed
+        );
     }
 
-    private void assertGood(String spec) throws ParseException {
-        // Throws exception if not working correctly
-        HostSpecifier unused = HostSpecifier.fromValid(spec);
-        unused = HostSpecifier.from(spec);
-        assertTrue(HostSpecifier.isValid(spec));
+    /**
+     * Verifies that fromValid() rejects invalid IP address specifiers.
+     */
+    @ParameterizedTest
+    @MethodSource("invalidIpAddresses")
+    void fromValid_withInvalidIpAddress_throwsIllegalArgumentException(String invalidSpecifier) {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> HostSpecifier.fromValid(invalidSpecifier));
     }
 
-    private void assertBad(String spec) {
-        try {
-            HostSpecifier.fromValid(spec);
-            fail("Should have thrown IllegalArgumentException: " + spec);
-        } catch (IllegalArgumentException expected) {
-        }
-        try {
-            HostSpecifier.from(spec);
-            fail("Should have thrown ParseException: " + spec);
-        } catch (ParseException expected) {
-            assertThat(expected).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
-        }
-        assertFalse(HostSpecifier.isValid(spec));
+    /**
+     * Verifies that from() rejects invalid IP address specifiers.
+     */
+    @ParameterizedTest
+    @MethodSource("invalidIpAddresses")
+    void from_withInvalidIpAddress_throwsParseException(String invalidSpecifier) {
+        ParseException exception = assertThrows(
+                ParseException.class,
+                () -> HostSpecifier.from(invalidSpecifier));
+
+        // The ParseException should be caused by an IllegalArgumentException.
+        assertThat(exception).hasCauseThat().isInstanceOf(IllegalArgumentException.class);
     }
 
-    public void testBadIpAddresses() {
-        for (String spec : BAD_IPS) {
-            assertBad(spec);
-        }
+    /**
+     * Verifies that isValid() returns false for invalid IP address specifiers.
+     */
+    @ParameterizedTest
+    @MethodSource("invalidIpAddresses")
+    void isValid_withInvalidIpAddress_returnsFalse(String invalidSpecifier) {
+        assertFalse(HostSpecifier.isValid(invalidSpecifier));
     }
 }
