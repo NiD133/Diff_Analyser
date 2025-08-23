@@ -1,41 +1,32 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ * This test focuses on the behavior of the position(long, long) method.
+ */
+// The class name and inheritance are kept from the original to allow a direct replacement.
 public class MultiReadOnlySeekableByteChannel_ESTestTest9 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-        linkedList0.add((SeekableByteChannel) null);
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-        // Undeclared exception!
-        try {
-            multiReadOnlySeekableByteChannel0.position((-2052L), (-2052L));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.stream.MatchOps$1MatchSink", e);
-        }
+    /**
+     * Verifies that calling position(channel, offset) throws a NullPointerException
+     * if the channel was constructed with a list containing a null element.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void positionWithChannelAndOffsetThrowsNPEWhenChannelListContainsNull() throws IOException {
+        // Arrange: Create a MultiReadOnlySeekableByteChannel with a list
+        // containing a null element. This represents an invalid state.
+        List<SeekableByteChannel> channelsWithNull = Collections.singletonList(null);
+        MultiReadOnlySeekableByteChannel multiChannel = new MultiReadOnlySeekableByteChannel(channelsWithNull);
+
+        // Act & Assert: Calling position() should fail fast with a NullPointerException
+        // when it encounters the null channel. The specific position values are
+        // arbitrary for this test case.
+        multiChannel.position(-1L, -1L);
     }
 }
