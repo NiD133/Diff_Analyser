@@ -1,23 +1,29 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SparseBloomFilter_ESTestTest41 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        Shape shape0 = Shape.fromKM(989, 989);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        boolean boolean0 = sparseBloomFilter0.contains((BitMapExtractor) sparseBloomFilter0);
-        assertTrue(boolean0);
+    /**
+     * Tests that an empty filter correctly reports that it contains another empty filter.
+     * This is a test of the subset property, where an empty set is always a subset
+     * of any other set, including itself.
+     */
+    @Test
+    public void testContainsWithEmptyFilterReturnsTrue() {
+        // Arrange: Create an empty Bloom filter with a standard shape.
+        Shape shape = Shape.fromKM(17, 72); // A common shape for testing
+        SparseBloomFilter emptyFilter = new SparseBloomFilter(shape);
+
+        // Act: Check if the empty filter contains itself.
+        // Since it has no bits set, it should contain any other filter that also has no bits set.
+        boolean result = emptyFilter.contains(emptyFilter);
+
+        // Assert: The result should be true.
+        assertTrue("An empty filter should always contain itself.", result);
     }
 }
