@@ -1,28 +1,26 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MeterInterval_ESTestTest17 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
-        MeterInterval meterInterval0 = new MeterInterval(",", range0);
-        boolean boolean0 = meterInterval0.equals(meterInterval0);
-        assertTrue(boolean0);
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_givenSameInstance_returnsTrue() {
+        // Arrange: Create a MeterInterval instance.
+        Range range = new Range(0.0, 50.0);
+        MeterInterval interval = new MeterInterval("Normal", range);
+
+        // Act & Assert: An instance should be equal to itself.
+        assertTrue("A MeterInterval instance must be equal to itself.", interval.equals(interval));
     }
 }
