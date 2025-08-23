@@ -26,15 +26,22 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link LangCollectors}
+ * Tests for {@link LangCollectors}.
+ * The tests are organized by:
+ * - which joining overload is used (no delimiter, delimiter only, delimiter+prefix+suffix, and same with a custom toString),
+ * - input type (Strings vs non-Strings),
+ * - source (LangCollectors.collect(varargs), Stream.of, Arrays.stream),
+ * and include null-element and null-array behavior.
  */
+@DisplayName("LangCollectors joining()")
 class LangCollectorsTest {
 
     private static final class Fixture {
-        int value;
+        final int value;
 
         private Fixture(final int value) {
             this.value = value;
@@ -46,225 +53,227 @@ class LangCollectorsTest {
         }
     }
 
-    private static final Long _1L = Long.valueOf(1);
-    private static final Long _2L = Long.valueOf(2);
-    private static final Long _3L = Long.valueOf(3);
+    // Common inputs
+    private static final Long L1 = 1L;
+    private static final Long L2 = 2L;
+    private static final Long L3 = 3L;
 
-    private static final Function<Object, String> TO_STRING = Objects::toString;
+    private static final Function<Object, String> OBJ_TO_STRING = Objects::toString;
 
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
+    // Collectors under test, with descriptive names
+    private static final Collector<Object, ?, String> JOIN_NONE = LangCollectors.joining();
+    private static final Collector<Object, ?, String> JOIN_DASH = LangCollectors.joining("-");
+    private static final Collector<Object, ?, String> JOIN_DASH_ANGLE = LangCollectors.joining("-", "<", ">");
+    private static final Collector<Object, ?, String> JOIN_DASH_ANGLE_TOSTR = LangCollectors.joining("-", "<", ">", OBJ_TO_STRING);
+    private static final Collector<Object, ?, String> JOIN_DASH_ANGLE_TOSTR_NUL =
+            LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
 
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
+    // Small helpers to reduce noise and keep the focus on expectations
+    private static String collectVarargs(final Collector<Object, ?, String> c, final Object... elements) {
+        return LangCollectors.collect(c, elements);
     }
 
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
+    private static String collectVarargsNullArray(final Collector<Object, ?, String> c) {
+        return LangCollectors.collect(c, (Object[]) null);
     }
 
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
+    private static String collectStreamOf(final Collector<Object, ?, String> c, final Object... elements) {
+        return Stream.of(elements).collect(c);
     }
 
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
+    private static String collectArraysStream(final Collector<Object, ?, String> c, final Object[] array) {
+        return Arrays.stream(array).collect(c);
     }
 
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
+    private static Fixture fx(final int v) {
+        return new Fixture(v);
+    }
+
+    // ===== Varargs via LangCollectors.collect(...) =====
+
+    @Test
+    @DisplayName("collect(varargs) - Strings with delimiter only")
+    void collect_varargs_strings_delimiterOnly() {
+        assertEquals("", collectVarargs(JOIN_DASH));
+        assertEquals("1", collectVarargs(JOIN_DASH, "1"));
+        assertEquals("1-2", collectVarargs(JOIN_DASH, "1", "2"));
+        assertEquals("1-2-3", collectVarargs(JOIN_DASH, "1", "2", "3"));
+        assertEquals("1-null-3", collectVarargs(JOIN_DASH, "1", null, "3"));
     }
 
     @Test
-    void testCollectStrings1Arg() {
-        assertEquals("", join1());
-        assertEquals("1", join1("1"));
-        assertEquals("1-2", join1("1", "2"));
-        assertEquals("1-2-3", join1("1", "2", "3"));
-        assertEquals("1-null-3", join1("1", null, "3"));
+    @DisplayName("collect(varargs) - Non-Strings with no delimiter")
+    void collect_varargs_nonStrings_noDelimiter() {
+        assertEquals("", collectVarargs(JOIN_NONE));
+        assertEquals("1", collectVarargs(JOIN_NONE, L1));
+        assertEquals("12", collectVarargs(JOIN_NONE, L1, L2));
+        assertEquals("123", collectVarargs(JOIN_NONE, L1, L2, L3));
+        assertEquals("1null3", collectVarargs(JOIN_NONE, L1, null, L3));
+        assertEquals("12", collectVarargs(JOIN_NONE, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("12", collectVarargs(JOIN_NONE, fx(1), fx(2)));
     }
 
     @Test
-    void testJoinCollectNonStrings0Arg() {
-        assertEquals("", join0());
-        assertEquals("1", join0(_1L));
-        assertEquals("12", join0(_1L, _2L));
-        assertEquals("123", join0(_1L, _2L, _3L));
-        assertEquals("1null3", join0(_1L, null, _3L));
-        assertEquals("12", join0(new AtomicLong(1), new AtomicLong(2)));
-        assertEquals("12", join0(new Fixture(1), new Fixture(2)));
+    @DisplayName("collect(varargs) - Non-Strings with delimiter only")
+    void collect_varargs_nonStrings_delimiterOnly() {
+        assertEquals("", collectVarargs(JOIN_DASH));
+        assertEquals("1", collectVarargs(JOIN_DASH, L1));
+        assertEquals("1-2", collectVarargs(JOIN_DASH, L1, L2));
+        assertEquals("1-2-3", collectVarargs(JOIN_DASH, L1, L2, L3));
+        assertEquals("1-null-3", collectVarargs(JOIN_DASH, L1, null, L3));
+        assertEquals("1-2", collectVarargs(JOIN_DASH, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("1-2", collectVarargs(JOIN_DASH, fx(1), fx(2)));
     }
 
     @Test
-    void testJoinCollectNonStrings1Arg() {
-        assertEquals("", join1());
-        assertEquals("1", join1(_1L));
-        assertEquals("1-2", join1(_1L, _2L));
-        assertEquals("1-2-3", join1(_1L, _2L, _3L));
-        assertEquals("1-null-3", join1(_1L, null, _3L));
-        assertEquals("1-2", join1(new AtomicLong(1), new AtomicLong(2)));
-        assertEquals("1-2", join1(new Fixture(1), new Fixture(2)));
+    @DisplayName("collect(varargs) - Non-Strings with delimiter + prefix/suffix")
+    void collect_varargs_nonStrings_delimiterPrefixSuffix() {
+        assertEquals("<>", collectVarargs(JOIN_DASH_ANGLE));
+        assertEquals("<1>", collectVarargs(JOIN_DASH_ANGLE, L1));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE, L1, L2));
+        assertEquals("<1-2-3>", collectVarargs(JOIN_DASH_ANGLE, L1, L2, L3));
+        assertEquals("<1-null-3>", collectVarargs(JOIN_DASH_ANGLE, L1, null, L3));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE, fx(1), fx(2)));
     }
 
     @Test
-    void testJoinCollectNonStrings3Args() {
-        assertEquals("<>", join3());
-        assertEquals("<1>", join3(_1L));
-        assertEquals("<1-2>", join3(_1L, _2L));
-        assertEquals("<1-2-3>", join3(_1L, _2L, _3L));
-        assertEquals("<1-null-3>", join3(_1L, null, _3L));
-        assertEquals("<1-2>", join3(new AtomicLong(1), new AtomicLong(2)));
-        assertEquals("<1-2>", join3(new Fixture(1), new Fixture(2)));
+    @DisplayName("collect(varargs) - Non-Strings with delimiter + prefix/suffix + custom toString")
+    void collect_varargs_nonStrings_delimiterPrefixSuffix_customToString() {
+        assertEquals("<>", collectVarargs(JOIN_DASH_ANGLE_TOSTR));
+        assertEquals("<1>", collectVarargs(JOIN_DASH_ANGLE_TOSTR, L1));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE_TOSTR, L1, L2));
+        assertEquals("<1-2-3>", collectVarargs(JOIN_DASH_ANGLE_TOSTR, L1, L2, L3));
+        assertEquals("<1-null-3>", collectVarargs(JOIN_DASH_ANGLE_TOSTR, L1, null, L3));
+        assertEquals("<1-NUL-3>", collectVarargs(JOIN_DASH_ANGLE_TOSTR_NUL, L1, null, L3));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE_TOSTR, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE_TOSTR, fx(1), fx(2)));
     }
 
     @Test
-    void testJoinCollectNonStrings4Args() {
-        assertEquals("<>", join4());
-        assertEquals("<1>", join4(_1L));
-        assertEquals("<1-2>", join4(_1L, _2L));
-        assertEquals("<1-2-3>", join4(_1L, _2L, _3L));
-        assertEquals("<1-null-3>", join4(_1L, null, _3L));
-        assertEquals("<1-NUL-3>", join4NullToString(_1L, null, _3L));
-        assertEquals("<1-2>", join4(new AtomicLong(1), new AtomicLong(2)));
-        assertEquals("<1-2>", join4(new Fixture(1), new Fixture(2)));
+    @DisplayName("collect(varargs) - Null array is treated as empty")
+    void collect_varargs_nullArray() {
+        assertEquals("", collectVarargsNullArray(JOIN_NONE));
+        assertEquals("", collectVarargsNullArray(JOIN_DASH));
+        assertEquals("<>", collectVarargsNullArray(JOIN_DASH_ANGLE));
+        assertEquals("<>", collectVarargsNullArray(JOIN_DASH_ANGLE_TOSTR_NUL));
     }
 
     @Test
-    void testJoinCollectNullArgs() {
-        assertEquals("", join0((Object[]) null));
-        assertEquals("", join1((Object[]) null));
-        assertEquals("<>", join3((Object[]) null));
-        assertEquals("<>", join4NullToString((Object[]) null));
+    @DisplayName("collect(varargs) - Strings with no delimiter")
+    void collect_varargs_strings_noDelimiter() {
+        assertEquals("", collectVarargs(JOIN_NONE));
+        assertEquals("1", collectVarargs(JOIN_NONE, "1"));
+        assertEquals("12", collectVarargs(JOIN_NONE, "1", "2"));
+        assertEquals("123", collectVarargs(JOIN_NONE, "1", "2", "3"));
+        assertEquals("1null3", collectVarargs(JOIN_NONE, "1", null, "3"));
     }
 
     @Test
-    void testJoinCollectStrings0Arg() {
-        assertEquals("", join0());
-        assertEquals("1", join0("1"));
-        assertEquals("12", join0("1", "2"));
-        assertEquals("123", join0("1", "2", "3"));
-        assertEquals("1null3", join0("1", null, "3"));
+    @DisplayName("collect(varargs) - Strings with delimiter + prefix/suffix and custom toString")
+    void collect_varargs_strings_delimiterPrefixSuffix() {
+        assertEquals("<>", collectVarargs(JOIN_DASH_ANGLE));
+        assertEquals("<1>", collectVarargs(JOIN_DASH_ANGLE, "1"));
+        assertEquals("<1-2>", collectVarargs(JOIN_DASH_ANGLE, "1", "2"));
+        assertEquals("<1-2-3>", collectVarargs(JOIN_DASH_ANGLE, "1", "2", "3"));
+        assertEquals("<1-null-3>", collectVarargs(JOIN_DASH_ANGLE, "1", null, "3"));
+        assertEquals("<1-NUL-3>", collectVarargs(JOIN_DASH_ANGLE_TOSTR_NUL, "1", null, "3"));
+    }
+
+    // ===== Stream.of(...) =====
+
+    @Test
+    @DisplayName("Stream.of - Strings with no delimiter")
+    void streamOf_strings_noDelimiter() {
+        assertEquals("", collectStreamOf(JOIN_NONE));
+        assertEquals("1", collectStreamOf(JOIN_NONE, "1"));
+        assertEquals("12", collectStreamOf(JOIN_NONE, "1", "2"));
+        assertEquals("123", collectStreamOf(JOIN_NONE, "1", "2", "3"));
+        assertEquals("1null3", collectStreamOf(JOIN_NONE, "1", null, "3"));
     }
 
     @Test
-    void testJoinCollectStrings3Args() {
-        assertEquals("<>", join3());
-        assertEquals("<1>", join3("1"));
-        assertEquals("<1-2>", join3("1", "2"));
-        assertEquals("<1-2-3>", join3("1", "2", "3"));
-        assertEquals("<1-null-3>", join3("1", null, "3"));
+    @DisplayName("Stream.of - Strings with delimiter only")
+    void streamOf_strings_delimiterOnly() {
+        assertEquals("", collectStreamOf(JOIN_DASH));
+        assertEquals("1", collectStreamOf(JOIN_DASH, "1"));
+        assertEquals("1-2", collectStreamOf(JOIN_DASH, "1", "2"));
+        assertEquals("1-2-3", collectStreamOf(JOIN_DASH, "1", "2", "3"));
+        assertEquals("1-null-3", collectStreamOf(JOIN_DASH, "1", null, "3"));
     }
 
     @Test
-    void testJoinCollectStrings4Args() {
-        assertEquals("<>", join4());
-        assertEquals("<1>", join4("1"));
-        assertEquals("<1-2>", join4("1", "2"));
-        assertEquals("<1-2-3>", join4("1", "2", "3"));
-        assertEquals("<1-null-3>", join4("1", null, "3"));
-        assertEquals("<1-NUL-3>", join4NullToString("1", null, "3"));
+    @DisplayName("Stream.of - Strings with delimiter + prefix/suffix (+ custom toString)")
+    void streamOf_strings_delimiterPrefixSuffix() {
+        assertEquals("<>", collectStreamOf(JOIN_DASH_ANGLE));
+        assertEquals("<1>", collectStreamOf(JOIN_DASH_ANGLE, "1"));
+        assertEquals("<1-2>", collectStreamOf(JOIN_DASH_ANGLE, "1", "2"));
+        assertEquals("<1-2-3>", collectStreamOf(JOIN_DASH_ANGLE, "1", "2", "3"));
+        assertEquals("<1-null-3>", collectStreamOf(JOIN_DASH_ANGLE, "1", null, "3"));
+        assertEquals("<1-NUL-3>", collectStreamOf(JOIN_DASH_ANGLE_TOSTR_NUL, "1", null, "3"));
     }
 
     @Test
-    void testJoiningNonStrings0Arg() {
-        // Stream.of()
-        assertEquals("", Stream.of().collect(JOINING_0));
-        assertEquals("1", Stream.of(_1L).collect(JOINING_0));
-        assertEquals("12", Stream.of(_1L, _2L).collect(JOINING_0));
-        assertEquals("123", Stream.of(_1L, _2L, _3L).collect(JOINING_0));
-        assertEquals("1null3", Stream.of(_1L, null, _3L).collect(JOINING_0));
-        assertEquals("12", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_0));
-        assertEquals("12", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_0));
-        // Arrays.stream()
-        assertEquals("", Arrays.stream(new Object[] {}).collect(JOINING_0));
-        assertEquals("1", Arrays.stream(new Long[] { _1L }).collect(JOINING_0));
-        assertEquals("12", Arrays.stream(new Long[] { _1L, _2L }).collect(JOINING_0));
-        assertEquals("123", Arrays.stream(new Long[] { _1L, _2L, _3L }).collect(JOINING_0));
-        assertEquals("1null3", Arrays.stream(new Long[] { _1L, null, _3L }).collect(JOINING_0));
-        assertEquals("12", Arrays.stream(new AtomicLong[] { new AtomicLong(1), new AtomicLong(2) }).collect(JOINING_0));
-        assertEquals("12", Arrays.stream(new Fixture[] { new Fixture(1), new Fixture(2) }).collect(JOINING_0));
+    @DisplayName("Stream.of - Non-Strings with no delimiter")
+    void streamOf_nonStrings_noDelimiter() {
+        assertEquals("", collectStreamOf(JOIN_NONE));
+        assertEquals("1", collectStreamOf(JOIN_NONE, L1));
+        assertEquals("12", collectStreamOf(JOIN_NONE, L1, L2));
+        assertEquals("123", collectStreamOf(JOIN_NONE, L1, L2, L3));
+        assertEquals("1null3", collectStreamOf(JOIN_NONE, L1, null, L3));
+        assertEquals("12", collectStreamOf(JOIN_NONE, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("12", collectStreamOf(JOIN_NONE, fx(1), fx(2)));
     }
 
     @Test
-    void testJoiningNonStrings1Arg() {
-        // Stream.of()
-        assertEquals("", Stream.of().collect(JOINING_1));
-        assertEquals("1", Stream.of(_1L).collect(JOINING_1));
-        assertEquals("1-2", Stream.of(_1L, _2L).collect(JOINING_1));
-        assertEquals("1-2-3", Stream.of(_1L, _2L, _3L).collect(JOINING_1));
-        assertEquals("1-null-3", Stream.of(_1L, null, _3L).collect(JOINING_1));
-        assertEquals("1-2", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_1));
-        assertEquals("1-2", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_1));
-        // Arrays.stream()
-        assertEquals("", Arrays.stream(new Object[] {}).collect(JOINING_1));
-        assertEquals("1", Arrays.stream(new Long[] { _1L }).collect(JOINING_1));
-        assertEquals("1-2", Arrays.stream(new Long[] { _1L, _2L }).collect(JOINING_1));
-        assertEquals("1-2-3", Arrays.stream(new Long[] { _1L, _2L, _3L }).collect(JOINING_1));
-        assertEquals("1-null-3", Arrays.stream(new Long[] { _1L, null, _3L }).collect(JOINING_1));
-        assertEquals("1-2", Arrays.stream(new AtomicLong[] { new AtomicLong(1), new AtomicLong(2) }).collect(JOINING_1));
-        assertEquals("1-2", Arrays.stream(new Fixture[] { new Fixture(1), new Fixture(2) }).collect(JOINING_1));
+    @DisplayName("Stream.of - Non-Strings with delimiter only")
+    void streamOf_nonStrings_delimiterOnly() {
+        assertEquals("", collectStreamOf(JOIN_DASH));
+        assertEquals("1", collectStreamOf(JOIN_DASH, L1));
+        assertEquals("1-2", collectStreamOf(JOIN_DASH, L1, L2));
+        assertEquals("1-2-3", collectStreamOf(JOIN_DASH, L1, L2, L3));
+        assertEquals("1-null-3", collectStreamOf(JOIN_DASH, L1, null, L3));
+        assertEquals("1-2", collectStreamOf(JOIN_DASH, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("1-2", collectStreamOf(JOIN_DASH, fx(1), fx(2)));
     }
 
     @Test
-    void testJoiningNonStrings3Args() {
-        assertEquals("<>", Stream.of().collect(JOINING_3));
-        assertEquals("<1>", Stream.of(_1L).collect(JOINING_3));
-        assertEquals("<1-2>", Stream.of(_1L, _2L).collect(JOINING_3));
-        assertEquals("<1-2-3>", Stream.of(_1L, _2L, _3L).collect(JOINING_3));
-        assertEquals("<1-null-3>", Stream.of(_1L, null, _3L).collect(JOINING_3));
-        assertEquals("<1-2>", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_3));
-        assertEquals("<1-2>", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_3));
+    @DisplayName("Stream.of - Non-Strings with delimiter + prefix/suffix (+ custom toString)")
+    void streamOf_nonStrings_delimiterPrefixSuffix() {
+        assertEquals("<>", collectStreamOf(JOIN_DASH_ANGLE));
+        assertEquals("<1>", collectStreamOf(JOIN_DASH_ANGLE, L1));
+        assertEquals("<1-2>", collectStreamOf(JOIN_DASH_ANGLE, L1, L2));
+        assertEquals("<1-2-3>", collectStreamOf(JOIN_DASH_ANGLE, L1, L2, L3));
+        assertEquals("<1-null-3>", collectStreamOf(JOIN_DASH_ANGLE, L1, null, L3));
+        assertEquals("<1-NUL-3>", collectStreamOf(JOIN_DASH_ANGLE_TOSTR_NUL, L1, null, L3));
+        assertEquals("<1-2>", collectStreamOf(JOIN_DASH_ANGLE, new AtomicLong(1), new AtomicLong(2)));
+        assertEquals("<1-2>", collectStreamOf(JOIN_DASH_ANGLE, fx(1), fx(2)));
+    }
+
+    // ===== Arrays.stream(...) =====
+    // Keep a few typed-array cases to ensure behavior with arrays of specific element types.
+
+    @Test
+    @DisplayName("Arrays.stream - Non-Strings with no delimiter")
+    void arraysStream_nonStrings_noDelimiter() {
+        assertEquals("", collectArraysStream(JOIN_NONE, new Object[]{}));
+        assertEquals("1", collectArraysStream(JOIN_NONE, new Long[]{L1}));
+        assertEquals("12", collectArraysStream(JOIN_NONE, new Long[]{L1, L2}));
+        assertEquals("123", collectArraysStream(JOIN_NONE, new Long[]{L1, L2, L3}));
+        assertEquals("1null3", collectArraysStream(JOIN_NONE, new Long[]{L1, null, L3}));
+        assertEquals("12", collectArraysStream(JOIN_NONE, new AtomicLong[]{new AtomicLong(1), new AtomicLong(2)}));
+        assertEquals("12", collectArraysStream(JOIN_NONE, new Fixture[]{fx(1), fx(2)}));
     }
 
     @Test
-    void testJoiningNonStrings4Args() {
-        assertEquals("<>", Stream.of().collect(JOINING_4));
-        assertEquals("<1>", Stream.of(_1L).collect(JOINING_4));
-        assertEquals("<1-2>", Stream.of(_1L, _2L).collect(JOINING_4));
-        assertEquals("<1-2-3>", Stream.of(_1L, _2L, _3L).collect(JOINING_4));
-        assertEquals("<1-null-3>", Stream.of(_1L, null, _3L).collect(JOINING_4));
-        assertEquals("<1-NUL-3>", Stream.of(_1L, null, _3L).collect(JOINING_4_NUL));
-        assertEquals("<1-2>", Stream.of(new AtomicLong(1), new AtomicLong(2)).collect(JOINING_4));
-        assertEquals("<1-2>", Stream.of(new Fixture(1), new Fixture(2)).collect(JOINING_4));
-    }
-
-    @Test
-    void testJoiningStrings0Arg() {
-        assertEquals("", Stream.of().collect(JOINING_0));
-        assertEquals("1", Stream.of("1").collect(JOINING_0));
-        assertEquals("12", Stream.of("1", "2").collect(JOINING_0));
-        assertEquals("123", Stream.of("1", "2", "3").collect(JOINING_0));
-        assertEquals("1null3", Stream.of("1", null, "3").collect(JOINING_0));
-    }
-
-    @Test
-    void testJoiningStrings1Arg() {
-        assertEquals("", Stream.of().collect(JOINING_1));
-        assertEquals("1", Stream.of("1").collect(JOINING_1));
-        assertEquals("1-2", Stream.of("1", "2").collect(JOINING_1));
-        assertEquals("1-2-3", Stream.of("1", "2", "3").collect(JOINING_1));
-        assertEquals("1-null-3", Stream.of("1", null, "3").collect(JOINING_1));
-    }
-
-    @Test
-    void testJoiningStrings3Args() {
-        assertEquals("<>", Stream.of().collect(JOINING_3));
-        assertEquals("<1>", Stream.of("1").collect(JOINING_3));
-        assertEquals("<1-2>", Stream.of("1", "2").collect(JOINING_3));
-        assertEquals("<1-2-3>", Stream.of("1", "2", "3").collect(JOINING_3));
-        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(JOINING_3));
-    }
-
-    @Test
-    void testJoiningStrings4Args() {
-        assertEquals("<>", Stream.of().collect(JOINING_4));
-        assertEquals("<1>", Stream.of("1").collect(JOINING_4));
-        assertEquals("<1-2>", Stream.of("1", "2").collect(JOINING_4));
-        assertEquals("<1-2-3>", Stream.of("1", "2", "3").collect(JOINING_4));
-        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(JOINING_4));
-        assertEquals("<1-NUL-3>", Stream.of("1", null, "3").collect(JOINING_4_NUL));
+    @DisplayName("Arrays.stream - Non-Strings with delimiter only")
+    void arraysStream_nonStrings_delimiterOnly() {
+        assertEquals("", collectArraysStream(JOIN_DASH, new Object[]{}));
+        assertEquals("1", collectArraysStream(JOIN_DASH, new Long[]{L1}));
+        assertEquals("1-2", collectArraysStream(JOIN_DASH, new Long[]{L1, L2}));
+        assertEquals("1-2-3", collectArraysStream(JOIN_DASH, new Long[]{L1, L2, L3}));
+        assertEquals("1-null-3", collectArraysStream(JOIN_DASH, new Long[]{L1, null, L3}));
+        assertEquals("1-2", collectArraysStream(JOIN_DASH, new AtomicLong[]{new AtomicLong(1), new AtomicLong(2)}));
+        assertEquals("1-2", collectArraysStream(JOIN_DASH, new Fixture[]{fx(1), fx(2)}));
     }
 }
