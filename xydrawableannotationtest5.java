@@ -1,70 +1,71 @@
 package org.jfree.chart.annotations;
 
+import org.jfree.chart.TestUtils;
+import org.jfree.chart.Drawable;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.Drawable;
-import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XYDrawableAnnotationTestTest5 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    static class TestDrawable implements Drawable, Cloneable, Serializable {
+/**
+ * Tests for the {@link XYDrawableAnnotation} class, focusing on serialization.
+ */
+class XYDrawableAnnotationTest {
 
-        /**
-         * Default constructor.
-         */
-        public TestDrawable() {
-        }
-
-        /**
-         * Draws something.
-         * @param g2  the graphics device.
-         * @param area  the area in which to draw.
-         */
+    /**
+     * A simple, serializable mock Drawable for testing purposes.
+     * All instances of this class are considered equal to each other.
+     */
+    private static class MockDrawable implements Drawable, Cloneable, Serializable {
         @Override
         public void draw(Graphics2D g2, Rectangle2D area) {
-            // do nothing
+            // This mock implementation does not need to perform any drawing.
         }
 
         /**
-         * Tests this object for equality with an arbitrary object.
-         * @param obj  the object to test against ({@code null} permitted).
-         * @return A boolean.
+         * Returns true if the object is an instance of MockDrawable, false otherwise.
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof TestDrawable)) {
-                return false;
-            }
-            return true;
+            return obj instanceof MockDrawable;
         }
 
         /**
-         * Returns a clone.
-         *
-         * @return A clone.
-         *
-         * @throws CloneNotSupportedException if there is a problem cloning.
+         * Returns a consistent hash code for all instances, adhering to the
+         * equals/hashCode contract.
          */
+        @Override
+        public int hashCode() {
+            // A constant hash code is appropriate since all instances are equal.
+            return 123;
+        }
+
         @Override
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
     @Test
-    public void testSerialization() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, new TestDrawable());
-        XYDrawableAnnotation a2 = TestUtils.serialised(a1);
-        assertEquals(a1, a2);
+    @DisplayName("An XYDrawableAnnotation instance should be correctly serialized and deserialized")
+    void serialization_shouldPreserveAnnotationEquality() {
+        // Arrange: Create an annotation with specific properties.
+        final double x = 10.0;
+        final double y = 20.0;
+        final double width = 100.0;
+        final double height = 200.0;
+        final Drawable drawable = new MockDrawable();
+
+        XYDrawableAnnotation originalAnnotation = new XYDrawableAnnotation(x, y, width, height, drawable);
+
+        // Act: Serialize and then deserialize the annotation.
+        XYDrawableAnnotation deserializedAnnotation = TestUtils.serialised(originalAnnotation);
+
+        // Assert: The deserialized annotation should be equal to the original.
+        assertEquals(originalAnnotation, deserializedAnnotation);
     }
 }
