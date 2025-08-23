@@ -1,32 +1,40 @@
 package org.jfree.chart.plot;
 
+import org.jfree.data.Range;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
 
-public class MeterInterval_ESTestTest11 extends MeterInterval_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Range range0 = new Range((-808.678), (-808.678));
-        SystemColor systemColor0 = SystemColor.infoText;
-        GradientPaint gradientPaint0 = new GradientPaint(657.688F, 657.688F, systemColor0, (-89.9F), (-89.9F), systemColor0, false);
-        BasicStroke basicStroke0 = new BasicStroke();
-        MeterInterval meterInterval0 = new MeterInterval("k", range0, gradientPaint0, basicStroke0, systemColor0);
-        MeterInterval meterInterval1 = new MeterInterval("k", range0, gradientPaint0, basicStroke0, gradientPaint0);
-        boolean boolean0 = meterInterval0.equals(meterInterval1);
-        assertFalse(boolean0);
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+public class MeterIntervalTest {
+
+    /**
+     * Verifies that the equals() method returns false for two MeterInterval
+     * objects that differ only by their background paint.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenBackgroundPaintsDiffer() {
+        // Arrange: Create two MeterInterval instances that are identical except for the background paint.
+        String commonLabel = "Test Interval";
+        Range commonRange = new Range(0.0, 100.0);
+        Paint commonOutlinePaint = Color.BLACK;
+        Stroke commonOutlineStroke = new BasicStroke(2.0f);
+
+        MeterInterval interval1 = new MeterInterval(commonLabel, commonRange,
+                commonOutlinePaint, commonOutlineStroke, Color.GREEN);
+
+        // Create a second interval with a different background paint.
+        MeterInterval interval2 = new MeterInterval(commonLabel, commonRange,
+                commonOutlinePaint, commonOutlineStroke, Color.RED);
+
+        // Act & Assert: The two intervals should not be considered equal.
+        assertNotEquals("Intervals with different background paints should not be equal", interval1, interval2);
     }
 }
