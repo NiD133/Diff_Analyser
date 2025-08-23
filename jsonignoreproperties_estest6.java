@@ -1,25 +1,38 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest6 extends JsonIgnoreProperties_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
-        boolean boolean0 = jsonIgnoreProperties_Value0.getAllowSetters();
-        assertFalse(boolean0);
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value0.getIgnoreUnknown());
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class, focusing on its factory methods
+ * and default property values.
+ */
+public class JsonIgnoreProperties_ValueTest {
+
+    /**
+     * Verifies that creating a {@link JsonIgnoreProperties.Value} instance
+     * via {@code forIgnoreUnknown(true)} correctly sets the {@code ignoreUnknown}
+     * property to true, while ensuring other properties retain their expected default values.
+     */
+    @Test
+    public void forIgnoreUnknown_whenSetToTrue_shouldEnableFlagAndUseDefaultsForOthers() {
+        // Arrange & Act: Create a Value instance configured to ignore unknown properties.
+        JsonIgnoreProperties.Value configValue = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
+
+        // Assert: Verify the state of the created Value instance.
+
+        // 1. The main property 'ignoreUnknown' should be set as requested.
+        assertTrue("The 'ignoreUnknown' property should be true.",
+                configValue.getIgnoreUnknown());
+
+        // 2. Other properties should retain their standard default values.
+        assertFalse("The 'allowGetters' property should be false by default.",
+                configValue.getAllowGetters());
+        assertFalse("The 'allowSetters' property should be false by default.",
+                configValue.getAllowSetters());
+        assertTrue("The 'merge' property should be true by default.",
+                configValue.getMerge());
     }
 }
