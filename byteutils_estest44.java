@@ -1,38 +1,48 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+// The class name is preserved from the original test suite structure.
 public class ByteUtils_ESTestTest44 extends ByteUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        DataOutputStream dataOutputStream0 = new DataOutputStream(byteArrayOutputStream0);
-        ByteUtils.OutputStreamByteConsumer byteUtils_OutputStreamByteConsumer0 = new ByteUtils.OutputStreamByteConsumer(dataOutputStream0);
-        ByteUtils.toLittleEndian((ByteUtils.ByteConsumer) byteUtils_OutputStreamByteConsumer0, (long) (-2038), 20);
-        assertEquals(20, byteArrayOutputStream0.size());
-        assertEquals("\n\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD", byteArrayOutputStream0.toString());
+    /**
+     * Tests that toLittleEndian correctly writes a negative long value to a ByteConsumer,
+     * sign-extending it to a specified length greater than the standard 8 bytes for a long.
+     */
+    @Test
+    public void toLittleEndianWithByteConsumerShouldWriteNegativeLongWithSignExtension() throws IOException {
+        // Arrange
+        final long valueToWrite = -2038L; // Hex: 0xFFFFFFFFFFFFF80A
+        final int outputLength = 20;
+
+        // The expected little-endian representation of -2038L is:
+        // 0x0A, 0xF8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+        // Since the requested length (20) is greater than 8, the value is sign-extended.
+        // For a negative number, this means padding with 0xFF bytes.
+        final byte[] expectedBytes = new byte[outputLength];
+        expectedBytes[0] = (byte) 0x0A;
+        expectedBytes[1] = (byte) 0xF8;
+        // Fill the rest of the array with 0xFF for the long's value and sign extension
+        Arrays.fill(expectedBytes, 2, outputLength, (byte) 0xFF);
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final ByteUtils.ByteConsumer byteConsumer = new ByteUtils.OutputStreamByteConsumer(outputStream);
+
+        // Act
+        ByteUtils.toLittleEndian(byteConsumer, valueToWrite, outputLength);
+
+        // Assert
+        final byte[] actualBytes = outputStream.toByteArray();
+
+        assertEquals("The output should have the specified length.", outputLength, actualBytes.length);
+        assertArrayEquals("The written bytes should match the little-endian, sign-extended value.",
+                expectedBytes, actualBytes);
     }
 }
