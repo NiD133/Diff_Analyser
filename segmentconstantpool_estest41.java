@@ -1,29 +1,27 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest41 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getValue(2, 2);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Tests that calling getValue() on a SegmentConstantPool initialized with null CpBands
+     * throws a NullPointerException, as it cannot proceed without its required dependency.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getValueShouldThrowNPEWhenConstructedWithNullBands() {
+        // Arrange: Create a SegmentConstantPool with a null CpBands dependency.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Act: Call getValue(). This is expected to fail immediately because it will
+        // attempt to access the null CpBands object. The arguments are representative
+        // values to trigger the method's logic.
+        segmentConstantPool.getValue(SegmentConstantPool.CP_INT, 2L);
+
+        // Assert: The test is successful if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
