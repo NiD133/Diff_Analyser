@@ -1,70 +1,61 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertSame;
+
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class GregorianChronologyTestTest6 extends TestCase {
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests the withUTC() method of {@link GregorianChronology}.
+ */
+public class GregorianChronologyTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    private DateTimeZone originalDefaultZone;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
+    @Before
+    public void setUp() {
+        // To ensure tests are deterministic, we save the original default time zone
+        // and set a known one for the duration of the test.
+        originalDefaultZone = DateTimeZone.getDefault();
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    @After
+    public void tearDown() {
+        // Restore the original default time zone to avoid side effects on other tests.
+        DateTimeZone.setDefault(originalDefaultZone);
     }
 
-    public void testWithUTC() {
-        assertSame(GregorianChronology.getInstanceUTC(), GregorianChronology.getInstance(LONDON).withUTC());
-        assertSame(GregorianChronology.getInstanceUTC(), GregorianChronology.getInstance(TOKYO).withUTC());
-        assertSame(GregorianChronology.getInstanceUTC(), GregorianChronology.getInstanceUTC().withUTC());
-        assertSame(GregorianChronology.getInstanceUTC(), GregorianChronology.getInstance().withUTC());
+    @Test
+    public void withUTC_shouldAlwaysReturnTheSameSingletonUtcInstance() {
+        // Arrange: Create chronology instances for various time zones.
+        // The withUTC() method is expected to return a canonical, singleton instance.
+        Chronology chronologyInLondon = GregorianChronology.getInstance(LONDON);
+        Chronology chronologyInTokyo = GregorianChronology.getInstance(TOKYO);
+        Chronology chronologyInDefaultZone = GregorianChronology.getInstance(); // Uses LONDON via setUp
+        Chronology chronologyInUtc = GregorianChronology.getInstanceUTC();
+
+        // Act & Assert:
+        // Verify that calling withUTC() on any instance returns the exact same UTC object.
+        // We use assertSame to check for object identity, not just equality.
+        final Chronology expectedUtcChronology = GregorianChronology.getInstanceUTC();
+
+        assertSame("withUTC() on a London instance should return the UTC singleton",
+                expectedUtcChronology, chronologyInLondon.withUTC());
+
+        assertSame("withUTC() on a Tokyo instance should return the UTC singleton",
+                expectedUtcChronology, chronologyInTokyo.withUTC());
+
+        assertSame("withUTC() on a default-zone instance should return the UTC singleton",
+                expectedUtcChronology, chronologyInDefaultZone.withUTC());
+
+        assertSame("withUTC() on the UTC instance should return itself",
+                expectedUtcChronology, chronologyInUtc.withUTC());
     }
 }
