@@ -1,22 +1,41 @@
 package org.apache.commons.codec.binary;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Base16_ESTestTest2 extends Base16_ESTest_scaffolding {
+import java.nio.charset.StandardCharsets;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-        Base16 base16_0 = new Base16(false, codecPolicy0);
-        byte[] byteArray0 = new byte[3];
-        byteArray0[1] = (byte) (-23);
-        byte[] byteArray1 = base16_0.encode(byteArray0);
-        assertArrayEquals(new byte[] { (byte) 48, (byte) 48, (byte) 69, (byte) 57, (byte) 48, (byte) 48 }, byteArray1);
+import static org.junit.Assert.assertArrayEquals;
+
+/**
+ * Test suite for the Base16 class.
+ */
+public class Base16Test {
+
+    /**
+     * Tests that encoding a byte array containing a negative value (which corresponds to a byte > 127)
+     * produces the correct upper-case hexadecimal string representation.
+     */
+    @Test
+    public void encodeByteArrayWithNegativeValueShouldReturnCorrectUpperCaseHexString() {
+        // Arrange
+        // The original test used (byte) -23, which is 0xE9 in hexadecimal.
+        // Using hex literals makes the input data's intent much clearer.
+        final byte[] inputData = {0x00, (byte) 0xE9, 0x00};
+
+        // The test uses an upper-case alphabet (the 'false' parameter) and a strict policy.
+        // The policy does not affect the encoding behavior.
+        final Base16 base16 = new Base16(false, CodecPolicy.STRICT);
+
+        // The expected output is the hexadecimal string "00E900".
+        // Representing it as a string and converting to bytes is more readable
+        // than an array of ASCII values.
+        final byte[] expectedEncodedData = "00E900".getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        final byte[] actualEncodedData = base16.encode(inputData);
+
+        // Assert
+        assertArrayEquals(expectedEncodedData, actualEncodedData);
     }
 }
