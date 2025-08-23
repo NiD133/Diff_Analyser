@@ -2,31 +2,28 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest47 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.clearAndGetParent();
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertNull(jsonWriteContext1);
-        assertTrue(jsonWriteContext0.inRoot());
+    /**
+     * Tests that calling clearAndGetParent() on a root context correctly returns null,
+     * as a root context has no parent.
+     */
+    @Test
+    public void clearAndGetParent_onRootContext_shouldReturnNull() {
+        // Arrange: Create a root-level write context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+
+        // Act: Attempt to get the parent of the root context.
+        JsonWriteContext parentContext = rootContext.clearAndGetParent();
+
+        // Assert: The parent should be null, and the root context's state should be unchanged.
+        assertNull("The parent of a root context must be null.", parentContext);
+        assertTrue("The context should still be considered the root.", rootContext.inRoot());
+        assertEquals("The nesting depth of the root context should remain 0.", 0, rootContext.getNestingDepth());
+        assertEquals("The entry count of the root context should remain 0.", 0, rootContext.getEntryCount());
     }
 }
