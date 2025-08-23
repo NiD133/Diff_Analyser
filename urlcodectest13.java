@@ -1,40 +1,46 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest13 {
+/**
+ * Tests for {@link URLCodec} focusing on its behavior with invalid constructor arguments.
+ */
+public class URLCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private static final String INVALID_CHARSET_NAME = "NONSENSE";
+    private static final String TEST_STRING = "Hello there!";
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+    private URLCodec urlCodecWithInvalidCharset;
 
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
+    @BeforeEach
+    void setUp() {
+        // Arrange: Create a URLCodec instance with a non-existent charset.
+        // This setup is shared by both tests.
+        urlCodecWithInvalidCharset = new URLCodec(INVALID_CHARSET_NAME);
     }
 
     @Test
-    void testInvalidEncoding() {
-        final URLCodec urlCodec = new URLCodec("NONSENSE");
-        final String plain = "Hello there!";
-        assertThrows(EncoderException.class, () -> urlCodec.encode(plain), "We set the encoding to a bogus NONSENSE value");
-        assertThrows(DecoderException.class, () -> urlCodec.decode(plain), "We set the encoding to a bogus NONSENSE value");
-        validateState(urlCodec);
+    void encodeWithInvalidCharsetShouldThrowEncoderException() {
+        // Act & Assert: An EncoderException is expected because the charset provided
+        // during construction is not supported.
+        assertThrows(EncoderException.class, () -> {
+            urlCodecWithInvalidCharset.encode(TEST_STRING);
+        });
+    }
+
+    @Test
+    void decodeWithInvalidCharsetShouldThrowDecoderException() {
+        // Act & Assert: A DecoderException is expected because the charset provided
+        // during construction is not supported. The content of the string being
+        // decoded is irrelevant, as the exception occurs when creating the
+        // final string from the decoded bytes.
+        assertThrows(DecoderException.class, () -> {
+            urlCodecWithInvalidCharset.decode(TEST_STRING);
+        });
     }
 }
