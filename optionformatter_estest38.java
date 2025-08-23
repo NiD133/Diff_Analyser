@@ -1,24 +1,27 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
-import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
+/**
+ * This test class contains tests for the {@link OptionFormatter.Builder}.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
 public class OptionFormatter_ESTestTest38 extends OptionFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        Option option0 = new Option((String) null, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        OptionFormatter.Builder optionFormatter_Builder0 = new OptionFormatter.Builder(optionFormatter0);
-        OptionFormatter.Builder optionFormatter_Builder1 = optionFormatter_Builder0.setDeprecatedFormatFunction(optionFormatter0.COMPLEX_DEPRECATED_FORMAT);
-        assertSame(optionFormatter_Builder0, optionFormatter_Builder1);
+    /**
+     * Tests that the {@code setDeprecatedFormatFunction} method on the {@code OptionFormatter.Builder}
+     * returns the same instance to allow for fluent method chaining.
+     */
+    @Test
+    public void setDeprecatedFormatFunctionShouldReturnSameBuilderInstanceForChaining() {
+        // Arrange: Create a new builder instance.
+        final OptionFormatter.Builder builder = OptionFormatter.builder();
+
+        // Act: Call the setter method.
+        final OptionFormatter.Builder result = builder.setDeprecatedFormatFunction(OptionFormatter.COMPLEX_DEPRECATED_FORMAT);
+
+        // Assert: The method should return the same builder instance.
+        assertSame("The setter method should return 'this' to support a fluent API.", builder, result);
     }
 }
