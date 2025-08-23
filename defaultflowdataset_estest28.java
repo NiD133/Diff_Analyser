@@ -1,29 +1,43 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
 import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class DefaultFlowDataset_ESTestTest28 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultFlowDataset} class, focusing on the getOutFlows() method.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.DEFAULT_LAYER;
-        Integer integer1 = JLayeredPane.PALETTE_LAYER;
-        defaultFlowDataset0.setFlow(0, integer1, integer1, 0);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
-        List<FlowKey> list0 = (List<FlowKey>) defaultFlowDataset0.getOutFlows(nodeKey0);
-        assertEquals(1, defaultFlowDataset0.getStageCount());
-        assertTrue(list0.isEmpty());
+    /**
+     * Verifies that getOutFlows() returns an empty list for a node that exists
+     * but has no outgoing flows defined.
+     */
+    @Test
+    public void getOutFlows_forNodeWithNoOutgoingFlows_shouldReturnEmptyList() {
+        // Arrange
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        
+        // Define a flow from node 100 to node 100 at stage 0.
+        // This ensures the stage exists and contains nodes.
+        final int stage = 0;
+        final Integer sourceNode = 100;
+        final Integer destNode = 100;
+        dataset.setFlow(stage, sourceNode, destNode, 50.0);
+
+        // The node we want to query has no outgoing flows.
+        final Integer nodeToQuery = 0;
+        NodeKey<Integer> keyForNodeToQuery = new NodeKey<>(stage, nodeToQuery);
+
+        // Act
+        List<FlowKey> outgoingFlows = dataset.getOutFlows(keyForNodeToQuery);
+
+        // Assert
+        // The dataset should have one stage because we added a flow.
+        assertEquals("The stage count should be 1.", 1, dataset.getStageCount());
+        
+        // The list of outgoing flows for 'nodeToQuery' should be empty.
+        assertTrue("Expected an empty list for a node with no outgoing flows.", outgoingFlows.isEmpty());
     }
 }
