@@ -1,41 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest67 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test066() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readUTF();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray instance
+     * after it has been closed results in a NullPointerException.
+     * <p>
+     * The {@code close()} method is expected to release internal resources,
+     * making subsequent read operations invalid.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void readUTF_onClosedStream_throwsNullPointerException() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance from a byte array.
+        byte[] sourceData = new byte[10]; // Content is irrelevant, only its existence matters.
+        RandomAccessFileOrArray randomAccess = new RandomAccessFileOrArray(sourceData);
+
+        // Act: Close the stream, which puts the object into the state under test.
+        randomAccess.close();
+
+        // Assert: Attempt to read from the now-closed stream.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        randomAccess.readUTF();
     }
 }
