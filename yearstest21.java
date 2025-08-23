@@ -1,38 +1,28 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class YearsTestTest21 extends TestCase {
+/**
+ * Unit tests for the {@link Years} class, focusing on its interaction with other Joda-Time types.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that adding a {@link Years} object to a {@link LocalDate} correctly
+     * advances the date by the specified number of years.
+     */
+    @Test
+    public void testAddingYearsToLocalDate() {
+        // Arrange: Define a period of 3 years and a starting date.
+        final Years threeYears = Years.years(3);
+        final LocalDate startDate = new LocalDate(2006, 6, 1);
+        final LocalDate expectedDate = new LocalDate(2009, 6, 1);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Add the years to the starting date.
+        final LocalDate resultDate = startDate.plus(threeYears);
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testAddToLocalDate() {
-        Years test = Years.years(3);
-        LocalDate date = new LocalDate(2006, 6, 1);
-        LocalDate expected = new LocalDate(2009, 6, 1);
-        assertEquals(expected, date.plus(test));
+        // Assert: The resulting date should be exactly 3 years after the start date.
+        assertEquals(expectedDate, resultDate);
     }
 }
