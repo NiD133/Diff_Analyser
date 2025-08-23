@@ -1,29 +1,33 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-public class CodecEncoding_ESTestTest7 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link CodecEncoding} class.
+ * This specific test focuses on the properties of canonical codecs.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        BHSDCodec bHSDCodec0 = CodecEncoding.getCanonicalCodec(9);
-        assertFalse(bHSDCodec0.isSigned());
+    /**
+     * Verifies that the canonical codec at index 9 is correctly retrieved and is an
+     * unsigned codec.
+     *
+     * According to the Pack200 specification and the implementation in CodecEncoding,
+     * the codec at index 9 is defined as {@code new BHSDCodec(3, 256)}, which
+     * defaults to being unsigned.
+     */
+    @Test
+    public void getCanonicalCodec_shouldReturnUnsignedCodecForIndex9() {
+        // Arrange
+        final int unsignedCodecIndex = 9;
+
+        // Act
+        final BHSDCodec codec = CodecEncoding.getCanonicalCodec(unsignedCodecIndex);
+
+        // Assert
+        assertNotNull("The codec for a valid index should not be null.", codec);
+        assertFalse("The canonical codec at index " + unsignedCodecIndex + " is expected to be unsigned.", codec.isSigned());
     }
 }
