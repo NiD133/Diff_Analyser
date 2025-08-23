@@ -1,26 +1,31 @@
 package com.google.gson.internal;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.MoreAsserts;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.Iterator;
+
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 import org.junit.Test;
 
-public class LinkedTreeMapTestTest9 {
+public class LinkedTreeMapTest {
 
+    /**
+     * The {@link Map#containsKey(Object)} contract allows for two behaviors when the key is of an
+     * inappropriate type for the map: either throw a {@code ClassCastException} or simply return
+     * {@code false}.
+     *
+     * <p>This test verifies that {@code LinkedTreeMap} safely returns {@code false} instead of
+     * throwing an exception when the key is not- and cannot be cast to- {@code Comparable}.
+     */
     @Test
-    public void testContainsNonComparableKeyReturnsFalse() {
+    public void containsKey_withNonComparableKey_returnsFalse() {
+        // Arrange
         LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", "android");
-        assertThat(map).doesNotContainKey(new Object());
+        map.put("a", "value"); // Ensure the map is not empty.
+        Object nonComparableKey = new Object();
+
+        // Act
+        boolean result = map.containsKey(nonComparableKey);
+
+        // Assert
+        assertThat(result).isFalse();
     }
 }
