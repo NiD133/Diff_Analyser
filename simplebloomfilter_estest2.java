@@ -1,27 +1,36 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class SimpleBloomFilter_ESTestTest2 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the merge() method in SimpleBloomFilter.
+ */
+public class SimpleBloomFilterMergeTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Shape shape0 = Shape.fromKM(19, 19);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(19, 2654L);
-        boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-        assertTrue(boolean0);
-        boolean boolean1 = simpleBloomFilter0.merge((BitMapExtractor) sparseBloomFilter0);
-        assertTrue(boolean1 == boolean0);
+    @Test
+    public void mergeShouldReturnTrueOnModificationAndFalseOtherwise() {
+        // Arrange: Create a shape, an empty Bloom filter, a hasher, and another empty filter.
+        Shape shape = Shape.fromKM(19, 19);
+        SimpleBloomFilter bloomFilter = new SimpleBloomFilter(shape);
+        Hasher hasher = new EnhancedDoubleHasher(19, 2654L);
+        
+        // An empty filter to test merging with no new data.
+        BloomFilter<?> emptyFilter = new SparseBloomFilter(shape);
+
+        // Act & Assert: Part 1
+        // Merging a hasher into an empty filter should modify it.
+        boolean changedByHasher = bloomFilter.merge(hasher);
+        
+        assertTrue("Merging a hasher into an empty filter should return true, as it modifies the filter.",
+                changedByHasher);
+
+        // Act & Assert: Part 2
+        // Merging an empty filter should not cause any changes.
+        boolean changedByEmptyFilter = bloomFilter.merge(emptyFilter);
+
+        assertFalse("Merging an empty filter should return false, as it does not modify the filter.",
+                changedByEmptyFilter);
     }
 }
