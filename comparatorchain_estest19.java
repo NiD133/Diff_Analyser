@@ -1,33 +1,33 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class ComparatorChain_ESTestTest19 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * This test case focuses on the "locked" state of the {@link ComparatorChain}.
+ * A ComparatorChain can be modified until its compare() method is called,
+ * at which point it becomes "locked" to ensure consistency.
+ */
+public class ComparatorChain_ESTestTest19 {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>((Comparator<Object>) null, false);
-        comparatorChain0.setComparator(0, (Comparator<Object>) null, false);
-        assertFalse(comparatorChain0.isLocked());
+    /**
+     * Tests that modifying a ComparatorChain with setComparator() before any
+     * comparison has been performed does not lock the chain.
+     */
+    @Test
+    public void setComparatorOnUnlockedChainShouldNotLockIt() {
+        // Arrange: Create a chain with a single comparator.
+        // Upon creation, the chain is not locked.
+        final ComparatorChain<Object> comparatorChain = new ComparatorChain<>((Comparator<Object>) null);
+
+        // Act: Replace the existing comparator. This is a modification that should
+        // be allowed on an unlocked chain.
+        comparatorChain.setComparator(0, (Comparator<Object>) null, false);
+
+        // Assert: The chain should remain unlocked because the compare() method
+        // has not yet been invoked.
+        assertFalse("The chain should not be locked after modification, before any comparison is performed.",
+                    comparatorChain.isLocked());
     }
 }
