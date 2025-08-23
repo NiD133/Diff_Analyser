@@ -1,11 +1,15 @@
 package org.apache.commons.codec.language;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class RefinedSoundexTestTest5 extends AbstractStringEncoderTest<RefinedSoundex> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest extends AbstractStringEncoderTest<RefinedSoundex> {
 
     @Override
     protected RefinedSoundex createStringEncoder() {
@@ -13,7 +17,16 @@ public class RefinedSoundexTestTest5 extends AbstractStringEncoderTest<RefinedSo
     }
 
     @Test
-    void testNewInstance() {
-        assertEquals("D6043", new RefinedSoundex().soundex("dogs"));
+    @DisplayName("The soundex() method should correctly encode a simple word")
+    void shouldCorrectlyEncodeWordWithSoundexMethod() {
+        // Arrange
+        final String input = "dogs";
+        final String expectedEncoding = "D6043";
+
+        // Act
+        final String actualEncoding = this.stringEncoder.soundex(input);
+
+        // Assert
+        assertEquals(expectedEncoding, actualEncoding);
     }
 }
