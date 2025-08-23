@@ -2,46 +2,48 @@ package org.jfree.chart.annotations;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
 
-public class XYLineAnnotation_ESTestTest11 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        SamplingXYLineRenderer samplingXYLineRenderer0 = new SamplingXYLineRenderer();
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation(2545.5, (-909.0), (-1423.676), (double) samplingXYLineRenderer0.ZERO, samplingXYLineRenderer0.DEFAULT_OUTLINE_STROKE, samplingXYLineRenderer0.DEFAULT_OUTLINE_PAINT);
-        double double0 = xYLineAnnotation0.getY1();
-        assertEquals((-1423.676), xYLineAnnotation0.getX2(), 0.01);
-        assertEquals(2545.5, xYLineAnnotation0.getX1(), 0.01);
-        assertEquals((-909.0), double0, 0.01);
-        assertEquals(0.0, xYLineAnnotation0.getY2(), 0.01);
+    /**
+     * Verifies that the constructor correctly initializes all properties
+     * and that the corresponding getter methods return the correct values.
+     */
+    @Test
+    public void constructorShouldSetAllPropertiesCorrectly() {
+        // Arrange: Define the properties for the line annotation.
+        double expectedX1 = 2545.5;
+        double expectedY1 = -909.0;
+        double expectedX2 = -1423.676;
+        double expectedY2 = 0.0;
+        Stroke expectedStroke = new BasicStroke(1.0f);
+        Paint expectedPaint = Color.BLACK;
+
+        // Act: Create a new XYLineAnnotation instance.
+        XYLineAnnotation annotation = new XYLineAnnotation(
+                expectedX1, expectedY1, expectedX2, expectedY2, expectedStroke, expectedPaint
+        );
+
+        // Assert: Verify that the getters return the values provided to the constructor.
+        assertEquals("X1 coordinate should match the constructor argument.",
+                expectedX1, annotation.getX1(), 0.01);
+        assertEquals("Y1 coordinate should match the constructor argument.",
+                expectedY1, annotation.getY1(), 0.01);
+        assertEquals("X2 coordinate should match the constructor argument.",
+                expectedX2, annotation.getX2(), 0.01);
+        assertEquals("Y2 coordinate should match the constructor argument.",
+                expectedY2, annotation.getY2(), 0.01);
+        assertSame("Stroke object should be the same as the constructor argument.",
+                expectedStroke, annotation.getStroke());
+        assertSame("Paint object should be the same as the constructor argument.",
+                expectedPaint, annotation.getPaint());
     }
 }
