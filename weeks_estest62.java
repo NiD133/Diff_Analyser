@@ -1,26 +1,31 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Weeks_ESTestTest62 extends Weeks_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        // Undeclared exception!
+    /**
+     * Tests that calling negated() on Weeks.MIN_VALUE throws an ArithmeticException.
+     * This is the expected behavior because Integer.MIN_VALUE cannot be safely negated
+     * to a positive integer due to two's complement representation, which would cause an overflow.
+     */
+    @Test
+    public void negated_whenValueIsMinValue_throwsArithmeticException() {
+        // Arrange: Create a Weeks instance with the minimum possible value.
+        Weeks minWeeks = Weeks.MIN_VALUE;
+
+        // Act & Assert: Attempt to negate the value and verify that the correct exception is thrown.
         try {
-            weeks0.negated();
-            fail("Expecting exception: ArithmeticException");
+            minWeeks.negated();
+            fail("Expected an ArithmeticException to be thrown, but no exception occurred.");
         } catch (ArithmeticException e) {
-            //
-            // Integer.MIN_VALUE cannot be negated
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception message is as expected, confirming the reason for the failure.
+            assertEquals("Integer.MIN_VALUE cannot be negated", e.getMessage());
         }
     }
 }
