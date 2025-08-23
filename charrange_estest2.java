@@ -1,27 +1,46 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest2 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharRange}.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        CharRange charRange0 = CharRange.isIn('+', '+');
-        CharRange charRange1 = CharRange.isNotIn('7', '7');
-        boolean boolean0 = charRange1.equals(charRange0);
-        assertFalse(boolean0);
-        assertEquals('7', charRange1.getStart());
-        assertEquals('+', charRange0.getEnd());
-        assertTrue(charRange1.isNegated());
-        assertEquals('+', charRange0.getStart());
-        assertEquals('7', charRange1.getEnd());
+    /**
+     * Tests that the equals() method correctly returns false when comparing two
+     * fundamentally different ranges (one inclusive, one negated, with different characters).
+     */
+    @Test
+    public void testEqualsReturnsFalseForDissimilarRanges() {
+        // Arrange: Create two distinct CharRange objects.
+        
+        // An inclusive range containing only the character '+'
+        CharRange inclusiveRange = CharRange.isIn('+', '+');
+        
+        // A negated range containing all characters EXCEPT '7'
+        CharRange negatedRange = CharRange.isNotIn('7', '7');
+
+        // Pre-assertion: Verify the initial state of the ranges to ensure our setup is correct.
+        // This is not the main assertion of the test.
+        assertEquals("Start of inclusive range should be '+'", '+', inclusiveRange.getStart());
+        assertEquals("End of inclusive range should be '+'", '+', inclusiveRange.getEnd());
+        assertFalse("Inclusive range should not be negated", inclusiveRange.isNegated());
+
+        assertEquals("Start of negated range should be '7'", '7', negatedRange.getStart());
+        assertEquals("End of negated range should be '7'", '7', negatedRange.getEnd());
+        assertTrue("Negated range should be marked as negated", negatedRange.isNegated());
+
+        // Act & Assert: The CharRange.equals() method checks for start, end, and the negated flag.
+        // Since these ranges differ in all three aspects, they must not be equal.
+        assertFalse("An inclusive range should not be equal to a different, negated range",
+                inclusiveRange.equals(negatedRange));
+        
+        // For completeness, check for symmetry in the equals comparison.
+        assertFalse("A negated range should not be equal to a different, inclusive range",
+                negatedRange.equals(inclusiveRange));
     }
 }
