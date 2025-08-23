@@ -1,29 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest88 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test087() throws Throwable {
-        Boolean boolean0 = Boolean.FALSE;
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(boolean0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        boolean boolean1 = jsonTreeReader0.nextBoolean();
-        assertFalse(boolean1);
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    @Test
+    public void nextBoolean_whenReadingFalsePrimitive_returnsFalse() throws IOException {
+        // Arrange
+        JsonPrimitive falseJsonPrimitive = new JsonPrimitive(false);
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(falseJsonPrimitive);
+
+        // Act
+        boolean result = jsonTreeReader.nextBoolean();
+
+        // Assert
+        assertFalse("The reader should return false for a JSON false primitive.", result);
     }
 }
