@@ -1,26 +1,25 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Vector_ESTestTest18 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class, focusing on exception handling and invalid inputs.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Vector vector0 = new Vector(4, 3, 8);
-        // Undeclared exception!
-        try {
-            vector0.dot((Vector) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.Vector", e);
-        }
+    /**
+     * Verifies that the dot() method throws a NullPointerException
+     * when its argument is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void dotShouldThrowNullPointerExceptionWhenArgumentIsNull() {
+        // Arrange: Create an arbitrary vector instance. The specific coordinates are not
+        // relevant for this test, as the method should fail before using them.
+        Vector vector = new Vector(4, 3, 8);
+
+        // Act & Assert: Call the dot() method with a null argument.
+        // The @Test(expected) annotation handles the assertion, ensuring that a
+        // NullPointerException is thrown.
+        vector.dot(null);
     }
 }
