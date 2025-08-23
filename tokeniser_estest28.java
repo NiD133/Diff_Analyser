@@ -1,23 +1,30 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class Tokeniser_ESTestTest28 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Test suite for the XML parser's handling of malformed input.
+ */
+public class XmlParserTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Document document0 = xmlTreeBuilder0.parse("{O_&<vinI", "{O_&<vinI");
-        assertEquals("#root", document0.normalName());
+    /**
+     * Tests that the XML parser can gracefully handle a string containing an unclosed tag.
+     * This is a test for robustness against malformed input.
+     */
+    @Test
+    public void gracefullyHandlesUnclosedTagInXml() {
+        // Arrange: A malformed XML string with an unclosed tag and an unescaped ampersand.
+        String malformedXml = "{O_&<vinI";
+
+        // Act: Parse the string using the XML parser.
+        Document doc = Jsoup.parse(malformedXml, "", Parser.xmlParser());
+
+        // Assert: The parser should not crash. It should treat the text as a text node
+        // (with the ampersand escaped) and the unclosed tag as a self-closing element.
+        String expectedOutput = "{O_&amp;<vinI />";
+        assertEquals(expectedOutput, doc.outerHtml());
     }
 }
