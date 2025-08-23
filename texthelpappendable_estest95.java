@@ -1,54 +1,37 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TextHelpAppendable_ESTestTest95 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test94() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        textHelpAppendable0.setMaxWidth((-2667));
-        ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-        arrayDeque0.add("{=]QX5oR_7fr:?6/");
-        // Undeclared exception!
+    /**
+     * Tests that appendList() throws an IllegalArgumentException if the max width
+     * has been set to a negative value.
+     */
+    @Test
+    public void appendListShouldThrowIllegalArgumentExceptionWhenMaxWidthIsNegative() throws IOException {
+        // Arrange: Create a formatter with a negative max width.
+        // Using a StringWriter avoids printing to System.out during the test.
+        StringWriter stringWriter = new StringWriter();
+        TextHelpAppendable helpFormatter = new TextHelpAppendable(stringWriter);
+        helpFormatter.setMaxWidth(-1);
+        List<CharSequence> listItems = Collections.singletonList("A list item.");
+
+        // Act & Assert: Verify that appending a list throws an exception with the correct message.
         try {
-            textHelpAppendable0.appendList(true, arrayDeque0);
-            fail("Expecting exception: IllegalArgumentException");
+            helpFormatter.appendList(true, listItems);
+            fail("Expected an IllegalArgumentException because the width is negative.");
         } catch (IllegalArgumentException e) {
-            //
-            // Width must be greater than 0
-            //
-            verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
+            // Verify the exception message is as expected.
+            assertEquals("Width must be greater than 0", e.getMessage());
         }
     }
 }
