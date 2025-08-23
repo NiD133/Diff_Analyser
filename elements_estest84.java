@@ -1,44 +1,27 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest84 extends Elements_ESTest_scaffolding {
+/**
+ * This test verifies the argument validation of the {@link Elements#eachAttr(String)} method.
+ */
+public class ElementsEachAttrTest {
 
-    @Test(timeout = 4000)
-    public void test083() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.children();
-        // Undeclared exception!
-        try {
-            elements0.eachAttr((String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    /**
+     * Tests that calling eachAttr with a null attribute key throws an IllegalArgumentException.
+     * The method should not accept null arguments, as an attribute key cannot be null.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void eachAttrShouldThrowExceptionForNullAttributeKey() {
+        // Arrange: Create a non-empty Elements collection. The specific content
+        // of the elements is irrelevant to this test case.
+        Elements elements = new Elements(new Element("p"));
+
+        // Act: Call the method under test with an invalid null argument.
+        elements.eachAttr(null);
+
+        // Assert: The test passes if an IllegalArgumentException is thrown,
+        // as specified by the 'expected' parameter in the @Test annotation.
     }
 }
