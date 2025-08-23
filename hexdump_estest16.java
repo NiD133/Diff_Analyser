@@ -1,42 +1,35 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
 import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest16 extends HexDump_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        PipedWriter pipedWriter0 = new PipedWriter();
-        byte[] byteArray0 = new byte[3];
-        byteArray0[2] = (byte) 127;
-        try {
-            HexDump.dump(byteArray0, (Appendable) pipedWriter0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedWriter", e);
-        }
+/**
+ * Tests for {@link HexDump}.
+ */
+public class HexDumpTest {
+
+    /**
+     * Tests that HexDump.dump() throws an IOException when attempting to write
+     * to an Appendable that is not ready for writing, such as an unconnected PipedWriter.
+     */
+    @Test
+    public void dump_toUnconnectedPipedWriter_shouldThrowIOException() {
+        // Arrange: Create some data and an unconnected PipedWriter.
+        // A PipedWriter must be connected to a PipedReader before it can be used.
+        final byte[] dataToDump = new byte[]{0x00, 0x01, 0x7F};
+        final PipedWriter unconnectedWriter = new PipedWriter();
+
+        // Act & Assert: Verify that calling dump with the unconnected writer throws an IOException.
+        final IOException exception = assertThrows(
+                IOException.class,
+                () -> HexDump.dump(dataToDump, unconnectedWriter)
+        );
+
+        // Assert: Check the exception message for more specific verification.
+        assertEquals("Pipe not connected", exception.getMessage());
     }
 }
