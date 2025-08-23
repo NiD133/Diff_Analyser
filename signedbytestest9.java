@@ -1,60 +1,63 @@
 package com.google.common.primitives;
 
-import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
+
 import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest9 extends TestCase {
+/**
+ * Tests for {@link SignedBytes#lexicographicalComparator()}.
+ */
+@RunWith(JUnit4.class)
+public class SignedBytesLexicographicalComparatorTest {
 
-    private static final byte[] EMPTY = {};
+    private static final byte MIN_VALUE = Byte.MIN_VALUE; // -128
+    private static final byte MAX_VALUE = Byte.MAX_VALUE; // 127
 
-    private static final byte[] ARRAY1 = { (byte) 1 };
+    // The constants are prefixed with letters to visually represent their lexicographical order.
+    private static final byte[] A_EMPTY = {};
+    private static final byte[] B_MIN_VALUE = {MIN_VALUE};
+    private static final byte[] C_MIN_VALUE_PREFIX = {MIN_VALUE, MIN_VALUE};
+    private static final byte[] D_MIN_VALUE_THEN_POSITIVE = {MIN_VALUE, 1};
+    private static final byte[] E_POSITIVE_ONE = {1};
+    private static final byte[] F_POSITIVE_THEN_MIN_VALUE = {1, MIN_VALUE};
+    private static final byte[] G_MAX_ALMOST = {MAX_VALUE, (byte) (MAX_VALUE - 1)};
+    private static final byte[] H_MAX_EXACT = {MAX_VALUE, MAX_VALUE};
+    private static final byte[] I_MAX_LONGER = {MAX_VALUE, MAX_VALUE, MAX_VALUE};
 
-    private static final byte LEAST = Byte.MIN_VALUE;
+    /**
+     * Verifies that the lexicographical comparator correctly orders a list of byte arrays. The test
+     * cases include:
+     * <ul>
+     *   <li>Empty vs. non-empty arrays.
+     *   <li>Arrays where one is a prefix of the other.
+     *   <li>Arrays of the same length with different values.
+     *   <li>Arrays containing minimum and maximum byte values.
+     * </ul>
+     */
+    @Test
+    public void lexicographicalComparator_sortsArraysAsExpected() {
+        List<byte[]> orderedExamples =
+            Arrays.asList(
+                A_EMPTY,
+                B_MIN_VALUE,
+                C_MIN_VALUE_PREFIX,
+                D_MIN_VALUE_THEN_POSITIVE,
+                E_POSITIVE_ONE,
+                F_POSITIVE_THEN_MIN_VALUE,
+                G_MAX_ALMOST,
+                H_MAX_EXACT,
+                I_MAX_LONGER);
 
-    private static final byte GREATEST = Byte.MAX_VALUE;
-
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
-
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
-        }
-    }
-
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    // b/285319375
-    @J2ktIncompatible
-    public void testLexicographicalComparator() {
-        List<byte[]> ordered = Arrays.asList(new byte[] {}, new byte[] { LEAST }, new byte[] { LEAST, LEAST }, new byte[] { LEAST, (byte) 1 }, new byte[] { (byte) 1 }, new byte[] { (byte) 1, LEAST }, new byte[] { GREATEST, GREATEST - (byte) 1 }, new byte[] { GREATEST, GREATEST }, new byte[] { GREATEST, GREATEST, GREATEST });
         Comparator<byte[]> comparator = SignedBytes.lexicographicalComparator();
-        Helpers.testComparator(comparator, ordered);
+
+        // Helpers.testComparator verifies that the comparator imposes the same order
+        // as the list's iteration order.
+        Helpers.testComparator(comparator, orderedExamples);
     }
 }
