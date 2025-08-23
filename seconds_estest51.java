@@ -1,25 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Seconds_ESTestTest51 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that parsing an empty string throws an IllegalArgumentException
+     * because it is not a valid ISO8601 period format.
+     */
+    @Test
+    public void parseSeconds_withEmptyString_shouldThrowIllegalArgumentException() {
         try {
             Seconds.parseSeconds("");
-            fail("Expecting exception: IllegalArgumentException");
+            fail("Expected an IllegalArgumentException to be thrown for an empty input string.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \"\"
-            //
-            verifyException("org.joda.time.format.PeriodFormatter", e);
+            // This is the expected outcome.
+            // We assert the message to ensure the exception is thrown for the correct reason.
+            assertEquals("Invalid format: \"\"", e.getMessage());
         }
     }
 }
