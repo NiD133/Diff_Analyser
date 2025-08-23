@@ -1,55 +1,43 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
+
+/**
+ * Contains a test case for the {@link TextHelpAppendable} class.
+ */
 public class TextHelpAppendable_ESTestTest27 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        textHelpAppendable0.setLeftPad((-2243));
-        Stack<TextStyle> stack0 = new Stack<TextStyle>();
-        ArrayList<String> arrayList0 = new ArrayList<String>();
-        List<Queue<String>> list0 = textHelpAppendable0.makeColumnQueues(arrayList0, stack0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.writeColumnQueues(list0, stack0);
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.Util", e);
-        }
+    /**
+     * Tests that {@link TextHelpAppendable#writeColumnQueues(List, List)} throws a
+     * {@link NegativeArraySizeException} if the left padding has been set to a negative value.
+     * The exception is expected because an underlying utility method will attempt to create
+     * a padding string, which involves allocating an array with a negative size.
+     *
+     * @throws IOException if an I/O error occurs (not expected in this test case).
+     */
+    @Test(expected = NegativeArraySizeException.class)
+    public void writeColumnQueuesShouldThrowExceptionForNegativeLeftPadding() throws IOException {
+        // Arrange: Create a TextHelpAppendable and configure it with an invalid state.
+        final TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        final int negativeLeftPad = -2243;
+        helpAppendable.setLeftPad(negativeLeftPad);
+
+        // The actual column data and styles are not relevant, as the exception is
+        // triggered by the negative padding value. Empty lists are sufficient.
+        final List<String> columnData = Collections.emptyList();
+        final List<TextStyle> styles = Collections.emptyList();
+        final List<Queue<String>> columnQueues = helpAppendable.makeColumnQueues(columnData, styles);
+
+        // Act: Attempt to write the columns. This action is expected to trigger the exception.
+        helpAppendable.writeColumnQueues(columnQueues, styles);
+
+        // Assert: The test is expected to throw a NegativeArraySizeException.
+        // This is handled by the @Test(expected = ...) annotation. The test will
+        // fail automatically if this exception is not thrown.
     }
 }
