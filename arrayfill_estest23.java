@@ -1,21 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest23 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        float[] floatArray0 = new float[0];
-        float[] floatArray1 = ArrayFill.fill(floatArray0, 1.0F);
-        assertSame(floatArray0, floatArray1);
+    /**
+     * Tests that calling ArrayFill.fill() on an empty array
+     * returns the same array instance without modification.
+     * This is an important edge case to ensure the method handles
+     * empty arrays gracefully.
+     */
+    @Test
+    public void testFillWithEmptyArrayReturnsSameInstance() {
+        // Arrange: Create an empty float array.
+        final float[] emptyArray = new float[0];
+
+        // Act: Call the fill method on the empty array.
+        final float[] resultArray = ArrayFill.fill(emptyArray, 1.0F);
+
+        // Assert: The method should return the exact same instance it was given.
+        assertSame("The returned array should be the same instance as the input for an empty array.",
+            emptyArray, resultArray);
     }
 }
