@@ -1,33 +1,35 @@
 package com.google.common.math;
 
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest25 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        double[] doubleArray0 = new double[1];
-        Stats stats0 = Stats.of(doubleArray0);
-        Stats stats1 = pairedStatsAccumulator0.xStats();
-        PairedStats pairedStats0 = new PairedStats(stats0, stats1, 5700.61466);
-        pairedStatsAccumulator0.addAll(pairedStats0);
-        // Undeclared exception!
+    @Test
+    public void add_afterAddingPairedStatsWithMismatchedCounts_throwsIllegalStateException() {
+        // ARRANGE: Create an accumulator and put it into an inconsistent state.
+        // This is done by adding a PairedStats object where the x-stats and y-stats
+        // have different counts (1 and 0, respectively). The addAll() method
+        // allows this when the accumulator is empty, leading to an invalid state.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        Stats xStatsWithOneValue = Stats.of(1.0);
+        Stats emptyYStats = Stats.of(); // An empty Stats object has a count of 0.
+        PairedStats inconsistentPairedStats = new PairedStats(xStatsWithOneValue, emptyYStats, 0.0);
+        
+        accumulator.addAll(inconsistentPairedStats);
+
+        // ACT & ASSERT: Attempting to add a new pair should fail. The add() method
+        // needs to calculate the mean of the y-values, which is not possible for an
+        // empty y-stats collection, resulting in an IllegalStateException.
         try {
-            pairedStatsAccumulator0.add(7367227.571539006, 7367227.571539006);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+            accumulator.add(2.0, 2.0);
+            fail("Expected an IllegalStateException to be thrown due to inconsistent state");
+        } catch (IllegalStateException expected) {
+            // This is the expected behavior.
         }
     }
 }
