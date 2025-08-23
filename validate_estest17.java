@@ -1,33 +1,32 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest17 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Object[] objectArray0 = new Object[1];
-        // Undeclared exception!
+    /**
+     * Verifies that {@link Validate#noNullElements(Object[], String)} throws an
+     * IllegalArgumentException when the provided array contains a null element.
+     */
+    @Test
+    public void noNullElementsShouldThrowExceptionForArrayContainingNull() {
+        // Arrange: Create an array that contains a null element and define the expected error message.
+        Object[] arrayWithNull = { "one", null, "three" };
+        String expectedMessage = "Array must not contain any null objects";
+
+        // Act & Assert: Call the method and verify the expected exception and its message.
         try {
-            Validate.noNullElements(objectArray0, "Object must not be null");
-            fail("Expecting exception: IllegalArgumentException");
+            Validate.noNullElements(arrayWithNull, expectedMessage);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception occurred.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Success: The correct exception type was thrown.
+            // Now, verify that the exception message is what we expect.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
