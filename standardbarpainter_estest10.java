@@ -1,28 +1,26 @@
 package org.jfree.chart.renderer.category;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StandardBarPainter_ESTestTest10 extends StandardBarPainter_ESTest_scaffolding {
+/**
+ * Tests for the {@link StandardBarPainter} class.
+ */
+public class StandardBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        StandardBarPainter standardBarPainter1 = new StandardBarPainter();
-        boolean boolean0 = standardBarPainter1.equals(standardBarPainter0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two separate instances of StandardBarPainter are considered equal.
+     * This is the expected behavior as the class is stateless.
+     */
+    @Test
+    public void twoDefaultInstancesShouldBeEqual() {
+        // Arrange: Create two separate instances of the painter.
+        StandardBarPainter painter1 = new StandardBarPainter();
+        StandardBarPainter painter2 = new StandardBarPainter();
+
+        // Act & Assert: The two instances should be equal to each other.
+        // assertEquals internally calls the .equals() method and provides a
+        // more informative failure message than assertTrue.
+        assertEquals(painter1, painter2);
     }
 }
