@@ -1,31 +1,32 @@
 package com.google.common.io;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceReader_ESTestTest18 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        char[] charArray0 = new char[6];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        charSequenceReader0.close();
-        try {
-            charSequenceReader0.read();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // reader closed
-            //
-            verifyException("com.google.common.io.CharSequenceReader", e);
-        }
+    // A JUnit Rule for declaratively testing exceptions.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void read_afterBeingClosed_throwsIOException() throws IOException {
+        // Arrange: Create a reader and immediately close it.
+        // The actual content of the CharSequence is irrelevant for this test.
+        CharSequenceReader reader = new CharSequenceReader("test data");
+        reader.close();
+
+        // Assert: Expect an IOException with a specific message.
+        thrown.expect(IOException.class);
+        thrown.expectMessage("reader closed");
+
+        // Act: Attempt to read from the already closed reader.
+        reader.read();
     }
 }
