@@ -1,40 +1,42 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializationUtils_ESTestTest8 extends SerializationUtils_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        Class<Object> class0 = Object.class;
-        // Undeclared exception!
+/**
+ * Tests for {@link SerializationUtils}.
+ */
+public class SerializationUtilsTest {
+
+    /**
+     * Tests that attempting to serialize to an unconnected PipedOutputStream
+     * results in a SerializationException that wraps the underlying IOException.
+     */
+    @Test
+    public void testSerializeToUnconnectedPipeThrowsException() {
+        // Arrange: Create a serializable object and an output stream that will fail on write.
+        // A PipedOutputStream must be connected to a PipedInputStream before use.
+        final PipedOutputStream unconnectedOutputStream = new PipedOutputStream();
+        final String objectToSerialize = "some test data";
+
+        // Act & Assert: Attempt to serialize and verify the correct exception is thrown.
         try {
-            SerializationUtils.serialize((Serializable) class0, (OutputStream) pipedOutputStream0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
+            SerializationUtils.serialize(objectToSerialize, unconnectedOutputStream);
+            fail("Expected SerializationException for writing to an unconnected pipe.");
+        } catch (final SerializationException e) {
+            // The method should wrap the underlying IOException in a SerializationException.
+            final Throwable cause = e.getCause();
+            assertNotNull("The exception should have a cause.", cause);
+            assertTrue("The cause should be an instance of IOException.", cause instanceof IOException);
+            assertEquals("The cause message should indicate the pipe is not connected.",
+                         "Pipe not connected", cause.getMessage());
         }
     }
 }
