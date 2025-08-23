@@ -1,45 +1,37 @@
 package com.itextpdf.text.xml.xmp;
 
+import com.itextpdf.xmp.XMPException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest24 extends XmpWriter_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link XmpWriter} class.
+ * This specific test focuses on the addDocInfoProperty method.
+ */
+// The original class name is kept to match the file context.
+public class XmpWriter_ESTestTest24 {
 
+    /**
+     * Verifies that adding a standard document information property, such as "Subject",
+     * to the XmpWriter executes successfully without throwing an exception.
+     */
     @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "Subject", 158);
-        xmpWriter0.addDocInfoProperty("Subject", "P:Z|Bx");
+    public void addDocInfoPropertyWithSubjectKeyShouldNotThrowException() throws IOException, XMPException {
+        // Arrange: Set up a realistic XmpWriter instance.
+        // Using a ByteArrayOutputStream is safer and clearer than using null.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        // Use a standard, valid encoding constant instead of a magic string.
+        XmpWriter xmpWriter = new XmpWriter(outputStream, XmpWriter.UTF8, 2000);
+
+        String propertyKey = "Subject";
+        String propertyValue = "This is a sample subject.";
+
+        // Act: Call the method under test.
+        xmpWriter.addDocInfoProperty(propertyKey, propertyValue);
+
+        // Assert: The test implicitly asserts that no exception was thrown during the 'Act' phase.
+        // A successful execution of the above line is the passing condition for this test.
     }
 }
