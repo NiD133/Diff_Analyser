@@ -1,11 +1,7 @@
 package org.mockito.internal.util.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 import org.junit.Rule;
@@ -14,34 +10,55 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+// The class name "HashCodeAndEqualsSafeSetTestTest8" is a bit redundant.
+// A better name would be "HashCodeAndEqualsSafeSetTest".
 public class HashCodeAndEqualsSafeSetTestTest8 {
 
     @Rule
-    public MockitoRule r = MockitoJUnit.rule();
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private UnmockableHashCodeAndEquals mock1;
+    private ObjectWithFailingHashCodeAndEquals mockWithFailingMethods;
 
-    private static class UnmockableHashCodeAndEquals {
+    @Mock
+    private Observer regularMock;
 
+    /**
+     * Helper class simulating an object whose hashCode() or equals() methods are "broken"
+     * and throw an exception upon invocation. This is used to test the "safe" nature
+     * of the HashCodeAndEqualsSafeSet.
+     */
+    private static class ObjectWithFailingHashCodeAndEquals {
         @Override
         public final int hashCode() {
-            throw new NullPointerException("I'm failing on hashCode and I don't care");
+            throw new UnsupportedOperationException("Failing hashCode() for test purposes");
         }
 
         @Override
         public final boolean equals(Object obj) {
-            throw new NullPointerException("I'm failing on equals and I don't care");
+            throw new UnsupportedOperationException("Failing equals() for test purposes");
         }
     }
 
     @Test
-    public void can_iterate() throws Exception {
-        HashCodeAndEqualsSafeSet mocks = HashCodeAndEqualsSafeSet.of(mock1, mock(Observer.class));
-        LinkedList<Object> accumulator = new LinkedList<Object>();
-        for (Object mock : mocks) {
-            accumulator.add(mock);
+    public void shouldIterateSuccessfullyWhenSetContainsObjectWithFailingHashCodeAndEquals() {
+        // This test verifies that HashCodeAndEqualsSafeSet can be iterated over
+        // without throwing an exception, even when it contains an object
+        // whose hashCode() and equals() methods are designed to fail.
+
+        // Arrange
+        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(mockWithFailingMethods, regularMock);
+
+        // Act
+        List<Object> iteratedElements = new ArrayList<>();
+        // The for-each loop implicitly calls iterator(), which is the behavior under test.
+        for (Object element : safeSet) {
+            iteratedElements.add(element);
         }
-        assertThat(accumulator).isNotEmpty();
+
+        // Assert
+        // Verify that the iteration was successful and collected all the original elements.
+        // This is a stronger and clearer assertion than just checking if the list is not empty.
+        assertThat(iteratedElements).containsExactlyInAnyOrder(mockWithFailingMethods, regularMock);
     }
 }
