@@ -1,78 +1,62 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.evosuite.shaded.org.mockito.Mockito.mock;
+import static org.evosuite.shaded.org.mockito.Mockito.when;
+import static org.junit.Assert.fail;
 
 public class SimplePathInterpreter_ESTestTest40 extends SimplePathInterpreter_ESTest_scaffolding {
 
+    /**
+     * Tests that createNullPointer throws a NullPointerException when a step in the
+     * path has a null predicate array.
+     * <p>
+     * This scenario is simulated by using a single mock Step instance for multiple
+     * path steps. The mock is configured to return a valid (empty) predicate array
+     * on the first invocation, but null on the second. The method is expected to
+     * process the first step and then fail when it encounters the null predicates
+     * from the second step.
+     */
     @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        SimplePathInterpreter simplePathInterpreter0 = new SimplePathInterpreter();
-        String string0 = "";
-        QName qName0 = new QName("", "");
-        NodeNameTest nodeNameTest0 = new NodeNameTest(qName0);
-        SelfContext selfContext0 = new SelfContext((EvalContext) null, nodeNameTest0);
-        NodePointer nodePointer0 = null;
-        Step[] stepArray0 = new Step[7];
-        Expression[] expressionArray0 = new Expression[0];
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn(6, 0).when(step0).getAxis();
-        doReturn((Object) expressionArray0, (Object) null).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        stepArray0[1] = step0;
-        stepArray0[2] = step0;
-        stepArray0[3] = step0;
-        stepArray0[4] = step0;
-        stepArray0[5] = step0;
-        stepArray0[6] = step0;
-        // Undeclared exception!
+    public void createNullPointerThrowsNPEWhenStepPredicatesAreNull() {
+        // ARRANGE
+        // A single mock Step instance is used for all steps in the path.
+        // It's configured to return different values on subsequent calls to simulate
+        // traversing a path where a subsequent step is malformed.
+        Step mockStep = mock(Step.class);
+
+        // Configure the mock to return a valid empty predicate array for the first step,
+        // and null for the second step, which is expected to cause the NPE.
+        Expression[] emptyPredicates = new Expression[0];
+        when(mockStep.getPredicates()).thenReturn(emptyPredicates, null);
+
+        // The axis values are configured to allow the method to proceed to the predicate check.
+        // The specific values are not critical to triggering the NPE.
+        when(mockStep.getAxis()).thenReturn(6, 0);
+
+        // A path with two steps is sufficient to trigger the behavior. Both steps
+        // use the same mock instance.
+        Step[] steps = {mockStep, mockStep};
+
+        // A minimal, non-null evaluation context is required for the method call.
+        QName qName = new QName("", "test");
+        NodeNameTest nodeNameTest = new NodeNameTest(qName);
+        EvalContext context = new SelfContext(null, nodeNameTest);
+
+        // ACT & ASSERT
         try {
-            SimplePathInterpreter.createNullPointer(selfContext0, (NodePointer) null, stepArray0, 0);
-            fail("Expecting exception: NullPointerException");
+            // The method starts processing at the first step (index 0).
+            // It should process steps[0] successfully and then throw an NPE on steps[1].
+            SimplePathInterpreter.createNullPointer(context, null, steps, 0);
+            fail("Expected a NullPointerException because the second step's predicates are null.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // This is the expected outcome. The test passes.
         }
     }
 }
