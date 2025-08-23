@@ -1,32 +1,33 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest19 extends Validate_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Validate} helper class.
+ */
+public class ValidateTest {
+
+    /**
+     * Verifies that {@link Validate#notEmpty(String, String)} throws an
+     * {@link IllegalArgumentException} when the input string is empty.
+     * The exception message should match the custom message provided.
+     */
+    @Test
+    public void notEmptyShouldThrowExceptionForEmptyString() {
+        // Arrange: Define an empty input string and the expected error message.
+        final String emptyString = "";
+        final String expectedErrorMessage = "String must not be empty.";
+
+        // Act & Assert: Call the method and verify that the correct exception is thrown.
         try {
-            Validate.notEmpty("", "yA~4uE4p\\XYz0W#");
-            fail("Expecting exception: IllegalArgumentException");
+            Validate.notEmpty(emptyString, expectedErrorMessage);
+            fail("Expected an IllegalArgumentException, but no exception was thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // yA~4uE4p\\XYz0W#
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is the one we provided.
+            assertEquals("The exception message should match the custom one.", expectedErrorMessage, e.getMessage());
         }
     }
 }
