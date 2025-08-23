@@ -1,27 +1,31 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class TypeAdapter_ESTestTest34 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TypeAdapter} class.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Gson.FutureTypeAdapter<Integer> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Integer>();
-        TypeAdapter<Integer> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        TypeAdapter<Integer> typeAdapter1 = typeAdapter0.nullSafe();
-        assertSame(typeAdapter1, typeAdapter0);
+    /**
+     * Tests that calling nullSafe() on a TypeAdapter that is already null-safe
+     * returns the same instance, rather than wrapping it again. This ensures
+     * the method is idempotent and avoids unnecessary object creation.
+     */
+    @Test
+    public void nullSafe_onAlreadyNullSafeAdapter_returnsSameInstance() {
+        // Arrange: Create a base TypeAdapter and then its null-safe wrapper.
+        // We use FutureTypeAdapter as a simple, concrete implementation for this test.
+        TypeAdapter<Integer> originalAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Integer> nullSafeAdapter = originalAdapter.nullSafe();
+
+        // Act: Call nullSafe() again on the adapter that is already null-safe.
+        TypeAdapter<Integer> resultAdapter = nullSafeAdapter.nullSafe();
+
+        // Assert: The result should be the exact same instance as the first
+        // null-safe adapter, demonstrating idempotency.
+        assertSame("Calling nullSafe() multiple times should not create extra wrappers",
+                nullSafeAdapter, resultAdapter);
     }
 }
