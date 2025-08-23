@@ -1,26 +1,41 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest8 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setHtmlSafe(true);
-        Long long0 = Long.getLong("", 0L);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value((Number) long0);
-        assertSame(jsonTreeWriter0, jsonWriter0);
+/**
+ * This class contains tests for the JsonTreeWriter.
+ * This particular test was refactored for clarity.
+ */
+public class JsonTreeWriter_ESTestTest8 { // Note: Class name kept for context
+
+    /**
+     * Tests that calling `value(Number)` correctly creates a JsonPrimitive
+     * and returns the same writer instance to support a fluent API.
+     */
+    @Test
+    public void valueWithNumber_shouldSetProductAndReturnSameInstanceForChaining() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        Number numberValue = 0L;
+        JsonElement expectedProduct = new JsonPrimitive(numberValue);
+
+        // Act
+        JsonWriter resultWriter = writer.value(numberValue);
+        JsonElement actualProduct = writer.get();
+
+        // Assert
+        // 1. Verify the method supports a fluent interface by returning the same instance.
+        assertSame("The writer instance should be returned to allow for method chaining.", writer, resultWriter);
+
+        // 2. Verify the correct JsonElement was created.
+        assertEquals("The written value should be a JsonPrimitive containing the number.", expectedProduct, actualProduct);
     }
 }
