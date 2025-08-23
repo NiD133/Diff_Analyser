@@ -1,30 +1,30 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest51 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.html;
-        String string0 = Attribute.getValidKey("w'8l4N", document_OutputSettings_Syntax0);
-        assertNotNull(string0);
-        assertEquals("_w_8l4N", string0);
+    /**
+     * Tests that getValidKey() correctly sanitizes an attribute name for HTML syntax.
+     * According to the Jsoup implementation, invalid characters for an HTML attribute name
+     * (like spaces and single quotes) are replaced with an underscore (_).
+     */
+    @Test
+    public void getValidKeySanitizesInvalidHtmlCharacters() {
+        // Arrange
+        String invalidKey = " w'8l4N";
+        String expectedSanitizedKey = "_w_8l4N";
+        Syntax htmlSyntax = Syntax.html;
+
+        // Act
+        String actualSanitizedKey = Attribute.getValidKey(invalidKey, htmlSyntax);
+
+        // Assert
+        assertEquals(expectedSanitizedKey, actualSanitizedKey);
     }
 }
