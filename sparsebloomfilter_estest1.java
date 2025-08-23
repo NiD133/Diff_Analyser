@@ -1,24 +1,37 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class SparseBloomFilter_ESTestTest1 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Shape shape0 = Shape.fromKM(2268, 64);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        IndexFilter.BitMapTracker indexFilter_BitMapTracker0 = new IndexFilter.BitMapTracker(shape0);
-        boolean boolean0 = sparseBloomFilter0.processIndices(indexFilter_BitMapTracker0);
-        assertTrue(boolean0);
+    /**
+     * Tests that calling processIndices() on an empty filter returns true.
+     * The contract states that the method returns true if the predicate is true for all
+     * indices. For an empty filter, this condition is vacuously true, and the
+     * predicate should never be called.
+     */
+    @Test
+    public void testProcessIndicesOnEmptyFilterReturnsTrue() {
+        // Arrange: Create an empty filter with a standard shape.
+        Shape shape = Shape.fromKM(10, 1024); // K=10 hash functions, M=1024 bits
+        SparseBloomFilter emptyFilter = new SparseBloomFilter(shape);
+
+        // Arrange: Create a predicate that will fail the test if it is ever invoked.
+        IntPredicate failingPredicate = index -> {
+            fail("Predicate should not be called for an empty filter.");
+            return false; // This line is unreachable
+        };
+
+        // Act: Process the indices of the empty filter.
+        boolean result = emptyFilter.processIndices(failingPredicate);
+
+        // Assert: The result should be true, as no indices were processed.
+        assertTrue("processIndices on an empty filter should return true", result);
     }
 }
