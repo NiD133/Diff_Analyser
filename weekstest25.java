@@ -1,47 +1,69 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class WeeksTestTest25 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for the {@link Weeks#dividedBy(int)} method.
+ */
+class WeeksDividedByTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    @DisplayName("dividedBy should perform integer division correctly")
+    void dividedBy_withVariousDivisors_returnsCorrectResult() {
+        // Arrange
+        Weeks twelveWeeks = Weeks.weeks(12);
+
+        // Act & Assert
+        assertEquals(Weeks.weeks(6), twelveWeeks.dividedBy(2));
+        assertEquals(Weeks.weeks(4), twelveWeeks.dividedBy(3));
+        assertEquals(Weeks.weeks(3), twelveWeeks.dividedBy(4));
+        assertEquals(Weeks.weeks(2), twelveWeeks.dividedBy(5), "Integer division should truncate the result (12 / 5 = 2)");
+        assertEquals(Weeks.weeks(2), twelveWeeks.dividedBy(6));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    @Test
+    @DisplayName("dividedBy should not modify the original Weeks object (immutability)")
+    void dividedBy_isImmutable() {
+        // Arrange
+        Weeks originalWeeks = Weeks.weeks(12);
+        int originalValue = originalWeeks.getWeeks();
+
+        // Act
+        originalWeeks.dividedBy(4); // Perform an operation
+
+        // Assert
+        assertEquals(originalValue, originalWeeks.getWeeks(), "Original Weeks object should not be modified.");
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    @DisplayName("dividedBy(1) should return the same instance")
+    void dividedBy_one_returnsSameInstance() {
+        // Arrange
+        Weeks twelveWeeks = Weeks.weeks(12);
+
+        // Act
+        Weeks result = twelveWeeks.dividedBy(1);
+
+        // Assert
+        assertSame(twelveWeeks, result, "Dividing by 1 is a special case that should return the same instance.");
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test
+    @DisplayName("dividedBy(0) should throw ArithmeticException")
+    void dividedBy_zero_throwsArithmeticException() {
+        // Arrange
+        Weeks oneWeek = Weeks.ONE;
 
-    public void testDividedBy_int() {
-        Weeks test = Weeks.weeks(12);
-        assertEquals(6, test.dividedBy(2).getWeeks());
-        assertEquals(12, test.getWeeks());
-        assertEquals(4, test.dividedBy(3).getWeeks());
-        assertEquals(3, test.dividedBy(4).getWeeks());
-        assertEquals(2, test.dividedBy(5).getWeeks());
-        assertEquals(2, test.dividedBy(6).getWeeks());
-        assertSame(test, test.dividedBy(1));
-        try {
-            Weeks.ONE.dividedBy(0);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act & Assert
+        assertThrows(ArithmeticException.class, () -> {
+            oneWeek.dividedBy(0);
+        }, "Division by zero is not allowed and should throw an exception.");
     }
 }
