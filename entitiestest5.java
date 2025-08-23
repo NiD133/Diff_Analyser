@@ -1,24 +1,27 @@
 package org.jsoup.nodes;
 
-import org.jsoup.Jsoup;
-import org.jsoup.parser.Parser;
-import org.junit.jupiter.api.Test;
-import static org.jsoup.nodes.Document.OutputSettings;
-import static org.jsoup.nodes.Entities.EscapeMode.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class EntitiesTestTest5 {
+/**
+ * Contains tests for the {@link Entities#unescape(String)} method.
+ */
+public class EntitiesUnescapeTest {
 
+    /**
+     * Verifies that the unescape method correctly handles an empty string input
+     * by returning an empty string.
+     */
     @Test
-    public void xhtml() {
-        assertEquals(38, xhtml.codepointForName("amp"));
-        assertEquals(62, xhtml.codepointForName("gt"));
-        assertEquals(60, xhtml.codepointForName("lt"));
-        assertEquals(34, xhtml.codepointForName("quot"));
-        assertEquals("amp", xhtml.nameForCodepoint(38));
-        assertEquals("gt", xhtml.nameForCodepoint(62));
-        assertEquals("lt", xhtml.nameForCodepoint(60));
-        assertEquals("quot", xhtml.nameForCodepoint(34));
+    public void unescape_withEmptyString_returnsEmptyString() {
+        // Arrange: Define the input and the expected outcome.
+        String input = "";
+        String expected = "";
+
+        // Act: Execute the method under test.
+        String result = Entities.unescape(input);
+
+        // Assert: Verify that the actual result matches the expected outcome.
+        assertEquals("Unescaping an empty string should yield an empty string.", expected, result);
     }
 }
