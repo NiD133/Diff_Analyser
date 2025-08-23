@@ -1,17 +1,26 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest31 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the CSS selector parser in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse(":only-of-type");
-        assertEquals(":only-of-type", evaluator0.toString());
+    /**
+     * Verifies that the ':only-of-type' pseudo-selector is parsed correctly.
+     * The resulting Evaluator's string representation should match the input query.
+     */
+    @Test
+    public void shouldParseOnlyOfTypePseudoSelector() {
+        // Arrange
+        String query = ":only-of-type";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(query);
+
+        // Assert
+        assertEquals(query, evaluator.toString());
     }
 }
