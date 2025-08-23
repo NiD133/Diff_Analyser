@@ -1,80 +1,48 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class IslamicChronologyTestTest7 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for the toString() method of {@link IslamicChronology}.
+ */
+@DisplayName("IslamicChronology.toString()")
+class IslamicChronologyToStringTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testToString() {
+    @Test
+    @DisplayName("should return the chronology name and zone ID for a specific time zone")
+    void toString_withSpecificZone_returnsNameAndZoneId() {
+        // Act & Assert
         assertEquals("IslamicChronology[Europe/London]", IslamicChronology.getInstance(LONDON).toString());
         assertEquals("IslamicChronology[Asia/Tokyo]", IslamicChronology.getInstance(TOKYO).toString());
-        assertEquals("IslamicChronology[Europe/London]", IslamicChronology.getInstance().toString());
+    }
+
+    @Test
+    @DisplayName("should return the chronology name and 'UTC' for a UTC instance")
+    void toString_withUTCInstance_returnsNameAndUTC() {
+        // Act & Assert
         assertEquals("IslamicChronology[UTC]", IslamicChronology.getInstanceUTC().toString());
+    }
+
+    @Test
+    @DisplayName("should use the default time zone when no zone is specified")
+    void toString_withDefaultZone_usesDefaultZoneId() {
+        DateTimeZone originalDefaultZone = DateTimeZone.getDefault();
+        try {
+            // Arrange: Set a known default time zone for this test
+            DateTimeZone.setDefault(LONDON);
+
+            // Act & Assert
+            assertEquals("IslamicChronology[Europe/London]", IslamicChronology.getInstance().toString());
+        } finally {
+            // Teardown: Restore the original default time zone to avoid side effects
+            DateTimeZone.setDefault(originalDefaultZone);
+        }
     }
 }
