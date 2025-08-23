@@ -1,48 +1,38 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ObservableInputStream_ESTestTest32 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream.Builder}.
+ */
+public class ObservableInputStream_ESTestTest32 {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        ObservableInputStream.Builder observableInputStream_Builder0 = new ObservableInputStream.Builder();
-        ObservableInputStream observableInputStream0 = null;
+    /**
+     * Tests that constructing an {@link ObservableInputStream} from a builder
+     * without an origin (the underlying InputStream) throws an
+     * {@link IllegalStateException}.
+     */
+    @Test
+    public void buildShouldThrowIllegalStateExceptionWhenOriginInputStreamNotSet() {
+        // Arrange: Create a builder without setting the required origin InputStream.
+        final ObservableInputStream.Builder builder = new ObservableInputStream.Builder();
+
+        // Act & Assert: Attempting to construct the stream should fail.
         try {
-            observableInputStream0 = new ObservableInputStream(observableInputStream_Builder0);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // origin == null
-            //
-            verifyException("org.apache.commons.io.build.AbstractOriginSupplier", e);
+            new ObservableInputStream(builder);
+            fail("Expected an IllegalStateException to be thrown because no origin InputStream was set on the builder.");
+        } catch (final IllegalStateException e) {
+            // This is the expected outcome. The message is thrown by a parent class
+            // to indicate the missing configuration.
+            assertEquals("origin == null", e.getMessage());
+        } catch (final IOException e) {
+            // The constructor signature includes 'throws IOException'.
+            // If this is thrown, the test should fail as it's not the expected exception.
+            fail("Expected an IllegalStateException, but caught an unexpected IOException: " + e.getMessage());
         }
     }
 }
