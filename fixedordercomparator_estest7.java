@@ -1,36 +1,29 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest7 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * This test case focuses on the behavior of the FixedOrderComparator's
+ * setUnknownObjectBehavior method.
+ *
+ * Note: This class name is retained from the original auto-generated test suite.
+ * In a real-world scenario, it would be renamed to something more descriptive,
+ * like FixedOrderComparatorTest.
+ */
+public class FixedOrderComparator_ESTestTest7 { // Retaining original class name for context
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        LinkedList<FixedOrderComparator<Object>> linkedList0 = new LinkedList<FixedOrderComparator<Object>>();
-        FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator<Object>>(linkedList0);
-        // Undeclared exception!
-        try {
-            fixedOrderComparator0.setUnknownObjectBehavior((FixedOrderComparator.UnknownObjectBehavior) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // unknownObjectBehavior
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that calling setUnknownObjectBehavior with a null argument
+     * throws a NullPointerException, as specified by the method's contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void setUnknownObjectBehaviorShouldThrowNullPointerExceptionWhenBehaviorIsNull() {
+        // Arrange: Create a simple instance of the comparator.
+        // The specific type parameter (e.g., String) is not important for this test.
+        final FixedOrderComparator<String> comparator = new FixedOrderComparator<>();
+
+        // Act: Attempt to set the behavior to null.
+        // The @Test(expected) annotation will handle the assertion.
+        comparator.setUnknownObjectBehavior(null);
     }
 }
