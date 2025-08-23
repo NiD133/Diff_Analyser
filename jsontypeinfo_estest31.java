@@ -1,20 +1,27 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class JsonTypeInfo_ESTestTest31 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonTypeInfo.Value} class.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.EMPTY;
-        Boolean boolean0 = jsonTypeInfo_Value0.getRequireTypeIdForSubtypes();
-        assertNull(boolean0);
+    /**
+     * This test verifies that the default EMPTY instance of {@link JsonTypeInfo.Value}
+     * has a null value for the 'requireTypeIdForSubtypes' property, as it represents
+     * a default, unconfigured state.
+     */
+    @Test
+    public void emptyValueShouldHaveNullRequireTypeIdForSubtypes() {
+        // Arrange
+        JsonTypeInfo.Value emptyValue = JsonTypeInfo.Value.EMPTY;
+
+        // Act
+        Boolean requireTypeId = emptyValue.getRequireTypeIdForSubtypes();
+
+        // Assert
+        assertNull("The 'requireTypeIdForSubtypes' property for an EMPTY Value should be null.", requireTypeId);
     }
 }
