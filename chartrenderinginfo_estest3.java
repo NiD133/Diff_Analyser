@@ -1,29 +1,38 @@
 package org.jfree.chart;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ChartRenderingInfo_ESTestTest3 extends ChartRenderingInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        chartRenderingInfo0.setEntityCollection((EntityCollection) null);
-        EntityCollection entityCollection0 = chartRenderingInfo0.getEntityCollection();
-        assertNull(entityCollection0);
+/**
+ * Unit tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
+
+    /**
+     * Verifies that the entity collection can be set to null, and the
+     * corresponding getter will subsequently return null.
+     * <p>
+     * This behavior is a documented feature, allowing developers to disable
+     * entity collection to improve performance when it's not needed.
+     * </p>
+     */
+    @Test
+    public void testSetAndGetEntityCollectionWithNull() {
+        // Arrange: Create a ChartRenderingInfo instance. By default, it has a
+        // non-null entity collection.
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo();
+        assertNotNull("Precondition: EntityCollection should be non-null after default construction.",
+                renderingInfo.getEntityCollection());
+
+        // Act: Set the entity collection to null.
+        renderingInfo.setEntityCollection(null);
+
+        // Assert: Verify that the getter now returns null.
+        EntityCollection retrievedCollection = renderingInfo.getEntityCollection();
+        assertNull("The entity collection should be null after being explicitly set to null.",
+                retrievedCollection);
     }
 }
