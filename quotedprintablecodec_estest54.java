@@ -1,23 +1,30 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class QuotedPrintableCodec_ESTestTest54 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(true);
-        Object object0 = quotedPrintableCodec0.decode((Object) null);
-        assertNull(object0);
+    /**
+     * Tests that decoding a null Object returns null, which is the expected behavior
+     * for a null-safe decoder.
+     *
+     * @throws DecoderException This exception should not be thrown in this test case.
+     */
+    @Test
+    public void decodeObjectWithNullInputShouldReturnNull() throws DecoderException {
+        // Arrange
+        // The 'strict' parameter does not affect the outcome for a null input.
+        QuotedPrintableCodec codec = new QuotedPrintableCodec(true);
+
+        // Act
+        Object result = codec.decode((Object) null);
+
+        // Assert
+        assertNull("Decoding a null object should result in null.", result);
     }
 }
