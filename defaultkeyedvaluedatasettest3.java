@@ -1,24 +1,35 @@
 package org.jfree.data.general;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import java.math.BigInteger;
 
-public class DefaultKeyedValueDatasetTestTest3 {
+/**
+ * This test suite focuses on verifying the behavior of the {@link DefaultKeyedValueDataset} class,
+ * specifically its data retrieval capabilities.
+ */
+public class DefaultKeyedValueDataset_ESTestTest3 {
 
     /**
-     * Confirm that the clone is independent of the original.
-     * @throws java.lang.CloneNotSupportedException
+     * Tests that the getValue method correctly returns the value provided in the constructor.
+     * This ensures that the dataset accurately stores and retrieves the initial key-value pair.
      */
     @Test
-    public void testCloneIndependence() throws CloneNotSupportedException {
-        DefaultKeyedValueDataset d1 = new DefaultKeyedValueDataset("Key", 10.0);
-        DefaultKeyedValueDataset d2 = CloneUtils.clone(d1);
-        assertEquals(d1, d2);
-        d2.updateValue(99.9);
-        assertNotEquals(d1, d2);
-        d2.updateValue(10.0);
-        assertEquals(d1, d2);
+    public void getValue_whenInitializedWithValue_returnsSameValue() {
+        // Arrange: Define a key and a value for the dataset.
+        // A simple String is used for the key and a BigInteger for the value
+        // to ensure the dataset correctly handles different Number types.
+        Comparable<String> key = "Sample Key";
+        Number expectedValue = BigInteger.valueOf(100L);
+
+        // Act: Create a new DefaultKeyedValueDataset with the specified key and value,
+        // and then retrieve the value.
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset(key, expectedValue);
+        Number actualValue = dataset.getValue();
+
+        // Assert: Verify that the retrieved value is the exact same instance
+        // as the one passed to the constructor.
+        assertSame("The value retrieved from the dataset should be the same instance as the initial value.",
+                expectedValue, actualValue);
     }
 }
