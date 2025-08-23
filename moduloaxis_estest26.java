@@ -1,47 +1,29 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest26 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        ModuloAxis moduloAxis0 = new ModuloAxis("", (Range) null);
-        // Undeclared exception!
-        try {
-            moduloAxis0.setDisplayRange((-1402.04), (-1402.04));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling setDisplayRange() throws a NullPointerException
+     * if the axis was constructed with a null fixedRange.
+     */
+    @Test(expected = NullPointerException.class)
+    public void setDisplayRangeShouldThrowNullPointerExceptionWhenFixedRangeIsNull() {
+        // Arrange: Create a ModuloAxis with a null fixed range. The constructor
+        // allows this, but methods that rely on the range are expected to fail.
+        ModuloAxis axis = new ModuloAxis("Test Axis", null);
+
+        // Act: Attempt to set the display range. This action should trigger the
+        // NullPointerException because the method requires the fixedRange to map values.
+        axis.setDisplayRange(0.0, 100.0);
+
+        // Assert: The expected exception is declared in the @Test annotation,
+        // so no further assertion is needed. The test will pass if the
+        // exception is thrown and fail otherwise.
     }
 }
