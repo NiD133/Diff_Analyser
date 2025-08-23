@@ -2,37 +2,35 @@ package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
 
-public class DeviationRenderer_ESTestTest11 extends DeviationRenderer_ESTest_scaffolding {
+/**
+ * A test suite for the {@link DeviationRenderer} class, focusing on its
+ * cloning and equality behavior.
+ */
+public class DeviationRendererTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer(false, false);
-        DeviationRenderer deviationRenderer1 = (DeviationRenderer) deviationRenderer0.clone();
-        boolean boolean0 = deviationRenderer0.equals(deviationRenderer1);
-        assertEquals(0.5F, deviationRenderer1.getAlpha(), 0.01F);
-        assertTrue(boolean0);
-        assertTrue(deviationRenderer1.getDrawSeriesLineAsPath());
+    /**
+     * Verifies that a cloned DeviationRenderer is a separate instance but is
+     * equal in value to the original object.
+     */
+    @Test
+    public void clone_shouldProduceEqualButDistinctInstance() throws CloneNotSupportedException {
+        // Arrange: Create an original renderer instance.
+        DeviationRenderer originalRenderer = new DeviationRenderer(false, false);
+
+        // Act: Clone the original renderer.
+        DeviationRenderer clonedRenderer = (DeviationRenderer) originalRenderer.clone();
+
+        // Assert: The clone should be a different object instance...
+        assertNotSame("The cloned object should be a new instance.", originalRenderer, clonedRenderer);
+
+        // ...but it should be logically equal to the original.
+        assertEquals("The cloned object should be equal to the original.", originalRenderer, clonedRenderer);
+
+        // Further, explicitly verify that key properties were copied correctly.
+        assertTrue("The 'drawSeriesLineAsPath' property should be true for the clone.",
+                clonedRenderer.getDrawSeriesLineAsPath());
+        assertEquals("The alpha value should be correctly copied to the clone.",
+                0.5F, clonedRenderer.getAlpha(), 0.01F);
     }
 }
