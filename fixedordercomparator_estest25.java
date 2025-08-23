@@ -1,30 +1,33 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class FixedOrderComparator_ESTestTest25 extends FixedOrderComparator_ESTest_scaffolding {
+public class FixedOrderComparator_ESTestTest25 {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-        FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.BEFORE;
-        fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-        int int0 = fixedOrderComparator0.compare(fixedOrderComparator0, fixedOrderComparator0);
-        assertTrue(fixedOrderComparator0.isLocked());
-        assertEquals(0, int0);
+    /**
+     * Tests that comparing two different, unknown objects returns 0 (indicating they are equal)
+     * when the unknown object behavior is set to BEFORE.
+     * Also verifies that the comparator becomes locked after the first comparison.
+     */
+    @Test
+    public void compareWithDifferentUnknownObjectsAndBeforeBehaviorShouldReturnZero() {
+        // Arrange
+        final FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+        comparator.setUnknownObjectBehavior(FixedOrderComparator.UnknownObjectBehavior.BEFORE);
+
+        final Object unknownObject1 = new Object();
+        final Object unknownObject2 = new Object();
+
+        // Act
+        final int result = comparator.compare(unknownObject1, unknownObject2);
+
+        // Assert
+        // With the BEFORE behavior, all unknown objects are considered equal to each other.
+        assertEquals("Two different unknown objects should be treated as equal.", 0, result);
+
+        // Any comparison should lock the comparator against further modification.
+        assertTrue("The comparator should be locked after the first comparison.", comparator.isLocked());
     }
 }
