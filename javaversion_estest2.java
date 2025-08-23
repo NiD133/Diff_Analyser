@@ -1,25 +1,19 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JavaVersion_ESTestTest2 extends JavaVersion_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JavaVersion}.
+ */
+public class JavaVersionTest {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        // Undeclared exception!
-        try {
-            JavaVersion.parseMajorJavaVersion((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.JavaVersion", e);
-        }
+    /**
+     * Verifies that parseMajorJavaVersion throws a NullPointerException when the input string is null.
+     * This is the expected behavior as the method does not accept null arguments.
+     */
+    @Test(expected = NullPointerException.class)
+    public void parseMajorJavaVersion_withNullInput_shouldThrowNullPointerException() {
+        // Calling the method with null should trigger the exception
+        JavaVersion.parseMajorJavaVersion(null);
     }
 }
