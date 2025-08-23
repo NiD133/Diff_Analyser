@@ -1,24 +1,32 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class QueueInputStream_ESTestTest15 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link QueueInputStream.Builder}.
+ *
+ * Note: This class name is simplified from the original auto-generated name
+ * for clarity. A name like {@code QueueInputStreamBuilderTest} would be conventional.
+ */
+public class QueueInputStreamBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        QueueInputStream.Builder queueInputStream_Builder0 = new QueueInputStream.Builder();
-        QueueInputStream.Builder queueInputStream_Builder1 = queueInputStream_Builder0.setTimeout((Duration) null);
-        assertSame(queueInputStream_Builder0, queueInputStream_Builder1);
+    /**
+     * Tests that the {@link QueueInputStream.Builder#setTimeout(Duration)} method
+     * returns the same builder instance, confirming support for fluent method chaining.
+     */
+    @Test
+    public void setTimeoutShouldReturnSameBuilderInstanceForFluentChaining() {
+        // Arrange
+        final QueueInputStream.Builder builder = new QueueInputStream.Builder();
+
+        // Act
+        // Calling setTimeout should return the same instance to allow chaining.
+        // Passing null is acceptable here; validation occurs when build() is called.
+        final QueueInputStream.Builder resultBuilder = builder.setTimeout(null);
+
+        // Assert
+        assertSame("The builder should return itself to allow for a fluent API.", builder, resultBuilder);
     }
 }
