@@ -1,18 +1,32 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class BinaryCodec_ESTestTest2 extends BinaryCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BinaryCodec} class.
+ */
+public class BinaryCodecTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        BinaryCodec binaryCodec0 = new BinaryCodec();
-        byte[] byteArray0 = binaryCodec0.toByteArray("\"S|Pn_%?u{!|");
-        assertArrayEquals(new byte[] { (byte) 0 }, byteArray0);
+    /**
+     * Tests that toByteArray returns a correctly sized, zeroed byte array
+     * when the input string contains no '1' characters.
+     */
+    @Test
+    public void toByteArray_whenInputContainsNoOnes_returnsZeroedBytes() {
+        // Arrange: Set up the test objects and data.
+        BinaryCodec binaryCodec = new BinaryCodec();
+        
+        // The toByteArray() method processes strings in 8-character chunks from right to left.
+        // Any character that is not '1' is treated as a '0'.
+        // An input string of length 12 results in a 1-byte array (12 / 8 = 1).
+        String inputWithNoOnes = "\"S|Pn_%?u{!|"; // Original 12-character input
+        byte[] expectedBytes = {0};
+
+        // Act: Call the method under test.
+        byte[] actualBytes = binaryCodec.toByteArray(inputWithNoOnes);
+
+        // Assert: Verify the result.
+        assertArrayEquals("The byte array should contain a single zero", expectedBytes, actualBytes);
     }
 }
