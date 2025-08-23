@@ -2,25 +2,39 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest35 extends Seconds_ESTest_scaffolding {
+/**
+ * A test suite for the {@link Seconds} class, focusing on its arithmetic operations.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Seconds seconds0 = Seconds.THREE;
-        // Undeclared exception!
+    /**
+     * Verifies that the minus() method throws an ArithmeticException when the calculation
+     * results in an integer overflow.
+     *
+     * This is tested by subtracting a negative number from Seconds.MAX_VALUE. This operation
+     * is equivalent to an addition that exceeds Integer.MAX_VALUE (e.g., `Integer.MAX_VALUE - (-1)`),
+     * which should safely fail by throwing an exception.
+     */
+    @Test
+    public void minus_throwsArithmeticException_onIntegerOverflow() {
+        // Arrange: Start with the maximum possible Seconds value.
+        // Subtracting -1 will attempt to compute MAX_VALUE + 1, causing an overflow.
+        final Seconds maxSeconds = Seconds.MAX_VALUE;
+        final int valueToSubtract = -1;
+
+        // Act & Assert: Verify that an ArithmeticException is thrown.
         try {
-            seconds0.minus((-2147483646));
-            fail("Expecting exception: ArithmeticException");
+            maxSeconds.minus(valueToSubtract);
+            fail("Expected an ArithmeticException to be thrown due to integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 3 + 2147483646
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // This is the expected outcome.
+            // We can optionally verify the exception message for more specific feedback.
+            // The underlying Joda-Time utility throws a message containing "overflow".
+            assertTrue(
+                "The exception message should indicate an overflow.",
+                e.getMessage().contains("The calculation caused an overflow")
+            );
         }
     }
 }
