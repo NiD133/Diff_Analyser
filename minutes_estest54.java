@@ -1,17 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest54 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        Minutes minutes0 = Minutes.parseMinutes((String) null);
-        assertEquals(1, minutes0.size());
+    /**
+     * Tests that parsing a null string returns a Minutes object representing zero.
+     * The Javadoc for parseMinutes specifies that a null input should result in Minutes.ZERO.
+     */
+    @Test
+    public void parseMinutes_shouldReturnZero_whenInputIsNull() {
+        // Act
+        Minutes parsedMinutes = Minutes.parseMinutes(null);
+
+        // Assert
+        assertEquals(Minutes.ZERO, parsedMinutes);
     }
 }
