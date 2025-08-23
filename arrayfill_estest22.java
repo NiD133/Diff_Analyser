@@ -1,20 +1,25 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
+/**
+ * Tests for {@link ArrayFill}.
+ * This class focuses on edge cases like null inputs.
+ */
 public class ArrayFill_ESTestTest22 extends ArrayFill_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        int[] intArray0 = ArrayFill.fill((int[]) null, 0);
-        assertNull(intArray0);
+    /**
+     * Tests that {@link ArrayFill#fill(int[], int)} returns null
+     * when the input array is null.
+     */
+    @Test
+    public void testFillIntArrayShouldReturnNullForNullInput() {
+        // The Javadoc for ArrayFill.fill states that a null input array is permissible
+        // and should result in a null return value. This test verifies that behavior.
+        // The fill value (0) is arbitrary as it's not used when the array is null.
+        final int[] result = ArrayFill.fill((int[]) null, 0);
+
+        assertNull("The method should return null when the input array is null.", result);
     }
 }
