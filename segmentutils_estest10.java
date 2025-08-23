@@ -1,25 +1,20 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentUtils_ESTestTest10 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentUtils} class.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        // Undeclared exception!
-        try {
-            SegmentUtils.countArgs((String) null, 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
-        }
+    /**
+     * Verifies that countArgs() throws a NullPointerException when the
+     * descriptor string is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void countArgsShouldThrowNullPointerExceptionForNullDescriptor() {
+        // The second argument (widthOfLongsAndDoubles) is arbitrary, as the
+        // method should throw the exception before using it.
+        SegmentUtils.countArgs(null, 1);
     }
 }
