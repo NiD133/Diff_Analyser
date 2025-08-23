@@ -1,20 +1,31 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest11 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.insecure();
-        long long0 = randomUtils0.randomLong(0L, 0L);
-        assertEquals(0L, long0);
+    /**
+     * Tests that {@code randomLong(start, end)} returns the lower bound when the
+     * range is empty (i.e., start and end are the same). This is an important
+     * edge case to verify.
+     */
+    @Test
+    public void randomLongShouldReturnBoundWhenRangeIsEmpty() {
+        // Arrange
+        final RandomUtils randomUtils = RandomUtils.insecure();
+        final long bound = 0L;
+
+        // Act
+        // Call the method with an empty range [0, 0).
+        final long result = randomUtils.randomLong(bound, bound);
+
+        // Assert
+        // For an empty range, the method should consistently return the bound.
+        assertEquals(bound, result);
     }
 }
