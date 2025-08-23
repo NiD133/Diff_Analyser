@@ -1,46 +1,40 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest41 extends W3CDom_ESTest_scaffolding {
+/**
+ * Tests the behavior of the {@link W3CDom} helper class when converting jsoup
+ * documents that contain elements with invalid tag names for the W3C DOM standard.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parseBodyFragment("javax.xml.xpath.XPathFactory:jsoup", "xmlns:");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup(document0);
-        W3CDom.W3CBuilder w3CDom_W3CBuilder0 = new W3CDom.W3CBuilder(document1);
-        Element element0 = document0.id("javax.xml.xpath.XPathFactory:jsoup");
-        // Undeclared exception!
-        try {
-            w3CDom_W3CBuilder0.traverse(element0);
-            fail("Expecting exception: DOMException");
-        } catch (DOMException e) {
-        }
+    /**
+     * Verifies that converting a jsoup Document to a W3C Document throws a
+     * {@link DOMException} if it contains an element with an invalid tag name.
+     * <p>
+     * According to the W3C DOM specification, element tag names must be valid
+     * qualified names, which do not permit multiple colons. Jsoup's parser is more
+     * lenient and can create such elements, but they cannot be represented in a
+     * standard W3C DOM.
+     * </p>
+     */
+    @Test(expected = DOMException.class)
+    public void fromJsoupThrowsExceptionOnInvalidTagName() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+        
+        // This HTML fragment creates an element with a tag name containing multiple colons,
+        // which is invalid in a strict W3C DOM context.
+        String htmlWithInvalidTagName = "<javax.xml.xpath.XPathFactory:jsoup>";
+        Document jsoupDocument = Parser.parseBodyFragment(htmlWithInvalidTagName, "");
+
+        // Act: Attempt to convert the jsoup document. This is expected to fail when
+        // the W3C builder encounters the invalid tag name.
+        w3cDom.fromJsoup(jsoupDocument);
+
+        // Assert: The test expects a DOMException, as declared in the @Test annotation.
     }
 }
