@@ -1,18 +1,29 @@
 package org.apache.ibatis.logging;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LogFactory_ESTestTest1 extends LogFactory_ESTest_scaffolding {
+/**
+ * Tests for the {@link LogFactory}.
+ */
+public class LogFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Log log0 = LogFactory.getLog("org.apache.ibatis.logging.LogFactory");
-        assertNotNull(log0);
+    /**
+     * The LogFactory is designed to fall back to a default logging implementation
+     * (like NoLoggingImpl) if no other logging frameworks are found on the classpath.
+     * This test verifies that getLog() always returns a valid, non-null Log instance,
+     * ensuring the fallback mechanism works as expected.
+     */
+    @Test
+    public void shouldReturnNonNullLoggerForGivenName() {
+        // Arrange
+        String loggerName = LogFactory.class.getName();
+
+        // Act
+        Log logger = LogFactory.getLog(loggerName);
+
+        // Assert
+        assertNotNull("LogFactory.getLog() should never return null.", logger);
     }
 }
