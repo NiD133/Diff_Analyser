@@ -1,31 +1,37 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class ISO8601Utils_ESTestTest13 extends ISO8601Utils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition(1);
+/**
+ * Test suite for {@link ISO8601Utils}.
+ */
+public class ISO8601UtilsTest {
+
+    /**
+     * Verifies that parsing an incomplete date string, which is too short to be a valid
+     * ISO 8601 date, correctly throws a ParseException.
+     */
+    @Test
+    public void parse_withIncompleteDateString_throwsParseException() {
+        // The full string is "+0000", but we start parsing from index 1.
+        String dateString = "+0000";
+        ParsePosition parsePosition = new ParsePosition(1);
+
         try {
-            ISO8601Utils.parse("+0000", parsePosition0);
-            fail("Expecting exception: ParseException");
+            // The effective string being parsed is "0000", which is an invalid format.
+            ISO8601Utils.parse(dateString, parsePosition);
+            fail("Expected a ParseException for an incomplete date string, but none was thrown.");
         } catch (ParseException e) {
-            //
-            // Failed to parse date [\"+0000\"]: +0000
-            //
-            verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
+            // The parser expects a format like "yyyy-MM-dd" or "yyyyMMdd".
+            // The string "0000" is too short, so parsing should fail.
+            String expectedMessage = "Failed to parse date [\"+0000\"]: +0000";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
