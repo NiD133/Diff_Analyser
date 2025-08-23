@@ -1,39 +1,32 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Note: The original test class name "ShapeCollection_ESTestTest21" and its
+ * base class "ShapeCollection_ESTest_scaffolding" are artifacts of a test
+ * generation tool (EvoSuite). A more conventional name would be "ShapeCollectionTest".
+ */
 public class ShapeCollection_ESTestTest21 extends ShapeCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        // Undeclared exception!
-        try {
-            shapeCollection0.get((-1151));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling the get() method with a negative index throws an
+     * ArrayIndexOutOfBoundsException, as expected from a List-based collection.
+     */
+    @Test(timeout = 4000, expected = ArrayIndexOutOfBoundsException.class)
+    public void getWithNegativeIndexShouldThrowException() {
+        // Arrange
+        // The constructor requires a list that implements RandomAccess, like ArrayList.
+        List<Shape> emptyShapes = new ArrayList<>();
+        SpatialContext context = SpatialContext.GEO;
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(emptyShapes, context);
+
+        // Act & Assert
+        // The test expects an ArrayIndexOutOfBoundsException, which is declared in the @Test annotation.
+        shapeCollection.get(-1);
     }
 }
