@@ -1,22 +1,26 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldUtils_ESTestTest52 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        FieldUtils.verifyValueBounds((DateTimeField) null, 400, 400, 400);
+    /**
+     * Tests that verifyValueBounds does not throw an exception for a value that is
+     * exactly at the boundary, even when the DateTimeField is null.
+     * <p>
+     * The method should only access the DateTimeField to build an exception message
+     * if the value is out of bounds. Since the value is valid, the null field
+     * should not be accessed, and no NullPointerException should be thrown.
+     */
+    @Test
+    public void verifyValueBoundsWithNullFieldSucceedsWhenValueIsOnBoundary() {
+        final int boundaryValue = 400;
+        
+        // This call should succeed. The test passes if no exception is thrown.
+        FieldUtils.verifyValueBounds((DateTimeField) null, boundaryValue, boundaryValue, boundaryValue);
     }
 }
