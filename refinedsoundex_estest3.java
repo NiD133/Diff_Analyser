@@ -1,18 +1,30 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RefinedSoundex_ESTestTest3 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the RefinedSoundex class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        RefinedSoundex refinedSoundex0 = RefinedSoundex.US_ENGLISH;
-        char char0 = refinedSoundex0.getMappingCode('y');
-        assertEquals('0', char0);
+    /**
+     * Tests that the US English mapping for the character 'y' is '0',
+     * which is the code used for vowels and vowel-like letters.
+     */
+    @Test
+    public void getMappingCodeShouldReturnZeroForVowelLikeY() {
+        // Arrange
+        final RefinedSoundex soundex = RefinedSoundex.US_ENGLISH;
+        final char inputChar = 'y';
+        final char expectedCode = '0';
+
+        // Act
+        final char actualCode = soundex.getMappingCode(inputChar);
+
+        // Assert
+        assertEquals("The mapping code for 'y' should be '0' as per the Refined Soundex rules.",
+                expectedCode,
+                actualCode);
     }
 }
