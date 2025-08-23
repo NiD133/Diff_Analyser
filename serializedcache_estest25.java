@@ -1,27 +1,31 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest25 extends SerializedCache_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        Object object0 = serializedCache0.getObject("");
-        assertNull(object0);
+/**
+ * Test suite for the SerializedCache decorator.
+ */
+public class SerializedCacheTest {
+
+    /**
+     * Verifies that getObject() returns null when the requested key does not exist in the cache.
+     * This ensures the cache correctly handles cache misses.
+     */
+    @Test
+    public void shouldReturnNullWhenGettingObjectForNonExistentKey() {
+        // Arrange: Create a delegate cache and wrap it with the SerializedCache decorator.
+        Cache delegateCache = new PerpetualCache("test-delegate");
+        SerializedCache serializedCache = new SerializedCache(delegateCache);
+        final String nonExistentKey = "some-key-that-does-not-exist";
+
+        // Act: Attempt to retrieve an object using a key that is not in the cache.
+        Object retrievedObject = serializedCache.getObject(nonExistentKey);
+
+        // Assert: The returned object should be null, indicating a cache miss.
+        assertNull("Expected a null result for a non-existent key.", retrievedObject);
     }
 }
