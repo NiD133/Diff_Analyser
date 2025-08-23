@@ -1,20 +1,27 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class ByteOrderMark_ESTestTest14 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Tests for {@link ByteOrderMark}.
+ */
+public class ByteOrderMarkTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        int[] intArray0 = new int[1];
-        ByteOrderMark byteOrderMark0 = new ByteOrderMark("eS5", intArray0);
-        int[] intArray1 = byteOrderMark0.getRawBytes();
-        boolean boolean0 = byteOrderMark0.matches(intArray1);
-        assertTrue(boolean0);
+    /**
+     * Tests that a ByteOrderMark instance correctly matches the byte array
+     * it was constructed with.
+     */
+    @Test
+    public void testMatchesReturnsTrueForOwnBytes() {
+        // Arrange: Create a custom BOM with a known byte sequence.
+        // Using a descriptive charset name and a non-trivial byte array makes the test's intent clearer.
+        final String charsetName = "CUSTOM-ENCODING";
+        final int[] bomBytes = {0xCA, 0xFE, 0xBA, 0xBE};
+        final ByteOrderMark bom = new ByteOrderMark(charsetName, bomBytes);
+
+        // Act & Assert: A BOM should always match its own byte sequence.
+        // The assertion message explains the expected behavior.
+        assertTrue("A BOM should match the byte array it was created with.", bom.matches(bomBytes));
     }
 }
