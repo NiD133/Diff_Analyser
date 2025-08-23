@@ -1,31 +1,36 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class NodeIterator_ESTestTest4 extends NodeIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Document document0 = new Document("org.jsoup.nodes.NodeIterator", "");
-        Element element0 = document0.doClone(document0);
-        Class<FormElement> class0 = FormElement.class;
-        NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(element0, class0);
-        // Undeclared exception!
-        try {
-            nodeIterator0.remove();
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 0, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+/**
+ * Test suite for {@link NodeIterator}.
+ * This focuses on the behavior of the remove() method.
+ */
+public class NodeIteratorTest {
+
+    /**
+     * Verifies that calling remove() on a new iterator, before next() has been called,
+     * throws an exception as per the Iterator contract.
+     */
+    @Test
+    public void removeShouldThrowExceptionWhenCalledBeforeNext() {
+        // Arrange: Create an iterator over an empty document.
+        // The iterator's 'current' element will be null.
+        Document emptyDoc = new Document("");
+        NodeIterator<Node> iterator = new NodeIterator<>(emptyDoc, Node.class);
+
+        // Act & Assert: Expect an exception when calling remove() without a preceding next().
+        // Jsoup's implementation throws an IllegalArgumentException in this case.
+        IllegalArgumentException exception = assertThrows(
+            "Calling remove() before next() should throw an exception.",
+            IllegalArgumentException.class,
+            iterator::remove
+        );
+
+        // Optional: Verify the exception message for more precise testing.
+        assertEquals("next() must be called before remove().", exception.getMessage());
     }
 }
