@@ -1,18 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest47 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Seconds seconds0 = Seconds.TWO;
-        Seconds seconds1 = seconds0.minus((Seconds) null);
-        assertEquals(2, seconds1.getSeconds());
+    /**
+     * Tests that the minus() method treats a null argument as zero, resulting in no change.
+     * The Javadoc for minus(Seconds) specifies that a null input is equivalent to subtracting zero.
+     */
+    @Test
+    public void minus_whenArgumentIsNull_doesNotChangeValue() {
+        // Arrange: Start with a known Seconds value.
+        Seconds initialSeconds = Seconds.TWO;
+
+        // Act: Subtract a null Seconds object.
+        Seconds result = initialSeconds.minus((Seconds) null);
+
+        // Assert: The resulting value should be unchanged.
+        assertEquals(initialSeconds, result);
     }
 }
