@@ -1,19 +1,24 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest42 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        boolean boolean0 = jsonLocation0.equals(jsonLocation0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method,
+     * ensuring that an instance is always equal to itself.
+     */
+    @Test
+    public void equalsShouldBeReflexive() {
+        // Arrange: Get the constant 'Not Applicable' location instance.
+        JsonLocation naLocation = JsonLocation.NA;
+
+        // Assert: An object must be equal to itself.
+        // This is a fundamental contract of the Object.equals() method.
+        assertEquals("A JsonLocation instance should be equal to itself.", naLocation, naLocation);
     }
 }
