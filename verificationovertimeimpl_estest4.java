@@ -1,29 +1,33 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
-import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest4 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        After after0 = new After(2416L, noMoreInteractions0);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(5157L, 1L, after0, false);
-        long long0 = verificationOverTimeImpl0.getPollingPeriodMillis();
-        assertEquals(5157L, long0);
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * This test verifies that the getPollingPeriodMillis() method correctly returns
+     * the polling period value that was provided in the constructor.
+     */
+    @Test
+    public void shouldReturnPollingPeriodSetInConstructor() {
+        // Arrange
+        final long expectedPollingPeriod = 50L;
+        final long duration = 100L;
+        final VerificationMode delegate = new NoMoreInteractions();
+
+        VerificationOverTimeImpl verificationOverTime =
+            new VerificationOverTimeImpl(expectedPollingPeriod, duration, delegate, false);
+
+        // Act
+        long actualPollingPeriod = verificationOverTime.getPollingPeriodMillis();
+
+        // Assert
+        assertEquals(expectedPollingPeriod, actualPollingPeriod);
     }
 }
