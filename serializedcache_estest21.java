@@ -1,36 +1,34 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest21 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for {@link SerializedCache}.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        TransactionalCache transactionalCache0 = new TransactionalCache((Cache) null);
-        SoftCache softCache0 = new SoftCache(transactionalCache0);
-        SerializedCache serializedCache0 = new SerializedCache(softCache0);
-        // Undeclared exception!
-        try {
-            serializedCache0.getObject(softCache0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.TransactionalCache", e);
-        }
+    /**
+     * Verifies that {@link SerializedCache#getObject(Object)} propagates a NullPointerException
+     * if the underlying delegate cache throws it. This ensures that the decorator correctly
+     * handles and passes through exceptions from the cache it wraps.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getObjectShouldPropagateNPEWhenDelegateThrowsNPE() {
+        // Arrange
+        // Create a delegate cache that is guaranteed to throw a NullPointerException when used.
+        // A TransactionalCache initialized with a null delegate serves this purpose.
+        Cache failingDelegate = new TransactionalCache(null);
+        Cache serializedCache = new SerializedCache(failingDelegate);
+        Object anyKey = "some-key";
+
+        // Act
+        // Attempt to retrieve an object. This call is expected to fail by throwing an
+        // exception because the delegate will throw a NullPointerException.
+        serializedCache.getObject(anyKey);
+
+        // Assert
+        // The test succeeds if a NullPointerException is thrown, as specified by the
+        // @Test(expected = ...) annotation. No further assertions are needed.
     }
 }
