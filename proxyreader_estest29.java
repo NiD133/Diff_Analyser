@@ -1,33 +1,30 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
+import static org.junit.Assert.assertThrows;
+
 import java.io.PipedReader;
-import java.io.StringReader;
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest29 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for {@link ProxyReader}.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
-        // Undeclared exception!
-        try {
-            taggedReader0.read((CharBuffer) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.Reader", e);
-        }
+    /**
+     * Tests that calling read() with a null CharBuffer throws a NullPointerException.
+     * This is the expected behavior of the underlying java.io.Reader, which
+     * ProxyReader should correctly delegate to.
+     */
+    @Test
+    public void readCharBufferWithNullTargetShouldThrowNullPointerException() {
+        // Arrange: Create a concrete instance of ProxyReader.
+        // TaggedReader is a simple subclass suitable for this test.
+        // The underlying PipedReader is a standard Reader implementation.
+        final ProxyReader proxyReader = new TaggedReader(new PipedReader());
+
+        // Act & Assert: Verify that calling read with a null buffer throws the expected exception.
+        // The cast to (CharBuffer) is necessary to resolve method ambiguity for the null argument.
+        assertThrows(NullPointerException.class, () -> proxyReader.read((CharBuffer) null));
     }
 }
