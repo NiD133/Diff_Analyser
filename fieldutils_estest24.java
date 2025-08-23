@@ -1,24 +1,31 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest24 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        RoundingMode roundingMode0 = RoundingMode.CEILING;
-        long long0 = FieldUtils.safeDivide(0L, 218L, roundingMode0);
-        assertEquals(0L, long0);
+    /**
+     * Tests that safeDivide returns 0 when the dividend is 0,
+     * regardless of the divisor or rounding mode.
+     */
+    @Test
+    public void safeDivide_shouldReturnZero_whenDividendIsZero() {
+        // Arrange
+        final long dividend = 0L;
+        final long divisor = 218L;
+        // The specific rounding mode should not affect the outcome when the dividend is zero.
+        final RoundingMode roundingMode = RoundingMode.CEILING;
+
+        // Act
+        final long result = FieldUtils.safeDivide(dividend, divisor, roundingMode);
+
+        // Assert
+        assertEquals(0L, result);
     }
 }
