@@ -1,60 +1,36 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest8 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * This test class contains tests for the OrderedProperties class.
+ * This specific test focuses on the behavior of the toString() method
+ * when dealing with self-referential (cyclic) data structures.
+ */
+public class OrderedProperties_ESTestTest8 {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Set<Object> set0 = orderedProperties0.keySet();
-        orderedProperties0.putIfAbsent(set0, set0);
-        // Undeclared exception!
-        try {
-            orderedProperties0.toString();
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling toString() on an OrderedProperties instance that contains a
+     * self-referential element (e.g., its own key set) results in a StackOverflowError.
+     * <p>
+     * This is the expected behavior for collections with cyclic dependencies, as the
+     * toString() implementation would otherwise lead to infinite recursion.
+     */
+    @Test(expected = StackOverflowError.class, timeout = 4000)
+    public void toStringShouldThrowStackOverflowErrorOnCyclicReference() {
+        // Arrange: Create an OrderedProperties instance and obtain its key set.
+        final OrderedProperties properties = new OrderedProperties();
+        final Set<Object> keySet = properties.keySet();
+
+        // Act: Add the key set to the properties as both a key and a value.
+        // This creates a self-referential (cyclic) structure where the properties
+        // map contains its own key set, which in turn refers back to the map.
+        properties.putIfAbsent(keySet, keySet);
+
+        // Assert: Calling toString() on the properties will cause infinite recursion.
+        // The 'expected' attribute of the @Test annotation asserts that a
+        // StackOverflowError is thrown, which is the expected outcome.
+        properties.toString();
     }
 }
