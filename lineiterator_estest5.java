@@ -1,33 +1,34 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest5 extends LineIterator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LineIterator}.
+ */
+public class LineIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        StringReader stringReader0 = new StringReader("p)");
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        lineIterator0.hasNext();
-        LineIterator lineIterator1 = new LineIterator(stringReader0);
-        // Undeclared exception!
-        try {
-            lineIterator1.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // No more lines
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
-        }
+    /**
+     * Tests that creating a new LineIterator on an already consumed Reader
+     * results in an empty iterator. This is because both iterators share the
+     * same underlying Reader instance, which has advanced past its content.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void nextShouldThrowExceptionForIteratorOnAlreadyConsumedReader() {
+        // Arrange: Create a reader and a "consuming" iterator to exhaust it.
+        StringReader reader = new StringReader("a single line");
+        LineIterator consumingIterator = new LineIterator(reader);
+
+        // Act: Consume the only line from the reader.
+        consumingIterator.next();
+
+        // Arrange: Create a second iterator on the same, now-consumed reader.
+        LineIterator secondIterator = new LineIterator(reader);
+
+        // Assert: Calling next() on the second iterator throws NoSuchElementException
+        // because the underlying reader has no more lines. The assertion is handled
+        // by the @Test(expected=...) annotation.
+        secondIterator.next();
     }
 }
