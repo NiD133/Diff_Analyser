@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.lang3.reflect;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -24,23 +8,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.lang3.AbstractLangTest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests ConstructorUtils
+ * Tests for ConstructorUtils with a focus on clarity:
+ * - Small helpers to reduce noise around Class<?>[] construction.
+ * - Descriptive test names and comments explaining intent.
+ * - Grouped assertions by behavior (accessibility, matching, invocation, varargs, etc.).
  */
 public class ConstructorUtilsTest extends AbstractLangTest {
-    private static class BaseClass {
-    }
 
+    // ------------ Test Fixtures ------------
+
+    private static class BaseClass { /* marker type for tests */ }
+
+    private static final class SubClass extends BaseClass { /* subclass of BaseClass */ }
+
+    /**
+     * A class with public and private visibility scenarios.
+     */
     static class PrivateClass {
         @SuppressWarnings("unused")
         public static class PublicInnerClass {
@@ -53,9 +46,13 @@ public class ConstructorUtilsTest extends AbstractLangTest {
         }
     }
 
-    private static final class SubClass extends BaseClass {
-    }
-
+    /**
+     * A bean exposing multiple overloaded constructors to exercise matching rules:
+     * - Widening and boxing/unboxing
+     * - Object vs String vs primitive types
+     * - Varargs resolution
+     * - Inheritance (BaseClass vs SubClass)
+     */
     public static class TestBean {
         private final String toString;
         final String[] varArgs;
@@ -118,128 +115,187 @@ public class ConstructorUtilsTest extends AbstractLangTest {
             return toString;
         }
 
-        void verify(final String str, final String[] args) {
-            assertEquals(str, toString);
-            assertArrayEquals(args, varArgs);
+        void verify(final String expectedToString, final String[] expectedVarArgs) {
+            assertEquals(expectedToString, toString);
+            assertArrayEquals(expectedVarArgs, varArgs);
         }
     }
 
-    private final Map<Class<?>, Class<?>[]> classCache;
+    // ------------ Test State/Helpers ------------
 
-    public ConstructorUtilsTest() {
-        classCache = new HashMap<>();
-    }
-
-    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
-        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
-    }
+    private static final Class<?>[] NO_PARAMS = new Class<?>[0];
 
     @BeforeEach
     public void setUp() {
-        classCache.clear();
+        // No mutable shared state; reserved for future use.
     }
 
-    private Class<?>[] singletonArray(final Class<?> c) {
-        Class<?>[] result = classCache.get(c);
-        if (result == null) {
-            result = new Class[] { c };
-            classCache.put(c, result);
-        }
-        return result;
+    private static Class<?>[] types(final Class<?>... parameterTypes) {
+        return parameterTypes == null ? NO_PARAMS : parameterTypes;
     }
+
+    private static String typeListToString(final Class<?>[] types) {
+        return Arrays.asList(types).toString();
+    }
+
+    /**
+     * Asserts that getMatchingAccessibleConstructor resolves to a constructor
+     * whose parameter types equal expectedTypes when requested with requestTypes.
+     */
+    private static void assertMatchingParamTypes(final Class<?> target,
+                                                 final Class<?>[] requestTypes,
+                                                 final Class<?>[] expectedTypes) {
+        final Constructor<?> ctor = ConstructorUtils.getMatchingAccessibleConstructor(target, requestTypes);
+        assertNotNull(ctor, "Expected a matching accessible constructor");
+        final Class<?>[] actual = ctor.getParameterTypes();
+        assertArrayEquals(
+            expectedTypes,
+            actual,
+            typeListToString(actual) + " != " + typeListToString(expectedTypes)
+        );
+    }
+
+    // ------------ Tests: Accessibility ------------
 
     @Test
+    @DisplayName("Smoke: public no-arg constructor on a utility class (MethodUtils) is present")
     void testConstructor() throws Exception {
+        // Historically these Utils classes expose a public no-arg constructor (even if discouraged).
         assertNotNull(MethodUtils.class.getConstructor().newInstance());
     }
 
     @Test
+    @DisplayName("getAccessibleConstructor(Constructor) respects visibility of declaring types")
     void testGetAccessibleConstructor() throws Exception {
-        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
+        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class.getConstructor(NO_PARAMS)));
+        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class.getConstructor(NO_PARAMS)));
+        // Public inner class of a non-public enclosing class should not be accessible here
         assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.PublicInnerClass.class));
     }
 
     @Test
+    @DisplayName("getAccessibleConstructor(Class, Class...) respects visibility of declaring types")
     void testGetAccessibleConstructorFromDescription() {
-        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class, ArrayUtils.EMPTY_CLASS_ARRAY));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class, ArrayUtils.EMPTY_CLASS_ARRAY));
+        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class, NO_PARAMS));
+        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class, NO_PARAMS));
     }
 
-    @Test
-    void testGetMatchingAccessibleMethod() {
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY);
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, null, ArrayUtils.EMPTY_CLASS_ARRAY);
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(String.class), singletonArray(String.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Object.class), singletonArray(Object.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Boolean.class), singletonArray(Object.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Byte.class), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Byte.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Short.class), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Short.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Character.class), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Character.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Integer.class), singletonArray(Integer.class));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Integer.TYPE), singletonArray(Integer.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Long.class), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Long.TYPE), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Float.class), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Float.TYPE), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Double.class), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, singletonArray(Double.TYPE), singletonArray(Double.TYPE));
-        expectMatchingAccessibleConstructorParameterTypes(TestBean.class, new Class<?>[] { SubClass.class, String[].class },
-                new Class<?>[] { BaseClass.class, String[].class });
-    }
+    // ------------ Tests: Matching (overload resolution, widening, boxing, varargs) ------------
 
     @Test
+    @DisplayName("getMatchingAccessibleConstructor: exact, null, boxing, widening, and inheritance")
+    void testGetMatchingAccessibleConstructor() {
+        // Exact and null parameter types
+        assertMatchingParamTypes(TestBean.class, NO_PARAMS, NO_PARAMS);
+        assertMatchingParamTypes(TestBean.class, null, NO_PARAMS);
+
+        // Exact matches
+        assertMatchingParamTypes(TestBean.class, types(String.class), types(String.class));
+        assertMatchingParamTypes(TestBean.class, types(Object.class), types(Object.class));
+
+        // Non-exact: falls back to Object
+        assertMatchingParamTypes(TestBean.class, types(Boolean.class), types(Object.class));
+
+        // Widening/boxing to (int)
+        assertMatchingParamTypes(TestBean.class, types(Byte.class), types(Integer.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Byte.TYPE), types(Integer.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Short.class), types(Integer.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Short.TYPE), types(Integer.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Character.class), types(Integer.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Character.TYPE), types(Integer.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Integer.class), types(Integer.class));
+        assertMatchingParamTypes(TestBean.class, types(Integer.TYPE), types(Integer.TYPE));
+
+        // Widening to (double)
+        assertMatchingParamTypes(TestBean.class, types(Long.class), types(Double.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Long.TYPE), types(Double.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Float.class), types(Double.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Float.TYPE), types(Double.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Double.class), types(Double.TYPE));
+        assertMatchingParamTypes(TestBean.class, types(Double.TYPE), types(Double.TYPE));
+
+        // Inheritance + varargs shape: (SubClass, String[]) -> (BaseClass, String[])
+        assertMatchingParamTypes(TestBean.class,
+            types(SubClass.class, String[].class),
+            types(BaseClass.class, String[].class));
+    }
+
+    // ------------ Tests: Invocation (compatible match) ------------
+
+    @Test
+    @DisplayName("invokeConstructor: compatible match (boxing, widening, varargs, inheritance)")
     void testInvokeConstructor() throws Exception {
-        assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class, (Object[]) ArrayUtils.EMPTY_CLASS_ARRAY).toString());
+        // No-args
+        assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class, (Object[]) NO_PARAMS).toString());
         assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class, (Object[]) null).toString());
         assertEquals("()", ConstructorUtils.invokeConstructor(TestBean.class).toString());
+
+        // Simple overloads
         assertEquals("(String)", ConstructorUtils.invokeConstructor(TestBean.class, "").toString());
         assertEquals("(Object)", ConstructorUtils.invokeConstructor(TestBean.class, new Object()).toString());
+
+        // Boxing/widening selections
         assertEquals("(Object)", ConstructorUtils.invokeConstructor(TestBean.class, Boolean.TRUE).toString());
         assertEquals("(Integer)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE).toString());
         assertEquals("(int)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.BYTE_ONE).toString());
         assertEquals("(double)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.LONG_ONE).toString());
         assertEquals("(double)", ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.DOUBLE_ONE).toString());
+
+        // Varargs and inheritance
         ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE).verify("(Integer)", null);
         ConstructorUtils.invokeConstructor(TestBean.class, "a", "b").verify("(String...)", new String[] { "a", "b" });
-        ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE, "a", "b").verify("(Integer, String...)", new String[] { "a", "b" });
-        ConstructorUtils.invokeConstructor(TestBean.class, new SubClass(), new String[] { "a", "b" }).verify("(BaseClass, String...)",
-                new String[] { "a", "b" });
+        ConstructorUtils.invokeConstructor(TestBean.class, NumberUtils.INTEGER_ONE, "a", "b")
+            .verify("(Integer, String...)", new String[] { "a", "b" });
+        ConstructorUtils.invokeConstructor(TestBean.class, new SubClass(), new String[] { "a", "b" })
+            .verify("(BaseClass, String...)", new String[] { "a", "b" });
     }
 
+    // ------------ Tests: Invocation (exact match) ------------
+
     @Test
+    @DisplayName("invokeExactConstructor: exact match only (no boxing/widening)")
     void testInvokeExactConstructor() throws Exception {
-        assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) ArrayUtils.EMPTY_CLASS_ARRAY).toString());
+        // No-args
+        assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) NO_PARAMS).toString());
         assertEquals("()", ConstructorUtils.invokeExactConstructor(TestBean.class, (Object[]) null).toString());
+
+        // Exact matches
         assertEquals("(String)", ConstructorUtils.invokeExactConstructor(TestBean.class, "").toString());
         assertEquals("(Object)", ConstructorUtils.invokeExactConstructor(TestBean.class, new Object()).toString());
         assertEquals("(Integer)", ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.INTEGER_ONE).toString());
-        assertEquals("(double)",
-                ConstructorUtils.invokeExactConstructor(TestBean.class, new Object[] { NumberUtils.DOUBLE_ONE }, new Class[] { Double.TYPE }).toString());
 
+        // Explicit primitive signature
+        assertEquals("(double)",
+            ConstructorUtils.invokeExactConstructor(
+                TestBean.class,
+                new Object[] { NumberUtils.DOUBLE_ONE },
+                new Class[] { Double.TYPE }
+            ).toString()
+        );
+
+        // No widening/boxing allowed in exact mode
         assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.BYTE_ONE));
         assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, NumberUtils.LONG_ONE));
         assertThrows(NoSuchMethodException.class, () -> ConstructorUtils.invokeExactConstructor(TestBean.class, Boolean.TRUE));
     }
 
+    // ------------ Edge cases ------------
+
     @Test
+    @DisplayName("Null argument type resolves to Object parameter")
     void testNullArgument() {
-        expectMatchingAccessibleConstructorParameterTypes(MutableObject.class, singletonArray(null), singletonArray(Object.class));
+        assertMatchingParamTypes(MutableObject.class, types((Class<?>) null), types(Object.class));
     }
 
     @Test
+    @DisplayName("Varargs with unboxing inside the varargs segment")
     void testVarArgsUnboxing() throws Exception {
-        final TestBean testBean = ConstructorUtils.invokeConstructor(TestBean.class, Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3));
-
+        final TestBean testBean = ConstructorUtils.invokeConstructor(
+            TestBean.class,
+            Integer.valueOf(1), // selects (Integer, int...)
+            Integer.valueOf(2),
+            Integer.valueOf(3)
+        );
         assertArrayEquals(new String[] { "2", "3" }, testBean.varArgs);
     }
-
-    private String toString(final Class<?>[] c) {
-        return Arrays.asList(c).toString();
-    }
-
 }
