@@ -1,28 +1,36 @@
 package org.apache.commons.compress.utils;
 
 import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest11 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+class ByteUtilsTest {
 
     @Test
-    void testFromLittleEndianFromStream() throws IOException {
-        final ByteArrayInputStream bin = new ByteArrayInputStream(new byte[] { 2, 3, 4, 5 });
-        assertEquals(2 + 3 * 256 + 4 * 256 * 256, fromLittleEndian(bin, 3));
+    void fromLittleEndianShouldReadCorrectValueFromInputStream() throws IOException {
+        // Arrange
+        // The input byte array represents a multi-byte number in little-endian format.
+        // The test will read the first 3 bytes: [0x02, 0x03, 0x04].
+        // The last byte (0x05) should be ignored by the method call.
+        final byte[] littleEndianBytes = { 2, 3, 4, 5 };
+        final ByteArrayInputStream inputStream = new ByteArrayInputStream(littleEndianBytes);
+        final int bytesToRead = 3;
+
+        // The expected value for the little-endian bytes [0x02, 0x03, 0x04] is calculated as:
+        // 2 * (256^0) + 3 * (256^1) + 4 * (256^2) = 2 + 768 + 262144 = 262914
+        final long expectedValue = 262914;
+
+        // Act
+        final long actualValue = fromLittleEndian(inputStream, bytesToRead);
+
+        // Assert
+        assertEquals(expectedValue, actualValue,
+            "The method should correctly interpret the 3-byte little-endian value from the stream.");
     }
 }
