@@ -1,29 +1,27 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest15 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getConstantPoolEntry(7, 1152L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that getConstantPoolEntry() throws a NullPointerException when the
+     * SegmentConstantPool is constructed with null CpBands. This is because the
+     * internal bands object is required to look up any constant pool entry.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getConstantPoolEntryShouldThrowNPEWhenBandsAreNull() throws Pack200Exception {
+        // Arrange: Create a SegmentConstantPool with null bands, representing an invalid state.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        final int arbitraryType = SegmentConstantPool.CP_CLASS;
+        final long arbitraryIndex = 1152L;
+
+        // Act & Assert: Attempting to get an entry should trigger a NullPointerException,
+        // which is caught and verified by the @Test(expected) annotation.
+        segmentConstantPool.getConstantPoolEntry(arbitraryType, arbitraryIndex);
     }
 }
