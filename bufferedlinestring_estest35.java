@@ -1,32 +1,56 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest35 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, (-2877.398196062), true, spatialContext0);
-        boolean boolean0 = bufferedLineString0.equals(spatialContextFactory0);
-        assertEquals((-2877.398196062), bufferedLineString0.getBuf(), 0.01);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * This test class contains improved tests for the {@link BufferedLineString} class.
+ * The original test was auto-generated and has been refactored for better understandability.
+ */
+public class BufferedLineStringTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * Tests that the equals() method correctly returns false when comparing
+     * a BufferedLineString to an object of an incompatible type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentObjectType() {
+        // Arrange
+        // Note: The constructor Javadoc suggests the buffer should be >= 0,
+        // but the implementation accepts negative values. This test uses a negative
+        // value as found in the original auto-generated test to verify this behavior.
+        final double negativeBuffer = -2877.398196062;
+        final List<Point> emptyPoints = Collections.emptyList();
+
+        // Create an empty BufferedLineString.
+        BufferedLineString lineString = new BufferedLineString(
+                emptyPoints,
+                negativeBuffer,
+                true, // expandBufForLongitudeSkew
+                spatialContext
+        );
+
+        // An object of a completely different type for comparison.
+        Object otherObject = new Object();
+
+        // Act
+        boolean isEqual = lineString.equals(otherObject);
+
+        // Assert
+        // A BufferedLineString instance should never be equal to an object of a different class.
+        assertFalse("equals() should return false for an object of a different type.", isEqual);
+
+        // Also, verify the buffer was stored correctly, even if negative.
+        assertEquals("The buffer value should be stored as provided.",
+                negativeBuffer, lineString.getBuf(), 0.01);
     }
 }
