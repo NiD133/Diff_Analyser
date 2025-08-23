@@ -1,25 +1,34 @@
 package org.joda.time;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class Years_ESTestTest21 extends Years_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        // Undeclared exception!
-        try {
-            Years.yearsBetween((ReadablePartial) null, (ReadablePartial) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // ReadablePartial objects must not be null
-            //
-            verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-        }
+/**
+ * Test suite for the {@link Years} class.
+ */
+public class YearsTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that yearsBetween() throws an IllegalArgumentException
+     * when both start and end partials are null, as per the method's contract.
+     */
+    @Test
+    public void yearsBetween_withNullPartials_throwsIllegalArgumentException() {
+        // Arrange: Define the expected exception and its message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("ReadablePartial objects must not be null");
+
+        // Act: Call the method that should trigger the exception.
+        Years.yearsBetween(null, null);
+
+        // Assert: The ExpectedException rule automatically verifies that the
+        // specified exception was thrown. If not, the test fails.
     }
 }
