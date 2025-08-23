@@ -1,37 +1,33 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class PeriodFormatter_ESTestTest9 extends PeriodFormatter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PeriodFormatter} class.
+ */
+public class PeriodFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        PeriodFormatterBuilder.Composite periodFormatterBuilder_Composite0 = new PeriodFormatterBuilder.Composite(linkedList0);
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Composite0, periodFormatterBuilder_Composite0);
-        PeriodPrinter periodPrinter0 = periodFormatter0.getPrinter();
-        assertSame(periodPrinter0, periodFormatterBuilder_Composite0);
+    /**
+     * Tests that the getPrinter() method returns the exact printer instance
+     * that was supplied to the constructor.
+     */
+    @Test
+    public void getPrinter_shouldReturnThePrinterSuppliedToTheConstructor() {
+        // Arrange
+        // A PeriodFormatterBuilder.Composite can act as both a printer and a parser,
+        // which is required to construct a PeriodFormatter.
+        LinkedList<Object> components = new LinkedList<>();
+        PeriodFormatterBuilder.Composite printerAndParser = new PeriodFormatterBuilder.Composite(components);
+        PeriodFormatter formatter = new PeriodFormatter(printerAndParser, printerAndParser);
+
+        // Act
+        PeriodPrinter actualPrinter = formatter.getPrinter();
+
+        // Assert
+        // The getter should return the exact same instance provided at construction.
+        assertSame("The returned printer should be the same instance provided to the constructor.",
+                     printerAndParser, actualPrinter);
     }
 }
