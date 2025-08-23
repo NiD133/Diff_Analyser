@@ -1,29 +1,25 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest3 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        String string0 = Attribute.getValidKey("AfterFrameset", document_OutputSettings_Syntax0);
-        assertEquals("AfterFrameset", string0);
+/**
+ * Tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    @Test
+    public void getValidKeyWithValidXmlKeyReturnsKeyUnchanged() {
+        // Arrange
+        String validKey = "AfterFrameset";
+        Syntax syntax = Syntax.xml;
+
+        // Act
+        String result = Attribute.getValidKey(validKey, syntax);
+
+        // Assert
+        assertEquals(validKey, result);
     }
 }
