@@ -1,26 +1,42 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest63 extends JsonIgnoreProperties_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties((Set<String>) linkedHashSet0);
-        boolean boolean0 = jsonIgnoreProperties_Value0.getMerge();
-        assertFalse(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertTrue(boolean0);
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowSetters());
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class.
+ */
+public class JsonIgnorePropertiesValueTest {
+
+    /**
+     * Verifies that creating a {@link JsonIgnoreProperties.Value} instance using the
+     * {@code forIgnoredProperties} factory method sets the boolean flags to their
+     * expected default states.
+     * <p>
+     * By default, merging should be enabled, while all other flags
+     * (ignoreUnknown, allowGetters, allowSetters) should be disabled.
+     */
+    @Test
+    public void forIgnoredPropertiesShouldCreateValueWithDefaultFlags() {
+        // Arrange
+        // The specific properties to ignore are not relevant for this test.
+        Set<String> ignoredProperties = Collections.emptySet();
+
+        // Act
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.forIgnoredProperties(ignoredProperties);
+
+        // Assert
+        // The 'merge' flag is expected to be true by default to allow combining configurations.
+        assertTrue("The 'merge' property should be true by default", value.getMerge());
+
+        // The other boolean properties should be false by default.
+        assertFalse("The 'ignoreUnknown' property should be false by default", value.getIgnoreUnknown());
+        assertFalse("The 'allowGetters' property should be false by default", value.getAllowGetters());
+        assertFalse("The 'allowSetters' property should be false by default", value.getAllowSetters());
     }
 }
