@@ -1,36 +1,43 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest44 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test043() throws Throwable {
-        Document document0 = new Document("b*LY=0yr*g]q30");
-        Elements elements0 = document0.getAllElements();
-        boolean boolean0 = elements0.deselect((Object) document0);
-        assertTrue(boolean0);
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Tests that `deselect(Object)` successfully removes an element that exists in the collection.
+     * The method should return true, and the element should no longer be present in the list.
+     *
+     * Note: This test covers the `deselect(Object)` method, which is not part of the modern public Jsoup API
+     * but is inferred to exist from the original auto-generated test. It is assumed to behave like
+     * {@link java.util.List#remove(Object)}, modifying only the list and not the underlying DOM.
+     */
+    @Test
+    public void deselectRemovesExistingElementFromList() {
+        // Arrange
+        Document doc = new Document(""); // The base URI is irrelevant for this test.
+        Elements elements = doc.getAllElements();
+        int initialSize = elements.size();
+
+        // The Document object itself is an Element and is included in the list returned by getAllElements().
+        // We verify this precondition to ensure the test setup is correct.
+        assertTrue("Precondition failed: The document element should be in the elements list.", elements.contains(doc));
+
+        // Act
+        // The deselect(Object) method removes the element from this list, but not from the DOM.
+        boolean wasRemoved = elements.deselect((Object) doc);
+
+        // Assert
+        assertTrue("deselect() should return true when an element is successfully removed.", wasRemoved);
+        assertEquals("The size of the elements list should decrease by one.", initialSize - 1, elements.size());
+        assertFalse("The deselected element should no longer be in the list.", elements.contains(doc));
     }
 }
