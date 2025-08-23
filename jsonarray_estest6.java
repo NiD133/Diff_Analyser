@@ -1,24 +1,23 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest6 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class, focusing on the getAsString() method.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Integer integer0 = new Integer((-3));
-        jsonArray0.add((Number) integer0);
-        String string0 = jsonArray0.getAsString();
-        assertNotNull(string0);
+    @Test
+    public void getAsString_onArrayWithSingleNumber_returnsNumberAsString() {
+        // Arrange: Create a JsonArray and add a single integer element.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(-3);
+
+        // Act: Call the method under test.
+        String result = jsonArray.getAsString();
+
+        // Assert: Verify that the result is the string representation of the number.
+        assertEquals("-3", result);
     }
 }
