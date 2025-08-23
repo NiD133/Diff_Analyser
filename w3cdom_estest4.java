@@ -1,45 +1,44 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest4 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Document.createShell("");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup(document0);
-        W3CDom.W3CBuilder w3CDom_W3CBuilder0 = new W3CDom.W3CBuilder(document1);
-        // Undeclared exception!
-        try {
-            w3CDom_W3CBuilder0.head(document0, 0);
-            fail("Expecting exception: DOMException");
-        } catch (DOMException e) {
-        }
+/**
+ * Test suite for {@link W3CDom}.
+ * Note: The original test class name "W3CDom_ESTestTest4" and its dependency on a scaffolding class
+ * are artifacts of a test generation tool. For better maintainability, tests are typically
+ * consolidated into a single, hand-written test class like this one.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that attempting to add a root element to a W3C document that already
+     * contains one will result in a DOMException.
+     */
+    @Test
+    public void headShouldThrowExceptionWhenAddingRootToDocumentThatAlreadyHasOne() {
+        // Arrange
+        // 1. Create a standard Jsoup document.
+        Document jsoupDoc = Document.createShell("");
+
+        // 2. Convert it to a W3C Document. This W3C doc now has a root element (<html>).
+        W3CDom w3cDomConverter = new W3CDom();
+        org.w3c.dom.Document w3cDoc = w3cDomConverter.fromJsoup(jsoupDoc);
+
+        // 3. Instantiate a W3CBuilder, which is the internal class used for the conversion.
+        //    Its destination is the W3C document itself.
+        W3CDom.W3CBuilder w3cBuilder = new W3CDom.W3CBuilder(w3cDoc);
+        final int rootNodeDepth = 0;
+
+        // Act & Assert
+        // Calling head() on the builder with the Jsoup document attempts to add another
+        // root element to the W3C document. This is not allowed by the W3C DOM
+        // specification (HIERARCHY_REQUEST_ERR) and must throw a DOMException.
+        assertThrows(DOMException.class, () -> {
+            w3cBuilder.head(jsoupDoc, rootNodeDepth);
+        });
     }
 }
