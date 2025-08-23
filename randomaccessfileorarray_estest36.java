@@ -1,36 +1,46 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
+
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest36 extends RandomAccessFileOrArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test035() throws Throwable {
-        byte[] byteArray0 = new byte[24];
-        byteArray0[1] = (byte) 16;
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArrayInputStream0);
-        long long0 = randomAccessFileOrArray0.readLong();
-        assertEquals(8L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(4503599627370496L, long0);
+public class RandomAccessFileOrArray_ESTestTest36 {
+
+    /**
+     * Tests that readLong() correctly interprets an 8-byte sequence from the input
+     * as a big-endian long value and advances the internal pointer accordingly.
+     */
+    @Test
+    public void readLongShouldReturnCorrectBigEndianValueAndAdvancePointer() throws IOException {
+        // Arrange
+        // Create a byte array representing a 64-bit long in big-endian format.
+        // The value is 0x0010000000000000, where the second byte is 16 (0x10).
+        byte[] bigEndianLongBytes = new byte[]{
+                (byte) 0x00, (byte) 0x10, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
+        };
+
+        // The expected long value corresponding to the byte array above.
+        // Using a hex literal makes the relationship to the byte array clear.
+        long expectedLongValue = 0x0010000000000000L; // This is 4503599627370496 in decimal
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(bigEndianLongBytes);
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputStream);
+
+        // Act
+        long actualLongValue = reader.readLong();
+
+        // Assert
+        // 1. Verify that the correct long value was read from the stream.
+        assertEquals("The read long value should match the big-endian representation.",
+                expectedLongValue, actualLongValue);
+
+        // 2. Verify that the file pointer has advanced by the size of a long (8 bytes).
+        long expectedPosition = Long.BYTES;
+        assertEquals("The file pointer should advance by 8 bytes after reading a long.",
+                expectedPosition, reader.getFilePointer());
     }
 }
