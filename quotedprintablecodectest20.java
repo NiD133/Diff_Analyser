@@ -1,47 +1,68 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
+
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest20 {
+/**
+ * Tests for soft line breaks ('soft breaks') in Quoted-Printable encoding,
+ * as specified by RFC 1521. These tests use the strict codec, which enforces
+ * a maximum line length of 76 characters.
+ */
+class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    // A codec configured for strict encoding, which enables soft line breaks.
+    private QuotedPrintableCodec strictCodec;
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        strictCodec = new QuotedPrintableCodec(true);
     }
 
     @Test
-    void testUltimateSoftBreak() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec(true);
-        String plain = "This is a example of a quoted-printable text file. There is no end to it\t";
-        String expected = "This is a example of a quoted-printable text file. There is no end to i=\r\nt=09";
-        assertEquals(expected, qpcodec.encode(plain));
-        plain = "This is a example of a quoted-printable text file. There is no end to it ";
-        expected = "This is a example of a quoted-printable text file. There is no end to i=\r\nt=20";
-        assertEquals(expected, qpcodec.encode(plain));
-        // whitespace before soft break
-        plain = "This is a example of a quoted-printable text file. There is no end to   ";
-        expected = "This is a example of a quoted-printable text file. There is no end to=20=\r\n =20";
-        assertEquals(expected, qpcodec.encode(plain));
-        // non-printable character before soft break
-        plain = "This is a example of a quoted-printable text file. There is no end to=  ";
-        expected = "This is a example of a quoted-printable text file. There is no end to=3D=\r\n =20";
-        assertEquals(expected, qpcodec.encode(plain));
+    @DisplayName("Encoding with soft break should correctly handle a trailing tab")
+    void testStrictEncodeWithSoftBreakAndTrailingTab() throws EncoderException {
+        // A soft break is inserted to avoid the line exceeding the safe length.
+        // The trailing tab is then encoded on the new line.
+        final String input = "This is a example of a quoted-printable text file. There is no end to it\t";
+        final String expected = "This is a example of a quoted-printable text file. There is no end to i=\r\nt=09";
+
+        assertEquals(expected, strictCodec.encode(input));
+    }
+
+    @Test
+    @DisplayName("Encoding with soft break should correctly handle a trailing space")
+    void testStrictEncodeWithSoftBreakAndTrailingSpace() throws EncoderException {
+        // Similar to the tab test, a soft break is inserted, and the trailing
+        // space is encoded on the new line.
+        final String input = "This is a example of a quoted-printable text file. There is no end to it ";
+        final String expected = "This is a example of a quoted-printable text file. There is no end to i=\r\nt=20";
+
+        assertEquals(expected, strictCodec.encode(input));
+    }
+
+    @Test
+    @DisplayName("Encoding should handle multiple trailing spaces before a soft break")
+    void testStrictEncodeWithSoftBreakAndMultipleTrailingSpaces() throws EncoderException {
+        // This tests a more complex case where a space must be encoded to allow a soft
+        // break, preventing a line from ending in whitespace before the break.
+        final String input = "This is a example of a quoted-printable text file. There is no end to   ";
+        final String expected = "This is a example of a quoted-printable text file. There is no end to=20=\r\n =20";
+
+        assertEquals(expected, strictCodec.encode(input));
+    }
+
+    @Test
+    @DisplayName("Encoding should handle a non-printable character before a soft break")
+    void testStrictEncodeWithSoftBreakAndTrailingNonPrintableChar() throws EncoderException {
+        // An '=' sign must be encoded. This test ensures the soft break is correctly
+        // placed after the encoded character.
+        final String input = "This is a example of a quoted-printable text file. There is no end to=  ";
+        final String expected = "This is a example of a quoted-printable text file. There is no end to=3D=\r\n =20";
+
+        assertEquals(expected, strictCodec.encode(input));
     }
 }
