@@ -1,31 +1,35 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class BoundedIterator_ESTestTest2 extends BoundedIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedIterator}.
+ */
+public class BoundedIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Integer integer0 = new Integer(1);
-        linkedList0.add(integer0);
-        Iterator<Integer> iterator0 = linkedList0.descendingIterator();
-        BoundedIterator<Integer> boundedIterator0 = new BoundedIterator<Integer>(iterator0, 0L, 508L);
-        boolean boolean0 = boundedIterator0.hasNext();
-        assertTrue(boolean0);
+    /**
+     * Tests that hasNext() returns true when the underlying iterator has elements
+     * and the current position is within the specified bounds.
+     */
+    @Test
+    public void hasNextShouldReturnTrueForNonEmptyIteratorWithinBounds() {
+        // Arrange: Create an iterator with one element.
+        final List<Integer> sourceList = Collections.singletonList(1);
+        final Iterator<Integer> underlyingIterator = sourceList.iterator();
+
+        // Create a BoundedIterator starting at offset 0 with a max of 5 elements.
+        // The underlying iterator has fewer elements than max, so hasNext() should be true.
+        final BoundedIterator<Integer> boundedIterator = new BoundedIterator<>(underlyingIterator, 0L, 5L);
+
+        // Act: Check if there is a next element.
+        final boolean hasNext = boundedIterator.hasNext();
+
+        // Assert: The result should be true.
+        assertTrue("hasNext() should return true as the iterator has one element and is within bounds.", hasNext);
     }
 }
