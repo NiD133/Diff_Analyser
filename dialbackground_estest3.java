@@ -1,42 +1,31 @@
 package org.jfree.chart.plot.dial;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class DialBackground_ESTestTest3 extends DialBackground_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DialBackground} class.
+ */
+public class DialBackgroundTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        // Undeclared exception!
+    /**
+     * Verifies that setGradientPaintTransformer() throws an IllegalArgumentException
+     * when a null argument is provided. This is the expected behavior to prevent
+     * null pointer exceptions later.
+     */
+    @Test
+    public void setGradientPaintTransformer_whenGivenNull_shouldThrowIllegalArgumentException() {
+        // Arrange: Create an instance of the class under test.
+        DialBackground dialBackground = new DialBackground();
+
+        // Act & Assert: Call the method with a null argument and verify the resulting exception.
         try {
-            dialBackground0.setGradientPaintTransformer((GradientPaintTransformer) null);
-            fail("Expecting exception: IllegalArgumentException");
+            dialBackground.setGradientPaintTransformer(null);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 't' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is correct, confirming the right check failed.
+            assertEquals("Null 't' argument.", e.getMessage());
         }
     }
 }
