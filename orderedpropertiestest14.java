@@ -1,83 +1,47 @@
 package org.apache.commons.collections4.properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
-public class OrderedPropertiesTestTest14 {
+/**
+ * Tests for {@link OrderedProperties#toString()}.
+ *
+ * This test suite focuses on verifying that the string representation of
+ * an {@link OrderedProperties} instance correctly reflects the insertion
+ * order of its elements.
+ */
+public class OrderedPropertiesToStringTest {
 
-    private void assertAscendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 1;
-        final int last = 11;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i++) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-    }
-
-    private OrderedProperties assertDescendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 11;
-        final int last = 1;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i--) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-        return orderedProperties;
-    }
-
-    private OrderedProperties loadOrderedKeysReverse() throws FileNotFoundException, IOException {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties")) {
-            orderedProperties.load(reader);
-        }
-        return assertDescendingOrder(orderedProperties);
-    }
-
+    /**
+     * Verifies that the toString() method generates a string where entries
+     * appear in the order they were added.
+     */
     @Test
-    void testToString() {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        final char first = 'Z';
-        final char last = 'A';
-        for (char ch = first; ch >= last; ch--) {
-            orderedProperties.put(String.valueOf(ch), "Value" + ch);
+    void toStringShouldPreserveInsertionOrder() {
+        // Arrange: Create properties and add entries in a specific, non-alphabetical order (Z down to A).
+        final OrderedProperties properties = new OrderedProperties();
+        for (char ch = 'Z'; ch >= 'A'; ch--) {
+            final String key = String.valueOf(ch);
+            final String value = "Value" + ch;
+            properties.put(key, value);
         }
-        assertEquals("{Z=ValueZ, Y=ValueY, X=ValueX, W=ValueW, V=ValueV, U=ValueU, T=ValueT, S=ValueS, R=ValueR, Q=ValueQ, P=ValueP, O=ValueO, N=ValueN, M=ValueM, L=ValueL, K=ValueK, J=ValueJ, I=ValueI, H=ValueH, G=ValueG, F=ValueF, E=ValueE, D=ValueD, C=ValueC, B=ValueB, A=ValueA}", orderedProperties.toString());
+
+        // Act
+        final String actualToString = properties.toString();
+
+        // Assert: The toString() output should match the insertion order.
+        // We build the expected string programmatically to make the test's intent
+        // clear and avoid a long, hard-to-read hardcoded string literal.
+        final String expectedToString = IntStream.rangeClosed('A', 'Z')
+                .mapToObj(i -> (char) i)
+                .sorted(Collections.reverseOrder()) // Ensures the order is Z, Y, X...
+                .map(ch -> ch + "=Value" + ch)
+                .collect(Collectors.joining(", ", "{", "}"));
+
+        assertEquals(expectedToString, actualToString);
     }
 }
