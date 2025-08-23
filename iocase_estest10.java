@@ -1,18 +1,31 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest10 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        int int0 = iOCase0.checkIndexOf("\"93F*1y", (-794), "\"93F*1y");
-        assertEquals(0, int0);
+    /**
+     * Tests that {@link IOCase#checkIndexOf(String, int, String)} treats a negative
+     * start index as zero, which is consistent with the behavior of
+     * {@link String#indexOf(String, int)}.
+     */
+    @Test
+    public void checkIndexOfWithNegativeStartIndexShouldBeTreatedAsZero() {
+        // Arrange
+        final String text = "\"93F*1y";
+        final String search = "\"93F*1y";
+        final int negativeStartIndex = -794;
+        final int expectedIndex = 0; // The search should start from index 0
+
+        // Act
+        final int actualIndex = IOCase.INSENSITIVE.checkIndexOf(text, negativeStartIndex, search);
+
+        // Assert
+        assertEquals("A negative start index should be treated as 0, finding the match at the beginning.",
+                expectedIndex, actualIndex);
     }
 }
