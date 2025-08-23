@@ -1,35 +1,40 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
 import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest23 {
+/**
+ * Tests for {@link ByteUtils#toLittleEndian(DataOutput, long, int)}.
+ */
+class ByteUtilsTest {
 
     @Test
-    void testToLittleEndianToDataOutput() throws IOException {
-        final byte[] byteArray;
-        final byte[] expected = { 2, 3, 4 };
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            final DataOutput dos = new DataOutputStream(bos);
-            toLittleEndian(dos, 2 + 3 * 256 + 4 * 256 * 256, 3);
-            byteArray = bos.toByteArray();
-            assertArrayEquals(expected, byteArray);
+    @DisplayName("toLittleEndian should write a long value to a DataOutput in little-endian format")
+    void toLittleEndianShouldWriteCorrectBytesToDataOutput() throws IOException {
+        // Arrange
+        // The value 262914 is represented in little-endian format by 3 bytes as {2, 3, 4}
+        // because: 262914 = (2 * 256^0) + (3 * 256^1) + (4 * 256^2)
+        final long valueToWrite = 2 + (3 * 256L) + (4 * 256L * 256L);
+        final int length = 3;
+        final byte[] expectedBytes = {2, 3, 4};
+
+        try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            final DataOutput dataOutput = new DataOutputStream(byteArrayOutputStream);
+
+            // Act
+            toLittleEndian(dataOutput, valueToWrite, length);
+
+            // Assert
+            final byte[] actualBytes = byteArrayOutputStream.toByteArray();
+            assertArrayEquals(expectedBytes, actualBytes,
+                "The byte array should match the little-endian representation of the value.");
         }
-        assertArrayEquals(expected, byteArray);
     }
 }
