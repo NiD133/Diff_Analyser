@@ -1,21 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNull;
+
 import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest13 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Tests for {@link ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        Integer[] integerArray0 = ArraySorter.sort((Integer[]) null, (Comparator<? super Integer>) comparator0);
-        assertNull(integerArray0);
+    /**
+     * Tests that ArraySorter.sort() returns null when the input array is null,
+     * even when a comparator is provided.
+     */
+    @Test
+    public void testSortWithComparatorHandlesNullArray() {
+        // The behavior should be to return null for a null array, regardless of the comparator.
+        // We pass a null comparator as it's a valid and simple choice.
+        final Comparator<String> nullComparator = null;
+
+        // Act: Call the sort method with a null array.
+        // The cast `(String[]) null` is necessary to resolve the correct method overload.
+        final String[] result = ArraySorter.sort((String[]) null, nullComparator);
+
+        // Assert: Verify that the result is null.
+        assertNull("Sorting a null array should return null", result);
     }
 }
