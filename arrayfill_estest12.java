@@ -1,22 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest12 extends ArrayFill_ESTest_scaffolding {
+/**
+ * This class contains improved tests for the {@link ArrayFill} utility.
+ * The original test was automatically generated and lacked clarity.
+ */
+public class ArrayFillImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Object[] objectArray0 = new Object[0];
-        FailableIntFunction<Object, Throwable> failableIntFunction0 = FailableIntFunction.nop();
-        Object[] objectArray1 = ArrayFill.fill(objectArray0, (Object) failableIntFunction0);
-        assertSame(objectArray1, objectArray0);
+    /**
+     * Tests that calling ArrayFill.fill() on an empty array returns the same
+     * array instance, as no filling operation is performed.
+     */
+    @Test
+    public void testFill_withEmptyArray_shouldReturnSameInstance() {
+        // Arrange: Create an empty array. The value to fill with is irrelevant
+        // for an empty array, so we use a simple, clear example.
+        final Object[] emptyArray = new Object[0];
+        final String fillValue = "anyValue";
+
+        // Act: Call the fill method.
+        final Object[] resultArray = ArrayFill.fill(emptyArray, fillValue);
+
+        // Assert: The returned array should be the exact same instance as the input,
+        // confirming that no new array was allocated.
+        assertSame("Filling an empty array should return the same instance", emptyArray, resultArray);
     }
 }
