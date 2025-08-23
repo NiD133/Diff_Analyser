@@ -1,30 +1,24 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class GeohashUtils_ESTestTest7 extends GeohashUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link GeohashUtils}.
+ */
+public class GeohashUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        // Undeclared exception!
-        try {
-            GeohashUtils.lookupDegreesSizeForHashLen((-482));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -482
-            //
-            verifyException("org.locationtech.spatial4j.io.GeohashUtils", e);
-        }
+    /**
+     * Verifies that lookupDegreesSizeForHashLen throws an exception for negative input.
+     * The method uses the hash length as an array index, so it cannot be negative.
+     * This test ensures that such invalid input is handled by throwing an
+     * {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void lookupDegreesSizeForHashLen_shouldThrowException_whenHashLengthIsNegative() {
+        // Arrange: Define an invalid, negative hash length.
+        int invalidNegativeHashLength = -1;
+
+        // Act & Assert: Calling the method with this input should trigger the expected exception.
+        GeohashUtils.lookupDegreesSizeForHashLen(invalidNegativeHashLength);
     }
 }
