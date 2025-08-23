@@ -1,108 +1,67 @@
 package org.jfree.chart.block;
 
+import org.jfree.chart.api.Size2D;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
+import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest8 extends GridArrangement_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+// Note: The original test class name "GridArrangement_ESTestTest8" is kept,
+// but in a real-world scenario, it would be renamed to "GridArrangementTest".
+public class GridArrangement_ESTestTest8 {
+
+    /**
+     * Verifies that the arrange method correctly calculates the total size for a grid
+     * with no constraints. The total size should be based on the grid dimensions
+     * and the maximum dimensions of the blocks within the container. This test also
+     * covers the edge case of a block with a negative width.
+     */
     @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(59, 59);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        SystemColor systemColor0 = SystemColor.inactiveCaption;
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals(255, systemColor0.getAlpha());
-        assertNotNull(systemColor0);
-        ColorBlock colorBlock0 = new ColorBlock(systemColor0, (-1.0), 306.1);
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals(255, systemColor0.getAlpha());
-        assertEquals(0.0, colorBlock0.getContentXOffset(), 0.01);
-        assertEquals((-1.0), colorBlock0.getWidth(), 0.01);
-        assertEquals(306.1, colorBlock0.getHeight(), 0.01);
-        assertNull(colorBlock0.getID());
-        assertEquals(0.0, colorBlock0.getContentYOffset(), 0.01);
-        assertNotNull(colorBlock0);
-        Object object0 = new Object();
-        assertNotNull(object0);
-        blockContainer0.add((Block) colorBlock0, object0);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals(255, systemColor0.getAlpha());
-        assertEquals(0.0, colorBlock0.getContentXOffset(), 0.01);
-        assertEquals((-1.0), colorBlock0.getWidth(), 0.01);
-        assertEquals(306.1, colorBlock0.getHeight(), 0.01);
-        assertNull(colorBlock0.getID());
-        assertEquals(0.0, colorBlock0.getContentYOffset(), 0.01);
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        Size2D size2D0 = gridArrangement0.arrange(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, size2D0.getWidth(), 0.01);
-        assertEquals(18059.9, size2D0.getHeight(), 0.01);
-        assertEquals("Size2D[width=0.0, height=18059.9]", size2D0.toString());
-        assertNotNull(size2D0);
-        assertEquals(0.0, size2D0.width, 0.01);
-        assertEquals(18059.9, size2D0.height, 0.01);
+    public void arrangeWithNoConstraintShouldCalculateSizeFromGridAndBlockDimensions() {
+        // Arrange
+        int rows = 59;
+        int columns = 59;
+        GridArrangement arrangement = new GridArrangement(rows, columns);
+
+        // Create a container and add two blocks to it.
+        // The arrangement logic will be based on the largest block dimensions.
+        BlockContainer container = new BlockContainer();
+        
+        // Add a block with a negative width and a positive height.
+        double blockWidth = -1.0;
+        double blockHeight = 306.1;
+        ColorBlock colorBlock = new ColorBlock(Color.RED, blockWidth, blockHeight);
+        container.add(colorBlock);
+
+        // Add the container to itself, which acts as a second block of size (0,0).
+        // This ensures the arrangement handles multiple blocks.
+        container.add(container);
+
+        // Act
+        // Arrange the container's blocks in the grid without any size constraints.
+        // The Graphics2D object is not used in this arrangement scenario, so it can be null.
+        Size2D resultingSize = arrangement.arrange(container, null, RectangleConstraint.NONE);
+
+        // Assert
+        assertNotNull(resultingSize);
+
+        // The expected width is based on the maximum width of any block in the container.
+        // The blocks have widths of -1.0 and 0.0. The arrangement logic treats
+        // negative widths as 0, so the maximum width is 0.
+        // Total width = columns * max_block_width = 59 * 0.0 = 0.0
+        double expectedWidth = 0.0;
+
+        // The expected height is based on the maximum height of any block.
+        // The blocks have heights of 306.1 and 0.0, so the maximum is 306.1.
+        // Total height = rows * max_block_height = 59 * 306.1 = 18059.9
+        double expectedHeight = rows * blockHeight;
+
+        assertEquals("The total width should be zero when the widest block has a non-positive width.",
+                expectedWidth, resultingSize.getWidth(), 0.01);
+        assertEquals("The total height should be the number of rows multiplied by the tallest block's height.",
+                expectedHeight, resultingSize.getHeight(), 0.01);
     }
 }
