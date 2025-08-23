@@ -1,21 +1,29 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class OptionGroup_ESTestTest3 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        Option option0 = new Option((String) null, "", false, "cHfx;>NW^}R|1DYvgS");
-        optionGroup0.setSelected(option0);
-        String string0 = optionGroup0.getSelected();
-        assertEquals("", string0);
+    /**
+     * Tests that getSelected() correctly returns the name of the selected option,
+     * even when that name is an empty string.
+     */
+    @Test
+    public void getSelectedShouldReturnEmptyStringForOptionWithEmptyName() throws AlreadySelectedException {
+        // Arrange: Create an OptionGroup and an Option with an empty string as its long name.
+        // The long name is used as the option's primary identifier in this context.
+        OptionGroup optionGroup = new OptionGroup();
+        Option optionWithEmptyName = new Option(null, "", false, "An option with an empty name");
+
+        // Act: Select the option within the group.
+        optionGroup.setSelected(optionWithEmptyName);
+        String selectedOptionName = optionGroup.getSelected();
+
+        // Assert: Verify that the retrieved name is the expected empty string.
+        assertEquals("The selected option name should be an empty string", "", selectedOptionName);
     }
 }
