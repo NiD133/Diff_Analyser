@@ -1,73 +1,70 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
-
-public class AtomicDoubleArrayTestTest23 extends JSR166TestCase {
-
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+/**
+ * Tests for {@link AtomicDoubleArray#updateAndGet(int, java.util.function.DoubleUnaryOperator)}.
+ */
+public class AtomicDoubleArrayUpdateAndGetTest extends JSR166TestCase {
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * A selection of "interesting" double values for testing, including infinities, zeros, NaN, and
+     * other boundary values.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
+    private static final double[] TEST_DOUBLES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+    /**
+     * Asserts that two doubles are bit-wise equal, which is the notion of equality used by {@link
+     * AtomicDoubleArray}.
+     */
+    private static void assertBitEquals(double expected, double actual) {
+        assertEquals(
+            "Bitwise representations should be equal",
+            Double.doubleToRawLongBits(expected),
+            Double.doubleToRawLongBits(actual));
     }
 
     /**
-     * updateAndGet subtracts given value to current, and returns current value
+     * Verifies that updateAndGet correctly applies a subtraction function, returns the updated value,
+     * and stores it in the array. The test is performed on the first and last elements of the array
+     * using a wide range of double values to ensure correctness with edge cases.
      */
-    public void testUpdateAndGetWithSubtract() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.updateAndGet(i, value -> value - y);
-                    assertBitEquals(x - y, z);
-                    assertBitEquals(x - y, aa.get(i));
+    public void testUpdateAndGet_withSubtraction() {
+        // SIZE is a constant provided by the JSR166TestCase base class.
+        AtomicDoubleArray array = new AtomicDoubleArray(SIZE);
+        int[] indicesToTest = {0, SIZE - 1};
+
+        for (int index : indicesToTest) {
+            for (double initialValue : TEST_DOUBLES) {
+                for (double valueToSubtract : TEST_DOUBLES) {
+                    // Arrange: Set the initial value in the array.
+                    array.set(index, initialValue);
+                    double expectedResult = initialValue - valueToSubtract;
+
+                    // Act: Apply the update function.
+                    double returnedValue =
+                        array.updateAndGet(index, currentValue -> currentValue - valueToSubtract);
+
+                    // Assert: Check that the returned value and the stored value are correct.
+                    assertBitEquals(expectedResult, returnedValue);
+                    assertBitEquals(expectedResult, array.get(index));
                 }
             }
         }
