@@ -1,49 +1,41 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class InternationalFixedChronology_ESTestTest19 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link InternationalFixedChronology} class, focusing on date creation.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        InternationalFixedDate internationalFixedDate0 = internationalFixedChronology0.dateEpochDay(146096L);
-        InternationalFixedDate internationalFixedDate1 = internationalFixedChronology0.date((TemporalAccessor) internationalFixedDate0);
-        assertEquals(365, internationalFixedDate1.lengthOfYear());
-        assertEquals(29, internationalFixedDate1.lengthOfMonth());
+    /**
+     * Tests that creating a date from a {@link TemporalAccessor} that is already an
+     * {@link InternationalFixedDate} returns an equal date.
+     *
+     * This verifies the behavior of {@link InternationalFixedChronology#date(TemporalAccessor)}.
+     */
+    @Test
+    public void dateFromTemporalAccessor_whenInputIsInternationalFixedDate_returnsEqualDate() {
+        // Arrange
+        // The International Fixed calendar has 13 months. In a non-leap year, month 12 has 29 days.
+        // We use the year 2021 as a clear example of a non-leap year.
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        InternationalFixedDate originalDate = chronology.date(2021, 12, 15);
+
+        // Act
+        // The method under test should correctly handle an input that is already an InternationalFixedDate.
+        InternationalFixedDate convertedDate = chronology.date(originalDate);
+
+        // Assert
+        // The primary assertion is that the converted date is equal to the original.
+        assertEquals("The date converted from an InternationalFixedDate should be equal to the original.",
+                originalDate, convertedDate);
+
+        // We also verify the properties of the date to confirm its integrity after conversion.
+        // A non-leap year in the International Fixed calendar has 365 days.
+        assertEquals("A non-leap year should have 365 days.", 365, convertedDate.lengthOfYear());
+        // Month 12 in a non-leap year has 29 days.
+        assertEquals("The 12th month in a non-leap year should have 29 days.", 29, convertedDate.lengthOfMonth());
     }
 }
