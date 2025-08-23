@@ -1,64 +1,40 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest14 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests edge cases for the {@link OrderedProperties} class.
+ * This test focuses on behavior inherited from {@link java.util.Hashtable}
+ * concerning self-referential collections.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Set<Object> set0 = orderedProperties0.keySet();
-        Set<Map.Entry<Object, Object>> set1 = (Set<Map.Entry<Object, Object>>) orderedProperties0.entrySet();
-        orderedProperties0.putIfAbsent(set0, set0);
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        ComparatorPredicate.Criterion comparatorPredicate_Criterion0 = ComparatorPredicate.Criterion.LESS;
-        ComparatorPredicate<Object> comparatorPredicate0 = new ComparatorPredicate<Object>(set1, comparator0, comparatorPredicate_Criterion0);
-        // Undeclared exception!
-        try {
-            orderedProperties0.put(set0, comparatorPredicate0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that a StackOverflowError occurs when using a self-referential keySet as a key.
+     *
+     * <p>This behavior is inherited from {@link java.util.Hashtable}. When a map's keySet
+     * is used as a key within that same map, it creates a self-referential loop.
+     * Any subsequent operation that triggers the key's {@code hashCode()} method (like another
+     * {@code put}) will result in infinite recursion, leading to a {@link StackOverflowError}.</p>
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void putWithSelfReferentialKeySetShouldCauseStackOverflow() {
+        // Arrange: Create a properties map and get a reference to its keySet.
+        // The keySet is a "view" of the keys, not a separate copy.
+        OrderedProperties properties = new OrderedProperties();
+        Set<Object> keySet = properties.keySet();
+
+        // Arrange: Add the keySet to the map *as a key*. This creates a
+        // self-referential structure where the map's keySet contains itself.
+        properties.put(keySet, "initial value");
+
+        // Act: Attempt to update the value for the self-referential key.
+        // This 'put' operation requires calculating the hashCode of the key (the keySet).
+        // Because the keySet contains itself, the hashCode calculation enters an
+        // infinite recursion, which is expected to throw a StackOverflowError.
+        properties.put(keySet, "new value");
+
+        // Assert: The test passes if a StackOverflowError is thrown.
     }
 }
