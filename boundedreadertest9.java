@@ -1,61 +1,44 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest9 {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
-
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * Tests that reading stops at the defined bound, even if mark() is called
+     * with a larger readAheadLimit. The original test name was misleading as
+     * reset() is never called.
+     */
     @Test
-    void testMarkResetWithMarkOutsideBoundedReaderMax() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.mark(4);
-            mr.read();
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
+    void readShouldRespectBoundWhenMarkIsLarger() throws IOException {
+        // Arrange
+        final int maxCharsToRead = 3;
+        final int readAheadLimit = 4; // Intentionally larger than the bound
+        final String content = "01234567890";
+        final Reader sourceReader = new BufferedReader(new StringReader(content));
+
+        try (final BoundedReader boundedReader = new BoundedReader(sourceReader, maxCharsToRead)) {
+            // Act
+            // Set a mark with a read-ahead limit greater than the reader's bound.
+            boundedReader.mark(readAheadLimit);
+
+            // Assert
+            // Read characters up to the bound.
+            assertEquals('0', boundedReader.read(), "1st character should be '0'");
+            assertEquals('1', boundedReader.read(), "2nd character should be '1'");
+            assertEquals('2', boundedReader.read(), "3rd character should be '2'");
+
+            // The next read should return EOF, as the bound of 3 has been reached.
+            assertEquals(-1, boundedReader.read(), "Should return EOF after reaching the bound");
         }
     }
 }
