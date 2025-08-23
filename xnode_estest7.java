@@ -1,32 +1,47 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class XNode_ESTestTest7 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test006() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Supplier<String> supplier0 = (Supplier<String>) mock(Supplier.class, new ViolatedAssumptionAnswer());
-        doReturn("").when(supplier0).get();
-        String string0 = xNode0.getStringAttribute("cK(Z'", supplier0);
-        assertEquals("", string0);
+    /**
+     * Tests {@link XNode#getStringAttribute(String, Supplier)}.
+     *
+     * This test verifies that when a requested attribute does not exist on the XML node,
+     * the method correctly returns the default value provided by the given Supplier.
+     */
+    @Test
+    public void shouldReturnDefaultValueFromSupplierWhenAttributeIsMissing() {
+        // Arrange: Create an XNode from a DOM node that has no attributes.
+        IIOMetadataNode nodeWithoutAttributes = new IIOMetadataNode();
+        XNode xNode = new XNode(null, nodeWithoutAttributes, new Properties());
+
+        String expectedDefaultValue = "default-value";
+        String attributeName = "nonExistentAttribute";
+
+        // Arrange: Mock a supplier to provide the default value when called.
+        @SuppressWarnings("unchecked") // Safe cast for a mock of a generic type
+        Supplier<String> defaultValueSupplier = mock(Supplier.class);
+        when(defaultValueSupplier.get()).thenReturn(expectedDefaultValue);
+
+        // Act: Attempt to get the value of an attribute that does not exist.
+        String actualValue = xNode.getStringAttribute(attributeName, defaultValueSupplier);
+
+        // Assert: The returned value should be the one from the supplier.
+        assertEquals(expectedDefaultValue, actualValue);
+
+        // Assert: Verify that the supplier's get() method was called exactly once.
+        verify(defaultValueSupplier, times(1)).get();
     }
 }
