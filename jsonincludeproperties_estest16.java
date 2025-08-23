@@ -1,21 +1,32 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JsonIncludeProperties_ESTestTest16 extends JsonIncludeProperties_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonIncludeProperties.Value} class.
+ * Note: The original test class name was auto-generated and has been renamed for clarity.
+ */
+public class JsonIncludePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.all();
-        JsonIncludeProperties.Value jsonIncludeProperties_Value1 = jsonIncludeProperties_Value0.withOverrides((JsonIncludeProperties.Value) null);
-        assertSame(jsonIncludeProperties_Value1, jsonIncludeProperties_Value0);
+    /**
+     * Verifies that calling {@link JsonIncludeProperties.Value#withOverrides} with a null
+     * argument returns the original instance.
+     * <p>
+     * According to the method's contract, a null override is considered "undefined"
+     * and should have no effect on the original value.
+     */
+    @Test
+    public void withOverrides_whenGivenNull_shouldReturnSameInstance() {
+        // Arrange: Create a base Value instance that represents including all properties.
+        JsonIncludeProperties.Value initialValue = JsonIncludeProperties.Value.all();
+
+        // Act: Attempt to apply a null override, which signifies no override configuration.
+        JsonIncludeProperties.Value result = initialValue.withOverrides(null);
+
+        // Assert: The method should return the exact same instance, confirming that a
+        // null override is a no-op.
+        assertSame("Overriding with null should not create a new instance but return the original.",
+                initialValue, result);
     }
 }
