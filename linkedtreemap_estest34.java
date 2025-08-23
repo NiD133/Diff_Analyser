@@ -1,33 +1,37 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest34 extends LinkedTreeMap_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Integer integer0 = new Integer((-2139));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        LinkedTreeMap.Node<Map.Entry<Integer, Integer>, Object> linkedTreeMap_Node0 = new LinkedTreeMap.Node<Map.Entry<Integer, Integer>, Object>(false);
-        AbstractMap.SimpleEntry<Integer, Integer> abstractMap_SimpleEntry0 = new AbstractMap.SimpleEntry<Integer, Integer>(integer0, integer0);
-        LinkedTreeMap.Node<Map.Entry<Integer, Integer>, Object> linkedTreeMap_Node1 = new LinkedTreeMap.Node<Map.Entry<Integer, Integer>, Object>(false, linkedTreeMap_Node0, abstractMap_SimpleEntry0, linkedTreeMap_Node0, linkedTreeMap_Node0);
-        Object object0 = linkedTreeMap_Node1.getKey();
-        boolean boolean0 = linkedTreeMap_EntrySet0.contains(object0);
-        assertEquals(1, linkedTreeMap0.size());
-        assertTrue(boolean0);
+/**
+ * This test class focuses on the behavior of the EntrySet from LinkedTreeMap.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+public class LinkedTreeMapEntrySetTest {
+
+    @Test
+    public void entrySetContains_shouldReturnTrue_forExistingEntry() {
+        // Arrange: Create a map and add a key-value pair.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        Integer key = 100;
+        String value = "ValueFor100";
+        map.put(key, value);
+
+        // Create a Map.Entry object equivalent to the one in the map.
+        Map.Entry<Integer, String> existingEntry = new AbstractMap.SimpleEntry<>(key, value);
+        Set<Map.Entry<Integer, String>> entrySet = map.entrySet();
+
+        // Act: Check if the entry set contains the existing entry.
+        boolean result = entrySet.contains(existingEntry);
+
+        // Assert: Verify that the entry was found and the map size is correct.
+        assertTrue("The entry set should contain an entry that was explicitly added to the map.", result);
+        assertEquals("The map size should be 1 after adding one element.", 1, map.size());
     }
 }
