@@ -1,20 +1,41 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XXHash32_ESTestTest3 extends XXHash32_ESTest_scaffolding {
+/**
+ * Contains understandable, human-written unit tests for the {@link XXHash32} class.
+ */
+public class XXHash32Test {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        XXHash32 xXHash32_0 = new XXHash32();
-        byte[] byteArray0 = new byte[25];
-        byteArray0[21] = (byte) 16;
-        xXHash32_0.update(byteArray0, 7, (int) (byte) 16);
-        assertEquals(1866244335L, xXHash32_0.getValue());
+    /**
+     * Tests that the XXHash32 algorithm produces a known, correct hash value
+     * when updated with a 16-byte chunk of data. This specific length is
+     * significant as it matches the internal buffer size of the algorithm,
+     * representing a key execution path.
+     */
+    @Test
+    public void testUpdateWithFullBufferSizedChunkShouldProduceCorrectHash() {
+        // Arrange
+        // The expected hash is a pre-calculated, known-good result for the specific input data.
+        final long expectedHash = 1866244335L;
+        final XXHash32 xxHash = new XXHash32();
+
+        // This 16-byte input array is designed to test the hashing of a full internal buffer.
+        // It contains mostly zeros with one non-zero byte to create a non-trivial hash input.
+        final byte[] dataToHash = {
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 16, 0
+        };
+
+        // Act
+        // Process the entire 16-byte array.
+        xxHash.update(dataToHash, 0, dataToHash.length);
+        final long actualHash = xxHash.getValue();
+
+        // Assert
+        assertEquals("The calculated hash should match the pre-computed value for the 16-byte input.",
+                expectedHash, actualHash);
     }
 }
