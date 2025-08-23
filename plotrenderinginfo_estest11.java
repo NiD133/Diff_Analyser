@@ -1,31 +1,32 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.geom.Rectangle2D;
+import static org.junit.Assert.assertEquals;
 
-public class PlotRenderingInfo_ESTestTest11 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link PlotRenderingInfo} class, focusing on the data area property.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        Line2D.Float line2D_Float0 = new Line2D.Float(0.0F, (-1725.4F), 0.0F, 1.0F);
-        Rectangle rectangle0 = line2D_Float0.getBounds();
-        plotRenderingInfo0.setDataArea(rectangle0);
-        Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-        assertEquals((-1726.0), rectangle2D0.getY(), 0.01);
+    /**
+     * Verifies that the getDataArea() method correctly returns the Rectangle2D
+     * object that was previously set by the setDataArea() method.
+     */
+    @Test
+    public void getDataArea_ShouldReturnPreviouslySetDataArea() {
+        // Arrange: Create a PlotRenderingInfo instance and a sample data area.
+        ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo(null);
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartRenderingInfo);
+        Rectangle2D expectedDataArea = new Rectangle2D.Double(10.0, 20.0, 100.0, 200.0);
+
+        // Act: Set the data area and then retrieve it.
+        plotInfo.setDataArea(expectedDataArea);
+        Rectangle2D actualDataArea = plotInfo.getDataArea();
+
+        // Assert: The retrieved data area should be equal to the one that was set.
+        assertEquals("The retrieved data area should match the one that was set.",
+                expectedDataArea, actualDataArea);
     }
 }
