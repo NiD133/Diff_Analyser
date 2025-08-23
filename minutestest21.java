@@ -1,47 +1,66 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest21 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the {@link Minutes#plus(Minutes)} method.
+ */
+public class MinutesTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void plus_addsMinutesCorrectlyAndIsImmutable() {
+        // Arrange
+        final Minutes twoMinutes = Minutes.minutes(2);
+        final Minutes threeMinutes = Minutes.minutes(3);
+
+        // Act
+        final Minutes result = twoMinutes.plus(threeMinutes);
+
+        // Assert
+        // 1. The result of the addition should be correct.
+        assertEquals("2 + 3 should equal 5", 5, result.getMinutes());
+
+        // 2. The original instances should not be changed (verifying immutability).
+        assertEquals("Original instance should remain unchanged", 2, twoMinutes.getMinutes());
+        assertEquals("Parameter instance should remain unchanged", 3, threeMinutes.getMinutes());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void plus_addingZeroMinutes_returnsAnEqualInstance() {
+        // Arrange
+        final Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        final Minutes result = oneMinute.plus(Minutes.ZERO);
+
+        // Assert
+        assertEquals("Adding zero should not change the value", oneMinute, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void plus_addingNull_isTreatedAsAddingZero() {
+        // Arrange
+        final Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        // The method contract states that a null input is treated as zero.
+        final Minutes result = oneMinute.plus((Minutes) null);
+
+        // Assert
+        assertEquals("Adding null should not change the value", oneMinute, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test(expected = ArithmeticException.class)
+    public void plus_whenResultOverflows_throwsArithmeticException() {
+        // Arrange
+        final Minutes max = Minutes.MAX_VALUE;
+        final Minutes one = Minutes.ONE;
 
-    public void testPlus_Minutes() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes test3 = Minutes.minutes(3);
-        Minutes result = test2.plus(test3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(3, test3.getMinutes());
-        assertEquals(5, result.getMinutes());
-        assertEquals(1, Minutes.ONE.plus(Minutes.ZERO).getMinutes());
-        assertEquals(1, Minutes.ONE.plus((Minutes) null).getMinutes());
-        try {
-            Minutes.MAX_VALUE.plus(Minutes.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act: This operation should cause an integer overflow.
+        max.plus(one);
+
+        // Assert: The test will pass if an ArithmeticException is thrown.
     }
 }
