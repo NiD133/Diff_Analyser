@@ -1,141 +1,78 @@
 package com.itextpdf.text.pdf.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import com.itextpdf.testutils.TestResourceUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import com.itextpdf.awt.geom.AffineTransform;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class SimpleTextExtractionStrategyTestTest2 {
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-    String TEXT1 = "TEXT1 TEXT1";
+/**
+ * Tests the text extraction logic of {@link SimpleTextExtractionStrategy}.
+ */
+public class SimpleTextExtractionStrategyTest {
 
-    String TEXT2 = "TEXT2 TEXT2";
+    private static final String TEXT_CHUNK_1 = "Hello";
+    private static final String TEXT_CHUNK_2 = "World";
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    public TextExtractionStrategy createRenderListenerForTest() {
-        return new SimpleTextExtractionStrategy();
-    }
-
-    byte[] createPdfWithXObject(String xobjectText) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Document doc = new Document();
-        PdfWriter writer = PdfWriter.getInstance(doc, baos);
-        writer.setCompressionLevel(0);
-        doc.open();
-        doc.add(new Paragraph("A"));
-        doc.add(new Paragraph("B"));
-        PdfTemplate template = writer.getDirectContent().createTemplate(100, 100);
-        template.beginText();
-        template.setFontAndSize(BaseFont.createFont(), 12);
-        template.moveText(5, template.getHeight() - 5);
-        template.showText(xobjectText);
-        template.endText();
-        Image xobjectImage = Image.getInstance(template);
-        doc.add(xobjectImage);
-        doc.add(new Paragraph("C"));
-        doc.close();
-        return baos.toByteArray();
-    }
-
-    private static byte[] createPdfWithArrayText(String directContentTj) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.transform(AffineTransform.getTranslateInstance(100, 500));
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append(directContentTj + "\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithArrayText(String text1, String text2, int spaceInPoints) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.getInternalBuffer().append("[(" + text1 + ")" + (-spaceInPoints) + "(" + text2 + ")]TJ\n");
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static byte[] createPdfWithRotatedText(String text1, String text2, float rotation, boolean moveTextToNextLine, float moveTextDelta) throws Exception {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        final Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, byteStream);
-        document.setPageSize(PageSize.LETTER);
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont font = BaseFont.createFont();
-        float x = document.getPageSize().getWidth() / 2;
-        float y = document.getPageSize().getHeight() / 2;
-        cb.transform(AffineTransform.getTranslateInstance(x, y));
-        cb.moveTo(-10, 0);
-        cb.lineTo(10, 0);
-        cb.moveTo(0, -10);
-        cb.lineTo(0, 10);
-        cb.stroke();
-        cb.beginText();
-        cb.setFontAndSize(font, 12);
-        cb.transform(AffineTransform.getRotateInstance(rotation / 180f * Math.PI));
-        cb.showText(text1);
-        if (moveTextToNextLine)
-            cb.moveText(0, moveTextDelta);
-        else
-            cb.transform(AffineTransform.getTranslateInstance(moveTextDelta, 0));
-        cb.showText(text2);
-        cb.endText();
-        document.close();
-        final byte[] pdfBytes = byteStream.toByteArray();
-        return pdfBytes;
-    }
-
-    private static class SingleCharacterSimpleTextExtractionStrategy extends SimpleTextExtractionStrategy {
-
-        @Override
-        public void renderText(TextRenderInfo renderInfo) {
-            for (TextRenderInfo tri : renderInfo.getCharacterRenderInfos()) super.renderText(tri);
-        }
-    }
-
+    /**
+     * Verifies that the strategy inserts a space between two text chunks that are on the same line
+     * but separated by a small horizontal gap. This simulates how words are typically spaced in a sentence.
+     */
     @Test
-    public void testCoLinnearTextWithSpace() throws Exception {
-        byte[] bytes = createPdfWithRotatedText(TEXT1, TEXT2, 0, false, 2);
-        //saveBytesToFile(bytes, new File("c:/temp/test.pdf"));
-        Assert.assertEquals(TEXT1 + " " + TEXT2, PdfTextExtractor.getTextFromPage(new PdfReader(bytes), 1, createRenderListenerForTest()));
+    public void shouldInsertSpaceBetweenSlightlySeparatedTextOnSameLine() throws IOException, DocumentException {
+        // Arrange: Create a PDF with two text chunks on the same line with a small gap between them.
+        final float spacing = 2f; // A small horizontal gap in points.
+        byte[] pdfBytes = createPdfWithTwoHorizontallySpacedStrings(TEXT_CHUNK_1, TEXT_CHUNK_2, spacing);
+        PdfReader reader = new PdfReader(pdfBytes);
+        TextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+        String expectedText = TEXT_CHUNK_1 + " " + TEXT_CHUNK_2;
+
+        // Act: Extract text from the PDF page.
+        String actualText = PdfTextExtractor.getTextFromPage(reader, 1, strategy);
+
+        // Assert: The extracted text should contain a space between the two original chunks.
+        Assert.assertEquals(expectedText, actualText);
+    }
+
+    /**
+     * Creates a simple PDF document containing two strings of text written on the same
+     * horizontal line, separated by a specified spacing.
+     *
+     * @param text1   The first string to write.
+     * @param text2   The second string to write.
+     * @param spacing The horizontal space (in points) to leave between the two strings.
+     * @return A byte array representing the generated PDF file.
+     */
+    private byte[] createPdfWithTwoHorizontallySpacedStrings(String text1, String text2, float spacing)
+            throws DocumentException, IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            Document document = new Document();
+            PdfWriter writer = PdfWriter.getInstance(document, baos);
+            document.open();
+
+            PdfContentByte cb = writer.getDirectContent();
+            cb.beginText();
+            cb.setFontAndSize(BaseFont.createFont(), 12);
+            cb.moveText(100, 500); // Set starting position
+
+            // Write the first part of the text
+            cb.showText(text1);
+
+            // Move the text cursor horizontally to create a gap before the next word
+            cb.moveText(spacing, 0);
+
+            // Write the second part of the text
+            cb.showText(text2);
+
+            cb.endText();
+            document.close();
+            return baos.toByteArray();
+        }
     }
 }
