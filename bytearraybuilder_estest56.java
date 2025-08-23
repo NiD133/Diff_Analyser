@@ -1,23 +1,29 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest56 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on edge cases
+ * for its write operations.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byte[] byteArray0 = byteArrayBuilder0.completeAndCoalesce(500);
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.write(byteArray0, 500, 500);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that {@link ByteArrayBuilder#write(byte[], int, int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} when the specified offset and length
+     * would cause an access outside the bounds of the source array.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void write_whenSourceAccessIsOutOfBounds_shouldThrowException() {
+        // Arrange: Create a builder and a source byte array.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        byte[] sourceData = new byte[500];
+
+        // Act & Assert:
+        // Attempt to write 500 bytes starting from an offset of 500.
+        // This is invalid because it would require reading from indices 500 through 999
+        // of sourceData, which only has valid indices from 0 to 499.
+        // The write method is expected to detect this invalid access and throw.
+        builder.write(sourceData, 500, 500);
     }
 }
