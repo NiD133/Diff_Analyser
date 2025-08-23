@@ -1,59 +1,59 @@
 package com.fasterxml.jackson.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.io.ContentReference;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Unit tests for the {@link JsonLocation} class, focusing on the
+ * formatting of the source description.
+ */
 public class JsonLocationTestTest4 extends JUnit5TestBase {
 
-    private void _verifyContentDisabled(JsonParseException e) {
-        verifyException(e, "unrecognized token");
-        JsonLocation loc = e.getLocation();
-        assertNull(loc.contentReference().getRawContent());
-        assertThat(loc.sourceDescription()).startsWith("REDACTED");
+    /**
+     * Helper method to construct a {@link ContentReference} for a String source.
+     * This simplifies test setup by encapsulating the construction logic.
+     */
+    private ContentReference sourceReferenceFor(String text) {
+        return ContentReference.construct(
+                /* isTextual */ true,
+                text,
+                /* offset */ 0,
+                /* length */ text.length(),
+                ErrorReportConfiguration.defaults());
     }
 
-    private ContentReference _sourceRef(String rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length(), ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(char[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(byte[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(byte[] rawSrc, int offset, int length) {
-        return ContentReference.construct(true, rawSrc, offset, length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(InputStream rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(File rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _rawSourceRef(boolean textual, Object rawSrc) {
-        return ContentReference.rawReference(textual, rawSrc);
-    }
-
-    static class Foobar {
-    }
-
-    // for [jackson-core#658]
+    /**
+     * Tests that the {@link JsonLocation#sourceDescription()} method correctly
+     * escapes non-printable characters like TAB and NULL.
+     *
+     * @see <a href="https://github.com/FasterXML/jackson-core/issues/658">jackson-core#658</a>
+     */
     @Test
-    void escapeNonPrintable() throws Exception {
-        final String DOC = "[ \"tab:[\t]/null:[\0]\" ]";
-        JsonLocation loc = new JsonLocation(_sourceRef(DOC), 0L, 0L, -1, -1);
-        final String sourceDesc = loc.sourceDescription();
-        assertEquals(String.format("(String)\"[ \"tab:[%s]/null:[%s]\" ]\"", "\\u0009", "\\u0000"), sourceDesc);
+    void sourceDescriptionShouldEscapeNonPrintableCharacters() {
+        // Arrange
+        final String jsonWithNonPrintables = "[ \"tab:[\t]/null:[\0]\" ]";
+
+        // For this test, we only care about the content reference. The other location
+        // parameters (offsets, line/column numbers) are not relevant.
+        final JsonLocation location = new JsonLocation(
+                sourceReferenceFor(jsonWithNonPrintables),
+                /* totalBytes */ -1L,
+                /* totalChars */ -1L,
+                /* lineNr */ -1,
+                /* columnNr */ -1);
+
+        // Act
+        final String actualDescription = location.sourceDescription();
+
+        // Assert
+        // The expected description should be prefixed with the source type `(String)`,
+        // wrapped in quotes, and have non-printable characters (TAB, NULL)
+        // replaced with their Unicode escape sequences.
+        final String expectedDescription = String.format("(String)\"[ \"tab:[%s]/null:[%s]\" ]\"",
+                "\\u0009", "\\u0000");
+
+        assertThat(actualDescription).isEqualTo(expectedDescription);
     }
 }
