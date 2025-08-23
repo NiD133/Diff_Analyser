@@ -1,30 +1,40 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.io.StringWriter;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest2 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for {@link Entities}.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        MockPrintStream mockPrintStream0 = new MockPrintStream("regFX{u");
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(mockPrintStream0);
-        Entities.escape(quietAppendable0, "sup1$w1b#6@>wd6L", document_OutputSettings0, 88);
-        assertEquals(Document.OutputSettings.Syntax.html, document_OutputSettings0.syntax());
+    @Test
+    public void escapeWithHtmlSettingsShouldEscapeSpecialCharacters() {
+        // Arrange
+        String input = "Handles <, >, &, and \" characters";
+        String expectedOutput = "Handles &lt;, &gt;, &amp;, and &quot; characters";
+
+        StringWriter stringWriter = new StringWriter();
+        // The method under test requires a QuietAppendable, which wraps our StringWriter.
+        QuietAppendable appendable = new QuietAppendable(stringWriter);
+
+        Document.OutputSettings settings = new Document.OutputSettings();
+        // Explicitly set syntax to HTML for clarity, even though it's the default.
+        settings.syntax(Document.OutputSettings.Syntax.html);
+
+        // Act
+        // We call the escape method to write the escaped output into our appendable.
+        // The last argument 'options' is a package-private bitmask.
+        // 0 represents the default behavior for escaping text content.
+        Entities.escape(appendable, input, settings, 0);
+
+        // Assert
+        // 1. Verify the primary functionality: the string is correctly escaped.
+        assertEquals(expectedOutput, stringWriter.toString());
+
+        // 2. Verify the original test's intent: the settings object is not mutated.
+        assertEquals(Document.OutputSettings.Syntax.html, settings.syntax());
     }
 }
