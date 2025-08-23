@@ -1,35 +1,26 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest10 extends Elements_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test009() throws Throwable {
-        Elements elements0 = new Elements();
-        List<TextNode> list0 = elements0.textNodes();
-        assertTrue(list0.isEmpty());
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for the {@link Elements#textNodes()} method.
+ */
+public class ElementsTextNodesTest {
+
+    @Test
+    public void textNodesShouldReturnEmptyListWhenElementsIsEmpty() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act: Get the list of text nodes from the empty collection.
+        List<TextNode> textNodes = emptyElements.textNodes();
+
+        // Assert: Verify that the resulting list is empty.
+        assertTrue("Expected an empty list of text nodes for an empty Elements collection.", textNodes.isEmpty());
     }
 }
