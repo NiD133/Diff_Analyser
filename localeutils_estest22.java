@@ -1,21 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class LocaleUtils_ESTestTest22 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale("zh-CN");
-        assertNotNull(locale0);
-        assertEquals("zh_CN", locale0.toString());
+    /**
+     * Tests that toLocale() can correctly parse a locale string
+     * where the language and country codes are separated by a dash.
+     */
+    @Test
+    public void toLocale_shouldParseLocaleStringWithDashSeparator() {
+        // Arrange
+        final String localeString = "zh-CN";
+        final Locale expectedLocale = new Locale("zh", "CN");
+
+        // Act
+        final Locale actualLocale = LocaleUtils.toLocale(localeString);
+
+        // Assert
+        assertNotNull("The resulting locale should not be null", actualLocale);
+        assertEquals("The parsed locale should match the expected locale", expectedLocale, actualLocale);
+        
+        // Also verify the standard string representation, which uses an underscore
+        assertEquals("zh_CN", actualLocale.toString());
     }
 }
