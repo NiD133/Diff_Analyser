@@ -1,22 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest35 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class, focusing on the minutesBetween method.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        DateTimeFieldType[] dateTimeFieldTypeArray0 = new DateTimeFieldType[1];
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.year();
-        dateTimeFieldTypeArray0[0] = dateTimeFieldType0;
-        int[] intArray0 = new int[9];
-        Partial partial0 = new Partial((Chronology) null, dateTimeFieldTypeArray0, intArray0);
-        Minutes minutes0 = Minutes.minutesBetween((ReadablePartial) partial0, (ReadablePartial) partial0);
-        assertEquals(0, minutes0.getMinutes());
+    /**
+     * Tests that calculating the minutes between two identical ReadablePartial objects
+     * results in zero minutes.
+     */
+    @Test
+    public void minutesBetween_withIdenticalReadablePartials_returnsZero() {
+        // Arrange: Create a single ReadablePartial instance.
+        // Using LocalTime is a clear and concrete example of a ReadablePartial.
+        ReadablePartial samePartial = new LocalTime(10, 30);
+
+        // Act: Calculate the minutes between the partial and itself.
+        Minutes result = Minutes.minutesBetween(samePartial, samePartial);
+
+        // Assert: The result should be the constant for zero minutes.
+        assertEquals(Minutes.ZERO, result);
     }
 }
