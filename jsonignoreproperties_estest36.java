@@ -2,22 +2,28 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest36 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the {@link JsonIgnoreProperties.Value} class.
+ */
+// The original test extended a scaffolding class, which is omitted here for clarity
+// as it was not used in this specific test case.
+// Original class name: JsonIgnoreProperties_ESTestTest36
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.EMPTY;
-        Predicate<Object> predicate0 = Predicate.isEqual((Object) jsonIgnoreProperties_Value0);
-        boolean boolean0 = predicate0.test(jsonIgnoreProperties_Value0);
-        assertTrue(boolean0);
+    /**
+     * Tests the reflexivity property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void emptyValueShouldBeEqualToItself() {
+        // Arrange
+        // Get the singleton instance representing an empty configuration.
+        final JsonIgnoreProperties.Value emptyValue = JsonIgnoreProperties.Value.EMPTY;
+
+        // Act & Assert
+        // An object should always be equal to itself. This test verifies
+        // this basic property for the JsonIgnoreProperties.Value.EMPTY instance.
+        assertEquals("The EMPTY instance should be equal to itself.", emptyValue, emptyValue);
     }
 }
