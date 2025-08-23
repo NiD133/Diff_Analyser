@@ -2,29 +2,30 @@ package org.jfree.chart.entity;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
+
 import java.awt.Shape;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
 
-public class LegendItemEntity_ESTestTest5 extends LegendItemEntity_ESTest_scaffolding {
+/**
+ * Tests for the {@link LegendItemEntity} class.
+ */
+public class LegendItemEntityTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Line2D.Float line2D_Float0 = new Line2D.Float();
-        Rectangle2D rectangle2D0 = line2D_Float0.getBounds2D();
-        LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D0);
-        Object object0 = new Object();
-        boolean boolean0 = legendItemEntity0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing a LegendItemEntity
+     * with an object of a completely different type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange: Create a LegendItemEntity and a standard Java Object.
+        Shape area = new Rectangle2D.Double();
+        LegendItemEntity<String> legendItemEntity = new LegendItemEntity<>(area);
+        Object otherObject = new Object();
+
+        // Act: Compare the two objects for equality.
+        boolean isEqual = legendItemEntity.equals(otherObject);
+
+        // Assert: The result should be false, as they are different types.
+        assertFalse("A LegendItemEntity should not be equal to an object of a different class.", isEqual);
     }
 }
