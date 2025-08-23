@@ -1,52 +1,38 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class OrderedProperties_ESTestTest3 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests for {@link OrderedProperties}.
+ * This class focuses on specific behaviors of the OrderedProperties methods.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        orderedProperties0.setProperty("aMWow", "aMWow");
-        Object object0 = orderedProperties0.putIfAbsent("aMWow", "aMWow");
-        assertEquals("aMWow", object0);
+    /**
+     * Tests that putIfAbsent() returns the existing value and does not
+     * replace it when the key is already present in the properties.
+     */
+    @Test
+    public void putIfAbsent_shouldReturnExistingValue_whenKeyIsPresent() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final String key = "existing.key";
+        final String initialValue = "initial.value";
+        final String newValue = "new.value";
+
+        // Pre-populate the properties with an initial key-value pair.
+        properties.setProperty(key, initialValue);
+
+        // Act
+        // Attempt to put a new value for the same key.
+        final Object returnedValue = properties.putIfAbsent(key, newValue);
+
+        // Assert
+        // 1. The method should return the value that was already associated with the key.
+        assertEquals("putIfAbsent should return the existing value.", initialValue, returnedValue);
+
+        // 2. The original value for the key should remain unchanged.
+        assertEquals("The value for the key should not have been updated.", initialValue, properties.getProperty(key));
     }
 }
