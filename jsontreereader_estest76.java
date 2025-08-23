@@ -1,29 +1,33 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for {@link JsonTreeReader}.
+ * This class contains the refactored test case.
+ */
 public class JsonTreeReader_ESTestTest76 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test075() throws Throwable {
-        Long long0 = new Long((-1977L));
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(long0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        long long1 = jsonTreeReader0.nextLong();
-        assertEquals((-1977L), long1);
+    /**
+     * Verifies that {@link JsonTreeReader#nextLong()} correctly reads and returns
+     * the long value from a {@link JsonPrimitive} containing a number.
+     */
+    @Test
+    public void nextLong_whenReadingJsonPrimitiveNumber_returnsLongValue() throws IOException {
+        // Arrange
+        long expectedValue = -1977L;
+        JsonPrimitive jsonNumber = new JsonPrimitive(expectedValue);
+        JsonTreeReader reader = new JsonTreeReader(jsonNumber);
+
+        // Act
+        long actualValue = reader.nextLong();
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
