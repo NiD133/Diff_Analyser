@@ -1,47 +1,63 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest23 extends TestCase {
+/**
+ * Unit tests for the minus(Seconds) method in the Seconds class.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void minus_shouldReturnCorrectDifference() {
+        // Arrange
+        final Seconds twoSeconds = Seconds.seconds(2);
+        final Seconds threeSeconds = Seconds.seconds(3);
+        final int expectedDifference = -1;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        Seconds result = twoSeconds.minus(threeSeconds);
+
+        // Assert
+        assertEquals(expectedDifference, result.getSeconds());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
+    @Test
+    public void minus_shouldBeImmutable() {
+        // Arrange
+        final Seconds twoSeconds = Seconds.seconds(2);
+        final Seconds threeSeconds = Seconds.seconds(3);
+
+        // Act
+        twoSeconds.minus(threeSeconds);
+
+        // Assert
+        // Verify that the original instances were not modified.
+        assertEquals(2, twoSeconds.getSeconds());
+        assertEquals(3, threeSeconds.getSeconds());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void minus_shouldTreatNullAsZero() {
+        // Arrange
+        final Seconds oneSecond = Seconds.ONE;
+
+        // Act
+        // Per the method's contract, subtracting null is the same as subtracting zero.
+        Seconds result = oneSecond.minus((Seconds) null);
+
+        // Assert
+        assertEquals(1, result.getSeconds());
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test(expected = ArithmeticException.class)
+    public void minus_shouldThrowExceptionOnOverflow() {
+        // Arrange
+        final Seconds min = Seconds.MIN_VALUE;
+        final Seconds one = Seconds.ONE;
 
-    public void testMinus_Seconds() {
-        Seconds test2 = Seconds.seconds(2);
-        Seconds test3 = Seconds.seconds(3);
-        Seconds result = test2.minus(test3);
-        assertEquals(2, test2.getSeconds());
-        assertEquals(3, test3.getSeconds());
-        assertEquals(-1, result.getSeconds());
-        assertEquals(1, Seconds.ONE.minus(Seconds.ZERO).getSeconds());
-        assertEquals(1, Seconds.ONE.minus((Seconds) null).getSeconds());
-        try {
-            Seconds.MIN_VALUE.minus(Seconds.ONE);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act
+        // This operation (Integer.MIN_VALUE - 1) should cause an overflow.
+        min.minus(one);
     }
 }
