@@ -1,22 +1,27 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest16 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber((String) null);
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.floatValue();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that calling {@link LazilyParsedNumber#floatValue()} on an instance
+     * created with a {@code null} string throws a {@link NullPointerException}.
+     *
+     * <p>Although the constructor's Javadoc states the input string must not be null,
+     * this test verifies the actual behavior where the NullPointerException is deferred
+     * until a conversion method is called.
+     */
+    @Test(expected = NullPointerException.class)
+    public void floatValue_whenConstructedWithNull_throwsNullPointerException() {
+        // Arrange: Create a LazilyParsedNumber with a null internal value.
+        LazilyParsedNumber number = new LazilyParsedNumber(null);
+
+        // Act & Assert: Attempting to get the float value should throw a NullPointerException.
+        // The assertion is handled by the `expected` attribute of the @Test annotation.
+        number.floatValue();
     }
 }
