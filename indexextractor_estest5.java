@@ -1,25 +1,31 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IndexExtractor_ESTestTest5 extends IndexExtractor_ESTest_scaffolding {
+/**
+ * Tests for the static factory methods in the {@link IndexExtractor} interface.
+ */
+public class IndexExtractorTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that the {@code fromBitMapExtractor} factory method throws a
+     * NullPointerException when its argument is null. This ensures the method
+     * correctly handles invalid input.
+     */
+    @Test
+    public void fromBitMapExtractorShouldThrowNullPointerExceptionForNullInput() {
         try {
-            IndexExtractor.fromBitMapExtractor((BitMapExtractor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // bitMapExtractor
-            //
-            verifyException("java.util.Objects", e);
+            // Act: Attempt to create an IndexExtractor from a null BitMapExtractor.
+            IndexExtractor.fromBitMapExtractor(null);
+            fail("A NullPointerException was expected but not thrown.");
+        } catch (final NullPointerException e) {
+            // Assert: Verify that the exception message is as expected.
+            // This confirms that the null check is specific to the 'bitMapExtractor' parameter,
+            // which is a common practice when using java.util.Objects.requireNonNull.
+            assertEquals("bitMapExtractor", e.getMessage());
         }
     }
 }
