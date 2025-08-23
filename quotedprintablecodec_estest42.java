@@ -1,30 +1,32 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest42 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
+
+    @Test
+    public void decodeObjectWithUnsupportedTypeShouldThrowDecoderException() {
+        // Arrange: Create a codec and an object of a type that cannot be decoded.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final Object unsupportedObject = new QuotedPrintableCodec(); // Any object other than String or byte[]
+
+        // Act & Assert: Verify that attempting to decode the unsupported object throws a DecoderException.
         try {
-            quotedPrintableCodec0.decode((Object) quotedPrintableCodec0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Objects of type org.apache.commons.codec.net.QuotedPrintableCodec cannot be quoted-printable decoded
-            //
-            verifyException("org.apache.commons.codec.net.QuotedPrintableCodec", e);
+            codec.decode(unsupportedObject);
+            fail("Expected a DecoderException to be thrown for an unsupported object type.");
+        } catch (final DecoderException e) {
+            // Verify the exception message is correct and informative.
+            final String expectedMessage = "Objects of type " +
+                    unsupportedObject.getClass().getName() +
+                    " cannot be quoted-printable decoded";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
