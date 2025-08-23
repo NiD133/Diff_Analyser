@@ -1,25 +1,20 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest13 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class, focusing on edge cases and invalid inputs.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash64((byte[]) null, (-420));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that hash64() throws a NullPointerException when the input data array is null.
+     * The behavior is expected regardless of the provided length parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void hash64ShouldThrowNullPointerExceptionForNullData() {
+        // The length parameter is arbitrary; the method should fail on the null array first.
+        final int irrelevantLength = 10;
+        MurmurHash2.hash64(null, irrelevantLength);
     }
 }
