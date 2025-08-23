@@ -1,30 +1,26 @@
 package org.apache.commons.lang3.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ConstructorUtils_ESTestTest12 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link ConstructorUtils}.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        // Undeclared exception!
+    @Test
+    public void getAccessibleConstructor_withNullConstructor_shouldThrowNullPointerException() {
         try {
-            ConstructorUtils.getAccessibleConstructor((Constructor<Integer>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // ctor
-            //
-            verifyException("java.util.Objects", e);
+            // The method under test is called with a null argument.
+            ConstructorUtils.getAccessibleConstructor((Constructor<Object>) null);
+            fail("Expected a NullPointerException to be thrown, but nothing was thrown.");
+        } catch (final NullPointerException e) {
+            // Verify that the exception has the expected message.
+            // This is the message produced by Objects.requireNonNull(ctor, "ctor").
+            assertEquals("ctor", e.getMessage());
         }
     }
 }
