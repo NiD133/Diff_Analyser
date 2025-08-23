@@ -1,30 +1,28 @@
 package com.google.common.reflect;
 
+import java.lang.reflect.Method;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Parameter_ESTestTest3 extends Parameter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 1296, (TypeToken<?>) null, annotationArray0, (Object) null);
-        // Undeclared exception!
-        try {
-            parameter0.isAnnotationPresent((Class<? extends Annotation>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /** A simple fixture class to obtain a real method and parameter for testing. */
+    private static class MethodFixture {
+        @SuppressWarnings("unused") // This method is used via reflection.
+        void sampleMethod(String aParameter) {}
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void isAnnotationPresent_whenAnnotationTypeIsNull_throwsNullPointerException() throws Exception {
+        // Arrange: Create a valid Parameter instance from a real method.
+        Method method = MethodFixture.class.getDeclaredMethod("sampleMethod", String.class);
+        Invokable<?, ?> invokable = Invokable.from(method);
+        Parameter parameter = invokable.getParameters().get(0);
+
+        // Act: Call the method under test with a null argument.
+        // The @Test(expected) annotation handles the assertion.
+        parameter.isAnnotationPresent(null);
     }
 }
