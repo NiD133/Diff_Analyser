@@ -1,48 +1,29 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertThrows;
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest33 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream}.
+ * This test focuses on constructor behavior with invalid arguments.
+ */
+public class ObservableInputStream_ESTestTest33 { // Note: In a real project, this class would be renamed and merged.
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        ObservableInputStream observableInputStream0 = new ObservableInputStream((InputStream) null);
-        ObservableInputStream observableInputStream1 = null;
-        try {
-            observableInputStream1 = new ObservableInputStream(observableInputStream0, (ObservableInputStream.Observer[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the constructor {@code ObservableInputStream(InputStream, Observer...)}
+     * throws a NullPointerException if the provided observer array is null.
+     */
+    @Test
+    public void constructorWithNullObserverArrayShouldThrowNullPointerException() {
+        // Arrange: Create a non-null dummy input stream, as the constructor requires one.
+        final InputStream dummyInputStream = new ByteArrayInputStream(new byte[0]);
+
+        // Act & Assert: Verify that instantiating with a null observer array throws NullPointerException.
+        // The cast to (Observer[]) is necessary to resolve ambiguity for the varargs parameter.
+        assertThrows(NullPointerException.class, () ->
+                new ObservableInputStream(dummyInputStream, (ObservableInputStream.Observer[]) null)
+        );
     }
 }
