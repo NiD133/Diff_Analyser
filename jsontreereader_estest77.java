@@ -1,31 +1,35 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest77 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * This class contains tests for the JsonTreeReader.
+ * This specific test focuses on the promoteNameToValue() method.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test076() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        jsonObject0.addProperty("5", "5");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        jsonTreeReader0.promoteNameToValue();
-        double double0 = jsonTreeReader0.nextDouble();
-        assertEquals(5.0, double0, 0.01);
+    @Test
+    public void promoteNameToValue_whenNameIsNumericString_canBeReadAsDouble() throws IOException {
+        // Arrange
+        // Create a JSON object {"5": "value"}. We want to test if the name "5" can be
+        // promoted to a value and then parsed as a number. The actual property value is irrelevant.
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("5", "this value is ignored");
+        JsonTreeReader reader = new JsonTreeReader(jsonObject);
+
+        reader.beginObject(); // Position the reader after the opening '{'
+
+        // Act
+        // Instead of reading the name "5" with nextName(), we promote it to a value.
+        reader.promoteNameToValue();
+        // Now, we attempt to read that promoted value as a double.
+        double actualDouble = reader.nextDouble();
+
+        // Assert
+        double expectedDouble = 5.0;
+        assertEquals("The promoted name '5' should be correctly parsed as a double.", expectedDouble, actualDouble, 0.01);
     }
 }
