@@ -1,19 +1,62 @@
 package org.apache.commons.codec.language;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest12 extends Metaphone_ESTest_scaffolding {
+/**
+ * Tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("S9B]_aD^");
-        //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
-        //  // Unstable assertion: assertEquals("XBT", string0);
+    private Metaphone metaphone;
+
+    @Before
+    public void setUp() {
+        metaphone = new Metaphone();
+    }
+
+    /**
+     * Tests that the metaphone algorithm correctly processes a string containing
+     * non-alphabetic characters by ignoring them.
+     */
+    @Test
+    public void metaphoneShouldIgnoreNonAlphabeticCharacters() {
+        // Arrange
+        // The Metaphone algorithm is defined for alphabetic characters. This test
+        // verifies that numbers and symbols in the input string are stripped out
+        // before encoding.
+        // Input "S9B]_aD^" is sanitized to "SBAD".
+        final String inputWithNonAlphabetics = "S9B]_aD^";
+
+        // The expected code for "SBAD" is "SBT":
+        // S -> S
+        // B -> B
+        // A -> (vowel after first letter, ignored)
+        // D -> T
+        final String expectedCode = "SBT";
+
+        // Act
+        final String actualCode = metaphone.metaphone(inputWithNonAlphabetics);
+
+        // Assert
+        assertEquals("The metaphone code should be generated from only the alphabetic characters.",
+                     expectedCode, actualCode);
+    }
+
+    /**
+     * Tests that a new Metaphone instance has the correct default maximum code length.
+     */
+    @Test
+    public void shouldHaveDefaultMaxCodeLengthOfFour() {
+        // Arrange
+        final int expectedMaxCodeLen = 4;
+
+        // Act
+        final int actualMaxCodeLen = metaphone.getMaxCodeLen();
+
+        // Assert
+        assertEquals("Default max code length should be 4.",
+                     expectedMaxCodeLen, actualMaxCodeLen);
     }
 }
