@@ -1,51 +1,38 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+import org.junit.jupiter.api.Test;
 import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest22 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        // Undeclared exception!
-        try {
-            symmetry454Chronology0.eraOf((-334));
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid era: -334
-            //
-            verifyException("java.time.chrono.IsoEra", e);
-        }
+/**
+ * Unit tests for the {@link Symmetry454Chronology} class.
+ */
+class Symmetry454ChronologyTest {
+
+    /**
+     * Tests that calling {@code eraOf(int)} with an invalid integer value
+     * throws a {@code DateTimeException}.
+     * <p>
+     * The Symmetry454Chronology uses the same eras as the ISO calendar system (IsoEra),
+     * which only defines eras for the values 0 (BCE) and 1 (CE). Any other value is invalid.
+     */
+    @Test
+    void eraOf_shouldThrowException_forInvalidEraValue() {
+        // Arrange: Get an instance of the chronology and define an invalid era value.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        int invalidEraValue = -334;
+        String expectedErrorMessage = "Invalid era: " + invalidEraValue;
+
+        // Act & Assert: Verify that calling eraOf() with the invalid value throws the correct exception.
+        DateTimeException thrown = assertThrows(
+                DateTimeException.class,
+                () -> chronology.eraOf(invalidEraValue),
+                "Symmetry454Chronology.eraOf() should throw for an invalid era value."
+        );
+
+        // Further Assert: Check that the exception message is as expected.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
