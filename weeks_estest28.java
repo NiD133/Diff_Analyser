@@ -1,25 +1,31 @@
 package org.joda.time;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class Weeks_ESTestTest28 extends Weeks_ESTest_scaffolding {
+import static org.hamcrest.CoreMatchers.is;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        // Undeclared exception!
-        try {
-            Weeks.weeksBetween((ReadablePartial) null, (ReadablePartial) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // ReadablePartial objects must not be null
-            //
-            verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
-        }
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that weeksBetween() throws an IllegalArgumentException when both
+     * start and end ReadablePartial arguments are null.
+     */
+    @Test
+    public void weeksBetween_withNullReadablePartials_throwsIllegalArgumentException() {
+        // Arrange: Define the expected exception type and message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(is("ReadablePartial objects must not be null"));
+
+        // Act: Call the method under test with null arguments.
+        // This call is expected to throw the exception defined above.
+        Weeks.weeksBetween((ReadablePartial) null, (ReadablePartial) null);
     }
 }
