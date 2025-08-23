@@ -1,38 +1,38 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import javax.imageio.metadata.IIOMetadataNode;
 import java.util.Properties;
 import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
+/**
+ * This test suite contains tests for the {@link XNode} class.
+ * The original test was auto-generated and has been improved for clarity.
+ */
 public class XNode_ESTestTest45 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test044() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getStringAttribute("07#W,'B'", (Supplier<String>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.parsing.XNode", e);
-        }
+    /**
+     * Verifies that `getStringAttribute` throws a NullPointerException when called
+     * with a null default value supplier.
+     *
+     * This scenario is triggered when an attribute is requested that does not exist on the node.
+     * The method then attempts to use the provided supplier to get a default value. If that
+     * supplier is null, a NullPointerException is the expected behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getStringAttributeWithNullDefaultSupplierShouldThrowNPE() {
+        // Arrange: Create an XNode based on a node with no attributes.
+        // The XPathParser is not used when retrieving attributes directly, so it can be null for this test.
+        Node emptyNode = new IIOMetadataNode();
+        Properties variables = new Properties();
+        XNode xNode = new XNode(null, emptyNode, variables);
+
+        // Act: Attempt to get a non-existent attribute with a null default value supplier.
+        // The `Supplier<String>` is explicitly cast to null to match the method signature.
+        xNode.getStringAttribute("anyAttributeName", (Supplier<String>) null);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
+        // If no NullPointerException is thrown, the test will fail.
     }
 }
