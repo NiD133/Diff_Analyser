@@ -1,36 +1,43 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GroupedRandomAccessSource_ESTestTest15 extends GroupedRandomAccessSource_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-        byte[] byteArray0 = new byte[10];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        groupedRandomAccessSource0.close();
-        // Undeclared exception!
+/**
+ * Test suite for {@link GroupedRandomAccessSource}.
+ * This class contains the refactored test case.
+ */
+// The original test class extended an EvoSuite scaffolding class. 
+// This has been removed for clarity and to promote standard testing practices.
+public class GroupedRandomAccessSourceTest {
+
+    /**
+     * Verifies that attempting to read from a GroupedRandomAccessSource after it has been closed
+     * throws an IllegalStateException.
+     */
+    @Test
+    public void get_whenSourceIsClosed_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a GroupedRandomAccessSource from two distinct underlying sources.
+        RandomAccessSource source1 = new ArrayRandomAccessSource(new byte[10]);
+        RandomAccessSource source2 = new ArrayRandomAccessSource(new byte[10]);
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(new RandomAccessSource[]{source1, source2});
+
+        // Act: Close the source before attempting to read from it.
+        groupedSource.close();
+
+        // Assert: An attempt to read from the closed source should fail.
         try {
-            groupedRandomAccessSource0.get(10L);
-            fail("Expecting exception: IllegalStateException");
+            // Attempt to read at an offset that falls within the second underlying source.
+            groupedSource.get(10L);
+            fail("Expected an IllegalStateException because the source is closed, but no exception was thrown.");
         } catch (IllegalStateException e) {
-            //
-            // Already closed
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
+            // Verify that the correct exception was thrown.
+            // The underlying ArrayRandomAccessSource is responsible for throwing this exception.
+            assertEquals("Already closed", e.getMessage());
         }
     }
 }
