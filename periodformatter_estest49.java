@@ -1,45 +1,33 @@
 package org.joda.time.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
 import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
 import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.Writer;
+
+/**
+ * This test class contains tests for the PeriodFormatter class.
+ * This specific test focuses on the behavior of the printTo() method.
+ */
 public class PeriodFormatter_ESTestTest49 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        // Undeclared exception!
-        try {
-            periodFormatter0.printTo((Writer) null, (ReadablePeriod) weeks0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.format.PeriodFormatterBuilder$Literal", e);
-        }
+    /**
+     * Verifies that calling printTo() with a null Writer throws a NullPointerException.
+     * The formatter's internal printer is responsible for this null check.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testPrintTo_withNullWriter_throwsNullPointerException() {
+        // Arrange: Create a basic formatter. The actual printing logic is not important,
+        // as the exception should be thrown before any printing occurs.
+        PeriodFormatterBuilder.Literal emptyPrinterParser = PeriodFormatterBuilder.Literal.EMPTY;
+        PeriodFormatter formatter = new PeriodFormatter(emptyPrinterParser, emptyPrinterParser);
+
+        // A simple, non-null period is needed to satisfy the method signature.
+        ReadablePeriod anyPeriod = Period.ZERO;
+
+        // Act & Assert: Attempting to print to a null writer should throw.
+        // The @Test(expected=...) annotation handles the assertion.
+        formatter.printTo((Writer) null, anyPeriod);
     }
 }
