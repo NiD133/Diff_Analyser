@@ -1,25 +1,28 @@
 package org.apache.commons.jxpath.util;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class ClassLoaderUtil_ESTestTest1 extends ClassLoaderUtil_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ClassLoaderUtil}.
+ */
+public class ClassLoaderUtilTest {
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        // Undeclared exception!
-        try {
-            ClassLoaderUtil.getClass((String) null, false);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // className
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that getClass() throws a NullPointerException when the class name is null.
+     */
+    @Test
+    public void getClass_withNullClassName_throwsNullPointerException() {
+        // Arrange: We expect a NullPointerException with a specific message.
+        // This is a standard check, often implemented with Objects.requireNonNull(className, "className").
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("className");
+
+        // Act: Call the method under test with a null class name.
+        ClassLoaderUtil.getClass(null, false);
     }
 }
