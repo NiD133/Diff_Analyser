@@ -1,79 +1,44 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import org.junit.Test;
 
-public class GregorianChronologyTestTest4 extends TestCase {
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+/**
+ * Unit tests for the factory method {@link GregorianChronology#getInstance(DateTimeZone, int)}.
+ */
+public class GregorianChronology_GetInstanceWithZoneAndMinDaysTest {
 
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    @Test
+    public void shouldReturnChronologyWithCorrectProperties() {
+        // Arrange
+        final int minDaysInFirstWeek = 2;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
+        // Act
+        GregorianChronology chrono = GregorianChronology.getInstance(TOKYO, minDaysInFirstWeek);
 
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert
+        assertEquals("The time zone should match the one provided.", TOKYO, chrono.getZone());
+        assertEquals("The minimum days in the first week should match the one provided.",
+                minDaysInFirstWeek, chrono.getMinimumDaysInFirstWeek());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenMinDaysIsLessThanOne() {
+        // The valid range for minimum days in the first week is 1 to 7.
+        // This test verifies the lower bound by passing 0.
+        final int invalidMinDays = 0;
+        GregorianChronology.getInstance(TOKYO, invalidMinDays);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testFactory_Zone_int() {
-        GregorianChronology chrono = GregorianChronology.getInstance(TOKYO, 2);
-        assertEquals(TOKYO, chrono.getZone());
-        assertEquals(2, chrono.getMinimumDaysInFirstWeek());
-        try {
-            GregorianChronology.getInstance(TOKYO, 0);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
-        try {
-            GregorianChronology.getInstance(TOKYO, 8);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenMinDaysIsGreaterThanSeven() {
+        // The valid range for minimum days in the first week is 1 to 7.
+        // This test verifies the upper bound by passing 8.
+        final int invalidMinDays = 8;
+        GregorianChronology.getInstance(TOKYO, invalidMinDays);
     }
 }
