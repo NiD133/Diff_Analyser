@@ -1,41 +1,38 @@
 package org.jsoup.nodes;
 
+import org.jsoup.internal.QuietAppendable;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
+
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.fail;
+
+// The original test class name and hierarchy are preserved.
 public class Attribute_ESTestTest20 extends Attribute_ESTest_scaffolding {
 
+    /**
+     * Verifies that writing an attribute's HTML to an Appendable that is too small
+     * correctly throws a BufferOverflowException.
+     */
     @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Attribute attribute0 = new Attribute("v7JC~OF}qK`", "v7JC~OF}qK`");
-        char[] charArray0 = new char[6];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(charBuffer0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
+    public void htmlShouldThrowBufferOverflowWhenAppendableIsTooSmall() {
+        // Arrange
+        // The HTML representation will be `key="value"`, which is 13 characters long.
+        Attribute attribute = new Attribute("key", "value");
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+
+        // Create a buffer that is intentionally too small to hold the attribute's HTML.
+        final int bufferSize = 10;
+        CharBuffer smallBuffer = CharBuffer.allocate(bufferSize);
+        QuietAppendable appendable = QuietAppendable.wrap(smallBuffer);
+
+        // Act & Assert
         try {
-            attribute0.html(quietAppendable0, document_OutputSettings0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
+            attribute.html(appendable, outputSettings);
+            fail("Expected a BufferOverflowException because the buffer is too small, but none was thrown.");
+        } catch (BufferOverflowException expected) {
+            // This is the expected behavior, so the test passes.
         }
     }
 }
