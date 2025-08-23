@@ -1,22 +1,27 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SeekableInMemoryByteChannel_ESTestTest20 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SeekableInMemoryByteChannel} class.
+ * This class focuses on verifying the behavior of the channel's open state.
+ */
+public class SeekableInMemoryByteChannel_ESTestTest20 {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(1);
-        boolean boolean0 = seekableInMemoryByteChannel0.isOpen();
-        assertTrue(boolean0);
+    /**
+     * Verifies that a newly created SeekableInMemoryByteChannel is in an open state by default.
+     */
+    @Test
+    public void newChannelShouldBeOpen() {
+        // Arrange: Create a new instance of the channel. The initial capacity is not
+        // relevant to this test, so a small value is used.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel(1);
+
+        // Act: The action is implicitly the channel's state after creation.
+        // We will directly assert on the result of isOpen().
+
+        // Assert: The channel should report that it is open.
+        assertTrue("A new channel should be open immediately after creation.", channel.isOpen());
     }
 }
