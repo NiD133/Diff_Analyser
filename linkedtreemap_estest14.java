@@ -2,26 +2,27 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest14 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Contains tests for the internal {@link LinkedTreeMap#find(Object, boolean)} method.
+ */
+public class LinkedTreeMapFindTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap0 = new LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer>(true);
-        LinkedTreeMap<Integer, Integer> linkedTreeMap1 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap0.find(linkedTreeMap1, false);
-        assertEquals(0, linkedTreeMap1.size());
-        assertEquals(0, linkedTreeMap0.size());
+    /**
+     * Verifies that calling find(key, false) on an empty map does not
+     * create a new node or modify the map in any way.
+     */
+    @Test
+    public void findWithCreateFalse_onEmptyMap_shouldNotAddNode() {
+        // Arrange: Create an empty LinkedTreeMap.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+        String keyToFind = "some_key";
+
+        // Act: Attempt to find a key without creating a new node if it's absent.
+        LinkedTreeMap.Node<String, Integer> foundNode = map.find(keyToFind, false);
+
+        // Assert: Verify that the map remains empty and the method returns null.
+        assertNull("find() should return null for a non-existent key when create is false.", foundNode);
+        assertTrue("The map should remain empty after the find operation.", map.isEmpty());
     }
 }
