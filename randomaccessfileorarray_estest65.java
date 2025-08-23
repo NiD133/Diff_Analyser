@@ -1,39 +1,25 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import org.junit.Test;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+// Note: The original test class name and inheritance are kept to match the context.
+// In a real-world scenario, renaming "RandomAccessFileOrArray_ESTestTest65" to something
+// more meaningful like "RandomAccessFileOrArrayTest" would be advisable.
 public class RandomAccessFileOrArray_ESTestTest65 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test064() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readUnsignedInt();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray instance
+     * initialized with a null source throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readUnsignedInt_whenSourceIsNull_throwsNullPointerException() throws IOException {
+        // Arrange: Create an instance with a null underlying source.
+        RandomAccessFileOrArray randomAccessFileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act: Attempt to read from the null source.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        randomAccessFileOrArray.readUnsignedInt();
     }
 }
