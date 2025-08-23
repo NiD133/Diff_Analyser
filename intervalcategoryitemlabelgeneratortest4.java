@@ -1,21 +1,28 @@
 package org.jfree.chart.labels;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class IntervalCategoryItemLabelGeneratorTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Tests for the {@link IntervalCategoryItemLabelGenerator} class.
+ */
+class IntervalCategoryItemLabelGeneratorTest {
 
     /**
-     * Check to ensure that this class implements PublicCloneable.
+     * Verifies that IntervalCategoryItemLabelGenerator implements PublicCloneable,
+     * which is essential for the chart's cloning mechanism.
      */
     @Test
-    public void testPublicCloneable() {
-        IntervalCategoryItemLabelGenerator g1 = new IntervalCategoryItemLabelGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+    @DisplayName("Should implement the PublicCloneable interface")
+    void shouldImplementPublicCloneable() {
+        // Arrange
+        IntervalCategoryItemLabelGenerator generator = new IntervalCategoryItemLabelGenerator();
+
+        // Act & Assert
+        assertTrue(generator instanceof PublicCloneable,
+                "An instance of IntervalCategoryItemLabelGenerator should also be an instance of PublicCloneable.");
     }
 }
