@@ -1,94 +1,75 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeZone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Locale;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
 
-public class ISOChronologyTestTest4 extends TestCase {
+import static org.junit.Assert.assertSame;
 
+/**
+ * Tests the factory methods of {@link ISOChronology}, focusing on instance caching.
+ * It verifies that {@code getInstance()} returns the same, cached instance for a given time zone.
+ */
+public class ISOChronologyGetInstanceTest {
+
+    // Time zone constants used for testing
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    // Fields to store and restore the original system default settings
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestISOChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+    @Before
+    public void setUp() {
+        // Save original default settings to ensure tests are isolated
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+
+        // Set a known default time zone for predictable test results
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London")); // For java.util.TimeZone
         Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
+    @After
+    public void tearDown() {
+        // Restore original default settings to avoid side-effects on other tests
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    private void testAdd(String start, DurationFieldType type, int amt, String end) {
-        DateTime dtStart = new DateTime(start, ISOChronology.getInstanceUTC());
-        DateTime dtEnd = new DateTime(end, ISOChronology.getInstanceUTC());
-        assertEquals(dtEnd, dtStart.withFieldAdded(type, amt));
-        assertEquals(dtStart, dtEnd.withFieldAdded(type, -amt));
-        DurationField field = type.getField(ISOChronology.getInstanceUTC());
-        int diff = field.getDifference(dtEnd.getMillis(), dtStart.getMillis());
-        assertEquals(amt, diff);
-        if (type == DurationFieldType.years() || type == DurationFieldType.months() || type == DurationFieldType.days()) {
-            YearMonthDay ymdStart = new YearMonthDay(start, ISOChronology.getInstanceUTC());
-            YearMonthDay ymdEnd = new YearMonthDay(end, ISOChronology.getInstanceUTC());
-            assertEquals(ymdEnd, ymdStart.withFieldAdded(type, amt));
-            assertEquals(ymdStart, ymdEnd.withFieldAdded(type, -amt));
-        }
+    @Test
+    public void getInstance_withExplicitZone_shouldReturnCachedInstance() {
+        // Verifies that getInstance(DateTimeZone) returns the same singleton instance
+        // for the same time zone, demonstrating that instances are cached.
+
+        // Test with specific time zones
+        assertSame("Instances for TOKYO should be cached",
+                ISOChronology.getInstance(TOKYO), ISOChronology.getInstance(TOKYO));
+        assertSame("Instances for LONDON should be cached",
+                ISOChronology.getInstance(LONDON), ISOChronology.getInstance(LONDON));
+        assertSame("Instances for PARIS should be cached",
+                ISOChronology.getInstance(PARIS), ISOChronology.getInstance(PARIS));
+
+        // Test with UTC, which has a dedicated factory method
+        assertSame("Instances for UTC should be cached",
+                ISOChronology.getInstanceUTC(), ISOChronology.getInstanceUTC());
     }
 
-    //-----------------------------------------------------------------------
-    public void testEquality() {
-        assertSame(ISOChronology.getInstance(TOKYO), ISOChronology.getInstance(TOKYO));
-        assertSame(ISOChronology.getInstance(LONDON), ISOChronology.getInstance(LONDON));
-        assertSame(ISOChronology.getInstance(PARIS), ISOChronology.getInstance(PARIS));
-        assertSame(ISOChronology.getInstanceUTC(), ISOChronology.getInstanceUTC());
-        assertSame(ISOChronology.getInstance(), ISOChronology.getInstance(LONDON));
+    @Test
+    public void getInstance_withDefaultZone_shouldReturnCorrectCachedInstance() {
+        // Verifies that the no-argument getInstance() returns the instance for the default time zone.
+        // This test relies on the default zone being set to LONDON in the setUp() method.
+        assertSame("getInstance() should return the instance for the default zone (LONDON)",
+                ISOChronology.getInstance(), ISOChronology.getInstance(LONDON));
     }
 }
