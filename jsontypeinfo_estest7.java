@@ -1,20 +1,27 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTypeInfo_ESTestTest7 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTypeInfo.Value} class, focusing on its equality contract.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.EMPTY;
-        boolean boolean0 = jsonTypeInfo_Value0.equals("EXTERNAL_PROPERTY");
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a JsonTypeInfo.Value
+     * instance is compared with an object of a different, incompatible type.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenComparedWithDifferentType() {
+        // Arrange
+        JsonTypeInfo.Value value = JsonTypeInfo.Value.EMPTY;
+        Object otherObject = "a random string"; // An object of a different type
+
+        // Act
+        boolean result = value.equals(otherObject);
+
+        // Assert
+        assertFalse("equals() must return false for objects of different types.", result);
     }
 }
