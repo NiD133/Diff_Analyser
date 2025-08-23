@@ -1,37 +1,30 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JsonTreeReader_ESTestTest87 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+// The original class name "JsonTreeReader_ESTestTest87" was renamed for clarity.
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test086() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.close();
-        // Undeclared exception!
+    @Test
+    public void hasNext_whenReaderIsClosed_throwsIllegalStateException() throws IOException {
+        // Arrange
+        JsonArray emptyJsonArray = new JsonArray();
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(emptyJsonArray);
+        jsonTreeReader.close();
+
+        // Act & Assert
         try {
-            jsonTreeReader0.hasNext();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // JsonReader is closed
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            jsonTreeReader.hasNext();
+            fail("Expected an IllegalStateException because the reader is closed.");
+        } catch (IllegalStateException expected) {
+            assertEquals("JsonReader is closed", expected.getMessage());
         }
     }
 }
