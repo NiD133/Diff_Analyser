@@ -1,29 +1,31 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest10 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Tests for BlockingCache to ensure it handles various scenarios correctly.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        BlockingCache blockingCache0 = new BlockingCache((Cache) null);
-        // Undeclared exception!
-        try {
-            blockingCache0.removeObject((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.concurrent.ConcurrentHashMap", e);
-        }
+    /**
+     * The removeObject method should not accept a null key, as the underlying
+     * collections do not support it. This test verifies that attempting to do so
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenRemovingNullKey() {
+        // Arrange
+        // Use a real cache implementation as the delegate for a realistic setup.
+        Cache delegate = new PerpetualCache("test-delegate-cache");
+        BlockingCache blockingCache = new BlockingCache(delegate);
+
+        // Act
+        // Attempting to remove an object with a null key should fail fast.
+        blockingCache.removeObject(null);
+
+        // Assert
+        // The test expects a NullPointerException, as declared in the @Test annotation.
     }
 }
