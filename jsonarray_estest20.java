@@ -1,24 +1,28 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest20 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Float float0 = new Float(0.0);
-        jsonArray0.add((Number) float0);
-        byte byte0 = jsonArray0.getAsByte();
-        assertEquals((byte) 0, byte0);
+    /**
+     * Tests that {@link JsonArray#getAsByte()} correctly returns the byte representation
+     * when the array contains a single element that is a floating-point number.
+     */
+    @Test
+    public void getAsByte_whenArrayContainsSingleFloat_shouldReturnCorrespondingByte() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(0.0f); // Add a float that can be safely converted to a byte
+
+        // Act
+        byte actualByte = jsonArray.getAsByte();
+
+        // Assert
+        byte expectedByte = 0;
+        assertEquals(expectedByte, actualByte);
     }
 }
