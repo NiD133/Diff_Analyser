@@ -1,30 +1,32 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+// The test class name and inheritance are kept from the original to maintain context.
+// In a real-world scenario, these might also be renamed for clarity.
 public class RandomAccessFileMode_ESTestTest4 extends RandomAccessFileMode_ESTest_scaffolding {
 
+    /**
+     * Tests that calling the io() method with a read-write mode on a non-existent
+     * file path results in the creation of a new, empty file.
+     */
     @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-        IORandomAccessFile iORandomAccessFile0 = randomAccessFileMode0.io(".4");
-        assertEquals(0L, iORandomAccessFile0.length());
+    public void ioWithReadWriteModeShouldCreateNewEmptyFile() throws IOException {
+        // Arrange: Set up the test conditions.
+        // We use a read-write mode that should create a file if it doesn't exist.
+        final RandomAccessFileMode readWriteMode = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+        final String nonExistentFileName = "new_file.txt";
+        // The test environment is expected to provide a clean directory, so this file
+        // should not exist before the 'Act' phase.
+
+        // Act: Execute the method under test.
+        // Using try-with-resources ensures the file is closed automatically after the test.
+        try (IORandomAccessFile newFile = readWriteMode.io(nonExistentFileName)) {
+            // Assert: Verify the outcome.
+            // A newly created file should have a length of zero.
+            assertEquals("A newly created file should be empty.", 0L, newFile.length());
+        }
     }
 }
