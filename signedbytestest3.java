@@ -1,68 +1,42 @@
 package com.google.common.primitives;
 
-import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest3 extends TestCase {
-
-    private static final byte[] EMPTY = {};
-
-    private static final byte[] ARRAY1 = { (byte) 1 };
+/**
+ * Tests for {@link SignedBytes#compare(byte, byte)}.
+ *
+ * <p>This test focuses on verifying that {@code SignedBytes.compare()} behaves identically to the
+ * standard {@code Byte.compare()}, as stated in its documentation.
+ */
+@RunWith(JUnit4.class)
+public class SignedBytesCompareTest {
 
     private static final byte LEAST = Byte.MIN_VALUE;
-
     private static final byte GREATEST = Byte.MAX_VALUE;
 
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
+    // A selection of byte values to test, including boundaries and common cases.
+    private static final byte[] TEST_VALUES = {LEAST, -1, 0, 1, GREATEST};
 
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
-        }
-    }
+    @Test
+    public void compare_shouldBehaveIdenticallyToByteCompare() {
+        // The contract of compare(a, b) is based on the sign of the result:
+        // - negative if a < b
+        // - positive if a > b
+        // - zero if a == b
+        // We verify this by comparing the signum of our implementation's result
+        // against the signum of the standard JDK's result.
 
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
+        for (byte a : TEST_VALUES) {
+            for (byte b : TEST_VALUES) {
+                int expectedSign = Integer.signum(Byte.compare(a, b));
+                int actualSign = Integer.signum(SignedBytes.compare(a, b));
 
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    public void testCompare() {
-        for (byte x : VALUES) {
-            for (byte y : VALUES) {
-                // Only compare the sign of the result of compare().
-                int expected = Byte.compare(x, y);
-                int actual = SignedBytes.compare(x, y);
-                if (expected == 0) {
-                    assertWithMessage(x + ", " + y).that(actual).isEqualTo(expected);
-                } else if (expected < 0) {
-                    assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")").that(actual < 0).isTrue();
-                } else {
-                    assertWithMessage(x + ", " + y + " (expected: " + expected + ", actual" + actual + ")").that(actual > 0).isTrue();
-                }
+                assertWithMessage("Comparison of bytes (%s, %s) failed", a, b)
+                        .that(actualSign)
+                        .isEqualTo(expectedSign);
             }
         }
     }
