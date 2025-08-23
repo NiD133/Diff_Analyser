@@ -1,34 +1,33 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
+import org.junit.Test;
+
+/**
+ * This test class focuses on the behavior of the ComparatorChain.equals() method.
+ * The original class name and inheritance are kept to match the input structure.
+ */
 public class ComparatorChain_ESTestTest26 extends ComparatorChain_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>();
-        ComparatorChain<Object> comparatorChain1 = new ComparatorChain<Object>(comparatorChain0, true);
-        boolean boolean0 = comparatorChain0.equals(comparatorChain1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that two ComparatorChains are not equal if their underlying
+     * lists of comparators are different.
+     */
+    @Test
+    public void testEqualsReturnsFalseForChainsWithDifferentComparatorLists() {
+        // Arrange
+        // Create an empty comparator chain, which has no comparators in its internal list.
+        final ComparatorChain<Object> emptyChain = new ComparatorChain<>();
+
+        // Create a second chain that contains the first (empty) chain as its single comparator.
+        // Its internal list of comparators contains one element.
+        final ComparatorChain<Object> chainWithOneComparator = new ComparatorChain<>(emptyChain, true);
+
+        // Act & Assert
+        // The two chains should not be equal because their internal comparator lists
+        // differ in size and content, which is what the equals() method checks.
+        assertNotEquals("Chains with different comparator lists should not be equal",
+                        emptyChain, chainWithOneComparator);
     }
 }
