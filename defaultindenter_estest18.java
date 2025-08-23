@@ -1,42 +1,30 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.io.ContentReference;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
-import com.fasterxml.jackson.core.json.WriterBasedJsonGenerator;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class DefaultIndenter_ESTestTest18 extends DefaultIndenter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultIndenter} class, focusing on its configuration methods.
+ */
+public class DefaultIndenterTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        DefaultIndenter defaultIndenter0 = new DefaultIndenter();
-        DefaultIndenter defaultIndenter1 = defaultIndenter0.withLinefeed("\n");
-        assertSame(defaultIndenter1, defaultIndenter0);
+    /**
+     * Tests that calling {@code withLinefeed()} with the same linefeed string
+     * returns the original instance, confirming it avoids unnecessary object creation.
+     */
+    @Test
+    public void withLinefeed_shouldReturnSameInstance_whenLinefeedIsUnchanged() {
+        // Arrange: Create an indenter with a specific, known linefeed.
+        // This approach removes the original test's dependency on the system's
+        // default line separator, making the test more robust and reliable.
+        final String linefeed = "\n";
+        DefaultIndenter indenter = new DefaultIndenter("  ", linefeed);
+
+        // Act: Call withLinefeed() with the exact same linefeed string.
+        DefaultIndenter result = indenter.withLinefeed(linefeed);
+
+        // Assert: The method should return the identical instance, not a new one.
+        assertSame("Expected withLinefeed() to return the same instance for an identical linefeed",
+                indenter, result);
     }
 }
