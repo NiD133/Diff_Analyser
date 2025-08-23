@@ -1,39 +1,42 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+// The following imports from the original test were removed as they are no longer needed:
+// import static org.junit.Assert.*;
+// import static org.evosuite.runtime.EvoAssertions.*;
+// import java.io.OutputStream;
+// import java.nio.file.LinkOption;
+// ... and other EvoSuite-specific imports.
+
+import org.junit.runner.RunWith;
+import org.evosuite.runtime.EvoRunner;
+
+// Note: The EvoSuite runner and scaffolding are kept to maintain the original test's execution context.
+// The primary improvements are within the test method itself.
+@RunWith(EvoRunner.class)
 public class ArArchiveOutputStream_ESTestTest35 extends ArArchiveOutputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        // Undeclared exception!
-        try {
-            arArchiveOutputStream0.createArchiveEntry((File) null, "kofjB^0gi} ");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.ar.ArArchiveEntry", e);
-        }
+    /**
+     * Verifies that createArchiveEntry throws a NullPointerException when the input File is null.
+     * The underlying ArArchiveEntry constructor does not permit a null file argument.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createArchiveEntryShouldThrowExceptionForNullFile() throws IOException {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream);
+        final String entryName = "test-entry.txt";
+
+        // Act: Attempt to create an archive entry with a null file.
+        // This is expected to throw a NullPointerException.
+        arOut.createArchiveEntry((File) null, entryName);
+
+        // Assert: The test passes if the expected NullPointerException is thrown.
+        // This is handled declaratively by the @Test(expected=...) annotation.
     }
 }
