@@ -1,51 +1,33 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest24 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ObservableInputStream} class.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        ObservableInputStream.Observer[] observableInputStream_ObserverArray0 = new ObservableInputStream.Observer[1];
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(pipedInputStream0, observableInputStream_ObserverArray0);
-        // Undeclared exception!
-        try {
-            observableInputStream0.noteDataBytes((byte[]) null, 3677, (-1));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.ObservableInputStream", e);
-        }
+    /**
+     * Tests that calling {@code noteDataBytes(byte[], int, int)} with a null buffer
+     * correctly throws a {@code NullPointerException}. The method is expected to
+     * perform a null check on its arguments before proceeding.
+     */
+    @Test(expected = NullPointerException.class)
+    public void noteDataBytesWithNullBufferShouldThrowException() {
+        // Arrange: Create an ObservableInputStream.
+        // The underlying stream's content is irrelevant for this test, so an empty
+        // one is used for simplicity. No observers are needed either.
+        final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+        final ObservableInputStream observableInputStream = new ObservableInputStream(inputStream);
+
+        // Act: Call the method under test with a null buffer.
+        // The offset and length values are arbitrary, as the null check on the buffer
+        // should occur first. This call is expected to throw the exception.
+        observableInputStream.noteDataBytes(null, 3677, -1);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected = ...) annotation.
     }
 }
