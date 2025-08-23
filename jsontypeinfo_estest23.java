@@ -1,19 +1,26 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class JsonTypeInfo_ESTestTest23 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTypeInfo.Value} class.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.from((JsonTypeInfo) null);
-        assertNull(jsonTypeInfo_Value0);
+    /**
+     * Verifies that the factory method {@code JsonTypeInfo.Value.from()}
+     * correctly handles a null input by returning null.
+     */
+    @Test
+    public void from_shouldReturnNull_whenAnnotationIsNull() {
+        // Arrange: No arrangement needed as we are testing a null input.
+        JsonTypeInfo nullAnnotation = null;
+
+        // Act: Call the factory method with the null input.
+        JsonTypeInfo.Value result = JsonTypeInfo.Value.from(nullAnnotation);
+
+        // Assert: The result should be null.
+        assertNull("The factory method should return null when the source annotation is null.", result);
     }
 }
