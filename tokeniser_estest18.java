@@ -1,31 +1,25 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
+// Note: The original test class name "Tokeniser_ESTestTest18" and its scaffolding
+// are preserved as per the prompt's context. In a real-world scenario,
+// this test would be part of a comprehensive "TokeniserTest" class.
 public class Tokeniser_ESTestTest18 extends Tokeniser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        HtmlTreeBuilder htmlTreeBuilder0 = new HtmlTreeBuilder();
-        Tokeniser tokeniser0 = null;
-        try {
-            tokeniser0 = new Tokeniser(htmlTreeBuilder0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.Tokeniser", e);
-        }
+    /**
+     * Verifies that the Tokeniser constructor throws a NullPointerException when passed an
+     * uninitialized TreeBuilder. This occurs because the constructor attempts to access
+     * the builder's 'parser' field, which is null in a newly created TreeBuilder instance.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorThrowsNullPointerExceptionForUninitializedTreeBuilder() {
+        // An HtmlTreeBuilder created with its default constructor is not fully initialized;
+        // it lacks a reader and a parser.
+        HtmlTreeBuilder uninitializedTreeBuilder = new HtmlTreeBuilder();
+
+        // Attempting to create a Tokeniser with this uninitialized builder should fail
+        // with an NPE, as it tries to access `builder.parser.getErrors()`.
+        new Tokeniser(uninitializedTreeBuilder);
     }
 }
