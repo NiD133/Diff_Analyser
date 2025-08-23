@@ -1,45 +1,41 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
-public class DayOfMonth_ESTestTest4 extends DayOfMonth_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        TemporalQuery<Object> temporalQuery0 = (TemporalQuery<Object>) mock(TemporalQuery.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(temporalQuery0).queryFrom(any(java.time.temporal.TemporalAccessor.class));
-        dayOfMonth0.query(temporalQuery0);
-        assertEquals(14, dayOfMonth0.getValue());
+/**
+ * Tests for the query() method in the DayOfMonth class.
+ */
+public class DayOfMonthQueryTest {
+
+    @Test
+    public void query_shouldDelegateToTheProvidedQueryObjectAndReturnItsResult() {
+        // Arrange: Create a DayOfMonth instance and a mock TemporalQuery.
+        DayOfMonth dayOfMonth = DayOfMonth.of(21);
+
+        // Use a specific type for the query result (e.g., String) for better type safety.
+        @SuppressWarnings("unchecked")
+        TemporalQuery<String> mockQuery = (TemporalQuery<String>) mock(TemporalQuery.class);
+
+        String expectedResult = "TestQueryResult";
+        // Configure the mock: when queryFrom is called with our DayOfMonth instance,
+        // it should return our predefined result.
+        when(mockQuery.queryFrom(dayOfMonth)).thenReturn(expectedResult);
+
+        // Act: Call the method under test.
+        String actualResult = dayOfMonth.query(mockQuery);
+
+        // Assert: Verify the behavior.
+        // 1. The method should return the result from the mock query.
+        assertEquals("The query method should return the value from the TemporalQuery object.",
+                expectedResult, actualResult);
+
+        // 2. The method should have called the queryFrom method on the mock exactly once.
+        verify(mockQuery).queryFrom(dayOfMonth);
     }
 }
