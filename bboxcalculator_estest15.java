@@ -1,32 +1,31 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
+// The EvoSuite runner annotations are kept as this test may be part of a larger, generated suite.
+import org.evosuite.runtime.EvoRunner;
+import org.junit.runner.RunWith;
+
+@RunWith(EvoRunner.class) // This annotation is from the original test.
 public class BBoxCalculator_ESTestTest15 extends BBoxCalculator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
-        // Undeclared exception!
-        try {
-            bBoxCalculator0.expandRange((-610.206), (-610.206), (-610.206), (-610.206));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
-        }
+    /**
+     * Verifies that calling expandRange() on a BBoxCalculator initialized with a null
+     * SpatialContext throws a NullPointerException.
+     *
+     * This test ensures that the BBoxCalculator handles invalid initialization states gracefully
+     * by failing fast.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void expandRangeWithNullContextThrowsNullPointerException() {
+        // Arrange: Create a BBoxCalculator with a null context. The expandRange method
+        // relies on the context, so this is an invalid state.
+        BBoxCalculator calculator = new BBoxCalculator((SpatialContext) null);
+
+        // Act & Assert: Attempt to expand the bounding box. This action is expected to
+        // trigger a NullPointerException because the internal context is null.
+        // The specific coordinate values are arbitrary as the exception should occur first.
+        calculator.expandRange(-610.206, -610.206, -610.206, -610.206);
     }
 }
