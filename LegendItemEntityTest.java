@@ -1,116 +1,133 @@
-/* ======================================================
- * JFreeChart : a chart library for the Java(tm) platform
- * ======================================================
- *
- * (C) Copyright 2000-present, by David Gilbert and Contributors.
- *
- * Project Info:  https://www.jfree.org/jfreechart/index.html
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
- * Other names may be trademarks of their respective owners.]
- *
- * -------------------------
- * LegendItemEntityTest.java
- * -------------------------
- * (C) Copyright 2004-present, by David Gilbert and Contributors.
- *
- * Original Author:  David Gilbert;
- * Contributor(s):   -;
- *
- */
-
 package org.jfree.chart.entity;
 
 import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
-
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link LegendItemEntity} class.
+ * 
+ * The tests are organized to make it clear which field difference causes
+ * inequality, and to verify basic equals/clone/serialization behavior.
  */
 public class LegendItemEntityTest {
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
-    @Test
-    public void testEquals() {
-        LegendItemEntity<String> e1 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        LegendItemEntity<String> e2 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        assertEquals(e1, e2);
+    private static final Rectangle2D DEFAULT_AREA = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
 
-        e1.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
-        assertNotEquals(e1, e2);
-        e2.setArea(new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0));
-        assertEquals(e1, e2);
-
-        e1.setToolTipText("New ToolTip");
-        assertNotEquals(e1, e2);
-        e2.setToolTipText("New ToolTip");
-        assertEquals(e1, e2);
-
-        e1.setURLText("New URL");
-        assertNotEquals(e1, e2);
-        e2.setURLText("New URL");
-        assertEquals(e1, e2);
-
-        e1.setDataset(new DefaultCategoryDataset<String, String>());
-        assertNotEquals(e1, e2);
-        e2.setDataset(new DefaultCategoryDataset<String, String>());
-        assertEquals(e1, e2);
-
-        e1.setSeriesKey("A");
-        assertNotEquals(e1, e2);
-        e2.setSeriesKey("A");
-        assertEquals(e1, e2);
-
+    private static LegendItemEntity<String> newEntity() {
+        return new LegendItemEntity<>(DEFAULT_AREA);
     }
 
-    /**
-     * Confirm that cloning works.
-     */
-    @Test
-    public void testCloning() throws CloneNotSupportedException {
-        LegendItemEntity<String> e1 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        LegendItemEntity<String> e2 = CloneUtils.clone(e1);
-        assertNotSame(e1, e2);
-        assertSame(e1.getClass(), e2.getClass());
-        assertEquals(e1, e2);
+    private static Rectangle2D otherArea() {
+        return new Rectangle2D.Double(4.0, 3.0, 2.0, 1.0);
     }
 
-    /**
-     * Serialize an instance, restore it, and check for equality.
-     */
-    @Test
-    public void testSerialization() {
-        LegendItemEntity<String> e1 = new LegendItemEntity<>(
-                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        LegendItemEntity<String> e2 = TestUtils.serialised(e1);
-        assertEquals(e1, e2);
+    private static DefaultCategoryDataset<String, String> newCategoryDataset() {
+        return new DefaultCategoryDataset<>();
     }
 
+    @Test
+    @DisplayName("equals: entities with identical state are equal")
+    public void equals_sameState_isEqual() {
+        LegendItemEntity<String> a = newEntity();
+        LegendItemEntity<String> b = newEntity();
+
+        // basic equals checks
+        assertEquals(a, b);
+        assertEquals(a, a);            // reflexive
+        assertEquals(b, a);            // symmetric
+        assertNotEquals(a, null);      // handles null
+        assertNotEquals(a, "string");  // handles different type
+    }
+
+    @Test
+    @DisplayName("equals: differs by area")
+    public void equals_differsByArea() {
+        LegendItemEntity<String> a = newEntity();
+        LegendItemEntity<String> b = newEntity();
+
+        a.setArea(otherArea());
+        assertNotEquals(a, b, "Entities with different areas should not be equal");
+
+        b.setArea(otherArea());
+        assertEquals(a, b, "Entities with the same area should be equal again");
+    }
+
+    @Test
+    @DisplayName("equals: differs by tooltip text")
+    public void equals_differsByToolTip() {
+        LegendItemEntity<String> a = newEntity();
+        LegendItemEntity<String> b = newEntity();
+
+        a.setToolTipText("New ToolTip");
+        assertNotEquals(a, b, "Entities with different tooltips should not be equal");
+
+        b.setToolTipText("New ToolTip");
+        assertEquals(a, b, "Entities with the same tooltip should be equal again");
+    }
+
+    @Test
+    @DisplayName("equals: differs by URL text")
+    public void equals_differsByUrlText() {
+        LegendItemEntity<String> a = newEntity();
+        LegendItemEntity<String> b = newEntity();
+
+        a.setURLText("New URL");
+        assertNotEquals(a, b, "Entities with different URLs should not be equal");
+
+        b.setURLText("New URL");
+        assertEquals(a, b, "Entities with the same URL should be equal again");
+    }
+
+    @Test
+    @DisplayName("equals: differs by dataset")
+    public void equals_differsByDataset() {
+        LegendItemEntity<String> a = newEntity();
+        LegendItemEntity<String> b = newEntity();
+
+        a.setDataset(newCategoryDataset());
+        assertNotEquals(a, b, "Entities with different datasets should not be equal");
+
+        b.setDataset(newCategoryDataset());
+        assertEquals(a, b, "Entities with equal datasets should be equal again");
+    }
+
+    @Test
+    @DisplayName("equals: differs by series key")
+    public void equals_differsBySeriesKey() {
+        LegendItemEntity<String> a = newEntity();
+        LegendItemEntity<String> b = newEntity();
+
+        a.setSeriesKey("A");
+        assertNotEquals(a, b, "Entities with different series keys should not be equal");
+
+        b.setSeriesKey("A");
+        assertEquals(a, b, "Entities with the same series key should be equal again");
+    }
+
+    @Test
+    @DisplayName("clone: produces a distinct but equal copy")
+    public void clone_createsDistinctButEqualCopy() throws CloneNotSupportedException {
+        LegendItemEntity<String> original = newEntity();
+        LegendItemEntity<String> copy = CloneUtils.clone(original);
+
+        assertNotSame(original, copy, "Clone should be a different instance");
+        assertSame(original.getClass(), copy.getClass(), "Clone should have the same type");
+        assertEquals(original, copy, "Clone should be equal to the original");
+    }
+
+    @Test
+    @DisplayName("serialization: round-trip preserves equality")
+    public void serialization_roundTripPreservesEquality() {
+        LegendItemEntity<String> original = newEntity();
+        LegendItemEntity<String> restored = TestUtils.serialised(original);
+
+        assertEquals(original, restored, "Deserialized instance should be equal to the original");
+    }
 }
