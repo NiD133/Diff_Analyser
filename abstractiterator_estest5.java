@@ -1,30 +1,72 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
+import org.mockito.Mockito;
+
 import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AbstractIterator_ESTestTest5 extends AbstractIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Object object0 = new Object();
-        linkedList0.add(object0);
-        ConsumingQueueIterator<Object> consumingQueueIterator0 = new ConsumingQueueIterator<Object>(linkedList0);
-        consumingQueueIterator0.peek();
-        Consumer<Object> consumer0 = (Consumer<Object>) mock(Consumer.class, new ViolatedAssumptionAnswer());
-        consumingQueueIterator0.forEachRemaining(consumer0);
+/**
+ * Tests for {@link AbstractIterator}.
+ */
+public class AbstractIteratorTest {
+
+    /**
+     * A simple implementation of AbstractIterator that consumes elements from a Queue.
+     * This helper class makes the test self-contained and easier to understand.
+     * @param <T> The type of elements returned by this iterator.
+     */
+    private static class ConsumingQueueIterator<T> extends AbstractIterator<T> {
+        private final Queue<T> queue;
+
+        ConsumingQueueIterator(Queue<T> queue) {
+            this.queue = queue;
+        }
+
+        @Override
+        protected T computeNext() {
+            if (queue.isEmpty()) {
+                return endOfData();
+            }
+            return queue.poll();
+        }
+    }
+
+    @Test
+    public void forEachRemaining_afterPeek_consumesAllElements() {
+        // Arrange
+        Queue<String> sourceQueue = new LinkedList<>();
+        sourceQueue.add("first-element");
+
+        AbstractIterator<String> iterator = new ConsumingQueueIterator<>(sourceQueue);
+
+        @SuppressWarnings("unchecked") // Standard for Mockito.mock() with generic types
+        Consumer<String> mockConsumer = mock(Consumer.class);
+
+        // Act
+        // First, peek at the element. This calls computeNext() internally, moving the
+        // iterator state to READY, but doesn't advance the iterator's position.
+        String peekedElement = iterator.peek();
+
+        // Next, consume all remaining elements.
+        iterator.forEachRemaining(mockConsumer);
+
+        // Assert
+        assertEquals("peek() should return the first element", "first-element", peekedElement);
+
+        // Verify the consumer was called exactly once with the correct element.
+        verify(mockConsumer).accept("first-element");
+        verifyNoMoreInteractions(mockConsumer);
+
+        // Verify the iterator is now exhausted.
+        assertFalse("Iterator should be exhausted after forEachRemaining", iterator.hasNext());
+        assertTrue("The underlying queue should be empty", sourceQueue.isEmpty());
     }
 }
