@@ -1,18 +1,28 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest52 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byteArrayBuilder0.release();
-        assertEquals(0, byteArrayBuilder0.size());
+    /**
+     * Tests that calling release() on a newly created, empty ByteArrayBuilder
+     * correctly maintains the size as zero.
+     */
+    @Test
+    public void shouldHaveZeroSizeAfterReleasingEmptyBuilder() {
+        // Arrange: Create a new, empty ByteArrayBuilder.
+        // A new builder is expected to have a size of 0.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        assertEquals("Pre-condition: A new builder should have a size of 0.", 0, builder.size());
+
+        // Act: Release the builder's resources.
+        builder.release();
+
+        // Assert: The size should remain 0 after the release operation.
+        assertEquals("The size of an empty builder should still be 0 after release.", 0, builder.size());
     }
 }
