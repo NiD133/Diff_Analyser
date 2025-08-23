@@ -1,34 +1,33 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.data.Range;
+import org.jfree.chart.util.Size2D;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest14 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static final double EPSILON = 0.000000001;
+/**
+ * Tests for the {@link GridArrangement} class, focusing on edge cases.
+ */
+class GridArrangementTest {
 
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
+    private static final double DELTA = 1e-9;
 
     /**
-     * The arrangement should be able to handle null blocks in the layout.
+     * Verifies that the arrangement correctly handles a null block. When a
+     * container with a null block is arranged, the resulting size should be zero.
      */
     @Test
-    public void testNullBlock_NN() {
-        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
-        c.add(null);
-        Size2D s = c.arrange(null, RectangleConstraint.NONE);
-        assertEquals(0.0, s.getWidth(), EPSILON);
-        assertEquals(0.0, s.getHeight(), EPSILON);
+    void arrangeShouldReturnZeroSizeWhenContainerHasNullBlock() {
+        // Arrange: Create a container with a 1x1 grid and add a null block.
+        BlockContainer container = new BlockContainer(new GridArrangement(1, 1));
+        container.add(null);
+
+        // Act: Arrange the container with no constraints.
+        // The Graphics2D context is null as no actual drawing is performed.
+        Size2D arrangedSize = container.arrange(null, RectangleConstraint.NONE);
+
+        // Assert: The resulting size should have zero width and height.
+        assertEquals(0.0, arrangedSize.getWidth(), DELTA, "Width should be zero for a null block");
+        assertEquals(0.0, arrangedSize.getHeight(), DELTA, "Height should be zero for a null block");
     }
 }
