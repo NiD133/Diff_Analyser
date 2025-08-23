@@ -1,46 +1,40 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
 import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class StreamCompressor_ESTestTest14 extends StreamCompressor_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link StreamCompressor} class, focusing on edge cases for the write method.
+ */
+public class StreamCompressorTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            streamCompressor0.write(byteArray0, (-822), (-822), (-822));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.zip.CRC32", e);
-        }
+    /**
+     * Verifies that the write() method throws an ArrayIndexOutOfBoundsException
+     * when called with a negative offset and a negative length.
+     * <p>
+     * This behavior is expected because the underlying CRC32 checksum calculation
+     * does not permit negative array indices or lengths.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void writeWithNegativeOffsetAndLengthShouldThrowException() throws IOException {
+        // Arrange: Set up the StreamCompressor and define invalid input parameters.
+        // A simple OutputStream is sufficient as the exception occurs before any data is written.
+        OutputStream outputStream = new PipedOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(outputStream);
+
+        byte[] data = new byte[10]; // The array content is irrelevant.
+        int invalidOffset = -1;
+        int invalidLength = -1;
+        // The compression method is also irrelevant for this specific exception but is a required argument.
+        int compressionMethod = Deflater.DEFLATED;
+
+        // Act: Attempt to write with invalid parameters.
+        // The @Test(expected=...) annotation will automatically handle the assertion,
+        // failing the test if the expected exception is not thrown.
+        streamCompressor.write(data, invalidOffset, invalidLength, compressionMethod);
     }
 }
