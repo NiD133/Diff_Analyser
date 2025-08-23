@@ -1,23 +1,34 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest12 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+// The class name is simplified for clarity, assuming it's part of a larger test suite.
+// public class QuotedPrintableCodecTest {
+public class QuotedPrintableCodec_ESTestTest12 extends QuotedPrintableCodec_ESTest_scaffolding { // Retaining original class for context
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(false);
-        String string0 = quotedPrintableCodec0.encode("UTF-8", "UTF-8");
-        assertEquals("UTF-8", string0);
+    /**
+     * Tests that encoding a string containing only printable ASCII characters
+     * in non-strict mode results in the original, unchanged string.
+     */
+    @Test
+    public void encodeStringWithPrintableAsciiShouldNotChangeInput() throws UnsupportedEncodingException {
+        // Arrange
+        // The 'false' argument creates the codec in non-strict mode.
+        QuotedPrintableCodec codec = new QuotedPrintableCodec(false);
+        String plainText = "This is a simple string with numbers 123 and symbols like ./-_";
+        String expectedEncodedText = plainText;
+
+        // Act
+        String actualEncodedText = codec.encode(plainText, "UTF-8");
+
+        // Assert
+        assertEquals("Encoding a string of printable characters should not alter it.",
+                expectedEncodedText, actualEncodedText);
     }
 }
