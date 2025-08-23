@@ -1,26 +1,24 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest13 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber} to ensure it handles various inputs correctly.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("Deserialization is unsupported");
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.intValue();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.math.BigDecimal", e);
-        }
+    /**
+     * Verifies that calling intValue() on a LazilyParsedNumber created with a
+     * non-numeric string throws a NumberFormatException.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void intValueShouldThrowNumberFormatExceptionForInvalidNumberString() {
+        // Arrange: Create a LazilyParsedNumber with a string that cannot be parsed into a number.
+        String invalidNumberString = "not a number";
+        LazilyParsedNumber number = new LazilyParsedNumber(invalidNumberString);
+
+        // Act: Attempt to convert the invalid string to an integer.
+        // This action is expected to throw a NumberFormatException.
+        number.intValue();
     }
 }
