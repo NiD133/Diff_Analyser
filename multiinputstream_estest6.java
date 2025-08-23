@@ -1,39 +1,33 @@
 package com.google.common.io;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MultiInputStream_ESTestTest6 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        ByteSource byteSource0 = ByteSource.empty();
-        LinkedList<ByteSource> linkedList0 = new LinkedList<ByteSource>();
-        linkedList0.add(byteSource0);
-        Iterator<ByteSource> iterator0 = linkedList0.descendingIterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void read_withInvalidBufferParameters_throwsIndexOutOfBoundsException() throws IOException {
+        // Arrange: Create a MultiInputStream. The content of the underlying stream is not
+        // relevant, so we use a single, empty source.
+        InputStream multiInputStream =
+                new MultiInputStream(Collections.singletonList(ByteSource.empty()).iterator());
+
+        byte[] buffer = new byte[8];
+        int offset = 6;
+        int length = 4; // Invalid: offset + length (10) is greater than buffer.length (8)
+
+        // Act & Assert: Attempting to read with parameters that exceed the buffer's
+        // bounds should throw an IndexOutOfBoundsException.
         try {
-            multiInputStream0.read(byteArray0, 408, 408);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.ByteArrayInputStream", e);
+            multiInputStream.read(buffer, offset, length);
+        } finally {
+            // Ensure the stream is closed, regardless of the test's outcome.
+            multiInputStream.close();
         }
     }
 }
