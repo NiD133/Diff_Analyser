@@ -1,31 +1,30 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
 
-public class IslamicChronology_ESTestTest32 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IslamicChronology}.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        GJChronology gJChronology0 = GJChronology.getInstanceUTC();
-        Object object0 = new Object();
-        IslamicChronology islamicChronology0 = new IslamicChronology(gJChronology0, object0, (IslamicChronology.LeapYearPatternType) null);
-        // Undeclared exception!
-        try {
-            islamicChronology0.calculateFirstDayOfYearMillis(1593);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * This test verifies that methods relying on the leap year pattern fail fast
+     * when the pattern is null. This scenario is not possible via the public API
+     * but is tested to ensure internal robustness.
+     */
+    @Test(expected = NullPointerException.class)
+    public void calculateFirstDayOfYearMillis_shouldThrowNullPointerException_whenLeapYearPatternIsNull() {
+        // Arrange: Create an IslamicChronology instance with a null leap year pattern.
+        // This requires using the package-private constructor to simulate this internal state.
+        Chronology baseChronology = GJChronology.getInstanceUTC();
+        Object dummyParam = new Object(); // This parameter is not relevant for the test's logic.
+        IslamicChronology.LeapYearPatternType nullPattern = null;
+
+        IslamicChronology chronologyWithNullPattern = new IslamicChronology(baseChronology, dummyParam, nullPattern);
+
+        // Act: Attempt to calculate the start of a year, which requires the leap year pattern.
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
+        chronologyWithNullPattern.calculateFirstDayOfYearMillis(1593);
     }
 }
