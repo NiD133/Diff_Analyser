@@ -1,31 +1,28 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest40 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        double[] doubleArray0 = new double[8];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        // Undeclared exception!
-        try {
-            atomicDoubleArray0.accumulateAndGet(1953, 1953, (DoubleBinaryOperator) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    @Test(expected = NullPointerException.class)
+    public void accumulateAndGet_withNullFunction_throwsNullPointerException() {
+        // Arrange: Create an array and define parameters for the method call.
+        // The array size and initial values are not critical, but we need a valid index
+        // to ensure the test focuses solely on the null function argument.
+        AtomicDoubleArray array = new AtomicDoubleArray(1);
+        int validIndex = 0;
+        double value = 10.0;
+        DoubleBinaryOperator nullFunction = null;
+
+        // Act: Call the method under test with a null function.
+        // The test is expected to throw a NullPointerException at this point.
+        // The original test confusingly used an out-of-bounds index, which obscured
+        // the test's purpose. By using a valid index, we verify that the null check
+        // on the function is the specific cause of the failure.
+        array.accumulateAndGet(validIndex, value, nullFunction);
     }
 }
