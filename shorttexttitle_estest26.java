@@ -1,52 +1,41 @@
 package org.jfree.chart.title;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.RectangleConstraint;
-import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ShortTextTitle_ESTestTest26 extends ShortTextTitle_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint((-3132.55), (Range) null);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for the {@link ShortTextTitle} class, focusing on exception handling.
+ */
+public class ShortTextTitleTest {
+
+    /**
+     * Verifies that the arrange() method throws a RuntimeException for a code path
+     * that is marked as "Not yet implemented".
+     *
+     * This specific scenario is triggered by passing a null Graphics2D object and
+     * a constraint with a fixed width and unconstrained height.
+     */
+    @Test
+    public void arrange_WhenPathIsUnimplemented_ShouldThrowRuntimeException() {
+        // Arrange
+        ShortTextTitle title = new ShortTextTitle("Test Title");
+        // A constraint with a fixed width and no height constraint.
+        RectangleConstraint constraint = new RectangleConstraint(-1.0, (Range) null);
+        Graphics2D g2 = null;
+
+        // Act & Assert
         try {
-            shortTextTitle0.arrange((Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
+            title.arrange(g2, constraint);
+            fail("A RuntimeException was expected but not thrown.");
         } catch (RuntimeException e) {
-            //
-            // Not yet implemented.
-            //
-            verifyException("org.jfree.chart.title.ShortTextTitle", e);
+            // Verify that the exception is the one we expect from an unimplemented method.
+            assertEquals("Not yet implemented.", e.getMessage());
         }
     }
 }
