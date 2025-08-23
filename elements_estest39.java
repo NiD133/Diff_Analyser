@@ -1,36 +1,30 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest39 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test038() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("Invalid xmlns attribute [%s] on tag [%s]", "\"D%\fn");
-        Elements elements0 = document0.children();
-        Element element0 = elements0.first();
-        assertEquals("html", element0.normalName());
+/**
+ * Contains tests for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    @Test
+    public void firstShouldReturnTheFirstElementFromACollection() {
+        // Arrange: Jsoup wraps a body fragment in a full HTML document.
+        // The direct child of the Document object is always the <html> element.
+        Document doc = Jsoup.parseBodyFragment("<div>Some content</div>");
+        Elements children = doc.children(); // This collection will contain just the <html> element.
+
+        // Act: Get the first element from the collection.
+        Element firstElement = children.first();
+
+        // Assert: Verify that the first element is the expected <html> tag.
+        assertNotNull("The first element should not be null for a non-empty list.", firstElement);
+        assertEquals("The first child of a parsed document should be the <html> element.", "html", firstElement.tagName());
     }
 }
