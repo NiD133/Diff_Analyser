@@ -1,31 +1,39 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest24 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        double[] doubleArray0 = new double[1];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        // Undeclared exception!
-        try {
-            atomicDoubleArray0.set(1102, 1102);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 1102
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-        }
+    /**
+     * Verifies that calling set() with an index that is out of the array's bounds
+     * throws an IndexOutOfBoundsException.
+     */
+    @Test
+    public void set_withOutOfBoundsIndex_throwsIndexOutOfBoundsException() {
+        // Arrange: Create an array of a small, known size.
+        AtomicDoubleArray array = new AtomicDoubleArray(10);
+        int outOfBoundsIndex = 15;
+        double valueToSet = 99.9;
+
+        // Act & Assert: Attempt to set a value at the out-of-bounds index and
+        // verify that the correct exception is thrown.
+        IndexOutOfBoundsException thrown = assertThrows(
+            IndexOutOfBoundsException.class,
+            () -> array.set(outOfBoundsIndex, valueToSet)
+        );
+
+        // Optional but recommended: Verify the exception message for more precise testing.
+        String expectedMessageFragment = String.valueOf(outOfBoundsIndex);
+        assertTrue(
+            "Exception message should contain the out-of-bounds index",
+            thrown.getMessage().contains(expectedMessageFragment)
+        );
     }
 }
