@@ -1,24 +1,37 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BoundedReader_ESTestTest2 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1805);
-        boundedReader0.read();
-        boundedReader0.mark(0);
-        int int0 = boundedReader0.read();
-        assertEquals((-1), int0);
+    /**
+     * Tests that read() continues to return EOF on an exhausted stream,
+     * even after calling mark(). This ensures that marking at the end of the
+     * stream doesn't incorrectly change the reader's state.
+     */
+    @Test
+    public void shouldReturnEofOnReadAfterMarkingAtEndOfStream() throws IOException {
+        // Arrange: A BoundedReader wrapping an empty, and thus already exhausted, reader.
+        // The bound is set to a positive value that won't be reached.
+        final StringReader emptyReader = new StringReader("");
+        final BoundedReader boundedReader = new BoundedReader(emptyReader, 100);
+
+        // Act:
+        // 1. Read once to ensure the reader is at the end of the stream.
+        // 2. Mark the current position (which is the end).
+        boundedReader.read(); // This first read returns EOF.
+        boundedReader.mark(1);
+
+        // Assert: A subsequent read should also return EOF.
+        final int result = boundedReader.read();
+        assertEquals("Reading after marking at the end of the stream should return EOF.", EOF, result);
     }
 }
