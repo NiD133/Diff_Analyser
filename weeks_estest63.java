@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Weeks_ESTestTest63 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        Weeks weeks0 = Weeks.THREE;
-        DurationFieldType durationFieldType0 = weeks0.getFieldType();
-        assertEquals("weeks", durationFieldType0.getName());
+    /**
+     * Verifies that getFieldType() returns the correct singleton instance for weeks.
+     */
+    @Test
+    public void getFieldType_shouldReturnWeeksType() {
+        // Arrange
+        Weeks weeks = Weeks.THREE; // Any Weeks instance will work for this test
+
+        // Act
+        DurationFieldType actualFieldType = weeks.getFieldType();
+
+        // Assert
+        // The field type for a Weeks object should always be the singleton 'weeks' type.
+        // We use assertSame to verify it's the exact same object instance.
+        assertSame(DurationFieldType.weeks(), actualFieldType);
     }
 }
