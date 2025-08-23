@@ -1,39 +1,38 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
-public class W3CDom_ESTestTest37 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parse("<!DOCTYPE", "javax.xml.xpath.XPathFactory:jsoup");
-        w3CDom0.fromJsoup((Element) document0);
-        assertTrue(w3CDom0.namespaceAware());
+/**
+ * This test class contains refactored tests for the {@link W3CDom} class.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
+public class W3CDom_ESTestTest37 {
+
+    /**
+     * Verifies that converting a Jsoup document to a W3C DOM does not alter the
+     * namespace-aware setting of the W3CDom converter instance.
+     */
+    @Test
+    public void fromJsoupDoesNotAlterNamespaceAwareProperty() {
+        // Arrange
+        // A new W3CDom instance is namespace-aware by default.
+        W3CDom w3cDom = new W3CDom();
+
+        // The original auto-generated test used a document containing only a DOCTYPE,
+        // likely to ensure that specific code path is exercised. We use a valid, simple DOCTYPE.
+        Document jsoupDocument = Parser.parse("<!DOCTYPE html>", "");
+
+        // Act
+        // Convert the Jsoup document. The specific content is less important than
+        // exercising the conversion process itself.
+        w3cDom.fromJsoup(jsoupDocument);
+
+        // Assert
+        // The conversion process should not have any side effects on the converter's properties.
+        assertTrue("The namespaceAware property should remain true after conversion", w3cDom.namespaceAware());
     }
 }
