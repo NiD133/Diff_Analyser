@@ -1,23 +1,22 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest10 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link ExtraFieldUtils}.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Class<Object> class0 = Object.class;
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.register(class0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-        }
+    /**
+     * Verifies that the register() method throws a ClassCastException when
+     * provided with a class that does not implement the ZipExtraField interface.
+     * The Javadoc for register() explicitly requires the class to implement
+     * ZipExtraField.
+     */
+    @Test(expected = ClassCastException.class)
+    public void registerShouldThrowClassCastExceptionForNonZipExtraFieldClass() {
+        // The register method expects a class that implements ZipExtraField.
+        // java.lang.Object is used here as a simple example of a class that does not.
+        ExtraFieldUtils.register(Object.class);
     }
 }
