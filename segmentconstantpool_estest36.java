@@ -1,29 +1,29 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest36 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getValue(8, 2L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that {@code getValue()} throws a {@code NullPointerException}
+     * when the {@code SegmentConstantPool} is constructed with null {@code CpBands}.
+     * This is expected behavior as the method will attempt to dereference the null bands object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getValueShouldThrowNullPointerExceptionWhenBandsAreNull() throws Pack200Exception {
+        // Arrange: Create a SegmentConstantPool with a null CpBands dependency.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Act: Call the method under test. This is expected to throw the exception.
+        // The arguments (SIGNATURE, 2L) are representative valid inputs to ensure
+        // the failure is caused by the null state, not by the arguments themselves.
+        segmentConstantPool.getValue(SegmentConstantPool.SIGNATURE, 2L);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
