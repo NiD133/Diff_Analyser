@@ -1,43 +1,34 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for {@link ByteUtils}.
+ * This specific test class focuses on edge cases and error handling.
+ */
+// The original class name and inheritance are preserved to maintain compatibility
+// with the auto-generation tool's test infrastructure.
 public class ByteUtils_ESTestTest33 extends ByteUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        DataInputStream dataInputStream0 = new DataInputStream(pipedInputStream0);
-        try {
-            ByteUtils.fromLittleEndian((DataInput) dataInputStream0, 1);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedInputStream", e);
-        }
+    /**
+     * Verifies that fromLittleEndian throws an IOException when attempting to read
+     * from a stream that is not ready, such as an unconnected PipedInputStream.
+     */
+    @Test(expected = IOException.class, timeout = 4000)
+    public void fromLittleEndianOnUnconnectedStreamThrowsIOException() throws IOException {
+        // Arrange: Create a PipedInputStream that is not connected to an output stream.
+        // According to its contract, any attempt to read from it will throw an IOException.
+        PipedInputStream unconnectedPipe = new PipedInputStream();
+        DataInput dataInput = new DataInputStream(unconnectedPipe);
+
+        // Act & Assert: Attempt to read from the unconnected stream.
+        // The @Test(expected = IOException.class) annotation asserts that the expected
+        // exception is thrown.
+        ByteUtils.fromLittleEndian(dataInput, 1);
     }
 }
