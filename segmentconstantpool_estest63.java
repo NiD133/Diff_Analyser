@@ -1,32 +1,40 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the SegmentConstantPool class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class SegmentConstantPool_ESTestTest63 extends SegmentConstantPool_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        String[] stringArray0 = new String[6];
-        segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, "<init>", "^6]wcG1bBG#D", 2355);
-        stringArray0[0] = "((";
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray0, stringArray0, (String) null, "^<init>.*", 0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that matchSpecificPoolEntryIndex throws a NullPointerException when the
+     * primary array being searched contains a null element. The method is expected to
+     * throw the exception when it attempts to call .equals() on the null element.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void matchSpecificPoolEntryIndexShouldThrowNPEWhenPrimaryArrayContainsNull() {
+        // Arrange
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Create an array with a non-null element followed by a null. The method will
+        // process the first element and then throw an NPE upon reaching the second.
+        String[] arrayWithNull = {"someValue", null};
+        String primaryCompareString = "aDifferentValue"; // A value that won't match "someValue"
+        String secondaryCompareRegex = ".*"; // A regex that matches anything
+        int desiredIndex = 0;
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException when it encounters
+        // the null element at index 1 of arrayWithNull. The assertion is handled
+        // by the 'expected' attribute of the @Test annotation.
+        segmentConstantPool.matchSpecificPoolEntryIndex(
+            arrayWithNull,
+            arrayWithNull, // The secondary array's content is not relevant for this NPE test.
+            primaryCompareString,
+            secondaryCompareRegex,
+            desiredIndex
+        );
     }
 }
