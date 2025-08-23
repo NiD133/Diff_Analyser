@@ -1,83 +1,43 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.Test;
 
-public class StringConverterTestTest30 extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+/**
+ * Test class for the setInto(ReadWritableInterval, ...) method of {@link StringConverter}.
+ */
+public class StringConverterTest {
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+    /**
+     * Tests that StringConverter can correctly parse an ISO 8601 interval string
+     * defined by a period and an end instant.
+     */
+    @Test
+    public void setIntoInterval_withPeriodAndEndInstantString_shouldUpdateIntervalCorrectly() {
+        // ARRANGE
+        // An ISO 8601 interval string defined by a period (P1Y2M) before an end instant.
+        // When the chronology is passed as null, the default ISO chronology should be used.
+        final String intervalString = "P1Y2M/2004-06-09";
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // The end instant is parsed directly from the string.
+        final DateTime expectedEnd = new DateTime("2004-06-09T00:00:00.000");
+        // The start instant is calculated by subtracting the period (1 year, 2 months) from the end.
+        final DateTime expectedStart = new DateTime("2003-04-09T00:00:00.000");
+        final Interval expectedInterval = new Interval(expectedStart, expectedEnd);
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
+        // The initial state of the interval is irrelevant, as setInto() overwrites it completely.
+        final MutableInterval intervalToUpdate = new MutableInterval();
 
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
+        // ACT
+        StringConverter.INSTANCE.setInto(intervalToUpdate, intervalString, null);
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoInterval_Object_Chronology2() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
-        StringConverter.INSTANCE.setInto(m, "P1Y2M/2004-06-09", null);
-        assertEquals(new DateTime(2003, 4, 9, 0, 0, 0, 0), m.getStart());
-        assertEquals(new DateTime(2004, 6, 9, 0, 0, 0, 0), m.getEnd());
-        assertEquals(ISOChronology.getInstance(), m.getChronology());
+        // ASSERT
+        // The equals() method for AbstractInterval checks start millis, end millis, and chronology,
+        // so this single assertion validates the entire state of the interval.
+        assertEquals(expectedInterval, intervalToUpdate);
     }
 }
