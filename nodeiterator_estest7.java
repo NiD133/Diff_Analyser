@@ -1,27 +1,34 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class NodeIterator_ESTestTest7 extends NodeIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        // Undeclared exception!
-        try {
-            NodeIterator.from((Node) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+/**
+ * Tests for the {@link NodeIterator} class.
+ */
+public class NodeIteratorTest {
+
+    /**
+     * Verifies that the {@link NodeIterator#from(Node)} factory method throws an
+     * IllegalArgumentException when passed a null Node, as the starting node
+     * for iteration must not be null.
+     */
+    @Test
+    public void fromWithNullNodeThrowsIllegalArgumentException() {
+        // The contract of the `from()` factory method, via `Validate.notNull()`,
+        // requires a non-null root node to begin iteration.
+        // This test ensures that passing null results in the expected exception.
+
+        // Act & Assert
+        IllegalArgumentException thrown = assertThrows(
+            "The factory method should throw an exception for a null input.",
+            IllegalArgumentException.class,
+            () -> NodeIterator.from(null)
+        );
+
+        // Verify that the exception message is helpful and matches the contract.
+        assertEquals("Object must not be null", thrown.getMessage());
     }
 }
