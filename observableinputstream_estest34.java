@@ -1,49 +1,32 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for {@link ObservableInputStream}.
+ * This test class focuses on behavior when the underlying stream is null.
+ */
 public class ObservableInputStream_ESTestTest34 extends ObservableInputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        ObservableInputStream observableInputStream0 = new ObservableInputStream((InputStream) null);
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            observableInputStream0.read(byteArray0, (-1), (-1));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.ProxyInputStream", e);
-        }
+    /**
+     * Verifies that attempting to read from an ObservableInputStream that was
+     * constructed with a null underlying stream results in a NullPointerException.
+     * The read operation is delegated to the underlying stream, which, being null,
+     * causes the exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readFromNullInputStreamShouldThrowNullPointerException() throws IOException {
+        // Arrange: Create an ObservableInputStream with a null source stream.
+        final ObservableInputStream observableInputStream = new ObservableInputStream((InputStream) null);
+        final byte[] buffer = new byte[16];
+
+        // Act: Attempt to read from the stream. This is expected to throw the NullPointerException.
+        observableInputStream.read(buffer, 0, buffer.length);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // in the @Test annotation.
     }
 }
