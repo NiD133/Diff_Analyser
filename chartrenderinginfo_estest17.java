@@ -1,27 +1,31 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class ChartRenderingInfo_ESTestTest17 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo((EntityCollection) null);
-        chartRenderingInfo0.clear();
+    /**
+     * Verifies that calling clear() on an instance with a null entity collection
+     * does not throw a NullPointerException and correctly resets its state.
+     * This is a regression test for a potential null-check issue.
+     */
+    @Test
+    public void clear_whenEntityCollectionIsNull_shouldNotThrowException() {
+        // Arrange: Create a ChartRenderingInfo instance with a null entity collection.
+        // The constructor is designed to handle this scenario.
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo(null);
+
+        // Act: Call the clear() method. The primary purpose of this test is to
+        // ensure this action completes without throwing an exception.
+        renderingInfo.clear();
+
+        // Assert: Confirm that the object's state was properly cleared. This adds
+        // robustness by verifying the method's behavior beyond just the absence of an error.
+        assertTrue("The chart area should be empty after being cleared.",
+                renderingInfo.getChartArea().isEmpty());
     }
 }
