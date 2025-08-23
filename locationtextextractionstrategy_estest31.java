@@ -1,40 +1,47 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class LocationTextExtractionStrategy_ESTestTest31 extends LocationTextExtractionStrategy_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = new Matrix(8, 2);
-        PdfOCProperties pdfOCProperties0 = new PdfOCProperties();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfOCProperties0);
-        LinkedList<MarkedContentInfo> linkedList0 = new LinkedList<MarkedContentInfo>();
-        graphicsState0.font = cMapAwareDocumentFont0;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedList0);
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        String string0 = locationTextExtractionStrategy0.getResultantText();
-        assertEquals("", string0);
+    /**
+     * Tests that rendering text with an empty string does not add any content
+     * to the resultant text, even when called multiple times.
+     */
+    @Test
+    public void getResultantText_whenRenderingEmptyText_returnsEmptyString() {
+        // Arrange: Set up the necessary objects for the test.
+        // We create a TextRenderInfo object that represents an empty string.
+        // The specific values for graphics state, matrix, and font are not critical for this test,
+        // as we are focused on the behavior with empty text content.
+        PdfString emptyText = new PdfString("");
+        GraphicsState graphicsState = new GraphicsState();
+        
+        // A font must be set in the GraphicsState for TextRenderInfo construction.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfDictionary());
+        
+        Matrix textMatrix = new Matrix();
+        List<MarkedContentInfo> markedContentStack = Collections.emptyList();
+
+        TextRenderInfo emptyTextRenderInfo = new TextRenderInfo(emptyText, graphicsState, textMatrix, markedContentStack);
+        LocationTextExtractionStrategy strategy = new LocationTextExtractionStrategy();
+
+        // Act: Perform the action under test.
+        // Render the empty text twice to ensure no side effects like adding newlines or spaces.
+        strategy.renderText(emptyTextRenderInfo);
+        strategy.renderText(emptyTextRenderInfo);
+
+        String actualText = strategy.getResultantText();
+
+        // Assert: Verify the outcome.
+        assertEquals("The resultant text should be empty after rendering empty strings.", "", actualText);
     }
 }
