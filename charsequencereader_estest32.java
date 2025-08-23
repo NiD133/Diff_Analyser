@@ -1,23 +1,26 @@
 package com.google.common.io;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceReader_ESTestTest32 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        char[] charArray0 = new char[2];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        charSequenceReader0.reset();
-        assertTrue(charSequenceReader0.markSupported());
+    /**
+     * Verifies that CharSequenceReader correctly reports that it supports
+     * the mark() and reset() operations.
+     */
+    @Test
+    public void markSupported_shouldAlwaysReturnTrue() {
+        // Arrange: Create a reader with any CharSequence. A simple string is sufficient.
+        CharSequenceReader reader = new CharSequenceReader("test-data");
+
+        // Act & Assert: The reader should consistently support marking.
+        assertTrue(
+                "CharSequenceReader should always support mark and reset operations.",
+                reader.markSupported());
     }
 }
