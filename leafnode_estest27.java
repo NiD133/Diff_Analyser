@@ -1,22 +1,33 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest27 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode abstract class, focusing on edge cases and invalid states.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("-cOata");
-        cDataNode0.parentNode = (Node) cDataNode0;
-        // Undeclared exception!
-        cDataNode0.attr("-cOata", "-cOata");
+    /**
+     * Verifies that calling attr() on a node with a circular parent reference
+     * (i.e., a node that is its own parent) results in a StackOverflowError.
+     * <p>
+     * This is an invalid state for a node tree. This test ensures that operations that may
+     * traverse the parent chain fail predictably with a StackOverflowError due to
+     * infinite recursion, rather than causing an infinite loop.
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void attrOnNodeWithCircularParentReferenceShouldThrowStackOverflowError() {
+        // Arrange: Create a CDataNode and set its parent to itself to form a cycle.
+        // CDataNode is used here as a concrete implementation of the abstract LeafNode.
+        CDataNode cdataNode = new CDataNode("some data");
+        cdataNode.parentNode = cdataNode; // Create the invalid circular reference.
+
+        // Act: Attempt to set an attribute on the node. This action is expected
+        // to trigger a recursive loop when traversing the parent hierarchy,
+        // leading to the expected StackOverflowError.
+        cdataNode.attr("key", "value");
+
+        // Assert: The test passes if a StackOverflowError is thrown, as declared
+        // by the @Test(expected=...) annotation. No further assertion code is needed.
     }
 }
