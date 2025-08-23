@@ -1,31 +1,30 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest10 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        char[] charArray0 = new char[2];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        charSequenceReader0.close();
+    @Test
+    public void reset_onClosedReader_throwsIOException() throws IOException {
+        // Arrange: Create a reader and immediately close it.
+        // A simple String is a readable choice for the CharSequence.
+        CharSequenceReader reader = new CharSequenceReader("test data");
+        reader.close();
+
+        // Act & Assert: Verify that calling reset() on a closed reader throws an exception.
         try {
-            charSequenceReader0.reset();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // reader closed
-            //
-            verifyException("com.google.common.io.CharSequenceReader", e);
+            reader.reset();
+            fail("Expected an IOException to be thrown when resetting a closed reader.");
+        } catch (IOException expected) {
+            // The source code for CharSequenceReader uses this specific message.
+            assertEquals("reader closed", expected.getMessage());
         }
     }
 }
