@@ -1,56 +1,47 @@
 package org.apache.commons.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Properties;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class OptionGroupTestTest6 {
+/**
+ * Tests for the {@link OptionGroup#toString()} method.
+ */
+class OptionGroupToStringTest {
 
-    private Options options;
+    @Test
+    @DisplayName("toString() should correctly format a group containing only long options")
+    void toStringWithLongOptions() {
+        // Arrange
+        final OptionGroup group = new OptionGroup();
+        group.addOption(new Option(null, "foo", false, "Foo"));
+        group.addOption(new Option(null, "bar", false, "Bar"));
 
-    private final Parser parser = new PosixParser();
+        // The order is determined by the insertion order of the options.
+        final String expectedString = "[--foo Foo, --bar Bar]";
 
-    @BeforeEach
-    public void setUp() {
-        final Option file = new Option("f", "file", false, "file to process");
-        final Option dir = new Option("d", "directory", false, "directory to process");
-        final OptionGroup optionGroup1 = new OptionGroup();
-        optionGroup1.addOption(file);
-        optionGroup1.addOption(dir);
-        options = new Options().addOptionGroup(optionGroup1);
-        final Option section = new Option("s", "section", false, "section to process");
-        final Option chapter = new Option("c", "chapter", false, "chapter to process");
-        final OptionGroup optionGroup2 = new OptionGroup();
-        optionGroup2.addOption(section);
-        optionGroup2.addOption(chapter);
-        options.addOptionGroup(optionGroup2);
-        final Option importOpt = new Option(null, "import", false, "section to process");
-        final Option exportOpt = new Option(null, "export", false, "chapter to process");
-        final OptionGroup optionGroup3 = new OptionGroup();
-        optionGroup3.addOption(importOpt);
-        optionGroup3.addOption(exportOpt);
-        options.addOptionGroup(optionGroup3);
-        options.addOption("r", "revision", false, "revision number");
+        // Act
+        final String actualString = group.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 
     @Test
-    void testToString() {
-        final OptionGroup optionGroup1 = new OptionGroup();
-        optionGroup1.addOption(new Option(null, "foo", false, "Foo"));
-        optionGroup1.addOption(new Option(null, "bar", false, "Bar"));
-        if (!"[--bar Bar, --foo Foo]".equals(optionGroup1.toString())) {
-            assertEquals("[--foo Foo, --bar Bar]", optionGroup1.toString());
-        }
-        final OptionGroup optionGroup2 = new OptionGroup();
-        optionGroup2.addOption(new Option("f", "foo", false, "Foo"));
-        optionGroup2.addOption(new Option("b", "bar", false, "Bar"));
-        if (!"[-b Bar, -f Foo]".equals(optionGroup2.toString())) {
-            assertEquals("[-f Foo, -b Bar]", optionGroup2.toString());
-        }
+    @DisplayName("toString() should correctly format a group containing short options")
+    void toStringWithShortOptions() {
+        // Arrange
+        final OptionGroup group = new OptionGroup();
+        group.addOption(new Option("f", "foo", false, "Foo"));
+        group.addOption(new Option("b", "bar", false, "Bar"));
+
+        // The order is determined by insertion order, and the short option name is used.
+        final String expectedString = "[-f Foo, -b Bar]";
+
+        // Act
+        final String actualString = group.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
