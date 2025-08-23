@@ -1,30 +1,40 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest18 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * This test class contains tests for the BCodec, focusing on its
+ * adherence to RFC 1522 decoding rules.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        BCodec bCodec0 = new BCodec();
+    /**
+     * Tests that the decodeText method throws a DecoderException when given a
+     * malformed input string that contains multiple RFC 1522 start sequences ("=?").
+     */
+    @Test
+    public void decodeTextShouldThrowDecoderExceptionForMalformedInputWithMultiplePrefixes() {
+        // Arrange
+        BCodec bCodec = new BCodec();
+        // An RFC 1522 "encoded-word" must start with "=?" and end with "?=".
+        // This input is malformed because it contains multiple start sequences.
+        String malformedText = "=?=?=?ZCg05nk5fYK>>";
+        String expectedErrorMessage = "RFC 1522 violation: malformed encoded content";
+
+        // Act & Assert
         try {
-            bCodec0.decodeText("=?=?=?ZCg05nk5fYK>>");
-            fail("Expecting exception: Exception");
+            bCodec.decodeText(malformedText);
+            fail("Expected a DecoderException to be thrown for malformed input");
+        } catch (DecoderException e) {
+            // Verify that the exception message is correct.
+            assertEquals(expectedErrorMessage, e.getMessage());
         } catch (Exception e) {
-            //
-            // RFC 1522 violation: malformed encoded content
-            //
-            verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
+            // Fail the test if an unexpected exception type is thrown.
+            fail("Expected a DecoderException, but caught " + e.getClass().getName());
         }
     }
 }
