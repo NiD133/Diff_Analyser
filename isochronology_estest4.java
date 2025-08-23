@@ -2,20 +2,26 @@ package org.joda.time.chrono;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
 
-public class ISOChronology_ESTestTest4 extends ISOChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ISOChronology} class.
+ */
+public class ISOChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
-        Object object0 = new Object();
-        boolean boolean0 = iSOChronology0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when comparing an ISOChronology
+     * instance with an object of a completely different type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentTypeObject() {
+        // Arrange: Create an instance of the class under test and an object of a different type.
+        ISOChronology chronology = ISOChronology.getInstanceUTC();
+        Object nonChronologyObject = new Object();
+
+        // Act: Call the equals() method.
+        boolean isEqual = chronology.equals(nonChronologyObject);
+
+        // Assert: Verify that the result is false, as the types are incompatible.
+        assertFalse(isEqual);
     }
 }
