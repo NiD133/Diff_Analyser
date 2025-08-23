@@ -1,23 +1,33 @@
-package org.jsoup.parser;
+package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Tokeniser_ESTestTest29 extends Tokeniser_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Comment comment0 = new Comment("/Q");
-        XmlDeclaration xmlDeclaration0 = comment0.asXmlDeclaration();
-        assertNull(xmlDeclaration0);
+/**
+ * Test suite for the {@link Comment#asXmlDeclaration()} method.
+ *
+ * Note: This test was originally located in a test suite for the `Tokeniser` class,
+ * but its actual subject is the `Comment` node's functionality.
+ */
+public class CommentTest {
+
+    /**
+     * Verifies that asXmlDeclaration() returns null for a Comment node
+     * whose content is not a valid XML declaration.
+     * A valid XML declaration must start with a '?' or '!' character.
+     */
+    @Test
+    public void asXmlDeclarationReturnsNullForRegularComment() {
+        // Arrange: Create a standard comment with content that does not resemble an XML declaration.
+        Comment comment = new Comment("/Q");
+
+        // Act: Attempt to interpret the comment as an XML declaration.
+        XmlDeclaration declaration = comment.asXmlDeclaration();
+
+        // Assert: The method should return null, as the comment is not a declaration.
+        assertNull("A comment with plain text content should not be converted to an XmlDeclaration.", declaration);
     }
 }
