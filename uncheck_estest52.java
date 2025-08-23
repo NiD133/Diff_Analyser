@@ -1,31 +1,37 @@
 package org.apache.commons.io.function;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
 import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest52 extends Uncheck_ESTest_scaffolding {
+import org.junit.Test;
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        IOSupplier<ForkJoinTask<String>> iOSupplier0 = (IOSupplier<ForkJoinTask<String>>) mock(IOSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(iOSupplier0).get();
-        ForkJoinTask<String> forkJoinTask0 = Uncheck.get(iOSupplier0);
-        assertNull(forkJoinTask0);
+/**
+ * Contains tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
+
+    /**
+     * Tests that {@link Uncheck#get(IOSupplier)} correctly returns null when the
+     * provided supplier returns null, without throwing an exception.
+     *
+     * @throws IOException Required for the mock setup, but not expected to be thrown in this test.
+     */
+    @Test
+    public void get_shouldReturnNull_whenSupplierReturnsNull() throws IOException {
+        // Arrange: Create a mock IOSupplier that is configured to return null.
+        // The @SuppressWarnings is necessary because of type erasure with generic mocks.
+        @SuppressWarnings("unchecked")
+        final IOSupplier<ForkJoinTask<String>> mockSupplier = mock(IOSupplier.class);
+        when(mockSupplier.get()).thenReturn(null);
+
+        // Act: Call the method under test with the mock supplier.
+        final ForkJoinTask<String> result = Uncheck.get(mockSupplier);
+
+        // Assert: Verify that the result from Uncheck.get() is null, as provided by the mock.
+        assertNull("Expected Uncheck.get() to return the null value from the supplier.", result);
     }
 }
