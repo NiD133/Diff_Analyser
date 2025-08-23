@@ -1,41 +1,31 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest23 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} utility class.
+ * This test focuses on verifying argument validation.
+ */
+public class HexDump_ESTestTest23 { // Note: The class name is kept from the original for consistency.
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        // Undeclared exception!
-        try {
-            HexDump.dump(byteArray0, (long) 2185, (OutputStream) null, 2185);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // stream
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that HexDump.dump() throws a NullPointerException when the provided
+     * OutputStream is null. The method is expected to validate its arguments
+     * before attempting to process any data.
+     */
+    @Test(expected = NullPointerException.class)
+    public void dumpWithNullOutputStreamShouldThrowNullPointerException() {
+        // Arrange: Define valid inputs for all parameters except for the stream.
+        final byte[] data = new byte[16];
+        final long offset = 0L;
+        final int index = 0;
+        final OutputStream nullStream = null;
+
+        // Act & Assert: This call is expected to throw a NullPointerException
+        // because the output stream is null. The assertion is handled by the
+        // 'expected' attribute of the @Test annotation.
+        HexDump.dump(data, offset, nullStream, index);
     }
 }
