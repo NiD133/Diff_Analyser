@@ -1,39 +1,39 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class MinutesTestTest11 extends TestCase {
+/**
+ * Test cases for the {@link Minutes#isGreaterThan(Minutes)} method.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingToSmallerValue() {
+        assertTrue("3 minutes should be greater than 2 minutes", Minutes.THREE.isGreaterThan(Minutes.TWO));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingToLargerValue() {
+        assertFalse("2 minutes should not be greater than 3 minutes", Minutes.TWO.isGreaterThan(Minutes.THREE));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingToSameValue() {
+        assertFalse("3 minutes should not be greater than 3 minutes", Minutes.THREE.isGreaterThan(Minutes.THREE));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingPositiveToNull() {
+        // A null Minutes object is treated as zero.
+        assertTrue("1 minute should be greater than null (0 minutes)", Minutes.ONE.isGreaterThan(null));
     }
 
-    //-----------------------------------------------------------------------
-    public void testIsGreaterThan() {
-        assertEquals(true, Minutes.THREE.isGreaterThan(Minutes.TWO));
-        assertEquals(false, Minutes.THREE.isGreaterThan(Minutes.THREE));
-        assertEquals(false, Minutes.TWO.isGreaterThan(Minutes.THREE));
-        assertEquals(true, Minutes.ONE.isGreaterThan(null));
-        assertEquals(false, Minutes.minutes(-1).isGreaterThan(null));
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingNegativeToNull() {
+        // A null Minutes object is treated as zero.
+        Minutes negativeMinutes = Minutes.minutes(-1);
+        assertFalse("-1 minutes should not be greater than null (0 minutes)", negativeMinutes.isGreaterThan(null));
     }
 }
