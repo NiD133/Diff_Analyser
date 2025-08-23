@@ -1,27 +1,43 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertNull;
 
-public class ConverterSet_ESTestTest26 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ConverterSet} class.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Converter[] converterArray0 = new Converter[1];
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        converterArray0[0] = (Converter) stringConverter0;
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        ConverterSet converterSet1 = converterSet0.add(stringConverter0, converterArray0);
-        assertSame(converterSet1, converterSet0);
+    /**
+     * Tests that adding a converter that is already present in the set
+     * returns the same ConverterSet instance, confirming its immutable behavior
+     * in this scenario.
+     */
+    @Test
+    public void add_whenConverterIsAlreadyPresent_shouldReturnSameInstance() {
+        // Arrange: Create a ConverterSet that already contains a StringConverter.
+        Converter existingConverter = StringConverter.INSTANCE;
+        Converter[] initialConverters = { existingConverter };
+        ConverterSet initialSet = new ConverterSet(initialConverters);
+
+        // The 'add' method can optionally return the converter that was replaced.
+        // We expect no replacement, so this array should remain unchanged.
+        Converter[] replacedConverterContainer = new Converter[1];
+
+        // Act: Attempt to add the same converter instance to the set.
+        ConverterSet resultSet = initialSet.add(existingConverter, replacedConverterContainer);
+
+        // Assert: The returned set should be the exact same instance as the original,
+        // not a new copy, because no change was made.
+        assertSame(
+            "Adding an existing converter should return the same set instance",
+            initialSet,
+            resultSet
+        );
+        assertNull(
+            "No converter should have been replaced",
+            replacedConverterContainer[0]
+        );
     }
 }
