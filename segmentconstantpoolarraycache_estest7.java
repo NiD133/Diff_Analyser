@@ -1,29 +1,26 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPoolArrayCache_ESTestTest7 extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentConstantPoolArrayCache} class.
+ */
+public class SegmentConstantPoolArrayCacheTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
-        // Undeclared exception!
-        try {
-            segmentConstantPoolArrayCache0.cacheArray((String[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache$CachedArray", e);
-        }
+    /**
+     * Verifies that calling cacheArray() with a null argument
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void cacheArrayShouldThrowNullPointerExceptionForNullInput() {
+        // Arrange: Create an instance of the class under test.
+        final SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
+
+        // Act: Call the method with a null input.
+        // This action is expected to throw the exception.
+        cache.cacheArray(null);
+
+        // Assert: The test framework verifies that a NullPointerException was thrown.
+        // If no exception is thrown, the test will fail.
     }
 }
