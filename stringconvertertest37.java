@@ -1,84 +1,32 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.joda.time.ReadWritableInterval;
+import org.junit.jupiter.api.Test;
 
-public class StringConverterTestTest37 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+/**
+ * Unit tests for {@link StringConverter#setInto(ReadWritableInterval, Object, Chronology)}.
+ */
+class StringConverterSetIntoIntervalTest {
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+    private final StringConverter converter = StringConverter.INSTANCE;
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+    /**
+     * Tests that calling setInto() with an empty string fails, as it's not a valid
+     * representation of an interval.
+     */
+    @Test
+    void setInto_withEmptyString_throwsIllegalArgumentException() {
+        // Arrange
+        MutableInterval interval = new MutableInterval(0L, 1000L);
+        String invalidInput = "";
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoIntervalEx_Object_Chronology1() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
-        try {
-            StringConverter.INSTANCE.setInto(m, "", null);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
+        // Act & Assert
+        // An empty string is not a valid format for an interval.
+        assertThrows(IllegalArgumentException.class, () -> {
+            converter.setInto(interval, invalidInput, null);
+        });
     }
 }
