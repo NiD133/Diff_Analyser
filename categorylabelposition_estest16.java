@@ -1,24 +1,34 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CategoryLabelPosition_ESTestTest16 extends CategoryLabelPosition_ESTest_scaffolding {
+/**
+ * Tests for the {@link CategoryLabelPosition} class, focusing on object equality.
+ */
+public class CategoryLabelPositionTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
-        CategoryLabelPosition categoryLabelPosition1 = new CategoryLabelPosition();
-        boolean boolean0 = categoryLabelPosition0.equals(categoryLabelPosition1);
-        assertEquals(0.95F, categoryLabelPosition1.getWidthRatio(), 0.01F);
-        assertTrue(boolean0);
-        assertEquals(0.0, categoryLabelPosition1.getAngle(), 0.01);
+    /**
+     * Verifies that two CategoryLabelPosition instances created with the default
+     * constructor are considered equal.
+     */
+    @Test
+    public void twoDefaultInstancesShouldBeEqual() {
+        // Arrange: Create two instances using the default constructor.
+        // The default constructor creates a position with specific default values,
+        // such as a 0.0 angle and a 0.95 width ratio.
+        CategoryLabelPosition positionA = new CategoryLabelPosition();
+        CategoryLabelPosition positionB = new CategoryLabelPosition();
+
+        // Assert: The two instances should be equal, and their hash codes should match.
+        // This confirms that the default constructor consistently initializes objects
+        // to an identical state.
+        assertEquals(positionA, positionB);
+        assertEquals("Equal objects must have equal hash codes.", positionA.hashCode(), positionB.hashCode());
+
+        // For clarity, explicitly verify the properties that were checked in the original test.
+        // This makes it clear *why* the objects are considered equal.
+        assertEquals("Default angle should be 0.0.", 0.0, positionA.getAngle(), 0.001);
+        assertEquals("Default width ratio should be 0.95.", 0.95f, positionA.getWidthRatio(), 0.001f);
     }
 }
