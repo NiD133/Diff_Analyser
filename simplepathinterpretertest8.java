@@ -3,6 +3,7 @@ package org.apache.commons.jxpath.ri.axes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.HashMap;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.NestedTestBean;
@@ -21,41 +22,118 @@ import org.apache.commons.jxpath.ri.model.dom.DOMNodePointer;
 import org.apache.commons.jxpath.ri.model.dynamic.DynamicPointer;
 import org.apache.commons.jxpath.ri.model.dynamic.DynamicPropertyPointer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SimplePathInterpreterTestTest8 {
-
-    private TestBeanWithNode bean;
+/**
+ * Tests for {@link SimplePathInterpreter} focusing on its behavior in lenient mode,
+ * particularly the creation of "null" pointers for non-existent paths.
+ * These tests often verify the internal structure of the generated {@link Pointer}
+ * chains, which is crucial for the 'createPath' functionality of JXPath.
+ */
+@DisplayName("SimplePathInterpreter Lenient Mode Tests")
+class SimplePathInterpreterTest {
 
     private JXPathContext context;
 
-    private void assertNullPointer(final String path, final String expectedPath, final String expectedSignature) {
-        final Pointer pointer = context.getPointer(path);
-        assertNotNull(pointer, "Null path exists: " + path);
-        assertEquals(expectedPath, pointer.asPath(), "Null path as path: " + path);
-        assertEquals(expectedSignature, pointerSignature(pointer), "Checking Signature: " + path);
-        final Pointer vPointer = ((NodePointer) pointer).getValuePointer();
-        assertFalse(((NodePointer) vPointer).isActual(), "Null path is null: " + path);
-        assertEquals(expectedSignature + "N", pointerSignature(vPointer), "Checking value pointer signature: " + path);
+    @BeforeEach
+    void setUp() {
+        // This setup creates a complex bean structure. While not all parts are used
+        // in every test, it provides a rich environment for various XPath queries.
+        TestBeanWithNode bean = TestBeanWithNode.createTestBeanWithDOM();
+        HashMap<String, Object> submap = new HashMap<>();
+        submap.put("key", new NestedTestBean("Name 9"));
+        submap.put("strings", bean.getNestedBean().getStrings());
+        bean.getList().add(new int[] { 1, 2 });
+        bean.getList().add(bean.getVendor());
+        bean.getMap().put("Key3", new Object[] { new NestedTestBean("some"), 2, bean.getVendor(), submap });
+        bean.getMap().put("Key4", bean.getVendor());
+        bean.getMap().put("Key5", submap);
+        bean.getMap().put("Key6", new Object[0]);
+
+        context = JXPathContext.newContext(null, bean);
+        context.setLenient(true);
+        context.setFactory(new TestBeanFactory());
     }
 
-    private void assertValueAndPointer(final String path, final Object expectedValue, final String expectedPath, final String expectedSignature) {
-        assertValueAndPointer(path, expectedValue, expectedPath, expectedSignature, expectedSignature);
-    }
+    @Test
+    void testPointerForNonExistentIndexedPropertyInLenientMode() {
+        // ARRANGE
+        // The TestNull object has a "nothing" property which is null.
+        context.getVariables().declareVariable("testnull", new TestNull());
 
-    private void assertValueAndPointer(final String path, final Object expectedValue, final String expectedPath, final String expectedSignature, final String expectedValueSignature) {
-        final Object value = context.getValue(path);
-        assertEquals(expectedValue, value, "Checking value: " + path);
-        final Pointer pointer = context.getPointer(path);
-        assertEquals(expectedPath, pointer.toString(), "Checking pointer: " + path);
-        assertEquals(expectedSignature, pointerSignature(pointer), "Checking signature: " + path);
-        final Pointer vPointer = ((NodePointer) pointer).getValuePointer();
-        assertEquals(expectedValueSignature, pointerSignature(vPointer), "Checking value pointer signature: " + path);
+        // Path to a non-existent element (index [2]) of a null property.
+        // In lenient mode, JXPath should not throw an exception but return
+        // a chain of "null pointers" representing the path.
+        final String path = "$testnull/nothing[2]";
+
+        // The expected pointer path string.
+        final String expectedPointerPath = "$testnull/nothing[2]";
+
+        // The expected signature represents the chain of pointer types created by JXPath:
+        // V: VariablePointer for "$testnull"
+        // B: BeanPointer for the TestNull object
+        // b: BeanPropertyPointer for the "nothing" property
+        // E: NullElementPointer for the non-existent index [2]
+        final String expectedSignature = "VBbE";
+
+        // ACT & ASSERT
+        // The assertNullPointer helper verifies that JXPath creates the correct
+        // chain of pointers for a path that does not resolve to an actual value.
+        assertNullPointer(path, expectedPointerPath, expectedSignature);
     }
 
     /**
-     * Since we need to test the internal Signature of a pointer, we will get a signature which will contain a single character per pointer in the chain,
-     * representing that pointer's type.
+     * Asserts that a given XPath resolves to a "null pointer" - a pointer that
+     * represents a non-existent node in lenient mode. It checks the pointer's path
+     * representation, its internal type signature, and confirms its value is null.
+     *
+     * @param path              The XPath expression to evaluate.
+     * @param expectedPath      The expected string representation of the resulting pointer.
+     * @param expectedSignature The expected internal type signature of the pointer chain.
+     */
+    private void assertNullPointer(final String path, final String expectedPath, final String expectedSignature) {
+        // Act
+        final Pointer pointer = context.getPointer(path);
+
+        // Assert
+        assertNotNull(pointer, "A pointer should be returned for the path: " + path);
+        assertEquals(expectedPath, pointer.asPath(), "Pointer.asPath() should match the queried path");
+
+        String actualSignature = pointerSignature(pointer);
+        assertEquals(expectedSignature, actualSignature, "The chain of pointer types should match the expected signature");
+
+        // A "null pointer" chain's final value should be a non-actual pointer
+        final NodePointer valuePointer = ((NodePointer) pointer).getValuePointer();
+        assertFalse(valuePointer.isActual(), "The value pointer for a null path should not be 'actual'");
+
+        String actualValueSignature = pointerSignature(valuePointer);
+        assertEquals(expectedSignature + "N", actualValueSignature, "The value pointer should append a NullPointer 'N' to the signature");
+    }
+
+    /**
+     * Generates a compact signature string representing the types of pointers in a chain.
+     * This is a testing utility to verify the internal structure of the pointer hierarchy
+     * created by JXPath for a given path.
+     * <p>
+     * Each character in the signature corresponds to a specific Pointer subclass:
+     * <ul>
+     *   <li>'V': {@link VariablePointer}</li>
+     *   <li>'B': {@link BeanPointer}</li>
+     *   <li>'b': {@link BeanPropertyPointer}</li>
+     *   <li>'D': {@link DynamicPointer}</li>
+     *   <li>'d': {@link DynamicPropertyPointer}</li>
+     *   <li>'C': {@link CollectionPointer}</li>
+     *   <li>'M': {@link DOMNodePointer}</li>
+     *   <li>'N': {@link NullPointer} - Represents a null value</li>
+     *   <li>'n': {@link NullPropertyPointer} - Represents a non-existent property</li>
+     *   <li>'E': {@link NullElementPointer} - Represents a non-existent collection element</li>
+     *   <li>'?': Unknown pointer type</li>
+     * </ul>
+     * The signature is built by recursively traversing up the parent pointers.
+     *
+     * @param pointer The leaf pointer of the chain.
+     * @return A string representing the pointer types from root to leaf.
      */
     private String pointerSignature(final Pointer pointer) {
         if (pointer == null) {
@@ -83,33 +161,24 @@ public class SimplePathInterpreterTestTest8 {
         } else if (pointer instanceof DOMNodePointer) {
             type = 'M';
         } else {
-            System.err.println("UNKNOWN TYPE: " + pointer.getClass());
+            System.err.println("UNKNOWN POINTER TYPE: " + pointer.getClass().getName());
         }
         final NodePointer parent = ((NodePointer) pointer).getImmediateParentPointer();
         return pointerSignature(parent) + type;
     }
 
-    @BeforeEach
-    protected void setUp() throws Exception {
-        bean = TestBeanWithNode.createTestBeanWithDOM();
-        final HashMap submap = new HashMap();
-        submap.put("key", new NestedTestBean("Name 9"));
-        submap.put("strings", bean.getNestedBean().getStrings());
-        bean.getList().add(new int[] { 1, 2 });
-        bean.getList().add(bean.getVendor());
-        bean.getMap().put("Key3", new Object[] { new NestedTestBean("some"), Integer.valueOf(2), bean.getVendor(), submap });
-        bean.getMap().put("Key4", bean.getVendor());
-        bean.getMap().put("Key5", submap);
-        bean.getMap().put("Key6", new Object[0]);
-        context = JXPathContext.newContext(null, bean);
-        context.setLenient(true);
-        context.setFactory(new TestBeanFactory());
+    // The assertValueAndPointer helper is preserved as it may be used by other tests in the original suite.
+    private void assertValueAndPointer(final String path, final Object expectedValue, final String expectedPath, final String expectedSignature) {
+        assertValueAndPointer(path, expectedValue, expectedPath, expectedSignature, expectedSignature);
     }
 
-    @Test
-    void testInterpretExpressionPath() {
-        context.getVariables().declareVariable("array", new String[] { "Value1" });
-        context.getVariables().declareVariable("testnull", new TestNull());
-        assertNullPointer("$testnull/nothing[2]", "$testnull/nothing[2]", "VBbE");
+    private void assertValueAndPointer(final String path, final Object expectedValue, final String expectedPath, final String expectedSignature, final String expectedValueSignature) {
+        final Object value = context.getValue(path);
+        assertEquals(expectedValue, value, "Checking value: " + path);
+        final Pointer pointer = context.getPointer(path);
+        assertEquals(expectedPath, pointer.toString(), "Checking pointer: " + path);
+        assertEquals(expectedSignature, pointerSignature(pointer), "Checking signature: " + path);
+        final Pointer vPointer = ((NodePointer) pointer).getValuePointer();
+        assertEquals(expectedValueSignature, pointerSignature(vPointer), "Checking value pointer signature: " + path);
     }
 }
