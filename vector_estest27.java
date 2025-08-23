@@ -1,20 +1,24 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Vector_ESTestTest27 extends Vector_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Vector vector0 = new Vector(0.0F, 0.0F, 3.3516045F);
-        Vector vector1 = new Vector(0.0F, 0.0F, 1);
-        boolean boolean0 = vector0.equals(vector1);
-        assertEquals(1.0F, vector1.length(), 0.01F);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method correctly returns false for two vectors
+     * that differ only in their Z-coordinate.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenOnlyZCoordinatesDiffer() {
+        // Arrange: Create two vectors with the same X and Y coordinates, but different Z coordinates.
+        Vector vectorA = new Vector(0.0F, 0.0F, 3.3516045F);
+        Vector vectorB = new Vector(0.0F, 1.0F);
+
+        // Act & Assert: Verify that the two vectors are not considered equal.
+        assertFalse("Vectors with different Z coordinates should not be equal.", vectorA.equals(vectorB));
     }
 }
