@@ -1,36 +1,41 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.jsoup.select.Elements;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This class contains tests for the Elements class.
+ * The original test class name is preserved as per the instructions.
+ * A more conventional name would be ElementsTest.
+ */
 public class Elements_ESTestTest160 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test159() throws Throwable {
-        Document document0 = Parser.parse("", "");
-        Elements elements0 = document0.children();
-        String string0 = elements0.toString();
-        assertEquals("<html>\n <head></head>\n <body></body>\n</html>", string0);
+    /**
+     * Verifies that the toString() method on an Elements collection returns the
+     * combined outer HTML of all elements it contains.
+     *
+     * This specific test checks the case where the collection contains just the
+     * single root <html> element of a default document.
+     */
+    @Test
+    public void toStringReturnsOuterHtmlOfContainedElements() {
+        // Arrange: Create a default document structure (<html><head></head><body></body></html>)
+        // and select its single root element, <html>.
+        Document doc = Parser.parse("", "");
+        Elements elements = doc.children(); // This will contain only the <html> element
+
+        // The expected output is the outer HTML of the <html> element,
+        // formatted by Jsoup's default pretty-printer.
+        String expectedHtml = "<html>\n <head></head>\n <body></body>\n</html>";
+
+        // Act: Call the method under test.
+        String actualHtml = elements.toString();
+
+        // Assert: The result should match the element's full outer HTML.
+        assertEquals(expectedHtml, actualHtml);
     }
 }
