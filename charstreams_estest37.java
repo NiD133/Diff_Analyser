@@ -1,45 +1,41 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest37 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams}.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        CharBuffer charBuffer0 = CharStreams.createBuffer();
-        CharStreams.readLines((Readable) charBuffer0);
-        assertEquals(2048, charBuffer0.position());
-        assertEquals(2048, charBuffer0.limit());
+    /**
+     * Verifies that readLines consumes the entire Readable, even when it contains no newline
+     * characters.
+     */
+    @Test
+    public void readLines_withReadableContainingNoNewlines_consumesEntireReadable() throws IOException {
+        // Arrange: Create a CharBuffer to act as a Readable.
+        // The buffer is filled with 2048 null characters and has no newlines.
+        CharBuffer sourceBuffer = CharStreams.createBuffer();
+        int bufferCapacity = sourceBuffer.capacity();
+
+        // Act: Call readLines, which should read the entire buffer and return its
+        // content as a single line.
+        List<String> lines = CharStreams.readLines(sourceBuffer);
+
+        // Assert:
+        // 1. The buffer should be fully consumed.
+        assertFalse("The buffer should have no remaining characters after being read.", sourceBuffer.hasRemaining());
+        assertEquals("The buffer's position should be at its limit.", bufferCapacity, sourceBuffer.position());
+
+        // 2. The returned list should contain one line with all the buffer's content.
+        assertEquals("Expected a single line to be read from the buffer.", 1, lines.size());
+        assertEquals("The length of the read line should match the buffer's capacity.",
+                bufferCapacity, lines.get(0).length());
     }
 }
