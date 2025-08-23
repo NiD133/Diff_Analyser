@@ -1,47 +1,26 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class BritishCutoverChronology_ESTestTest6 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
-        boolean boolean0 = britishCutoverChronology0.isLeapYear(371);
-        assertFalse(boolean0);
+    @Test
+    public void isLeapYear_shouldReturnFalse_forNonLeapYearBeforeCutover() {
+        // Arrange
+        // The BritishCutoverChronology uses Julian calendar rules for years before the 1752 cutover.
+        // In the Julian calendar, a year is a leap year if it is divisible by 4.
+        // The year 371 is not divisible by 4, so it should not be a leap year.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        long year = 371;
+
+        // Act
+        boolean isLeap = chronology.isLeapYear(year);
+
+        // Assert
+        assertFalse("Year 371 should not be a leap year under Julian rules", isLeap);
     }
 }
