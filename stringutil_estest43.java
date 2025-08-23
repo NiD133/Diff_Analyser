@@ -1,28 +1,20 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest43 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        boolean boolean0 = StringUtil.isWhitespace(32);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the isWhitespace method correctly identifies the space character.
+     */
+    @Test
+    public void isWhitespaceShouldReturnTrueForSpaceCharacter() {
+        // The integer value 32 represents the code point for the space character (' ').
+        // The test confirms that this common whitespace character is correctly identified.
+        assertTrue("The space character should be classified as whitespace.", StringUtil.isWhitespace(' '));
     }
 }
