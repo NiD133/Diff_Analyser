@@ -1,41 +1,34 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class HexDump_ESTestTest11 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for {@link HexDump}.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        byte[] byteArray0 = new byte[37];
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        try {
-            HexDump.dump(byteArray0, 804L, (OutputStream) pipedOutputStream0, 16);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
-        }
+    /**
+     * Verifies that calling HexDump.dump() with an unconnected PipedOutputStream
+     * results in an IOException, as the underlying stream cannot be written to.
+     */
+    @Test
+    public void testDumpToUnconnectedPipeThrowsIOException() {
+        // Arrange: Create test data and an output stream that is not connected to an input stream.
+        final byte[] data = new byte[16]; // The data content is irrelevant for this test.
+        final PipedOutputStream unconnectedPipe = new PipedOutputStream();
+
+        // Act & Assert: Expect an IOException when attempting to write to the unconnected pipe.
+        // The assertThrows method checks that the provided lambda throws the specified exception.
+        final IOException thrown = assertThrows(IOException.class, () -> {
+            HexDump.dump(data, 0L, unconnectedPipe, 0);
+        });
+
+        // Further verify that the exception message is what we expect, making the test more robust.
+        assertEquals("Pipe not connected", thrown.getMessage());
     }
 }
