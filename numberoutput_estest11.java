@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest11 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        String string0 = NumberOutput.toString(11L);
-        assertEquals("11", string0);
+    /**
+     * Tests that the {@code toString(long)} method correctly converts a positive 
+     * two-digit long value into its string representation.
+     */
+    @Test
+    public void toString_shouldConvertPositiveTwoDigitLongToString() {
+        // Arrange
+        long numberToConvert = 11L;
+        String expectedString = "11";
+
+        // Act
+        String actualString = NumberOutput.toString(numberToConvert);
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
