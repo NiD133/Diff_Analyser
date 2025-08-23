@@ -1,34 +1,23 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
+import static org.junit.Assert.assertThrows;
+
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest100 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test099() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.beginArray();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    @Test
+    public void beginArray_shouldThrowNullPointerException_whenInitializedWithNull() {
+        // Arrange: Create a JsonTreeReader with a null JsonElement.
+        // This simulates a scenario where the reader has no content to parse.
+        JsonTreeReader reader = new JsonTreeReader((JsonElement) null);
+
+        // Act & Assert: Verify that attempting to start reading an array
+        // throws a NullPointerException because there is no underlying element to inspect.
+        assertThrows(NullPointerException.class, reader::beginArray);
     }
 }
