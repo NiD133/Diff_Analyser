@@ -17,9 +17,9 @@ public class JsonTypeInfo_ESTestTest30 extends JsonTypeInfo_ESTest_scaffolding {
         JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.EXISTING_PROPERTY;
         Class<Object> class0 = Object.class;
         Boolean boolean0 = Boolean.valueOf(false);
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "<CLLX)Xg+tvh?s;", class0, true, boolean0);
+        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "<C LLX)Xg+tvh?s;", class0, true, boolean0);
         jsonTypeInfo_Value0.getIdType();
         assertTrue(jsonTypeInfo_Value0.getIdVisible());
-        assertEquals("<CLLX)Xg+tvh?s;", jsonTypeInfo_Value0.getPropertyName());
+        assertEquals("<C LLX)Xg+tvh?s;", jsonTypeInfo_Value0.getPropertyName());
     }
 }
