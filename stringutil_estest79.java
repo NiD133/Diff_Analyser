@@ -1,28 +1,17 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest79 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for {@link StringUtil#isNumeric(String)}.
+ */
+public class StringUtilIsNumericTest {
 
-    @Test(timeout = 4000)
-    public void test78() throws Throwable {
-        boolean boolean0 = StringUtil.isNumeric("");
-        assertFalse(boolean0);
+    @Test
+    public void isNumericShouldReturnFalseForEmptyString() {
+        // The isNumeric method should return false for an empty input string.
+        boolean result = StringUtil.isNumeric("");
+        assertFalse("An empty string should not be considered numeric", result);
     }
 }
