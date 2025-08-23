@@ -1,33 +1,46 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.apache.ibatis.executor.result.ResultMapException;
+import org.junit.Test;
 
-public class BaseTypeHandler_ESTestTest8 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for the abstract BaseTypeHandler class.
+ */
+public class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ClobTypeHandler clobTypeHandler0 = ClobTypeHandler.INSTANCE;
-        // Undeclared exception!
-        try {
-            clobTypeHandler0.getResult((CallableStatement) null, 4491);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error attempting to get column #4491 from callable statement.  Cause: java.lang.NullPointerException
-            //
-            verifyException("org.apache.ibatis.type.BaseTypeHandler", e);
-        }
+  // Use a concrete implementation (ClobTypeHandler) to test the abstract class's logic.
+  private final BaseTypeHandler<String> typeHandler = ClobTypeHandler.INSTANCE;
+
+  /**
+   * Verifies that getResult(CallableStatement, int) wraps any underlying exception
+   * in a descriptive ResultMapException. This is tested by passing a null statement,
+   * which is expected to cause a NullPointerException internally.
+   */
+  @Test
+  public void shouldWrapExceptionWhenGettingResultFromNullCallableStatement() {
+    // Arrange
+    int columnIndex = 4491;
+    String expectedErrorMessage = "Error attempting to get column #" + columnIndex
+        + " from callable statement.  Cause: java.lang.NullPointerException";
+
+    try {
+      // Act
+      typeHandler.getResult((CallableStatement) null, columnIndex);
+      fail("Expected a ResultMapException to be thrown, but nothing was thrown.");
+    } catch (ResultMapException e) {
+      // Assert
+      assertEquals(expectedErrorMessage, e.getMessage());
+      assertNotNull("The wrapped cause should not be null.", e.getCause());
+      assertTrue("The cause should be a NullPointerException.",
+          e.getCause() instanceof NullPointerException);
+    } catch (Exception e) {
+      fail("An unexpected exception type was thrown: " + e.getClass().getName());
     }
+  }
 }
