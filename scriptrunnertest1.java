@@ -1,34 +1,52 @@
 package org.apache.ibatis.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.sql.DataSource;
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
-import org.apache.ibatis.io.Resources;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class ScriptRunnerTestTest1 extends BaseDataTest {
+/**
+ * Tests for ScriptRunner sending the entire script at once.
+ */
+class ScriptRunnerFullScriptTest extends BaseDataTest {
 
-    private static final String LINE_SEPARATOR = System.lineSeparator();
+    /**
+     * This test demonstrates the ScriptRunner's ability to execute an entire script
+     * in one go, rather than statement by statement.
+     * <p>
+     * It is currently disabled because the underlying HSQLDB (v2.0) fails on
+     * 'CREATE INDEX' statements within the script. The original test also contained
+     * a bug where the connection was closed before the script was executed.
+     */
+    @Test
+    @Disabled("Fails with HSQLDB 2.0 due to 'CREATE INDEX' statements in the schema script.")
+    void shouldExecuteAllStatementsWhenSendingFullScript() throws Exception {
+        // Arrange
+        DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
+        try (Connection connection = ds.getConnection()) {
+            ScriptRunner runner = new ScriptRunner(connection);
+            // Configure the runner to send the entire script in one execution
+            runner.setSendFullScript(true);
+            runner.setAutoCommit(true);
+            runner.setStopOnError(false);
+            runner.setErrorLogWriter(null); // Suppress logs for clean test output
+            runner.setLogWriter(null);
+
+            // Act
+            runJPetStoreScripts(runner);
+        } // The try-with-resources block ensures the connection is closed automatically.
+
+        // Assert
+        assertProductsTableExistsAndLoaded();
+    }
 
     private void runJPetStoreScripts(ScriptRunner runner) throws IOException, SQLException {
         runScript(runner, JPETSTORE_DDL);
@@ -44,26 +62,5 @@ public class ScriptRunnerTestTest1 extends BaseDataTest {
         } finally {
             ds.forceCloseAll();
         }
-    }
-
-    private StringBuilder y(StringBuilder sb) {
-        sb.append("ABC");
-        return sb;
-    }
-
-    @Test
-    @Disabled("This fails with HSQLDB 2.0 due to the create index statements in the schema script")
-    void shouldRunScriptsBySendingFullScriptAtOnce() throws Exception {
-        DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
-        Connection conn = ds.getConnection();
-        ScriptRunner runner = new ScriptRunner(conn);
-        runner.setSendFullScript(true);
-        runner.setAutoCommit(true);
-        runner.setStopOnError(false);
-        runner.setErrorLogWriter(null);
-        runner.setLogWriter(null);
-        conn.close();
-        runJPetStoreScripts(runner);
-        assertProductsTableExistsAndLoaded();
     }
 }
