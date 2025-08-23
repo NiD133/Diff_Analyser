@@ -1,28 +1,39 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the {@link NumericEntityUnescaper} class,
+ * focusing on boundary conditions of the translate method.
+ */
+// The original test extended a scaffolding class. We'll keep it for compatibility,
+// but note that in a real-world scenario, we'd question its necessity.
 public class NumericEntityUnescaper_ESTestTest6 extends NumericEntityUnescaper_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        NumericEntityUnescaper.OPTION[] numericEntityUnescaper_OPTIONArray0 = new NumericEntityUnescaper.OPTION[0];
-        NumericEntityUnescaper numericEntityUnescaper0 = new NumericEntityUnescaper(numericEntityUnescaper_OPTIONArray0);
-        StringWriter stringWriter0 = new StringWriter(1416);
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        // Undeclared exception!
-        try {
-            numericEntityUnescaper0.translate((CharSequence) stringBuffer0, 1416, (Writer) stringWriter0);
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-        }
+    /**
+     * Tests that translate() throws a StringIndexOutOfBoundsException when the
+     * provided index is outside the bounds of the input character sequence.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class)
+    public void translateShouldThrowExceptionForOutOfBoundsIndex() throws IOException {
+        // Arrange
+        // Create an unescaper with default options. The specific options are not relevant for this test.
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+
+        final CharSequence emptyInput = "";
+        final Writer writer = new StringWriter();
+        
+        // Any index greater than or equal to the input's length (0) is out of bounds.
+        // We use 1 for clarity.
+        final int outOfBoundsIndex = 1;
+
+        // Act & Assert
+        // This call is expected to throw a StringIndexOutOfBoundsException,
+        // which is declared by the @Test annotation.
+        unescaper.translate(emptyInput, outOfBoundsIndex, writer);
     }
 }
