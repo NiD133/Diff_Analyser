@@ -1,29 +1,35 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BCodec_ESTestTest19 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link BCodec} class, focusing on its constructor behavior.
+ */
+public class BCodecConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        BCodec bCodec0 = null;
-        try {
-            bCodec0 = new BCodec("p-Ubb");
-            fail("Expecting exception: UnsupportedCharsetException");
-        } catch (UnsupportedCharsetException e) {
-            //
-            // p-Ubb
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Tests that the BCodec constructor that accepts a charset name throws
+     * an UnsupportedCharsetException when provided with an invalid or
+     * unsupported charset name.
+     */
+    @Test
+    public void constructorWithUnsupportedCharsetNameShouldThrowException() {
+        // Arrange: Define an invalid charset name that is not supported by the Java runtime.
+        final String unsupportedCharsetName = "p-Ubb";
+
+        // Act & Assert: Verify that instantiating BCodec with the unsupported charset name
+        // throws the expected exception. The BCodec constructor delegates to Charset.forName(),
+        // which is responsible for throwing this exception.
+        UnsupportedCharsetException thrown = assertThrows(
+            UnsupportedCharsetException.class,
+            () -> new BCodec(unsupportedCharsetName)
+        );
+
+        // Further Assert: Check that the exception message correctly identifies the problematic charset.
+        assertEquals(unsupportedCharsetName, thrown.getMessage());
     }
 }
