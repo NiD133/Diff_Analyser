@@ -1,21 +1,28 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class URLCodec_ESTestTest10 extends URLCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link URLCodec} class.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        byte[] byteArray0 = new byte[0];
-        byte[] byteArray1 = uRLCodec0.encode(byteArray0);
-        assertEquals(0, byteArray1.length);
+    /**
+     * Tests that encoding an empty byte array correctly results in an empty byte array.
+     * This verifies the handling of an important edge case.
+     */
+    @Test
+    public void encodeEmptyByteArrayShouldReturnEmptyByteArray() {
+        // Arrange: Create a URLCodec instance and the input data.
+        final URLCodec urlCodec = new URLCodec();
+        final byte[] emptyInput = new byte[0];
+
+        // Act: Call the method under test.
+        final byte[] result = urlCodec.encode(emptyInput);
+
+        // Assert: Verify that the output is also an empty byte array.
+        final byte[] expectedOutput = new byte[0];
+        assertArrayEquals(expectedOutput, result);
     }
 }
