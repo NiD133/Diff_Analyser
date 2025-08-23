@@ -1,43 +1,41 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
+
 import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparatorChain_ESTestTest9 extends ComparatorChain_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        long[] longArray0 = new long[0];
-        BitSet bitSet0 = BitSet.valueOf(longArray0);
-        ComparatorChain<ComparatorChain<Object>> comparatorChain0 = new ComparatorChain<ComparatorChain<Object>>((List<Comparator<ComparatorChain<Object>>>) null, bitSet0);
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link ComparatorChain} class.
+ */
+public class ComparatorChainTest {
+
+    /**
+     * Tests that calling setComparator() on a ComparatorChain initialized with a null
+     * list of comparators throws a NullPointerException.
+     * <p>
+     * The constructor {@link ComparatorChain#ComparatorChain(List, BitSet)} allows a null
+     * list to be passed, but any subsequent attempt to modify the chain's internal
+     * state is expected to fail.
+     */
+    @Test
+    public void setComparatorOnChainConstructedWithNullListShouldThrowNPE() {
+        // Arrange: Create a ComparatorChain with a null internal list of comparators.
+        final List<Comparator<Object>> nullComparatorList = null;
+        final ComparatorChain<Object> chain = new ComparatorChain<>(nullComparatorList, new BitSet());
+
+        // Act & Assert: Attempting to set a comparator should throw a NullPointerException
+        // because the method tries to operate on the null internal list.
         try {
-            comparatorChain0.setComparator(2147483645, (Comparator<ComparatorChain<Object>>) comparatorChain0, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.comparators.ComparatorChain", e);
+            // The index, comparator, and reverse flag are arbitrary, as the call will
+            // fail before they are meaningfully used.
+            chain.setComparator(0, (o1, o2) -> 0, false);
+            fail("Expected a NullPointerException to be thrown due to the null internal list.");
+        } catch (final NullPointerException e) {
+            // This is the expected behavior. The test passes.
         }
     }
 }
