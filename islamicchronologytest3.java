@@ -1,80 +1,59 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class IslamicChronologyTestTest3 extends TestCase {
-
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+/**
+ * Tests for the factory methods of {@link IslamicChronology}.
+ * This focuses on verifying the creation of chronologies with different time zones.
+ */
+class IslamicChronologyTestTest3 {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
+    @Test
+    @DisplayName("getInstance(DateTimeZone) should return a chronology with the specified zone")
+    void getInstance_withSpecificZone_returnsChronologyWithThatZone() {
+        // Act: Create a chronology with a specific time zone
+        Chronology chronology = IslamicChronology.getInstance(TOKYO);
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert: The resulting chronology should have the exact same time zone
+        assertEquals(TOKYO, chronology.getZone());
     }
 
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
+    @Test
+    @DisplayName("getInstance(null) should return a chronology with the default system zone")
+    void getInstance_withNullZone_returnsChronologyWithDefaultZone() {
+        // Arrange: Store the original default time zone and set a known one for the test
+        DateTimeZone originalDefault = DateTimeZone.getDefault();
+        try {
+            DateTimeZone.setDefault(PARIS);
+
+            // Act: Create a chronology with a null time zone
+            Chronology chronology = IslamicChronology.getInstance(null);
+
+            // Assert: The chronology should adopt the default time zone
+            assertEquals(PARIS, chronology.getZone());
+        } finally {
+            // Teardown: Restore the original default time zone to avoid side effects
+            DateTimeZone.setDefault(originalDefault);
+        }
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
+    @Test
+    @DisplayName("getInstance() should return an instance of IslamicChronology")
+    void getInstance_returnsCorrectChronologyType() {
+        // Act: Create a chronology instance
+        Chronology chronology = IslamicChronology.getInstance(TOKYO);
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testFactory_Zone() {
-        assertEquals(TOKYO, IslamicChronology.getInstance(TOKYO).getZone());
-        assertEquals(PARIS, IslamicChronology.getInstance(PARIS).getZone());
-        assertEquals(LONDON, IslamicChronology.getInstance(null).getZone());
-        assertSame(IslamicChronology.class, IslamicChronology.getInstance(TOKYO).getClass());
+        // Assert: The created object should be of the type IslamicChronology
+        assertInstanceOf(IslamicChronology.class, chronology);
     }
 }
