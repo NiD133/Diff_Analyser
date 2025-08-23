@@ -2,25 +2,35 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest60 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("{#7l{C/gwF;D^Xtn&");
-        // Undeclared exception!
+    /**
+     * Tests that chompBalanced throws an exception when the input string does not contain
+     * a matching closing character for the initial opening character.
+     */
+    @Test
+    public void chompBalancedThrowsExceptionForUnbalancedMarkers() {
+        // Arrange: Create a queue with an input string that has a nested structure
+        // but is ultimately unbalanced because the initial '{' is never closed.
+        String unbalancedInput = "{#7l{C/gwF;D^Xtn&";
+        TokenQueue queue = new TokenQueue(unbalancedInput);
+
+        // The method is expected to throw an exception. The exception message should
+        // contain the state of the queue after the initial opening marker is consumed.
+        String expectedRemainingQueue = "#7l{C/gwF;D^Xtn&";
+        String expectedMessage = "Did not find balanced marker at '" + expectedRemainingQueue + "'";
+
+        // Act & Assert
         try {
-            tokenQueue0.chompBalanced('{', ';');
-            fail("Expecting exception: IllegalArgumentException");
+            queue.chompBalanced('{', ';');
+            fail("Expected an IllegalArgumentException because the markers are not balanced.");
         } catch (IllegalArgumentException e) {
-            //
-            // Did not find balanced marker at '#7l{C/gwF;D^Xtn&'
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
