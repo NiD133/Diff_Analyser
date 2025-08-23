@@ -1,28 +1,45 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ProxyReader_ESTestTest8 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for the abstract {@link ProxyReader} class, using {@link CloseShieldReader}
+ * as a concrete implementation for testing delegation behavior.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(taggedReader0);
-        char[] charArray0 = new char[4];
-        int int0 = closeShieldReader0.read(charArray0, 1, 1);
-        assertArrayEquals(new char[] { '\u0000', '6', '\u0000', '\u0000' }, charArray0);
-        assertEquals(1, int0);
+    /**
+     * Tests that calling read(buffer, offset, length) on a ProxyReader
+     * correctly delegates the call, reads the specified number of characters
+     * into the buffer at the correct offset, and returns the correct count.
+     */
+    @Test
+    public void testReadIntoBufferWithOffsetAndLength() throws IOException {
+        // Arrange: Set up the input data and the proxy reader
+        final String inputData = "ABCDE";
+        // Use CloseShieldReader as a concrete implementation of the abstract ProxyReader
+        final Reader proxyReader = new CloseShieldReader(new StringReader(inputData));
+
+        final char[] buffer = new char[5];
+        final int offset = 2;
+        final int lengthToRead = 1;
+
+        // Act: Call the method under test
+        final int charsRead = proxyReader.read(buffer, offset, lengthToRead);
+
+        // Assert: Verify the outcome
+        // 1. Check that the method returned the correct number of characters read.
+        assertEquals(1, charsRead);
+
+        // 2. Check that the character was written to the correct position in the buffer,
+        //    leaving other elements untouched (i.e., at their default char value '\u0000').
+        final char[] expectedBuffer = {'\u0000', '\u0000', 'A', '\u0000', '\u0000'};
+        assertArrayEquals(expectedBuffer, buffer);
     }
 }
