@@ -1,52 +1,42 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class Symmetry454Chronology_ESTestTest23 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link Symmetry454Chronology} class, focusing on date creation.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        IsoEra isoEra0 = IsoEra.BCE;
-        // Undeclared exception!
+    /**
+     * Verifies that dateYearDay() throws a DateTimeException when provided with an invalid
+     * day-of-year value. The day-of-year must be a positive integer within the valid
+     * range for the calendar system (1 to 364 or 371).
+     */
+    @Test
+    public void dateYearDay_withNegativeDayOfYear_throwsDateTimeException() {
+        // Arrange: Set up the chronology and input parameters.
+        // A negative day-of-year is always invalid.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        Era era = IsoEra.BCE;
+        int yearOfEra = 2023; // A valid year-of-era.
+        int invalidDayOfYear = -313;
+
+        // Act & Assert: Attempt to create the date and verify that the correct exception is thrown.
         try {
-            symmetry454Chronology0.dateYearDay((Era) isoEra0, (-313), (-313));
-            fail("Expecting exception: DateTimeException");
+            chronology.dateYearDay(era, yearOfEra, invalidDayOfYear);
+            fail("Expected a DateTimeException to be thrown for an invalid day-of-year.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for DayOfYear (valid values 1 - 364/371): -313
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // The exception is expected. We check the message to ensure it's informative.
+            String expectedMessageContent = "Invalid value for DayOfYear";
+            assertTrue(
+                "Exception message should explain that the day-of-year is invalid.",
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
