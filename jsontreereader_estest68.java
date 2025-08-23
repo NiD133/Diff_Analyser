@@ -1,37 +1,34 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JsonTreeReader_ESTestTest68 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test067() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        // Undeclared exception!
+    /**
+     * Verifies that calling nextJsonElement() after consuming the beginning of an empty
+     * object throws an IllegalStateException. The reader expects to find a name or the
+     * end of the object, not another complete JSON element.
+     */
+    @Test
+    public void nextJsonElement_atEndOfEmptyObject_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a reader for an empty JSON object and advance it past the opening brace.
+        JsonObject emptyObject = new JsonObject();
+        JsonTreeReader reader = new JsonTreeReader(emptyObject);
+        reader.beginObject(); // Reader is now positioned inside the empty object: {|}
+
+        // Act & Assert: Attempting to read the next element should fail with a specific message.
         try {
-            jsonTreeReader0.nextJsonElement();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Unexpected END_OBJECT when reading a JsonElement.
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            reader.nextJsonElement();
+            fail("Expected an IllegalStateException to be thrown, but no exception occurred.");
+        } catch (IllegalStateException expected) {
+            assertEquals("Unexpected END_OBJECT when reading a JsonElement.", expected.getMessage());
         }
     }
 }
