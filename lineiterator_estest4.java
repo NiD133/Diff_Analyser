@@ -1,32 +1,43 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
+
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LineIterator_ESTestTest4 extends LineIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StringReader stringReader0 = new StringReader("remove Kot supported");
-        stringReader0.close();
-        LineIterator lineIterator0 = new LineIterator(stringReader0);
-        // Undeclared exception!
+/**
+ * Tests for {@link LineIterator}.
+ */
+public class LineIteratorTest {
+
+    /**
+     * Tests that calling next() on an iterator whose underlying reader has been closed
+     * throws an IllegalStateException. The exception should be caused by an IOException.
+     */
+    @Test
+    public void nextShouldThrowIllegalStateExceptionWhenReaderIsClosed() throws IOException {
+        // Arrange: Create a LineIterator with a reader that is already closed.
+        Reader reader = new StringReader("This data will not be read.");
+        LineIterator lineIterator = new LineIterator(reader);
+        reader.close(); // Close the reader *before* attempting to iterate.
+
+        // Act & Assert: Attempting to read the next line should fail.
         try {
-            lineIterator0.nextLine();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // java.io.IOException: Stream closed
-            //
-            verifyException("org.apache.commons.io.LineIterator", e);
+            lineIterator.next();
+            fail("Expected an IllegalStateException because the underlying reader is closed.");
+        } catch (final IllegalStateException e) {
+            // The exception is expected. Now, verify its cause.
+            // The LineIterator is expected to wrap the underlying IOException.
+            final Throwable cause = e.getCause();
+            assertNotNull("The exception should have a cause.", cause);
+            assertTrue("The cause should be an IOException.", cause instanceof IOException);
+            assertEquals("The cause message should indicate a closed stream.", "Stream closed", cause.getMessage());
         }
     }
 }
