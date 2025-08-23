@@ -1,20 +1,42 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Vector_ESTestTest2 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
-        Vector vector1 = new Vector(1103.0195F, 0.0F, 8.0F);
-        float float0 = vector0.dot(vector1);
-        assertEquals(0.0F, float0, 0.01F);
-        assertEquals(1103.0486F, vector1.length(), 0.01F);
+    /**
+     * A small tolerance for floating-point comparisons.
+     */
+    private static final float DELTA = 0.01f;
+
+    @Test
+    public void dot_withZeroVector_shouldReturnZero() {
+        // Arrange
+        Vector zeroVector = new Vector(0.0f, 0.0f, 0.0f);
+        Vector anyVector = new Vector(1103.0195f, 0.0f, 8.0f);
+
+        // Act
+        float dotProduct = zeroVector.dot(anyVector);
+
+        // Assert
+        assertEquals(0.0f, dotProduct, DELTA);
+    }
+
+    @Test
+    public void length_shouldCalculateCorrectMagnitude() {
+        // Arrange
+        Vector vector = new Vector(1103.0195f, 0.0f, 8.0f);
+        // Expected length is sqrt(1103.0195^2 + 0^2 + 8.0^2) ≈ 1103.0486
+        float expectedLength = 1103.0486f;
+
+        // Act
+        float actualLength = vector.length();
+
+        // Assert
+        assertEquals(expectedLength, actualLength, DELTA);
     }
 }
