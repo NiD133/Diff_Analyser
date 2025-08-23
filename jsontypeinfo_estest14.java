@@ -1,19 +1,25 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTypeInfo_ESTestTest14 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * This test suite focuses on the {@link JsonTypeInfo.Value} class, specifically testing
+ * its helper methods.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        boolean boolean0 = JsonTypeInfo.Value.isEnabled((JsonTypeInfo.Value) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the static helper method {@code JsonTypeInfo.Value.isEnabled()}
+     * correctly handles null input by returning false. This confirms that a null
+     * {@code JsonTypeInfo.Value} is treated as "not enabled" for polymorphic handling.
+     */
+    @Test
+    public void isEnabledShouldReturnFalseWhenValueIsNull() {
+        // Act: Call the isEnabled method with a null argument.
+        boolean result = JsonTypeInfo.Value.isEnabled(null);
+
+        // Assert: Verify that the result is false, as expected for a null input.
+        assertFalse("The isEnabled() method should return false when passed a null value.", result);
     }
 }
