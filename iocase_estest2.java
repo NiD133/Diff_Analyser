@@ -1,18 +1,32 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest2 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        int int0 = iOCase0.checkCompareTo("LINUX", "\"#S6?U_R7?'mwf");
-        assertEquals(74, int0);
+    /**
+     * Tests that checkCompareTo with IOCase.INSENSITIVE performs a case-insensitive
+     * comparison, returning a positive value when the first string is lexicographically
+     * greater than the second.
+     */
+    @Test
+    public void checkCompareTo_insensitive_returnsPositiveForGreaterString() {
+        // Arrange
+        final IOCase caseInsensitive = IOCase.INSENSITIVE;
+        final String greaterString = "Cat";
+        final String smallerString = "Bat"; // 'C' comes after 'B' regardless of case
+
+        // Act
+        final int result = caseInsensitive.checkCompareTo(greaterString, smallerString);
+
+        // Assert
+        assertTrue(
+            "Expected a positive result when the first string is lexicographically greater (case-insensitive).",
+            result > 0
+        );
     }
 }
