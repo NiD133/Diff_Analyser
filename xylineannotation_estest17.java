@@ -1,50 +1,35 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class XYLineAnnotation_ESTestTest17 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Tests for the constructor of the {@link XYLineAnnotation} class, focusing on argument validation.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when the x1 coordinate
+     * is not a finite number. The constructor must reject non-finite values like
+     * Double.NEGATIVE_INFINITY to ensure the annotation's state is valid.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForNonFiniteX1() {
+        // Arrange: Define coordinates with a non-finite value for x1.
+        double nonFiniteX1 = Double.NEGATIVE_INFINITY;
+        double y1 = 0.0;
+        double x2 = 10.0;
+        double y2 = 20.0;
+
+        // Act & Assert
         try {
-            xYLineAnnotation0 = new XYLineAnnotation(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
-            fail("Expecting exception: IllegalArgumentException");
+            new XYLineAnnotation(nonFiniteX1, y1, x2, y2);
+            fail("Expected an IllegalArgumentException because the x1 coordinate is not finite.");
         } catch (IllegalArgumentException e) {
-            //
-            // Require 'x1' (-Infinity) to be finite.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Verify that the exception message is clear and correct.
+            String expectedMessage = "Require 'x1' (-Infinity) to be finite.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
