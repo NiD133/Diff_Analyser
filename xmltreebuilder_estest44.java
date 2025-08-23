@@ -1,32 +1,30 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.io.StringReader;
+import static org.junit.Assert.assertEquals;
 
 public class XmlTreeBuilder_ESTestTest44 extends XmlTreeBuilder_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        StringReader stringReader0 = new StringReader("xmlns");
-        xmlTreeBuilder0.parse(stringReader0, "xmlns");
+    /**
+     * Tests that the XML parser correctly handles a simple string without any tags.
+     * The string "xmlns" is notable because it's a keyword in XML for namespace declarations,
+     * but here it should be treated as simple text content.
+     */
+    @Test
+    public void parseShouldTreatSimpleStringAsTextContent() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        String inputText = "xmlns";
+        StringReader reader = new StringReader(inputText);
+        String baseUri = "http://example.com";
+
+        // Act
+        Document doc = xmlTreeBuilder.parse(reader, baseUri);
+
+        // Assert
+        // The parser should produce a document whose text content is exactly the input string.
+        assertEquals(inputText, doc.text());
     }
 }
