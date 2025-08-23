@@ -1,20 +1,37 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest13 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        circularByteBuffer0.add((byte) (-31));
-        byte byte0 = circularByteBuffer0.read();
-        assertEquals(8192, circularByteBuffer0.getSpace());
-        assertEquals((byte) (-31), byte0);
+    /**
+     * Tests that adding a single byte and then reading it returns the correct byte,
+     * leaving the buffer empty.
+     */
+    @Test
+    public void addThenReadSingleByteShouldReturnSameByteAndEmptyBuffer() {
+        // Arrange: Create a buffer with the default size and define a byte to test.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte byteToAdd = (byte) 123;
+        final int initialSpace = IOUtils.DEFAULT_BUFFER_SIZE;
+
+        // Act: Add the byte to the buffer and then immediately read it back.
+        buffer.add(byteToAdd);
+        final byte readByte = buffer.read();
+
+        // Assert: Verify the outcome.
+        assertEquals("The byte read should be the same as the byte added.", byteToAdd, readByte);
+        
+        // Verify the buffer is empty again.
+        assertEquals("Buffer should have no bytes after reading the only element.", 0, buffer.getCurrentNumberOfBytes());
+        assertFalse("Buffer should not have any bytes available.", buffer.hasBytes());
+        assertEquals("Buffer space should be fully restored to its initial capacity.", initialSpace, buffer.getSpace());
     }
 }
