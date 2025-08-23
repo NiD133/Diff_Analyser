@@ -1,86 +1,43 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Test;
 
-public class IslamicChronologyTestTest18 extends TestCase {
-
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+/**
+ * Tests the conversion of a Gregorian DateTime with a specific time zone
+ * to the IslamicChronology in UTC.
+ */
+public class IslamicChronologyWithZoneTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
     private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+    @Test
+    public void gregorianToIslamic_whenConvertingDateTimeWithZone_thenZoneIsHandledCorrectly() {
+        // Arrange: A Gregorian date in the Paris time zone.
+        // On 2005-11-26, Paris is in CET (UTC+1).
+        // So, 12:00 in Paris corresponds to 11:00 UTC.
+        DateTime gregorianInParis = new DateTime(2005, 11, 26, 12, 0, 0, 0, PARIS);
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+        // Act: Convert the DateTime object to the Islamic calendar in UTC.
+        DateTime islamicInUTC = gregorianInParis.withChronology(ISLAMIC_UTC);
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+        // Assert: The resulting date and time should correspond to the
+        //         Islamic calendar representation of the original UTC instant.
+        // Expected Islamic Date: 1426-10-24
+        assertEquals("Era should be Anno Hegirae (AH)", IslamicChronology.AH, islamicInUTC.getEra());
+        assertEquals("Year should be 1426", 1426, islamicInUTC.getYear());
+        assertEquals("Month should be 10", 10, islamicInUTC.getMonthOfYear());
+        assertEquals("Day should be 24", 24, islamicInUTC.getDayOfMonth());
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testSampleDateWithZone() {
-        DateTime dt = new DateTime(2005, 11, 26, 12, 0, 0, 0, PARIS).withChronology(ISLAMIC_UTC);
-        assertEquals(IslamicChronology.AH, dt.getEra());
-        assertEquals(1426, dt.getYear());
-        assertEquals(10, dt.getMonthOfYear());
-        assertEquals(24, dt.getDayOfMonth());
-        // PARIS is UTC+1 in summer (12-1=11)
-        assertEquals(11, dt.getHourOfDay());
-        assertEquals(0, dt.getMinuteOfHour());
-        assertEquals(0, dt.getSecondOfMinute());
-        assertEquals(0, dt.getMillisOfSecond());
+        // Assert time components are correct after UTC conversion
+        assertEquals("Hour should be 11 (12:00 Paris -> 11:00 UTC)", 11, islamicInUTC.getHourOfDay());
+        assertEquals("Minute should be 0", 0, islamicInUTC.getMinuteOfHour());
+        assertEquals("Second should be 0", 0, islamicInUTC.getSecondOfMinute());
+        assertEquals("Millis should be 0", 0, islamicInUTC.getMillisOfSecond());
     }
 }
