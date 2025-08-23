@@ -1,20 +1,31 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class URLCodec_ESTestTest11 extends URLCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link URLCodec}.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        String string0 = uRLCodec0.encode("VoM;", "UTF-8");
-        assertEquals("VoM%3B", string0);
+    /**
+     * Tests that the encode method correctly percent-encodes a special character (semicolon)
+     * while leaving alphanumeric characters untouched.
+     */
+    @Test
+    public void encodeShouldPercentEncodeSpecialCharacters() throws UnsupportedEncodingException {
+        // Arrange
+        final URLCodec urlCodec = new URLCodec();
+        final String originalString = "VoM;";
+        final String expectedEncodedString = "VoM%3B";
+
+        // Act
+        final String actualEncodedString = urlCodec.encode(originalString, StandardCharsets.UTF_8.name());
+
+        // Assert
+        assertEquals("The semicolon should be percent-encoded.", expectedEncodedString, actualEncodedString);
     }
 }
