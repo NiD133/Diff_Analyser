@@ -1,24 +1,28 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
 import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class DefaultFlowDataset_ESTestTest22 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        List<Integer> list0 = defaultFlowDataset0.getDestinations(0);
-        assertTrue(list0.isEmpty());
+    /**
+     * Verifies that getDestinations() returns an empty list for a newly
+     * instantiated, empty dataset.
+     */
+    @Test
+    public void getDestinations_shouldReturnEmptyList_forNewDataset() {
+        // Arrange: Create a new, empty dataset.
+        DefaultFlowDataset<String> dataset = new DefaultFlowDataset<>();
+
+        // Act: Request the list of destination nodes for the first stage.
+        List<String> destinations = dataset.getDestinations(0);
+
+        // Assert: The returned list should be empty.
+        assertTrue("For a new dataset, the list of destinations should be empty.",
+                   destinations.isEmpty());
     }
 }
