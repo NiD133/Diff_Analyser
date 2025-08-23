@@ -1,25 +1,60 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest23 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        ErrorReportConfiguration errorReportConfiguration0 = new ErrorReportConfiguration(1, 1);
-        ContentReference contentReference0 = ContentReference.construct(false, (Object) null, 2879, 2879, errorReportConfiguration0);
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference0, (long) 314, 0, (-2189));
-        ContentReference contentReference1 = jsonLocation0.contentReference();
-        assertEquals(314L, jsonLocation0.getCharOffset());
-        assertEquals(0, jsonLocation0.getLineNr());
-        assertEquals((-2189), jsonLocation0.getColumnNr());
-        assertEquals(2879, contentReference1.contentOffset());
-        assertEquals((-1L), jsonLocation0.getByteOffset());
+/**
+ * Unit tests for the JsonLocation class, focusing on its constructors and accessors.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Tests that the constructor correctly initializes the location properties
+     * and that the getter methods return the expected values.
+     */
+    @Test
+    public void shouldCorrectlyStoreAndRetrieveLocationDetails() {
+        // Arrange: Define the location parameters for clarity.
+        final long expectedCharOffset = 314L;
+        final int expectedLineNr = 0;
+        final int expectedColumnNr = -2189;
+        final int contentOffset = 2879;
+        final int contentLength = 2879;
+
+        // Create a dummy ContentReference, which is a required argument for the JsonLocation constructor.
+        ContentReference inputContentReference = ContentReference.construct(
+                false, /* isResource */
+                null,  /* rawContent */
+                contentOffset,
+                contentLength,
+                null   /* errorReportConfig */
+        );
+
+        // Act: Create a new JsonLocation instance using the constructor under test.
+        JsonLocation location = new JsonLocation(
+                inputContentReference,
+                expectedCharOffset,
+                expectedLineNr,
+                expectedColumnNr
+        );
+
+        // Assert: Verify that all properties are stored and can be retrieved correctly.
+        assertEquals("Character offset should match the constructor argument",
+                expectedCharOffset, location.getCharOffset());
+        assertEquals("Line number should match the constructor argument",
+                expectedLineNr, location.getLineNr());
+        assertEquals("Column number should match the constructor argument",
+                expectedColumnNr, location.getColumnNr());
+
+        // This specific constructor does not set the byte offset, so it should default to -1.
+        assertEquals("Byte offset should default to -1",
+                -1L, location.getByteOffset());
+
+        // Verify the content reference is the same instance that was passed in.
+        assertSame("The retrieved ContentReference should be the same instance as the input",
+                inputContentReference, location.contentReference());
     }
 }
