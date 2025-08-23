@@ -1,19 +1,25 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Years_ESTestTest27 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Years years0 = Years.years(0);
-        boolean boolean0 = years0.isLessThan((Years) null);
-        assertFalse(boolean0);
-        assertEquals(0, years0.getYears());
+    @Test
+    public void isLessThan_shouldReturnFalse_whenComparingZeroYearsToNull() {
+        // The Javadoc for isLessThan() states that a null comparison value is treated as zero.
+        // This test verifies that comparing zero years to null returns false, as 0 is not less than 0.
+
+        // Arrange
+        Years zeroYears = Years.years(0);
+
+        // Act
+        boolean result = zeroYears.isLessThan(null);
+
+        // Assert
+        assertFalse("Zero years should not be considered less than null (treated as zero)", result);
     }
 }
