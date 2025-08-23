@@ -1,18 +1,35 @@
 package com.google.common.base;
 
+import com.google.common.base.Converter;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class CaseFormat_ESTestTest25 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
-        Converter<String, String> converter0 = caseFormat0.converterTo(caseFormat0);
-        assertNotNull(converter0);
+    /**
+     * Verifies that creating a converter for the same source and target format
+     * results in an "identity" converter, which returns the input string unchanged.
+     */
+    @Test
+    public void converterTo_withSameSourceAndTargetFormat_returnsIdentityConverter() {
+        // Arrange
+        CaseFormat format = CaseFormat.LOWER_CAMEL;
+        String originalString = "thisIsLowerCamelCase";
+
+        // Act
+        Converter<String, String> identityConverter = format.converterTo(format);
+        String convertedString = identityConverter.convert(originalString);
+
+        // Assert
+        assertNotNull("The converter should never be null.", identityConverter);
+        assertEquals(
+            "Expected the string to be unchanged when converting to the same format.",
+            originalString,
+            convertedString
+        );
     }
 }
