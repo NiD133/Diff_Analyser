@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest64 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on integer to string conversion.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        String string0 = NumberOutput.toString(0);
-        assertEquals("0", string0);
+    /**
+     * Tests that {@link NumberOutput#toString(int)} correctly converts the integer 0
+     * to its string representation "0".
+     */
+    @Test
+    public void toString_withZeroInteger_shouldReturnZeroString() {
+        // Arrange
+        int numberToConvert = 0;
+        String expectedString = "0";
+
+        // Act
+        String actualString = NumberOutput.toString(numberToConvert);
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
