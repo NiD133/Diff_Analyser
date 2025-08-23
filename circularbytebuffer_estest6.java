@@ -1,21 +1,33 @@
 package org.apache.commons.io.input.buffer;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest6 extends CircularByteBuffer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        byte[] byteArray0 = new byte[7];
-        byteArray0[0] = (byte) 127;
-        boolean boolean0 = circularByteBuffer0.peek(byteArray0, (byte) 0, (byte) 25);
-        assertFalse(boolean0);
-        assertEquals(8192, circularByteBuffer0.getSpace());
+/**
+ * Tests for the {@link CircularByteBuffer} class.
+ */
+public class CircularByteBufferTest {
+
+    @Test
+    public void peekShouldReturnFalseIfBufferHasInsufficientBytes() {
+        // Arrange: Create an empty buffer, which has 0 bytes available.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final int lengthToPeek = 25;
+        final byte[] comparisonBytes = new byte[lengthToPeek];
+
+        // The buffer is empty, so it has fewer bytes than we want to peek.
+
+        // Act: Attempt to peek for more bytes than are available.
+        final boolean result = buffer.peek(comparisonBytes, 0, lengthToPeek);
+
+        // Assert: The operation should fail and not alter the buffer's state.
+        assertFalse("peek() should return false when the buffer contains fewer bytes than requested.", result);
+        
+        // Also, verify that this non-destructive operation did not change the buffer's state.
+        assertEquals("The number of bytes in the buffer should remain 0.", 0, buffer.getCurrentNumberOfBytes());
+        assertEquals("The available space should still be the initial capacity.", IOUtils.DEFAULT_BUFFER_SIZE, buffer.getSpace());
     }
 }
