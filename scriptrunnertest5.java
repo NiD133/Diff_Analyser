@@ -1,69 +1,55 @@
 package org.apache.ibatis.jdbc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import javax.sql.DataSource;
 import org.apache.ibatis.BaseDataTest;
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.io.Resources;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class ScriptRunnerTestTest5 extends BaseDataTest {
+/**
+ * Tests for edge cases in ScriptRunner, focusing on comment handling.
+ */
+class ScriptRunnerCommentHandlingTest extends BaseDataTest {
 
-    private static final String LINE_SEPARATOR = System.lineSeparator();
+  private static final String SCRIPT_WITH_COMMENT_AFTER_DELIMITER = "org/apache/ibatis/jdbc/ScriptCommentAfterEOLTerminator.sql";
 
-    private void runJPetStoreScripts(ScriptRunner runner) throws IOException, SQLException {
-        runScript(runner, JPETSTORE_DDL);
-        runScript(runner, JPETSTORE_DATA);
-    }
+  /**
+   * A script with a comment immediately following a statement delimiter (e.g., "SELECT 1; -- comment")
+   * should execute without errors.
+   */
+  @Test
+  void shouldNotFailOnScriptWithCommentAfterDelimiter() throws Exception {
+    // Arrange
+    DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
+    try (Connection conn = ds.getConnection()) {
+      ScriptRunner runner = new ScriptRunner(conn);
+      runner.setAutoCommit(true);
+      runner.setStopOnError(true);
+      runner.setErrorLogWriter(null); // Suppress error log for clean test output
+      runner.setLogWriter(null);      // Suppress regular log for clean test output
 
-    private void assertProductsTableExistsAndLoaded() throws IOException, SQLException {
-        PooledDataSource ds = createPooledDataSource(JPETSTORE_PROPERTIES);
-        try (Connection conn = ds.getConnection()) {
-            SqlRunner executor = new SqlRunner(conn);
-            List<Map<String, Object>> products = executor.selectAll("SELECT * FROM PRODUCT");
-            assertEquals(16, products.size());
-        } finally {
-            ds.forceCloseAll();
+      // Act & Assert
+      assertDoesNotThrow(() -> {
+        // First, run setup scripts to establish a baseline database state.
+        runJPetStoreScripts(runner);
+        // Then, run the specific script under test.
+        try (Reader reader = Resources.getResourceAsReader(SCRIPT_WITH_COMMENT_AFTER_DELIMITER)) {
+          runner.runScript(reader);
         }
+      }, "ScriptRunner should not fail when a comment follows a statement delimiter.");
     }
+  }
 
-    private StringBuilder y(StringBuilder sb) {
-        sb.append("ABC");
-        return sb;
-    }
-
-    @Test
-    void commentAfterStatementDelimiterShouldNotCauseRunnerFail() throws Exception {
-        DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
-        String resource = "org/apache/ibatis/jdbc/ScriptCommentAfterEOLTerminator.sql";
-        try (Connection conn = ds.getConnection();
-            Reader reader = Resources.getResourceAsReader(resource)) {
-            ScriptRunner runner = new ScriptRunner(conn);
-            runner.setAutoCommit(true);
-            runner.setStopOnError(true);
-            runner.setErrorLogWriter(null);
-            runner.setLogWriter(null);
-            runJPetStoreScripts(runner);
-            runner.runScript(reader);
-        }
-    }
+  /**
+   * Helper method to run the standard JPetStore DDL and data scripts.
+   */
+  private void runJPetStoreScripts(ScriptRunner runner) throws IOException, SQLException {
+    runScript(runner, JPETSTORE_DDL);
+    runScript(runner, JPETSTORE_DATA);
+  }
 }
