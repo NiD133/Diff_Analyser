@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Separators_ESTestTest35 extends Separators_ESTest_scaffolding {
+/**
+ * Unit tests for the inner enum {@link Separators.Spacing}.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.BOTH;
-        String string0 = separators_Spacing0.spacesAfter();
-        assertEquals(" ", string0);
+    /**
+     * Verifies that the {@code spacesAfter()} method for the {@code BOTH}
+     * spacing option returns a single space.
+     */
+    @Test
+    public void spacesAfter_whenSpacingIsBoth_shouldReturnSpace() {
+        // Arrange: Define the expected behavior and inputs.
+        Separators.Spacing spacing = Separators.Spacing.BOTH;
+        String expectedSpace = " ";
+
+        // Act: Execute the method under test.
+        String actualSpace = spacing.spacesAfter();
+
+        // Assert: Verify the result is as expected.
+        assertEquals("The space after for BOTH should be a single space.", expectedSpace, actualSpace);
     }
 }
