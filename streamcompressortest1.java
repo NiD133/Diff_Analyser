@@ -1,24 +1,32 @@
 package org.apache.commons.compress.archivers.zip;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
-import java.util.zip.ZipEntry;
 import org.junit.jupiter.api.Test;
 
-public class StreamCompressorTestTest1 {
+/**
+ * Tests for the {@link StreamCompressor} factory methods.
+ */
+class StreamCompressorTest {
 
     @Test
-    void testCreateDataOutputCompressor() throws IOException {
-        final DataOutput dataOutputStream = new DataOutputStream(new ByteArrayOutputStream());
-        try (StreamCompressor streamCompressor = StreamCompressor.create(dataOutputStream, new Deflater(9))) {
-            assertNotNull(streamCompressor);
+    void createWithDataOutputShouldReturnNonNullInstance() throws IOException {
+        // Arrange: Set up the necessary components for the test.
+        // A DataOutput is required by the factory method. We use a DataOutputStream
+        // wrapping a ByteArrayOutputStream as a test-friendly implementation.
+        final DataOutput dataOutput = new DataOutputStream(new ByteArrayOutputStream());
+        final Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
+
+        // Act: Call the method under test.
+        // The try-with-resources statement ensures the compressor is closed automatically.
+        try (StreamCompressor compressor = StreamCompressor.create(dataOutput, deflater)) {
+            // Assert: Verify the outcome.
+            assertNotNull(compressor, "The factory method should successfully create a non-null StreamCompressor instance.");
         }
     }
 }
