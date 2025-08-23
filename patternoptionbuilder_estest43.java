@@ -1,17 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PatternOptionBuilder_ESTestTest43 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('-');
-        assertNull(class0);
+    /**
+     * Tests that getValueType returns null for a character that is not a recognized
+     * value type identifier. The PatternOptionBuilder class documentation specifies
+     * characters like '@', '>', '%', etc., as valid type codes.
+     */
+    @Test
+    public void getValueTypeShouldReturnNullForUnrecognizedCharacter() {
+        // Arrange: The hyphen character '-' is not a defined value type code.
+        final char unrecognizedChar = '-';
+
+        // Act: Call the method with the unrecognized character.
+        Class<?> valueType = PatternOptionBuilder.getValueType(unrecognizedChar);
+
+        // Assert: The result should be null, as the character does not map to a type.
+        assertNull("Expected null for a character that is not a value code.", valueType);
     }
 }
