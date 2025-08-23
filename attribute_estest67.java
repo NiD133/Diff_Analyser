@@ -1,29 +1,61 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest67 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class, focusing on key prefixing logic.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test66() throws Throwable {
-        Attribute attribute0 = new Attribute("^-a-A-Z0-z_:.]+", "^-a-A-Z0-z_:.]+");
-        String string0 = attribute0.prefix();
-        assertEquals("^-a-A-Z0-z_", string0);
+    /**
+     * Tests that prefix() correctly extracts the part of the key before the first colon.
+     * This is a common use case for namespaced attributes like 'og:title', which is used
+     * in the method's own documentation.
+     */
+    @Test
+    public void prefixShouldExtractNameBeforeColon() {
+        // Arrange: Create an attribute with a standard namespaced key.
+        Attribute attribute = new Attribute("og:title", "The Rock");
+        String expectedPrefix = "og";
+
+        // Act: Get the prefix from the attribute.
+        String actualPrefix = attribute.prefix();
+
+        // Assert: The extracted prefix should match the part of the key before the colon.
+        assertEquals(expectedPrefix, actualPrefix);
+    }
+
+    /**
+     * Tests that prefix() returns an empty string if the attribute key does not contain a colon.
+     */
+    @Test
+    public void prefixShouldBeEmptyWhenNoColonInKey() {
+        // Arrange: Create an attribute with a simple key without a namespace.
+        Attribute attribute = new Attribute("title", "The Rock");
+
+        // Act: Get the prefix.
+        String actualPrefix = attribute.prefix();
+
+        // Assert: The prefix should be an empty string.
+        assertEquals("", actualPrefix);
+    }
+
+    /**
+     * This test preserves the logic of the original auto-generated test but uses a
+     * descriptive name to clarify its purpose: ensuring the prefix logic handles
+     * unconventional keys correctly.
+     */
+    @Test
+    public void prefixShouldHandleUnconventionalKeysWithColon() {
+        // Arrange: Use the original complex key to verify robustness.
+        Attribute attribute = new Attribute("^-a-A-Z0-z_:.]+", "some value");
+        String expectedPrefix = "^-a-A-Z0-z_";
+
+        // Act: Get the prefix.
+        String actualPrefix = attribute.prefix();
+
+        // Assert: The logic should still split correctly at the first colon.
+        assertEquals(expectedPrefix, actualPrefix);
     }
 }
