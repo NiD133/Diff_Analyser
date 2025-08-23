@@ -1,31 +1,35 @@
 package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest48 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        jsonWriteContext0.setCurrentValue(jsonWriteContext0);
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertTrue(jsonWriteContext0.inRoot());
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
+    /**
+     * Verifies that setting a current value on a newly created root context
+     * does not alter its fundamental properties like entry count, root status,
+     * or nesting depth.
+     */
+    @Test
+    public void setCurrentValueOnRootContextShouldNotChangeItsState() {
+        // Arrange: Create a new root context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+        Object testValue = new Object();
+
+        // Act: Set a current value on the context.
+        rootContext.setCurrentValue(testValue);
+
+        // Assert: Verify that the context's state remains consistent with a root context.
+        assertEquals("Entry count should remain 0", 0, rootContext.getEntryCount());
+        assertTrue("Context should still be in the root", rootContext.inRoot());
+        assertEquals("Nesting depth should remain 0", 0, rootContext.getNestingDepth());
+
+        // Also, confirm the value was set correctly.
+        assertSame("getCurrentValue() should return the object that was set",
+                testValue, rootContext.getCurrentValue());
     }
 }
