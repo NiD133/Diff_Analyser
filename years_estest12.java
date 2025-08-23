@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest12 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Years years0 = Years.THREE;
-        Years years1 = years0.multipliedBy((-1129));
-        assertEquals((-3387), years1.getYears());
+    /**
+     * Tests that multiplying a Years instance by a negative scalar
+     * produces the correct negative result.
+     */
+    @Test
+    public void multipliedBy_withNegativeScalar_returnsCorrectlyMultipliedYears() {
+        // Arrange
+        Years threeYears = Years.THREE;
+        int scalar = -1129;
+        int expectedYears = -3387; // 3 * -1129
+
+        // Act
+        Years result = threeYears.multipliedBy(scalar);
+
+        // Assert
+        assertEquals(expectedYears, result.getYears());
     }
 }
