@@ -1,31 +1,40 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class QuotedPrintableCodec_ESTestTest28 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec} focusing on decoding error handling.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        byte[] byteArray0 = new byte[7];
-        byteArray0[2] = (byte) 61;
+    /**
+     * Tests that decoding a Quoted-Printable byte array fails when an escape character '='
+     * is followed by a non-hexadecimal character.
+     * <p>
+     * According to RFC 1521, an '=' in a Quoted-Printable string must be followed by
+     * two hexadecimal digits (0-9 or A-F). This test case provides an input where '='
+     * is followed by a null byte (value 0), which is invalid.
+     * </p>
+     */
+    @Test
+    public void decodeQuotedPrintable_shouldThrowException_whenEscapeCharIsFollowedByNonHexChar() {
+        // Arrange: Create a byte array with an invalid Quoted-Printable sequence.
+        // The sequence contains an escape character '=' followed by a null byte,
+        // which is not a valid hexadecimal digit.
+        byte[] invalidEncodedBytes = new byte[]{'A', 'B', '=', 0, 'C'}; // Represents "AB<NULL>C"
+
+        // Act & Assert
         try {
-            QuotedPrintableCodec.decodeQuotedPrintable(byteArray0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Invalid URL encoding: not a valid digit (radix 16): 0
-            //
-            verifyException("org.apache.commons.codec.net.Utils", e);
+            QuotedPrintableCodec.decodeQuotedPrintable(invalidEncodedBytes);
+            fail("Expected DecoderException was not thrown for invalid input.");
+        } catch (DecoderException e) {
+            // The exception is expected. We verify its message to ensure it's the correct error.
+            // The original test verified this specific message, which is preserved here for consistency.
+            String expectedMessage = "Invalid URL encoding: not a valid digit (radix 16): 0";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
