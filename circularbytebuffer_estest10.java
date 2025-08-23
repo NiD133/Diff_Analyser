@@ -1,20 +1,29 @@
 package org.apache.commons.io.input.buffer;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest10 extends CircularByteBuffer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        circularByteBuffer0.add((byte) 0);
-        int int0 = circularByteBuffer0.getSpace();
-        assertEquals(1, circularByteBuffer0.getCurrentNumberOfBytes());
-        assertEquals(8191, int0);
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
+
+    @Test
+    public void getSpaceShouldDecreaseCorrectlyAfterAddingOneByte() {
+        // Arrange: Create a buffer with the default capacity.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final int expectedBytesInBuffer = 1;
+        final int expectedSpace = IOUtils.DEFAULT_BUFFER_SIZE - expectedBytesInBuffer;
+
+        // Act: Add a single byte to the buffer.
+        buffer.add((byte) 42);
+
+        // Assert: Verify the number of bytes and the remaining space are as expected.
+        assertEquals("The buffer should contain exactly one byte after one was added.",
+                expectedBytesInBuffer, buffer.getCurrentNumberOfBytes());
+        assertEquals("The available space should be the total size minus one.",
+                expectedSpace, buffer.getSpace());
     }
 }
