@@ -1,18 +1,26 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PercentCodec_ESTestTest11 extends PercentCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PercentCodec} class.
+ */
+public class PercentCodecTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        PercentCodec percentCodec0 = new PercentCodec();
-        byte[] byteArray0 = percentCodec0.encode((byte[]) null);
-        assertNull(byteArray0);
+    /**
+     * Tests that the encode method follows the common convention of returning
+     * null when given a null input.
+     */
+    @Test
+    public void encodeShouldReturnNullForNullInput() {
+        // Arrange
+        final PercentCodec percentCodec = new PercentCodec();
+
+        // Act
+        final byte[] result = percentCodec.encode(null);
+
+        // Assert
+        assertNull("Encoding a null byte array should result in null.", result);
     }
 }
