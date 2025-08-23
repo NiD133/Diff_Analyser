@@ -2,31 +2,48 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This class contains tests for the {@link JsonIgnoreProperties.Value} class,
+ * focusing on its merging capabilities.
+ */
 public class JsonIgnoreProperties_ESTestTest53 extends JsonIgnoreProperties_ESTest_scaffolding {
 
+    /**
+     * Tests that merging a {@link JsonIgnoreProperties.Value} instance with an empty
+     * Value instance results in a new Value that is logically equivalent to the
+     * original non-empty one.
+     */
     @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        String[] stringArray0 = new String[1];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[2];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.empty();
-        jsonIgnoreProperties_ValueArray0[0] = jsonIgnoreProperties_Value1;
-        jsonIgnoreProperties_ValueArray0[1] = jsonIgnoreProperties_Value0;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = JsonIgnoreProperties.Value.mergeAll(jsonIgnoreProperties_ValueArray0);
-        assertTrue(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value0));
-        assertFalse(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertFalse(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value0);
+    public void mergeAllWithEmptyValueShouldProduceEquivalentOfNonEmptyValue() {
+        // Arrange
+        // Create a Value instance with one ignored property (a single null, as in the original test).
+        String[] propertiesToIgnore = { null };
+        JsonIgnoreProperties.Value valueWithIgnoredProperty = JsonIgnoreProperties.Value.forIgnoredProperties(propertiesToIgnore);
+
+        // Create an empty Value instance, which should act as a neutral element in the merge.
+        JsonIgnoreProperties.Value emptyValue = JsonIgnoreProperties.Value.empty();
+
+        JsonIgnoreProperties.Value[] valuesToMerge = { emptyValue, valueWithIgnoredProperty };
+
+        // Act
+        // Merge the empty value with the value containing the ignored property.
+        JsonIgnoreProperties.Value mergedValue = JsonIgnoreProperties.Value.mergeAll(valuesToMerge);
+
+        // Assert
+        // 1. The merged result should be logically equal to the original non-empty value.
+        assertEquals(valueWithIgnoredProperty, mergedValue);
+
+        // 2. The merge operation should create a new instance, not return one of the inputs.
+        assertNotSame("Merged value should be a new instance, not the non-empty input",
+                valueWithIgnoredProperty, mergedValue);
+        assertNotSame("Merged value should be a new instance, not the empty input",
+                emptyValue, mergedValue);
+
+        // 3. Verify that the properties of the merged value match the expected defaults
+        //    from the non-empty input.
+        assertFalse("ignoreUnknown should be false by default", mergedValue.getIgnoreUnknown());
+        assertFalse("allowGetters should be false by default", mergedValue.getAllowGetters());
+        assertFalse("allowSetters should be false by default", mergedValue.getAllowSetters());
     }
 }
