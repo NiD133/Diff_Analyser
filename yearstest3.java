@@ -1,42 +1,68 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class YearsTestTest3 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
+/**
+ * Test cases for the {@link Years} class, focusing on the {@link Years#yearsBetween(ReadableInstant, ReadableInstant)} factory method.
+ */
+public class YearsTest {
+
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testFactory_yearsBetween_RInstant() {
+    @Test
+    public void yearsBetween_shouldCalculatePositiveYears_whenEndIsAfterStart() {
+        // Arrange
         DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end1 = new DateTime(2009, 6, 9, 12, 0, 0, 0, PARIS);
-        DateTime end2 = new DateTime(2012, 6, 9, 12, 0, 0, 0, PARIS);
-        assertEquals(3, Years.yearsBetween(start, end1).getYears());
-        assertEquals(0, Years.yearsBetween(start, start).getYears());
-        assertEquals(0, Years.yearsBetween(end1, end1).getYears());
-        assertEquals(-3, Years.yearsBetween(end1, start).getYears());
-        assertEquals(6, Years.yearsBetween(start, end2).getYears());
+        DateTime end = new DateTime(2009, 6, 9, 12, 0, 0, 0, PARIS);
+        Years expected = Years.THREE;
+
+        // Act
+        Years actual = Years.yearsBetween(start, end);
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void yearsBetween_shouldReturnZero_whenStartAndEndAreSame() {
+        // Arrange
+        DateTime instant = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+        Years expected = Years.ZERO;
+
+        // Act
+        Years actual = Years.yearsBetween(instant, instant);
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void yearsBetween_shouldCalculateNegativeYears_whenEndIsBeforeStart() {
+        // Arrange
+        DateTime start = new DateTime(2009, 6, 9, 12, 0, 0, 0, PARIS);
+        DateTime end = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+        Years expected = Years.years(-3);
+
+        // Act
+        Years actual = Years.yearsBetween(start, end);
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void yearsBetween_shouldCalculateAcrossLongerInterval() {
+        // Arrange
+        DateTime start = new DateTime(2006, 6, 9, 12, 0, 0, 0, PARIS);
+        DateTime end = new DateTime(2012, 6, 9, 12, 0, 0, 0, PARIS);
+        Years expected = Years.years(6);
+
+        // Act
+        Years actual = Years.yearsBetween(start, end);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
