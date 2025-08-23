@@ -1,38 +1,23 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class RandomAccessFileMode_ESTestTest18 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode} enum.
+ */
+public class RandomAccessFileModeTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_ONLY;
-        // Undeclared exception!
-        try {
-            randomAccessFileMode0.create((File) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-        }
+    /**
+     * Tests that calling create() with a null File object throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createWithNullFileShouldThrowNullPointerException() {
+        // Arrange: Get an instance of the enum. The specific mode does not matter for this test.
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_ONLY;
+
+        // Act: Attempt to create a RandomAccessFile with a null File argument.
+        // Assert: The test framework will assert that a NullPointerException is thrown.
+        mode.create((File) null);
     }
 }
