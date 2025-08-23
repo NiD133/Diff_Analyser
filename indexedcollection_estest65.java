@@ -1,62 +1,39 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.util.Collection;
+import org.apache.commons.collections4.Transformer;
+import org.junit.Test;
+
+// Note: The original test class name and structure from EvoSuite are preserved
+// to show a direct improvement of the provided code. In a real-world scenario,
+// the class might be renamed to "IndexedCollectionTest".
 public class IndexedCollection_ESTestTest65 extends IndexedCollection_ESTest_scaffolding {
 
+    /**
+     * Tests that the factory method {@code uniqueIndexedCollection} throws a
+     * NullPointerException when the provided collection is null.
+     */
     @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        // Undeclared exception!
+    public void uniqueIndexedCollection_shouldThrowNullPointerException_whenCollectionIsNull() {
+        // Arrange: The transformer can also be null, as the check for the collection's
+        // nullity is expected to happen first.
+        final Transformer<Object, ?> nullTransformer = null;
+
         try {
-            IndexedCollection.uniqueIndexedCollection((Collection<Object>) null, (Transformer<Object, Predicate<Integer>>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // collection
-            //
-            verifyException("java.util.Objects", e);
+            // Act: Attempt to create an IndexedCollection with a null collection.
+            IndexedCollection.uniqueIndexedCollection((Collection<Object>) null, nullTransformer);
+
+            // Assert: If the method completes without an exception, the test fails.
+            fail("Expected a NullPointerException, but it was not thrown.");
+
+        } catch (final NullPointerException e) {
+            // Assert: Verify that the exception message is "collection". This confirms
+            // that the exception originates from the intended null-check, which is
+            // likely Objects.requireNonNull(coll, "collection").
+            assertEquals("collection", e.getMessage());
         }
     }
 }
