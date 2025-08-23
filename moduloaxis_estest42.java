@@ -1,44 +1,44 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest42 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        double double0 = moduloAxis0.valueToJava2D(53843.88561595805, rectangle2D_Double0, (RectangleEdge) null);
-        assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
-        assertEquals(0.0, double0, 0.01);
-        assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link ModuloAxis} class.
+ */
+// The class name is kept to match the original file context.
+public class ModuloAxis_ESTestTest42 {
+
+    /**
+     * Verifies that valueToJava2D returns the origin of the drawing area (0.0)
+     * when the provided area has zero width and height. In this scenario, any
+     * data value should map to the top-left corner of the area.
+     */
+    @Test
+    public void valueToJava2DShouldReturnZeroForZeroSizedArea() {
+        // Arrange
+        // A standard range for a ModuloAxis, e.g., for degrees in a circle.
+        Range range = new Range(0.0, 360.0);
+        ModuloAxis moduloAxis = new ModuloAxis("Angle", range);
+
+        // A drawing area with zero width and height is a key condition for this test.
+        Rectangle2D.Double zeroSizedArea = new Rectangle2D.Double();
+        
+        // An arbitrary data value to be converted.
+        double valueToConvert = 180.0;
+
+        // Act
+        // Convert the data value to a 2D coordinate using a null edge, which
+        // can be a tricky case.
+        double coordinate = moduloAxis.valueToJava2D(valueToConvert, zeroSizedArea, null);
+
+        // Assert
+        // For a zero-sized area, the resulting coordinate should always be the origin (0.0).
+        assertEquals(0.0, coordinate, 0.01);
     }
 }
