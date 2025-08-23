@@ -1,33 +1,23 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class TaiInstant_ESTestTest56 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Tests the parsing functionality of {@link TaiInstant}.
+ */
+public class TaiInstantParseTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        // Undeclared exception!
-        try {
-            TaiInstant.parse("0.00000000s(TAI)");
-            fail("Expecting exception: DateTimeParseException");
-        } catch (DateTimeParseException e) {
-            //
-            // The text could not be parsed
-            //
-            verifyException("org.threeten.extra.scale.TaiInstant", e);
-        }
+    /**
+     * Tests that parsing a string with an incorrect number of nanosecond digits
+     * fails with a DateTimeParseException. The format requires exactly nine digits.
+     */
+    @Test(expected = DateTimeParseException.class)
+    public void parse_invalidStringWithTooFewNanoDigits_throwsException() {
+        // The TAI format requires exactly nine digits for the nanosecond part.
+        // This input string is invalid because it has only eight.
+        final String textWithEightNanoDigits = "0.00000000s(TAI)";
+        
+        TaiInstant.parse(textWithEightNanoDigits);
     }
 }
