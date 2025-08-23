@@ -1,27 +1,23 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest36 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Entities} class, focusing on its string escaping functionality.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        String string0 = Entities.escape((String) null);
-        assertEquals("", string0);
+    /**
+     * Verifies that the {@link Entities#escape(String)} method is null-safe and returns
+     * an empty string when the input is null.
+     */
+    @Test
+    public void escapeWithNullInputShouldReturnEmptyString() {
+        // The escape method is expected to handle null input gracefully without throwing an exception.
+        String escapedString = Entities.escape(null);
+
+        // It should return an empty string as a safe default.
+        assertEquals("Escaping a null string should result in an empty string.", "", escapedString);
     }
 }
