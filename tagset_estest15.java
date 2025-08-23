@@ -1,29 +1,35 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TagSet_ESTestTest15 extends TagSet_ESTest_scaffolding {
+/**
+ * Tests for the {@link TagSet} class.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        TagSet tagSet0 = TagSet.initHtmlDefault();
-        // Undeclared exception!
+    /**
+     * Verifies that the internal valueOf method throws an IllegalArgumentException
+     * when the provided tag name is an empty string, as this is an invalid state.
+     */
+    @Test
+    public void valueOfThrowsIllegalArgumentExceptionForEmptyTagName() {
+        // Arrange
+        TagSet tagSet = TagSet.initHtmlDefault();
+        String emptyTagName = "";
+        String anyNormalName = "p";
+        String anyNamespace = Parser.NamespaceHtml;
+        boolean preserveCase = true;
+
+        // Act & Assert
         try {
-            tagSet0.valueOf("", "", "", true);
-            fail("Expecting exception: IllegalArgumentException");
+            // This is a private-access method called via a public one, but the test targets its validation.
+            tagSet.valueOf(emptyTagName, anyNormalName, anyNamespace, preserveCase);
+            fail("Expected an IllegalArgumentException to be thrown for an empty tag name.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is correct, confirming the validation source.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
