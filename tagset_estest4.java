@@ -2,24 +2,36 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TagSet_ESTestTest4 extends TagSet_ESTest_scaffolding {
+/**
+ * Test suite for {@link TagSet}.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        TagSet tagSet0 = TagSet.Html();
-        Tag tag0 = new Tag("fg6U2^oJ<:", "fg6U2^oJ<:");
-        tagSet0.add(tag0);
-        assertFalse(tag0.isFormSubmittable());
-        Tag.FormSubmittable = (-1);
-        Tag tag1 = tagSet0.valueOf("fg6U2^oJ<:", "html", "fg6U2^oJ<:", false);
-        assertEquals("fg6U2^oJ<", tag1.prefix());
+    /**
+     * Tests that {@link TagSet#valueOf(String, String)} retrieves a pre-existing tag
+     * that has a namespace prefix in its name, rather than creating a new one.
+     */
+    @Test
+    public void valueOfRetrievesExistingTagWithNamespacePrefix() {
+        // Arrange
+        TagSet tagSet = TagSet.Html();
+        String tagNameWithPrefix = "custom:tag";
+        String namespace = "test-namespace";
+
+        // Create a custom tag with a prefixed name and add it to the set
+        Tag customTag = new Tag(tagNameWithPrefix, namespace);
+        tagSet.add(customTag);
+
+        // Act
+        // Attempt to retrieve the same tag using valueOf
+        Tag retrievedTag = tagSet.valueOf(tagNameWithPrefix, namespace);
+
+        // Assert
+        // 1. The exact same instance should be returned, confirming it was retrieved not created.
+        assertSame("Should retrieve the exact same tag instance that was added.", customTag, retrievedTag);
+
+        // 2. Verify that the prefix is correctly identified on the retrieved tag.
+        assertEquals("The prefix of the tag name should be correctly parsed.", "custom", retrievedTag.prefix());
     }
 }
