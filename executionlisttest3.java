@@ -1,72 +1,68 @@
 package com.google.common.util.concurrent;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import com.google.common.testing.NullPointerTester;
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class ExecutionListTestTest3 extends TestCase {
+/**
+ * Tests for the concurrent behavior of {@link ExecutionList}.
+ */
+public class ExecutionListTest extends TestCase {
 
-    private final ExecutionList list = new ExecutionList();
+  /**
+   * This test verifies that {@code ExecutionList.execute()} is idempotent, even when called
+   * concurrently from multiple threads. It ensures that the listeners are executed only once.
+   */
+  public void testExecute_whenCalledConcurrently_runsListenerOnlyOnce() throws InterruptedException {
+    // Arrange
+    ExecutionList executionList = new ExecutionList();
+    AtomicInteger executionCount = new AtomicInteger(0);
 
-    private static final Runnable THROWING_RUNNABLE = new Runnable() {
+    // Use a latch to ensure both threads call execute() before the listener is allowed to proceed.
+    // This creates a race condition to test the idempotency of execute().
+    CountDownLatch executionGate = new CountDownLatch(1);
 
-        @Override
-        public void run() {
-            throw new RuntimeException();
-        }
+    Runnable listener = () -> {
+      try {
+        // Wait for the gate to open before counting the execution.
+        executionGate.await();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(e);
+      }
+      executionCount.incrementAndGet();
     };
 
-    private class MockRunnable implements Runnable {
+    executionList.add(listener, directExecutor());
 
-        final CountDownLatch countDownLatch;
+    // Act
+    // Create and start two threads that will call execute() concurrently.
+    Runnable callExecute = executionList::execute;
+    Thread thread1 = new Thread(callExecute, "Thread-1-calls-execute");
+    Thread thread2 = new Thread(callExecute, "Thread-2-calls-execute");
 
-        MockRunnable(CountDownLatch countDownLatch) {
-            this.countDownLatch = countDownLatch;
-        }
+    thread1.start();
+    thread2.start();
 
-        @Override
-        public void run() {
-            countDownLatch.countDown();
-        }
-    }
+    // Assert that the listener has not run yet because it's waiting on the latch.
+    assertEquals("Listener should not have run before the gate is opened", 0, executionCount.get());
 
-    public void testExecute_idempotentConcurrently() throws InterruptedException {
-        CountDownLatch okayToRun = new CountDownLatch(1);
-        AtomicInteger runCalled = new AtomicInteger();
-        list.add(new Runnable() {
+    // Open the gate, allowing the listener to proceed.
+    executionGate.countDown();
 
-            @Override
-            public void run() {
-                try {
-                    okayToRun.await();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException(e);
-                }
-                runCalled.getAndIncrement();
-            }
-        }, directExecutor());
-        Runnable execute = new Runnable() {
+    // Wait for both threads to complete their work.
+    thread1.join();
+    thread2.join();
 
-            @Override
-            public void run() {
-                list.execute();
-            }
-        };
-        Thread thread1 = new Thread(execute);
-        Thread thread2 = new Thread(execute);
-        thread1.start();
-        thread2.start();
-        assertEquals(0, runCalled.get());
-        okayToRun.countDown();
-        thread1.join();
-        thread2.join();
-        assertEquals(1, runCalled.get());
-    }
+    // Assert
+    // Verify that the listener was executed exactly once, proving execute() is idempotent.
+    assertEquals(
+        "Listener should be executed exactly once despite concurrent calls to execute()",
+        1,
+        executionCount.get());
+  }
 }
