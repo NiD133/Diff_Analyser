@@ -1,23 +1,30 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest20 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Option option0 = new Option((String) null, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getOpt();
-        assertEquals("", string0);
+/**
+ * Unit tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
+
+    /**
+     * Verifies that getOpt() returns an empty string when the Option
+     * was constructed with a null short name. This ensures that no
+     * prefix or "null" string is returned.
+     */
+    @Test
+    public void getOptShouldReturnEmptyStringForOptionWithNullShortName() {
+        // Arrange: Create an Option that lacks a short name.
+        final Option optionWithNullShortName = new Option(null, "long-name");
+        final OptionFormatter formatter = OptionFormatter.from(optionWithNullShortName);
+
+        // Act: Get the formatted short option string.
+        final String formattedOpt = formatter.getOpt();
+
+        // Assert: The result should be an empty string.
+        assertEquals("Expected an empty string for an option with a null short name", "", formattedOpt);
     }
 }
