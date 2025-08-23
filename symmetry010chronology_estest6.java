@@ -1,45 +1,40 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
+
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest6 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        OffsetDateTime offsetDateTime0 = MockOffsetDateTime.now();
-        ChronoLocalDateTime<Symmetry010Date> chronoLocalDateTime0 = symmetry010Chronology0.localDateTime(offsetDateTime0);
-        assertNotNull(chronoLocalDateTime0);
+/**
+ * Tests for the {@link Symmetry010Chronology} class, focusing on local date-time creation.
+ */
+public class Symmetry010ChronologyTest {
+
+    /**
+     * Tests that a standard ISO OffsetDateTime can be correctly converted into a
+     * Symmetry010Chronology-based ChronoLocalDateTime.
+     *
+     * The test verifies that the conversion is successful, the resulting object uses the
+     * correct chronology, and the time-of-day information is preserved.
+     */
+    @Test
+    public void localDateTime_shouldConvertFromTemporalAccessor() {
+        // Arrange
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        OffsetDateTime isoDateTime = OffsetDateTime.of(2023, 10, 27, 14, 45, 30, 0, ZoneOffset.UTC);
+        LocalTime expectedTime = isoDateTime.toLocalTime();
+
+        // Act
+        ChronoLocalDateTime<Symmetry010Date> sym010DateTime = chronology.localDateTime(isoDateTime);
+
+        // Assert
+        assertNotNull("The conversion should produce a non-null result.", sym010DateTime);
+        assertEquals("The chronology of the result should be Symmetry010.", chronology, sym010DateTime.getChronology());
+        assertEquals("The time part of the date-time should be preserved.", expectedTime, sym010DateTime.toLocalTime());
     }
 }
