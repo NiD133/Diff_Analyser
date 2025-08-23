@@ -1,24 +1,30 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import static org.junit.Assert.assertNotEquals;
+
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IslamicChronology_ESTestTest53 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the IslamicChronology class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis(1);
-        IslamicChronology islamicChronology1 = IslamicChronology.getInstance(dateTimeZone0);
-        boolean boolean0 = islamicChronology0.equals(islamicChronology1);
-        assertFalse(boolean0);
+    /**
+     * Tests that two IslamicChronology instances are not considered equal
+     * if they are configured with different time zones, even if they share
+     * the same leap year pattern.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenChronologiesHaveDifferentTimeZones() {
+        // Arrange: Create two chronology instances with different time zones.
+        // The default leap year pattern is used for both.
+        IslamicChronology chronologyInUtc = IslamicChronology.getInstanceUTC();
+        
+        DateTimeZone nonUtcZone = DateTimeZone.forOffsetMillis(1);
+        IslamicChronology chronologyInNonUtc = IslamicChronology.getInstance(nonUtcZone);
+
+        // Act & Assert: The equals() method should return false because the time zones differ.
+        assertNotEquals(chronologyInUtc, chronologyInNonUtc);
     }
 }
