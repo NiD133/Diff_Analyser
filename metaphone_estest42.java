@@ -1,19 +1,48 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest42 extends Metaphone_ESTest_scaffolding {
+/**
+ * Tests for the {@link Metaphone} class, focusing on its encoding behavior and
+ * default configuration.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("KBMF");
-        assertEquals("KBMF", string0);
-        assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests that the Metaphone encoding for a simple string of consonants, which do not
+     * trigger any special encoding rules, remains unchanged.
+     */
+    @Test
+    public void testMetaphoneWithSimpleConsonantString() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "KBMF";
+        final String expectedCode = "KBMF";
+
+        // Act
+        final String actualCode = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("The Metaphone code for a simple consonant string should be unchanged.",
+                expectedCode, actualCode);
+    }
+
+    /**
+     * Verifies that a new instance of the Metaphone encoder has a default
+     * maximum code length of 4, as specified by the algorithm.
+     */
+    @Test
+    public void testDefaultMaxCodeLengthIsFour() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final int expectedLength = 4;
+
+        // Act
+        final int actualLength = metaphone.getMaxCodeLen();
+
+        // Assert
+        assertEquals("The default max code length should be 4.",
+                expectedLength, actualLength);
     }
 }
