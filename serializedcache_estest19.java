@@ -1,36 +1,32 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest19 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for {@link SerializedCache}.
+ * This test focuses on how the cache decorator handles exceptions from the underlying cache chain.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        SoftCache softCache0 = new SoftCache((Cache) null);
-        SynchronizedCache synchronizedCache0 = new SynchronizedCache(softCache0);
-        SerializedCache serializedCache0 = new SerializedCache(synchronizedCache0);
-        // Undeclared exception!
-        try {
-            serializedCache0.getSize();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SoftCache", e);
-        }
+    /**
+     * Verifies that calling getSize() on a SerializedCache throws a NullPointerException
+     * if the underlying cache delegate is improperly configured (i.e., null).
+     * This ensures that exceptions from the delegate chain are propagated correctly.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getSizeShouldThrowNullPointerExceptionWhenUnderlyingCacheIsNull() {
+        // Arrange: Create a chain of cache decorators with a null cache at the end.
+        // This simulates an improper configuration where the base cache is missing.
+        Cache softCacheWithNullDelegate = new SoftCache(null);
+        Cache synchronizedCache = new SynchronizedCache(softCacheWithNullDelegate);
+        Cache serializedCache = new SerializedCache(synchronizedCache);
+
+        // Act: Attempt to get the size. This call will be delegated down the chain
+        // until it reaches the null reference, which will cause a NullPointerException.
+        serializedCache.getSize();
+
+        // Assert: The test expects a NullPointerException to be thrown, which is
+        // declared by the @Test(expected=...) annotation.
     }
 }
