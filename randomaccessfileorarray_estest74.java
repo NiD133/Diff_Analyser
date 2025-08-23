@@ -1,41 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
-public class RandomAccessFileOrArray_ESTestTest74 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test073() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray instance after it
+     * has been closed results in a NullPointerException. This confirms that the object
+     * correctly invalidates its state and releases its resources upon closing.
+     */
+    @Test
+    public void readShort_afterClose_throwsNullPointerException() {
+        // Arrange: Create an instance from a byte array and then close it.
+        byte[] sourceData = new byte[5];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
         try {
-            randomAccessFileOrArray0.readShort();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            fileOrArray.close();
+        } catch (IOException e) {
+            // The close() method might throw an IOException. If it fails during setup,
+            // the test cannot proceed and should be marked as a failure.
+            fail("Test setup failed: closing the RandomAccessFileOrArray instance threw an unexpected exception: " + e.getMessage());
         }
+
+        // Act & Assert: Verify that a subsequent read operation throws a NullPointerException.
+        assertThrows(NullPointerException.class, fileOrArray::readShort);
     }
 }
