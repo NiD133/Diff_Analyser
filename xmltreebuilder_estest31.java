@@ -1,41 +1,38 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
+
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
-public class XmlTreeBuilder_ESTestTest31 extends XmlTreeBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Parser parser0 = Parser.xmlParser();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link XmlTreeBuilder} class.
+ * This test focuses on input validation for the initialization phase.
+ */
+public class XmlTreeBuilderTest {
+
+    /**
+     * Verifies that initialiseParse() throws an IllegalArgumentException when the input Reader is null.
+     * This ensures the method correctly validates its inputs and fails fast with a clear error message,
+     * preventing potential NullPointerExceptions later in the parsing process.
+     */
+    @Test
+    public void initialiseParseWithNullReaderThrowsIllegalArgumentException() {
+        // Arrange: Create the necessary objects for the test.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        Parser parser = Parser.xmlParser();
+        String baseUri = "https://example.com/";
+        Reader nullReader = null;
+
+        // Act & Assert: Attempt the invalid operation and verify the expected exception.
         try {
-            xmlTreeBuilder0.initialiseParse((Reader) null, "ScriptData", parser0);
-            fail("Expecting exception: IllegalArgumentException");
+            xmlTreeBuilder.initialiseParse(nullReader, baseUri, parser);
+            fail("Expected an IllegalArgumentException to be thrown for a null input reader.");
         } catch (IllegalArgumentException e) {
-            //
-            // The parameter 'input' must not be null.
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception has the expected, informative message.
+            assertEquals("The parameter 'input' must not be null.", e.getMessage());
         }
     }
 }
