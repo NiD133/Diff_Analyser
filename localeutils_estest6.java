@@ -1,20 +1,37 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocaleUtils_ESTestTest6 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale("-DY-n");
-        assertEquals("_DY_n", locale0.toString());
+    /**
+     * Tests that {@link LocaleUtils#toLocale(String)} can correctly parse a
+     * string that starts with a separator, followed by a country and variant code.
+     * The input "-DY-n" should result in a Locale with an empty language,
+     * the country "DY", and the variant "n".
+     */
+    @Test
+    public void toLocaleShouldParseStringWithLeadingSeparatorAndCountryAndVariant() {
+        // Arrange
+        final String localeString = "-DY-n";
+        final String expectedLanguage = "";
+        final String expectedCountry = "DY";
+        final String expectedVariant = "n";
+
+        // Act
+        final Locale resultLocale = LocaleUtils.toLocale(localeString);
+
+        // Assert
+        assertEquals(expectedLanguage, resultLocale.getLanguage());
+        assertEquals(expectedCountry, resultLocale.getCountry());
+        assertEquals(expectedVariant, resultLocale.getVariant());
+        
+        // The toString() representation should be "_DY_n"
+        assertEquals("_DY_n", resultLocale.toString());
     }
 }
