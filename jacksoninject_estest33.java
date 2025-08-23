@@ -1,20 +1,26 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class JacksonInject_ESTestTest33 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.EMPTY;
-        Object object0 = jacksonInject_Value0.getId();
-        assertNull(object0);
+    /**
+     * Verifies that the predefined {@code JacksonInject.Value.EMPTY} constant
+     * has a null ID, as it represents a default, unconfigured state.
+     */
+    @Test
+    public void getId_onEmptyInstance_shouldReturnNull() {
+        // Arrange
+        JacksonInject.Value emptyValue = JacksonInject.Value.EMPTY;
+
+        // Act
+        Object actualId = emptyValue.getId();
+
+        // Assert
+        assertNull("The ID for the EMPTY value should be null.", actualId);
     }
 }
