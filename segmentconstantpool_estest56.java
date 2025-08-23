@@ -1,21 +1,33 @@
 package org.apache.commons.compress.harmony.unpack200;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SegmentConstantPool_ESTestTest56 extends SegmentConstantPool_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        ConstantPoolEntry constantPoolEntry0 = segmentConstantPool0.getConstantPoolEntry((-1), (-1));
-        assertNull(constantPoolEntry0);
+/**
+ * Unit tests for the {@link SegmentConstantPool} class.
+ */
+public class SegmentConstantPoolTest {
+
+    /**
+     * Tests that {@link SegmentConstantPool#getConstantPoolEntry(int, long)} returns null
+     * when provided with negative, and therefore invalid, indices. This ensures the method
+     * handles invalid inputs gracefully without throwing an exception.
+     */
+    @Test
+    public void getConstantPoolEntryShouldReturnNullForNegativeIndices() throws Pack200Exception {
+        // Arrange: Create a SegmentConstantPool. The CpBands dependency can be null
+        // because it is not accessed when the input indices are invalid.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        final int invalidPoolType = -1;
+        final long invalidPoolIndex = -1;
+
+        // Act: Attempt to retrieve a constant pool entry with invalid indices.
+        final ConstantPoolEntry result = segmentConstantPool.getConstantPoolEntry(invalidPoolType, invalidPoolIndex);
+
+        // Assert: The method should return null for invalid negative inputs.
+        assertNull("getConstantPoolEntry() should return null for a negative type and index.", result);
     }
 }
