@@ -1,47 +1,49 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
 import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest6 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        Instant instant0 = Instant.now();
-        DateTime dateTime0 = yearMonth0.toDateTime(instant0);
-        assertEquals(1392409281320L, dateTime0.getMillis());
+/**
+ * Unit tests for the AbstractPartial class, focusing on the toDateTime(ReadableInstant) method.
+ */
+public class AbstractPartialTest {
+
+    /**
+     * Tests that toDateTime() correctly combines the fields from a partial (YearMonth)
+     * with the fields from a base instant to create a complete DateTime.
+     * The fields from the partial should override the corresponding fields from the instant.
+     */
+    @Test
+    public void toDateTime_shouldCombinePartialWithInstantFields() {
+        // Arrange
+        // A partial date representing October 2023.
+        YearMonth yearMonthPartial = new YearMonth(2023, 10);
+
+        // A base instant providing the remaining date-time fields (day, time, time zone).
+        // This instant corresponds to 2005-06-09T10:20:30.456Z.
+        Instant baseInstant = new DateTime(2005, 6, 9, 10, 20, 30, 456, DateTimeZone.UTC).toInstant();
+
+        // Act
+        // Combine the YearMonth with the base instant. The year and month from the partial
+        // should override those from the base instant.
+        DateTime result = yearMonthPartial.toDateTime(baseInstant);
+
+        // Assert
+        // The expected DateTime should have the year/month from the partial and all other
+        // fields (day, time) from the base instant.
+        DateTime expectedDateTime = new DateTime(2023, 10, 9, 10, 20, 30, 456, DateTimeZone.UTC);
+        assertEquals(expectedDateTime, result);
+
+        // We can also assert individual fields for maximum clarity.
+        assertEquals(2023, result.getYear());
+        assertEquals(10, result.getMonthOfYear());
+        assertEquals(9, result.getDayOfMonth());
+        assertEquals(10, result.getHourOfDay());
+        assertEquals(DateTimeZone.UTC, result.getZone());
     }
 }
