@@ -1,27 +1,24 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LinkedTreeMap_ESTestTest75 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Tests for the inner EntrySet class of {@link LinkedTreeMap}.
+ */
+public class LinkedTreeMapEntrySetTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        Comparator<LinkedTreeMap<Integer, Integer>> comparator0 = (Comparator<LinkedTreeMap<Integer, Integer>>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap0 = new LinkedTreeMap<LinkedTreeMap<Integer, Integer>, Integer>(comparator0, true);
-        LinkedTreeMap.EntrySet linkedTreeMap_EntrySet0 = linkedTreeMap0.new EntrySet();
-        int int0 = linkedTreeMap_EntrySet0.size();
-        assertEquals(0, int0);
+    @Test
+    public void sizeOfEntrySetForNewMapShouldBeZero() {
+        // Arrange: Create a new, empty LinkedTreeMap.
+        LinkedTreeMap<String, Integer> map = new LinkedTreeMap<>();
+
+        // Act: Get the entry set from the map.
+        Set<Map.Entry<String, Integer>> entrySet = map.entrySet();
+
+        // Assert: The size of the entry set should be 0.
+        assertEquals(0, entrySet.size());
     }
 }
