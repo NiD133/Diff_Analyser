@@ -1,19 +1,29 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class OptionGroup_ESTestTest11 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        optionGroup0.setSelected((Option) null);
-        assertFalse(optionGroup0.isRequired());
+    /**
+     * Verifies that setting the selected option to null does not inadvertently
+     * change the 'required' status of the OptionGroup. The 'required' status
+     * should remain at its default value of false.
+     */
+    @Test
+    public void setSelectedWithNullShouldNotAffectRequiredProperty() {
+        // Arrange: Create a new OptionGroup. By default, it is not required.
+        OptionGroup optionGroup = new OptionGroup();
+
+        // Act: Set the selected option to null. This is an edge case that
+        // should be handled gracefully without side effects on other properties.
+        optionGroup.setSelected(null);
+
+        // Assert: The 'required' status of the group should remain unchanged (i.e., false).
+        assertFalse("The 'required' property should not change after setSelected(null) is called",
+                    optionGroup.isRequired());
     }
 }
