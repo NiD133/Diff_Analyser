@@ -1,29 +1,32 @@
 package org.apache.commons.compress.harmony.unpack200;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest53 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentConstantPool} class.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getConstantPoolEntry(5, 2L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that getConstantPoolEntry() throws a NullPointerException
+     * when the SegmentConstantPool is constructed with null CpBands.
+     * <p>
+     * This test ensures that the method fails fast if its essential dependency (CpBands)
+     * is not provided, preventing potential issues later in the process.
+     * </p>
+     */
+    @Test
+    public void getConstantPoolEntryShouldThrowNPEWhenBandsAreNull() {
+        // Arrange: Create a SegmentConstantPool with a null CpBands dependency.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        final long arbitraryIndex = 2L;
+
+        // Act & Assert: Expect a NullPointerException when trying to access a constant pool entry.
+        // The method internally tries to access the null 'bands' field, which triggers the exception.
+        assertThrows(NullPointerException.class, () -> {
+            segmentConstantPool.getConstantPoolEntry(SegmentConstantPool.CP_DOUBLE, arbitraryIndex);
+        });
     }
 }
