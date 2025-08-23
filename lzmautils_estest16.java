@@ -1,19 +1,28 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LZMAUtils_ESTestTest16 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        byte[] byteArray0 = new byte[16];
-        byteArray0[0] = (byte) 93;
-        boolean boolean0 = LZMAUtils.matches(byteArray0, (byte) 93);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the matches() method correctly identifies a byte array
+     * that begins with the standard LZMA magic header.
+     */
+    @Test
+    public void matchesShouldReturnTrueForValidLzmaHeader() {
+        // Arrange: The LZMA magic header is the byte sequence { 0x5D, 0, 0 }.
+        // We create a sample byte array that simulates the beginning of an LZMA file.
+        byte[] signature = new byte[] { (byte) 0x5D, 0, 0, 's', 'o', 'm', 'e', '-', 'd', 'a', 't', 'a' };
+
+        // Act: Check if the beginning of the byte array matches the LZMA signature.
+        // The method only requires the first 3 bytes for a positive match.
+        boolean isMatch = LZMAUtils.matches(signature, signature.length);
+
+        // Assert
+        assertTrue("The signature should be identified as a valid LZMA header.", isMatch);
     }
 }
