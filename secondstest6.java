@@ -1,45 +1,64 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SecondsTestTest6 extends TestCase {
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the {@link Seconds} class, focusing on the
+ * {@code standardSecondsIn(ReadablePeriod)} factory method.
+ */
+@DisplayName("Seconds.standardSecondsIn(ReadablePeriod)")
+class SecondsTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    @DisplayName("should return zero seconds when the period is null")
+    void standardSecondsIn_givenNullPeriod_returnsZero() {
+        assertEquals(Seconds.ZERO, Seconds.standardSecondsIn(null));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
+    @Test
+    @DisplayName("should return zero seconds for a zero-length period")
+    void standardSecondsIn_givenZeroPeriod_returnsZero() {
+        assertEquals(Seconds.ZERO, Seconds.standardSecondsIn(Period.ZERO));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    @DisplayName("should create an equivalent Seconds object for a period containing only seconds")
+    void standardSecondsIn_givenPeriodOfSeconds_createsEquivalentSeconds() {
+        assertEquals(Seconds.seconds(123), Seconds.standardSecondsIn(Period.seconds(123)));
+        assertEquals(Seconds.seconds(-987), Seconds.standardSecondsIn(Period.seconds(-987)));
+        assertEquals(Seconds.ONE, Seconds.standardSecondsIn(Period.seconds(1)));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    @DisplayName("should correctly convert standard period units (like days) into seconds")
+    void standardSecondsIn_givenPeriodOfDays_convertsToSeconds() {
+        // Given a period of 2 days
+        Period twoDays = Period.days(2);
+        
+        // There are 2 * 24 * 60 * 60 = 172,800 seconds in 2 standard days
+        Seconds expected = Seconds.seconds(172800);
+
+        // When converting the period to seconds
+        Seconds actual = Seconds.standardSecondsIn(twoDays);
+
+        // Then the result should be correct
+        assertEquals(expected, actual);
     }
 
-    public void testFactory_standardSecondsIn_RPeriod() {
-        assertEquals(0, Seconds.standardSecondsIn((ReadablePeriod) null).getSeconds());
-        assertEquals(0, Seconds.standardSecondsIn(Period.ZERO).getSeconds());
-        assertEquals(1, Seconds.standardSecondsIn(new Period(0, 0, 0, 0, 0, 0, 1, 0)).getSeconds());
-        assertEquals(123, Seconds.standardSecondsIn(Period.seconds(123)).getSeconds());
-        assertEquals(-987, Seconds.standardSecondsIn(Period.seconds(-987)).getSeconds());
-        assertEquals(2 * 24 * 60 * 60, Seconds.standardSecondsIn(Period.days(2)).getSeconds());
-        try {
-            Seconds.standardSecondsIn(Period.months(1));
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+    @Test
+    @DisplayName("should throw IllegalArgumentException for periods with imprecise units like months")
+    void standardSecondsIn_givenPeriodWithImpreciseUnits_throwsException() {
+        // Given a period containing months, which have a variable number of days
+        Period periodWithMonths = Period.months(1);
+
+        // Then an IllegalArgumentException is expected
+        assertThrows(IllegalArgumentException.class, () -> {
+            Seconds.standardSecondsIn(periodWithMonths);
+        });
     }
 }
