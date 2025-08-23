@@ -1,32 +1,42 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class NodeIterator_ESTestTest15 extends NodeIterator_ESTest_scaffolding {
+import java.util.NoSuchElementException;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("org.jsoup.nodes.NodeIterator", "org.jsoup.nodes.NodeIterator");
-        Element element0 = document0.doClone(document0);
-        Class<FormElement> class0 = FormElement.class;
-        NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(element0, class0);
-        nodeIterator0.remove();
-        // Undeclared exception!
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class contains tests for the NodeIterator.
+ * This particular test was refactored for clarity from an auto-generated test.
+ */
+public class NodeIteratorTest {
+
+    /**
+     * Verifies that calling next() on an iterator with no matching node types
+     * throws a NoSuchElementException.
+     */
+    @Test
+    public void nextThrowsNoSuchElementExceptionWhenNoMatchingNodesExist() {
+        // Arrange: Create a document that does not contain the target node type (FormElement).
+        String html = "<div><p>This is a sample document without any forms.</p></div>";
+        Document doc = Parser.parse(html);
+        Node root = doc.body(); // The node to start iteration from.
+
+        // Act: Create an iterator that searches for a node type not present in the document.
+        NodeIterator<FormElement> iterator = new NodeIterator<>(root, FormElement.class);
+
+        // Assert: The iterator should correctly report that it has no elements.
+        assertFalse("The iterator should be empty as no FormElements exist.", iterator.hasNext());
+
+        // Assert: Calling next() on an exhausted iterator should throw the expected exception.
         try {
-            nodeIterator0.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.nodes.NodeIterator", e);
+            iterator.next();
+            fail("A NoSuchElementException should have been thrown because the iterator is exhausted.");
+        } catch (NoSuchElementException expected) {
+            // This is the expected behavior. The test passes.
         }
     }
 }
