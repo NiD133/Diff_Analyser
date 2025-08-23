@@ -1,52 +1,49 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test for {@link TextHelpAppendable}.
+ * This test was improved to clarify its intent and improve maintainability.
+ */
 public class TextHelpAppendable_ESTestTest88 extends TextHelpAppendable_ESTest_scaffolding {
 
+    /**
+     * Tests that calling appendTable does not alter the default configuration
+     * values for maximum width and indent.
+     */
     @Test(timeout = 4000)
-    public void test87() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        arrayList0.add(textStyle0);
-        ArrayList<String> arrayList1 = new ArrayList<String>();
-        arrayList1.add("|iq2*P~/");
-        PriorityQueue<List<String>> priorityQueue0 = new PriorityQueue<List<String>>();
-        priorityQueue0.add(arrayList1);
-        TableDefinition tableDefinition0 = TableDefinition.from("|iq2*P~/", arrayList0, arrayList1, priorityQueue0);
-        textHelpAppendable0.appendTable(tableDefinition0);
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
-        assertEquals(3, textHelpAppendable0.getIndent());
+    public void appendTable_shouldNotChangeDefaultWidthAndIndent() throws IOException {
+        // Arrange: Create a TextHelpAppendable instance.
+        // The actual output destination is not relevant for this test.
+        TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+
+        // Pre-condition check: Verify the instance starts with the expected default values.
+        assertEquals("Pre-condition: Max width should be the default",
+                TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
+        assertEquals("Pre-condition: Indent should be the default",
+                TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
+
+        // Create a minimal but valid TableDefinition to pass to the method.
+        List<TextStyle> columnStyles = Collections.singletonList(TextStyle.DEFAULT);
+        List<String> headers = Collections.singletonList("Header");
+        Collection<List<String>> rows = Collections.singletonList(Collections.singletonList("Data"));
+        TableDefinition tableDefinition = TableDefinition.from("Title", columnStyles, headers, rows);
+
+        // Act: Call the method under test.
+        helpAppendable.appendTable(tableDefinition);
+
+        // Assert: Verify that the properties have not been changed by the method call.
+        assertEquals("Max width should remain default after appending a table",
+                TextHelpAppendable.DEFAULT_WIDTH, helpAppendable.getMaxWidth());
+        assertEquals("Indent should remain default after appending a table",
+                TextHelpAppendable.DEFAULT_INDENT, helpAppendable.getIndent());
     }
 }
