@@ -1,33 +1,27 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest41 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonTreeWriter}.
+ * This focuses on validating the correct state transitions and error handling.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.value((-1.0));
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that attempting to write a value inside a JSON object without first
+     * specifying a name throws an {@link IllegalStateException}. According to the JSON
+     * specification, an object must consist of name-value pairs.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void writeValue_insideObjectWithoutName_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a writer and start a JSON object.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginObject();
+
+        // Act: Attempt to write a value without a preceding name.
+        // This is an invalid operation and is expected to throw.
+        writer.value(-1.0);
     }
 }
