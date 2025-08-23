@@ -1,20 +1,29 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JacksonInject_ESTestTest22 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its factory and
+ * mutant factory methods.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.empty();
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withOptional((Boolean) null);
-        assertSame(jacksonInject_Value1, jacksonInject_Value0);
+    /**
+     * Tests that calling {@code withOptional(null)} on an empty {@link JacksonInject.Value}
+     * instance returns the same instance, confirming it's an identity operation.
+     */
+    @Test
+    public void withOptional_whenCalledWithNullOnEmptyValue_returnsSameInstance() {
+        // Arrange: Start with the singleton empty instance.
+        JacksonInject.Value emptyValue = JacksonInject.Value.empty();
+
+        // Act: Attempt to modify the 'optional' property with a null value.
+        JacksonInject.Value result = emptyValue.withOptional(null);
+
+        // Assert: The method should recognize that no change is being made
+        // and return the original instance as an optimization.
+        assertSame("Expected withOptional(null) on an empty value to be a no-op and return the same instance.",
+                emptyValue, result);
     }
 }
