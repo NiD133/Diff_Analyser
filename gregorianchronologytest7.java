@@ -5,46 +5,49 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
 
-public class GregorianChronologyTestTest7 extends TestCase {
+/**
+ * Tests for the withZone() method of GregorianChronology.
+ *
+ * <p>This test suite focuses on verifying the caching behavior of GregorianChronology,
+ * ensuring that {@code withZone()} returns the expected singleton instance for a given time zone.
+ */
+public class TestGregorianChronologyWithZone extends TestCase {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    // A fixed point in time, 2002-06-09T00:00:00Z, for predictable test results.
+    private static final long TEST_TIME_NOW = new DateTime(2002, 6, 9, 0, 0, 0, 0, DateTimeZone.UTC).getMillis();
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
+    private DateTimeZone originalDateTimeZone;
+    private TimeZone originalTimeZone;
+    private Locale originalLocale;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
     public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
+        return new TestSuite(TestGregorianChronologyWithZone.class);
     }
 
     @Override
     protected void setUp() throws Exception {
+        // Fix the current time to ensure tests are deterministic.
         DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
+
+        // Store original system defaults to restore them after the test.
         originalDateTimeZone = DateTimeZone.getDefault();
         originalTimeZone = TimeZone.getDefault();
         originalLocale = Locale.getDefault();
+
+        // Set predictable defaults for the tests. This is crucial for tests
+        // that rely on the "default" time zone.
         DateTimeZone.setDefault(LONDON);
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         Locale.setDefault(Locale.UK);
@@ -52,21 +55,70 @@ public class GregorianChronologyTestTest7 extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        // Restore original system defaults to avoid side-effects on other tests.
         DateTimeUtils.setCurrentMillisSystem();
         DateTimeZone.setDefault(originalDateTimeZone);
         TimeZone.setDefault(originalTimeZone);
         Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
     }
 
-    public void testWithZone() {
-        assertSame(GregorianChronology.getInstance(TOKYO), GregorianChronology.getInstance(TOKYO).withZone(TOKYO));
-        assertSame(GregorianChronology.getInstance(LONDON), GregorianChronology.getInstance(TOKYO).withZone(LONDON));
-        assertSame(GregorianChronology.getInstance(PARIS), GregorianChronology.getInstance(TOKYO).withZone(PARIS));
-        assertSame(GregorianChronology.getInstance(LONDON), GregorianChronology.getInstance(TOKYO).withZone(null));
-        assertSame(GregorianChronology.getInstance(PARIS), GregorianChronology.getInstance().withZone(PARIS));
-        assertSame(GregorianChronology.getInstance(PARIS), GregorianChronology.getInstanceUTC().withZone(PARIS));
+    //-----------------------------------------------------------------------
+
+    /**
+     * Tests that calling withZone() with the chronology's current zone returns the same instance.
+     * This verifies the optimization to avoid creating a new object unnecessarily.
+     */
+    public void testWithZone_givenSameZone_returnsSameInstance() {
+        Chronology tokyoChronology = GregorianChronology.getInstance(TOKYO);
+        assertSame("Calling withZone with the same zone should return the same instance",
+                tokyoChronology, tokyoChronology.withZone(TOKYO));
+    }
+
+    /**
+     * Tests that calling withZone() with a different zone returns the correct cached instance for that new zone.
+     */
+    public void testWithZone_givenDifferentZone_returnsCachedInstanceForNewZone() {
+        Chronology tokyoChronology = GregorianChronology.getInstance(TOKYO);
+
+        Chronology londonChronology = GregorianChronology.getInstance(LONDON);
+        assertSame("withZone(LONDON) should return the cached LONDON instance",
+                londonChronology, tokyoChronology.withZone(LONDON));
+    }
+
+    /**
+     * Tests that calling withZone(null) returns the instance for the default time zone.
+     */
+    public void testWithZone_givenNullZone_returnsDefaultZoneInstance() {
+        // The default time zone is set to LONDON in setUp()
+        Chronology tokyoChronology = GregorianChronology.getInstance(TOKYO);
+        Chronology defaultChronology = GregorianChronology.getInstance(LONDON);
+
+        assertSame("withZone(null) should return the instance for the default zone (LONDON)",
+                defaultChronology, tokyoChronology.withZone(null));
+    }
+
+    /**
+     * Tests calling withZone() on an instance that was created using the default time zone.
+     */
+    public void testWithZone_onDefaultInstance() {
+        // The default time zone is set to LONDON in setUp()
+        Chronology defaultChronology = GregorianChronology.getInstance();
+        assertEquals("getInstance() should return a chronology with the default zone",
+                LONDON, defaultChronology.getZone());
+
+        Chronology parisChronology = GregorianChronology.getInstance(PARIS);
+        assertSame("Calling withZone(PARIS) on the default instance should return the PARIS instance",
+                parisChronology, defaultChronology.withZone(PARIS));
+    }
+
+    /**
+     * Tests calling withZone() on the UTC instance.
+     */
+    public void testWithZone_onUTCInstance() {
+        Chronology utcChronology = GregorianChronology.getInstanceUTC();
+        Chronology parisChronology = GregorianChronology.getInstance(PARIS);
+
+        assertSame("Calling withZone(PARIS) on the UTC instance should return the PARIS instance",
+                parisChronology, utcChronology.withZone(PARIS));
     }
 }
