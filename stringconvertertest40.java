@@ -1,84 +1,35 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.Test;
 
-public class StringConverterTestTest40 extends TestCase {
+/**
+ * Tests the behavior of {@link StringConverter#setInto(ReadWritableInterval, Object, Chronology)}
+ * when handling invalid string formats for intervals.
+ */
+public class StringConverterInvalidIntervalStringTest {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+    /**
+     * Verifies that setInto() throws an IllegalArgumentException when the input string
+     * for an interval is malformed.
+     *
+     * The ISO-8601 standard for intervals requires a start and end instant, or a
+     * start/end instant combined with a duration/period. A string like "/P1Y", which
+     * only contains a period without a reference instant, is not a valid representation.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void setIntoInterval_withPeriodOnlyString_throwsIllegalArgumentException() {
+        // Arrange: Define the invalid input and a target interval object.
+        // The string "/P1Y" is invalid because it only contains a period (P1Y)
+        // without a start or end instant to anchor it.
+        String invalidIntervalString = "/P1Y";
+        MutableInterval interval = new MutableInterval(0L, 1000L);
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+        // Act: Attempt to update the interval's value from the invalid string.
+        // The StringConverter is a singleton, accessed via its INSTANCE field.
+        StringConverter.INSTANCE.setInto(interval, invalidIntervalString, null);
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoIntervalEx_Object_Chronology4() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
-        try {
-            StringConverter.INSTANCE.setInto(m, "/P1Y", null);
-            fail();
-        } catch (IllegalArgumentException ex) {
-        }
+        // Assert: The test will automatically pass if an IllegalArgumentException is thrown,
+        // as specified by the @Test(expected=...) annotation. It will fail otherwise.
     }
 }
