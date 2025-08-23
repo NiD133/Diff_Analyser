@@ -1,28 +1,37 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest29 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the SparseBloomFilter, focusing on behavior under
+ * extreme resource constraints.
+ */
+public class SparseBloomFilterResourceTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Shape shape0 = Shape.fromKM(2147483639, 2147483639);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        long[] longArray0 = new long[2];
-        LongBiPredicate longBiPredicate0 = mock(LongBiPredicate.class, new ViolatedAssumptionAnswer());
-        doReturn(false, false, false, false, false).when(longBiPredicate0).test(anyLong(), anyLong());
-        CountingLongPredicate countingLongPredicate0 = new CountingLongPredicate(longArray0, longBiPredicate0);
-        LongPredicate longPredicate0 = countingLongPredicate0.negate();
-        // Undeclared exception!
-        sparseBloomFilter0.processBitMaps(longPredicate0);
+    /**
+     * Tests that calling processBitMaps() on a filter with a huge shape
+     * throws an OutOfMemoryError.
+     *
+     * <p>The processBitMaps() method internally creates a long[] bitmap
+     * representation of the filter. When the shape specifies a very large number of
+     * bits (e.g., Integer.MAX_VALUE), the required array size can exceed
+     * available heap memory. This test verifies that this allocation attempt fails
+     * as expected with an OutOfMemoryError.</p>
+     *
+     * <p>Note: Testing for OutOfMemoryError is generally discouraged, but it is
+     * appropriate here to confirm the behavior of the system at its memory limits.</p>
+     */
+    @Test(expected = OutOfMemoryError.class)
+    public void processBitMapsWithHugeShapeShouldThrowOutOfMemoryError() {
+        // Arrange: Create a Shape with the maximum possible number of bits.
+        // This theoretical shape is too large to be instantiated in memory as a
+        // dense bit array.
+        final Shape hugeShape = Shape.fromKM(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        final SparseBloomFilter filter = new SparseBloomFilter(hugeShape);
+
+        // Act: Attempt to process the filter's bit maps. This will trigger the
+        // allocation of a giant long[], which is expected to fail. The predicate
+        // itself is trivial (val -> true) as the error occurs before it is ever used.
+        filter.processBitMaps(val -> true);
     }
 }
