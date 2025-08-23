@@ -1,35 +1,28 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest24 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        // Undeclared exception!
-        try {
-            hashCodeAndEqualsSafeSet0.containsAll((Collection<?>) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Passed collection should notify() be null should not be null
-            //
-            verifyException("org.mockito.internal.util.Checks", e);
-        }
+    /**
+     * This test verifies that the containsAll() method correctly throws
+     * an IllegalArgumentException when a null collection is passed as an argument,
+     * enforcing its non-null contract.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void containsAll_shouldThrowIllegalArgumentException_whenCollectionIsNull() {
+        // Given
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+        Collection<?> nullCollection = null;
+
+        // When
+        safeSet.containsAll(nullCollection);
+
+        // Then: An IllegalArgumentException is expected, as declared by the @Test annotation.
     }
 }
