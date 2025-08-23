@@ -1,23 +1,29 @@
 package com.google.common.base;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
 import static com.google.common.base.CaseFormat.UPPER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
+
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CaseFormatTestTest31 extends TestCase {
+/**
+ * Tests for the {@link Converter} returned by {@link CaseFormat#converterTo(CaseFormat)}.
+ */
+public class CaseFormatConverterTest extends TestCase {
 
-    public void testConverter_toString() {
-        assertThat(LOWER_HYPHEN.converterTo(UPPER_CAMEL).toString()).isEqualTo("LOWER_HYPHEN.converterTo(UPPER_CAMEL)");
-    }
+  /**
+   * The converter's toString() method should return a descriptive string that is useful for
+   * debugging, clearly identifying the source and target formats.
+   */
+  public void testToString_returnsDescriptiveString() {
+    // Arrange
+    Converter<String, String> caseConverter = LOWER_HYPHEN.converterTo(UPPER_CAMEL);
+    String expectedToString = "LOWER_HYPHEN.converterTo(UPPER_CAMEL)";
+
+    // Act
+    String actualToString = caseConverter.toString();
+
+    // Assert
+    assertThat(actualToString).isEqualTo(expectedToString);
+  }
 }
