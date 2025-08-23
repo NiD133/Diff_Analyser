@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Years_ESTestTest30 extends Years_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Years years0 = Years.MAX_VALUE;
-        boolean boolean0 = years0.isGreaterThan((Years) null);
-        assertTrue(boolean0);
+    /**
+     * Tests that isGreaterThan() returns true when a positive Years value is compared to null.
+     * The method's contract specifies that a null comparison argument should be treated as zero.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingPositiveYearsToNull() {
+        // Arrange: A large positive Years value. According to the Javadoc, the null
+        // 'other' value in the comparison is treated as Years.ZERO.
+        Years positiveYears = Years.MAX_VALUE;
+
+        // Act: Compare the positive Years value to null.
+        boolean isGreater = positiveYears.isGreaterThan(null);
+
+        // Assert: The result should be true, as MAX_VALUE is greater than zero.
+        assertTrue("Years.MAX_VALUE should be considered greater than null.", isGreater);
     }
 }
