@@ -1,67 +1,56 @@
 package org.apache.commons.collections4.iterators;
 
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.functors.NullPredicate;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
+
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class FilterListIterator_ESTestTest12 extends FilterListIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Predicate<Integer> predicate0 = NullPredicate.nullPredicate();
-        FilterListIterator<Integer> filterListIterator0 = new FilterListIterator<Integer>(predicate0);
-        NullPredicate.nullPredicate();
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        linkedList0.add((Integer) null);
-        ListIterator<Integer> listIterator0 = linkedList0.listIterator(1);
-        filterListIterator0.setListIterator(listIterator0);
-        FilterListIterator<Integer> filterListIterator1 = new FilterListIterator<Integer>(listIterator0, predicate0);
-        filterListIterator1.hasPrevious();
-        filterListIterator0.hasPrevious();
-        filterListIterator1.previous();
-        assertEquals((-1), filterListIterator1.nextIndex());
+/**
+ * Contains tests for the {@link FilterListIterator}.
+ * This improved test focuses on a specific scenario: iterating backward from the end of a list.
+ */
+public class FilterListIteratorTest {
+
+    /**
+     * Tests that when a {@link FilterListIterator} is positioned at the end of a list,
+     * calling {@code previous()} correctly returns the last matching element and updates
+     * the iterator's indices.
+     */
+    @Test
+    public void testPreviousFromEndWithMatchingElement() {
+        // Arrange
+        final LinkedList<Object> list = new LinkedList<>();
+        list.add("A");
+        list.add(null); // The element that should be found by the predicate.
+        list.add("B");
+
+        // Use a predicate that only accepts null values.
+        final Predicate<Object> nullOnlyPredicate = NullPredicate.nullPredicate();
+
+        // Create a list iterator starting at the end of the list (index 3).
+        final ListIterator<Object> underlyingIterator = list.listIterator(list.size());
+
+        final FilterListIterator<Object> filterIterator =
+                new FilterListIterator<>(underlyingIterator, nullOnlyPredicate);
+
+        // Act & Assert
+
+        // 1. Verify that the iterator reports it has a previous element that matches the predicate.
+        assertTrue("hasPrevious() should be true as a matching 'null' element exists.", filterIterator.hasPrevious());
+
+        // 2. Retrieve the previous element and verify it is the expected 'null'.
+        final Object previousElement = filterIterator.previous();
+        assertNull("previous() should return the matching 'null' element.", previousElement);
+
+        // 3. After moving backward past the 'null' at index 1, the cursor should be positioned
+        //    before it. The next element would be at index 1, and the previous index is 0.
+        assertEquals("nextIndex() should be 1 after moving back to the 'null' element.", 1, filterIterator.nextIndex());
+        assertEquals("previousIndex() should be 0.", 0, filterIterator.previousIndex());
     }
 }
