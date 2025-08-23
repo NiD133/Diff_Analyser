@@ -1,40 +1,48 @@
 package org.apache.ibatis.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
 import java.io.Reader;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl;
-import org.apache.ibatis.logging.jdk14.Jdk14LoggingImpl;
-import org.apache.ibatis.logging.log4j.Log4jImpl;
-import org.apache.ibatis.logging.log4j2.Log4j2Impl;
 import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.logging.slf4j.Slf4jImpl;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LogFactoryTestTest8 {
+/**
+ * Tests the configuration of the LogFactory from mybatis-config.xml.
+ */
+@DisplayName("LogFactory Configuration")
+class LogFactoryConfigurationTest {
 
-    @AfterAll
-    static void restore() {
-        LogFactory.useSlf4jLogging();
+  /**
+   * The LogFactory maintains a static reference to the logging implementation.
+   * This method resets it to the default after all tests in this class run,
+   * ensuring test isolation and preventing side effects on other tests.
+   */
+  @AfterAll
+  static void restoreDefaultLoggingImplementation() {
+    LogFactory.useSlf4jLogging();
+  }
+
+  @Test
+  @DisplayName("Should use log implementation specified in mybatis-config.xml")
+  void shouldUseLogImplementationFromConfigFile() throws Exception {
+    // Arrange: The mybatis-config.xml file is expected to contain a setting
+    // that configures the logging implementation, e.g., <setting name="logImpl" value="NO_LOGGING"/>
+    String configFile = "org/apache/ibatis/logging/mybatis-config.xml";
+
+    // Act: Building the SqlSessionFactory from an XML configuration file triggers
+    // the configuration of the static LogFactory based on the settings in that file.
+    try (Reader reader = Resources.getResourceAsReader(configFile)) {
+      new SqlSessionFactoryBuilder().build(reader);
     }
 
-    private void logSomething(Log log) {
-        log.warn("Warning message.");
-        log.debug("Debug message.");
-        log.error("Error message.");
-        log.error("Error with Exception.", new Exception("Test exception."));
-    }
-
-    @Test
-    void shouldReadLogImplFromSettings() throws Exception {
-        try (Reader reader = Resources.getResourceAsReader("org/apache/ibatis/logging/mybatis-config.xml")) {
-            new SqlSessionFactoryBuilder().build(reader);
-        }
-        Log log = LogFactory.getLog(Object.class);
-        log.debug("Debug message.");
-        assertEquals(log.getClass().getName(), NoLoggingImpl.class.getName());
-    }
+    // Assert: Verify that the LogFactory now uses the implementation specified in the config.
+    // In this case, we expect it to be configured to use NoLoggingImpl.
+    Log log = LogFactory.getLog(LogFactoryConfigurationTest.class);
+    assertInstanceOf(NoLoggingImpl.class, log,
+        "LogFactory should have been configured to use NoLoggingImpl from the XML config.");
+  }
 }
