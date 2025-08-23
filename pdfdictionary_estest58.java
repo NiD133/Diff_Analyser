@@ -1,27 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class PdfDictionary_ESTestTest58 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        PdfTransparencyGroup pdfTransparencyGroup0 = new PdfTransparencyGroup();
-        boolean boolean0 = pdfTransparencyGroup0.contains((PdfName) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the contains() method returns false when checking for a null key.
+     * A dictionary should not contain a null key, so this check should consistently fail.
+     */
+    @Test
+    public void contains_shouldReturnFalse_forNullKey() {
+        // Arrange: Create an empty dictionary instance.
+        PdfDictionary dictionary = new PdfDictionary();
+
+        // Act: Check if the dictionary contains a null key.
+        boolean result = dictionary.contains(null);
+
+        // Assert: The dictionary should report that it does not contain the null key.
+        assertFalse("A dictionary should not contain a null key.", result);
     }
 }
