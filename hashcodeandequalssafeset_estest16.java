@@ -1,28 +1,29 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest16 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        LinkedList<HashCodeAndEqualsMockWrapper> linkedList0 = new LinkedList<HashCodeAndEqualsMockWrapper>();
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.addAll(linkedList0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that calling addAll with an empty collection does not modify the set
+     * and correctly returns false, adhering to the Collection#addAll contract.
+     */
+    @Test
+    public void addAllWithEmptyCollectionShouldReturnFalse() {
+        // Arrange: Create an empty set.
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+
+        // Act: Attempt to add all elements from an empty collection.
+        boolean wasSetModified = safeSet.addAll(Collections.emptyList());
+
+        // Assert: The set should not have been modified, and the method should return false.
+        assertFalse("addAll should return false when the collection to add is empty.", wasSetModified);
+        assertTrue("The set should remain empty after the operation.", safeSet.isEmpty());
     }
 }
