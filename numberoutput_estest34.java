@@ -1,17 +1,31 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest34 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Contains tests for the utility methods in the {@link NumberOutput} class.
+ * This focuses on the {@code divBy1000} method.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        int int0 = NumberOutput.divBy1000((-1652));
-        assertEquals(67108862, int0);
+    /**
+     * Tests that the optimized `divBy1000` method correctly calculates the quotient
+     * for a negative input, matching the behavior of standard integer division.
+     */
+    @Test
+    public void divBy1000_withNegativeInput_returnsCorrectQuotient() {
+        // Arrange
+        int inputNumber = -1652;
+        // The method under test is an optimization, so its result must match
+        // standard integer division, which truncates toward zero.
+        int expectedQuotient = -1652 / 1000; // This evaluates to -1
+
+        // Act
+        int actualQuotient = NumberOutput.divBy1000(inputNumber);
+
+        // Assert
+        assertEquals("The optimized division result should match standard integer division",
+                expectedQuotient, actualQuotient);
     }
 }
