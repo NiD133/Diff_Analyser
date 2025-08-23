@@ -1,75 +1,89 @@
 package com.fasterxml.jackson.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.io.ContentReference;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * This test suite verifies the behavior of {@link JsonLocation} when the
+ * {@link StreamReadFeature#INCLUDE_SOURCE_IN_LOCATION} feature is disabled.
+ *
+ * @see JsonLocation
+ * @see StreamReadFeature#INCLUDE_SOURCE_IN_LOCATION
+ */
 public class JsonLocationTestTest5 extends JUnit5TestBase {
 
-    private void _verifyContentDisabled(JsonParseException e) {
-        verifyException(e, "unrecognized token");
-        JsonLocation loc = e.getLocation();
-        assertNull(loc.contentReference().getRawContent());
-        assertThat(loc.sourceDescription()).startsWith("REDACTED");
+    private JsonFactory factoryWithSourceDisabled;
+
+    @BeforeEach
+    void setUp() {
+        // This factory is configured to disable the inclusion of source content
+        // in JsonLocation upon errors. This is the main configuration under test.
+        factoryWithSourceDisabled = JsonFactory.builder()
+                .disable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+                .build();
     }
 
-    private ContentReference _sourceRef(String rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length(), ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(char[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(byte[] rawSrc) {
-        return ContentReference.construct(true, rawSrc, 0, rawSrc.length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(byte[] rawSrc, int offset, int length) {
-        return ContentReference.construct(true, rawSrc, offset, length, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(InputStream rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _sourceRef(File rawSrc) {
-        return ContentReference.construct(true, rawSrc, -1, -1, ErrorReportConfiguration.defaults());
-    }
-
-    private ContentReference _rawSourceRef(boolean textual, Object rawSrc) {
-        return ContentReference.rawReference(textual, rawSrc);
-    }
-
-    static class Foobar {
-    }
-
-    // for [jackson-core#356]
     @Test
-    void disableSourceInclusion() throws Exception {
-        JsonFactory f = JsonFactory.builder().disable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build();
-        try (JsonParser p = f.createParser("[ foobar ]")) {
-            assertToken(JsonToken.START_ARRAY, p.nextToken());
-            try {
-                p.nextToken();
-                fail("Shouldn't have passed");
-            } catch (JsonParseException e) {
-                _verifyContentDisabled(e);
+    @DisplayName("Source content should be redacted for String input when feature is disabled")
+    void shouldRedactSourceForStringInputWhenDisabled() {
+        // GIVEN
+        String invalidJson = "[ foobar ]";
+
+        // WHEN
+        JsonParseException exception = assertThrows(JsonParseException.class, () -> {
+            try (JsonParser parser = factoryWithSourceDisabled.createParser(invalidJson)) {
+                parser.nextToken(); // Consume '['
+                parser.nextToken(); // This call is expected to fail on the invalid token 'foobar'
             }
-        }
-        // and verify same works for byte-based too
-        try (JsonParser p = f.createParser("[ foobar ]".getBytes("UTF-8"))) {
-            assertToken(JsonToken.START_ARRAY, p.nextToken());
-            try {
-                p.nextToken();
-                fail("Shouldn't have passed");
-            } catch (JsonParseException e) {
-                _verifyContentDisabled(e);
+        });
+
+        // THEN
+        assertSourceContentIsRedacted(exception);
+    }
+
+    @Test
+    @DisplayName("Source content should be redacted for byte array input when feature is disabled")
+    void shouldRedactSourceForByteArrayInputWhenDisabled() throws IOException {
+        // GIVEN
+        byte[] invalidJson = "[ foobar ]".getBytes("UTF-8");
+
+        // WHEN
+        JsonParseException exception = assertThrows(JsonParseException.class, () -> {
+            try (JsonParser parser = factoryWithSourceDisabled.createParser(invalidJson)) {
+                parser.nextToken(); // Consume '['
+                parser.nextToken(); // This call is expected to fail on the invalid token 'foobar'
             }
-        }
+        });
+
+        // THEN
+        assertSourceContentIsRedacted(exception);
+    }
+
+    /**
+     * Asserts that the {@link JsonLocation} from a {@link JsonParseException}
+     * does not contain the original source content.
+     *
+     * @param e The exception to inspect.
+     */
+    private void assertSourceContentIsRedacted(JsonParseException e) {
+        // First, verify the exception's cause is what we expect.
+        verifyException(e, "unrecognized token");
+
+        // Then, verify the location information has been properly redacted.
+        JsonLocation location = e.getLocation();
+        ContentReference contentRef = location.contentReference();
+
+        // The raw content should not be available in the content reference.
+        assertThat(contentRef.getRawContent()).isNull();
+
+        // The source description should be explicitly marked as "REDACTED".
+        assertThat(location.sourceDescription()).startsWith("REDACTED");
     }
 }
