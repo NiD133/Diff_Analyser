@@ -1,31 +1,34 @@
 package org.threeten.extra.scale;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class UtcInstant_ESTestTest35 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Test suite for the {@link UtcInstant} class.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        // Undeclared exception!
-        try {
-            UtcInstant.parse((CharSequence) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // text
-            //
-            verifyException("java.util.Objects", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that calling {@code UtcInstant.parse()} with a null input
+     * throws a {@code NullPointerException} with a specific message.
+     * <p>
+     * The method contract requires a non-null input, typically enforced
+     * by {@code Objects.requireNonNull}.
+     */
+    @Test
+    public void parse_withNullInput_shouldThrowNullPointerException() {
+        // Arrange: Define the expected exception type and message.
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("text");
+
+        // Act: Call the method under test with invalid input.
+        UtcInstant.parse(null);
+
+        // Assert: The ExpectedException rule handles the assertion.
+        // If the expected exception is not thrown, the test will fail.
     }
 }
