@@ -1,28 +1,20 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests the behavior of the {@link JsonParser} class, specifically how it handles
+ * invalid or exceptional inputs.
+ */
 public class JsonParser_ESTestTest11 extends JsonParser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        // Undeclared exception!
-        try {
-            JsonParser.parseString((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.StringReader", e);
-        }
+    /**
+     * Verifies that {@link JsonParser#parseString(String)} throws a NullPointerException
+     * when the input string is null. This is the expected behavior because the method
+     * internally attempts to create a {@code new StringReader(null)}.
+     */
+    @Test(expected = NullPointerException.class)
+    public void parseStringWithNullInputThrowsNullPointerException() {
+        JsonParser.parseString(null);
     }
 }
