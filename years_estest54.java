@@ -2,17 +2,22 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Years_ESTestTest54 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        Years years0 = Years.ZERO;
-        DurationFieldType durationFieldType0 = years0.getFieldType();
-        assertEquals("years", durationFieldType0.getName());
+    @Test
+    public void getFieldType_shouldReturnYearsDurationFieldType() {
+        // Arrange
+        Years years = Years.ZERO;
+        
+        // Act
+        DurationFieldType actualFieldType = years.getFieldType();
+        
+        // Assert
+        // The getFieldType() method for a Years object should always return the 'years' singleton.
+        assertSame(DurationFieldType.years(), actualFieldType);
     }
 }
