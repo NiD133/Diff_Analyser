@@ -1,41 +1,29 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
 public class XmlTreeBuilder_ESTestTest19 extends XmlTreeBuilder_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse(",Ix<T(pi#>?mbGzH", ",Ix<T(pi#>?mbGzH");
-        // Undeclared exception!
-        try {
-            xmlTreeBuilder0.pop();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.TreeBuilder", e);
-        }
+    /**
+     * Verifies that calling pop() on a builder with an empty element stack
+     * throws a NoSuchElementException.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void popFromEmptyStackThrowsNoSuchElementException() {
+        // Arrange: Create a builder and parse a document to initialize its state.
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+
+        // The parse method pushes the root Document node onto the builder's internal stack.
+        // The input content ("") is not important; we just need to establish the initial state.
+        builder.parse("", "https://example.com");
+
+        // Act 1: Pop the root Document element. This succeeds and empties the stack.
+        builder.pop();
+
+        // Act 2 & Assert: Attempting to pop again from the now-empty stack.
+        // This call is expected to throw a NoSuchElementException, which is verified
+        // by the @Test(expected) annotation.
+        builder.pop();
     }
 }
