@@ -1,34 +1,38 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.jsoup.nodes.Document.OutputSettings;
 
-public class DocumentType_ESTestTest10 extends DocumentType_ESTest_scaffolding {
+/**
+ * Test suite for {@link DocumentType}.
+ * This class focuses on improving a specific generated test case for clarity.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DocumentType documentType0 = new DocumentType("", "<!doctype", "jcEA3& P6-6$CAL");
-        char[] charArray0 = new char[4];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(charBuffer0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            documentType0.outerHtmlHead(quietAppendable0, document_OutputSettings0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that writing a DocumentType to an Appendable with insufficient
+     * capacity throws a BufferOverflowException.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void outerHtmlHeadThrowsBufferOverflowWhenAppendableIsTooSmall() {
+        // Arrange: Create a standard DocumentType. Its outer HTML representation will be
+        // significantly longer than the small buffer we create below.
+        DocumentType docType = new DocumentType("html",
+            "-//W3C//DTD XHTML 1.0 Strict//EN",
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
+
+        // Arrange: Create an Appendable with a very small, fixed capacity.
+        final int bufferCapacity = 4;
+        CharBuffer smallBuffer = CharBuffer.allocate(bufferCapacity);
+        QuietAppendable appendable = QuietAppendable.wrap(smallBuffer);
+        
+        OutputSettings settings = new OutputSettings();
+
+        // Act: Attempt to write the doctype's HTML to the undersized appendable.
+        // The @Test(expected) annotation will assert that a BufferOverflowException is thrown.
+        docType.outerHtmlHead(appendable, settings);
     }
 }
