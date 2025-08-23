@@ -1,29 +1,34 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class PlotRenderingInfo_ESTestTest4 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the subplot management features of the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        plotRenderingInfo0.addSubplotInfo(plotRenderingInfo0);
-        PlotRenderingInfo plotRenderingInfo1 = plotRenderingInfo0.getSubplotInfo(0);
-        assertEquals(1, plotRenderingInfo1.getSubplotCount());
+    /**
+     * Verifies that adding a subplot correctly increases the subplot count and
+     * that the same subplot instance can be retrieved by its index.
+     */
+    @Test
+    public void addAndGetSubplotInfo_shouldStoreAndRetrieveSubplotCorrectly() {
+        // Arrange: Create a parent plot info and a separate subplot info.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo parentPlotInfo = new PlotRenderingInfo(chartInfo);
+        PlotRenderingInfo subplotInfoToAdd = new PlotRenderingInfo(chartInfo);
+
+        // Act: Add the subplot info to the parent.
+        parentPlotInfo.addSubplotInfo(subplotInfoToAdd);
+
+        // Assert: Verify the state of the parent plot info.
+        assertEquals("After adding one subplot, the count should be 1.", 1, parentPlotInfo.getSubplotCount());
+
+        PlotRenderingInfo retrievedSubplotInfo = parentPlotInfo.getSubplotInfo(0);
+        assertSame("The retrieved subplot should be the same instance that was added.",
+                subplotInfoToAdd, retrievedSubplotInfo);
     }
 }
