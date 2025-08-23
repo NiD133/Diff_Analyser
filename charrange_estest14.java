@@ -1,23 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest14 extends CharRange_ESTest_scaffolding {
+/**
+ * This class contains tests for the CharRange class.
+ * The following test case was improved for clarity and maintainability.
+ */
+public class CharRange_ESTestTest14 { // Retaining original class name context
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        CharRange charRange0 = CharRange.isNotIn('N', 'N');
-        charRange0.hashCode();
-        assertEquals('N', charRange0.getStart());
-        assertEquals('N', charRange0.getEnd());
-        assertTrue(charRange0.isNegated());
+    /**
+     * Tests that CharRange.isNotIn() with the same start and end character
+     * correctly creates a negated range representing a single character.
+     */
+    @Test
+    public void isNotInWithSameStartAndEndCharShouldCreateNegatedSingleCharRange() {
+        // Arrange: Define the character for the range.
+        final char testChar = 'N';
+
+        // Act: Create a negated character range for a single character.
+        final CharRange range = CharRange.isNotIn(testChar, testChar);
+
+        // Assert: Verify that the range is correctly configured.
+        // It should be negated and contain the single specified character.
+        assertTrue("The range should be negated.", range.isNegated());
+        assertEquals("The start character should be correct.", testChar, range.getStart());
+        assertEquals("The end character should be correct.", testChar, range.getEnd());
     }
 }
