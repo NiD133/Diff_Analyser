@@ -1,46 +1,35 @@
 package org.threeten.extra.chrono;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest6 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link InternationalFixedChronology} class, focusing on the
+ * {@code getLeapYearsBefore} static method.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        long long0 = InternationalFixedChronology.getLeapYearsBefore(0L);
-        assertEquals(0L, long0);
+    /**
+     * Tests that the number of leap years before year 0 is correctly calculated as 0.
+     * <p>
+     * The International Fixed Chronology is defined for years 1 and greater. This test
+     * verifies the behavior for an input just below the supported range, ensuring it
+     * handles this edge case gracefully.
+     */
+    @Test
+    public void getLeapYearsBefore_forYearZero_returnsZero() {
+        // Arrange: Define the input year and the expected result.
+        long prolepticYear = 0L;
+        long expectedLeapYearCount = 0L;
+
+        // Act: Call the method under test.
+        long actualLeapYearCount = InternationalFixedChronology.getLeapYearsBefore(prolepticYear);
+
+        // Assert: Verify the result matches the expectation.
+        assertEquals(
+            "The number of leap years before year 0 should be 0.",
+            expectedLeapYearCount,
+            actualLeapYearCount
+        );
     }
 }
