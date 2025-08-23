@@ -1,54 +1,34 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest38 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        // Undeclared exception!
+/**
+ * Test suite for the comparison logic in {@link AbstractPartial}.
+ * This class focuses on verifying the behavior of methods like isAfter().
+ */
+public class AbstractPartial_ESTestTest38 {
+
+    /**
+     * Tests that isAfter() throws an IllegalArgumentException when its argument is null.
+     * The method contract explicitly forbids comparison with a null partial.
+     */
+    @Test
+    public void isAfter_shouldThrowIllegalArgumentException_whenComparingWithNull() {
+        // Arrange: Create an instance of a class that extends AbstractPartial.
+        YearMonth yearMonth = YearMonth.now();
+        String expectedErrorMessage = "Partial cannot be null";
+
+        // Act & Assert: Attempting to call isAfter(null) should throw an exception.
         try {
-            yearMonth0.isAfter((ReadablePartial) null);
-            fail("Expecting exception: IllegalArgumentException");
+            yearMonth.isAfter(null);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was caught.");
         } catch (IllegalArgumentException e) {
-            //
-            // Partial cannot be null
-            //
-            verifyException("org.joda.time.base.AbstractPartial", e);
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
