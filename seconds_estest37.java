@@ -1,19 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest37 extends Seconds_ESTest_scaffolding {
+/**
+ * A test suite for the {@link Seconds} class, focusing on the minus operation.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        Days days0 = Days.ZERO;
-        Seconds seconds0 = days0.toStandardSeconds();
-        Seconds seconds1 = seconds0.minus(1);
-        assertEquals((-1), seconds1.getSeconds());
+    /**
+     * Tests that subtracting a positive integer from zero seconds
+     * results in a negative Seconds value.
+     */
+    @Test
+    public void minus_whenSubtractingOneFromZero_shouldReturnNegativeOne() {
+        // Arrange
+        Seconds zeroSeconds = Seconds.ZERO;
+        int secondsToSubtract = 1;
+
+        // Act
+        Seconds result = zeroSeconds.minus(secondsToSubtract);
+
+        // Assert
+        int expectedSeconds = -1;
+        assertEquals(expectedSeconds, result.getSeconds());
     }
 }
