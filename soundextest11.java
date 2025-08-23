@@ -1,11 +1,11 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class SoundexTestTest11 extends AbstractStringEncoderTest<Soundex> {
 
@@ -14,21 +14,24 @@ public class SoundexTestTest11 extends AbstractStringEncoderTest<Soundex> {
         return new Soundex();
     }
 
-    @Test
-    // examples and algorithm rules from:  http://www.genealogy.com/articles/research/00000060.html
-    void testGenealogy() {
-        // treat vowels and HW as silent
-        final Soundex s = Soundex.US_ENGLISH_GENEALOGY;
-        assertEquals("H251", s.encode("Heggenburger"));
-        assertEquals("B425", s.encode("Blackman"));
-        assertEquals("S530", s.encode("Schmidt"));
-        assertEquals("L150", s.encode("Lippmann"));
-        // Additional local example
-        // 'o' is not a separator here - it is silent
-        assertEquals("D200", s.encode("Dodds"));
-        // 'h' is silent
-        assertEquals("D200", s.encode("Dhdds"));
-        // 'w' is silent
-        assertEquals("D200", s.encode("Dwdds"));
+    @DisplayName("Soundex.US_ENGLISH_GENEALOGY should correctly encode names")
+    @ParameterizedTest(name = "''{0}'' should be encoded as ''{1}''")
+    @CsvSource({
+        // Examples based on the US English Genealogy Soundex algorithm rules.
+        // In this variant, vowels (AEIOUY) as well as H and W are treated as silent
+        // characters (ignored) after the first letter and do not act as separators.
+        "Heggenburger, H251",
+        "Blackman,     B425",
+        "Schmidt,      S530",
+        "Lippmann,     L150",
+
+        // Test cases demonstrating silent character handling
+        "Dodds,        D200", // 'o' is silent, does not separate the 'd' sounds
+        "Dhdds,        D200", // 'h' is silent
+        "Dwdds,        D200"  // 'w' is silent
+    })
+    void testUsEnglishGenealogyVariant(final String name, final String expectedCode) {
+        final Soundex soundex = Soundex.US_ENGLISH_GENEALOGY;
+        assertEquals(expectedCode, soundex.encode(name));
     }
 }
