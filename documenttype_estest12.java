@@ -1,22 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DocumentType_ESTestTest12 extends DocumentType_ESTest_scaffolding {
+/**
+ * Test suite for the {@link DocumentType} class.
+ */
+public class DocumentTypeTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DocumentType documentType0 = new DocumentType("", "", "<!doctype");
-        documentType0.setPubSysKey("org.jsoup.nodes.DocumentType");
-        assertEquals("#doctype", documentType0.nodeName());
+    /**
+     * Verifies that modifying the 'pubSysKey' of a DocumentType does not change its fundamental node name.
+     * The node name for a DocumentType should always be "#doctype", as it represents the node's type.
+     */
+    @Test
+    public void setPubSysKeyDoesNotAlterNodeName() {
+        // Arrange: Create a DocumentType instance.
+        // The specific initial values are not critical for this test.
+        DocumentType docType = new DocumentType("name", "publicId", "systemId");
+
+        // Act: Call the method under test to change an attribute.
+        docType.setPubSysKey("some-new-key");
+
+        // Assert: The node name should remain unchanged, confirming it's an invariant property.
+        assertEquals("#doctype", docType.nodeName());
     }
 }
