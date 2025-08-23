@@ -1,39 +1,32 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
+
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class CountingPathVisitor_ESTestTest26 extends CountingPathVisitor_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        UnaryOperator<Path> unaryOperator0 = UnaryOperator.identity();
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        CountingPathVisitor.Builder countingPathVisitor_Builder1 = countingPathVisitor_Builder0.setDirectoryPostTransformer(unaryOperator0);
-        assertSame(countingPathVisitor_Builder1, countingPathVisitor_Builder0);
+/**
+ * Tests for the fluent interface of {@link CountingPathVisitor.Builder}.
+ */
+public class CountingPathVisitorBuilderTest {
+
+    /**
+     * Tests that the {@code setDirectoryPostTransformer} method returns the same
+     * builder instance to allow for fluent method chaining.
+     */
+    @Test
+    public void setDirectoryPostTransformerShouldReturnSameBuilderInstance() {
+        // Arrange
+        final CountingPathVisitor.Builder builder = new CountingPathVisitor.Builder();
+        final UnaryOperator<Path> identityTransformer = UnaryOperator.identity();
+
+        // Act
+        final CountingPathVisitor.Builder resultBuilder = builder.setDirectoryPostTransformer(identityTransformer);
+
+        // Assert
+        assertSame("The method should return the same builder instance for fluent chaining.",
+                builder, resultBuilder);
     }
 }
