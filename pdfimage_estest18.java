@@ -1,36 +1,51 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Image;
+import com.itextpdf.text.BadPdfFormatException;
 import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class contains tests for the {@link PdfImage} constructor.
+ */
+// The original class name is kept for context, but in a real scenario,
+// it would be renamed to something like PdfImageTest.
 public class PdfImage_ESTestTest18 extends PdfImage_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ImgJBIG2 imgJBIG2_0 = new ImgJBIG2(484, 484, byteArray0, byteArray0);
-        imgJBIG2_0.makeMask();
-        int[] intArray0 = new int[0];
-        imgJBIG2_0.setTransparency(intArray0);
-        PdfIndirectReference pdfIndirectReference0 = new PdfIndirectReference(4096, 4096, (-1013));
-        PdfImage pdfImage0 = new PdfImage(imgJBIG2_0, (String) null, pdfIndirectReference0);
-        assertEquals(7, pdfImage0.type());
+    /**
+     * Tests that the PdfImage constructor correctly processes a JBIG2 image
+     * that is both an image mask itself and has an external mask reference provided.
+     *
+     * <p>It should result in a PDF dictionary containing both the /ImageMask flag
+     * and a /Mask entry pointing to the external reference.</p>
+     */
+    @Test
+    public void constructor_withJbig2ImageMaskAndExternalMaskRef_setsCorrectPdfProperties() throws BadPdfFormatException {
+        // Arrange
+        // 1. Create a JBIG2 image, which is a 1-bit-per-component image type.
+        byte[] emptyImageData = new byte[0];
+        ImgJBIG2 jbig2Image = new ImgJBIG2(100, 100, emptyImageData, null);
+
+        // 2. Configure the image to be an image mask.
+        jbig2Image.makeMask();
+
+        // 3. Create a PDF indirect reference to act as an external mask.
+        PdfIndirectReference externalMaskReference = new PdfIndirectReference(1, 0);
+
+        // Act
+        // Create the PdfImage, passing the image mask and the external mask reference.
+        PdfImage pdfImage = new PdfImage(jbig2Image, null, externalMaskReference);
+
+        // Assert
+        // The resulting PdfImage object should be a dictionary.
+        assertEquals(PdfObject.DICTIONARY, pdfImage.type());
+
+        // Verify that the /ImageMask property is set to true, as the source image is a mask
+        // with 1 bit per component.
+        assertEquals(PdfBoolean.PDFTRUE, pdfImage.get(PdfName.IMAGEMASK));
+
+        // Verify that the /Mask property points to the provided external mask reference.
+        assertEquals(externalMaskReference, pdfImage.get(PdfName.MASK));
     }
 }
