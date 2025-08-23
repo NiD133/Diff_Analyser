@@ -2,48 +2,50 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class IOCaseTestTest19 {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+@DisplayName("IOCase Enum")
+class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    /**
+     * Contains tests for the {@link IOCase#isCaseSensitive()} method.
+     */
+    @Nested
+    @DisplayName("isCaseSensitive() method")
+    class IsCaseSensitiveTest {
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+        @Test
+        @DisplayName("should return true for SENSITIVE")
+        void forSensitive_shouldReturnTrue() {
+            assertTrue(IOCase.SENSITIVE.isCaseSensitive(),
+                "IOCase.SENSITIVE must be case-sensitive.");
         }
-    }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
+        @Test
+        @DisplayName("should return false for INSENSITIVE")
+        void forInsensitive_shouldReturnFalse() {
+            assertFalse(IOCase.INSENSITIVE.isCaseSensitive(),
+                "IOCase.INSENSITIVE must not be case-sensitive.");
         }
-    }
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
+        @Test
+        @DisplayName("should correctly reflect the operating system's sensitivity for SYSTEM")
+        void forSystem_shouldReflectOperatingSystem() {
+            // The expected sensitivity for IOCase.SYSTEM depends on the OS.
+            // It's sensitive for Unix-like systems (separator '/') and
+            // insensitive for Windows (separator '\').
+            final boolean isOsCaseSensitive = (File.separatorChar != '\\');
+
+            assertEquals(isOsCaseSensitive, IOCase.SYSTEM.isCaseSensitive(),
+                "IOCase.SYSTEM sensitivity should match the underlying OS.");
         }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
-
-    @Test
-    void test_isCaseSensitive() {
-        assertTrue(IOCase.SENSITIVE.isCaseSensitive());
-        assertFalse(IOCase.INSENSITIVE.isCaseSensitive());
-        assertEquals(!WINDOWS, IOCase.SYSTEM.isCaseSensitive());
     }
 }
