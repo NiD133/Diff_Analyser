@@ -1,32 +1,48 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest18 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Shape shape0 = Shape.fromKM(3130, 1);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(3130, 3130);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
+    /**
+     * Tests that merging a hasher that produces an index outside the valid range
+     * for the filter's shape throws an IllegalArgumentException.
+     */
+    @Test
+    public void testMergeHasherWithOutOfBoundsIndexThrowsIllegalArgumentException() {
+        // Arrange
+        // Create a shape with only one bit. This means the only valid index is 0.
+        final int numBits = 1;
+        final int numHashFunctions = 3130; // This value is not critical, but matches the original test.
+        final Shape shape = Shape.fromKM(numHashFunctions, numBits);
+        final SparseBloomFilter filter = new SparseBloomFilter(shape);
+
+        // Create a hasher that is known to produce indices. The test relies on this
+        // hasher producing at least one index greater than 0, which is out of bounds
+        // for our shape.
+        final Hasher hasher = new EnhancedDoubleHasher(3130, 3130);
+
+        // Act & Assert
         try {
-            sparseBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Value in list 2146453540 is greater than maximum value (0)
-            //
-            verifyException("org.apache.commons.collections4.bloomfilter.SparseBloomFilter", e);
+            filter.merge(hasher);
+            fail("Expected an IllegalArgumentException to be thrown.");
+        } catch (IllegalArgumentException expected) {
+            // The maximum allowed index is numBits - 1.
+            final int maxAllowedIndex = numBits - 1;
+            final String expectedMessagePart = String.format("is greater than maximum value (%d)", maxAllowedIndex);
+
+            // Verify the exception message confirms the index was out of bounds.
+            assertTrue(
+                String.format("Exception message should contain '%s'. Actual: %s",
+                    expectedMessagePart, expected.getMessage()),
+                expected.getMessage().contains(expectedMessagePart)
+            );
         }
     }
 }
