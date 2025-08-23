@@ -1,53 +1,35 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class StringConverter_ESTestTest23 extends StringConverter_ESTest_scaffolding {
+/**
+ * Tests for {@link StringConverter}, focusing on how it handles invalid string formats
+ * when parsing Joda-Time objects.
+ */
+public class StringConverterTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        // Undeclared exception!
-        try {
-            MutableInterval.parse(";Xb='|Z!0*'jzM0/");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Format invalid: ;Xb='|Z!0*'jzM0/
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
-        }
+    // The ExpectedException rule is a clean, declarative way to test for exceptions in JUnit 4.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that attempting to parse an interval from a string with an invalid format
+     * results in an IllegalArgumentException. This test indirectly validates the behavior
+     * of StringConverter, which is used internally by MutableInterval.parse().
+     */
+    @Test
+    public void parseInterval_withInvalidFormatString_shouldThrowIllegalArgumentException() {
+        // Arrange: Define an input string that does not conform to the expected ISO 8601 interval format.
+        final String invalidIntervalString = ";Xb='|Z!0*'jzM0/";
+
+        // Assert: Configure the rule to expect an IllegalArgumentException with a specific message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Format invalid: " + invalidIntervalString);
+
+        // Act: Attempt to parse the invalid string, which should trigger the expected exception.
+        MutableInterval.parse(invalidIntervalString);
     }
 }
