@@ -1,23 +1,40 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNotEquals;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest15 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter#equals(Object)}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3558), (TypeToken<?>) null, annotationArray0, (Object) null);
-        Parameter parameter1 = new Parameter((Invokable<?, ?>) null, 1, (TypeToken<?>) null, annotationArray0, parameter0);
-        boolean boolean0 = parameter0.equals(parameter1);
-        assertFalse(boolean0);
+    @Test
+    public void equals_whenParametersHaveDifferentPositions_returnsFalse() {
+        // Arrange
+        // Create two Parameter objects that are otherwise identical but have different positions.
+        // The other constructor arguments (Invokable, TypeToken) are null because they are not
+        // relevant to this specific test of the position field.
+        Annotation[] noAnnotations = new Annotation[0];
+
+        Parameter parameterAtPosition0 = new Parameter(
+                /* declaration */ null,
+                /* position */ 0,
+                /* type */ null,
+                noAnnotations,
+                /* annotatedType */ null);
+
+        Parameter parameterAtPosition1 = new Parameter(
+                /* declaration */ null,
+                /* position */ 1,
+                /* type */ null,
+                noAnnotations,
+                /* annotatedType */ null);
+
+        // Act & Assert
+        // Two Parameter objects should not be equal if their positions differ,
+        // even if they belong to the same declaring method or constructor.
+        assertNotEquals(parameterAtPosition0, parameterAtPosition1);
     }
 }
