@@ -1,26 +1,28 @@
 package org.apache.commons.codec.digest;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest32 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for exceptional behavior in the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            MurmurHash2.hash64(byteArray0, 2441);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("org.apache.commons.codec.digest.MurmurHash2", e);
-        }
+    /**
+     * Tests that {@link MurmurHash2#hash64(byte[], int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} if the provided length is greater
+     * than the actual length of the byte array.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void hash64ShouldThrowExceptionWhenLengthExceedsArrayBounds() {
+        // Arrange: Define an empty byte array and a length that is out of bounds.
+        final byte[] emptyData = new byte[0];
+        final int lengthGreaterThanDataSize = 1;
+
+        // Act: Attempt to hash the array with the invalid length.
+        // This call is expected to throw an ArrayIndexOutOfBoundsException.
+        MurmurHash2.hash64(emptyData, lengthGreaterThanDataSize);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
