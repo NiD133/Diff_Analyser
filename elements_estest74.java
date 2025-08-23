@@ -1,43 +1,32 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest74 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test073() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements} class, focusing on selector-based methods.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that the prevAll() method throws an IllegalStateException when passed an empty
+     * CSS query string. The underlying QueryParser is responsible for validating the query.
+     */
+    @Test
+    public void prevAll_shouldThrowIllegalStateException_whenQueryIsEmpty() {
+        // Arrange: An empty Elements collection is sufficient for this test.
+        // The exception is expected from the query parser before any elements are processed.
+        Elements elements = new Elements();
+
+        // Act & Assert: Verify that calling prevAll with an empty string throws the correct exception.
         try {
-            elements0.prevAll("");
-            fail("Expecting exception: IllegalStateException");
+            elements.prevAll("");
+            fail("Expected an IllegalStateException to be thrown for an empty CSS query.");
         } catch (IllegalStateException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // The QueryParser should reject empty query strings.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
