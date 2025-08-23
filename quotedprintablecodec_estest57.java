@@ -1,24 +1,39 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class QuotedPrintableCodec_ESTestTest57 extends QuotedPrintableCodec_ESTest_scaffolding {
+import java.nio.charset.StandardCharsets;
 
-    @Test(timeout = 4000)
-    public void test56() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        byteArray0[6] = (byte) (-56);
-        byte[] byteArray1 = QuotedPrintableCodec.encodeQuotedPrintable((BitSet) null, byteArray0);
-        assertFalse(byteArray1.equals((Object) byteArray0));
+/**
+ * Tests for the static methods of the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that the static {@code encodeQuotedPrintable} method correctly encodes
+     * an array of bytes containing non-printable characters.
+     */
+    @Test
+    public void encodeQuotedPrintableWithUnsafeBytesShouldReturnCorrectlyEncodedArray() {
+        // Arrange
+        // The input contains a non-printable byte (-56, which is 0xC8 in hex) and several
+        // null bytes (0x00). Both are considered "unsafe" and require encoding.
+        final byte[] unsafeBytes = new byte[]{0, 0, 0, 0, 0, 0, (byte) -56, 0, 0};
+
+        // According to RFC 1521, non-printable bytes must be encoded in the "=HH" format,
+        // where HH is the two-digit hexadecimal representation of the byte.
+        // Therefore, the null byte (0x00) becomes "=00" and 0xC8 becomes "=C8".
+        final String expectedEncodedString = "=00=00=00=00=00=00=C8=00=00";
+        final byte[] expectedBytes = expectedEncodedString.getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        // We pass 'null' for the BitSet of printable characters, which causes the method
+        // to use its default set.
+        final byte[] actualEncodedBytes = QuotedPrintableCodec.encodeQuotedPrintable(null, unsafeBytes);
+
+        // Assert
+        // Verify that the actual encoded output matches the expected byte-for-byte.
+        assertArrayEquals(expectedBytes, actualEncodedBytes);
     }
 }
