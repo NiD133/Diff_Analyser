@@ -1,39 +1,48 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest38 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        JsonFactoryBuilder jsonFactoryBuilder0 = new JsonFactoryBuilder();
-        JsonFactory jsonFactory0 = new JsonFactory(jsonFactoryBuilder0);
-        JsonParser jsonParser0 = jsonFactory0.createNonBlockingByteBufferParser();
-        DupDetector dupDetector0 = DupDetector.rootDetector(jsonParser0);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(dupDetector0);
-        jsonReadContext0.setCurrentName("JSON");
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its behavior
+ * with duplicate field names.
+ */
+public class JsonReadContextTest {
+
+    /**
+     * Verifies that calling {@link JsonReadContext#setCurrentName(String)} twice
+     * with the same name throws a {@link JsonProcessingException} when duplicate
+     * detection is enabled.
+     */
+    @Test
+    public void setCurrentName_whenCalledWithDuplicateName_shouldThrowException() throws JsonProcessingException {
+        // Arrange: Create a root context with duplicate detection enabled.
+        JsonFactory factory = new JsonFactory();
+        // A parser instance is required to create a root DupDetector.
+        JsonParser parser = factory.createNonBlockingByteBufferParser();
+        DupDetector dupDetector = DupDetector.rootDetector(parser);
+        JsonReadContext context = JsonReadContext.createRootContext(dupDetector);
+        final String fieldName = "JSON";
+
+        // Set the field name for the first time (this should succeed).
+        context.setCurrentName(fieldName);
+
+        // Act & Assert: Attempt to set the same field name again and verify the exception.
         try {
-            jsonReadContext0.setCurrentName("JSON");
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Duplicate field 'JSON'
-            //  at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1]
-            //
-            verifyException("com.fasterxml.jackson.core.json.JsonReadContext", e);
+            context.setCurrentName(fieldName);
+            fail("Expected a JsonProcessingException to be thrown for a duplicate field name.");
+        } catch (JsonProcessingException e) {
+            // Assert that the exception message clearly indicates a duplicate field.
+            String expectedMessageFragment = "Duplicate field '" + fieldName + "'";
+            assertTrue(
+                "Exception message should contain '" + expectedMessageFragment + "', but was: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
