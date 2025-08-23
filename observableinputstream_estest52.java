@@ -1,42 +1,33 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ObservableInputStream_ESTestTest52 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream}.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(byteArrayInputStream0);
-        int int0 = observableInputStream0.read();
-        assertEquals((-1), int0);
+    /**
+     * Tests that calling read() on an empty stream correctly returns the
+     * end-of-file marker without reading any data.
+     */
+    @Test
+    public void readOnEmptyStreamShouldReturnEof() throws IOException {
+        // Arrange: Create an ObservableInputStream that wraps an empty input stream.
+        final byte[] emptyData = new byte[0];
+        final ByteArrayInputStream emptyInputStream = new ByteArrayInputStream(emptyData);
+        
+        try (final ObservableInputStream observableInputStream = new ObservableInputStream(emptyInputStream)) {
+            // Act: Attempt to read a single byte from the stream.
+            final int result = observableInputStream.read();
+
+            // Assert: The result should be the end-of-file marker.
+            assertEquals("Reading from an empty stream should return EOF", EOF, result);
+        }
     }
 }
