@@ -1,41 +1,49 @@
 package com.fasterxml.jackson.core.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import java.io.ByteArrayInputStream;
-import java.io.CharConversionException;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link DataFormatMatcher} constructor's input validation.
+ */
+// The original test class name is preserved for context.
 public class DataFormatMatcher_ESTestTest16 extends DataFormatMatcher_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        JsonFactory jsonFactory0 = new JsonFactory();
-        MatchStrength matchStrength0 = MatchStrength.INCONCLUSIVE;
-        DataFormatMatcher dataFormatMatcher0 = null;
+    /**
+     * Verifies that the DataFormatMatcher constructor throws an IllegalArgumentException
+     * when the provided buffer start offset and length combined exceed the buffer's bounds.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForOutOfBoundsBufferRange() {
+        // Arrange: Set up an empty buffer and parameters that are clearly out of bounds.
+        byte[] emptyBuffer = new byte[0];
+        InputStream inputStream = new ByteArrayInputStream(emptyBuffer);
+        JsonFactory jsonFactory = new JsonFactory();
+        MatchStrength matchStrength = MatchStrength.INCONCLUSIVE;
+
+        // The constructor validates that (start + length) is not greater than the buffer's length.
+        // Here, we use values that will fail this check against a zero-length buffer.
+        int outOfBoundsStart = 34;
+        int outOfBoundsLength = 34;
+
+        String expectedMessage = String.format(
+            "Illegal start/length (%d/%d) wrt input array of %d bytes",
+            outOfBoundsStart, outOfBoundsLength, emptyBuffer.length
+        );
+
+        // Act & Assert
         try {
-            dataFormatMatcher0 = new DataFormatMatcher(byteArrayInputStream0, byteArray0, '\"', '\"', jsonFactory0, matchStrength0);
-            fail("Expecting exception: IllegalArgumentException");
+            new DataFormatMatcher(inputStream, emptyBuffer, outOfBoundsStart, outOfBoundsLength, jsonFactory, matchStrength);
+            fail("Expected an IllegalArgumentException because the start/length is out of bounds.");
         } catch (IllegalArgumentException e) {
-            //
-            // Illegal start/length (34/34) wrt input array of 0 bytes
-            //
-            verifyException("com.fasterxml.jackson.core.format.DataFormatMatcher", e);
+            // Verify that the exception message is correct, confirming the right validation failed.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
