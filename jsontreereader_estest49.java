@@ -1,28 +1,26 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest49 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test048() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        JsonToken jsonToken0 = jsonTreeReader0.peek();
-        assertEquals(JsonToken.BEGIN_OBJECT, jsonToken0);
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    @Test
+    public void peek_onJsonObject_returnsBeginObject() throws Exception {
+        // Arrange
+        JsonObject jsonObject = new JsonObject();
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(jsonObject);
+
+        // Act
+        JsonToken actualToken = jsonTreeReader.peek();
+
+        // Assert
+        assertEquals(JsonToken.BEGIN_OBJECT, actualToken);
     }
 }
