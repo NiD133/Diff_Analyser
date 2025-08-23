@@ -1,31 +1,38 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class ISO8601Utils_ESTestTest10 extends ISO8601Utils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition(0);
+/**
+ * Test suite for {@link ISO8601Utils}.
+ * This class focuses on testing the parsing of date strings.
+ */
+public class ISO8601UtilsTest {
+
+    /**
+     * Tests that the {@code parse} method throws a {@link ParseException}
+     * when given a date string that is fundamentally malformed and cannot be parsed as a number.
+     */
+    @Test
+    public void parse_withMalformedDateString_shouldThrowParseException() {
+        // Arrange
+        // This string is malformed because it starts with a digit but is immediately
+        // followed by non-digit characters, making it an invalid number for any date component (e.g., year).
+        String malformedDateString = "9>({Cf/Td,\";U)Ji*";
+        ParsePosition position = new ParsePosition(0);
+
+        // Act & Assert
         try {
-            ISO8601Utils.parse("9>({Cf/Td,\";U)Ji*", parsePosition0);
-            fail("Expecting exception: ParseException");
+            ISO8601Utils.parse(malformedDateString, position);
+            fail("A ParseException should have been thrown for the malformed date string.");
         } catch (ParseException e) {
-            //
-            // Failed to parse date [\"9>({Cf/Td,\";U)Ji*\"]: Invalid number: 9>({
-            //
-            verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
+            // Verify that the exception message is informative and contains the root cause.
+            String expectedMessage = "Failed to parse date [\"" + malformedDateString + "\"]: Invalid number: 9>({";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
