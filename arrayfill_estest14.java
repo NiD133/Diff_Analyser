@@ -1,21 +1,36 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
 import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ArrayFill_ESTestTest14 extends ArrayFill_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Object[] objectArray0 = new Object[4];
-        Object[] objectArray1 = ArrayFill.fill(objectArray0, (FailableIntFunction<?, Throwable>) null);
-        assertSame(objectArray0, objectArray1);
+/**
+ * Unit tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
+
+    /**
+     * Tests that calling fill() with a null generator function returns the same array instance
+     * without modifying its contents, effectively performing a no-op.
+     */
+    @Test
+    public void testFillWithNullGeneratorReturnsSameArrayUnchanged() {
+        // Arrange
+        final Object[] inputArray = new Object[4];
+        // Create an array representing the expected state after the operation.
+        final Object[] expectedArray = new Object[4];
+
+        // Act
+        // The cast to FailableIntFunction is required to resolve ambiguity between the
+        // fill(T[], T) and fill(T[], FailableIntFunction) overloads when passing null.
+        final Object[] resultArray = ArrayFill.fill(inputArray, (FailableIntFunction<?, Throwable>) null);
+
+        // Assert
+        // The method should return the exact same array instance.
+        assertSame("The returned array should be the same instance as the input", inputArray, resultArray);
+        // The contents of the array should remain unchanged.
+        assertArrayEquals("The array contents should not be modified", expectedArray, resultArray);
     }
 }
