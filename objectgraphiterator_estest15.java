@@ -1,64 +1,42 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
+
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ObjectGraphIterator_ESTestTest15 extends ObjectGraphIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Iterator<Integer> iterator0 = linkedList0.descendingIterator();
-        Iterator<Integer> iterator1 = linkedList0.descendingIterator();
-        ObjectGraphIterator<Object> objectGraphIterator0 = new ObjectGraphIterator<Object>(iterator1);
-        objectGraphIterator0.findNext(iterator0);
-        // Undeclared exception!
-        try {
-            objectGraphIterator0.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // No more elements in the iteration
-            //
-            verifyException("org.apache.commons.collections4.iterators.ObjectGraphIterator", e);
-        }
+/**
+ * Tests for {@link ObjectGraphIterator}.
+ * This test focuses on the behavior of the next() method after the iterator has been exhausted.
+ */
+public class ObjectGraphIteratorTest {
+
+    /**
+     * Verifies that calling next() throws a NoSuchElementException
+     * after the iterator's traversal has been completed by an explicit
+     * call to the internal findNext() method.
+     */
+    @Test
+    public void nextShouldThrowExceptionWhenIteratorIsExhaustedByFindNext() {
+        // Arrange: Create an ObjectGraphIterator with an empty root iterator.
+        // This means the iterator is initially exhausted.
+        final Iterator<String> emptyRootIterator = Collections.emptyIterator();
+        final ObjectGraphIterator<String> graphIterator = new ObjectGraphIterator<>(emptyRootIterator);
+
+        // Act: Call the protected findNext() method with another empty iterator.
+        // This simulates an internal state change that confirms the iterator is fully traversed.
+        // This is a white-box test of the iterator's state machine.
+        final Iterator<String> anotherEmptyIterator = Collections.emptyIterator();
+        graphIterator.findNext(anotherEmptyIterator);
+
+        // Assert: The iterator should report that it has no more elements.
+        assertFalse("Iterator should be exhausted after the call to findNext", graphIterator.hasNext());
+
+        // Assert: Calling next() on the exhausted iterator must throw an exception.
+        assertThrows(NoSuchElementException.class, graphIterator::next);
     }
 }
