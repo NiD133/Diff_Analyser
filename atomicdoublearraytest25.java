@@ -1,82 +1,101 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
 
-public class AtomicDoubleArrayTestTest25 extends JSR166TestCase {
-
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+/**
+ * Tests for the serialization and deserialization of {@link AtomicDoubleArray}.
+ */
+@GwtIncompatible
+@J2ktIncompatible
+public class AtomicDoubleArraySerializationTest extends JSR166TestCase {
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * An array of special double values, including infinities, NaN, and zero variations,
+     * to ensure they are handled correctly during serialization.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
+    private static final double[] SPECIAL_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+    /**
+     * Asserts that two double values are bit-wise equal, which is the equality contract
+     * used by {@link AtomicDoubleArray}.
+     */
+    private static void assertBitEquals(double expected, double actual) {
+        assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
     }
 
     /**
-     * a deserialized serialized array holds same values
+     * Verifies that a deserialized AtomicDoubleArray is a distinct object instance
+     * but contains an identical copy of the original array's data.
      */
-    public void testSerialization() throws Exception {
-        AtomicDoubleArray x = new AtomicDoubleArray(SIZE);
-        for (int i = 0; i < SIZE; i++) {
-            x.set(i, (double) -i);
+    public void testSerialization_preservesArrayContent() throws Exception {
+        // Arrange
+        final int arraySize = 10;
+        AtomicDoubleArray originalArray = new AtomicDoubleArray(arraySize);
+        for (int i = 0; i < arraySize; i++) {
+            originalArray.set(i, (double) -i);
         }
-        AtomicDoubleArray y = serialClone(x);
-        assertTrue(x != y);
-        assertEquals(x.length(), y.length());
-        for (int i = 0; i < SIZE; i++) {
-            assertBitEquals(x.get(i), y.get(i));
+
+        // Act
+        AtomicDoubleArray deserializedArray = serialClone(originalArray);
+
+        // Assert
+        assertNotSame("Deserialized object should be a new instance", originalArray, deserializedArray);
+        assertEquals("Deserialized array should have the same length",
+            originalArray.length(), deserializedArray.length());
+
+        for (int i = 0; i < arraySize; i++) {
+            assertBitEquals(originalArray.get(i), deserializedArray.get(i));
         }
-        AtomicDoubleArray a = new AtomicDoubleArray(VALUES);
-        AtomicDoubleArray b = serialClone(a);
-        assertFalse(a.equals(b));
-        assertFalse(b.equals(a));
-        assertEquals(a.length(), b.length());
-        for (int i = 0; i < VALUES.length; i++) {
-            assertBitEquals(a.get(i), b.get(i));
+    }
+
+    /**
+     * Verifies that special double values (like NaN, infinities, and -0.0) are
+     * correctly preserved after a serialization-deserialization cycle.
+     */
+    public void testSerialization_preservesSpecialValues() throws Exception {
+        // Arrange
+        AtomicDoubleArray originalArray = new AtomicDoubleArray(SPECIAL_VALUES);
+
+        // Act
+        AtomicDoubleArray deserializedArray = serialClone(originalArray);
+
+        // Assert
+        assertNotSame("Deserialized object should be a new instance", originalArray, deserializedArray);
+
+        // AtomicDoubleArray does not override Object.equals(), so it uses reference equality.
+        // This assertion confirms that behavior and that we have a new instance.
+        assertFalse("equals() should be false for different instances", originalArray.equals(deserializedArray));
+        assertFalse("equals() should be symmetric", deserializedArray.equals(originalArray));
+
+        assertEquals("Deserialized array should have the same length",
+            originalArray.length(), deserializedArray.length());
+
+        for (int i = 0; i < SPECIAL_VALUES.length; i++) {
+            assertBitEquals(originalArray.get(i), deserializedArray.get(i));
         }
     }
 }
