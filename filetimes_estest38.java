@@ -1,24 +1,29 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest38 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        long long0 = FileTimes.toUnixTime((FileTime) null);
-        assertEquals(0L, long0);
+    /**
+     * Tests that {@link FileTimes#toUnixTime(FileTime)} returns 0 when the input is null,
+     * as specified by its Javadoc contract.
+     */
+    @Test
+    public void testToUnixTime_withNullInput_shouldReturnZero() {
+        // Arrange: The input is a null FileTime.
+        final FileTime nullFileTime = null;
+        final long expectedResult = 0L;
+
+        // Act: Call the method under test.
+        final long actualResult = FileTimes.toUnixTime(nullFileTime);
+
+        // Assert: Verify that the result is 0.
+        assertEquals(expectedResult, actualResult);
     }
 }
