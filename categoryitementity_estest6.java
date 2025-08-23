@@ -1,45 +1,43 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import javax.swing.JLayeredPane;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
+import java.awt.Shape;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class CategoryItemEntity_ESTestTest6 extends CategoryItemEntity_ESTest_scaffolding {
+/**
+ * Tests for the {@link CategoryItemEntity} class, focusing on edge cases.
+ */
+public class CategoryItemEntity_ESTestTest6 {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        DefaultMultiValueCategoryDataset<Integer, Integer> defaultMultiValueCategoryDataset0 = new DefaultMultiValueCategoryDataset<Integer, Integer>();
-        CategoryItemEntity<Integer, Integer> categoryItemEntity0 = new CategoryItemEntity<Integer, Integer>(defaultCaret0, "lK", "lK", defaultMultiValueCategoryDataset0, (Integer) null, (Integer) null);
-        Object object0 = categoryItemEntity0.clone();
-        // Undeclared exception!
-        try {
-            categoryItemEntity0.equals(object0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.entity.CategoryItemEntity", e);
-        }
+    /**
+     * This test verifies that calling equals() on a CategoryItemEntity
+     * with null keys against its clone throws a NullPointerException.
+     * This behavior occurs because the equals() method does not correctly
+     * handle null checks for its row and column keys before comparison.
+     */
+    @Test(expected = NullPointerException.class)
+    public void equals_onClonedEntityWithNullKeys_shouldThrowNullPointerException() {
+        // Arrange: Create an entity with null row and column keys.
+        Shape area = new Rectangle(10, 20, 30, 40);
+        CategoryDataset<Integer, Integer> dataset = new DefaultMultiValueCategoryDataset<>();
+        CategoryItemEntity<Integer, Integer> originalEntity = new CategoryItemEntity<>(
+                area, 
+                "Test ToolTip", 
+                "http://test.url", 
+                dataset, 
+                null, // rowKey is null
+                null  // columnKey is null
+        );
+
+        // Act: Clone the entity. The clone will also have null keys.
+        Object clonedEntity = originalEntity.clone();
+
+        // Assert: The equals() method is called.
+        // We expect a NullPointerException because the method attempts to
+        // dereference the null rowKey or columnKey. The assertion is handled
+        // by the @Test(expected=...) annotation.
+        originalEntity.equals(clonedEntity);
     }
 }
