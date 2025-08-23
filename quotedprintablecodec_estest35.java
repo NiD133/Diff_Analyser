@@ -1,30 +1,32 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class QuotedPrintableCodec_ESTestTest35 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link QuotedPrintableCodec} class, focusing on constructor behavior.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = null;
-        try {
-            quotedPrintableCodec0 = new QuotedPrintableCodec("g");
-            fail("Expecting exception: UnsupportedCharsetException");
-        } catch (UnsupportedCharsetException e) {
-            //
-            // g
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Tests that the QuotedPrintableCodec constructor throws an UnsupportedCharsetException
+     * when initialized with an invalid or unsupported charset name.
+     */
+    @Test
+    public void constructorWithUnsupportedCharsetNameShouldThrowException() {
+        // Arrange: Define an invalid charset name that is highly unlikely to ever be supported.
+        final String invalidCharsetName = "X-INVALID-CHARSET";
+
+        // Act & Assert: Verify that instantiating the codec with the invalid name throws the correct exception.
+        final UnsupportedCharsetException thrown = assertThrows(
+            UnsupportedCharsetException.class,
+            () -> new QuotedPrintableCodec(invalidCharsetName)
+        );
+
+        // Assert: Further verify that the exception message contains the invalid charset name.
+        assertEquals(invalidCharsetName, thrown.getMessage());
     }
 }
