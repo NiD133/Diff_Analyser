@@ -1,60 +1,56 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest63 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(68, 68);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint((-374.0), (Range) null);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals((-374.0), rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link GridArrangement} class, focusing on edge cases
+ * and invalid inputs for arrangement logic.
+ */
+public class GridArrangementTest {
+
+    /**
+     * Verifies that the {@code arrangeFN} method throws an {@link IllegalArgumentException}
+     * when provided with a constraint that has a negative fixed width.
+     * <p>
+     * The method is expected to fail because it attempts to calculate the width
+     * for each grid cell by dividing the total width by the number of columns. A negative
+     * total width results in a negative cell width. This value is then used to create a
+     * {@link Range} object, which throws an exception because its lower bound (0.0)
+     * cannot be greater than its upper bound.
+     */
+    @Test
+    public void arrangeFN_withNegativeWidthConstraint_shouldThrowIllegalArgumentException() {
+        // Arrange: Set up a grid, a container with one block, and a constraint with a negative width.
+        GridArrangement gridArrangement = new GridArrangement(68, 68);
+        BlockContainer container = new BlockContainer();
+        
+        // The container must not be empty for the arrangement logic to be triggered.
+        // Adding the container to itself is a simple way to add a block.
+        container.add(container);
+
+        // Create a constraint with a fixed negative width and an unconstrained height.
+        // The 'FN' in arrangeFN stands for Fixed-width and No-height-constraint.
+        double negativeWidth = -374.0;
+        RectangleConstraint negativeWidthConstraint = new RectangleConstraint(negativeWidth, null);
+
+        // Act & Assert: Call the method and verify that the expected exception is thrown.
         try {
-            gridArrangement0.arrangeFN(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: IllegalArgumentException");
+            // The Graphics2D context can be null as it's not used before the exception occurs.
+            gridArrangement.arrangeFN(container, (Graphics2D) null, negativeWidthConstraint);
+            fail("Expected an IllegalArgumentException to be thrown due to negative width.");
         } catch (IllegalArgumentException e) {
-            //
-            // Range(double, double): require lower (0.0) <= upper (-5.5).
-            //
-            verifyException("org.jfree.data.Range", e);
+            // The exception originates from the Range class constructor.
+            // The internal calculation is: width per column = -374.0 / 68 columns = -5.5.
+            // The code then fails when trying to create new Range(0.0, -5.5).
+            String expectedMessage = "Range(double, double): require lower (0.0) <= upper (-5.5).";
+            assertEquals("The exception message should match the expected Range error.",
+                    expectedMessage, e.getMessage());
         }
     }
 }
