@@ -1,36 +1,49 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class Elements_ESTestTest19 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#remove(int)} method.
+ */
+public class ElementsRemoveTest {
 
-    @Test(timeout = 4000)
-    public void test018() throws Throwable {
-        Document document0 = new Document("b*RY=0r*g]q0");
-        Elements elements0 = document0.getAllElements();
-        Element element0 = elements0.remove(0);
-        assertFalse(element0.isBlock());
+    /**
+     * Verifies that calling remove(index) on an Elements collection
+     * correctly removes the element from both the list and the underlying DOM tree.
+     */
+    @Test
+    public void removeByIndexRemovesElementFromListAndDom() {
+        // Arrange: A new Document is initialized with a default HTML structure
+        // (<html><head></head><body></body></html>).
+        Document doc = new Document("");
+        Elements allElements = doc.getAllElements();
+        
+        // Initially, getAllElements() returns [<html>, <head>, <body>].
+        // We will test removing the first element, the <html> tag.
+        int initialSize = allElements.size();
+        Element elementToRemove = allElements.get(0);
+        
+        // Sanity checks on the initial state.
+        assertEquals(3, initialSize);
+        assertEquals("html", elementToRemove.tagName());
+
+        // Act: Remove the element at index 0.
+        Element removedElement = allElements.remove(0);
+
+        // Assert
+        // 1. The method should return the element that was removed.
+        assertSame("The returned element should be the same instance as the one at the specified index.",
+            elementToRemove, removedElement);
+
+        // 2. The Elements list should now be smaller.
+        assertEquals("The list size should be reduced by one.",
+            initialSize - 1, allElements.size());
+
+        // 3. The element should be detached from the DOM (its parent should be null).
+        assertNull("The removed element should be detached from the DOM.",
+            removedElement.parent());
     }
 }
