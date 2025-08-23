@@ -1,86 +1,61 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+/**
+ * This test class contains tests for the CompositeSet class.
+ * The original test was automatically generated and has been refactored for clarity.
+ */
 public class CompositeSet_ESTestTest73 extends CompositeSet_ESTest_scaffolding {
 
+    /**
+     * Tests that CompositeSets that are logically empty are considered equal,
+     * regardless of their internal composition. Also verifies that different
+     * empty CompositeSet instances share the same singleton empty iterator.
+     */
     @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        Set<Integer>[] setArray0 = (Set<Integer>[]) Array.newInstance(Set.class, 6);
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        setArray0[0] = (Set<Integer>) linkedHashSet0;
-        Set<Integer>[] setArray1 = (Set<Integer>[]) Array.newInstance(Set.class, 2);
-        setArray1[0] = (Set<Integer>) linkedHashSet0;
-        setArray1[1] = (Set<Integer>) linkedHashSet0;
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(setArray1);
-        setArray0[1] = (Set<Integer>) compositeSet0;
-        Set<Integer>[] setArray2 = (Set<Integer>[]) Array.newInstance(Set.class, 1);
-        Set<Integer> set0 = compositeSet0.toSet();
-        setArray2[0] = set0;
-        CompositeSet<Integer> compositeSet1 = new CompositeSet<Integer>(setArray2);
-        setArray0[2] = (Set<Integer>) compositeSet1;
-        CompositeSet<Integer> compositeSet2 = new CompositeSet<Integer>();
-        setArray0[3] = (Set<Integer>) compositeSet2;
-        CompositeSet<Integer> compositeSet3 = new CompositeSet<Integer>();
-        setArray0[4] = (Set<Integer>) compositeSet3;
-        CompositeSet<Integer> compositeSet4 = new CompositeSet<Integer>();
-        setArray0[5] = (Set<Integer>) compositeSet4;
-        CompositeSet<Integer> compositeSet5 = new CompositeSet<Integer>(setArray0);
-        Set<Integer> set1 = compositeSet5.toSet();
-        CompositeSet<Integer> compositeSet6 = new CompositeSet<Integer>(set1);
-        compositeSet6.stream();
-        CompositeSet<Integer> compositeSet7 = new CompositeSet<Integer>();
-        compositeSet6.addComposited((Set<Integer>) compositeSet4, (Set<Integer>) compositeSet7);
-        Iterator<Integer> iterator0 = compositeSet7.iterator();
-        compositeSet3.clear();
-        compositeSet7.getMutator();
-        Iterator<Integer> iterator1 = compositeSet4.iterator();
-        assertSame(iterator1, iterator0);
-        CompositeSet<LinkedHashSet<Integer>> compositeSet8 = new CompositeSet<LinkedHashSet<Integer>>();
-        compositeSet8.toArray();
-        compositeSet4.getMutator();
-        assertTrue(compositeSet4.equals((Object) compositeSet6));
+    public void testEmptyCompositeSetsAreEqualAndShareEmptyIterator() {
+        // Arrange: Create different configurations of empty CompositeSets.
+
+        // set1 is empty because it was constructed with no underlying sets.
+        final CompositeSet<Integer> setEmptyByDefault = new CompositeSet<>();
+
+        // set2 is also logically empty, but it is composed of other empty sets.
+        final CompositeSet<Integer> setComposedOfEmptySets = new CompositeSet<>();
+        final Set<Integer> underlyingEmptyHashSet = new HashSet<>();
+        final CompositeSet<Integer> underlyingEmptyCompositeSet = new CompositeSet<>();
+        setComposedOfEmptySets.addComposited(underlyingEmptyHashSet, underlyingEmptyCompositeSet);
+
+        // set3 is another empty set, created to compare its iterator instance.
+        final CompositeSet<Integer> anotherEmptySet = new CompositeSet<>();
+
+        // Assert: Verify core properties of empty sets.
+        assertTrue("A set constructed with no components should be empty", setEmptyByDefault.isEmpty());
+        assertEquals("A set constructed with no components should have size 0", 0, setEmptyByDefault.size());
+
+        assertTrue("A set composed of only empty sets should be empty", setComposedOfEmptySets.isEmpty());
+        assertEquals("A set composed of only empty sets should have size 0", 0, setComposedOfEmptySets.size());
+
+        // Assert: Verify that the two types of empty sets are equal, fulfilling the Set contract.
+        assertEquals("An empty set should be equal to a set composed of other empty sets",
+                     setEmptyByDefault, setComposedOfEmptySets);
+        assertEquals("Equality should be symmetric",
+                     setComposedOfEmptySets, setEmptyByDefault);
+        assertEquals("Equal sets must have equal hash codes",
+                     setEmptyByDefault.hashCode(), setComposedOfEmptySets.hashCode());
+
+        // Assert: Verify that iterators from different empty CompositeSet instances are the same object.
+        // This suggests an efficient implementation using a singleton empty iterator.
+        final Iterator<Integer> iterator1 = setEmptyByDefault.iterator();
+        final Iterator<Integer> iterator2 = anotherEmptySet.iterator();
+        assertSame("Iterators from two distinct, empty CompositeSets should be the same instance",
+                     iterator1, iterator2);
     }
 }
