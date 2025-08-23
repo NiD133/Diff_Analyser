@@ -2,34 +2,33 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest14 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the JsonWriteContext class, focusing on context creation and parent-child relationships.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        jsonWriteContext0._currentName = "";
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext();
-        JsonWriteContext jsonWriteContext2 = jsonWriteContext1.getParent();
-        assertNotNull(jsonWriteContext2);
-        assertTrue(jsonWriteContext2.inRoot());
-        assertEquals("OBJECT", jsonWriteContext1.getTypeDesc());
-        assertEquals(0, jsonWriteContext2.getEntryCount());
-        assertEquals(1, jsonWriteContext1.getNestingDepth());
+    /**
+     * Verifies that creating a child object context from a root context
+     * correctly initializes the child's state (type, depth) and maintains
+     * the correct link back to the parent.
+     */
+    @Test
+    public void createChildObjectContext_shouldSetCorrectStateAndParent() {
+        // Arrange: Create a root context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+
+        // Act: Create a child object context from the root.
+        JsonWriteContext childObjectContext = rootContext.createChildObjectContext();
+
+        // Assert: Verify the properties of the newly created child context.
+        assertEquals("Child context type should be OBJECT", "OBJECT", childObjectContext.getTypeDesc());
+        assertEquals("Child context should be at nesting depth 1", 1, childObjectContext.getNestingDepth());
+
+        // Assert: Verify the relationship with the parent context.
+        JsonWriteContext parentContext = childObjectContext.getParent();
+        assertSame("getParent() should return the original root context instance", rootContext, parentContext);
+        assertTrue("The parent context should be the root", parentContext.inRoot());
+        assertEquals("Creating a child should not affect the parent's entry count", 0, parentContext.getEntryCount());
     }
 }
