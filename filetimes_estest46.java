@@ -1,24 +1,26 @@
 package org.apache.commons.io.file.attribute;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest46 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        boolean boolean0 = FileTimes.isUnixTime((-9223372036854775808L));
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link FileTimes#isUnixTime(long)} returns false for the minimum possible
+     * long value, as it falls far outside the representable range of a standard Unix timestamp.
+     */
+    @Test
+    public void isUnixTimeShouldReturnFalseForLongMinValue() {
+        // The value Long.MIN_VALUE is an extreme boundary case that is not a valid
+        // number of seconds since the epoch. The valid range is constrained by
+        // the limits of java.time.Instant, which FileTime is based on.
+        final boolean isWithinRange = FileTimes.isUnixTime(Long.MIN_VALUE);
+
+        // Assert that the method correctly identifies this value as out of range.
+        assertFalse("Long.MIN_VALUE should be considered outside the valid Unix time range.", isWithinRange);
     }
 }
