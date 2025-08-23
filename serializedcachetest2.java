@@ -1,78 +1,47 @@
 package org.apache.ibatis.cache;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.Serializable;
-import java.util.Objects;
+
 import org.apache.ibatis.cache.decorators.SerializedCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SerializedCacheTestTest2 {
+/**
+ * Tests for {@link SerializedCache} to ensure it handles various caching scenarios correctly.
+ */
+class SerializedCacheTest {
 
-    static class CachingObject implements Serializable {
+    private Cache cache;
 
-        private static final long serialVersionUID = 1L;
-
-        int x;
-
-        public CachingObject(int x) {
-            this.x = x;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CachingObject obj = (CachingObject) o;
-            return x == obj.x;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x);
-        }
-    }
-
-    static class CachingObjectWithoutSerializable {
-
-        int x;
-
-        public CachingObjectWithoutSerializable(int x) {
-            this.x = x;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CachingObjectWithoutSerializable obj = (CachingObjectWithoutSerializable) o;
-            return x == obj.x;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x);
-        }
+    @BeforeEach
+    void setUp() {
+        // A SerializedCache decorates another cache, in this case, a simple PerpetualCache.
+        cache = new SerializedCache(new PerpetualCache("default-cache"));
     }
 
     @Test
-    void shouldDemonstrateNullsAreSerializable() {
-        SerializedCache cache = new SerializedCache(new PerpetualCache("default"));
-        for (int i = 0; i < 5; i++) {
-            cache.putObject(i, null);
-        }
-        for (int i = 0; i < 5; i++) {
-            assertNull(cache.getObject(i));
-        }
+    void shouldStoreAndRetrieveNullValue() {
+        // Arrange
+        Integer key = 1;
+
+        // Act: Store a null value in the cache.
+        cache.putObject(key, null);
+        Object retrievedValue = cache.getObject(key);
+
+        // Assert: The retrieved value should be null.
+        assertNull(retrievedValue, "Cache should correctly handle storing and retrieving null values.");
+    }
+
+    @Test
+    void shouldReturnNullForNonExistentKey() {
+        // Arrange
+        Integer nonExistentKey = 999;
+
+        // Act
+        Object retrievedValue = cache.getObject(nonExistentKey);
+
+        // Assert
+        assertNull(retrievedValue, "Cache should return null for a key that does not exist.");
     }
 }
