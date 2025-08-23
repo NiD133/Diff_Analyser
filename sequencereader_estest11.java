@@ -1,32 +1,42 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class SequenceReader_ESTestTest11 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        StringReader stringReader0 = new StringReader("directoryFilter");
-        arrayDeque0.add(stringReader0);
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        char[] charArray0 = new char[3];
-        int int0 = sequenceReader0.read(charArray0, 1, 1);
-        assertArrayEquals(new char[] { '\u0000', 'd', '\u0000' }, charArray0);
-        assertEquals(1, int0);
+    /**
+     * Tests that the read(char[], int, int) method correctly reads a single character
+     * into the specified offset of a buffer.
+     */
+    @Test
+    public void readWithOffsetAndLengthShouldReadIntoCorrectBufferPosition() throws IOException {
+        // Arrange: Set up a SequenceReader with a single source reader.
+        StringReader sourceReader = new StringReader("directoryFilter");
+        SequenceReader sequenceReader = new SequenceReader(Collections.singletonList(sourceReader));
+
+        char[] buffer = new char[3];
+        int offset = 1;
+        int lengthToRead = 1;
+
+        // Act: Attempt to read one character into the middle of the buffer.
+        int charsRead = sequenceReader.read(buffer, offset, lengthToRead);
+
+        // Assert: Verify that exactly one character was read and placed correctly.
+        assertEquals("The number of characters read should be 1.", 1, charsRead);
+
+        // The first character 'd' should be at index 1. The rest of the buffer
+        // should remain untouched (i.e., contain the default char value '\u0000').
+        char[] expectedBuffer = {'\u0000', 'd', '\u0000'};
+        assertArrayEquals("The buffer content is incorrect.", expectedBuffer, buffer);
     }
 }
