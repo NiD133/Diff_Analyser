@@ -1,24 +1,35 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class GetBufferedRandomAccessSource_ESTestTest3 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GetBufferedRandomAccessSource} class.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource(arrayRandomAccessSource0, (-782L), (-782L));
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(windowRandomAccessSource0);
-        long long0 = getBufferedRandomAccessSource0.length();
-        assertEquals((-782L), long0);
+    /**
+     * Tests that the length() method correctly delegates to the underlying source,
+     * even when the source reports a negative length. This is an edge case test
+     * to ensure proper behavior with unusual source configurations.
+     */
+    @Test
+    public void length_whenSourceReportsNegativeLength_returnsSourcesNegativeLength() {
+        // Arrange
+        final long expectedNegativeLength = -782L;
+
+        // Create a source that reports a negative length.
+        // We use a WindowRandomAccessSource with a negative length parameter to achieve this.
+        RandomAccessSource emptyBaseSource = new ArrayRandomAccessSource(new byte[0]);
+        RandomAccessSource sourceWithNegativeLength = new WindowRandomAccessSource(emptyBaseSource, expectedNegativeLength, expectedNegativeLength);
+
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(sourceWithNegativeLength);
+
+        // Act
+        long actualLength = bufferedSource.length();
+
+        // Assert
+        assertEquals("The length should be delegated from the underlying source, even if negative.",
+                expectedNegativeLength, actualLength);
     }
 }
