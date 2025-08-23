@@ -1,21 +1,28 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class MappedRandomAccessFile_ESTestTest11 extends MappedRandomAccessFile_ESTest_scaffolding {
+/**
+ * Contains tests for the static utility methods of the {@link MappedRandomAccessFile} class.
+ */
+public class MappedRandomAccessFileTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        boolean boolean0 = MappedRandomAccessFile.clean((java.nio.ByteBuffer) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the clean() method gracefully handles a null ByteBuffer input.
+     *
+     * The method is expected to return false to indicate that the cleanup operation
+     * was not successful, rather than throwing a NullPointerException.
+     */
+    @Test
+    public void clean_whenBufferIsNull_shouldReturnFalse() {
+        // Arrange: Define a null ByteBuffer to pass to the method.
+        java.nio.ByteBuffer nullBuffer = null;
+
+        // Act: Call the static clean method with the null buffer.
+        boolean wasCleaned = MappedRandomAccessFile.clean(nullBuffer);
+
+        // Assert: The method should return false, indicating the operation failed.
+        assertFalse("The clean() method should return false for a null input.", wasCleaned);
     }
 }
