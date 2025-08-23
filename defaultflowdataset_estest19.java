@@ -1,28 +1,31 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultFlowDataset_ESTestTest19 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultFlowDataset} class, focusing on boundary conditions
+ * and exception handling.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultFlowDataset0.getDestinations(1);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling getDestinations() with an invalid stage index
+     * throws an IndexOutOfBoundsException.
+     * <p>
+     * According to the class design, a newly created DefaultFlowDataset has one
+     * stage, which is at index 0. Therefore, attempting to access stage index 1
+     * should fail.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getDestinations_withInvalidStageIndex_shouldThrowException() {
+        // Arrange: Create a new, empty dataset.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+
+        // Act: Attempt to get destinations for a stage index that is out of bounds.
+        // An empty dataset has one stage (index 0), so index 1 is invalid.
+        dataset.getDestinations(1);
+
+        // Assert: An IndexOutOfBoundsException is expected, which is handled by the
+        // @Test(expected=...) annotation.
     }
 }
