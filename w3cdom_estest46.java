@@ -1,38 +1,48 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
+import org.junit.Test;
+import org.w3c.dom.Comment;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest46 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("<!DOCMTYPE", "<!DOCMTYPE");
-        org.w3c.dom.Document document1 = W3CDom.convert(document0);
-        assertNotNull(document1);
+/**
+ * Test suite for {@link W3CDom}.
+ * This class focuses on verifying the conversion of Jsoup documents to W3C DOM documents.
+ */
+public class W3CDomTest {
+
+    /**
+     * Tests that a Jsoup document containing a malformed DOCTYPE, which Jsoup's
+     * lenient parser interprets as a comment, is correctly converted to a W3C DOM
+     * with a corresponding comment node.
+     */
+    @Test
+    public void convertsMalformedDoctypeAsComment() {
+        // Arrange: Create a Jsoup document from a malformed DOCTYPE string.
+        // Jsoup's HTML parser will parse "<!DOCMTYPE" as a comment node "<!--DOCMTYPE-->".
+        String malformedHtml = "<!DOCMTYPE";
+        Document jsoupDoc = Parser.parseBodyFragment(malformedHtml, "");
+
+        // Act: Convert the Jsoup document to a W3C DOM document.
+        org.w3c.dom.Document w3cDoc = W3CDom.convert(jsoupDoc);
+
+        // Assert: Verify the structure and content of the resulting W3C document.
+        assertNotNull("The converted W3C document should not be null.", w3cDoc);
+
+        // The body fragment is wrapped in <html><body>...</body></html>.
+        // We expect the comment to be inside the body element.
+        Node bodyElement = w3cDoc.getElementsByTagName("body").item(0);
+        assertNotNull("The W3C document should contain a <body> element.", bodyElement);
+        assertTrue("The <body> element should have child nodes.", bodyElement.hasChildNodes());
+        assertEquals("The <body> element should have exactly one child node.", 1, bodyElement.getChildNodes().getLength());
+
+        Node childNode = bodyElement.getFirstChild();
+        assertEquals("The child node should be a comment.", Node.COMMENT_NODE, childNode.getNodeType());
+
+        Comment commentNode = (Comment) childNode;
+        assertEquals("The comment content should match the parsed malformed DOCTYPE.", "DOCMTYPE", commentNode.getData());
     }
 }
