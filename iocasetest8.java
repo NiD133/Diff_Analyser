@@ -1,80 +1,74 @@
 package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class IOCaseTestTest8 {
+/**
+ * Tests for {@link IOCase#checkIndexOf(String, int, String)} using the {@link IOCase#SENSITIVE} constant.
+ */
+@DisplayName("IOCase.SENSITIVE.checkIndexOf()")
+class IOCaseCheckIndexOfSensitiveTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    private static final IOCase SENSITIVE_CASE = IOCase.SENSITIVE;
+    private static final String TEXT = "ABCDEFGHIJ";
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+    @Nested
+    @DisplayName("when substring is found")
+    class SubstringFound {
+
+        @ParameterizedTest(name = "finds \"{2}\" in \"{0}\" at index {3} when starting from {1}")
+        @CsvSource({
+            // Substring at start
+            "ABCDEFGHIJ, 0, A,   0",
+            "ABCDEFGHIJ, 0, AB,  0",
+            "ABCDEFGHIJ, 0, ABC, 0",
+            // Substring in middle
+            "ABCDEFGHIJ, 0, D,   3",
+            "ABCDEFGHIJ, 3, D,   3",
+            "ABCDEFGHIJ, 0, DEF, 3",
+            "ABCDEFGHIJ, 3, DEF, 3",
+            // Substring at end
+            "ABCDEFGHIJ, 0, J,   9",
+            "ABCDEFGHIJ, 9, J,   9",
+            "ABCDEFGHIJ, 8, IJ,  8",
+            "ABCDEFGHIJ, 7, HIJ, 7"
+        })
+        void shouldReturnCorrectIndex(final String text, final int startIndex, final String search, final int expectedIndex) {
+            assertEquals(expectedIndex, SENSITIVE_CASE.checkIndexOf(text, startIndex, search));
         }
     }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
+    @Nested
+    @DisplayName("when substring is not found or inputs are invalid")
+    class SubstringNotFound {
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
+        @ParameterizedTest(name = "returns -1 when searching for \"{2}\" in \"{0}\" from index {1}")
+        @CsvSource({
+            // Start index is past the potential match
+            "ABCDEFGHIJ, 1, A",
+            "ABCDEFGHIJ, 4, D",
+            "ABCDEFGHIJ, 9, IJ",
+            "ABCDEFGHIJ, 8, HIJ",
+            // Substring does not exist in the text
+            "ABCDEFGHIJ, 0, DED",
+            // Search string is longer than the text
+            "DEF, 0, ABCDEFGHIJ"
+        })
+        void shouldReturnNegativeOne(final String text, final int startIndex, final String search) {
+            assertEquals(-1, SENSITIVE_CASE.checkIndexOf(text, startIndex, search));
         }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
 
-    @Test
-    void test_checkIndexOf_functionality() {
-        // start
-        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "A"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "A"));
-        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "AB"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "AB"));
-        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "ABC"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "ABC"));
-        // middle
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "D"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "D"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "D"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DE"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DE"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DE"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DEF"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DEF"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DEF"));
-        // end
-        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "J"));
-        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "J"));
-        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "J"));
-        assertEquals(8, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "IJ"));
-        assertEquals(8, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "IJ"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "IJ"));
-        assertEquals(7, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 6, "HIJ"));
-        assertEquals(7, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 7, "HIJ"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "HIJ"));
-        // not found
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DED"));
-        // too long
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("DEF", 0, "ABCDEFGHIJ"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, null));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf(null, 0, "ABC"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf(null, 0, null));
+        @Test
+        @DisplayName("returns -1 for null inputs")
+        void shouldReturnNegativeOneForNullInputs() {
+            assertEquals(-1, SENSITIVE_CASE.checkIndexOf(TEXT, 0, null));
+            assertEquals(-1, SENSITIVE_CASE.checkIndexOf(null, 0, "ABC"));
+            assertEquals(-1, SENSITIVE_CASE.checkIndexOf(null, 0, null));
+        }
     }
 }
