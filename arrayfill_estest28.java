@@ -1,20 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class ArrayFill_ESTestTest28 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        char[] charArray0 = ArrayFill.fill((char[]) null, 'B');
-        assertNull(charArray0);
+    /**
+     * Tests that the fill(char[], char) method gracefully handles a null input array
+     * by returning null, as specified in its contract.
+     */
+    @Test
+    public void fill_withNullCharArray_shouldReturnNull() {
+        // Arrange: Define the inputs for the test case.
+        // The method contract allows for a null array.
+        final char[] inputArray = null;
+        final char valueToFill = 'B';
+
+        // Act: Execute the method under test.
+        final char[] resultArray = ArrayFill.fill(inputArray, valueToFill);
+
+        // Assert: Verify that the actual output matches the expected outcome.
+        assertNull("The result of filling a null array should be null.", resultArray);
     }
 }
