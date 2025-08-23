@@ -1,29 +1,26 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest20 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Test suite for the BlockingCache decorator.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        BlockingCache blockingCache0 = new BlockingCache((Cache) null);
-        // Undeclared exception!
-        try {
-            blockingCache0.clear();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.BlockingCache", e);
-        }
+    /**
+     * Verifies that operations on BlockingCache fail when it is constructed with a null delegate.
+     * The decorator pattern requires a valid underlying object to delegate calls to.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenDelegateIsNull() {
+        // Arrange: Create a BlockingCache with a null delegate cache.
+        Cache nullDelegate = null;
+        BlockingCache blockingCache = new BlockingCache(nullDelegate);
+
+        // Act: Attempt to call a method that delegates to the underlying cache.
+        blockingCache.clear();
+
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
     }
 }
