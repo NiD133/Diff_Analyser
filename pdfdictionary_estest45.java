@@ -2,27 +2,32 @@ package com.itextpdf.text.pdf;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class PdfDictionary_ESTestTest45 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        PdfName pdfName0 = PdfName.TYPE3;
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.putEx(pdfName0, (PdfObject) null);
-        assertEquals(4, PdfObject.NAME);
+    /**
+     * Verifies that calling putEx() with a null value does not add an entry to the dictionary.
+     * <p>
+     * According to its documentation, the putEx() method should do nothing if the provided
+     * value is null. This test ensures that the dictionary's size remains unchanged and
+     * the key is not added.
+     */
+    @Test
+    public void putEx_withNullValue_shouldNotModifyDictionary() {
+        // Arrange
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName key = new PdfName("TestKey");
+
+        // Act
+        dictionary.putEx(key, null);
+
+        // Assert
+        assertTrue("The dictionary should be empty after calling putEx with a null value.",
+                   dictionary.getKeys().isEmpty());
+        assertFalse("The dictionary should not contain the key after calling putEx with a null value.",
+                    dictionary.contains(key));
     }
 }
