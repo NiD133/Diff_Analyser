@@ -1,36 +1,26 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-public class SecondsTestTest17 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class, focusing on conversions to other standard period types.
+ */
+public class TestSeconds extends TestCase {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
+    /**
+     * Tests that {@link Seconds#toStandardHours()} correctly converts a duration
+     * in seconds to the equivalent number of whole hours.
+     */
     public void testToStandardHours() {
-        Seconds test = Seconds.seconds(60 * 60 * 2);
-        Hours expected = Hours.hours(2);
-        assertEquals(expected, test.toStandardHours());
+        // Arrange: Define a period of 2 hours, both in Seconds and Hours.
+        final int hoursValue = 2;
+        final Seconds twoHoursInSeconds = Seconds.seconds(hoursValue * DateTimeConstants.SECONDS_PER_HOUR);
+        final Hours expectedHours = Hours.hours(hoursValue);
+
+        // Act: Convert the Seconds object to Hours.
+        final Hours actualHours = twoHoursInSeconds.toStandardHours();
+
+        // Assert: The converted value should match the expected Hours object.
+        assertEquals("Conversion from seconds to hours should be correct", expectedHours, actualHours);
     }
 }
