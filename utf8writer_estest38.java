@@ -1,40 +1,60 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest38 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        Object object0 = new Object();
-        ContentReference contentReference0 = ContentReference.rawReference(true, object0);
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, byteArrayOutputStream0);
-        uTF8Writer0.write(2048);
-        assertEquals((-56613888), UTF8Writer.SURROGATE_BASE);
+/**
+ * Contains tests for the {@link UTF8Writer} class.
+ * This refactored test corresponds to the original UTF8Writer_ESTestTest38.
+ */
+public class UTF8WriterRefactoredTest {
+
+    /**
+     * Tests that writing a single character that requires three bytes in UTF-8
+     * produces the correct byte sequence. The character U+0800 (decimal 2048)
+     * is the first code point that requires a three-byte encoding.
+     */
+    @Test
+    public void shouldCorrectlyEncodeThreeByteCharacter() throws IOException {
+        // Arrange
+        // The character U+0800 (decimal 2048) requires a 3-byte representation in UTF-8.
+        final int threeByteChar = 2048;
+        // The expected UTF-8 byte sequence for U+0800 is [0xE8, 0x80, 0x80].
+        final byte[] expectedBytes = new byte[]{(byte) 0xE8, (byte) 0x80, (byte) 0x80};
+
+        IOContext ioContext = createIOContext();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, outputStream);
+
+        // Act
+        utf8Writer.write(threeByteChar);
+        utf8Writer.close(); // Flushes and closes the writer and underlying stream.
+
+        // Assert
+        byte[] actualBytes = outputStream.toByteArray();
+        assertArrayEquals("The UTF-8 encoding for character 2048 should be 3 bytes long",
+                expectedBytes, actualBytes);
+    }
+
+    /**
+     * Helper method to create a default IOContext for tests.
+     */
+    private IOContext createIOContext() {
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        return new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                null, // ContentReference is not relevant for this test
+                false); // isResourceManaged
     }
 }
