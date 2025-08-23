@@ -1,41 +1,30 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class DefaultPieDataset_ESTestTest43 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Tests for the exception-throwing behavior of the {@link DefaultPieDataset#insertValue} method.
+ */
+public class DefaultPieDatasetInsertTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        DefaultKeyedValues<Integer> defaultKeyedValues0 = new DefaultKeyedValues<Integer>();
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>(defaultKeyedValues0);
-        Integer integer0 = JLayeredPane.POPUP_LAYER;
-        // Undeclared exception!
+    @Test
+    public void insertValue_withOutOfBoundsPosition_shouldThrowIllegalArgumentException() {
+        // Arrange: Create an empty dataset. For an empty dataset, the only valid
+        // insertion position is 0. Any other position is out of bounds.
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+        final int invalidPosition = 1;
+        final String key = "Any Key";
+        final double value = 10.0;
+
+        // Act & Assert
         try {
-            defaultPieDataset0.insertValue(1, integer0, (-3722.9802));
-            fail("Expecting exception: IllegalArgumentException");
+            dataset.insertValue(invalidPosition, key, value);
+            fail("Expected an IllegalArgumentException because the insertion position is out of bounds.");
         } catch (IllegalArgumentException e) {
-            //
-            // 'position' out of bounds.
-            //
-            verifyException("org.jfree.data.DefaultKeyedValues", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("'position' out of bounds.", e.getMessage());
         }
     }
 }
