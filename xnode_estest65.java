@@ -1,39 +1,47 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest65 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.xml.xpath.XPathExpressionException;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test064() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that calling evalBoolean with a syntactically invalid XPath expression
+     * throws a BuilderException.
+     */
+    @Test
+    public void evalBooleanShouldThrowBuilderExceptionForInvalidXPathExpression() {
+        // Arrange
+        // An XPathParser is required by the XNode constructor. A null document is sufficient for this test.
+        XPathParser xpathParser = new XPathParser(null, false, null);
+        Node node = new IIOMetadataNode(); // A simple, empty DOM node.
+        Properties variables = new Properties();
+        XNode xNode = new XNode(xpathParser, node, variables);
+
+        // An XPath expression that is syntactically invalid.
+        String invalidXPathExpression = "=";
+
+        // Act & Assert
         try {
-            xNode0.evalBoolean("=)coWX*V^N1)|]");
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error evaluating XPath.  Cause: javax.xml.xpath.XPathExpressionException: javax.xml.transform.TransformerException: A location path was expected, but the following token was encountered:  =
-            //
-            verifyException("org.apache.ibatis.parsing.XPathParser", e);
+            xNode.evalBoolean(invalidXPathExpression);
+            fail("Should have thrown a BuilderException due to the invalid XPath expression.");
+        } catch (BuilderException e) {
+            // The exception message should clearly indicate an XPath evaluation error.
+            assertTrue("Exception message should indicate an XPath error",
+                e.getMessage().startsWith("Error evaluating XPath."));
+            // The cause should be the original exception from the underlying XPath engine.
+            assertTrue("Exception cause should be XPathExpressionException",
+                e.getCause() instanceof XPathExpressionException);
         }
     }
 }
