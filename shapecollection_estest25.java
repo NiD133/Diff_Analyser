@@ -1,33 +1,38 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest25 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        boolean boolean0 = shapeCollection0.equals(spatialContext0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertNotEquals;
+
+/**
+ * Test suite for the {@link ShapeCollection} class, focusing on understandability.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * Verifies that the equals() method returns false when a ShapeCollection
+     * is compared to an object of an incompatible type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentObjectType() {
+        // Arrange
+        // Use a standard spatial context, which is required by the ShapeCollection constructor.
+        SpatialContext spatialContext = SpatialContext.GEO;
+
+        // Create an empty ShapeCollection. The contents are not relevant for this specific test.
+        List<Shape> emptyList = new ArrayList<>();
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(emptyList, spatialContext);
+
+        // Act & Assert
+        // A ShapeCollection should not be equal to an object of a different class.
+        // The original test compared it to the SpatialContext object, which serves as a good example
+        // of an incompatible type.
+        // Using assertNotEquals is more expressive than assertFalse(shapeCollection.equals(spatialContext)).
+        assertNotEquals("A ShapeCollection should not be equal to an object of a different type.",
+                shapeCollection, spatialContext);
     }
 }
