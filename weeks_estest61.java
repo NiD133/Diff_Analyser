@@ -1,26 +1,32 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Weeks_ESTestTest61 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        Weeks weeks0 = Weeks.MAX_VALUE;
-        // Undeclared exception!
+    /**
+     * Tests that converting Weeks.MAX_VALUE to days throws an ArithmeticException.
+     * This is expected because the calculation (Integer.MAX_VALUE * 7) results
+     * in a value that overflows the capacity of an integer.
+     */
+    @Test
+    public void toStandardDays_withMaxValue_throwsArithmeticException() {
+        // Arrange: Use the largest possible value for Weeks.
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+
+        // Act & Assert
         try {
-            weeks0.toStandardDays();
-            fail("Expecting exception: ArithmeticException");
+            maxWeeks.toStandardDays();
+            fail("Expected an ArithmeticException to be thrown due to integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: 2147483647 * 7
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception is the one we expect and that its message
+            // clearly indicates the cause of the overflow.
+            assertEquals("Multiplication overflows an int: 2147483647 * 7", e.getMessage());
         }
     }
 }
