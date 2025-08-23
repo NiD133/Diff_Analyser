@@ -1,29 +1,25 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest65 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the StringUtil class, focusing on the appendNormalisedWhitespace method.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        StringBuilder stringBuilder0 = StringUtil.borrowBuilder();
-        StringUtil.appendNormalisedWhitespace(stringBuilder0, "         ", true);
-        assertEquals("", stringBuilder0.toString());
+    @Test
+    public void appendNormalisedWhitespaceStripsAllWhitespaceWhenInputIsOnlyWhitespace() {
+        // Arrange
+        StringBuilder accumulator = new StringBuilder();
+        String inputWithOnlyWhitespace = "         "; // Input consists of multiple space characters.
+
+        // Act
+        // Call the method with stripLeading=true, which should treat the entire string as leading whitespace.
+        StringUtil.appendNormalisedWhitespace(accumulator, inputWithOnlyWhitespace, true);
+
+        // Assert
+        // The accumulator should be empty because the input string was entirely stripped.
+        assertEquals("The accumulator should be empty.", "", accumulator.toString());
     }
 }
