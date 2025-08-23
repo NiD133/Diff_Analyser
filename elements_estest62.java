@@ -1,44 +1,31 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest62 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for {@link Elements}.
+ * This class focuses on the behavior of the set() method.
+ */
+public class ElementsSetTest {
 
-    @Test(timeout = 4000)
-    public void test061() throws Throwable {
-        Document document0 = Document.createShell("ol");
-        Elements elements0 = document0.getAllElements();
-        // Undeclared exception!
-        try {
-            elements0.set(126, (Element) document0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 126, Size: 4
-            //
-            verifyException("java.util.ArrayList", e);
-        }
+    /**
+     * Verifies that calling set() with an index that is out of the list's bounds
+     * throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void setShouldThrowExceptionForIndexOutOfBounds() {
+        // Arrange: Create a list of elements.
+        // A default shell document contains 4 elements: #root, html, head, and body.
+        Document doc = Document.createShell("http://example.com");
+        Elements elements = doc.getAllElements();
+        
+        int outOfBoundsIndex = elements.size() + 10; // Any index >= size() is invalid.
+        Element newElement = new Element("p");
+
+        // Act: Attempt to set an element at an index that does not exist.
+        // The @Test(expected=...) annotation will assert that the correct exception is thrown.
+        elements.set(outOfBoundsIndex, newElement);
     }
 }
