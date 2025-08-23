@@ -1,38 +1,42 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.ParentContext;
-import org.apache.commons.jxpath.ri.axes.PrecedingOrFollowingContext;
 import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.axes.SelfContext;
 import org.apache.commons.jxpath.ri.axes.UnionContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CoreOperation_ESTestTest4 extends CoreOperation_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Expression[] expressionArray0 = new Expression[0];
-        CoreOperationUnion coreOperationUnion0 = new CoreOperationUnion(expressionArray0);
-        RootContext rootContext0 = new RootContext((JXPathContextReferenceImpl) null, (NodePointer) null);
-        NodeTypeTest nodeTypeTest0 = new NodeTypeTest(22);
-        PrecedingOrFollowingContext precedingOrFollowingContext0 = new PrecedingOrFollowingContext(rootContext0, nodeTypeTest0, false);
-        SelfContext selfContext0 = new SelfContext(precedingOrFollowingContext0, nodeTypeTest0);
-        QName qName0 = new QName("");
-        NodeNameTest nodeNameTest0 = new NodeNameTest(qName0);
-        ParentContext parentContext0 = new ParentContext(selfContext0, nodeNameTest0);
-        UnionContext unionContext0 = (UnionContext) coreOperationUnion0.compute(parentContext0);
-        assertFalse(unionContext0.isChildOrderingRequired());
+/**
+ * Contains tests for the {@link CoreOperationUnion} class.
+ */
+public class CoreOperationUnionTest {
+
+    /**
+     * Tests that calling compute() on a CoreOperationUnion with no expressions
+     * returns a UnionContext that does not require child ordering.
+     * The 'isChildOrderingRequired' property is inherent to UnionContext and should be false.
+     */
+    @Test
+    public void computeWithNoExpressionsReturnsContextNotRequiringChildOrdering() {
+        // Arrange: Create a union operation with an empty array of expressions.
+        Expression[] noExpressions = new Expression[0];
+        CoreOperationUnion unionOperation = new CoreOperationUnion(noExpressions);
+
+        // A simple, dummy evaluation context is sufficient for this test.
+        EvalContext dummyContext = new RootContext(null, null);
+
+        // Act: Compute the result of the union operation.
+        Object result = unionOperation.compute(dummyContext);
+
+        // Assert: The result should be a UnionContext instance that does not require child ordering.
+        assertNotNull("The computed result should not be null.", result);
+        assertTrue("The result should be an instance of UnionContext.", result instanceof UnionContext);
+
+        UnionContext resultContext = (UnionContext) result;
+        assertFalse("A union of zero expressions should not require child ordering.",
+                    resultContext.isChildOrderingRequired());
     }
 }
