@@ -1,24 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.GreekList;
-import com.itextpdf.text.TabSettings;
-import java.util.ArrayList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultSplitCharacter_ESTestTest5 extends DefaultSplitCharacter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultSplitCharacter} class.
+ */
+public class DefaultSplitCharacterTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        DefaultSplitCharacter defaultSplitCharacter0 = new DefaultSplitCharacter();
-        char[] charArray0 = new char[7];
-        charArray0[4] = '1';
-        char char0 = defaultSplitCharacter0.getCurrentCharacter(4, charArray0, (PdfChunk[]) null);
-        assertEquals('1', char0);
+    /**
+     * Verifies that getCurrentCharacter returns the correct character from the character array
+     * at the specified index when the PdfChunk array is null.
+     */
+    @Test
+    public void getCurrentCharacter_shouldReturnCharacterAtIndex_whenChunkArrayIsNull() {
+        // Arrange: Set up the test objects and data.
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        char[] textChars = {'a', 'b', 'c', 'd', '1', 'f', 'g'};
+        int targetIndex = 4;
+        char expectedCharacter = '1';
+
+        // Act: Call the method under test.
+        // The PdfChunk array is intentionally null to test the simple path.
+        char actualCharacter = splitCharacter.getCurrentCharacter(targetIndex, textChars, null);
+
+        // Assert: Verify the result is as expected.
+        assertEquals(expectedCharacter, actualCharacter);
     }
 }
