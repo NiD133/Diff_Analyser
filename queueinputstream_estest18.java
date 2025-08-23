@@ -1,24 +1,29 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class QueueInputStream_ESTestTest18 extends QueueInputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        QueueInputStream queueInputStream0 = new QueueInputStream();
-        QueueOutputStream queueOutputStream0 = queueInputStream0.newQueueOutputStream();
-        assertNotNull(queueOutputStream0);
+/**
+ * Unit tests for the {@link QueueInputStream} class.
+ */
+public class QueueInputStreamTest {
+
+    /**
+     * Tests that calling {@link QueueInputStream#newQueueOutputStream()}
+     * successfully creates and returns a non-null instance of
+     * {@link QueueOutputStream}.
+     */
+    @Test
+    public void newQueueOutputStreamShouldReturnNonNullInstance() {
+        // Arrange: Create a new QueueInputStream instance.
+        final QueueInputStream inputStream = new QueueInputStream();
+
+        // Act: Create a corresponding QueueOutputStream from the input stream.
+        final QueueOutputStream outputStream = inputStream.newQueueOutputStream();
+
+        // Assert: Verify that the created output stream is not null.
+        assertNotNull("The new QueueOutputStream should not be null.", outputStream);
     }
 }
