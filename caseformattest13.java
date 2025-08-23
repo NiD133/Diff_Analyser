@@ -2,24 +2,29 @@ package com.google.common.base;
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
+
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CaseFormatTestTest13 extends TestCase {
+/**
+ * Tests for converting strings from {@link CaseFormat#LOWER_CAMEL} to {@link
+ * CaseFormat#LOWER_HYPHEN}.
+ */
+public class CaseFormatTest extends TestCase {
 
-    public void testLowerCamelToLowerHyphen() {
-        assertThat(LOWER_CAMEL.to(LOWER_HYPHEN, "foo")).isEqualTo("foo");
-        assertThat(LOWER_CAMEL.to(LOWER_HYPHEN, "fooBar")).isEqualTo("foo-bar");
-        assertThat(LOWER_CAMEL.to(LOWER_HYPHEN, "HTTP")).isEqualTo("h-t-t-p");
-    }
+  public void testLowerCamelToLowerHyphen_singleWord_isUnchanged() {
+    assertThat(LOWER_CAMEL.to(LOWER_HYPHEN, "foo")).isEqualTo("foo");
+  }
+
+  public void testLowerCamelToLowerHyphen_standardConversion() {
+    assertThat(LOWER_CAMEL.to(LOWER_HYPHEN, "fooBar")).isEqualTo("foo-bar");
+  }
+
+  /**
+   * This test verifies a specific behavior: when an all-caps word like an acronym is encountered,
+   * it's treated as a series of single-letter words.
+   */
+  public void testLowerCamelToLowerHyphen_acronymIsSplit() {
+    assertThat(LOWER_CAMEL.to(LOWER_HYPHEN, "HTTP")).isEqualTo("h-t-t-p");
+  }
 }
