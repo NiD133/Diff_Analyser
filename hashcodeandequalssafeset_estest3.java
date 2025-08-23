@@ -1,29 +1,26 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest3 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Object object0 = new Object();
-        hashCodeAndEqualsSafeSet0.add(object0);
-        Object[] objectArray0 = hashCodeAndEqualsSafeSet0.toArray();
-        assertEquals(1, objectArray0.length);
+    @Test
+    public void toArray_shouldReturnArrayWithCorrectElement_whenSetContainsOneElement() {
+        // Arrange: Create a new set and an element to add to it.
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+        Object elementToAdd = new Object();
+        safeSet.add(elementToAdd);
+
+        // Act: Convert the set to an array.
+        Object[] resultArray = safeSet.toArray();
+
+        // Assert: Verify that the resulting array has the correct size and content.
+        assertEquals("The array should contain exactly one element.", 1, resultArray.length);
+        assertSame("The element in the array should be the same instance that was added.", elementToAdd, resultArray[0]);
     }
 }
