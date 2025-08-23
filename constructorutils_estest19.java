@@ -1,25 +1,33 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ConstructorUtils_ESTestTest19 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConstructorUtils}.
+ * This class focuses on testing the getAccessibleConstructor(Constructor) method.
+ */
+public class ConstructorUtilsImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Class<Object> class0 = Object.class;
-        Class<Annotation>[] classArray0 = (Class<Annotation>[]) Array.newInstance(Class.class, 0);
-        Constructor<Object> constructor0 = ConstructorUtils.getAccessibleConstructor(class0, (Class<?>[]) classArray0);
-        Constructor<Object> constructor1 = ConstructorUtils.getAccessibleConstructor(constructor0);
-        assertSame(constructor0, constructor1);
+    /**
+     * Tests that {@link ConstructorUtils#getAccessibleConstructor(Constructor)}
+     * returns the same instance for a constructor that is already accessible.
+     *
+     * The public no-argument constructor of {@link Object} is used as a
+     * well-known, guaranteed accessible constructor.
+     */
+    @Test
+    public void getAccessibleConstructorForAlreadyAccessibleConstructorShouldReturnSameInstance() throws Exception {
+        // Arrange: Obtain a constructor that is known to be accessible.
+        // The public, no-argument constructor of the Object class is a perfect candidate.
+        final Constructor<Object> accessibleConstructor = Object.class.getConstructor();
+
+        // Act: Pass the accessible constructor to the method under test.
+        final Constructor<Object> resultConstructor = ConstructorUtils.getAccessibleConstructor(accessibleConstructor);
+
+        // Assert: The method should return the exact same constructor instance without modification.
+        assertSame("Expected the same constructor instance to be returned",
+                accessibleConstructor, resultConstructor);
     }
 }
