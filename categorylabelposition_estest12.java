@@ -1,29 +1,34 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryLabelPosition_ESTestTest12 extends CategoryLabelPosition_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.BOTTOM_LEFT;
-        CategoryLabelPosition categoryLabelPosition0 = null;
+/**
+ * Tests for the {@link CategoryLabelPosition} class, focusing on constructor argument validation.
+ */
+public class CategoryLabelPositionTest {
+
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException
+     * when the 'labelAnchor' argument is null.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForNullLabelAnchor() {
+        // Arrange: A valid category anchor and a null label anchor.
+        RectangleAnchor categoryAnchor = RectangleAnchor.BOTTOM_LEFT;
+        TextBlockAnchor nullLabelAnchor = null;
+
+        // Act & Assert
         try {
-            categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, (TextBlockAnchor) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new CategoryLabelPosition(categoryAnchor, nullLabelAnchor);
+            fail("Expected an IllegalArgumentException, but no exception was thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'labelAnchor' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Assert that the exception message is correct, confirming the right check failed.
+            assertEquals("Null 'labelAnchor' argument.", e.getMessage());
         }
     }
 }
