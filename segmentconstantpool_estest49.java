@@ -1,29 +1,29 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest49 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getConstantPoolEntry(10, 139L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that getConstantPoolEntry() throws a NullPointerException if the
+     * SegmentConstantPool was constructed with a null CpBands dependency.
+     *
+     * This is expected because the method will attempt to access the null 'bands'
+     * field, leading to the exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getConstantPoolEntryThrowsNPEWhenConstructedWithNullBands() {
+        // Arrange: Create a SegmentConstantPool with its required CpBands dependency set to null.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        final int entryType = SegmentConstantPool.CP_FIELD; // Use the constant for clarity
+        final long arbitraryIndex = 139L; // The specific index value is not relevant for this test
+
+        // Act: Call the method under test.
+        // The @Test(expected=...) annotation will automatically assert that a
+        // NullPointerException is thrown.
+        segmentConstantPool.getConstantPoolEntry(entryType, arbitraryIndex);
     }
 }
