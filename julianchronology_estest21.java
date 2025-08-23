@@ -1,68 +1,56 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for {@link JulianChronology}.
+ * This class focuses on edge cases related to date creation.
+ */
 public class JulianChronology_ESTestTest21 extends JulianChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        Instant instant0 = MockInstant.ofEpochSecond(1702L);
-        Period period0 = Period.ofDays((-1073741823));
-        Instant instant1 = MockInstant.minus(instant0, (TemporalAmount) period0);
-        ZoneOffset zoneOffset0 = ZoneOffset.UTC;
-        Clock clock0 = MockClock.fixed(instant1, zoneOffset0);
-        // Undeclared exception!
+    /**
+     * Tests that dateNow() throws a DateTimeException when the clock is set to a date
+     * that is beyond the maximum supported year of the Julian calendar.
+     */
+    @Test
+    public void dateNow_whenClockRepresentsDateBeyondMaxSupportedYear_throwsDateTimeException() {
+        // Arrange
+        // Use the singleton instance of JulianChronology, which is the recommended practice.
+        final JulianChronology julianChronology = JulianChronology.INSTANCE;
+        final ZoneId utc = ZoneOffset.UTC;
+
+        // The JulianChronology's valid year range is defined from -999,998 to 999,999.
+        // We need to create a clock that is fixed to a date outside this range.
+        // Let's use the year 1,000,000, which is just beyond the maximum.
+        // We construct this date using the standard ISO calendar (LocalDateTime) because
+        // attempting to create a JulianDate directly with this year would also fail.
+        Instant instantBeyondMaxYear = LocalDateTime.of(1_000_000, Month.JANUARY, 1, 0, 0)
+                                                   .toInstant(utc);
+        Clock clockFixedAtFutureDate = Clock.fixed(instantBeyondMaxYear, utc);
+
+        // Act & Assert
         try {
-            julianChronology0.dateNow(clock0);
-            fail("Expecting exception: DateTimeException");
+            julianChronology.dateNow(clockFixedAtFutureDate);
+            fail("Expected a DateTimeException to be thrown, but it wasn't.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for Year (valid values -999998 - 999999): 2941714
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // The test passes if a DateTimeException is caught.
+            // For completeness, we verify the exception message confirms the cause.
+            String expectedMessageContent = "Invalid value for Year";
+            assertTrue(
+                "Exception message should indicate an invalid year. Actual message: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
