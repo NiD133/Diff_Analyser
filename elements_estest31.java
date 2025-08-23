@@ -1,36 +1,40 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class Elements_ESTestTest31 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test030() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.nextAll();
-        assertEquals(1, elements1.size());
+    /**
+     * Tests that nextAll() on a list of elements collects all unique following
+     * siblings from each element in the list.
+     */
+    @Test
+    public void nextAllCollectsFollowingSiblingsFromAllElementsInList() {
+        // Arrange
+        // A shell document has the structure: <html><head></head><body></body></html>
+        Document doc = Document.createShell("");
+        
+        // doc.getAllElements() will return a list of [<html>, <head>, <body>]
+        Elements sourceElements = doc.getAllElements();
+
+        // Act
+        // nextAll() should find the following siblings for each element in sourceElements.
+        // - <html> has no parent, thus no siblings.
+        // - <head>'s only following sibling is <body>.
+        // - <body> has no following siblings.
+        // The result should be a unique list containing just the <body> element.
+        Elements followingSiblings = sourceElements.nextAll();
+
+        // Assert
+        assertEquals("Should find one unique following sibling", 1, followingSiblings.size());
+        
+        Element resultElement = followingSiblings.first();
+        assertNotNull("The resulting element should not be null", resultElement);
+        assertEquals("The single sibling should be the <body> tag", "body", resultElement.tagName());
     }
 }
