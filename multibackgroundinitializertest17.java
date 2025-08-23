@@ -1,23 +1,25 @@
 package org.apache.commons.lang3.concurrent;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
+/**
+ * Test suite for {@link MultiBackgroundInitializer}.
+ * This refactored version focuses on a single test case's clarity.
+ */
+public class MultiBackgroundInitializerTest extends AbstractLangTest {
 
     /**
      * Constant for the names of the child initializers.
@@ -25,14 +27,55 @@ public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
     private static final String CHILD_INIT = "childInitializer";
 
     /**
-     * A short time to wait for background threads to run.
-     */
-    protected static final long PERIOD_MILLIS = 50;
-
-    /**
      * The initializer to be tested.
      */
     protected MultiBackgroundInitializer initializer;
+
+    @BeforeEach
+    public void setUp() {
+        initializer = new MultiBackgroundInitializer();
+    }
+
+    /**
+     * Tests that the set of initializer names returned by the results object
+     * is unmodifiable.
+     */
+    @Test
+    @DisplayName("The set of initializer names from the results should be unmodifiable")
+    void initializerNamesSetFromResultsShouldBeUnmodifiable() throws ConcurrentException {
+        // Arrange: Set up the initializer with a single child task, start it,
+        // and retrieve the results.
+        final String childName = "child_task_1";
+        initializer.addInitializer(childName, createChildBackgroundInitializer());
+        initializer.start();
+        final MultiBackgroundInitializer.MultiBackgroundInitializerResults results = initializer.get();
+
+        // Act: Get the set of names and attempt to modify it via its iterator.
+        final Set<String> names = results.initializerNames();
+        final Iterator<String> iterator = names.iterator();
+        
+        assertTrue(iterator.hasNext(), "The set of names should contain the added initializer.");
+        iterator.next(); // Advance to the first element.
+
+        // Assert: The attempt to remove an element should throw an exception.
+        assertThrows(UnsupportedOperationException.class, iterator::remove,
+            "The set of initializer names should be unmodifiable.");
+    }
+
+
+    // ---------------------------------------------------------------------------------
+    // Helper methods and classes from the original test file.
+    // These are kept to support other potential tests and provide context.
+    // ---------------------------------------------------------------------------------
+
+    /**
+     * An overrideable method to create concrete implementations of
+     * {@code BackgroundInitializer} used for defining background tasks
+     * for {@code MultiBackgroundInitializer}.
+     */
+    protected AbstractChildBackgroundInitializer createChildBackgroundInitializer() {
+        return new MethodChildBackgroundInitializer();
+    }
 
     /**
      * Tests whether a child initializer has been executed. Optionally the
@@ -80,53 +123,15 @@ public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
     }
 
     /**
-     * An overrideable method to create concrete implementations of
-     * {@code BackgroundInitializer} used for defining background tasks
-     * for {@code MultiBackgroundInitializer}.
-     */
-    protected AbstractChildBackgroundInitializer createChildBackgroundInitializer() {
-        return new MethodChildBackgroundInitializer();
-    }
-
-    @BeforeEach
-    public void setUp() {
-        initializer = new MultiBackgroundInitializer();
-    }
-
-    /**
      * A mostly complete implementation of {@code BackgroundInitializer} used for
      * defining background tasks for {@code MultiBackgroundInitializer}.
-     *
-     * Subclasses will contain the initializer, either as an method implementation
-     * or by using a supplier.
      */
     protected static class AbstractChildBackgroundInitializer extends BackgroundInitializer<CloseableCounter> {
-
-        /**
-         * Stores the current executor service.
-         */
         volatile ExecutorService currentExecutor;
-
-        /**
-         * An object containing the state we are testing
-         */
-        CloseableCounter counter = new CloseableCounter();
-
-        /**
-         * A counter for the invocations of initialize().
-         */
+        final CloseableCounter counter = new CloseableCounter();
         volatile int initializeCalls;
-
-        /**
-         * An exception to be thrown by initialize().
-         */
         Exception ex;
-
-        /**
-         * A latch tests can use to control when initialize completes.
-         */
         final CountDownLatch latch = new CountDownLatch(1);
-
         boolean waitForLatch;
 
         public void enableLatch() {
@@ -137,9 +142,6 @@ public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
             return counter;
         }
 
-        /**
-         * Records this invocation. Optionally throws an exception.
-         */
         protected CloseableCounter initializeInternal() throws Exception {
             initializeCalls++;
             currentExecutor = getActiveExecutor();
@@ -158,26 +160,14 @@ public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
     }
 
     protected static class CloseableCounter {
-
-        // A convenience for testing that a CloseableCounter typed as Object has a specific initializeCalls value
         public static CloseableCounter wrapInteger(final int i) {
             return new CloseableCounter().setInitializeCalls(i);
         }
-
-        /**
-         * The number of invocations of initialize().
-         */
         volatile int initializeCalls;
-
-        /**
-         * Has the close consumer successfully reached this object.
-         */
         volatile boolean closed;
-
         public void close() {
             closed = true;
         }
-
         @Override
         public boolean equals(final Object other) {
             if (other instanceof CloseableCounter) {
@@ -185,25 +175,20 @@ public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
             }
             return false;
         }
-
         public int getInitializeCalls() {
             return initializeCalls;
         }
-
         @Override
         public int hashCode() {
             return initializeCalls;
         }
-
         public CloseableCounter increment() {
             initializeCalls++;
             return this;
         }
-
         public boolean isClosed() {
             return closed;
         }
-
         public CloseableCounter setInitializeCalls(final int i) {
             initializeCalls = i;
             return this;
@@ -211,24 +196,9 @@ public class MultiBackgroundInitializerTestTest17 extends AbstractLangTest {
     }
 
     protected static class MethodChildBackgroundInitializer extends AbstractChildBackgroundInitializer {
-
         @Override
         protected CloseableCounter initialize() throws Exception {
             return initializeInternal();
         }
-    }
-
-    /**
-     * Tests that the set with the names of the initializers cannot be modified.
-     *
-     * @throws org.apache.commons.lang3.concurrent.ConcurrentException so we don't have to catch it
-     */
-    @Test
-    void testResultInitializerNamesModify() throws ConcurrentException {
-        checkInitialize();
-        final MultiBackgroundInitializer.MultiBackgroundInitializerResults res = initializer.get();
-        final Iterator<String> it = res.initializerNames().iterator();
-        it.next();
-        assertThrows(UnsupportedOperationException.class, it::remove);
     }
 }
