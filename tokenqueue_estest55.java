@@ -1,17 +1,30 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest55 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for the static CSS identifier escaping method in {@link TokenQueue}.
+ */
+public class TokenQueueCssIdentifierTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        String string0 = TokenQueue.escapeCssIdentifier("-6Ih");
-        assertEquals("-\\36 Ih", string0);
+    @Test
+    public void shouldEscapeDigitWhenItFollowsLeadingHyphen() {
+        // According to CSS syntax, an identifier cannot start with a hyphen immediately followed by a digit.
+        // For example, "-6" would be parsed as a negative number, not an identifier.
+        // To represent this sequence literally, the digit must be escaped.
+        // The character '6' is Unicode U+0036. The CSS escape is "\36 ", including a trailing space
+        // to delimit the hex escape sequence from subsequent characters.
+        // See: https://www.w3.org/TR/css-syntax-3/#ident-token-diagram
+
+        // Arrange
+        String identifier = "-6Ih";
+        String expectedEscapedIdentifier = "-\\36 Ih";
+
+        // Act
+        String actualEscapedIdentifier = TokenQueue.escapeCssIdentifier(identifier);
+
+        // Assert
+        assertEquals(expectedEscapedIdentifier, actualEscapedIdentifier);
     }
 }
