@@ -1,52 +1,38 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * Tests for {@link Symmetry010Chronology}.
+ * This class focuses on validating exception-throwing behavior for invalid date creation.
+ */
+// Note: The original class name and inheritance are preserved as requested.
 public class Symmetry010Chronology_ESTestTest31 extends Symmetry010Chronology_ESTest_scaffolding {
 
+    /**
+     * Tests that calling date() with a month value outside the valid range (1-12)
+     * throws a DateTimeException.
+     */
     @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        // Undeclared exception!
+    public void date_shouldThrowDateTimeException_whenMonthIsInvalid() {
+        // Arrange: Set up the test conditions and inputs.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        int invalidMonth = 13;
+        // Use arbitrary but valid values for year and day to isolate the invalid month.
+        int year = 2023;
+        int dayOfMonth = 1;
+        String expectedErrorMessage = "Invalid value for MonthOfYear (valid values 1 - 12): " + invalidMonth;
+
+        // Act & Assert: Execute the method and verify the outcome.
         try {
-            symmetry010Chronology0.date(13, 13, 13);
-            fail("Expecting exception: DateTimeException");
+            chronology.date(year, invalidMonth, dayOfMonth);
+            fail("Expected a DateTimeException to be thrown for an invalid month, but it was not.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for MonthOfYear (valid values 1 - 12): 13
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
