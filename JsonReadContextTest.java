@@ -1,96 +1,73 @@
 package com.fasterxml.jackson.core.json;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for class {@link JsonReadContext}.
  */
-class JsonReadContextTest extends JUnit5TestBase {
-
-    /**
-     * Helper class to verify that JsonReadContext can be extended.
-     */
-    private static class TestJsonReadContext extends JsonReadContext {
-        public TestJsonReadContext(JsonReadContext parent, int nestingDepth, DupDetector dups,
-                                   int type, int lineNr, int colNr) {
+class JsonReadContextTest extends JUnit5TestBase
+{
+    static class MyContext extends JsonReadContext {
+        public MyContext(JsonReadContext parent, int nestingDepth, DupDetector dups,
+                         int type, int lineNr, int colNr) {
             super(parent, nestingDepth, dups, type, lineNr, colNr);
         }
     }
 
     @Test
-    void setCurrentName_withDuplicateName_shouldThrowJsonParseException() throws Exception {
-        // Arrange
-        final String DUPLICATE_FIELD_NAME = "dupField";
-        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
-        // Use TYPE_OBJECT as this is a realistic context for duplicate fields
-        JsonReadContext context = new JsonReadContext(null, 0, dupDetector,
-                JsonStreamContext.TYPE_OBJECT, 1, 10);
-        context.setCurrentName(DUPLICATE_FIELD_NAME);
-
-        // Act & Assert
-        JsonParseException e = assertThrows(JsonParseException.class, () -> {
-            context.setCurrentName(DUPLICATE_FIELD_NAME);
-        });
-
-        // Verify the exception message is as expected
-        verifyException(e, "Duplicate field '" + DUPLICATE_FIELD_NAME + "'");
+    void setCurrentNameTwiceWithSameNameRaisesJsonParseException() throws Exception
+    {
+      DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+      JsonReadContext jsonReadContext = new JsonReadContext((JsonReadContext) null, 0,
+              dupDetector, 2441, 2441, 2441);
+      jsonReadContext.setCurrentName("dupField");
+      try {
+          jsonReadContext.setCurrentName("dupField");
+          fail("Should not pass");
+      } catch (JsonParseException e) {
+          verifyException(e, "Duplicate field 'dupField'");
+      }
     }
 
     @Test
-    void setCurrentName_shouldSetAndClearName() throws Exception {
-        // Arrange
-        JsonReadContext context = JsonReadContext.createRootContext(null);
-
-        // Act & Assert for setting a name
-        context.setCurrentName("abc");
-        assertEquals("abc", context.getCurrentName());
-
-        // Act & Assert for clearing the name
-        context.setCurrentName(null);
-        assertNull(context.getCurrentName());
+    void setCurrentName() throws Exception
+    {
+      JsonReadContext jsonReadContext = JsonReadContext.createRootContext(0, 0, (DupDetector) null);
+      jsonReadContext.setCurrentName("abc");
+      assertEquals("abc", jsonReadContext.getCurrentName());
+      jsonReadContext.setCurrentName(null);
+      assertNull(jsonReadContext.getCurrentName());
     }
 
     @Test
-    void reset_shouldUpdateTypeAndLocationState() {
-        // Arrange
-        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
-        JsonReadContext context = JsonReadContext.createRootContext(dupDetector);
-        final ContentReference contentRef = ContentReference.unknown();
+    void reset()
+    {
+      DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+      JsonReadContext jsonReadContext = JsonReadContext.createRootContext(dupDetector);
+      final ContentReference bogusSrc = ContentReference.unknown();
 
-        // Assert initial state
-        assertAll("Initial Root Context State",
-                () -> assertTrue(context.inRoot()),
-                () -> assertEquals("root", context.typeDesc()),
-                () -> assertEquals(1, context.startLocation(contentRef).getLineNr()),
-                () -> assertEquals(0, context.startLocation(contentRef).getColumnNr())
-        );
+      assertTrue(jsonReadContext.inRoot());
+      assertEquals("root", jsonReadContext.typeDesc());
+      assertEquals(1, jsonReadContext.startLocation(bogusSrc).getLineNr());
+      assertEquals(0, jsonReadContext.startLocation(bogusSrc).getColumnNr());
 
-        // Act
-        final int NEW_TYPE = 200; // An arbitrary, non-standard type
-        final int NEW_LINE_NR = 500;
-        final int NEW_COL_NR = 200;
-        context.reset(NEW_TYPE, NEW_LINE_NR, NEW_COL_NR);
+      jsonReadContext.reset(200, 500, 200);
 
-        // Assert state after reset
-        assertAll("Context State After Reset",
-                () -> assertFalse(context.inRoot(), "Context should no longer be in root state"),
-                () -> assertEquals("?", context.typeDesc(), "Type description for unknown types should be '?'"),
-                () -> assertEquals(NEW_LINE_NR, context.startLocation(contentRef).getLineNr()),
-                () -> assertEquals(NEW_COL_NR, context.startLocation(contentRef).getColumnNr())
-        );
+      assertFalse(jsonReadContext.inRoot());
+      assertEquals("?", jsonReadContext.typeDesc());
+      assertEquals(500, jsonReadContext.startLocation(bogusSrc).getLineNr());
+      assertEquals(200, jsonReadContext.startLocation(bogusSrc).getColumnNr());
     }
 
-    // [core#1421]: Verifies that JsonReadContext can be subclassed.
+    // [core#1421]
     @Test
-    void shouldAllowSubclassing() {
-        // Arrange & Act
-        TestJsonReadContext context = new TestJsonReadContext(null, 0, null, 0, 0, 0);
-
-        // Assert
-        assertNotNull(context, "Subclass instance should be created successfully");
+    void testExtension() {
+        MyContext context = new MyContext(null, 0, null, 0, 0, 0);
+        assertNotNull(context);
     }
 }
