@@ -1,18 +1,26 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.testing.EqualsTester;
-import com.google.gson.common.MoreAsserts;
-import java.math.BigInteger;
+
 import org.junit.Test;
 
-public class JsonArrayTestTest16 {
+/**
+ * Tests for {@link JsonArray} to ensure correct handling of null elements.
+ */
+public class JsonArrayTest {
 
     @Test
-    public void testNullJsonElementAddition() {
+    public void add_whenNullJsonElementIsAdded_itIsConvertedToJsonNull() {
+        // Arrange
         JsonArray jsonArray = new JsonArray();
+
+        // Act
+        // The explicit cast to JsonElement is necessary to resolve the ambiguous
+        // `add(JsonElement)` and `add(String)` overloads when passing `null`.
         jsonArray.add((JsonElement) null);
+
+        // Assert
+        assertThat(jsonArray.size()).isEqualTo(1);
         assertThat(jsonArray.get(0)).isEqualTo(JsonNull.INSTANCE);
     }
 }
