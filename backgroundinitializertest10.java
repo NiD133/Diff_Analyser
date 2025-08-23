@@ -1,95 +1,64 @@
 package org.apache.commons.lang3.concurrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.lang3.AbstractLangTest;
 import org.apache.commons.lang3.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
-public class BackgroundInitializerTestTest10 extends AbstractLangTest {
+/**
+ * Tests for {@link BackgroundInitializer}.
+ *
+ * <p>This class verifies the core functionality of the BackgroundInitializer,
+ * ensuring that the initialization process is started correctly and that the
+ * result can be retrieved as expected.</p>
+ */
+public class BackgroundInitializerTest {
 
     /**
-     * Helper method for checking whether the initialize() method was correctly
-     * called. start() must already have been invoked.
+     * A controllable implementation of BackgroundInitializer for testing purposes.
      *
-     * @param init the initializer to test
+     * <p>This class allows tests to simulate various initialization scenarios,
+     * such as delays or exceptions, by providing hooks like latches and flags.</p>
      */
-    private void checkInitialize(final AbstractBackgroundInitializerTestImpl init) throws ConcurrentException {
-        final Integer result = init.get().getInitializeCalls();
-        assertEquals(1, result.intValue(), "Wrong result");
-        assertEquals(1, init.getCloseableCounter().getInitializeCalls(), "Wrong number of invocations");
-        assertNotNull(init.getFuture(), "No future");
-    }
+    protected static class ControllableBackgroundInitializer extends BackgroundInitializer<CloseableCounter> {
 
-    protected AbstractBackgroundInitializerTestImpl getBackgroundInitializerTestImpl() {
-        return new MethodBackgroundInitializerTestImpl();
-    }
-
-    protected AbstractBackgroundInitializerTestImpl getBackgroundInitializerTestImpl(final ExecutorService exec) {
-        return new MethodBackgroundInitializerTestImpl(exec);
-    }
-
-    /**
-     * A concrete implementation of BackgroundInitializer. It also overloads
-     * some methods that simplify testing.
-     */
-    protected static class AbstractBackgroundInitializerTestImpl extends BackgroundInitializer<CloseableCounter> {
-
-        /**
-         * An exception to be thrown by initialize().
-         */
+        /** An exception to be thrown by initialize() for testing error handling. */
         Exception ex;
 
-        /**
-         * A flag whether the background task should sleep a while.
-         */
+        /** A flag to make the background task sleep, simulating a long-running task. */
         boolean shouldSleep;
 
-        /**
-         * A latch tests can use to control when initialize completes.
-         */
-        final CountDownLatch latch = new CountDownLatch(1);
+        /** A latch that tests can use to control when the initialize() method completes. */
+        final CountDownLatch completionLatch = new CountDownLatch(1);
 
+        /** A flag to determine if the background task should wait for the latch. */
         boolean waitForLatch;
 
-        /**
-         * An object containing the state we are testing
-         */
-        CloseableCounter counter = new CloseableCounter();
+        /** The object that holds the state we are testing, created during initialization. */
+        private final CloseableCounter counter = new CloseableCounter();
 
-        AbstractBackgroundInitializerTestImpl() {
+        ControllableBackgroundInitializer() {
         }
 
-        AbstractBackgroundInitializerTestImpl(final ExecutorService exec) {
+        ControllableBackgroundInitializer(final ExecutorService exec) {
             super(exec);
         }
 
-        public void enableLatch() {
-            waitForLatch = true;
-        }
-
-        public CloseableCounter getCloseableCounter() {
-            return counter;
-        }
-
         /**
-         * Records this invocation. Optionally throws an exception or sleeps a
-         * while.
+         * The actual initialization logic.
          *
-         * @throws Exception in case of an error
+         * <p>This method increments the counter and can be configured to throw an
+         * exception or wait for a latch to simulate different conditions.</p>
+         *
+         * @return the counter after incrementing its call count.
+         * @throws Exception if a test exception is configured.
          */
         protected CloseableCounter initializeInternal() throws Exception {
             if (ex != null) {
@@ -99,39 +68,44 @@ public class BackgroundInitializerTestTest10 extends AbstractLangTest {
                 ThreadUtils.sleep(Duration.ofMinutes(1));
             }
             if (waitForLatch) {
-                latch.await();
+                completionLatch.await();
             }
             return counter.increment();
         }
 
+        public CloseableCounter getCloseableCounter() {
+            return counter;
+        }
+
+        public void enableLatch() {
+            waitForLatch = true;
+        }
+
         public void releaseLatch() {
-            latch.countDown();
+            completionLatch.countDown();
         }
     }
 
+    /**
+     * A simple counter that can be "closed", used as the result of the background initialization.
+     * It tracks the number of times it has been initialized and its closed state.
+     */
     protected static class CloseableCounter {
 
-        /**
-         * The number of invocations of initialize().
-         */
-        AtomicInteger initializeCalls = new AtomicInteger();
+        private final AtomicInteger initializeCalls = new AtomicInteger();
+        private final AtomicBoolean closed = new AtomicBoolean();
 
-        /**
-         * Has the close consumer successfully reached this object.
-         */
-        AtomicBoolean closed = new AtomicBoolean();
-
-        public void close() {
-            closed.set(true);
+        public CloseableCounter increment() {
+            initializeCalls.incrementAndGet();
+            return this;
         }
 
         public int getInitializeCalls() {
             return initializeCalls.get();
         }
 
-        public CloseableCounter increment() {
-            initializeCalls.incrementAndGet();
-            return this;
+        public void close() {
+            closed.set(true);
         }
 
         public boolean isClosed() {
@@ -139,12 +113,16 @@ public class BackgroundInitializerTestTest10 extends AbstractLangTest {
         }
     }
 
-    protected static class MethodBackgroundInitializerTestImpl extends AbstractBackgroundInitializerTestImpl {
+    /**
+     * The concrete test implementation of BackgroundInitializer that overrides the
+     * initialize() method to call our controllable logic.
+     */
+    protected static class TestBackgroundInitializer extends ControllableBackgroundInitializer {
 
-        MethodBackgroundInitializerTestImpl() {
+        TestBackgroundInitializer() {
         }
 
-        MethodBackgroundInitializerTestImpl(final ExecutorService exec) {
+        TestBackgroundInitializer(final ExecutorService exec) {
             super(exec);
         }
 
@@ -155,12 +133,44 @@ public class BackgroundInitializerTestTest10 extends AbstractLangTest {
     }
 
     /**
-     * Tests whether initialize() is invoked.
+     * Factory method to create a test initializer.
+     * @return a new {@link TestBackgroundInitializer}.
+     */
+    protected TestBackgroundInitializer createTestInitializer() {
+        return new TestBackgroundInitializer();
+    }
+
+    /**
+     * Factory method to create a test initializer with a specific executor.
+     * @param exec The executor service to use.
+     * @return a new {@link TestBackgroundInitializer}.
+     */
+    protected TestBackgroundInitializer createTestInitializer(final ExecutorService exec) {
+        return new TestBackgroundInitializer(exec);
+    }
+
+    /**
+     * Tests that calling start() on a BackgroundInitializer executes the
+     * initialize() method exactly once.
      */
     @Test
-    void testInitialize() throws ConcurrentException {
-        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
-        init.start();
-        checkInitialize(init);
+    void whenStartIsCalled_initializeIsExecutedOnce() throws ConcurrentException {
+        // Arrange: Create a new initializer.
+        final ControllableBackgroundInitializer initializer = createTestInitializer();
+
+        // Act: Start the background initialization and call get() to wait for it to complete.
+        initializer.start();
+        final CloseableCounter result = initializer.get();
+
+        // Assert: Verify that the initialization was successful and happened only once.
+        assertNotNull(initializer.getFuture(), "A Future object should be created after start().");
+        assertNotNull(result, "The result of initialization should not be null.");
+
+        assertEquals(1, result.getInitializeCalls(),
+            "The initialize() method should have been called exactly once.");
+        assertEquals(1, initializer.getCloseableCounter().getInitializeCalls(),
+            "The internal counter should also reflect one initialization call.");
+        assertSame(initializer.getCloseableCounter(), result,
+            "The object returned by get() should be the same instance created during initialization.");
     }
 }
