@@ -1,22 +1,48 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Separators_ESTestTest32 extends Separators_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Separators separators0 = Separators.createDefaultInstance();
-        Separators separators1 = separators0.withObjectFieldValueSeparator('|');
-        assertEquals('|', separators1.getObjectFieldValueSeparator());
-        assertEquals(',', separators0.getArrayValueSeparator());
-        assertEquals(Separators.Spacing.NONE, separators1.getObjectEntrySpacing());
-        assertEquals(Separators.Spacing.NONE, separators1.getArrayValueSpacing());
-        assertEquals(Separators.Spacing.BOTH, separators1.getObjectFieldValueSpacing());
-        assertEquals(',', separators0.getObjectEntrySeparator());
+/**
+ * Unit tests for the {@link Separators} class, focusing on its immutability
+ * and "wither" methods.
+ */
+public class SeparatorsTest {
+
+    /**
+     * Tests that the {@code withObjectFieldValueSeparator} method correctly creates a new
+     * instance with the updated separator, while leaving the original instance unchanged.
+     */
+    @Test
+    public void shouldCreateNewInstanceWithUpdatedObjectFieldValueSeparator() {
+        // Arrange: Create a default Separators instance.
+        Separators defaultSeparators = Separators.createDefaultInstance();
+        char newSeparator = '|';
+
+        // Act: Call the "wither" method to get a new, modified instance.
+        Separators modifiedSeparators = defaultSeparators.withObjectFieldValueSeparator(newSeparator);
+
+        // Assert:
+
+        // 1. The new instance is a different object.
+        assertNotSame("A new instance should be created", defaultSeparators, modifiedSeparators);
+
+        // 2. The new instance has the updated property value.
+        assertEquals("The object field value separator should be updated",
+                newSeparator, modifiedSeparators.getObjectFieldValueSeparator());
+
+        // 3. Other properties on the new instance remain unchanged from the original.
+        assertEquals("Object entry separator should be preserved",
+                defaultSeparators.getObjectEntrySeparator(), modifiedSeparators.getObjectEntrySeparator());
+        assertEquals("Array value separator should be preserved",
+                defaultSeparators.getArrayValueSeparator(), modifiedSeparators.getArrayValueSeparator());
+        assertEquals("Object field value spacing should be preserved",
+                defaultSeparators.getObjectFieldValueSpacing(), modifiedSeparators.getObjectFieldValueSpacing());
+
+        // 4. The original instance remains immutable.
+        assertEquals("Original instance's separator should not change",
+                ':', defaultSeparators.getObjectFieldValueSeparator());
     }
 }
