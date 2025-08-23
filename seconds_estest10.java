@@ -1,18 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest10 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class, focusing on the toStandardDuration method.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Seconds seconds0 = Seconds.ZERO;
-        Duration duration0 = seconds0.toStandardDuration();
-        assertEquals(0L, duration0.getStandardSeconds());
+    @Test
+    public void toStandardDuration_shouldReturnZeroDuration_whenSecondsIsZero() {
+        // Arrange
+        Seconds zeroSeconds = Seconds.ZERO;
+        Duration expectedDuration = Duration.ZERO;
+
+        // Act
+        Duration actualDuration = zeroSeconds.toStandardDuration();
+
+        // Assert
+        assertEquals(expectedDuration, actualDuration);
     }
 }
