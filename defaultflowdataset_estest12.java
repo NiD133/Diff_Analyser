@@ -1,27 +1,40 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
 import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class DefaultFlowDataset_ESTestTest12 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * A test suite for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
-        defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
-        List<Integer> list0 = defaultFlowDataset0.getDestinations(0);
-        assertTrue(list0.contains(integer0));
-        assertEquals(1, defaultFlowDataset0.getStageCount());
+    /**
+     * Verifies that calling setFlow() for a new stage correctly adds the
+     * destination node to that stage and updates the total stage count.
+     */
+    @Test
+    public void setFlow_forNewStage_updatesDestinationsAndStageCount() {
+        // Arrange
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        Integer sourceNode = 100;
+        Integer destinationNode = 200;
+        int stage = 0;
+        double flowValue = 50.0;
+
+        // Act
+        dataset.setFlow(stage, sourceNode, destinationNode, flowValue);
+
+        // Assert
+        // Verify that the destination node was added correctly
+        List<Integer> destinations = dataset.getDestinations(stage);
+        assertEquals("There should be exactly one destination node for the stage.", 1, destinations.size());
+        assertTrue("The destination node should be present in the list of destinations.",
+                destinations.contains(destinationNode));
+
+        // Verify that the stage count was updated
+        assertEquals("The stage count should be 1 after adding a flow to stage 0.",
+                1, dataset.getStageCount());
     }
 }
