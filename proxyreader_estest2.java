@@ -1,24 +1,36 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.PipedReader;
+
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ProxyReader_ESTestTest2 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ProxyReader} class.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StringReader stringReader0 = new StringReader("");
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
-        closeShieldReader0.afterRead(1139);
+    /**
+     * Tests that the default implementation of the {@code afterRead()} hook method
+     * is a no-op and can be called without throwing an exception.
+     * <p>
+     * The {@code afterRead()} method is a protected "hook" intended for subclasses
+     * to override. This test verifies the behavior of the base implementation.
+     * </p>
+     */
+    @Test
+    public void afterReadDefaultImplementationIsNoOp() throws Exception {
+        // Arrange: Create a concrete instance of ProxyReader to test the hook method.
+        // CloseShieldReader is a simple, concrete subclass suitable for this purpose.
+        final Reader originalReader = new StringReader("test data");
+        final ProxyReader proxyReader = CloseShieldReader.wrap(originalReader);
+        final int arbitraryCharsReadCount = 42;
+
+        // Act: Call the method under test.
+        proxyReader.afterRead(arbitraryCharsReadCount);
+
+        // Assert: The test passes if the method call completes without throwing an
+        // exception, confirming the default implementation is safe to call.
+        // No explicit "assert" is needed for this type of test.
     }
 }
