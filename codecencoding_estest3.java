@@ -1,29 +1,29 @@
 package org.apache.commons.compress.harmony.pack200;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CodecEncoding_ESTestTest3 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CodecEncoding} class.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        int int0 = CodecEncoding.getSpecifierForDefaultCodec((BHSDCodec) null);
-        assertEquals(0, int0);
+    /**
+     * Tests that getSpecifierForDefaultCodec returns 0 when the input codec is null.
+     * The Pack200 specification defines the first canonical codec (at index 0)
+     * as null, which represents the default encoding. This test verifies that
+     * passing null correctly returns this specifier.
+     */
+    @Test
+    public void getSpecifierForDefaultCodec_whenCodecIsNull_shouldReturnZero() {
+        // Arrange
+        final BHSDCodec nullCodec = null;
+        final int expectedSpecifier = 0;
+
+        // Act
+        final int actualSpecifier = CodecEncoding.getSpecifierForDefaultCodec(nullCodec);
+
+        // Assert
+        assertEquals("The specifier for a null default codec should be 0.", expectedSpecifier, actualSpecifier);
     }
 }
