@@ -1,36 +1,32 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.util.List;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This class contains tests for the Elements class. The original test was auto-generated.
+ * This refactored version aims for improved clarity and maintainability.
+ */
 public class Elements_ESTestTest159 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test158() throws Throwable {
-        Document document0 = new Document("Bb,76");
-        Elements elements0 = document0.getAllElements();
-        List<Comment> list0 = elements0.comments();
-        assertEquals(0, list0.size());
+    /**
+     * Verifies that the comments() method returns an empty list when called on a collection
+     * of elements that do not contain any direct child comment nodes.
+     */
+    @Test
+    public void commentsShouldReturnEmptyListWhenNoCommentsExist() {
+        // Arrange: Create a document with a basic structure but no comment nodes.
+        // A new Document() creates a shell with <html>, <head>, and <body> tags.
+        Document document = new Document("https://example.com");
+        Elements allElements = document.getAllElements();
+
+        // Act: Call the method under test to retrieve all direct child comments.
+        List<Comment> comments = allElements.comments();
+
+        // Assert: Verify that the resulting list is empty, as expected.
+        assertTrue("Expected an empty list because no comment nodes were present.", comments.isEmpty());
     }
 }
