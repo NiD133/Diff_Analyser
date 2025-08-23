@@ -1,21 +1,28 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class NodeIterator_ESTestTest2 extends NodeIterator_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("org.jsoup.nodes.NodeIterator", "org.jsoup.nodes.NodeIterator");
-        NodeIterator<Node> nodeIterator0 = NodeIterator.from(document0);
-        boolean boolean0 = nodeIterator0.hasNext();
-        assertTrue(boolean0);
+/**
+ * Tests for the {@link NodeIterator} class.
+ */
+public class NodeIteratorTest {
+
+    /**
+     * Verifies that hasNext() returns true for an iterator created from a non-empty document,
+     * indicating that there is at least one node to traverse (the document itself).
+     */
+    @Test
+    public void hasNextReturnsTrueForNonEmptyDocument() {
+        // 1. Arrange: Create a simple document with some content.
+        Document doc = Parser.parseBodyFragment("<p>Hello</p>", "");
+
+        // 2. Act: Create a NodeIterator starting from the document root.
+        NodeIterator<Node> iterator = NodeIterator.from(doc);
+
+        // 3. Assert: The iterator should report that it has a next element.
+        assertTrue("Iterator should have a next element for a document with content.", iterator.hasNext());
     }
 }
