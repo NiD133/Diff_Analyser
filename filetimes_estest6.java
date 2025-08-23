@@ -1,27 +1,45 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest6 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes} focusing on NTFS time conversions.
+ * This class contains tests related to converting between NTFS time and java.util.Date.
+ */
+public class FileTimesTest { // Renamed from FileTimes_ESTestTest6 for clarity
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BigDecimal bigDecimal0 = new BigDecimal((-9223372036854775808L));
-        Date date0 = FileTimes.ntfsTimeToDate(bigDecimal0);
-        long long0 = FileTimes.toNtfsTime(date0);
-        assertEquals((-9223372036854775808L), long0);
-        assertEquals("Thu Nov 14 21:11:54 GMT 27628", date0.toString());
+    /**
+     * Tests that converting the minimum possible NTFS time (Long.MIN_VALUE) to a Date
+     * and back again results in the original value. This verifies the round-trip
+     * conversion for a critical boundary condition.
+     */
+    @Test
+    public void testNtfsTimeDateConversionRoundTripWithLongMinValue() {
+        // Arrange
+        // An NTFS file time is a 64-bit value. We test the boundary condition Long.MIN_VALUE.
+        final long originalNtfsTime = Long.MIN_VALUE;
+
+        // The expected millisecond epoch value for an NTFS time of Long.MIN_VALUE.
+        // This value is pre-calculated to verify the intermediate conversion step.
+        // Calculation: floor((Long.MIN_VALUE + UNIX_TO_NTFS_OFFSET) / HUNDRED_NANOS_PER_MILLISECOND)
+        final long expectedDateMillis = -933981677285478L;
+
+        // Act
+        // 1. Convert the NTFS time to a Date using the public API.
+        final Date convertedDate = FileTimes.ntfsTimeToDate(originalNtfsTime);
+        // 2. Convert the Date back to an NTFS time.
+        final long roundTripNtfsTime = FileTimes.toNtfsTime(convertedDate);
+
+        // Assert
+        // Verify that the intermediate Date object has the correct millisecond value.
+        assertEquals("The intermediate Date's millisecond value is incorrect.",
+            expectedDateMillis, convertedDate.getTime());
+            
+        // Verify that the value after the round-trip conversion is the same as the original.
+        assertEquals("The round-trip NTFS time conversion failed.",
+            originalNtfsTime, roundTripNtfsTime);
     }
 }
