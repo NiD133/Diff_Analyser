@@ -1,38 +1,31 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest27 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Object object0 = new Object();
-        hashCodeAndEqualsSafeSet0.add(object0);
-        HashCodeAndEqualsMockWrapper[] hashCodeAndEqualsMockWrapperArray0 = new HashCodeAndEqualsMockWrapper[4];
-        // Undeclared exception!
-        try {
-            hashCodeAndEqualsSafeSet0.toArray(hashCodeAndEqualsMockWrapperArray0);
-            fail("Expecting exception: ArrayStoreException");
-        } catch (ArrayStoreException e) {
-            //
-            // java.lang.Object
-            //
-            verifyException("org.mockito.internal.util.collections.HashCodeAndEqualsSafeSet", e);
-        }
+    /**
+     * This test verifies that the toArray(T[] a) method behaves consistently
+     * with the java.util.Collection contract. Specifically, it should throw
+     * an ArrayStoreException if the runtime type of the specified array is not
+     * a supertype of the runtime type of every element in this set.
+     */
+    @Test(expected = ArrayStoreException.class)
+    public void toArray_whenGivenArrayHasIncompatibleType_shouldThrowArrayStoreException() {
+        // Arrange: Create a set and add a plain Object to it.
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+
+        // Arrange: Create an array of a specific, incompatible type.
+        // The set contains an `Object`, which cannot be cast to `HashCodeAndEqualsMockWrapper`.
+        HashCodeAndEqualsMockWrapper[] incompatibleArray = new HashCodeAndEqualsMockWrapper[1];
+
+        // Act & Assert: Attempting to copy the set's contents into the incompatible
+        // array should throw an ArrayStoreException. The assertion is handled by the
+        // @Test(expected=...) annotation.
+        set.toArray(incompatibleArray);
     }
 }
