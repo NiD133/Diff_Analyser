@@ -1,25 +1,41 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SparseBloomFilter_ESTestTest40 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SparseBloomFilter} class.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Shape shape0 = Shape.fromNM(1618, 1618);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(1618, 1618);
-        sparseBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-        long[] longArray0 = sparseBloomFilter0.asBitMapArray();
-        assertEquals(26, longArray0.length);
+    /**
+     * Tests that the asBitMapArray() method returns a long array of the correct size
+     * to represent all the bits defined by the filter's Shape.
+     * The array size must be calculated as ceil(numberOfBits / 64).
+     */
+    @Test
+    public void testAsBitMapArrayReturnsArrayOfCorrectSize() {
+        // Arrange
+        // Use a number of bits that is not a multiple of 64 to ensure the ceiling
+        // calculation for the array size is handled correctly.
+        final int numberOfBits = 1618;
+        final int numberOfHashFunctions = 5; // A typical value for k.
+        final Shape shape = Shape.fromNM(numberOfBits, numberOfHashFunctions);
+        final SparseBloomFilter bloomFilter = new SparseBloomFilter(shape);
+
+        // The filter's content doesn't affect the size of the bitmap array,
+        // but we merge a hasher to simulate a realistic, non-empty filter.
+        final Hasher hasher = new EnhancedDoubleHasher("test data".getBytes());
+        bloomFilter.merge(hasher);
+
+        // Act
+        final long[] bitMap = bloomFilter.asBitMapArray();
+
+        // Assert
+        // The expected length is ceil(1618 / 64.0), which is 26.
+        // This can be calculated using integer arithmetic as (numberOfBits + 63) / 64.
+        final int expectedLength = (numberOfBits + Long.SIZE - 1) / Long.SIZE;
+        assertEquals("The bitmap array should be large enough to hold all the bits.",
+                expectedLength, bitMap.length);
     }
 }
