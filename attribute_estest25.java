@@ -1,38 +1,28 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest25 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class, focusing on edge cases and invalid inputs.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("g", "g");
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
-        try {
-            attribute0.html((Appendable) null, document_OutputSettings0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.internal.QuietAppendable$BaseAppendable", e);
-        }
+    /**
+     * Verifies that the html() method throws a NullPointerException when passed a null Appendable.
+     * The method's contract requires a valid Appendable instance to write the output to.
+     */
+    @Test(expected = NullPointerException.class)
+    public void htmlWithNullAppendableThrowsNullPointerException() {
+        // Arrange: Create a standard attribute and output settings.
+        // The specific key and value of the attribute do not matter for this test.
+        Attribute attribute = new Attribute("id", "test");
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+
+        // Act: Call the html() method with a null Appendable.
+        // The NullPointerException is expected to be thrown here.
+        attribute.html(null, outputSettings);
+
+        // Assert: The test passes if the expected NullPointerException is thrown.
+        // This is handled declaratively by the @Test(expected = ...) annotation.
     }
 }
