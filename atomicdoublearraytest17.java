@@ -1,74 +1,87 @@
 package com.google.common.util.concurrent;
 
 import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
 
+/**
+ * Tests for {@link AtomicDoubleArray}. This class focuses on the {@code getAndAccumulate} method.
+ */
 public class AtomicDoubleArrayTestTest17 extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+    /** A wide range of special double values to ensure comprehensive testing of edge cases. */
+    private static final double[] SPECIAL_DOUBLE_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN,
+        Float.MAX_VALUE
+    };
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Asserts that two double values are bitwise-equal.
+     *
+     * <p>This is necessary because {@code AtomicDoubleArray} uses {@link Double#doubleToRawLongBits}
+     * for comparisons, which has different semantics than {@code ==} or {@link Double#equals(Object)}
+     * (e.g., for NaN and -0.0).
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
-
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
+    private static void assertBitEquals(String message, double expected, double actual) {
+        assertEquals(
+            message, Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
     }
 
     /**
-     * getAndAccumulate with max stores max of given value to current, and returns previous value
+     * Verifies that getAndAccumulate with {@code Double::max} correctly returns the previous value
+     * and atomically updates the element to the maximum of the old and new values.
+     *
+     * <p>This test is exhaustive, checking all combinations of special double values (infinity, NaN,
+     * zero, etc.) at the boundaries of the array.
      */
-    public void testGetAndAccumulateWithMax() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.getAndAccumulate(i, y, Double::max);
-                    double expectedMax = max(x, y);
-                    assertBitEquals(x, z);
-                    assertBitEquals(expectedMax, aa.get(i));
+    public void testGetAndAccumulate_withMax_returnsPreviousValueAndStoresNewMax() {
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(SIZE);
+        // Test at the start and end of the array to check for boundary errors.
+        int[] indicesToTest = {0, SIZE - 1};
+
+        for (int i : indicesToTest) {
+            // Test all combinations of special double values to cover edge cases.
+            for (double initialValue : SPECIAL_DOUBLE_VALUES) {
+                for (double valueToAccumulate : SPECIAL_DOUBLE_VALUES) {
+                    // Arrange: Set the initial state of the array element.
+                    atomicArray.set(i, initialValue);
+                    double expectedFinalValue = max(initialValue, valueToAccumulate);
+
+                    // Act: Call the method under test.
+                    double returnedValue =
+                        atomicArray.getAndAccumulate(i, valueToAccumulate, Double::max);
+
+                    // Assert: Verify the returned value and the new state of the array.
+                    double finalValueInArray = atomicArray.get(i);
+                    String failureDetails =
+                        String.format(
+                            "\n  at index %d with initialValue=%s, valueToAccumulate=%s",
+                            i, initialValue, valueToAccumulate);
+
+                    assertBitEquals(
+                        "getAndAccumulate should return the value before the update." + failureDetails,
+                        initialValue,
+                        returnedValue);
+
+                    assertBitEquals(
+                        "The array element should be updated to the maximum of the two values."
+                            + failureDetails,
+                        expectedFinalValue,
+                        finalValueInArray);
                 }
             }
         }
