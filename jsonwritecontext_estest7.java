@@ -1,30 +1,31 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest7 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its state management.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext((DupDetector) null);
-        assertFalse(jsonWriteContext0.inObject());
-        jsonWriteContext0.reset(2, (Object) null);
-        assertEquals("OBJECT", jsonWriteContext0.getTypeDesc());
+    /**
+     * Verifies that the reset() method correctly changes the context's type.
+     * The test creates a root context, resets it to an object type, and asserts
+     * that the type description is updated as expected.
+     */
+    @Test
+    public void resetShouldChangeContextTypeToObject() {
+        // Arrange: Create a root context, which is the default initial state.
+        JsonWriteContext context = JsonWriteContext.createRootContext(null);
+        assertEquals("Initial context type should be ROOT", "ROOT", context.getTypeDesc());
+
+        // Act: Reset the context to an OBJECT type.
+        // We use the constant for clarity instead of the magic number '2'.
+        context.reset(JsonStreamContext.TYPE_OBJECT, null);
+
+        // Assert: Verify that the context type has been updated to OBJECT.
+        assertEquals("Context type should be OBJECT after reset", "OBJECT", context.getTypeDesc());
+        assertTrue("Context should be considered 'inObject' after reset", context.inObject());
     }
 }
