@@ -1,42 +1,45 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
 import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextRenderInfo_ESTestTest23 extends TextRenderInfo_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString();
-        Matrix matrix0 = graphicsState0.ctm;
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        cMapAwareDocumentFont0.setCompressionLevel(1);
-        DocumentFont documentFont0 = textRenderInfo0.getFont();
-        assertEquals(1, BaseFont.ASCENT);
+import static org.junit.Assert.assertSame;
+
+/**
+ * Unit tests for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that the getFont() method correctly returns the font instance
+     * that was provided via the GraphicsState during the object's construction.
+     */
+    @Test
+    public void getFont_shouldReturnTheFontSetInTheGraphicsState() {
+        // Arrange: Create a GraphicsState with a specific font.
+        GraphicsState graphicsState = new GraphicsState();
+        DocumentFont expectedFont = new CMapAwareDocumentFont(new PdfGState());
+        graphicsState.font = expectedFont;
+
+        // Arrange: Create a TextRenderInfo instance using this GraphicsState.
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                new PdfString("test text"),
+                graphicsState,
+                new Matrix(),
+                Collections.emptyList()
+        );
+
+        // Act: Retrieve the font from the TextRenderInfo instance.
+        DocumentFont actualFont = textRenderInfo.getFont();
+
+        // Assert: The retrieved font should be the exact same instance as the one
+        // originally set in the GraphicsState.
+        assertSame("The font returned by getFont() should be the same instance provided during construction.",
+                expectedFont, actualFont);
     }
 }
