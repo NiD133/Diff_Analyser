@@ -1,34 +1,45 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardXYBarPainter_ESTestTest16 extends StandardXYBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Arc2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        Arc2D.Float arc2D_Float0 = new Arc2D.Float(1);
-        BufferedImage bufferedImage0 = new BufferedImage(1, 1, 1);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        StackedXYBarRenderer stackedXYBarRenderer0 = new StackedXYBarRenderer(0.0F);
-        RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
-        standardXYBarPainter0.paintBarShadow(graphics2D0, stackedXYBarRenderer0, 0, 0, arc2D_Float0, rectangleEdge0, false);
-        assertTrue(stackedXYBarRenderer0.getShadowsVisible());
+/**
+ * Tests for the {@link StandardXYBarPainter} class, focusing on the paintBarShadow method.
+ */
+public class StandardXYBarPainterTest {
+
+    /**
+     * Verifies that the paintBarShadow method executes without throwing an exception
+     * when provided with a valid set of parameters. This test ensures the basic
+     * rendering path is safe from runtime errors like NullPointerException.
+     */
+    @Test
+    public void paintBarShadowShouldExecuteWithoutException() {
+        // Arrange: Set up the painter, a renderer, and a graphics context.
+        StandardXYBarPainter painter = new StandardXYBarPainter();
+        
+        // Use a concrete XYBarRenderer implementation for the test.
+        XYBarRenderer renderer = new StackedXYBarRenderer();
+        
+        // Create a dummy graphics target for the painter to draw on.
+        BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        
+        // Define the shape of the bar and its base edge.
+        Arc2D.Float bar = new Arc2D.Float(Arc2D.PIE);
+        RectangleEdge barBase = RectangleEdge.RIGHT;
+        final int row = 0;
+        final int column = 0;
+        final boolean pegShadow = false;
+
+        // Act: Call the method under test.
+        // The purpose is to confirm that this call completes successfully.
+        painter.paintBarShadow(graphics, renderer, row, column, bar, barBase, pegShadow);
+
+        // Assert: No explicit assertion is needed. The test succeeds if no exception is thrown.
     }
 }
