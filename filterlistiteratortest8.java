@@ -3,224 +3,187 @@ package org.apache.commons.collections4.iterators;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.PredicateUtils;
-import org.apache.commons.collections4.list.GrowthList;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class FilterListIteratorTestTest8 {
+/**
+ * Performs a comprehensive set of walk-through tests on a {@link FilterListIterator}.
+ *
+ * <p>This test class verifies that a {@code FilterListIterator}, especially a nested one,
+ * behaves identically to a standard {@link ListIterator} on a pre-filtered list. It checks
+ * various complex traversal patterns to ensure the iterator's internal state is managed correctly.
+ */
+class FilterListIteratorComprehensiveWalkTest {
 
-    private ArrayList<Integer> list;
+    private static final int LIST_SIZE = 20;
+    private static final int RANDOM_WALK_STEPS = 500;
 
-    private ArrayList<Integer> odds;
+    private List<Integer> fullList;
+    private List<Integer> expectedSixes;
 
-    private ArrayList<Integer> evens;
-
-    private ArrayList<Integer> threes;
-
-    private ArrayList<Integer> fours;
-
-    private ArrayList<Integer> sixes;
-
-    private Predicate<Integer> truePred;
-
-    private Predicate<Integer> falsePred;
-
-    private Predicate<Integer> evenPred;
-
-    private Predicate<Integer> oddPred;
-
-    private Predicate<Integer> threePred;
-
-    private Predicate<Integer> fourPred;
+    private Predicate<Integer> isEven;
+    private Predicate<Integer> isDivisibleByThree;
 
     private final Random random = new Random();
 
-    private void nextNextPrevious(final ListIterator<?> expected, final ListIterator<?> testing) {
-        // calls to next() should change the value returned by previous()
-        // even after previous() has been set by a call to hasPrevious()
-        assertEquals(expected.next(), testing.next());
-        assertEquals(expected.hasPrevious(), testing.hasPrevious());
-        final Object expecteda = expected.next();
-        final Object testinga = testing.next();
-        assertEquals(expecteda, testinga);
-        final Object expectedb = expected.previous();
-        final Object testingb = testing.previous();
-        assertEquals(expecteda, expectedb);
-        assertEquals(testinga, testingb);
-    }
-
-    private void previousPreviousNext(final ListIterator<?> expected, final ListIterator<?> testing) {
-        // calls to previous() should change the value returned by next()
-        // even after next() has been set by a call to hasNext()
-        assertEquals(expected.previous(), testing.previous());
-        assertEquals(expected.hasNext(), testing.hasNext());
-        final Object expecteda = expected.previous();
-        final Object testinga = testing.previous();
-        assertEquals(expecteda, testinga);
-        final Object expectedb = expected.next();
-        final Object testingb = testing.next();
-        assertEquals(expecteda, testingb);
-        assertEquals(expecteda, expectedb);
-        assertEquals(testinga, testingb);
-    }
-
     @BeforeEach
-    public void setUp() {
-        list = new ArrayList<>();
-        odds = new ArrayList<>();
-        evens = new ArrayList<>();
-        threes = new ArrayList<>();
-        fours = new ArrayList<>();
-        sixes = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            list.add(Integer.valueOf(i));
-            if (i % 2 == 0) {
-                evens.add(Integer.valueOf(i));
-            }
-            if (i % 2 != 0) {
-                odds.add(Integer.valueOf(i));
-            }
-            if (i % 3 == 0) {
-                threes.add(Integer.valueOf(i));
-            }
-            if (i % 4 == 0) {
-                fours.add(Integer.valueOf(i));
-            }
+    void setUp() {
+        fullList = new ArrayList<>();
+        expectedSixes = new ArrayList<>();
+
+        for (int i = 0; i < LIST_SIZE; i++) {
+            fullList.add(i);
             if (i % 6 == 0) {
-                sixes.add(Integer.valueOf(i));
+                expectedSixes.add(i);
             }
         }
-        truePred = x -> true;
-        falsePred = x -> true;
-        evenPred = x -> x % 2 == 0;
-        oddPred = x -> x % 2 != 0;
-        threePred = x -> x % 3 == 0;
-        fourPred = x -> x % 4 == 0;
-    }
 
-    @AfterEach
-    public void tearDown() throws Exception {
-        list = null;
-        odds = null;
-        evens = null;
-        threes = null;
-        fours = null;
-        sixes = null;
-        truePred = null;
-        falsePred = null;
-        evenPred = null;
-        oddPred = null;
-        threePred = null;
-        fourPred = null;
-    }
-
-    private void walkBackward(final ListIterator<?> expected, final ListIterator<?> testing) {
-        while (expected.hasPrevious()) {
-            assertEquals(expected.nextIndex(), testing.nextIndex());
-            assertEquals(expected.previousIndex(), testing.previousIndex());
-            assertTrue(testing.hasPrevious());
-            assertEquals(expected.previous(), testing.previous());
-        }
-    }
-
-    private void walkForward(final ListIterator<?> expected, final ListIterator<?> testing) {
-        while (expected.hasNext()) {
-            assertEquals(expected.nextIndex(), testing.nextIndex());
-            assertEquals(expected.previousIndex(), testing.previousIndex());
-            assertTrue(testing.hasNext());
-            assertEquals(expected.next(), testing.next());
-        }
-    }
-
-    private <E> void walkLists(final List<E> list, final ListIterator<E> testing) {
-        final ListIterator<E> expected = list.listIterator();
-        // walk all the way forward
-        walkForward(expected, testing);
-        // walk all the way back
-        walkBackward(expected, testing);
-        // forward,back,forward
-        while (expected.hasNext()) {
-            assertEquals(expected.nextIndex(), testing.nextIndex());
-            assertEquals(expected.previousIndex(), testing.previousIndex());
-            assertTrue(testing.hasNext());
-            assertEquals(expected.next(), testing.next());
-            assertTrue(testing.hasPrevious());
-            assertEquals(expected.previous(), testing.previous());
-            assertTrue(testing.hasNext());
-            assertEquals(expected.next(), testing.next());
-        }
-        // walk all the way back
-        walkBackward(expected, testing);
-        for (int i = 0; i < list.size(); i++) {
-            // walk forward i
-            for (int j = 0; j < i; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                // if this one fails we've got a logic error in the test
-                assertTrue(expected.hasNext());
-                assertTrue(testing.hasNext());
-                assertEquals(expected.next(), testing.next());
-            }
-            // walk back i/2
-            for (int j = 0; j < i / 2; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                // if this one fails we've got a logic error in the test
-                assertTrue(expected.hasPrevious());
-                assertTrue(testing.hasPrevious());
-                assertEquals(expected.previous(), testing.previous());
-            }
-            // walk forward i/2
-            for (int j = 0; j < i / 2; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                // if this one fails we've got a logic error in the test
-                assertTrue(expected.hasNext());
-                assertTrue(testing.hasNext());
-                assertEquals(expected.next(), testing.next());
-            }
-            // walk back i
-            for (int j = 0; j < i; j++) {
-                assertEquals(expected.nextIndex(), testing.nextIndex());
-                assertEquals(expected.previousIndex(), testing.previousIndex());
-                // if this one fails we've got a logic error in the test
-                assertTrue(expected.hasPrevious());
-                assertTrue(testing.hasPrevious());
-                assertEquals(expected.previous(), testing.previous());
-            }
-        }
-        // random walk
-        final StringBuilder walkdescr = new StringBuilder(500);
-        for (int i = 0; i < 500; i++) {
-            if (random.nextBoolean()) {
-                // step forward
-                walkdescr.append("+");
-                if (expected.hasNext()) {
-                    assertEquals(expected.next(), testing.next(), walkdescr.toString());
-                }
-            } else {
-                // step backward
-                walkdescr.append("-");
-                if (expected.hasPrevious()) {
-                    assertEquals(expected.previous(), testing.previous(), walkdescr.toString());
-                }
-            }
-            assertEquals(expected.nextIndex(), testing.nextIndex(), walkdescr.toString());
-            assertEquals(expected.previousIndex(), testing.previousIndex(), walkdescr.toString());
-        }
+        isEven = n -> n % 2 == 0;
+        isDivisibleByThree = n -> n % 3 == 0;
     }
 
     @Test
-    void testNestedSixes2() {
-        final FilterListIterator<Integer> filtered = new FilterListIterator<>(new FilterListIterator<>(list.listIterator(), evenPred), threePred);
-        walkLists(sixes, filtered);
+    void whenIteratingWithNestedFilters_thenBehavesLikeCorrectlyPreFilteredList() {
+        // Arrange: Create a nested filter iterator.
+        // It first filters for even numbers, then for numbers divisible by three.
+        // The result should be numbers divisible by six.
+        final ListIterator<Integer> listIterator = fullList.listIterator();
+        final FilterListIterator<Integer> evenFilter = new FilterListIterator<>(listIterator, isEven);
+        final FilterListIterator<Integer> nestedFilter = new FilterListIterator<>(evenFilter, isDivisibleByThree);
+
+        // Act & Assert: Verify the iterator behaves identically to an iterator over the expected list.
+        assertIteratorBehavesAsExpected(expectedSixes, nestedFilter);
+    }
+
+    /**
+     * Asserts that the actual iterator behaves identically to the expected iterator
+     * through a series of sequential, stateful traversal tests.
+     *
+     * @param expectedElements the list of elements the iterator is expected to produce.
+     * @param actualIterator   the {@link FilterListIterator} under test.
+     */
+    private <E> void assertIteratorBehavesAsExpected(final List<E> expectedElements, final ListIterator<E> actualIterator) {
+        final ListIterator<E> expectedIterator = expectedElements.listIterator();
+
+        assertWalksForwardAndThenBackward(expectedIterator, actualIterator);
+        assertWalksWithAlternatingNextAndPrevious(expectedIterator, actualIterator);
+        assertWalksWithComplexPattern(expectedElements.size(), expectedIterator, actualIterator);
+        assertWalksRandomly(expectedIterator, actualIterator);
+    }
+
+    /**
+     * Asserts that a full forward traversal followed by a full backward traversal
+     * works correctly. Leaves both iterators at the start.
+     */
+    private <E> void assertWalksForwardAndThenBackward(final ListIterator<E> expected, final ListIterator<E> actual) {
+        walkForward(expected, actual);
+        walkBackward(expected, actual);
+    }
+
+    /**
+     * Asserts that alternating between next() and previous() calls maintains the
+     * correct iterator state. Leaves both iterators at the start.
+     */
+    private <E> void assertWalksWithAlternatingNextAndPrevious(final ListIterator<E> expected, final ListIterator<E> actual) {
+        while (expected.hasNext()) {
+            assertNextEquals(expected, actual);
+            assertPreviousEquals(expected, actual);
+            assertNextEquals(expected, actual);
+        }
+        // Return to start for the next test.
+        walkBackward(expected, actual);
+    }
+
+    /**
+     * Asserts correct behavior during a complex, structured walk pattern.
+     * Leaves both iterators at the start.
+     */
+    private <E> void assertWalksWithComplexPattern(final int size, final ListIterator<E> expected, final ListIterator<E> actual) {
+        for (int i = 0; i < size; i++) {
+            // Walk forward i steps
+            for (int j = 0; j < i; j++) {
+                assertNextEquals(expected, actual);
+            }
+            // Walk back i/2 steps
+            for (int j = 0; j < i / 2; j++) {
+                assertPreviousEquals(expected, actual);
+            }
+            // Walk forward i/2 steps
+            for (int j = 0; j < i / 2; j++) {
+                assertNextEquals(expected, actual);
+            }
+            // Walk back i steps to return to the start
+            for (int j = 0; j < i; j++) {
+                assertPreviousEquals(expected, actual);
+            }
+        }
+    }
+
+    /**
+     * Asserts correct behavior during a long, randomized sequence of forward and
+     * backward steps.
+     */
+    private <E> void assertWalksRandomly(final ListIterator<E> expected, final ListIterator<E> actual) {
+        final StringBuilder walkDescription = new StringBuilder(RANDOM_WALK_STEPS * 10);
+
+        for (int i = 0; i < RANDOM_WALK_STEPS; i++) {
+            if (random.nextBoolean()) {
+                walkDescription.append(" next()");
+                if (expected.hasNext()) {
+                    assertNextEquals(expected, actual, "Mismatch after walk: " + walkDescription);
+                } else {
+                    assertFalse(actual.hasNext(), "Actual iterator should not have next. Walk: " + walkDescription);
+                }
+            } else {
+                walkDescription.append(" previous()");
+                if (expected.hasPrevious()) {
+                    assertPreviousEquals(expected, actual, "Mismatch after walk: " + walkDescription);
+                } else {
+                    assertFalse(actual.hasPrevious(), "Actual iterator should not have previous. Walk: " + walkDescription);
+                }
+            }
+        }
+    }
+
+    // Core traversal and assertion helpers
+
+    private <E> void walkForward(final ListIterator<E> expected, final ListIterator<E> actual) {
+        while (expected.hasNext()) {
+            assertNextEquals(expected, actual);
+        }
+    }
+
+    private <E> void walkBackward(final ListIterator<E> expected, final ListIterator<E> actual) {
+        while (expected.hasPrevious()) {
+            assertPreviousEquals(expected, actual);
+        }
+    }
+
+    private <E> void assertNextEquals(final ListIterator<E> expected, final ListIterator<E> actual) {
+        assertNextEquals(expected, actual, "");
+    }
+
+    private <E> void assertNextEquals(final ListIterator<E> expected, final ListIterator<E> actual, final String message) {
+        assertEquals(expected.nextIndex(), actual.nextIndex(), "Mismatched nextIndex. " + message);
+        assertEquals(expected.previousIndex(), actual.previousIndex(), "Mismatched previousIndex. " + message);
+        assertTrue(actual.hasNext(), "Actual iterator has no next. " + message);
+        assertEquals(expected.next(), actual.next(), "Mismatched next() element. " + message);
+    }
+
+    private <E> void assertPreviousEquals(final ListIterator<E> expected, final ListIterator<E> actual) {
+        assertPreviousEquals(expected, actual, "");
+    }
+
+    private <E> void assertPreviousEquals(final ListIterator<E> expected, final ListIterator<E> actual, final String message) {
+        assertEquals(expected.nextIndex(), actual.nextIndex(), "Mismatched nextIndex. " + message);
+        assertEquals(expected.previousIndex(), actual.previousIndex(), "Mismatched previousIndex. " + message);
+        assertTrue(actual.hasPrevious(), "Actual iterator has no previous. " + message);
+        assertEquals(expected.previous(), actual.previous(), "Mismatched previous() element. " + message);
     }
 }
