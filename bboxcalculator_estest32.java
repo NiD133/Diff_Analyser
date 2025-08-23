@@ -1,27 +1,38 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest32 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that expanding the bounding box along the X-axis does not affect the Y-axis coordinates.
+     * The Y coordinates should remain at their initial default values.
+     */
+    @Test
+    public void expandXRange_shouldNotAffectYCoordinates() {
+        // Arrange: Create a BBoxCalculator.
+        // By default, minY is +Infinity and maxY is -Infinity.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator bboxCalculator = new BBoxCalculator(geoContext);
+
+        // Capture the initial Y-axis boundaries for later comparison.
+        double initialMinY = bboxCalculator.getMinY();
+        double initialMaxY = bboxCalculator.getMaxY();
+
+        // Act: Expand the bounding box along the X-axis.
+        // This operation should only modify the X-axis boundaries.
+        bboxCalculator.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+        // Assert: Verify that the Y-coordinates remain unchanged.
+        assertEquals("minY should not be changed by expandXRange",
+                initialMinY, bboxCalculator.getMinY(), 0.0);
+        assertEquals("maxY should not be changed by expandXRange",
+                initialMaxY, bboxCalculator.getMaxY(), 0.0);
     }
 }
