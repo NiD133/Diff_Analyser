@@ -1,31 +1,25 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultPieDataset_ESTestTest25 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        int int0 = defaultPieDataset0.getItemCount();
-        assertEquals(0, int0);
+    /**
+     * Verifies that the item count of a newly instantiated DefaultPieDataset is zero.
+     */
+    @Test
+    public void getItemCount_shouldReturnZero_whenDatasetIsNew() {
+        // Arrange: Create a new, empty pie dataset.
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+        // Act: Get the number of items in the dataset.
+        int itemCount = dataset.getItemCount();
+
+        // Assert: The item count should be 0, as nothing has been added.
+        assertEquals(0, itemCount);
     }
 }
