@@ -1,23 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest15 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        long long0 = FieldUtils.safeSubtract((-9223372036854775808L), (-9223372036854775808L));
-        assertEquals(0L, long0);
+    /**
+     * Tests that subtracting Long.MIN_VALUE from itself using safeSubtract
+     * correctly results in 0 and does not throw an ArithmeticException.
+     * This is an important edge case for safe subtraction logic.
+     */
+    @Test
+    public void safeSubtract_longMinValueMinusItself_returnsZero() {
+        // Arrange
+        final long value = Long.MIN_VALUE;
+        final long expectedResult = 0L;
+
+        // Act
+        long actualResult = FieldUtils.safeSubtract(value, value);
+
+        // Assert
+        assertEquals(expectedResult, actualResult);
     }
 }
