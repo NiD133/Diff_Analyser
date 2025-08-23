@@ -1,54 +1,31 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
-public class DayOfMonth_ESTestTest15 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link DayOfMonth#now(Clock)} method.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Clock clock0 = MockClock.systemUTC();
-        ChronoUnit chronoUnit0 = ChronoUnit.ERAS;
-        Duration duration0 = chronoUnit0.getDuration();
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
-        try {
-            DayOfMonth.now(clock1);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Instant exceeds minimum or maximum instant
-            //
-            verifyException("java.time.Instant", e);
-        }
+    /**
+     * Tests that DayOfMonth.now(clock) throws a DateTimeException if the clock's
+     * instant is outside the valid range supported by java.time.Instant.
+     */
+    @Test(expected = DateTimeException.class)
+    public void nowWithClock_whenInstantIsOutOfRange_throwsDateTimeException() {
+        // Arrange: Create a clock that represents an instant just beyond the maximum
+        // representable Instant. The DayOfMonth.now(clock) method internally calls
+        // clock.instant(), which will throw an exception if the resulting instant is out of bounds.
+        Clock baseClock = Clock.fixed(Instant.MAX, ZoneOffset.UTC);
+        Clock outOfRangeClock = Clock.offset(baseClock, Duration.ofNanos(1));
+
+        // Act: Call now() with the out-of-range clock.
+        // Assert: A DateTimeException is expected, as declared in the @Test annotation.
+        DayOfMonth.now(outOfRangeClock);
     }
 }
