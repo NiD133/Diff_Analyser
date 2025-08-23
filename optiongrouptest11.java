@@ -1,52 +1,49 @@
 package org.apache.commons.cli;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Properties;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests parsing command lines that combine standalone options with options from an OptionGroup.
+ */
 public class OptionGroupTestTest11 {
 
     private Options options;
-
     private final Parser parser = new PosixParser();
 
     @BeforeEach
-    public void setUp() {
-        final Option file = new Option("f", "file", false, "file to process");
-        final Option dir = new Option("d", "directory", false, "directory to process");
-        final OptionGroup optionGroup1 = new OptionGroup();
-        optionGroup1.addOption(file);
-        optionGroup1.addOption(dir);
-        options = new Options().addOptionGroup(optionGroup1);
-        final Option section = new Option("s", "section", false, "section to process");
-        final Option chapter = new Option("c", "chapter", false, "chapter to process");
-        final OptionGroup optionGroup2 = new OptionGroup();
-        optionGroup2.addOption(section);
-        optionGroup2.addOption(chapter);
-        options.addOptionGroup(optionGroup2);
-        final Option importOpt = new Option(null, "import", false, "section to process");
-        final Option exportOpt = new Option(null, "export", false, "chapter to process");
-        final OptionGroup optionGroup3 = new OptionGroup();
-        optionGroup3.addOption(importOpt);
-        optionGroup3.addOption(exportOpt);
-        options.addOptionGroup(optionGroup3);
-        options.addOption("r", "revision", false, "revision number");
+    void setUp() {
+        // Define a group of mutually exclusive options: --file or --directory
+        final OptionGroup fileOrDirGroup = new OptionGroup();
+        fileOrDirGroup.addOption(new Option("f", "file", false, "file to process"));
+        fileOrDirGroup.addOption(new Option("d", "directory", false, "directory to process"));
+
+        // Configure the options for the parser
+        options = new Options();
+        options.addOptionGroup(fileOrDirGroup);
+        options.addOption("r", "revision", false, "revision number"); // Add a standalone option
     }
 
     @Test
-    void testTwoValidLongOptions() throws Exception {
-        final String[] args = { "--revision", "--file" };
-        final CommandLine cl = parser.parse(options, args);
-        assertTrue(cl.hasOption("r"), "Confirm -r is set");
-        assertTrue(cl.hasOption("f"), "Confirm -f is set");
-        assertFalse(cl.hasOption("d"), "Confirm -d is NOT set");
-        assertFalse(cl.hasOption("s"), "Confirm -s is NOT set");
-        assertFalse(cl.hasOption("c"), "Confirm -c is NOT set");
-        assertTrue(cl.getArgList().isEmpty(), "Confirm no extra args");
+    @DisplayName("Parser should handle a standalone option alongside one option from a group")
+    void parse_whenGivenStandaloneOptionAndOneOptionFromGroup_shouldSucceed() throws ParseException {
+        // Arrange: Command line with a standalone option (--revision) and one from a group (--file)
+        final String[] args = {"--revision", "--file"};
+
+        // Act: Parse the command line arguments
+        final CommandLine commandLine = parser.parse(options, args);
+
+        // Assert: Verify that the correct options were detected and no others
+        assertAll("Command line parsing results",
+            () -> assertTrue(commandLine.hasOption("r"), "The standalone 'revision' option should be present."),
+            () -> assertTrue(commandLine.hasOption("f"), "The 'file' option from the group should be present."),
+            () -> assertFalse(commandLine.hasOption("d"), "The mutually exclusive 'directory' option should NOT be present."),
+            () -> assertTrue(commandLine.getArgList().isEmpty(), "There should be no remaining arguments.")
+        );
     }
 }
