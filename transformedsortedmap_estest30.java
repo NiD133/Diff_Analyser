@@ -1,45 +1,50 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
+
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedSortedMap_ESTestTest30 extends TransformedSortedMap_ESTest_scaffolding {
+/**
+ * Tests for {@link TransformedSortedMap}.
+ * This class focuses on a specific test case that was part of a larger generated suite.
+ */
+public class TransformedSortedMap_ESTestTest30 { // Retaining original class name for context
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        String string0 = "i]oNU\\u7I%x";
-        Transformer<Object, Integer> transformer0 = InvokerTransformer.invokerTransformer(string0);
-        Comparator<Integer> comparator0 = (Comparator<Integer>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(comparator0).toString();
-        TreeMap<Integer, Integer> treeMap0 = new TreeMap<Integer, Integer>(comparator0);
-        TransformedSortedMap<Integer, Integer> transformedSortedMap0 = TransformedSortedMap.transformedSortedMap((SortedMap<Integer, Integer>) treeMap0, (Transformer<? super Integer, ? extends Integer>) transformer0, (Transformer<? super Integer, ? extends Integer>) transformer0);
-        Comparator<? super Integer> comparator1 = transformedSortedMap0.comparator();
-        assertNotNull(comparator1);
+    /**
+     * Tests that the comparator() method correctly delegates to the underlying sorted map.
+     */
+    @Test
+    public void testComparatorDelegatesToUnderlyingMapComparator() {
+        // Arrange
+        // 1. Create a mock comparator to be used by the underlying map.
+        @SuppressWarnings("unchecked")
+        final Comparator<Object> mockComparator = mock(Comparator.class);
+
+        // 2. The underlying map is a TreeMap initialized with our mock comparator.
+        final SortedMap<Object, Object> underlyingMap = new TreeMap<>(mockComparator);
+
+        // 3. The transformers are not relevant for this test, so mocks are used as placeholders.
+        @SuppressWarnings("unchecked")
+        final Transformer<Object, Object> mockKeyTransformer = mock(Transformer.class);
+        @SuppressWarnings("unchecked")
+        final Transformer<Object, Object> mockValueTransformer = mock(Transformer.class);
+
+        // 4. Create the TransformedSortedMap to be tested, decorating the underlying map.
+        final SortedMap<Object, Object> transformedMap =
+            TransformedSortedMap.transformedSortedMap(underlyingMap, mockKeyTransformer, mockValueTransformer);
+
+        // Act
+        // Retrieve the comparator from the transformed map.
+        final Comparator<?> retrievedComparator = transformedMap.comparator();
+
+        // Assert
+        // The returned comparator should be the exact same instance as the one from the underlying map.
+        assertSame("The comparator should be the one from the decorated map", mockComparator, retrievedComparator);
     }
 }
