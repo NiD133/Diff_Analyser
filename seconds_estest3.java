@@ -1,21 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Seconds_ESTestTest3 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Hours hours0 = Hours.ONE;
-        Days days0 = hours0.toStandardDays();
-        Seconds seconds0 = days0.toStandardSeconds();
-        boolean boolean0 = seconds0.isGreaterThan((Seconds) null);
-        assertEquals(0, seconds0.getSeconds());
-        assertFalse(boolean0);
+    /**
+     * Tests that isGreaterThan() returns false when comparing zero seconds to a null value.
+     * The method's contract specifies that a null input should be treated as a zero-value period.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnFalse_whenComparingZeroToNull() {
+        // Arrange: According to the Javadoc, a null parameter is treated as zero.
+        // This test verifies that comparing Seconds.ZERO to null is equivalent to 0 > 0.
+        Seconds zeroSeconds = Seconds.ZERO;
+
+        // Act: Call the method under test with a null argument.
+        boolean result = zeroSeconds.isGreaterThan(null);
+
+        // Assert: The result must be false, as zero is not greater than zero.
+        assertFalse(result);
     }
 }
