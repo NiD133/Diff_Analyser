@@ -1,34 +1,34 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.util.Collections;
+import java.util.Iterator;
+
+/**
+ * Tests for illegal constructor arguments in {@link BoundedIterator}.
+ *
+ * Note: This test class retains the original EvoSuite structure to ensure
+ * compatibility with its test execution environment, but the test case
+ * itself has been rewritten for clarity.
+ */
+// The original class name and runner are kept for compatibility.
 public class BoundedIterator_ESTestTest13 extends BoundedIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BoundedIterator<Boolean> boundedIterator0 = null;
-        try {
-            boundedIterator0 = new BoundedIterator<Boolean>((Iterator<? extends Boolean>) null, (-1007L), (-1007L));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Offset parameter must not be negative.
-            //
-            verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
-        }
+    /**
+     * Verifies that the BoundedIterator constructor throws an IllegalArgumentException
+     * when the 'offset' parameter is negative.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldThrowExceptionForNegativeOffset() {
+        // Arrange: Use a valid iterator and a valid 'max' value.
+        final Iterator<Object> emptyIterator = Collections.emptyIterator();
+        final long negativeOffset = -1L;
+        final long validMax = 10L;
+
+        // Act & Assert:
+        // Attempting to create a BoundedIterator with a negative offset
+        // should throw an IllegalArgumentException.
+        new BoundedIterator<>(emptyIterator, negativeOffset, validMax);
     }
 }
