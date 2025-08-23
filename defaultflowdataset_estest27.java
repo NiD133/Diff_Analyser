@@ -1,24 +1,24 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultFlowDataset_ESTestTest27 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        boolean boolean0 = defaultFlowDataset0.equals(defaultFlowDataset0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An instance of DefaultFlowDataset should always be equal to itself.
+     */
+    @Test
+    public void equals_onSameInstance_shouldReturnTrue() {
+        // Arrange
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+
+        // Act & Assert
+        // According to the contract of Object.equals(), an object must be equal to itself.
+        assertEquals(dataset, dataset);
     }
 }
