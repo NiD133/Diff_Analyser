@@ -2,24 +2,37 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JacksonInject_ESTestTest9 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Tests for the {@link JacksonInject.Value} class, focusing on its immutability
+ * and "wither" methods.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.EMPTY;
-        Boolean boolean0 = Boolean.FALSE;
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withUseInput(boolean0);
-        Object object0 = new Object();
-        JacksonInject.Value jacksonInject_Value2 = jacksonInject_Value1.withId(object0);
-        assertTrue(jacksonInject_Value2.hasId());
-        assertFalse(jacksonInject_Value1.equals((Object) jacksonInject_Value0));
-        assertNotSame(jacksonInject_Value1, jacksonInject_Value0);
+    @Test
+    public void witherMethods_shouldReturnNewImmutableInstance_withUpdatedState() {
+        // Arrange
+        final JacksonInject.Value emptyValue = JacksonInject.Value.EMPTY;
+        final Object injectionId = new Object();
+
+        // Act: Chain "wither" methods to create a new configured instance.
+        // First, create a new Value with 'useInput' set to false.
+        JacksonInject.Value valueWithUseInputSet = emptyValue.withUseInput(Boolean.FALSE);
+        // Then, use that new instance to create a final Value with an ID.
+        JacksonInject.Value finalValue = valueWithUseInputSet.withId(injectionId);
+
+        // Assert
+
+        // 1. Verify that withUseInput() creates a new, distinct instance (immutability).
+        assertNotSame("withUseInput() should return a new instance.", emptyValue, valueWithUseInputSet);
+        assertNotEquals("The new instance should not be equal to the original.", emptyValue, valueWithUseInputSet);
+
+        // 2. Verify the final instance has the correct ID set.
+        assertTrue("hasId() should be true after setting an ID.", finalValue.hasId());
+        assertEquals("The ID should match the object that was set.", injectionId, finalValue.getId());
+
+        // 3. Verify the original EMPTY instance remains unchanged.
+        assertNull("The original EMPTY instance should not be mutated.", emptyValue.getId());
+        assertFalse("The original EMPTY instance should not have an ID.", emptyValue.hasId());
     }
 }
