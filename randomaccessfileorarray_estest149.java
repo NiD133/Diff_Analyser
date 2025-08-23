@@ -1,34 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest149 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test148() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        byte byte0 = randomAccessFileOrArray0.readByte();
-        assertEquals(1L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals((byte) 0, byte0);
+    /**
+     * Verifies that readByte() correctly reads the first byte from a source byte array
+     * and advances the internal file pointer accordingly.
+     */
+    @Test
+    public void readByte_whenBackedByArray_readsFirstByteAndAdvancesPointer() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray instance backed by a byte array with known content.
+        byte[] sourceData = {15, 25, 35, 45, 55};
+        RandomAccessFileOrArray randomAccess = new RandomAccessFileOrArray(sourceData);
+
+        byte expectedByte = 15;
+        long expectedPointerPosition = 1L;
+
+        // Act: Read a single byte from the source.
+        byte actualByte = randomAccess.readByte();
+        long actualPointerPosition = randomAccess.getFilePointer();
+
+        // Assert: Verify that the correct byte was returned and the pointer was advanced by one.
+        assertEquals("The method should return the first byte from the source array.", expectedByte, actualByte);
+        assertEquals("The file pointer should advance by one byte after reading.", expectedPointerPosition, actualPointerPosition);
     }
 }
