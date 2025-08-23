@@ -1,42 +1,44 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import com.itextpdf.text.BadPdfFormatException;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import com.itextpdf.text.PdfTemplate;
+import org.junit.Test;
 
-public class PdfImage_ESTestTest20 extends PdfImage_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        PdfPSXObject pdfPSXObject0 = new PdfPSXObject();
-        Image image0 = Image.getInstance((PdfTemplate) pdfPSXObject0);
-        PdfIndirectReference pdfIndirectReference0 = new PdfIndirectReference(2, 3);
-        image0.setInterpolation(true);
-        PdfImage pdfImage0 = null;
+/**
+ * Test suite for the {@link PdfImage} class.
+ */
+public class PdfImageTest {
+
+    /**
+     * Verifies that the PdfImage constructor throws a NullPointerException
+     * when initialized with an Image created from a PdfTemplate.
+     * <p>
+     * An Image created from a template lacks a URL or raw data. The PdfImage
+     * constructor attempts to access one of these, resulting in an expected NPE.
+     */
+    @Test
+    public void constructor_whenImageIsFromTemplate_throwsNullPointerException() {
+        // Arrange: Create an Image from a template, which has no raw data or URL.
+        PdfTemplate template = new PdfPSXObject();
+        Image imageFromTemplate = Image.getInstance(template);
+
+        // A dummy reference is needed for the constructor parameter.
+        PdfIndirectReference dummyMaskReference = new PdfIndirectReference(0, 0);
+
+        // Act & Assert
         try {
-            pdfImage0 = new PdfImage(image0, (String) null, pdfIndirectReference0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.net.MockURL", e);
+            new PdfImage(imageFromTemplate, "anyName", dummyMaskReference);
+            fail("Expected a NullPointerException to be thrown, but no exception occurred.");
+        } catch (NullPointerException expectedException) {
+            // This is the expected outcome.
+            // The exception has no message because it's triggered by dereferencing a null object.
+            assertNull("The NullPointerException should not have a message.", expectedException.getMessage());
+        } catch (BadPdfFormatException e) {
+            fail("A BadPdfFormatException was thrown, but a NullPointerException was expected. Error: " + e.getMessage());
         }
     }
 }
