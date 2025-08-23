@@ -1,85 +1,40 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
 
-public class EthiopicChronologyTestTest18 extends TestCase {
+/**
+ * Tests the leap year properties of the EthiopicChronology.
+ */
+public class EthiopicChronologyLeapYearTest extends TestCase {
 
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * Tests the isLeap() method on different date fields for a date that falls within a leap year.
+     * In the Ethiopic calendar, a year is a leap year if it is divisible by 4, and year 3 is
+     * one such leap year. The 13th month is an intercalary month that contains the leap day.
+     */
+    public void testLeapPropertiesOnDateInLeapYear() {
+        // Arrange: Define a date within a known leap year in the Ethiopic calendar.
+        final int ETHIOPIC_LEAP_YEAR = 3;
+        final int INTERCALARY_MONTH_OF_YEAR = 13; // The 13th month contains the leap day.
+        final int DAY_OF_MONTH = 5;
 
-    private static long SKIP = 1 * MILLIS_PER_DAY;
+        Chronology ethiopicChronology = EthiopicChronology.getInstance();
+        DateTime date = new DateTime(ETHIOPIC_LEAP_YEAR, INTERCALARY_MONTH_OF_YEAR, DAY_OF_MONTH, 0, 0, ethiopicChronology);
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Act & Assert: Verify the leap properties of the date's fields.
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        // The year property should be leap because Ethiopic year 3 is a leap year.
+        assertTrue("Year 3 should be identified as a leap year", date.year().isLeap());
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        // The month property should be leap because the 13th month is where the leap day is added.
+        assertTrue("Month 13 should be identified as a leap month", date.monthOfYear().isLeap());
 
-    private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
+        // The day of month is just a position within the month and is never considered leap itself.
+        assertFalse("The day of the month field should not be leap", date.dayOfMonth().isLeap());
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    public void testLeap_5_13() {
-        Chronology chrono = EthiopicChronology.getInstance();
-        DateTime dt = new DateTime(3, 13, 5, 0, 0, chrono);
-        assertEquals(true, dt.year().isLeap());
-        assertEquals(true, dt.monthOfYear().isLeap());
-        assertEquals(false, dt.dayOfMonth().isLeap());
-        assertEquals(false, dt.dayOfYear().isLeap());
+        // The day of year is just a position within the year and is never considered leap itself.
+        assertFalse("The day of the year field should not be leap", date.dayOfYear().isLeap());
     }
 }
