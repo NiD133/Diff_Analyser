@@ -1,30 +1,32 @@
 package com.google.common.collect;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CompactLinkedHashSet_ESTestTest21 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        CompactLinkedHashSet<Object> compactLinkedHashSet0 = new CompactLinkedHashSet<Object>();
-        // Undeclared exception!
+    /**
+     * Verifies that the init() method throws an IllegalArgumentException
+     * when called with a negative expected size.
+     */
+    @Test
+    public void init_withNegativeExpectedSize_throwsIllegalArgumentException() {
+        // Arrange: Create a new set and define an invalid (negative) expected size.
+        CompactLinkedHashSet<Object> set = new CompactLinkedHashSet<>();
+        int negativeExpectedSize = -1;
+
+        // Act & Assert: Attempt to initialize the set and verify the exception.
         try {
-            compactLinkedHashSet0.init((-1191));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Expected size must be >= 0
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+            set.init(negativeExpectedSize);
+            fail("Expected an IllegalArgumentException to be thrown for negative expected size.");
+        } catch (IllegalArgumentException expectedException) {
+            // The method under test relies on Guava's Preconditions, which provides this message.
+            assertEquals("Expected size must be >= 0", expectedException.getMessage());
         }
     }
 }
