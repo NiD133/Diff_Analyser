@@ -1,37 +1,24 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmlStreamWriter_ESTestTest16 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Tests for the {@link XmlStreamWriter} class, focusing on constructor validation.
+ */
+public class XmlStreamWriterTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        XmlStreamWriter xmlStreamWriter0 = null;
-        try {
-            xmlStreamWriter0 = new XmlStreamWriter((File) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.File", e);
-        }
+    /**
+     * Tests that the constructor {@code XmlStreamWriter(File)} throws a
+     * NullPointerException when the provided file is null. This is the expected
+     * behavior as a null file cannot be used to create an output stream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullFileShouldThrowNullPointerException() throws FileNotFoundException {
+        // This line is expected to throw a NullPointerException because the constructor
+        // attempts to create a FileOutputStream with a null File argument.
+        new XmlStreamWriter((File) null);
     }
 }
