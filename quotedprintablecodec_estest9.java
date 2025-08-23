@@ -1,24 +1,40 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class QuotedPrintableCodec_ESTestTest9 extends QuotedPrintableCodec_ESTest_scaffolding {
+import java.nio.charset.StandardCharsets;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        byte[] byteArray0 = new byte[11];
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(false);
-        byte[] byteArray1 = quotedPrintableCodec0.encode(byteArray0);
-        assertNotSame(byteArray0, byteArray1);
+/**
+ * Contains tests for the byte array encoding functionality of {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecEncodingTest {
+
+    @Test
+    public void encodeShouldCorrectlyEncodeArrayOfNullBytes() {
+        // Arrange
+        // A Quoted-Printable codec in non-strict mode.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec(false);
+        
+        // An array of 11 null bytes. Null bytes are non-printable characters
+        // that must be encoded.
+        final byte[] inputBytes = new byte[11]; // Initialized to all zeros
+        
+        // According to the Quoted-Printable specification (RFC 1521), each null
+        // byte (0x00) must be encoded as "=00".
+        final String expectedEncodedString = "=00=00=00=00=00=00=00=00=00=00=00";
+        final byte[] expectedEncodedBytes = expectedEncodedString.getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        final byte[] actualEncodedBytes = codec.encode(inputBytes);
+
+        // Assert
+        // This assertion verifies the actual content of the encoded array, which is a much
+        // stronger guarantee of correctness than the original test's assertNotSame.
+        assertArrayEquals(
+            "An array of 11 null bytes should be encoded to 11 repetitions of '=00'",
+            expectedEncodedBytes,
+            actualEncodedBytes
+        );
     }
 }
