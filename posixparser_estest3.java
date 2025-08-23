@@ -1,23 +1,37 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PosixParser_ESTestTest3 extends PosixParser_ESTest_scaffolding {
+/**
+ * Tests for the flatten method in {@link PosixParser}.
+ */
+public class PosixParserTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Options options0 = new Options();
-        options0.addRequiredOption("j", "j", true, "j");
-        PosixParser posixParser0 = new PosixParser();
-        String[] stringArray0 = new String[5];
-        stringArray0[1] = "-j";
-        String[] stringArray1 = posixParser0.flatten(options0, stringArray0, true);
-        assertEquals(1, stringArray1.length);
+    /**
+     * Tests that the flatten method correctly processes an argument array containing null elements.
+     * It should filter out the nulls, returning only the non-null tokens.
+     */
+    @Test
+    public void flatten_shouldFilterOutNullsFromArgumentArray() throws ParseException {
+        // Arrange
+        Options options = new Options();
+        // Define a valid option. While not strictly necessary for this flatten() test,
+        // it represents a realistic setup.
+        options.addOption("j", "job", true, "Job name");
+
+        PosixParser parser = new PosixParser();
+
+        // An input array with nulls, which might occur if arguments are built programmatically.
+        String[] argumentsWithNulls = {null, "-j", null, null};
+        boolean stopAtNonOption = true;
+
+        // Act
+        String[] flattenedArguments = parser.flatten(options, argumentsWithNulls, stopAtNonOption);
+
+        // Assert
+        // The flattened array should contain only the non-null token from the input.
+        String[] expectedArguments = {"-j"};
+        assertArrayEquals(expectedArguments, flattenedArguments);
     }
 }
