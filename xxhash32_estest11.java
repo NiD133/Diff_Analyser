@@ -1,19 +1,35 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XXHash32_ESTestTest11 extends XXHash32_ESTest_scaffolding {
+/**
+ * Unit tests for the XXHash32 class.
+ */
+public class XXHash32Test {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        XXHash32 xXHash32_0 = new XXHash32();
-        byte[] byteArray0 = new byte[8];
-        xXHash32_0.update(byteArray0, (int) (byte) 0, (int) (byte) 0);
-        assertEquals(46947589L, xXHash32_0.getValue());
+    /**
+     * Tests that calling the update method with a zero-length segment
+     * does not change the hash state. The final hash should be the
+     * pre-calculated value for an empty input.
+     */
+    @Test
+    public void testUpdateWithZeroLengthIsANoOp() {
+        // Arrange
+        final XXHash32 xxHash = new XXHash32(); // Uses the default seed of 0
+        final byte[] anyData = new byte[8];
+
+        // This is the pre-calculated hash for an empty input with a seed of 0.
+        // It is the result of the finalization steps applied to the initial state.
+        final long expectedHashForEmptyInput = 46947589L;
+
+        // Act
+        // Call update with a length of 0. This should not process any bytes.
+        xxHash.update(anyData, 0, 0);
+        final long actualHash = xxHash.getValue();
+
+        // Assert
+        assertEquals("Updating with zero length should not alter the initial hash value",
+                expectedHashForEmptyInput, actualHash);
     }
 }
