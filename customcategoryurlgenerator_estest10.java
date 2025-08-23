@@ -1,28 +1,23 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest10 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        // Undeclared exception!
-        try {
-            customCategoryURLGenerator0.getURLCount(5570);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling getURLCount() with an invalid index on a newly
+     * created (and thus empty) generator throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getURLCountOnEmptyGeneratorShouldThrowException() {
+        // Arrange: Create a new generator, which contains no URL series lists.
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+
+        // Act & Assert: Attempting to get the URL count for any series index
+        // should fail. We use index 0 as the simplest boundary case.
+        generator.getURLCount(0);
     }
 }
