@@ -1,33 +1,37 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
-public class Tokeniser_ESTestTest9 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Tests for the {@link Tokeniser} class, focusing on illegal state transitions.
+ */
+public class TokeniserTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("</", "</");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        // Undeclared exception!
-        try {
-            tokeniser0.emitTagPending();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.Tokeniser", e);
-        }
+    /**
+     * Verifies that calling {@code emitTagPending()} is illegal when the tokeniser is not
+     * in the process of parsing a tag. This is an important contract of the method,
+     * as it should only be called by the state machine at the appropriate time.
+     */
+    @Test(expected = NullPointerException.class)
+    public void emitTagPendingThrowsExceptionWhenNoTagIsBeingParsed() {
+        // Arrange:
+        // 1. Create an XmlTreeBuilder.
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+
+        // 2. Parse a minimal fragment. The main purpose of this call is to initialize
+        // the internal state of the builder (e.g., its parser and settings), which is
+        // a prerequisite for the Tokeniser's constructor. After this, the builder is idle.
+        builder.parse("</", "");
+
+        // 3. Create a new Tokeniser from the initialized but idle builder.
+        // This tokeniser has a "pending" tag object, but it has not been populated
+        // with a tag name or any other data from an input stream.
+        Tokeniser tokeniser = new Tokeniser(builder);
+
+        // Act & Assert:
+        // Calling emitTagPending() in this invalid state should fail. The current
+        // implementation throws a NullPointerException because the pending tag's internal
+        // state is incomplete (e.g., its name is null).
+        tokeniser.emitTagPending();
     }
 }
