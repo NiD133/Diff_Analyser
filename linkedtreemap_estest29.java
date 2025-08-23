@@ -1,29 +1,35 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+// The original test class name 'LinkedTreeMap_ESTestTest29' and scaffolding are kept
+// to match the provided context.
 public class LinkedTreeMap_ESTestTest29 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Integer integer0 = new Integer((-2139));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        LinkedTreeMap.KeySet linkedTreeMap_KeySet0 = linkedTreeMap0.new KeySet();
-        boolean boolean0 = linkedTreeMap_KeySet0.remove(integer0);
-        assertEquals(0, linkedTreeMap_KeySet0.size());
-        assertTrue(boolean0);
+    /**
+     * Tests that removing an existing key from the KeySet view correctly
+     * removes the entry from the underlying map and returns true.
+     */
+    @Test
+    public void keySetRemove_whenKeyExists_removesElementAndReturnsTrue() {
+        // Arrange: Create a map and add a single element.
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+        Integer key = -2139;
+        map.put(key, key);
+        assertEquals("Precondition failed: Map should contain one element", 1, map.size());
+
+        // Act: Get the key set and remove the element from it.
+        Set<Integer> keySet = map.keySet();
+        boolean wasRemoved = keySet.remove(key);
+
+        // Assert: Verify the removal was successful and the map is now empty.
+        assertTrue("remove() should return true for an existing element.", wasRemoved);
+        assertTrue("The key set should be empty after removal.", keySet.isEmpty());
+        assertEquals("The map's size should be 0 after removing the element via its key set.", 0, map.size());
+        assertFalse("The map should no longer contain the removed key.", map.containsKey(key));
     }
 }
