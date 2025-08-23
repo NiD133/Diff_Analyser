@@ -1,78 +1,54 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.ReadWritableDateTime;
-import org.joda.time.ReadWritableInstant;
-import org.joda.time.ReadableDateTime;
-import org.joda.time.ReadableInstant;
+import org.junit.jupiter.api.Test;
 
-public class ConverterSetTestTest9 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private static final Converter c1 = new Converter() {
+/**
+ * Test class for the remove-by-index functionality of {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-        public Class getSupportedType() {
+    // Descriptive names for test data make the test's purpose clearer.
+    private static final Converter BOOLEAN_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Boolean.class;
         }
     };
-
-    private static final Converter c2 = new Converter() {
-
-        public Class getSupportedType() {
+    private static final Converter CHARACTER_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Character.class;
         }
     };
-
-    private static final Converter c3 = new Converter() {
-
-        public Class getSupportedType() {
+    private static final Converter BYTE_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Byte.class;
         }
     };
-
-    private static final Converter c4 = new Converter() {
-
-        public Class getSupportedType() {
+    private static final Converter SHORT_CONVERTER = new Converter() {
+        public Class<?> getSupportedType() {
             return Short.class;
         }
     };
 
-    private static final Converter c4a = new Converter() {
+    @Test
+    public void removeByIndex_withNegativeIndex_throwsExceptionAndLeavesSetUnchanged() {
+        // Arrange: Create a well-defined initial state for the test.
+        Converter[] initialConverters = {
+            BOOLEAN_CONVERTER, CHARACTER_CONVERTER, BYTE_CONVERTER, SHORT_CONVERTER
+        };
+        ConverterSet set = new ConverterSet(initialConverters);
+        int expectedSize = initialConverters.length;
+        assertEquals(expectedSize, set.size(), "Pre-condition: Initial set size should be correct.");
 
-        public Class getSupportedType() {
-            return Short.class;
-        }
-    };
-
-    private static final Converter c5 = new Converter() {
-
-        public Class getSupportedType() {
-            return Integer.class;
-        }
-    };
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestConverterSet.class);
-    }
-
-    public void testRemoveBadIndex2() {
-        Converter[] array = new Converter[] { c1, c2, c3, c4 };
-        ConverterSet set = new ConverterSet(array);
-        try {
+        // Act & Assert: Verify that calling the method with an invalid index throws the correct exception.
+        // Using assertThrows is a modern, clear way to test for exceptions.
+        assertThrows(IndexOutOfBoundsException.class, () -> {
             set.remove(-1, null);
-            fail();
-        } catch (IndexOutOfBoundsException ex) {
-        }
-        assertEquals(4, set.size());
+        });
+
+        // Assert: Verify that the state of the object remains unchanged after the failed operation.
+        assertEquals(expectedSize, set.size(), "The set size should not change after a failed removal attempt.");
     }
 }
