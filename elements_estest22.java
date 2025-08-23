@@ -1,36 +1,32 @@
 package org.jsoup.select;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest22 extends Elements_ESTest_scaffolding {
+/**
+ * Tests for {@link Elements#prevAll()}.
+ */
+public class ElementsPrevAllTest {
 
-    @Test(timeout = 4000)
-    public void test021() throws Throwable {
-        Document document0 = Parser.parse("<m-2,eSTL:N5y7", "<m-2,eSTL:N5y7");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.prevAll();
-        assertEquals(1, elements1.size());
+    @Test
+    public void prevAllOnMultipleElementsCollectsUniquePreviousSiblings() {
+        // Arrange
+        // Jsoup automatically creates a standard document structure: <html><head></head><body>...</body></html>
+        // The list of all elements will be [<html>, <head>, <body>].
+        // Of these, only the <body> element has a previous sibling, which is <head>.
+        Document doc = Jsoup.parse("<body></body>");
+        Elements allElements = doc.getAllElements();
+
+        // Act
+        // The prevAll() method is called on the entire set of elements. It finds all previous
+        // siblings for each element in the set and returns a new Elements object containing them.
+        Elements previousSiblings = allElements.prevAll();
+
+        // Assert
+        // The resulting set should contain only the single unique previous sibling found (<head>).
+        assertEquals(1, previousSiblings.size());
+        assertEquals("head", previousSiblings.first().tagName());
     }
 }
