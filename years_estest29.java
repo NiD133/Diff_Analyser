@@ -1,20 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Years_ESTestTest29 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class, focusing on comparison logic.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Years years0 = Years.THREE;
-        Years years1 = Years.years((-1));
-        boolean boolean0 = years0.isGreaterThan(years1);
-        assertEquals((-1), years1.getYears());
-        assertTrue(boolean0);
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingToSmallerValue() {
+        // Arrange
+        Years threeYears = Years.THREE;
+        Years minusOneYear = Years.years(-1);
+
+        // Act
+        boolean isGreater = threeYears.isGreaterThan(minusOneYear);
+
+        // Assert
+        assertTrue("3 years should be considered greater than -1 years", isGreater);
     }
 }
