@@ -1,23 +1,38 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PosixParser_ESTestTest4 extends PosixParser_ESTest_scaffolding {
+/**
+ * Tests for the PosixParser class, focusing on its token processing capabilities.
+ */
+public class PosixParserTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Options options0 = new Options();
-        Options options1 = options0.addRequiredOption("j", "org.apache.commons.cli.PosixParser", true, "j");
-        PosixParser posixParser0 = new PosixParser();
-        String[] stringArray0 = new String[9];
-        stringArray0[2] = "-org.apache.commons.cli.PosixParser";
-        posixParser0.flatten(options1, stringArray0, false);
-        posixParser0.burstToken(";-", true);
+    /**
+     * Tests that flatten() correctly "bursts" a token composed of multiple
+     * unrecognized short options into individual options. For example, "-abc"
+     * should be expanded to "-a", "-b", "-c".
+     *
+     * This behavior occurs when stopAtNonOption is false and the characters
+     * within the token do not correspond to any defined Options.
+     */
+    @Test
+    public void testFlattenBurstsCombinedTokenOfUnrecognizedOptions() throws ParseException {
+        // Arrange
+        Options options = new Options();
+        // Add an option that is not part of the token to be burst.
+        options.addOption("z", "zoom", false, "Zoom factor");
+
+        PosixParser parser = new PosixParser();
+        String[] arguments = {"-abc"};
+        boolean stopAtNonOption = false;
+
+        // Act
+        String[] flattenedArguments = parser.flatten(options, arguments, stopAtNonOption);
+
+        // Assert
+        String[] expected = {"-a", "-b", "-c"};
+        assertArrayEquals("The combined token '-abc' should be burst into three separate tokens",
+                          expected, flattenedArguments);
     }
 }
