@@ -1,43 +1,62 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest44 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Range range0 = ValueAxis.DEFAULT_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("horizontalAlignment", range0);
-        moduloAxis0.resizeRange(82.21630182402, 0.05);
-        double double0 = moduloAxis0.valueToJava2D(90.57956035375857, (Rectangle2D) null, (RectangleEdge) null);
-        assertEquals(0.6909867502108682, moduloAxis0.getDisplayEnd(), 0.01);
-        assertEquals(0.0, double0, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link ModuloAxis} class, focusing on value-to-coordinate conversions.
+ */
+public class ModuloAxisTest {
+
+    private static final double DELTA = 1e-9;
+
+    /**
+     * Verifies that the valueToJava2D method correctly maps data values to coordinates
+     * when the axis has a "wrapped" display range (e.g., from 315° to 45°).
+     */
+    @Test
+    public void valueToJava2D_shouldMapValuesToCoordinates_forWrappedRange() {
+        // Arrange
+        // Use a fixed range of 0-360, representing degrees in a circle.
+        Range fixedRange = new Range(0, 360);
+        ModuloAxis axis = new ModuloAxis("Angle (°)", fixedRange);
+
+        // Set a display range that wraps around the 360/0 point, from 315° to 45°.
+        // This represents a 90-degree view centered on 0°.
+        axis.setDisplayRange(315, 45);
+
+        // Define a standard plot area for the conversion.
+        Rectangle2D plotArea = new Rectangle2D.Double(0, 0, 200, 100);
+        RectangleEdge axisEdge = RectangleEdge.BOTTOM; // Horizontal axis
+
+        // Act & Assert
+        // The display range is 315-360 (45 units) and 0-45 (45 units).
+        // The first half of the plot area (0 to 100) should map to 315°-360°.
+        // The second half (100 to 200) should map to 0°-45°.
+
+        // Test the start boundary of the display range
+        assertEquals(0.0, axis.valueToJava2D(315.0, plotArea, axisEdge), DELTA);
+
+        // Test the wrap-around point (360° is equivalent to 0°)
+        assertEquals(100.0, axis.valueToJava2D(360.0, plotArea, axisEdge), DELTA);
+        assertEquals(100.0, axis.valueToJava2D(0.0, plotArea, axisEdge), DELTA);
+
+        // Test the end boundary of the display range
+        assertEquals(200.0, axis.valueToJava2D(45.0, plotArea, axisEdge), DELTA);
+
+        // Test a value that needs the modulo calculation to be mapped into the fixed range
+        // 405° is equivalent to 45° (405 % 360 = 45)
+        assertEquals(200.0, axis.valueToJava2D(405.0, plotArea, axisEdge), DELTA);
+
+        // Test a value in the middle of the first section (315-360)
+        assertEquals(50.0, axis.valueToJava2D(337.5, plotArea, axisEdge), DELTA);
+
+        // Test a value in the middle of the second section (0-45)
+        assertEquals(150.0, axis.valueToJava2D(22.5, plotArea, axisEdge), DELTA);
     }
 }
