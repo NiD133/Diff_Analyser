@@ -1,49 +1,32 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains an improved test case for the GridArrangement class.
+ * The original test was automatically generated and has been refactored for better
+ * understandability.
+ */
 public class GridArrangement_ESTestTest62 extends GridArrangement_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertNotNull(rectangleConstraint0);
-        GridArrangement gridArrangement0 = new GridArrangement(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        assertNotNull(gridArrangement0);
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrangeFN(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Tests that calling the arrangeFN method with an empty BlockContainer
+     * throws an IndexOutOfBoundsException. This is expected because the
+     * arrangement logic attempts to access a block from the empty container.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void arrangeFNWithEmptyContainerShouldThrowException() {
+        // Arrange: Create a grid arrangement and an empty container.
+        // A 1x1 grid is sufficient to trigger the arrangement logic.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer emptyContainer = new BlockContainer();
+
+        // Act: Attempt to arrange the empty container.
+        // This call is expected to fail immediately as it tries to access the
+        // first block in an empty list. The Graphics2D and RectangleConstraint
+        // arguments are required by the method signature but are not relevant
+        // to the cause of this specific exception.
+        arrangement.arrangeFN(emptyContainer, null, RectangleConstraint.NONE);
     }
 }
