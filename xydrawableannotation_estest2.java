@@ -1,52 +1,49 @@
 package org.jfree.chart.annotations;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.math.BigInteger;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.Drawable;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockContainer;
-import org.jfree.chart.legend.LegendTitle;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.PolarAxisLocation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.AbstractRenderer;
-import org.jfree.chart.renderer.category.ScatterRenderer;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.title.CompositeTitle;
-import org.jfree.chart.title.DateTitle;
-import org.jfree.chart.title.ShortTextTitle;
-import org.jfree.chart.title.TextTitle;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XYDrawableAnnotation_ESTestTest2 extends XYDrawableAnnotation_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        BlockContainer blockContainer0 = new BlockContainer();
-        XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation((-2674.765041096609), (-2674.765041096609), 2.0, (-2674.765041096609), blockContainer0);
-        XYDrawableAnnotation xYDrawableAnnotation1 = new XYDrawableAnnotation((-2674.765041096609), (-2674.765041096609), 2.0, (-2674.765041096609), (-888.093), blockContainer0);
-        boolean boolean0 = xYDrawableAnnotation0.equals(xYDrawableAnnotation1);
-        assertEquals((-2674.765041096609), xYDrawableAnnotation1.getY(), 0.01);
-        assertEquals(2.0, xYDrawableAnnotation1.getDisplayWidth(), 0.01);
-        assertEquals((-2674.765041096609), xYDrawableAnnotation1.getX(), 0.01);
-        assertFalse(boolean0);
-        assertEquals((-888.093), xYDrawableAnnotation1.getDrawScaleFactor(), 0.01);
-        assertFalse(xYDrawableAnnotation1.equals((Object) xYDrawableAnnotation0));
-        assertEquals((-2674.765041096609), xYDrawableAnnotation1.getDisplayHeight(), 0.01);
+/**
+ * Unit tests for the {@link XYDrawableAnnotation} class.
+ */
+public class XYDrawableAnnotationTest {
+
+    /**
+     * Verifies that the equals() method returns false when two annotations
+     * differ only by their drawScaleFactor.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenDrawScaleFactorsDiffer() {
+        // Arrange
+        Drawable commonDrawable = new BlockContainer();
+        double x = -2674.76;
+        double y = -2674.76;
+        double width = 2.0;
+        double height = -2674.76;
+
+        // Create an annotation using the constructor that defaults drawScaleFactor to 1.0.
+        XYDrawableAnnotation annotationWithDefaultScale = new XYDrawableAnnotation(
+                x, y, width, height, commonDrawable);
+
+        // Create a second annotation with an explicit, different drawScaleFactor.
+        double customScaleFactor = -888.093;
+        XYDrawableAnnotation annotationWithCustomScale = new XYDrawableAnnotation(
+                x, y, width, height, customScaleFactor, commonDrawable);
+
+        // Act & Assert
+        // The core assertion: the two objects should not be considered equal.
+        boolean areEqual = annotationWithDefaultScale.equals(annotationWithCustomScale);
+        assertFalse("Annotations with different drawScaleFactors should not be equal.", areEqual);
+
+        // For completeness, check the symmetric property of the equals contract.
+        assertFalse("The equals() method should be symmetric.",
+                annotationWithCustomScale.equals(annotationWithDefaultScale));
+        
+        // A more modern and direct way to assert inequality.
+        assertNotEquals(annotationWithDefaultScale, annotationWithCustomScale);
     }
 }
