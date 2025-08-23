@@ -1,46 +1,41 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextHelpAppendable_ESTestTest9 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for the resize functionality in {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableResizeTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        assertEquals(1, textStyle_Builder0.getLeftPad());
-        textStyle_Builder0.setLeftPad((-276));
-        textHelpAppendable0.resize(textStyle_Builder0, (-3392.733044942331));
-        assertEquals(0, textHelpAppendable0.getIndent());
+    /**
+     * The resize method calculates a new indent by multiplying the original indent
+     * by a given fraction. This test verifies that if this calculation results
+     * in a negative number, the indent is clamped to zero.
+     */
+    @Test
+    public void resizeWithNegativeFractionShouldClampIndentToZero() {
+        // Arrange
+        // Use a StringWriter for test isolation instead of System.out
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(new StringWriter());
+        TextStyle.Builder styleBuilder = helpAppendable.getTextStyleBuilder();
+        
+        // The default indent is 3, which is the value we expect to be resized.
+        final int initialIndent = 3;
+        assertEquals("Initial indent should be the default value.", initialIndent, helpAppendable.getIndent());
+
+        // A negative fraction will cause the resized indent to be negative.
+        final double negativeFraction = -2.0;
+
+        // Act
+        // Resize the style, which should update the indent on the helpAppendable instance.
+        helpAppendable.resize(styleBuilder, negativeFraction);
+
+        // Assert
+        // The new indent should be 0, not a negative value.
+        assertEquals("Indent should be clamped to 0 after resizing with a negative fraction.",
+                     0, helpAppendable.getIndent());
     }
 }
