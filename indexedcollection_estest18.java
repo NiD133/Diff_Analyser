@@ -1,66 +1,42 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
 import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest18 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Transformer<Object, LinkedList<Object>> transformer0 = ExceptionTransformer.exceptionTransformer();
-        IndexedCollection<LinkedList<Object>, Object> indexedCollection0 = IndexedCollection.uniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-        AnyPredicate<Object> anyPredicate0 = new AnyPredicate<Object>((Predicate<? super Object>[]) null);
-        linkedList0.add((Object) indexedCollection0);
-        // Undeclared exception!
-        try {
-            indexedCollection0.removeIf(anyPredicate0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+/**
+ * Contains tests for {@link IndexedCollection}.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that an exception thrown by the filter predicate during a call to removeIf
+     * is propagated correctly.
+     * <p>
+     * This test uses an {@link AnyPredicate} constructed with a null array, which is
+     * known to throw a NullPointerException when its test method is invoked.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void removeIfShouldPropagateNPEFromPredicate() {
+        // Arrange
+        Collection<String> baseCollection = new LinkedList<>();
+        baseCollection.add("some element"); // Add an element to ensure the predicate is called.
+
+        // The transformer is required by the constructor but is irrelevant to this test's logic.
+        final Transformer<String, Integer> keyTransformer = String::length;
+        IndexedCollection<Integer, String> indexedCollection =
+                IndexedCollection.uniqueIndexedCollection(baseCollection, keyTransformer);
+
+        // Create a predicate that will throw a NullPointerException when used.
+        final Predicate<String> faultyPredicate = new AnyPredicate<>((Predicate<? super String>[]) null);
+
+        // Act & Assert
+        // This call should throw a NullPointerException because the predicate's test() method will be called.
+        indexedCollection.removeIf(faultyPredicate);
     }
 }
