@@ -1,26 +1,31 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Minutes_ESTestTest73 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        Minutes minutes0 = Minutes.MIN_VALUE;
-        // Undeclared exception!
+    /**
+     * Tests that attempting to negate the minimum possible value of Minutes
+     * throws an ArithmeticException, as this operation would cause an integer overflow.
+     */
+    @Test
+    public void negatingMinValueThrowsArithmeticException() {
+        // Arrange: The minimum possible value for Minutes, which corresponds to Integer.MIN_VALUE.
+        Minutes minValue = Minutes.MIN_VALUE;
+
+        // Act & Assert: Verify that negating this value throws the expected exception.
         try {
-            minutes0.negated();
-            fail("Expecting exception: ArithmeticException");
+            minValue.negated();
+            fail("Expected an ArithmeticException to be thrown, but no exception occurred.");
         } catch (ArithmeticException e) {
-            //
-            // Integer.MIN_VALUE cannot be negated
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // This is the expected outcome.
+            // We can also assert the exception message for a more specific test.
+            assertEquals("Integer.MIN_VALUE cannot be negated", e.getMessage());
         }
     }
 }
