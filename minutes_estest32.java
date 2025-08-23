@@ -1,26 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Minutes_ESTestTest32 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Minutes minutes0 = Minutes.MIN_VALUE;
-        // Undeclared exception!
-        try {
-            minutes0.toStandardSeconds();
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: -2147483648 * 60
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that calling toStandardSeconds() on a Minutes instance with the
+     * minimum possible value (Integer.MIN_VALUE) throws an ArithmeticException.
+     * This is expected because the internal calculation to convert minutes to
+     * seconds (Integer.MIN_VALUE * 60) results in an integer overflow.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void toStandardSeconds_withMinValue_throwsArithmeticExceptionForOverflow() {
+        // Arrange
+        Minutes minutesWithMinValue = Minutes.MIN_VALUE;
+
+        // Act: This call is expected to throw an exception.
+        minutesWithMinValue.toStandardSeconds();
+
+        // Assert: The exception is verified by the @Test(expected=...) annotation.
     }
 }
