@@ -2,25 +2,47 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonTypeInfo_ESTestTest9 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the {@link JsonTypeInfo.Value} class.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.MINIMAL_CLASS;
-        JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
-        Class<Object> class0 = Object.class;
-        Boolean boolean0 = Boolean.valueOf("@2LLQRbW9{J2*\"1GY");
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "@2LLQRbW9{J2*\"1GY", class0, false, boolean0);
-        boolean boolean1 = jsonTypeInfo_Value0.equals(jsonTypeInfo_Value0);
-        assertEquals("@2LLQRbW9{J2*\"1GY", jsonTypeInfo_Value0.getPropertyName());
-        assertTrue(boolean1);
-        assertFalse(jsonTypeInfo_Value0.getIdVisible());
+    /**
+     * Tests the reflexivity of the JsonTypeInfo.Value.equals() method.
+     * According to the contract of equals(), an object must be equal to itself.
+     */
+    @Test
+    public void equals_shouldReturnTrue_whenComparingAnInstanceToItself() {
+        // Arrange: Create an instance of JsonTypeInfo.Value with clear, representative properties.
+        JsonTypeInfo.Id idType = JsonTypeInfo.Id.MINIMAL_CLASS;
+        JsonTypeInfo.As inclusion = JsonTypeInfo.As.WRAPPER_OBJECT;
+        String propertyName = "customTypeProperty";
+        Class<?> defaultImpl = Object.class;
+        boolean idVisible = false;
+        Boolean requireTypeIdForSubtypes = false;
+
+        JsonTypeInfo.Value value = JsonTypeInfo.Value.construct(
+            idType,
+            inclusion,
+            propertyName,
+            defaultImpl,
+            idVisible,
+            requireTypeIdForSubtypes
+        );
+
+        // Act: Compare the instance with itself.
+        boolean isEqualToItself = value.equals(value);
+
+        // Assert: The result must be true, confirming the reflexive property of equals().
+        assertTrue("An instance should always be equal to itself.", isEqualToItself);
+
+        // Also, verify the state of the constructed object to ensure the test setup is correct.
+        assertEquals("The property name should match the value provided during construction.",
+            propertyName, value.getPropertyName());
+        assertFalse("The idVisible flag should be false as set during construction.",
+            value.getIdVisible());
+        assertEquals("The IdType should match the value provided during construction.",
+            idType, value.getIdType());
     }
 }
