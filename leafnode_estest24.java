@@ -1,29 +1,24 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest24 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the abstract LeafNode class, verifying its attribute-handling contract.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("org.jsoup.nodes.LeafNode");
-        // Undeclared exception!
-        try {
-            cDataNode0.removeAttr((String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    /**
+     * Verifies that calling removeAttr() with a null key throws an IllegalArgumentException.
+     * This is the expected behavior, as attribute keys must not be null.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void removeAttrWithNullKeyShouldThrowIllegalArgumentException() {
+        // Arrange: Create an instance of a LeafNode subclass.
+        // The specific subclass (e.g., CDataNode) and its content are not important for this test.
+        LeafNode node = new CDataNode("some data");
+
+        // Act: Attempt to remove an attribute using a null key.
+        // Assert: The @Test(expected) annotation asserts that an IllegalArgumentException is thrown.
+        node.removeAttr(null);
     }
 }
