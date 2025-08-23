@@ -1,34 +1,38 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
 import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.io.Reader;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest25 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Contains tests for the exception-handling behavior of the {@link ProxyReader}.
+ */
+public class ProxyReaderExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(taggedReader0);
-        char[] charArray0 = new char[0];
-        try {
-            closeShieldReader0.read(charArray0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
-        }
+    /**
+     * Tests that an IOException thrown by the underlying reader's read(char[]) method
+     * is correctly propagated by the ProxyReader.
+     */
+    @Test
+    public void readShouldPropagateIOExceptionFromUnderlyingReader() {
+        // Arrange: Create a proxy reader that wraps a reader designed to fail.
+        // A PipedReader that is not connected to a PipedWriter will throw an
+        // IOException upon any read attempt.
+        final Reader failingReader = new PipedReader();
+        final ProxyReader proxyReader = new CloseShieldReader(failingReader);
+        final char[] buffer = new char[10];
+
+        // Act & Assert: Verify that calling read() on the proxy throws the expected
+        // IOException from the underlying reader.
+        final IOException thrown = assertThrows(IOException.class, () -> {
+            proxyReader.read(buffer);
+        });
+
+        // Verify that the exception message is the one from the underlying reader.
+        assertEquals("Pipe not connected", thrown.getMessage());
     }
 }
