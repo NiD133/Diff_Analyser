@@ -1,41 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test case verifies the behavior of the RandomAccessFileOrArray class
+ * when read operations are attempted after the instance has been closed.
+ */
+// Note: The class name and inheritance are preserved from the original auto-generated test.
 public class RandomAccessFileOrArray_ESTestTest61 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test060() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readUnsignedShortLE();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling readUnsignedShortLE() on a closed RandomAccessFileOrArray
+     * instance throws a NullPointerException. This ensures that the object correctly
+     * prevents operations on a released resource.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void readUnsignedShortLE_afterClose_throwsNullPointerException() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray from a byte array and then close it.
+        byte[] dummyData = new byte[16];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(dummyData);
+        fileOrArray.close();
+
+        // Act: Attempt to read from the closed instance.
+        // This action is expected to throw a NullPointerException.
+        fileOrArray.readUnsignedShortLE();
+
+        // Assert: The test passes if the expected NullPointerException is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
