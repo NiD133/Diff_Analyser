@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest75 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on floating-point number conversions.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        String string0 = NumberOutput.toString((-310.243F));
-        assertEquals("-310.243", string0);
+    /**
+     * Tests that the {@link NumberOutput#toString(float)} method correctly converts a
+     * negative float value into its string representation.
+     */
+    @Test
+    public void shouldConvertNegativeFloatToString() {
+        // Arrange: Define the input value and the expected result.
+        final float inputValue = -310.243F;
+        final String expectedOutput = "-310.243";
+
+        // Act: Call the method under test.
+        final String actualOutput = NumberOutput.toString(inputValue);
+
+        // Assert: Verify the result is as expected.
+        assertEquals(expectedOutput, actualOutput);
     }
 }
