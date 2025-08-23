@@ -1,41 +1,47 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
 import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest19 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
-        MillisDurationField millisDurationField0 = (MillisDurationField) MillisDurationField.INSTANCE;
-        JulianChronology julianChronology0 = JulianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-        long long0 = preciseDateTimeField0.remainder((-1142L));
-        assertEquals(0L, long0);
+/**
+ * Unit tests for the remainder() method in {@link PreciseDurationDateTimeField}.
+ */
+public class PreciseDurationDateTimeFieldRemainderTest {
+
+    /**
+     * Tests that the remainder is always zero when the field's unit duration is one millisecond.
+     * The remainder is calculated as `instant % unitMillis`, which will always be zero if unitMillis is 1.
+     */
+    @Test
+    public void remainder_whenUnitIsOneMillisecond_shouldReturnZero() {
+        // Arrange
+        // The remainder() method's behavior depends solely on the unit duration field.
+        // We create a field with a unit of 1 millisecond to test this specific case.
+        DurationField oneMillisecondUnitField = MillisDurationField.INSTANCE;
+
+        // The range field is required by the PreciseDateTimeField constructor but is not used
+        // by the remainder() method, so we can use a placeholder.
+        DurationField unsupportedRangeField = UnsupportedDurationField.getInstance(DurationFieldType.seconds());
+
+        // PreciseDateTimeField is a concrete implementation of the abstract PreciseDurationDateTimeField.
+        PreciseDateTimeField fieldWithOneMillisUnit = new PreciseDateTimeField(
+                DateTimeFieldType.millisOfSecond(), // A semantically appropriate type
+                oneMillisecondUnitField,
+                unsupportedRangeField
+        );
+
+        long instant = -1142L;
+
+        // Act
+        long actualRemainder = fieldWithOneMillisUnit.remainder(instant);
+
+        // Assert
+        // For a unit of 1 millisecond, any instant will be perfectly divisible,
+        // resulting in a remainder of 0.
+        assertEquals(0L, actualRemainder);
     }
 }
