@@ -1,23 +1,32 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SparseBloomFilter_ESTestTest45 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        Shape shape0 = Shape.fromKM(994, 994);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        boolean boolean0 = sparseBloomFilter0.contains((IndexExtractor) sparseBloomFilter0);
-        assertTrue(boolean0);
+    /**
+     * Tests that an empty filter "contains" another empty filter (in this case, itself).
+     *
+     * <p>The {@code contains(IndexExtractor)} method checks if all indices from the provided
+     * extractor are present in the filter. When the provided extractor is empty, it
+     * contains no indices. Therefore, the condition "all indices are present" is
+     * vacuously true, and the method should return {@code true}.</p>
+     */
+    @Test
+    public void testContainsWithEmptyExtractorReturnsTrue() {
+        // Arrange
+        Shape shape = Shape.fromKM(10, 100);
+        SparseBloomFilter emptyFilter = new SparseBloomFilter(shape);
+
+        // Act
+        // Check if an empty filter contains the indices from another empty filter (itself).
+        boolean result = emptyFilter.contains(emptyFilter);
+
+        // Assert
+        assertTrue("An empty filter should be considered to contain another empty filter.", result);
     }
 }
