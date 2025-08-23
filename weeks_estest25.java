@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest25 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        int int0 = weeks0.getWeeks();
-        assertEquals(Integer.MIN_VALUE, int0);
+    /**
+     * Tests that the getWeeks() method on the MIN_VALUE constant
+     * correctly returns Integer.MIN_VALUE.
+     */
+    @Test
+    public void getWeeks_fromMinValue_returnsIntegerMinValue() {
+        // The Weeks.MIN_VALUE constant is defined as a Weeks object
+        // wrapping Integer.MIN_VALUE.
+        final int expectedWeeks = Integer.MIN_VALUE;
+        final Weeks minWeeks = Weeks.MIN_VALUE;
+
+        // Act: retrieve the value from the constant
+        final int actualWeeks = minWeeks.getWeeks();
+
+        // Assert: the retrieved value should match the integer constant
+        assertEquals(expectedWeeks, actualWeeks);
     }
 }
