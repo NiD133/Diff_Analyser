@@ -1,27 +1,35 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest24 extends CircularByteBuffer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        byte[] byteArray0 = new byte[1];
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link CircularByteBuffer} class.
+ */
+public class CircularByteBufferTest {
+
+    /**
+     * Tests that the read(byte[], int, int) method throws an IllegalArgumentException
+     * when the provided offset is outside the bounds of the destination array.
+     */
+    @Test
+    public void readShouldThrowIllegalArgumentExceptionForOutOfBoundsOffset() {
+        // Arrange: Create a buffer and a destination array for the read operation.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] destination = new byte[5];
+        final int outOfBoundsOffset = 7; // An offset clearly larger than the destination array's length.
+        final int length = 1;
+
+        // Act & Assert: Attempt the read operation and verify the expected exception.
         try {
-            circularByteBuffer0.read(byteArray0, (int) (byte) 7, (int) (byte) 7);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: 7
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.read(destination, outOfBoundsOffset, length);
+            fail("Expected an IllegalArgumentException because the offset is out of bounds.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message is informative and correct.
+            final String expectedMessage = "Illegal offset: " + outOfBoundsOffset;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
