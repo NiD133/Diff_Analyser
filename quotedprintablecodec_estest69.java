@@ -1,24 +1,35 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QuotedPrintableCodec_ESTestTest69 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(true);
-        Object object0 = quotedPrintableCodec0.encode((Object) "Invalid URL encoding: not a valid digit (radix 16): ");
-        assertNotNull(object0);
-        assertEquals("Invalid URL encoding: not a valid digit (radix 16):=20", object0);
+    /**
+     * Tests that the generic {@code encode(Object)} method correctly encodes a string
+     * ending with a space when the codec is in "strict" mode.
+     * <p>
+     * According to RFC 1521, in strict quoted-printable encoding, a space character
+     * at the end of a line must be encoded to prevent it from being stripped by
+     * mail transport systems. The space character (ASCII 32) is encoded as "=20".
+     */
+    @Test
+    public void encodeObjectShouldEncodeTrailingSpaceInStrictMode() throws EncoderException {
+        // Arrange
+        final String inputString = "Invalid URL encoding: not a valid digit (radix 16): ";
+        final String expectedEncodedString = "Invalid URL encoding: not a valid digit (radix 16):=20";
+        
+        // The 'true' argument enables strict encoding as per RFC 1521.
+        final QuotedPrintableCodec strictCodec = new QuotedPrintableCodec(true);
+
+        // Act
+        final Object result = strictCodec.encode((Object) inputString);
+
+        // Assert
+        assertEquals(expectedEncodedString, result);
     }
 }
