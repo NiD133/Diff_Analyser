@@ -1,33 +1,27 @@
 package org.apache.ibatis.type;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.Array;
-import java.sql.CallableStatement;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.junit.runner.RunWith;
 
-public class ArrayTypeHandler_ESTestTest9 extends ArrayTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayTypeHandler} to verify its type resolution logic.
+ */
+public class ArrayTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ArrayTypeHandler arrayTypeHandler0 = new ArrayTypeHandler();
-        Class<java.util.Date> class0 = java.util.Date.class;
-        String string0 = arrayTypeHandler0.resolveTypeName(class0);
-        assertEquals("TIMESTAMP", string0);
+    @Test
+    public void shouldResolveJavaUtilDateToTimestampTypeName() {
+        // Arrange
+        ArrayTypeHandler handler = new ArrayTypeHandler();
+        // According to the standard JDBC mapping, java.util.Date should correspond to TIMESTAMP.
+        String expectedTypeName = JdbcType.TIMESTAMP.name();
+
+        // Act
+        // The method under test resolves the JDBC type name for a given Java class.
+        String actualTypeName = handler.resolveTypeName(java.util.Date.class);
+
+        // Assert
+        assertEquals("The type handler should map java.util.Date to the TIMESTAMP type name.",
+                expectedTypeName, actualTypeName);
     }
 }
