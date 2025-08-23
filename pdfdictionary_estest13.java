@@ -1,28 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PdfDictionary_ESTestTest13 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        PdfName pdfName0 = PdfName.CFM;
-        PdfDictionary pdfDictionary0 = new PdfDictionary(pdfName0);
-        boolean boolean0 = pdfDictionary0.checkType(pdfName0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the checkType() method returns true when the dictionary's type
+     * matches the type it was initialized with in the constructor.
+     */
+    @Test
+    public void checkType_shouldReturnTrue_whenTypeMatchesConstructorArgument() {
+        // Arrange: Create a PdfDictionary with a specific type. The constructor
+        // is expected to set the "/Type" key within the dictionary.
+        PdfName expectedType = PdfName.CFM;
+        PdfDictionary dictionary = new PdfDictionary(expectedType);
+
+        // Act: Call the method under test to check if the dictionary's type
+        // matches the one it was created with.
+        boolean typeMatches = dictionary.checkType(expectedType);
+
+        // Assert: The result should be true, confirming the type was set and checked correctly.
+        assertTrue("The dictionary type should match the one provided to its constructor.", typeMatches);
     }
 }
