@@ -1,24 +1,27 @@
 package org.jfree.chart.axis;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextAnchor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class CategoryLabelPositionTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    /**
-     * Two objects that are equal are required to return the same hashCode.
-     */
+/**
+ * Unit tests for the {@link CategoryLabelPosition} class.
+ */
+class CategoryLabelPositionTest {
+
     @Test
-    public void testHashCode() {
-        CategoryLabelPosition a1 = new CategoryLabelPosition();
-        CategoryLabelPosition a2 = new CategoryLabelPosition();
-        assertEquals(a1, a2);
-        int h1 = a1.hashCode();
-        int h2 = a2.hashCode();
-        assertEquals(h1, h2);
+    @DisplayName("Two equal objects must have the same hash code")
+    void hashCode_shouldBeSameForEqualObjects() {
+        // Arrange: Create two identical objects using the default constructor.
+        // According to the CategoryLabelPosition implementation, these should be equal.
+        CategoryLabelPosition position1 = new CategoryLabelPosition();
+        CategoryLabelPosition position2 = new CategoryLabelPosition();
+
+        // Assert: First, verify the precondition that the two objects are equal.
+        assertEquals(position1, position2, "Two default-constructed objects should be equal.");
+
+        // Act & Assert: Verify that their hash codes are also equal, fulfilling the Java Object contract.
+        assertEquals(position1.hashCode(), position2.hashCode(), "Equal objects must have the same hash code.");
     }
 }
