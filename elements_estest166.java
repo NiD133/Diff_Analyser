@@ -1,43 +1,31 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest166 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test165() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements} class, focusing on exception handling.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that calling selectFirst() with an empty query string
+     * throws an IllegalArgumentException, as the query must not be empty.
+     */
+    @Test
+    public void selectFirstShouldThrowIllegalArgumentExceptionForEmptyQuery() {
+        // Arrange
+        Elements elements = new Elements();
+
+        // Act & Assert
         try {
-            elements0.selectFirst("");
-            fail("Expecting exception: IllegalArgumentException");
+            elements.selectFirst("");
+            fail("Expected an IllegalArgumentException to be thrown for an empty query.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is correct, confirming the validation logic.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
