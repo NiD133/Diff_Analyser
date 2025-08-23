@@ -1,28 +1,50 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest54 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtil#isAsciiLetter(char)} method.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        boolean boolean0 = StringUtil.isAsciiLetter('A');
-        assertTrue(boolean0);
+    @Test
+    public void isAsciiLetter_shouldReturnTrue_forUppercaseLetters() {
+        assertTrue("An uppercase character like 'A' should be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter('A'));
+        assertTrue("An uppercase character like 'Z' should be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter('Z'));
+    }
+
+    @Test
+    public void isAsciiLetter_shouldReturnTrue_forLowercaseLetters() {
+        assertTrue("A lowercase character like 'a' should be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter('a'));
+        assertTrue("A lowercase character like 'z' should be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter('z'));
+    }
+
+    @Test
+    public void isAsciiLetter_shouldReturnFalse_forNonAsciiLetters() {
+        assertFalse("A digit like '7' should not be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter('7'));
+        assertFalse("A symbol like '$' should not be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter('$'));
+        assertFalse("A whitespace character should not be identified as an ASCII letter.",
+            StringUtil.isAsciiLetter(' '));
+    }
+
+    @Test
+    public void isAsciiLetter_shouldReturnFalse_forBoundaryCharacters() {
+        // Test characters with ASCII values immediately adjacent to the letter ranges.
+        assertFalse("The character before 'A' should not be an ASCII letter.",
+            StringUtil.isAsciiLetter('@'));
+        assertFalse("The character after 'Z' should not be an ASCII letter.",
+            StringUtil.isAsciiLetter('['));
+        assertFalse("The character before 'a' should not be an ASCII letter.",
+            StringUtil.isAsciiLetter('`'));
+        assertFalse("The character after 'z' should not be an ASCII letter.",
+            StringUtil.isAsciiLetter('{'));
     }
 }
