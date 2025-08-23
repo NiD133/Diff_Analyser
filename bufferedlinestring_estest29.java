@@ -1,31 +1,45 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest29 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 0.0, spatialContext0);
-        bufferedLineString0.hashCode();
-        assertEquals(0.0, bufferedLineString0.getBuf(), 0.01);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for {@link BufferedLineString}.
+ */
+// Renamed the class to follow standard conventions.
+public class BufferedLineStringTest {
+
+    /**
+     * Tests that constructing a BufferedLineString with an empty list of points
+     * results in a valid, empty shape.
+     */
+    @Test
+    // Renamed the test method to clearly describe the scenario under test.
+    public void shouldCreateEmptyShapeWhenConstructedWithEmptyPointList() {
+        // --- Arrange ---
+        // Use descriptive variable names and standard, immutable empty list.
+        List<Point> emptyPoints = Collections.emptyList();
+        // Use a standard, convenient way to get a SpatialContext.
+        SpatialContext geoContext = SpatialContext.GEO;
+        double bufferDistance = 0.0;
+
+        // --- Act ---
+        // The action is the creation of the BufferedLineString.
+        BufferedLineString lineString = new BufferedLineString(emptyPoints, bufferDistance, geoContext);
+
+        // --- Assert ---
+        // Assert the expected properties of an empty BufferedLineString.
+        // The test now clearly verifies the object's state.
+        assertTrue("A line string with no points should be considered empty.", lineString.isEmpty());
+        assertTrue("The collection of segments should be empty.", lineString.getSegments().isEmpty());
+        assertEquals("The buffer should be set to the value provided in the constructor.",
+                bufferDistance, lineString.getBuf(), 0.0);
     }
 }
