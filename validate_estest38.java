@@ -1,25 +1,28 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Validate_ESTestTest38 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate#ensureNotNull(Object, String, Object...)} method.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        Object[] objectArray0 = new Object[7];
-        Object object0 = Validate.ensureNotNull((Object) "", "", objectArray0);
-        assertEquals("", object0);
+    /**
+     * Verifies that ensureNotNull returns the same object instance
+     * when the input object is not null.
+     */
+    @Test
+    public void ensureNotNull_withNonNullObject_returnsSameObject() {
+        // Arrange: Create a non-null object to be validated.
+        // The message and its arguments are irrelevant for this "happy path" test.
+        String inputObject = "This is a valid, non-null string";
+        String messageForException = "This message should not be used";
+
+        // Act: Call the method under test.
+        Object returnedObject = Validate.ensureNotNull(inputObject, messageForException);
+
+        // Assert: Verify that the method returned the exact same object instance.
+        assertSame("The method should return the identical object that was passed in.", inputObject, returnedObject);
     }
 }
