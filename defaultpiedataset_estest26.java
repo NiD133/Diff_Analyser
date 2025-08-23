@@ -1,35 +1,25 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class DefaultPieDataset_ESTestTest26 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultPieDataset0.getValue(0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that attempting to get a value from an empty dataset
+     * throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getValue_onEmptyDataset_shouldThrowIndexOutOfBoundsException() {
+        // Arrange: Create an empty dataset.
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+        // Act: Attempt to retrieve a value at index 0, which is out of bounds.
+        dataset.getValue(0);
+
+        // Assert: The test passes if an IndexOutOfBoundsException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
