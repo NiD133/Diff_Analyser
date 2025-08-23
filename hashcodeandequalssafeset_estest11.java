@@ -1,29 +1,26 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest11 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Test suite for {@link HashCodeAndEqualsSafeSet}.
+ *
+ * This revised test focuses on clarity and maintainability,
+ * replacing the auto-generated original.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Object object0 = new Object();
-        hashCodeAndEqualsSafeSet0.add(object0);
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.isEmpty();
-        assertFalse(boolean0);
+    @Test
+    public void isEmpty_shouldReturnFalse_whenSetContainsAnElement() {
+        // Arrange: Create a set and add one element to it.
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        set.add(new Object());
+
+        // Act: Check if the set is empty.
+        boolean result = set.isEmpty();
+
+        // Assert: Verify that the set is not considered empty.
+        assertFalse("A set containing an element should not be reported as empty.", result);
     }
 }
