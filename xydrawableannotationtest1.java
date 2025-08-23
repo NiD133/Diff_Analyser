@@ -1,90 +1,164 @@
 package org.jfree.chart.annotations;
 
+import org.jfree.chart.Drawable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.Drawable;
-import org.jfree.chart.api.PublicCloneable;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Objects;
 
-public class XYDrawableAnnotationTestTest1 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+/**
+ * Tests for the {@link XYDrawableAnnotation} class, focusing on its contract and behavior.
+ */
+@DisplayName("XYDrawableAnnotation")
+class XYDrawableAnnotationTest {
+
+    /**
+     * A mock implementation of Drawable for testing purposes. It includes an 'id'
+     * to allow for meaningful equality checks.
+     */
     static class TestDrawable implements Drawable, Cloneable, Serializable {
+        private final String id;
 
-        /**
-         * Default constructor.
-         */
-        public TestDrawable() {
+        TestDrawable(String id) {
+            this.id = id;
         }
 
-        /**
-         * Draws something.
-         * @param g2  the graphics device.
-         * @param area  the area in which to draw.
-         */
         @Override
         public void draw(Graphics2D g2, Rectangle2D area) {
-            // do nothing
+            // No-op for this test
         }
 
-        /**
-         * Tests this object for equality with an arbitrary object.
-         * @param obj  the object to test against ({@code null} permitted).
-         * @return A boolean.
-         */
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof TestDrawable)) {
-                return false;
-            }
-            return true;
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            TestDrawable that = (TestDrawable) obj;
+            return Objects.equals(id, that.id);
         }
 
-        /**
-         * Returns a clone.
-         *
-         * @return A clone.
-         *
-         * @throws CloneNotSupportedException if there is a problem cloning.
-         */
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
+
         @Override
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
     }
 
-    /**
-     * Confirm that the equals method can distinguish all the required fields.
-     */
-    @Test
-    public void testEquals() {
-        XYDrawableAnnotation a1 = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, new TestDrawable());
-        XYDrawableAnnotation a2 = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, new TestDrawable());
-        assertEquals(a1, a2);
-        a1 = new XYDrawableAnnotation(11.0, 20.0, 100.0, 200.0, new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 20.0, 100.0, 200.0, new TestDrawable());
-        assertEquals(a1, a2);
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 100.0, 200.0, new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 100.0, 200.0, new TestDrawable());
-        assertEquals(a1, a2);
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 200.0, new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 200.0, new TestDrawable());
-        assertEquals(a1, a2);
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0, new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0, new TestDrawable());
-        assertEquals(a1, a2);
-        a1 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0, 2.0, new TestDrawable());
-        assertNotEquals(a1, a2);
-        a2 = new XYDrawableAnnotation(11.0, 22.0, 101.0, 202.0, 2.0, new TestDrawable());
-        assertEquals(a1, a2);
+    @Nested
+    @DisplayName("equals() contract")
+    class EqualsContract {
+
+        private XYDrawableAnnotation baseAnnotation;
+        private final Drawable baseDrawable = new TestDrawable("drawable-1");
+
+        @BeforeEach
+        void setUp() {
+            // Arrange a baseline annotation for comparison in each test.
+            // This instance uses the constructor that defaults drawScaleFactor to 1.0.
+            baseAnnotation = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, baseDrawable);
+        }
+
+        @Test
+        @DisplayName("should be equal to itself")
+        void shouldBeEqualToItself() {
+            // Assert
+            assertEquals(baseAnnotation, baseAnnotation);
+        }
+
+        @Test
+        @DisplayName("should be equal to an identical instance")
+        void shouldBeEqualToIdenticalInstance() {
+            // Arrange
+            XYDrawableAnnotation identicalAnnotation = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, baseDrawable);
+
+            // Assert
+            assertEquals(baseAnnotation, identicalAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal to null")
+        void shouldNotBeEqualToNull() {
+            // Assert
+            assertNotEquals(null, baseAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal to an object of a different type")
+        void shouldNotBeEqualToDifferentType() {
+            // Assert
+            assertNotEquals(baseAnnotation, new Object());
+        }
+
+        @Test
+        @DisplayName("should not be equal when x coordinate differs")
+        void shouldNotBeEqualWhenXDiffers() {
+            // Arrange
+            XYDrawableAnnotation changedAnnotation = new XYDrawableAnnotation(11.0, 20.0, 100.0, 200.0, baseDrawable);
+
+            // Assert
+            assertNotEquals(baseAnnotation, changedAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal when y coordinate differs")
+        void shouldNotBeEqualWhenYDiffers() {
+            // Arrange
+            XYDrawableAnnotation changedAnnotation = new XYDrawableAnnotation(10.0, 22.0, 100.0, 200.0, baseDrawable);
+
+            // Assert
+            assertNotEquals(baseAnnotation, changedAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal when display width differs")
+        void shouldNotBeEqualWhenWidthDiffers() {
+            // Arrange
+            XYDrawableAnnotation changedAnnotation = new XYDrawableAnnotation(10.0, 20.0, 101.0, 200.0, baseDrawable);
+
+            // Assert
+            assertNotEquals(baseAnnotation, changedAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal when display height differs")
+        void shouldNotBeEqualWhenHeightDiffers() {
+            // Arrange
+            XYDrawableAnnotation changedAnnotation = new XYDrawableAnnotation(10.0, 20.0, 100.0, 202.0, baseDrawable);
+
+            // Assert
+            assertNotEquals(baseAnnotation, changedAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal when draw scale factor differs")
+        void shouldNotBeEqualWhenScaleFactorDiffers() {
+            // Arrange: baseAnnotation has a default scale factor of 1.0
+            XYDrawableAnnotation changedAnnotation = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, 2.0, baseDrawable);
+
+            // Assert
+            assertNotEquals(baseAnnotation, changedAnnotation);
+        }
+
+        @Test
+        @DisplayName("should not be equal when drawable differs")
+        void shouldNotBeEqualWhenDrawableDiffers() {
+            // Arrange
+            Drawable differentDrawable = new TestDrawable("drawable-2");
+            XYDrawableAnnotation changedAnnotation = new XYDrawableAnnotation(10.0, 20.0, 100.0, 200.0, differentDrawable);
+
+            // Assert
+            assertNotEquals(baseAnnotation, changedAnnotation);
+        }
     }
 }
