@@ -2,29 +2,37 @@ package com.itextpdf.text.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest13 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+// This class is a placeholder for the original test's scaffolding.
+// In a real-world scenario, you would use your project's actual test base class.
+class GetBufferedRandomAccessSource_ESTest_scaffolding {}
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        MappedChannelRandomAccessSource mappedChannelRandomAccessSource0 = new MappedChannelRandomAccessSource((FileChannel) null, 2782L, 2782L);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(mappedChannelRandomAccessSource0);
-        byte[] byteArray0 = new byte[1];
+public class GetBufferedRandomAccessSourceTest extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+
+    /**
+     * Tests that the get() method correctly propagates an IOException thrown by the
+     * underlying source. This can happen if the underlying source is closed or invalid.
+     */
+    @Test
+    public void get_whenUnderlyingSourceIsInvalid_throwsIOException() {
+        // Arrange: Create a source that will throw an exception.
+        // We simulate an invalid or "unopened" source by passing a null FileChannel
+        // to the MappedChannelRandomAccessSource constructor.
+        RandomAccessSource invalidSource = new MappedChannelRandomAccessSource(null, 0L, 0L);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(invalidSource);
+        byte[] destinationBuffer = new byte[10];
+
+        // Act & Assert
         try {
-            getBufferedRandomAccessSource0.get(2782L, byteArray0, (int) (byte) (-27), (int) (byte) 0);
-            fail("Expecting exception: IOException");
+            bufferedSource.get(0L, destinationBuffer, 0, destinationBuffer.length);
+            fail("Expected an IOException because the underlying source is not opened.");
         } catch (IOException e) {
-            //
-            // RandomAccessSource not opened
-            //
-            verifyException("com.itextpdf.text.io.MappedChannelRandomAccessSource", e);
+            // Verify that the expected exception was caught and has the correct message.
+            // This confirms the exception originated from the underlying MappedChannelRandomAccessSource
+            // and was propagated correctly by the GetBufferedRandomAccessSource.
+            assertEquals("RandomAccessSource not opened", e.getMessage());
         }
     }
 }
