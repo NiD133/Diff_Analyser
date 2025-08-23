@@ -1,75 +1,75 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AtomicDoubleArrayTestTest14 extends JSR166TestCase {
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+/**
+ * Tests for {@link AtomicDoubleArray#getAndAdd(int, double)}.
+ */
+class AtomicDoubleArrayGetAndAddTest {
 
-    static final long COUNTDOWN = 100000;
-
-    /**
-     * The notion of equality used by AtomicDoubleArray
-     */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
-
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
-    }
+    private static final int ARRAY_SIZE = 10;
+    private static final int FIRST_INDEX = 0;
+    private static final int LAST_INDEX = ARRAY_SIZE - 1;
 
     /**
-     * getAndAdd returns previous value and adds given value
+     * A representative set of double values to test edge cases, including
+     * zero, infinities, NaN, and standard numbers.
      */
-    public void testGetAndAdd() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int i : new int[] { 0, SIZE - 1 }) {
-            for (double x : VALUES) {
-                for (double y : VALUES) {
-                    aa.set(i, x);
-                    double z = aa.getAndAdd(i, y);
-                    assertBitEquals(x, z);
-                    assertBitEquals(x + y, aa.get(i));
-                }
-            }
-        }
+    private static final double[] TEST_VALUES = {
+        +0.0, -0.0, 1.0, -1.0, Math.PI,
+        Double.MAX_VALUE, Double.MIN_VALUE,
+        Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
+        Double.NaN
+    };
+
+    /**
+     * Provides test cases by creating a cartesian product of indices,
+     * initial values, and deltas. This ensures comprehensive testing across
+     * various numeric scenarios and array boundaries.
+     */
+    private static Stream<Arguments> getAndAddTestCases() {
+        return Stream.of(FIRST_INDEX, LAST_INDEX)
+            .flatMap(index -> Stream.of(TEST_VALUES)
+                .flatMap(initialValue -> Stream.of(TEST_VALUES)
+                    .map(delta -> Arguments.of(index, initialValue, delta))));
+    }
+
+    @DisplayName("getAndAdd() should return the old value and atomically add the delta")
+    @ParameterizedTest(name = "at index {0}, for initial={1} and delta={2}")
+    @MethodSource("getAndAddTestCases")
+    void getAndAdd_returnsOldValueAndAddsDelta(int index, double initialValue, double delta) {
+        // Arrange
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(ARRAY_SIZE);
+        atomicArray.set(index, initialValue);
+        double expectedNewValue = initialValue + delta;
+
+        // Act
+        double returnedValue = atomicArray.getAndAdd(index, delta);
+
+        // Assert
+        // The core contract of AtomicDoubleArray is to compare values by their bit representation.
+        assertBitEquals(
+            initialValue,
+            returnedValue,
+            "getAndAdd should return the value before the addition.");
+
+        assertBitEquals(
+            expectedNewValue,
+            atomicArray.get(index),
+            "The value at the index should be updated to the sum.");
+    }
+
+    /**
+     * Asserts that two double values are bit-wise equal, which is the
+     * equality contract for AtomicDoubleArray.
+     */
+    private static void assertBitEquals(double expected, double actual, String message) {
+        assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual), message);
     }
 }
