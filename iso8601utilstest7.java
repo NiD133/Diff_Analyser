@@ -1,38 +1,30 @@
 package com.google.gson.internal.bind.util;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
 import org.junit.Test;
 
-public class ISO8601UtilsTestTest7 {
-
-    private static TimeZone utcTimeZone() {
-        return TimeZone.getTimeZone("UTC");
-    }
-
-    private static GregorianCalendar createUtcCalendar() {
-        TimeZone utc = utcTimeZone();
-        GregorianCalendar calendar = new GregorianCalendar(utc);
-        // Calendar was created with current time, must clear it
-        calendar.clear();
-        return calendar;
-    }
+/**
+ * Tests for {@link ISO8601Utils#parse(String, ParsePosition)}.
+ */
+public class ISO8601UtilsParseTest {
 
     @Test
-    @SuppressWarnings("UndefinedEquals")
-    public void testDateParseWithTimezone() throws ParseException {
-        String dateStr = "2018-06-25T00:00:00-03:00";
-        Date date = ISO8601Utils.parse(dateStr, new ParsePosition(0));
-        GregorianCalendar calendar = createUtcCalendar();
-        calendar.set(2018, Calendar.JUNE, 25, 3, 0);
-        Date expectedDate = calendar.getTime();
-        assertThat(date).isEqualTo(expectedDate);
+    public void parse_stringWithNegativeOffset_returnsCorrectUtcDate() throws ParseException {
+        // Arrange
+        String dateStringWithOffset = "2018-06-25T00:00:00-03:00";
+        // The input string is equivalent to 3:00 AM in the UTC time zone.
+        Instant expectedInstant = Instant.parse("2018-06-25T03:00:00Z");
+        Date expectedDate = Date.from(expectedInstant);
+
+        // Act
+        Date actualDate = ISO8601Utils.parse(dateStringWithOffset, new ParsePosition(0));
+
+        // Assert
+        assertThat(actualDate).isEqualTo(expectedDate);
     }
 }
