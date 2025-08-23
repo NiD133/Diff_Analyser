@@ -1,24 +1,34 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest14 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-2614));
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        int int0 = cachedDateTimeZone0.getOffset(86400000L);
-        assertEquals((-2614), int0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that getOffset() for a cached fixed-offset zone correctly returns
+     * the underlying zone's fixed offset.
+     */
+    @Test
+    public void getOffsetForFixedZoneShouldReturnTheFixedOffset() {
+        // Arrange
+        final int fixedOffsetMillis = -2614;
+        final DateTimeZone fixedZone = DateTimeZone.forOffsetMillis(fixedOffsetMillis);
+        final CachedDateTimeZone cachedZone = CachedDateTimeZone.forZone(fixedZone);
+
+        // An arbitrary instant in time. For a fixed zone, any instant should yield the same offset.
+        final long arbitraryInstant = 86_400_000L; // 24 hours in milliseconds
+
+        // Act
+        int actualOffset = cachedZone.getOffset(arbitraryInstant);
+
+        // Assert
+        assertEquals("The cached zone should return the same offset as the original fixed zone.",
+                fixedOffsetMillis, actualOffset);
     }
 }
