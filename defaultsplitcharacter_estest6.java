@@ -1,24 +1,39 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.GreekList;
-import com.itextpdf.text.TabSettings;
-import java.util.ArrayList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultSplitCharacter_ESTestTest6 extends DefaultSplitCharacter_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultSplitCharacter} class.
+ *
+ * Note: The original test class name "DefaultSplitCharacter_ESTestTest6" and its
+ * inheritance from a scaffolding class are artifacts of a test generation tool.
+ * In a real-world scenario, this would be part of a single, comprehensive
+ * "DefaultSplitCharacterTest" class.
+ */
+public class DefaultSplitCharacter_ESTestTest6 {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DefaultSplitCharacter defaultSplitCharacter0 = new DefaultSplitCharacter('w');
-        char[] charArray0 = new char[2];
-        charArray0[1] = 'w';
-        char char0 = defaultSplitCharacter0.getCurrentCharacter(1, charArray0, (PdfChunk[]) null);
-        assertEquals('w', char0);
+    /**
+     * Verifies that getCurrentCharacter correctly retrieves the character from a
+     * character array at a specified index when the PdfChunk array is null.
+     * This tests the method's basic functionality.
+     */
+    @Test
+    public void getCurrentCharacter_withNullChunkArray_returnsCharacterAtIndex() {
+        // Arrange
+        // The specific split character configuration is irrelevant for this method,
+        // so we use the default constructor to keep the setup simple.
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        
+        char[] textChars = {'H', 'e', 'l', 'l', 'o'};
+        int targetIndex = 2; // The index of the character to retrieve ('l')
+        char expectedChar = 'l';
+
+        // Act
+        // The third argument (PdfChunk[]) is null, which triggers the simplest code path.
+        char actualChar = splitCharacter.getCurrentCharacter(targetIndex, textChars, null);
+
+        // Assert
+        assertEquals("The method should return the character at the specified index.", expectedChar, actualChar);
     }
 }
