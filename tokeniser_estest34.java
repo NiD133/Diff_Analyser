@@ -1,24 +1,32 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
-public class Tokeniser_ESTestTest34 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Tokeniser} class.
+ */
+public class TokeniserTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("missing semicolon on [&#%s]", "missing semicolon on [&#%s]");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        tokeniser0.createBogusCommentPending();
+    /**
+     * Verifies that calling createBogusCommentPending() on an initialized Tokeniser
+     * does not throw an exception.
+     *
+     * This is a basic "smoke test" to ensure the method can be invoked safely
+     * without causing a crash, which is a common goal for tool-generated tests.
+     */
+    @Test
+    public void createBogusCommentPendingDoesNotThrowException() {
+        // Arrange: Set up a Tokeniser. The specific input used to initialize the
+        // parser is not relevant to this test, as we are only checking the
+        // behavior of creating a pending token.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        xmlTreeBuilder.parse("", "http://example.com"); // Initialize with empty input
+        Tokeniser tokeniser = new Tokeniser(xmlTreeBuilder);
+
+        // Act: Call the method under test.
+        tokeniser.createBogusCommentPending();
+
+        // Assert: The test is successful if no exception is thrown.
+        // No explicit assertion is needed.
     }
 }
