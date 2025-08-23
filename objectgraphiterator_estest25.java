@@ -1,54 +1,46 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
+
+// Note: The original test class structure and inheritance from a generated
+// scaffolding class are preserved. Unused imports have been removed for clarity.
 public class ObjectGraphIterator_ESTestTest25 extends ObjectGraphIterator_ESTest_scaffolding {
 
+    /**
+     * Tests the constructor that accepts another iterator as its root.
+     * <p>
+     * This test verifies that an ObjectGraphIterator initialized with another iterator
+     * will correctly traverse the elements of that root iterator. It effectively tests
+     * the "iterator of iterators" functionality.
+     */
     @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Integer integer0 = new Integer(4);
-        ObjectGraphIterator<Integer> objectGraphIterator0 = new ObjectGraphIterator<Integer>(integer0, (Transformer<? super Integer, ? extends Integer>) null);
-        ObjectGraphIterator<Object> objectGraphIterator1 = new ObjectGraphIterator<Object>(objectGraphIterator0);
-        Object object0 = objectGraphIterator1.next();
-        assertEquals(4, object0);
+    public void testConstructorWithRootIteratorTraversesTheRootIterator() {
+        // Arrange
+        // 1. Create a simple "inner" iterator that will yield a single element.
+        //    We use an ObjectGraphIterator for this, with a root object and a null transformer.
+        final Integer expectedElement = 4;
+        final Iterator<Integer> innerIterator = new ObjectGraphIterator<>(expectedElement, null);
+
+        // 2. Create the "outer" ObjectGraphIterator, passing the inner iterator as its root.
+        //    This invokes the constructor under test:
+        //    public ObjectGraphIterator(final Iterator<? extends E> rootIterator)
+        final ObjectGraphIterator<Object> outerIterator = new ObjectGraphIterator<>(innerIterator);
+
+        // Act & Assert
+        // The outer iterator should report that it has an element, which comes from the inner iterator.
+        assertTrue("The outer iterator should have a next element.", outerIterator.hasNext());
+
+        // Calling next() on the outer iterator should retrieve the element from the inner one.
+        final Object actualElement = outerIterator.next();
+        assertEquals("The element from next() should match the one from the inner iterator.",
+                     expectedElement, actualElement);
+
+        // After retrieving the only element, the outer iterator should be exhausted.
+        assertFalse("The outer iterator should have no more elements.", outerIterator.hasNext());
     }
 }
