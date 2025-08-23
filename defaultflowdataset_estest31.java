@@ -1,26 +1,29 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
 import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class DefaultFlowDataset_ESTestTest31 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.POPUP_LAYER;
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(1, integer0);
-        List<FlowKey> list0 = (List<FlowKey>) defaultFlowDataset0.getOutFlows(nodeKey0);
-        assertTrue(list0.isEmpty());
+    /**
+     * Verifies that getOutFlows() returns an empty list for a node
+     * when the dataset is newly created and has no data.
+     */
+    @Test
+    public void getOutFlows_forNodeInEmptyDataset_shouldReturnEmptyList() {
+        // Arrange: Create a new, empty dataset and a key for a node that doesn't exist yet.
+        DefaultFlowDataset<Integer> dataset = new DefaultFlowDataset<>();
+        NodeKey<Integer> nodeKey = new NodeKey<>(1, 100); // Stage 1, Node ID 100
+
+        // Act: Request the list of outgoing flows from the specified node.
+        List<FlowKey> outFlows = dataset.getOutFlows(nodeKey);
+
+        // Assert: The returned list should be empty, as no flows have been added.
+        assertTrue("Expected an empty list of outgoing flows for a node in an empty dataset.",
+                outFlows.isEmpty());
     }
 }
