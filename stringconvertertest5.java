@@ -1,80 +1,67 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.JulianChronology;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class StringConverterTestTest5 extends TestCase {
-
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
-
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * A test suite for the {@link StringConverter} class.
+ * This test focuses on the getInstantMillis method.
+ */
+public class StringConverterTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
 
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
+    // Store original default time zone and locale to restore them after tests
+    private DateTimeZone originalDefaultZone;
+    private Locale originalDefaultLocale;
 
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
+    @Before
+    public void setUp() {
+        // Save the original defaults to ensure tests are isolated
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultLocale = Locale.getDefault();
 
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
+        // Set predictable defaults for the test environment
         DateTimeZone.setDefault(LONDON);
         Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
+    @After
+    public void tearDown() {
+        // Restore the original defaults to avoid side effects on other tests
+        DateTimeZone.setDefault(originalDefaultZone);
+        Locale.setDefault(originalDefaultLocale);
     }
 
-    public void testGetInstantMillis_Object_Chronology() throws Exception {
-        DateTime dt = new DateTime(2004, 6, 9, 12, 24, 48, 501, JulianChronology.getInstance(LONDON));
-        assertEquals(dt.getMillis(), StringConverter.INSTANCE.getInstantMillis("2004-06-09T12:24:48.501+01:00", JULIAN));
+    @Test
+    public void getInstantMillis_shouldParseIsoStringUsingSpecifiedChronology() {
+        // Arrange
+        // An ISO-8601 formatted string. The +01:00 offset represents British Summer Time (BST),
+        // which is the correct offset for the London timezone in June.
+        final String dateTimeString = "2004-06-09T12:24:48.501+01:00";
+
+        // The test will parse the string using the Julian calendar system. The StringConverter
+        // should parse the ISO string format but interpret the date and time values
+        // using this specified chronology.
+        final Chronology julianChronologyInLondon = JulianChronology.getInstance(LONDON);
+
+        // Create the expected DateTime object to get the correct millisecond value for comparison.
+        // This ensures our reference point is built with the same parameters as the test input.
+        final DateTime expectedDateTime = new DateTime(2004, 6, 9, 12, 24, 48, 501, julianChronologyInLondon);
+        final long expectedMillis = expectedDateTime.getMillis();
+
+        // Act
+        final long actualMillis = StringConverter.INSTANCE.getInstantMillis(dateTimeString, julianChronologyInLondon);
+
+        // Assert
+        assertEquals(expectedMillis, actualMillis);
     }
 }
