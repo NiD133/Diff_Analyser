@@ -1,33 +1,36 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
+
 import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Lister_ESTestTest7 extends Lister_ESTest_scaffolding {
+/**
+ * Contains improved, understandable tests for the {@link Lister} class.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        String[] stringArray0 = new String[2];
-        stringArray0[0] = "sh;T]Ld";
-        stringArray0[1] = "zip";
-        Lister lister0 = new Lister(true, stringArray0);
-        // Undeclared exception!
-        try {
-            lister0.go();
-            fail("Expecting exception: NoClassDefFoundError");
-        } catch (NoClassDefFoundError e) {
-            //
-            // org/apache/commons/compress/archivers/zip/ZipFile$StoredStatisticsStream
-            //
-            verifyException("org.apache.commons.compress.archivers.Lister", e);
-        }
+    /**
+     * Verifies that Lister#go() throws a NoSuchFileException when the specified
+     * archive file does not exist.
+     *
+     * This test ensures that the application provides clear feedback for a common
+     * user error (providing an invalid file path), which is essential for robust
+     * error handling.
+     */
+    @Test(expected = NoSuchFileException.class)
+    public void goShouldThrowNoSuchFileExceptionWhenArchiveFileDoesNotExist() throws Exception {
+        // Arrange: Set up the Lister with arguments pointing to a file that is
+        // guaranteed not to exist. The archive type is specified, but the
+        // failure should occur before any format-specific processing.
+        String nonExistentFilePath = "path/to/a/surely/non-existent-file.zip";
+        String archiveFormat = "zip";
+        String[] args = {nonExistentFilePath, archiveFormat};
+
+        Lister lister = new Lister(true, args);
+
+        // Act: Execute the go() method.
+        // The @Test(expected=...) annotation will automatically assert that a
+        // NoSuchFileException is thrown, failing the test if it is not.
+        lister.go();
     }
 }
