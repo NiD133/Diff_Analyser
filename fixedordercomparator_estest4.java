@@ -1,27 +1,43 @@
 package org.apache.commons.collections4.comparators;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.collections4.comparators.FixedOrderComparator.UnknownObjectBehavior;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class FixedOrderComparator_ESTestTest4 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link FixedOrderComparator}.
+ * This class focuses on the initial state and locking mechanism of the comparator.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-        fixedOrderComparator0.checkLocked();
-        assertEquals(FixedOrderComparator.UnknownObjectBehavior.EXCEPTION, fixedOrderComparator0.getUnknownObjectBehavior());
+    /**
+     * Verifies that calling checkLocked() on a newly created, unlocked comparator
+     * does not throw an exception.
+     */
+    @Test
+    public void checkLockedShouldNotThrowExceptionWhenComparatorIsNew() {
+        // Arrange: Create a new comparator, which is unlocked by default.
+        final FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+
+        // Act & Assert: The call should complete without throwing an exception.
+        // If it threw, the test would fail.
+        comparator.checkLocked();
+    }
+
+    /**
+     * Verifies that a new FixedOrderComparator defaults to the EXCEPTION behavior
+     * for unknown objects.
+     */
+    @Test
+    public void newComparatorShouldHaveDefaultUnknownObjectBehaviorOfException() {
+        // Arrange: Create a new comparator.
+        final FixedOrderComparator<Object> comparator = new FixedOrderComparator<>();
+
+        // Act: Retrieve the default behavior for handling unknown objects.
+        final UnknownObjectBehavior actualBehavior = comparator.getUnknownObjectBehavior();
+
+        // Assert: The default behavior should be to throw an exception.
+        assertEquals(UnknownObjectBehavior.EXCEPTION, actualBehavior);
     }
 }
