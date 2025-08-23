@@ -1,20 +1,28 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonLocation_ESTestTest40 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        Object object0 = new Object();
-        boolean boolean0 = jsonLocation0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a JsonLocation instance
+     * is compared with an object of an incompatible type. This is a fundamental
+     * contract of the equals() method.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenComparedWithDifferentType() {
+        // Arrange
+        JsonLocation location = JsonLocation.NA;
+        Object otherObject = new Object();
+
+        // Act
+        boolean areEqual = location.equals(otherObject);
+
+        // Assert
+        assertFalse("A JsonLocation instance should not be equal to an object of a different type.", areEqual);
     }
 }
