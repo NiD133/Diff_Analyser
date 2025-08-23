@@ -1,18 +1,22 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest6 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("");
-        String string0 = tokenQueue0.toString();
-        assertEquals("", string0);
+    @Test
+    public void toString_whenQueueIsEmpty_returnsEmptyString() {
+        // Arrange: Create a TokenQueue with an empty string.
+        TokenQueue emptyQueue = new TokenQueue("");
+
+        // Act: Get the string representation of the queue.
+        String result = emptyQueue.toString();
+
+        // Assert: Verify the result is an empty string.
+        assertEquals("The string representation of an empty queue should be an empty string.", "", result);
     }
 }
