@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest52 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        Years years0 = Years.years(0);
-        int int0 = years0.getYears();
-        assertEquals(0, int0);
+    /**
+     * Verifies that the getYears() method returns the same integer value
+     * that was used to create the Years instance via the factory method.
+     */
+    @Test
+    public void getYears_shouldReturnTheValueUsedInFactory() {
+        // Arrange: Create a Years instance representing zero years.
+        final int expectedValue = 0;
+        Years years = Years.years(expectedValue);
+
+        // Act: Call the method under test.
+        int actualValue = years.getYears();
+
+        // Assert: Verify that the returned value matches the initial value.
+        assertEquals(expectedValue, actualValue);
     }
 }
