@@ -1,31 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link FieldUtils} class, focusing on exception-handling scenarios.
+ */
+// Note: The original class name and inheritance from EvoSuite scaffolding
+// are preserved for context. Ideally, this would be a standalone class named `FieldUtilsTest`.
 public class FieldUtils_ESTestTest46 extends FieldUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.getWrappedValue(697, 697, 697);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // MIN > MAX
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that getWrappedValue(int, int, int) throws an IllegalArgumentException
+     * when the minimum and maximum range boundaries are equal. The method's contract
+     * requires that the maximum value must be strictly greater than the minimum value.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void getWrappedValueShouldThrowExceptionWhenMinEqualsMax() {
+        // Arrange: Define a range where the minimum and maximum values are the same.
+        // The 'value' parameter can be any integer for this test case.
+        final int anyValue = 10;
+        final int boundary = 5;
+
+        // Act & Assert: This call is expected to throw an IllegalArgumentException
+        // because minValue (5) is not strictly less than maxValue (5).
+        FieldUtils.getWrappedValue(anyValue, boundary, boundary);
     }
 }
