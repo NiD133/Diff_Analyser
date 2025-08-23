@@ -1,19 +1,32 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest35 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("', is eithr of typ Map.Entrynor an Array");
-        boolean boolean0 = CharSequenceUtils.regionMatches("', is eithr of typ Map.Entrynor an Array", false, 1, stringBuilder0, 1, 7);
-        assertTrue(boolean0);
+    /**
+     * Tests that regionMatches correctly compares identical sub-regions from
+     * different CharSequence implementations (a String and a StringBuilder).
+     */
+    @Test
+    public void testRegionMatchesWithEqualRegionsInStringAndStringBuilder() {
+        // Arrange
+        final String text = "The quick brown fox";
+        final CharSequence sequence1 = text;
+        final CharSequence sequence2 = new StringBuilder(text);
+
+        final int offset = 4; // The start of the word "quick"
+        final int length = 5; // The length of the word "quick"
+        final boolean ignoreCase = false;
+
+        // Act
+        final boolean regionsMatch = CharSequenceUtils.regionMatches(sequence1, ignoreCase, offset, sequence2, offset, length);
+
+        // Assert
+        assertTrue("Expected regions to match for identical substrings in a String and StringBuilder.", regionsMatch);
     }
 }
