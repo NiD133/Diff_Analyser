@@ -1,34 +1,43 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Entities;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTreeBuilderTestTest28 {
+/**
+ * Tests for the {@link XmlTreeBuilder}.
+ */
+public class XmlTreeBuilderTest {
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
-
+    /**
+     * Verifies that in XML syntax, the less-than ('<') and greater-than ('>') characters
+     * are always escaped within attribute values, regardless of the configured escape mode.
+     * This is critical to prevent generating invalid XML.
+     *
+     * @see <a href="https://github.com/jhy/jsoup/issues/2337">GitHub issue #2337</a>
+     */
     @Test
     public void xmlSyntaxAlwaysEscapesLtAndGtInAttributeValues() {
-        // https://github.com/jhy/jsoup/issues/2337
-        Document doc = Jsoup.parse("<p one='&lt;two&gt;'>Three</p>", "", Parser.xmlParser());
+        // Arrange
+        String xmlWithEscapedCharsInAttr = "<p one='&lt;two&gt;'>Three</p>";
+        String expectedOutput = "<p one=\"&lt;two&gt;\">Three</p>";
+
+        Document doc = Jsoup.parse(xmlWithEscapedCharsInAttr, "", Parser.xmlParser());
+
+        // This setting should NOT affect the mandatory escaping of < and > in XML attributes.
         doc.outputSettings().escapeMode(Entities.EscapeMode.extended);
-        assertEquals(doc.outputSettings().syntax(), Syntax.xml);
-        assertEquals("<p one=\"&lt;two&gt;\">Three</p>", doc.html());
+
+        // Sanity check to confirm the document is in XML mode.
+        assertEquals(Syntax.xml, doc.outputSettings().syntax(), "Document should be in XML syntax mode.");
+
+        // Act
+        String actualOutput = doc.html();
+
+        // Assert
+        assertEquals(expectedOutput, actualOutput, "Attribute values should retain &lt; and &gt; escapes in XML mode.");
     }
 }
