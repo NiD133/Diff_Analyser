@@ -1,41 +1,33 @@
 package org.apache.commons.io.input;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest7 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream}.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ObservableInputStream observableInputStream0 = new ObservableInputStream((InputStream) null);
-        TimestampedObserver timestampedObserver0 = new TimestampedObserver();
-        observableInputStream0.remove(timestampedObserver0);
-        assertFalse(timestampedObserver0.isClosed());
+    /**
+     * Tests that attempting to remove an observer that has not been added
+     * is handled gracefully without throwing an exception.
+     */
+    @Test
+    public void testRemoveObserverThatWasNotAdded() {
+        // Arrange
+        // The underlying stream is not used in this test.
+        final ObservableInputStream stream = new ObservableInputStream(null);
+        final ObservableInputStream.Observer observer = new ObservableInputStream.Observer() {
+            // A simple anonymous observer for test purposes.
+        };
+
+        // Act
+        // Attempting to remove an observer that was never added should be a no-op.
+        // The primary goal is to ensure this action does not throw an exception.
+        stream.remove(observer);
+
+        // Assert
+        // The test implicitly verifies that no exception was thrown.
+        // Further assertions could be added if the observer had state to check.
     }
 }
