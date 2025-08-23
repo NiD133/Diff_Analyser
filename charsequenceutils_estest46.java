@@ -1,18 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest46 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        int int0 = CharSequenceUtils.lastIndexOf("', is either of typ Map.Entry nor an Array", 1203, 36);
-        assertEquals((-1), int0);
+    private static final int NOT_FOUND = -1;
+
+    /**
+     * Tests that lastIndexOf returns -1 when the character to be found does not exist
+     * in the CharSequence.
+     */
+    @Test
+    public void testLastIndexOfWithNonExistentCharShouldReturnNotFound() {
+        // Arrange
+        final CharSequence text = "', is either of typ Map.Entry nor an Array";
+        // The character to search for (1203 is the Unicode value for the Greek letter lambda 'λ') is not in the text.
+        final int nonExistentChar = 1203;
+        final int startIndex = 36;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(text, nonExistentChar, startIndex);
+
+        // Assert
+        assertEquals("Expected -1 for a character that is not found", NOT_FOUND, actualIndex);
     }
 }
