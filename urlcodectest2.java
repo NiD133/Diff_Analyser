@@ -1,43 +1,38 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class URLCodecTestTest2 {
+/**
+ * Tests for invalid decoding scenarios in {@link URLCodec}.
+ */
+class URLCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private URLCodec urlCodec;
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    @BeforeEach
+    void setUp() {
+        this.urlCodec = new URLCodec();
     }
 
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
-    }
-
-    @Test
-    void testDecodeInvalid() throws Exception {
-        final URLCodec urlCodec = new URLCodec();
-        assertThrows(DecoderException.class, () -> urlCodec.decode("%"));
-        assertThrows(DecoderException.class, () -> urlCodec.decode("%A"));
-        // Bad 1st char after %
-        assertThrows(DecoderException.class, () -> urlCodec.decode("%WW"));
-        // Bad 2nd char after %
-        assertThrows(DecoderException.class, () -> urlCodec.decode("%0W"));
-        validateState(urlCodec);
+    @DisplayName("decode() should throw DecoderException for malformed percent-encoded strings")
+    @ParameterizedTest(name = "Invalid input: \"{0}\" ({1})")
+    @CsvSource({
+        "'%',      'Incomplete escape sequence, missing two hex digits'",
+        "'%A',     'Incomplete escape sequence, missing one hex digit'",
+        "'%WW',    'Invalid non-hex character ''W'' in first position'",
+        "'%0W',    'Invalid non-hex character ''W'' in second position'"
+    })
+    void decodeWithMalformedInputThrowsDecoderException(final String invalidInput, final String description) {
+        // The 'description' parameter from CsvSource serves as inline documentation
+        // for why each input is expected to fail.
+        assertThrows(DecoderException.class, () -> {
+            urlCodec.decode(invalidInput);
+        });
     }
 }
