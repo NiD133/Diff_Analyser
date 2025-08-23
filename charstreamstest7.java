@@ -1,6 +1,8 @@
 package com.google.common.io;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.io.EOFException;
@@ -78,14 +80,34 @@ public class CharStreamsTestTest7 extends IoTestCase {
         };
     }
 
-    public void testCopy() throws IOException {
-        StringBuilder builder = new StringBuilder();
-        long copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(ASCII)), wrapAsGenericAppendable(builder));
-        assertEquals(ASCII, builder.toString());
-        assertEquals(ASCII.length(), copied);
-        StringBuilder builder2 = new StringBuilder();
-        copied = CharStreams.copy(wrapAsGenericReadable(new StringReader(I18N)), wrapAsGenericAppendable(builder2));
-        assertEquals(I18N, builder2.toString());
-        assertEquals(I18N.length(), copied);
+    /**
+     * Tests the generic copy(Readable, Appendable) implementation by using wrapper classes
+     * that prevent type-specific optimizations.
+     */
+    public void testCopy_genericImplementations() throws IOException {
+        assertCopyGeneric(ASCII);
+        assertCopyGeneric(I18N);
+    }
+
+    /**
+     * Asserts that CharStreams.copy correctly copies the full content of the given string
+     * when using generic Readable and Appendable types.
+     */
+    private void assertCopyGeneric(String original) throws IOException {
+        // Arrange: Create a source reader and a destination builder.
+        StringReader source = new StringReader(original);
+        StringBuilder destination = new StringBuilder();
+
+        // Wrap the source and destination to ensure we're testing the generic
+        // copy(Readable, Appendable) implementation, not an optimized overload.
+        Readable genericSource = wrapAsGenericReadable(source);
+        Appendable genericDestination = wrapAsGenericAppendable(destination);
+
+        // Act: Perform the copy operation.
+        long copiedCharCount = CharStreams.copy(genericSource, genericDestination);
+
+        // Assert: Verify the content and the reported number of copied characters.
+        assertThat(destination.toString()).isEqualTo(original);
+        assertThat(copiedCharCount).isEqualTo(original.length());
     }
 }
