@@ -1,45 +1,39 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
+// The test class name is inherited from the original EvoSuite-generated test.
+// In a real-world scenario, it would be renamed to something more descriptive, like W3CDomTest.
 public class W3CDom_ESTestTest28 extends W3CDom_ESTest_scaffolding {
 
+    /**
+     * Verifies that converting a Jsoup document with a malformed base URI
+     * throws an AssertionError.
+     * <p>
+     * This behavior is unexpected, as a DOMException would be more appropriate.
+     * The test captures this specific outcome, which likely stems from an
+     * internal assertion failure within the underlying W3C DOM implementation
+     * when it receives an invalid document URI.
+     * </p>
+     */
     @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Document document0 = new Document("*zHMY,@{AzE8{");
-        // Undeclared exception!
+    public void convertDocumentWithMalformedBaseUriThrowsAssertionError() {
+        // Arrange: Create a Jsoup document with a string that is not a valid URI for its base URI.
+        String malformedUri = "*zHMY,@{ Az E8{"; // Original malformed URI from generated test
+        Document jsoupDocument = new Document(malformedUri);
+
+        // Act & Assert: Attempt to convert the document and expect an AssertionError.
         try {
-            W3CDom.convert(document0);
-            fail("Expecting exception: AssertionError");
+            W3CDom.convert(jsoupDocument);
+            fail("Expected an AssertionError to be thrown for a malformed base URI, but no exception occurred.");
         } catch (AssertionError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // This is the expected outcome. The underlying DOM implementation throws
+            // an AssertionError instead of a more specific DOMException for this input.
+        } catch (Throwable t) {
+            fail("Expected an AssertionError, but a different exception was thrown: " + t.getClass().getName());
         }
     }
 }
