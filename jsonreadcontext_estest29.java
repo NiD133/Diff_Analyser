@@ -1,32 +1,52 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.core.JsonStreamContext;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest29 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonParser) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext((-2041), (-2041), dupDetector0);
-        JsonReadContext jsonReadContext1 = new JsonReadContext(jsonReadContext0, (-2041), dupDetector0, 1, 2, (-2260));
-        JsonReadContext jsonReadContext2 = jsonReadContext1.createChildArrayContext((-2041), 2);
-        assertEquals((-2040), jsonReadContext2.getNestingDepth());
-        assertEquals(0, jsonReadContext2.getEntryCount());
-        assertFalse(jsonReadContext0.inArray());
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals("ARRAY", jsonReadContext2.getTypeDesc());
+/**
+ * Contains tests for the {@link JsonReadContext} class.
+ */
+public class JsonReadContextTest {
+
+    /**
+     * Tests that creating a child array context correctly initializes its state,
+     * particularly that it increments the parent's nesting depth.
+     * This test uses an arbitrary negative nesting depth for the parent context
+     * to ensure the increment logic is robust and not dependent on positive-only depths.
+     */
+    @Test
+    public void createChildArrayContext_shouldIncrementParentNestingDepth() {
+        // Arrange
+        // Use an arbitrary negative depth to ensure the calculation is robust.
+        final int parentNestingDepth = -2041;
+        final int parentLine = 2;
+        final int parentCol = -2260;
+        final int childLine = -2041;
+        final int childCol = 2;
+
+        DupDetector dupDetector = DupDetector.rootDetector((JsonParser) null);
+        JsonReadContext rootContext = JsonReadContext.createRootContext(1, 1, dupDetector);
+
+        // Create a parent context (simulating an object) with the arbitrary nesting depth.
+        JsonReadContext parentObjectContext = new JsonReadContext(rootContext,
+                parentNestingDepth, dupDetector, JsonStreamContext.TYPE_OBJECT, parentLine, parentCol);
+
+        // Act
+        JsonReadContext childArrayContext = parentObjectContext.createChildArrayContext(childLine, childCol);
+
+        // Assert
+        // 1. Verify the state of the newly created child array context.
+        assertEquals("Child context should be an array", "ARRAY", childArrayContext.getTypeDesc());
+        assertEquals("Child nesting depth should be parent's depth + 1",
+                parentNestingDepth + 1, childArrayContext.getNestingDepth());
+        assertEquals("A new context should have an entry count of 0", 0, childArrayContext.getEntryCount());
+
+        // 2. Verify the state of the original root context remains unchanged.
+        assertEquals("Root context nesting depth should always be 0", 0, rootContext.getNestingDepth());
+        assertFalse("Root context should not be considered 'in an array'", rootContext.inArray());
     }
 }
