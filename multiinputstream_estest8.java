@@ -1,38 +1,38 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
+import com.google.common.io.ByteSource;
+import com.google.common.io.MultiInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.List;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest8 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ByteSource byteSource0 = ByteSource.empty();
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        arrayDeque0.add(byteSource0);
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        arrayDeque0.add(byteSource0);
-        MultiInputStream multiInputStream0 = null;
-        try {
-            multiInputStream0 = new MultiInputStream(iterator0);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayDeque$DeqIterator", e);
-        }
+    /**
+     * Verifies that the constructor throws a ConcurrentModificationException if the underlying
+     * collection for the iterator is modified after the iterator is created. This is the expected
+     * behavior for iterators that are not fail-safe.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void constructor_whenIteratorIsModified_throwsConcurrentModificationException() throws IOException {
+        // Arrange: Create a list of ByteSources and get an iterator for it.
+        List<ByteSource> byteSources = new ArrayList<>();
+        byteSources.add(ByteSource.empty());
+        Iterator<ByteSource> iterator = byteSources.iterator();
+
+        // Act: Modify the underlying list after creating the iterator. This invalidates it.
+        byteSources.add(ByteSource.empty());
+
+        // The MultiInputStream constructor attempts to advance the iterator (by calling hasNext()),
+        // which will trigger the exception because the iterator has been invalidated.
+        new MultiInputStream(iterator);
+
+        // Assert: The test succeeds if the expected ConcurrentModificationException is thrown.
     }
 }
