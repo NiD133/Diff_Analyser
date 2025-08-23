@@ -1,22 +1,33 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class ExtraFieldUtils_ESTestTest38 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link ExtraFieldUtils}.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        AsiExtraField asiExtraField0 = new AsiExtraField();
-        byte[] byteArray0 = asiExtraField0.getCentralDirectoryData();
-        ExtraFieldUtils.UnparseableExtraField extraFieldUtils_UnparseableExtraField0 = ExtraFieldUtils.UnparseableExtraField.READ;
-        ZipExtraField[] zipExtraFieldArray0 = ExtraFieldUtils.parse(byteArray0, false, extraFieldUtils_UnparseableExtraField0);
-        byte[] byteArray1 = ExtraFieldUtils.mergeCentralDirectoryData(zipExtraFieldArray0);
-        assertEquals(14, byteArray1.length);
+    /**
+     * Tests that parsing and then merging the central directory data of a known
+     * extra field results in the original byte data, verifying a successful round-trip.
+     */
+    @Test
+    public void testParseAndMergeCentralDirectoryDataRoundtrip() throws Exception {
+        // Arrange: Create a known extra field and get its raw central directory data.
+        final AsiExtraField originalExtraField = new AsiExtraField();
+        final byte[] originalData = originalExtraField.getCentralDirectoryData();
+
+        // Act: Parse the raw data into an array of ZipExtraField objects.
+        // The 'local' flag is false, indicating this is central directory data.
+        final ZipExtraField[] parsedExtraFields = ExtraFieldUtils.parse(
+            originalData, false, ExtraFieldUtils.UnparseableExtraField.READ);
+
+        // Merge the parsed fields back into a byte array.
+        final byte[] mergedData = ExtraFieldUtils.mergeCentralDirectoryData(parsedExtraFields);
+
+        // Assert: The data after the parse-and-merge round-trip should be
+        // identical to the original data.
+        assertArrayEquals(originalData, mergedData);
     }
 }
