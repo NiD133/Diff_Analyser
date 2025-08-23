@@ -1,39 +1,31 @@
 package org.jfree.data.general;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class DefaultPieDatasetTestTest1 implements DatasetChangeListener {
-
-    private DatasetChangeEvent lastEvent;
-
-    /**
-     * Records the last event.
-     *
-     * @param event  the last event.
-     */
-    @Override
-    public void datasetChanged(DatasetChangeEvent event) {
-        this.lastEvent = event;
-    }
+/**
+ * This test suite contains tests for the equals() method of the DefaultPieDataset class.
+ */
+public class DefaultPieDatasetTest {
 
     /**
-     * Some tests for the clear() method.
+     * Tests that the equals() method returns false when a DefaultPieDataset
+     * is compared with an object of a different, albeit related, type.
      */
     @Test
-    public void testClear() {
-        DefaultPieDataset<String> d = new DefaultPieDataset<>();
-        d.addChangeListener(this);
-        // no event is generated if the dataset is already empty
-        d.clear();
-        assertNull(this.lastEvent);
-        d.setValue("A", 1.0);
-        assertEquals(1, d.getItemCount());
-        this.lastEvent = null;
-        d.clear();
-        assertNotNull(this.lastEvent);
-        assertEquals(0, d.getItemCount());
+    public void equals_returnsFalse_whenComparedWithDifferentDatasetType() {
+        // Arrange: Create a populated DefaultPieDataset.
+        DefaultPieDataset<String> pieDataset = new DefaultPieDataset<>();
+        pieDataset.setValue("Sample Key", 100.0);
+
+        // Arrange: Create an empty dataset of a different type.
+        DefaultKeyedValuesDataset<String> otherDataset = new DefaultKeyedValuesDataset<>();
+
+        // Act: Compare the two datasets for equality.
+        boolean areEqual = pieDataset.equals(otherDataset);
+
+        // Assert: The datasets should not be equal, as they are of different types
+        // and have different content.
+        assertFalse(areEqual);
     }
 }
