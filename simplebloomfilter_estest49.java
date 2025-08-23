@@ -1,28 +1,45 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest49 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SimpleBloomFilter} class.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        Shape shape0 = Shape.fromKM(19, 19);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(1956L, (-2388L));
-        boolean boolean0 = simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-        IndexFilter.ArrayTracker indexFilter_ArrayTracker0 = new IndexFilter.ArrayTracker(shape0);
-        IntPredicate intPredicate0 = indexFilter_ArrayTracker0.negate();
-        boolean boolean1 = simpleBloomFilter0.processIndices(intPredicate0);
-        assertFalse(boolean1 == boolean0);
-        assertFalse(boolean1);
+    /**
+     * Tests that {@code processIndices} correctly returns {@code false} and stops
+     * processing as soon as the provided predicate returns {@code false}.
+     */
+    @Test
+    public void processIndicesShouldReturnFalseWhenPredicateReturnsFalse() {
+        // Arrange
+        // 1. Create a filter with a specific shape.
+        Shape shape = Shape.fromKM(10, 100); // 10 hash functions, 100 bits
+        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // 2. Populate the filter with some indices by merging a hasher.
+        // This ensures there are active indices to be processed.
+        Hasher hasher = new EnhancedDoubleHasher("Hello, World!".getBytes());
+        boolean wasFilterChanged = filter.merge(hasher);
+        assertTrue("The filter should be modified by the merge operation", wasFilterChanged);
+        assertFalse("The filter should not be empty after merging", filter.isEmpty());
+
+        // 3. Define a predicate that always returns false.
+        // This predicate will cause the processing to stop on the very first index.
+        IntPredicate predicateThatStopsProcessing = index -> false;
+
+        // Act
+        // Attempt to process the indices. The method should return false because
+        // the predicate will immediately return false.
+        boolean processingResult = filter.processIndices(predicateThatStopsProcessing);
+
+        // Assert
+        // Verify that the processing was halted and returned false as expected.
+        assertFalse("processIndices should return false if the predicate returns false", processingResult);
     }
 }
