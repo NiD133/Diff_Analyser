@@ -1,40 +1,57 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
 import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest12 extends UTF8Writer_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link UTF8Writer} class, focusing on handling very large inputs.
+ */
+// Note: The original test class extended a scaffolding class. This inheritance is
+// maintained for context, but in a real-world refactoring, it might be removed.
+public class UTF8WriterLargeInputTest extends UTF8Writer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = new ContentReference(false, (Object) null, 20000000, 20000000, errorReportConfiguration0);
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        MockPrintStream mockPrintStream0 = new MockPrintStream("&`!00)T9c3y5e:");
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, mockPrintStream0);
-        CharBuffer charBuffer0 = CharBuffer.allocate(20000000);
-        // Undeclared exception!
-        uTF8Writer0.append((CharSequence) charBuffer0);
+    /**
+     * Tests that attempting to append an extremely large CharSequence to the writer
+     * results in an {@link OutOfMemoryError}.
+     * <p>
+     * This behavior is expected because the default implementation of {@link java.io.Writer#append(CharSequence)}
+     * first converts the entire sequence to a {@link String} by calling {@code toString()},
+     * which can exhaust heap memory for very large sequences.
+     */
+    @Test(timeout = 4000, expected = OutOfMemoryError.class)
+    public void append_withExtremelyLargeCharSequence_shouldThrowOutOfMemoryError() throws IOException {
+        // Arrange
+        // A size large enough to likely cause an OutOfMemoryError when the CharBuffer
+        // is converted to a String on typical heap sizes.
+        final int HUGE_SEQUENCE_SIZE = 20_000_000;
+
+        // The UTF8Writer requires an IOContext, which we configure with default settings.
+        // The ContentReference is not relevant for this test and can be null.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                null, // contentReference
+                false); // isResourceManaged
+
+        // Use a ByteArrayOutputStream as a sink for the writer's output.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, outputStream);
+
+        // Create a character sequence that is too large to fit in memory as a String.
+        CharSequence largeCharSequence = CharBuffer.allocate(HUGE_SEQUENCE_SIZE);
+
+        // Act & Assert
+        // The append operation is expected to fail with an OutOfMemoryError.
+        utf8Writer.append(largeCharSequence);
     }
 }
