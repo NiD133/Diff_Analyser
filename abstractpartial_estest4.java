@@ -1,47 +1,34 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+
+/**
+ * This test class focuses on the behavior of methods inherited from {@link AbstractPartial}.
+ */
 public class AbstractPartial_ESTestTest4 extends AbstractPartial_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        LocalDateTime localDateTime0 = new LocalDateTime();
-        LocalDate localDate0 = new LocalDate(localDateTime0);
-        boolean boolean0 = localDateTime0.equals(localDate0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when comparing two different types of partials,
+     * even if one contains a subset of the other's data.
+     *
+     * A LocalDateTime (containing date and time fields) should not be considered equal to a
+     * LocalDate (containing only date fields), as the `AbstractPartial.equals()` contract
+     * requires the field types to be identical.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparingPartialsWithDifferentFieldTypes() {
+        // Arrange: Create a full date-time object and a date-only object from it.
+        LocalDateTime dateTimeWithTime = new LocalDateTime();
+        LocalDate dateOnly = dateTimeWithTime.toLocalDate();
+
+        // Act & Assert: Verify that they are not equal.
+        // The equals method, inherited from AbstractPartial, checks that both objects
+        // have the same class, chronology, and set of field types before comparing values.
+        // Since LocalDateTime and LocalDate have different field types, this must be false.
+        assertFalse("A LocalDateTime should not be equal to a LocalDate", dateTimeWithTime.equals(dateOnly));
     }
 }
