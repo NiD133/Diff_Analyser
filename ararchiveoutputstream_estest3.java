@@ -1,43 +1,49 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest3 extends ArArchiveOutputStream_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        MockPrintStream mockPrintStream0 = new MockPrintStream("HU)HAv");
-        byte[] byteArray0 = new byte[7];
-        File file0 = MockFile.createTempFile("HU)HAv", "HU)HAv", (File) null);
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(mockPrintStream0);
-        ArArchiveEntry arArchiveEntry0 = arArchiveOutputStream0.createArchiveEntry(file0, "HU)HAv");
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-        arArchiveOutputStream0.write(byteArray0, (int) (byte) 127, 536);
-        try {
-            arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Length does not match entry (0 != 536
-            //
-            verifyException("org.apache.commons.compress.archivers.ar.ArArchiveOutputStream", e);
+/**
+ * Contains tests for {@link ArArchiveOutputStream}.
+ * This refactored test replaces an auto-generated one to improve clarity.
+ */
+public class ArArchiveOutputStreamTest {
+
+    /**
+     * Tests that an IOException is thrown when adding a new entry if the
+     * previously written entry's content size does not match its declared size.
+     */
+    @Test
+    public void writingMismatchedSizeToEntryThrowsExceptionOnNextEntry() throws IOException {
+        // Arrange
+        final String entryName = "test_entry.txt";
+        final long declaredEntrySize = 100L;
+        final byte[] actualData = "This data is definitely not 100 bytes long.".getBytes();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream)) {
+            // Create an entry declaring a size of 100 bytes.
+            ArArchiveEntry entry = new ArArchiveEntry(entryName, declaredEntrySize);
+            arOut.putArchiveEntry(entry);
+
+            // Act: Write a different number of bytes than declared in the entry header.
+            arOut.write(actualData);
+
+            // Assert: Attempting to add a new entry should trigger a size check on the
+            // previous entry, which will fail and throw an IOException.
+            try {
+                ArArchiveEntry nextEntry = new ArArchiveEntry("next_entry.txt", 0);
+                arOut.putArchiveEntry(nextEntry);
+                fail("Expected an IOException because the written data size does not match the entry's declared size.");
+            } catch (final IOException e) {
+                final String expectedMessage = "Length does not match entry (" + actualData.length + " != " + declaredEntrySize;
+                assertTrue("The exception message should report the size mismatch.", e.getMessage().startsWith(expectedMessage));
+            }
         }
     }
 }
