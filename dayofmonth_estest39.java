@@ -1,44 +1,37 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertSame;
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+
+// Unused imports from the original test have been removed for clarity.
 
 public class DayOfMonth_ESTestTest39 extends DayOfMonth_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Clock clock0 = MockClock.systemDefaultZone();
-        DayOfMonth dayOfMonth0 = DayOfMonth.now(clock0);
-        DayOfMonth dayOfMonth1 = DayOfMonth.from(dayOfMonth0);
-        assertEquals(14, dayOfMonth1.getValue());
+    /**
+     * Tests that {@code DayOfMonth.from()} returns the same cached instance
+     * when passed an existing {@code DayOfMonth} object.
+     * <p>
+     * The {@code DayOfMonth} class pre-allocates and caches instances for all 31 possible days.
+     * This test verifies that the {@code from()} factory method is optimized to return the
+     * existing instance directly, rather than creating a new one.
+     */
+    @Test
+    public void from_whenCalledWithDayOfMonthInstance_shouldReturnSameInstance() {
+        // Arrange: Directly create a DayOfMonth instance. This is clearer than
+        // using a mock clock, as it removes any ambiguity about the initial value.
+        DayOfMonth originalDayOfMonth = DayOfMonth.of(14);
+
+        // Act: Call the from() factory method, passing the existing instance.
+        DayOfMonth resultFromFactory = DayOfMonth.from(originalDayOfMonth);
+
+        // Assert: The factory method should return the exact same object, not just
+        // an equal one. assertSame() checks for reference equality (obj1 == obj2).
+        assertSame(
+            "DayOfMonth.from() should return the same cached instance for a DayOfMonth input",
+            originalDayOfMonth,
+            resultFromFactory
+        );
     }
 }
