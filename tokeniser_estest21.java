@@ -2,23 +2,43 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class Tokeniser_ESTestTest21 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Tokeniser} class.
+ * This class focuses on testing specific error-handling behaviors.
+ */
+public class TokeniserTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("{O_&7vinI", "{O_&7vinI");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        tokeniser0.error("{O_&7vinI");
+    /**
+     * Verifies that calling the tokeniser.error(String) method correctly
+     * adds a new ParseError to the associated error list.
+     */
+    @Test
+    public void errorMethodAddsParseErrorToList() {
+        // Arrange
+        // A Tokeniser is constructed with a TreeBuilder, which holds the Parser
+        // and its list of errors. We must initialize the builder to get a valid state.
+        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+        treeBuilder.parse("<a>", "https://example.com"); // Initialize internal state.
+
+        // The Tokeniser instance under test.
+        Tokeniser tokeniser = new Tokeniser(treeBuilder);
+        
+        // The error list is retrieved from the parser associated with the tree builder.
+        List<ParseError> errors = treeBuilder.getParser().getErrors();
+        assertTrue("Error list should be empty before the test action", errors.isEmpty());
+        
+        String expectedErrorMessage = "This is a custom error message.";
+
+        // Act
+        tokeniser.error(expectedErrorMessage);
+
+        // Assert
+        assertEquals("Error list should contain exactly one error after the call", 1, errors.size());
+        
+        ParseError actualError = errors.get(0);
+        assertEquals("The error message should match the one provided",
+            expectedErrorMessage, actualError.getErrorMessage());
     }
 }
