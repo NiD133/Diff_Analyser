@@ -1,30 +1,45 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.apache.ibatis.cache.CacheException;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest15 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
-        BlockingCache blockingCache0 = new BlockingCache(perpetualCache0);
-        // Undeclared exception!
+/**
+ * Test suite for the BlockingCache decorator.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that if the delegate cache throws an exception during a getObject call,
+     * the BlockingCache decorator correctly propagates that exception to the caller.
+     */
+    @Test
+    public void shouldPropagateExceptionFromDelegateOnGet() {
+        // Arrange
+        // 1. Create a mock for the delegate cache, which is the dependency we want to control.
+        Cache delegateCache = mock(Cache.class);
+        BlockingCache blockingCache = new BlockingCache(delegateCache);
+
+        // 2. Define a sample key and the expected exception.
+        Object key = "some-key";
+        CacheException expectedException = new CacheException("Error from delegate cache");
+
+        // 3. Configure the mock to throw our defined exception when getObject is called.
+        when(delegateCache.getObject(key)).thenThrow(expectedException);
+
+        // Act & Assert
         try {
-            blockingCache0.getObject(perpetualCache0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Cache instances require an ID.
-            //
-            verifyException("org.apache.ibatis.cache.impl.PerpetualCache", e);
+            blockingCache.getObject(key);
+            fail("Expected BlockingCache to propagate CacheException from the delegate.");
+        } catch (CacheException actualException) {
+            // 4. Verify that the caught exception is the one we expected.
+            assertEquals("The propagated exception should be the same as the one from the delegate.",
+                expectedException, actualException);
         }
     }
 }
