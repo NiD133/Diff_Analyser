@@ -1,47 +1,32 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest8 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        LocalDate localDate0 = new LocalDate();
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfEra();
-        boolean boolean0 = localDate0.isSupported(dateTimeFieldType0);
-        assertTrue(boolean0);
+/**
+ * Unit test for the {@link AbstractPartial#isSupported(DateTimeFieldType)} method.
+ *
+ * <p>This test uses {@link LocalDate} as a concrete implementation of {@link AbstractPartial}
+ * to verify its behavior.
+ */
+public class AbstractPartialIsSupportedTest {
+
+    /**
+     * Tests that isSupported() returns true for a field type that is part of the partial.
+     */
+    @Test
+    public void isSupported_shouldReturnTrue_whenFieldTypeIsPresentInPartial() {
+        // Arrange: Create a LocalDate instance, which is a partial containing year, month, and day.
+        LocalDate partialDate = new LocalDate();
+        DateTimeFieldType yearField = DateTimeFieldType.yearOfEra();
+
+        // Act: Check if the 'yearOfEra' field is supported.
+        boolean isYearSupported = partialDate.isSupported(yearField);
+
+        // Assert: The 'yearOfEra' field should be supported by LocalDate.
+        assertTrue("LocalDate should support the 'yearOfEra' field type.", isYearSupported);
     }
 }
