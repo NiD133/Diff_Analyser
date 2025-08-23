@@ -1,23 +1,29 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SegmentConstantPoolArrayCache_ESTestTest11 extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentConstantPoolArrayCache.CachedArray} inner class.
+ */
+public class SegmentConstantPoolArrayCacheTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
-        String[] stringArray0 = new String[8];
-        SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray0);
-        int int0 = segmentConstantPoolArrayCache_CachedArray0.lastKnownSize();
-        assertEquals(8, int0);
+    /**
+     * Verifies that the {@code lastKnownSize()} method of a new {@code CachedArray}
+     * instance correctly returns the length of the array it was constructed with.
+     */
+    @Test
+    public void lastKnownSizeShouldReturnArrayLengthOnCreation() {
+        // Arrange: Create a parent cache instance and an input array of a specific size.
+        final int expectedSize = 8;
+        final String[] inputArray = new String[expectedSize];
+        final SegmentConstantPoolArrayCache parentCache = new SegmentConstantPoolArrayCache();
+
+        // Act: Create the CachedArray and get its last known size.
+        final SegmentConstantPoolArrayCache.CachedArray cachedArray = parentCache.new CachedArray(inputArray);
+        final int actualSize = cachedArray.lastKnownSize();
+
+        // Assert: The returned size should match the original array's length.
+        assertEquals(expectedSize, actualSize);
     }
 }
