@@ -1,21 +1,26 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest19 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        long[] longArray0 = new long[8];
-        long[] longArray1 = ArrayFill.fill(longArray0, (-1L));
-        assertArrayEquals(new long[] { (-1L), (-1L), (-1L), (-1L), (-1L), (-1L), (-1L), (-1L) }, longArray1);
+    @Test
+    public void testFillLongArray() {
+        // Arrange
+        final long[] inputArray = new long[8];
+        final long[] expectedArray = {-1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L};
+
+        // Act
+        final long[] resultArray = ArrayFill.fill(inputArray, -1L);
+
+        // Assert
+        // The method should fill the array in place and return the same instance.
+        assertSame("The returned array should be the same instance as the input.", inputArray, resultArray);
+        assertArrayEquals("The array elements should be filled with the specified value.", expectedArray, resultArray);
     }
 }
