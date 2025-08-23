@@ -1,53 +1,42 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
 import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest20 extends PredicatedMap_ESTest_scaffolding {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        UniquePredicate<Object> uniquePredicate0 = new UniquePredicate<Object>();
-        HashMap<Predicate<Object>, Predicate<Object>> hashMap0 = new HashMap<Predicate<Object>, Predicate<Object>>();
-        hashMap0.put(uniquePredicate0, uniquePredicate0);
-        PredicatedMap<Predicate<Object>, Predicate<Object>> predicatedMap0 = null;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for {@link PredicatedMap} constructor validation.
+ */
+public class PredicatedMapConstructorTest {
+
+    @Test
+    public void constructorShouldThrowExceptionWhenExistingMapValueFailsValidation() {
+        // Arrange: Create a predicate that only accepts an object once.
+        // We will use the same instance for both key and value validation.
+        Predicate<Object> uniquePredicate = new UniquePredicate<>();
+
+        // Arrange: Create a map with an entry where the key and value are the same object.
+        Map<Object, Object> initialMap = new HashMap<>();
+        initialMap.put(uniquePredicate, uniquePredicate);
+
+        // Act & Assert: Attempt to create a PredicatedMap.
+        // The constructor validates existing entries. The process is as follows:
+        // 1. The key (uniquePredicate) is validated first. This succeeds, and the
+        //    predicate internally records that it has seen this object.
+        // 2. The value (the same uniquePredicate instance) is validated second. This fails
+        //    because the UniquePredicate has already seen this object.
         try {
-            predicatedMap0 = new PredicatedMap<Predicate<Object>, Predicate<Object>>(hashMap0, uniquePredicate0, uniquePredicate0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Cannot add value - Predicate rejected it
-            //
-            verifyException("org.apache.commons.collections4.map.PredicatedMap", e);
+            new PredicatedMap<>(initialMap, uniquePredicate, uniquePredicate);
+            fail("Expected an IllegalArgumentException because the value predicate should fail.");
+        } catch (final IllegalArgumentException e) {
+            // Assert: Verify the exception message is correct.
+            assertEquals("Cannot add value - Predicate rejected it", e.getMessage());
         }
     }
 }
