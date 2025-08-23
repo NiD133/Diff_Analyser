@@ -1,38 +1,39 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class MinutesTestTest19 extends TestCase {
+/**
+ * Unit tests for the {@link Minutes} class, focusing on the toStandardDuration() method.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final long MILLIS_PER_MINUTE = DateTimeConstants.MILLIS_PER_MINUTE;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void toStandardDuration_withTypicalMinutes_returnsCorrectDuration() {
+        // Arrange
+        final int minutesValue = 20;
+        final Minutes minutes = Minutes.minutes(minutesValue);
+        final Duration expectedDuration = new Duration(minutesValue * MILLIS_PER_MINUTE);
+
+        // Act
+        final Duration actualDuration = minutes.toStandardDuration();
+
+        // Assert
+        assertEquals(expectedDuration, actualDuration);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
+    @Test
+    public void toStandardDuration_withMaxValue_returnsCorrectDuration() {
+        // Arrange
+        final Minutes maxMinutes = Minutes.MAX_VALUE;
+        final Duration expectedDuration = new Duration((long) Integer.MAX_VALUE * MILLIS_PER_MINUTE);
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        final Duration actualDuration = maxMinutes.toStandardDuration();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardDuration() {
-        Minutes test = Minutes.minutes(20);
-        Duration expected = new Duration(20L * DateTimeConstants.MILLIS_PER_MINUTE);
-        assertEquals(expected, test.toStandardDuration());
-        expected = new Duration(((long) Integer.MAX_VALUE) * DateTimeConstants.MILLIS_PER_MINUTE);
-        assertEquals(expected, Minutes.MAX_VALUE.toStandardDuration());
+        // Assert
+        assertEquals(expectedDuration, actualDuration);
     }
 }
