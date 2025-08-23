@@ -1,32 +1,28 @@
 package org.jsoup.helper;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class Validate_ESTestTest45 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for {@link Validate}.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        // Undeclared exception!
-        try {
-            Validate.notNull((Object) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    // A JUnit Rule that allows for declaratively testing for expected exceptions.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void notNullShouldThrowIllegalArgumentExceptionForNullInput() {
+        // Arrange: We expect an IllegalArgumentException with a specific message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Object must not be null");
+
+        // Act: Call the method under test with a null argument.
+        Validate.notNull(null);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // The ExpectedException rule handles this verification automatically.
     }
 }
