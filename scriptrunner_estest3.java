@@ -1,39 +1,50 @@
 package org.apache.ibatis.jdbc;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PrintWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Reader;
-import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ScriptRunner_ESTestTest3 extends ScriptRunner_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ScriptRunner} class.
+ * This class focuses on improving the understandability of an auto-generated test.
+ */
+public class ScriptRunnerTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ScriptRunner scriptRunner0 = new ScriptRunner((Connection) null);
-        Reader reader0 = Reader.nullReader();
-        // Undeclared exception!
+    /**
+     * Verifies that runScript() throws a RuntimeException when the ScriptRunner
+     * is initialized with a null Connection.
+     * <p>
+     * The method is expected to fail early because it first tries to configure
+     * the connection's auto-commit property, which will result in a
+     * NullPointerException.
+     */
+    @Test
+    public void runScriptShouldThrowRuntimeExceptionWhenConnectionIsNull() {
+        // Arrange: Create a ScriptRunner with a null database connection.
+        // The reader can be any valid reader; its content is irrelevant
+        // as the exception occurs before the script is read.
+        ScriptRunner scriptRunner = new ScriptRunner((Connection) null);
+        Reader emptyReader = Reader.nullReader();
+
+        // Act & Assert
         try {
-            scriptRunner0.runScript(reader0);
-            fail("Expecting exception: RuntimeException");
+            scriptRunner.runScript(emptyReader);
+            fail("Expected a RuntimeException to be thrown due to the null connection.");
         } catch (RuntimeException e) {
-            //
-            // Could not set AutoCommit to false. Cause: java.lang.NullPointerException
-            //
-            verifyException("org.apache.ibatis.jdbc.ScriptRunner", e);
+            // Verify that the exception is the one we expect.
+            // The ScriptRunner should wrap the underlying NullPointerException.
+            final String expectedMessage = "Could not set AutoCommit to false. Cause: java.lang.NullPointerException";
+            assertEquals(expectedMessage, e.getMessage());
+
+            // Verify the cause of the exception is indeed a NullPointerException.
+            Throwable cause = e.getCause();
+            assertNotNull("Exception cause should not be null", cause);
+            assertTrue("Exception cause should be a NullPointerException", cause instanceof NullPointerException);
         }
     }
 }
