@@ -1,59 +1,35 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest42 extends GridArrangement_ESTest_scaffolding {
+/**
+ * This test suite contains tests for the GridArrangement class.
+ * This specific test case focuses on how the arrangement handles recursive structures.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(15, 15);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        blockContainer0.add((Block) blockContainer0);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertNotNull(rectangleConstraint0);
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrangeRF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling arrangeRF with a BlockContainer that contains itself
+     * results in a StackOverflowError. This tests the system's behavior when
+     * faced with a recursive block structure, which should be avoided in practice
+     * but needs to be handled gracefully (even if by crashing predictably).
+     */
+    @Test(expected = StackOverflowError.class)
+    public void arrangeRFShouldThrowStackOverflowErrorWhenContainerContainsItself() {
+        // Arrange: Create a grid arrangement and a block container that contains itself,
+        // which creates a recursive structure.
+        GridArrangement gridArrangement = new GridArrangement(1, 1);
+        BlockContainer selfContainingContainer = new BlockContainer();
+        selfContainingContainer.add(selfContainingContainer); // The recursive step
+
+        RectangleConstraint constraint = RectangleConstraint.NONE;
+        Graphics2D g2 = null; // Graphics2D is not used in the path to the error.
+
+        // Act: Attempt to arrange the container. This should lead to infinite recursion.
+        gridArrangement.arrangeRF(selfContainingContainer, g2, constraint);
+
+        // Assert: The @Test(expected) annotation handles the assertion that a
+        // StackOverflowError is thrown. No further assertions are needed.
     }
 }
