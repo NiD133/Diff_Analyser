@@ -1,30 +1,30 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest25 extends AtomicDoubleArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(600);
-        // Undeclared exception!
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
+
+    @Test
+    public void lazySet_withIndexEqualToLength_shouldThrowIndexOutOfBoundsException() {
+        // Arrange
+        final int arrayLength = 10;
+        final int outOfBoundsIndex = arrayLength; // The first invalid index is equal to the length.
+        AtomicDoubleArray array = new AtomicDoubleArray(arrayLength);
+
+        // Act & Assert
         try {
-            atomicDoubleArray0.lazySet(600, 600);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 600
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
+            array.lazySet(outOfBoundsIndex, 123.45);
+            fail("Expected an IndexOutOfBoundsException because the index was out of bounds.");
+        } catch (IndexOutOfBoundsException expected) {
+            // The exception message is specified by the underlying AtomicLongArray.
+            // We verify it to ensure the correct exception is propagated.
+            assertEquals("index " + outOfBoundsIndex, expected.getMessage());
         }
     }
 }
