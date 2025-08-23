@@ -1,24 +1,26 @@
 package com.google.common.base;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
+
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class CaseFormatTestTest27 extends TestCase {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest extends TestCase {
 
-    public void testUpperUnderscoreToUpperUnderscore() {
-        assertThat(UPPER_UNDERSCORE.to(UPPER_UNDERSCORE, "FOO")).isEqualTo("FOO");
-        assertThat(UPPER_UNDERSCORE.to(UPPER_UNDERSCORE, "FOO_BAR")).isEqualTo("FOO_BAR");
-    }
+  /**
+   * Verifies that converting a string from a format to the same format results in the
+   * original, unchanged string.
+   */
+  public void testIdentityConversion_upperUnderscore() {
+    String singleWord = "FOO";
+    assertThat(UPPER_UNDERSCORE.to(UPPER_UNDERSCORE, singleWord))
+        .isEqualTo(singleWord);
+
+    String multipleWords = "FOO_BAR";
+    assertThat(UPPER_UNDERSCORE.to(UPPER_UNDERSCORE, multipleWords))
+        .isEqualTo(multipleWords);
+  }
 }
