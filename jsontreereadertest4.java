@@ -1,32 +1,37 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+
 import com.google.gson.JsonObject;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeReaderTestTest4 {
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test
-    public void testSkipValue_afterEndOfDocument() throws IOException {
-        JsonTreeReader reader = new JsonTreeReader(new JsonObject());
-        reader.beginObject();
-        reader.endObject();
-        assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-        assertThat(reader.getPath()).isEqualTo("$");
-        reader.skipValue();
-        assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-        assertThat(reader.getPath()).isEqualTo("$");
-    }
+  /**
+   * Verifies that calling {@code skipValue()} when the reader is at the end of the document
+   * has no effect. The reader's state should remain unchanged.
+   */
+  @Test
+  public void skipValue_atEndOfDocument_isNoOp() throws IOException {
+    // Arrange: Create a reader and consume an empty JSON object to reach the end.
+    JsonTreeReader reader = new JsonTreeReader(new JsonObject());
+    reader.beginObject();
+    reader.endObject();
+
+    // Verify the initial state is END_DOCUMENT before the main action.
+    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(reader.getPath()).isEqualTo("$");
+
+    // Act: Attempt to skip a value when there is nothing left to read.
+    reader.skipValue();
+
+    // Assert: The reader's state and path should be unchanged.
+    assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+    assertThat(reader.getPath()).isEqualTo("$");
+  }
 }
