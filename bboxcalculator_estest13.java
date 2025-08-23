@@ -1,32 +1,30 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest13 extends BBoxCalculator_ESTest_scaffolding {
+/**
+ * Test suite for {@link BBoxCalculator}.
+ * This class focuses on verifying the behavior of BBoxCalculator, particularly its handling of edge cases.
+ */
+public class BBoxCalculatorTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator((SpatialContext) null);
-        // Undeclared exception!
-        try {
-            bBoxCalculator0.expandXRange((-751.777671), (-751.777671));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.BBoxCalculator", e);
-        }
+    /**
+     * Verifies that creating a BBoxCalculator with a null SpatialContext
+     * and then calling a method on it results in a NullPointerException.
+     * This ensures the constructor's preconditions are handled correctly downstream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void expandXRangeShouldThrowNPEWhenContextIsNull() {
+        // Arrange: Create a BBoxCalculator with a null SpatialContext, which is an invalid state.
+        BBoxCalculator calculator = new BBoxCalculator((SpatialContext) null);
+
+        // Act: Attempt to use the calculator. This is expected to throw a NullPointerException
+        // because the internal context is null and required for calculations.
+        // The specific arguments (0, 0) are arbitrary as the exception should precede their use.
+        calculator.expandXRange(0, 0);
+
+        // Assert: The test framework asserts that a NullPointerException was thrown,
+        // as specified by the 'expected' attribute on the @Test annotation.
     }
 }
