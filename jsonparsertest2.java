@@ -1,24 +1,32 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.TestTypes.BagOfPrimitives;
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonReader;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.StringReader;
+
 import org.junit.Test;
 
-public class JsonParserTestTest2 {
+/**
+ * Tests for {@link JsonParser}.
+ */
+public class JsonParserTest {
 
-    @Test
-    public void testParseUnquotedStringArrayFails() {
-        JsonElement element = JsonParser.parseString("[a,b,c]");
-        assertThat(element.getAsJsonArray().get(0).getAsString()).isEqualTo("a");
-        assertThat(element.getAsJsonArray().get(1).getAsString()).isEqualTo("b");
-        assertThat(element.getAsJsonArray().get(2).getAsString()).isEqualTo("c");
-        assertThat(element.getAsJsonArray()).hasSize(3);
-    }
+  /**
+   * Tests that {@link JsonParser#parseString(String)} successfully parses an array with unquoted
+   * string values. This is the expected behavior because the parser operates in a lenient mode by
+   * default, which permits this syntax.
+   */
+  @Test
+  public void testParseString_parsesArrayWithUnquotedStrings() {
+    // Arrange
+    String jsonWithUnquotedStrings = "[a,b,c]";
+    JsonArray expectedArray = new JsonArray();
+    expectedArray.add("a");
+    expectedArray.add("b");
+    expectedArray.add("c");
+
+    // Act
+    JsonElement parsedElement = JsonParser.parseString(jsonWithUnquotedStrings);
+
+    // Assert
+    assertThat(parsedElement).isEqualTo(expectedArray);
+  }
 }
