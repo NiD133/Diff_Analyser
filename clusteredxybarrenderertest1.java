@@ -1,60 +1,73 @@
 package org.jfree.chart.renderer.xy;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.jfree.chart.api.PublicCloneable;
-import org.jfree.data.Range;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.XYDataset;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ClusteredXYBarRendererTestTest1 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-    private static final double EPSILON = 0.0000000001;
+/**
+ * Tests for the {@link ClusteredXYBarRenderer} class, focusing on the equals() contract.
+ */
+@DisplayName("ClusteredXYBarRenderer equals() Contract")
+class ClusteredXYBarRendererTest {
 
-    /**
-     * Creates a sample dataset for testing.
-     *
-     * @return A sample dataset.
-     */
-    public DefaultIntervalXYDataset<String> createSampleDataset1() {
-        DefaultIntervalXYDataset<String> d = new DefaultIntervalXYDataset<>();
-        double[] x1 = new double[] { 1.0, 2.0, 3.0 };
-        double[] x1Start = new double[] { 0.9, 1.9, 2.9 };
-        double[] x1End = new double[] { 1.1, 2.1, 3.1 };
-        double[] y1 = new double[] { 4.0, 5.0, 6.0 };
-        double[] y1Start = new double[] { 1.09, 2.09, 3.09 };
-        double[] y1End = new double[] { 1.11, 2.11, 3.11 };
-        double[][] data1 = new double[][] { x1, x1Start, x1End, y1, y1Start, y1End };
-        d.addSeries("S1", data1);
-        double[] x2 = new double[] { 11.0, 12.0, 13.0 };
-        double[] x2Start = new double[] { 10.9, 11.9, 12.9 };
-        double[] x2End = new double[] { 11.1, 12.1, 13.1 };
-        double[] y2 = new double[] { 14.0, 15.0, 16.0 };
-        double[] y2Start = new double[] { 11.09, 12.09, 13.09 };
-        double[] y2End = new double[] { 11.11, 12.11, 13.11 };
-        double[][] data2 = new double[][] { x2, x2Start, x2End, y2, y2Start, y2End };
-        d.addSeries("S2", data2);
-        return d;
+    @Test
+    @DisplayName("should be equal to itself")
+    void testEquals_sameInstance() {
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        assertEquals(renderer, renderer, "A renderer instance should be equal to itself.");
     }
 
-    /**
-     * Check that the equals() method distinguishes all fields.
-     */
     @Test
-    public void testEquals() {
-        ClusteredXYBarRenderer r1 = new ClusteredXYBarRenderer();
-        ClusteredXYBarRenderer r2 = new ClusteredXYBarRenderer();
-        assertEquals(r1, r2);
-        assertEquals(r2, r1);
-        r1 = new ClusteredXYBarRenderer(1.2, false);
-        assertNotEquals(r1, r2);
-        r2 = new ClusteredXYBarRenderer(1.2, false);
-        assertEquals(r1, r2);
-        r1 = new ClusteredXYBarRenderer(1.2, true);
-        assertNotEquals(r1, r2);
-        r2 = new ClusteredXYBarRenderer(1.2, true);
-        assertEquals(r1, r2);
+    @DisplayName("should return false when compared with null")
+    void testEquals_withNull() {
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        assertNotEquals(null, renderer, "A renderer instance should not be equal to null.");
+    }
+
+    @Test
+    @DisplayName("should return false when compared with a different object type")
+    void testEquals_withDifferentObjectType() {
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        assertNotEquals(renderer, new Object(), "A renderer instance should not be equal to an object of a different type.");
+    }
+
+    @Test
+    @DisplayName("should be true for two separate default instances")
+    void testEquals_defaultInstances() {
+        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer();
+        ClusteredXYBarRenderer renderer2 = new ClusteredXYBarRenderer();
+        assertEquals(renderer1, renderer2, "Two default-constructed renderers should be equal.");
+    }
+
+    @Test
+    @DisplayName("should be true for two identical non-default instances")
+    void testEquals_identicalNonDefaultInstances() {
+        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer(0.15, true);
+        ClusteredXYBarRenderer renderer2 = new ClusteredXYBarRenderer(0.15, true);
+        assertEquals(renderer1, renderer2, "Two renderers with identical properties should be equal.");
+    }
+
+    @Test
+    @DisplayName("should be false when 'centerBarAtStartValue' differs")
+    void testEquals_whenCenterBarAtStartValueDiffers() {
+        // Arrange
+        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer(0.15, true);
+        ClusteredXYBarRenderer renderer2 = new ClusteredXYBarRenderer(0.15, false);
+
+        // Act & Assert
+        assertNotEquals(renderer1, renderer2, "Renderers should not be equal if 'centerBarAtStartValue' differs.");
+    }
+
+    @Test
+    @DisplayName("should be false when 'margin' (from superclass) differs")
+    void testEquals_whenMarginDiffers() {
+        // Arrange
+        ClusteredXYBarRenderer renderer1 = new ClusteredXYBarRenderer(0.15, true);
+        ClusteredXYBarRenderer renderer2 = new ClusteredXYBarRenderer(0.20, true);
+
+        // Act & Assert
+        assertNotEquals(renderer1, renderer2, "Renderers should not be equal if the 'margin' property differs.");
     }
 }
