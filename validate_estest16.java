@@ -1,26 +1,25 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest16 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for the {@link Validate} class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Object[] objectArray0 = new Object[1];
-        objectArray0[0] = (Object) "";
-        Validate.noNullElements(objectArray0, "");
-        assertEquals(1, objectArray0.length);
+    /**
+     * Tests that noNullElements() does not throw an exception when given an array
+     * that contains only non-null elements.
+     */
+    @Test
+    public void noNullElementsSucceedsForArrayWithNonNulls() {
+        // Arrange: Create an array containing a non-null element.
+        Object[] validArray = new Object[]{""};
+
+        // Act: Call the method under test.
+        // The test will pass if this line executes without throwing an exception.
+        Validate.noNullElements(validArray, "This message should not be seen");
+
+        // Assert: No explicit assertion is needed. The absence of an exception is the success condition.
     }
 }
