@@ -1,36 +1,25 @@
 package org.apache.commons.io.file;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.apache.commons.io.filefilter.CanExecuteFileFilter;
-import org.apache.commons.io.filefilter.CanReadFileFilter;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class AccumulatorPathVisitor_ESTestTest17 extends AccumulatorPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link AccumulatorPathVisitor}, focusing on the equals() method contract.
+ */
+public class AccumulatorPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters();
-        boolean boolean0 = accumulatorPathVisitor0.equals(accumulatorPathVisitor0);
-        assertTrue(boolean0);
+    /**
+     * Tests that an instance of AccumulatorPathVisitor is equal to itself,
+     * verifying the reflexivity property of the equals() method.
+     */
+    @Test
+    public void testEqualsIsReflexive() {
+        // Arrange: Create an instance of the visitor.
+        final AccumulatorPathVisitor visitor = AccumulatorPathVisitor.withBigIntegerCounters();
+
+        // Assert: An object must be equal to itself.
+        // Using assertEquals is a standard and expressive way to test for object equality.
+        assertEquals(visitor, visitor);
     }
 }
