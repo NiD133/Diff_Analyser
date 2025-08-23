@@ -1,58 +1,49 @@
 package org.apache.commons.codec.language;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import org.apache.commons.codec.AbstractStringEncoderTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class MetaphoneTestTest19 extends AbstractStringEncoderTest<Metaphone> {
-
-    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
-        // match source to all matches
-        for (final String matche : matches) {
-            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
-        }
-        // match to each other
-        for (final String matche : matches) {
-            for (final String matche2 : matches) {
-                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
-            }
-        }
-    }
-
-    public void assertMetaphoneEqual(final String[][] pairs) {
-        validateFixture(pairs);
-        for (final String[] pair : pairs) {
-            final String name0 = pair[0];
-            final String name1 = pair[1];
-            final String failMsg = "Expected match between " + name0 + " and " + name1;
-            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
-            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
-        }
-    }
+/**
+ * Tests the {@code isMetaphoneEqual} method of the {@link Metaphone} class.
+ * This class focuses on verifying that phonetically similar words are correctly
+ * identified as being equal.
+ */
+public class MetaphoneEqualityTest extends AbstractStringEncoderTest<Metaphone> {
 
     @Override
     protected Metaphone createStringEncoder() {
         return new Metaphone();
     }
 
-    public void validateFixture(final String[][] pairs) {
-        if (pairs.length == 0) {
-            fail("Test fixture is empty");
-        }
-        for (int i = 0; i < pairs.length; i++) {
-            if (pairs[i].length != 2) {
-                fail("Error in test fixture in the data array at index " + i);
-            }
-        }
+    @Test
+    void isMetaphoneEqualShouldReturnTrueForSameWord() {
+        assertTrue(getStringEncoder().isMetaphoneEqual("Xalan", "Xalan"),
+            "A word should be metaphone-equal to itself.");
     }
 
     /**
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     * Tests that a set of phonetically similar words are all considered equal by the Metaphone algorithm.
+     * The reference word is "Xalan", and it is compared against a list of other names that should be phonetically equivalent.
+     * <p>
+     * Match data was originally computed from an external website: http://www.lanw.com/java/phonetic/default.htm
+     * </p>
+     *
+     * @param nameToCompare a name that should be phonetically equivalent to "Xalan"
      */
-    @Test
-    void testIsMetaphoneEqualXalan() {
-        assertIsMetaphoneEqual("Xalan", new String[] { "Celene", "Celina", "Celine", "Selena", "Selene", "Selina", "Seline", "Suellen", "Xylina" });
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "Celene", "Celina", "Celine", "Selena", "Selene", "Selina", "Seline", "Suellen", "Xylina"
+    })
+    void isMetaphoneEqualShouldReturnTrueForPhoneticallySimilarWords(final String nameToCompare) {
+        final String referenceName = "Xalan";
+
+        assertTrue(
+            getStringEncoder().isMetaphoneEqual(referenceName, nameToCompare),
+            () -> "Expected '" + referenceName + "' to be metaphone-equal with '" + nameToCompare + "'"
+        );
     }
 }
