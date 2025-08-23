@@ -1,17 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest59 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        Minutes minutes0 = Minutes.minutes(2);
-        assertEquals(2, minutes0.getMinutes());
+    @Test
+    public void minutesFactory_shouldCreateInstanceWithCorrectValue() {
+        // Arrange
+        final int expectedMinutes = 2;
+
+        // Act
+        Minutes twoMinutes = Minutes.minutes(expectedMinutes);
+
+        // Assert
+        assertEquals(expectedMinutes, twoMinutes.getMinutes());
     }
 }
