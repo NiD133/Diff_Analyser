@@ -1,35 +1,34 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class ExtensionFunction_ESTestTest9 extends ExtensionFunction_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ExtensionFunction#toString()} method.
+ */
+public class ExtensionFunctionToStringTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Expression[] expressionArray0 = new Expression[2];
-        ExtensionFunction extensionFunction0 = new ExtensionFunction((QName) null, expressionArray0);
-        String string0 = extensionFunction0.toString();
-        assertEquals("null(null, null)", string0);
+    /**
+     * Tests that the toString() method correctly formats its output
+     * when the function name and its arguments are null.
+     *
+     * The expected format is "functionName(arg1, arg2, ...)", where null
+     * values are rendered as the string "null".
+     */
+    @Test
+    public void testToStringWithNullFunctionNameAndArguments() {
+        // Arrange: Create an ExtensionFunction with a null function name and an
+        // array of two null expressions as arguments.
+        QName nullFunctionName = null;
+        Expression[] nullArguments = new Expression[2]; // Array elements are null by default
+        ExtensionFunction extensionFunction = new ExtensionFunction(nullFunctionName, nullArguments);
+
+        // Act: Call the toString() method.
+        String result = extensionFunction.toString();
+
+        // Assert: Verify that the output string is formatted as expected.
+        assertEquals("The toString() output for null function and args is incorrect",
+                "null(null, null)", result);
     }
 }
