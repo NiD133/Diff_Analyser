@@ -1,32 +1,41 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest49 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(dupDetector0);
-        JsonLocation jsonLocation0 = jsonReadContext0.getStartLocation(jsonReadContext0);
-        assertEquals((-1L), jsonLocation0.getCharOffset());
-        assertEquals("ROOT", jsonReadContext0.getTypeDesc());
-        assertEquals(1, jsonLocation0.getLineNr());
-        assertEquals(0, jsonLocation0.getColumnNr());
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals(0, jsonReadContext0.getEntryCount());
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its initial state and location reporting.
+ */
+public class JsonReadContextTest {
+
+    /**
+     * Tests that a newly created root context has the expected default state
+     * and that its start location is initialized correctly.
+     */
+    @Test
+    public void getStartLocationForRootContextShouldReturnDefaultLocation() {
+        // Arrange: Create a root-level context.
+        // A DupDetector is needed, but for this test, it can be a simple root detector.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonReadContext rootContext = JsonReadContext.createRootContext(dupDetector);
+
+        // Act: Retrieve the starting location from the context.
+        // The source object (here, the context itself) is used to construct the location's ContentReference.
+        JsonLocation startLocation = rootContext.getStartLocation(rootContext);
+
+        // Assert: Verify the properties of both the context and its location.
+
+        // 1. Check the context's state
+        assertEquals("Context type should be 'ROOT'", "ROOT", rootContext.getTypeDesc());
+        assertEquals("Root context nesting depth should be 0", 0, rootContext.getNestingDepth());
+        assertEquals("Root context initial entry count should be 0", 0, rootContext.getEntryCount());
+
+        // 2. Check the location's coordinates
+        assertEquals("Initial line number should be 1", 1, startLocation.getLineNr());
+        assertEquals("Initial column number should be 0", 0, startLocation.getColumnNr());
+        assertEquals("Initial character offset should be -1", -1L, startLocation.getCharOffset());
     }
 }
