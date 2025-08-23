@@ -1,29 +1,40 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SegmentConstantPool_ESTestTest11 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * This test class has been refactored from an auto-generated EvoSuite test
+ * to improve readability and maintainability.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
+    /**
+     * Tests that {@link SegmentConstantPool#getValue(int, long)} throws an {@link Error}
+     * when provided with an unknown constant pool (cp) type. The method is expected to
+     * throw an Error for any type that is not a predefined constant.
+     */
+    @Test
+    public void getValueShouldThrowErrorForUnknownConstantPoolType() {
+        // Arrange
+        // The CpBands object is not accessed when the cp type is invalid, so it can be null for this test.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        
+        // An arbitrary negative value representing an invalid constant pool type.
+        int unknownCpType = -1;
+        
+        // The index value is not used in this error path, so a simple value is used.
+        long index = 0L;
+
+        // Act & Assert
         try {
-            segmentConstantPool0.getValue((-282), 4294967296L);
-            fail("Expecting exception: Error");
+            segmentConstantPool.getValue(unknownCpType, index);
+            fail("Expected an Error to be thrown for an unknown constant pool type, but no exception was thrown.");
         } catch (Error e) {
-            //
-            // Tried to get a value I don't know about: -282
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
+            // Verify that the correct Error is thrown with the expected message.
+            String expectedMessage = "Tried to get a value I don't know about: " + unknownCpType;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
