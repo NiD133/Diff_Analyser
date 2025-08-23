@@ -1,33 +1,45 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileMode_ESTestTest12 extends RandomAccessFileMode_ESTest_scaffolding {
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        MockFile mockFile0 = new MockFile("krLiZQCe");
-        EvoSuiteFile evoSuiteFile0 = new EvoSuiteFile("krLiZQCe");
-        FileSystemHandling.appendLineToFile(evoSuiteFile0, "krLiZQCe");
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-        IORandomAccessFile iORandomAccessFile0 = (IORandomAccessFile) randomAccessFileMode0.create((File) mockFile0);
-        assertEquals("rwd", iORandomAccessFile0.getMode());
+/**
+ * Tests for the {@link RandomAccessFileMode#create(File)} method.
+ */
+public class RandomAccessFileModeTest {
+
+    /**
+     * The TemporaryFolder Rule allows creation of files and folders that are
+     * guaranteed to be deleted when the test method finishes.
+     */
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    /**
+     * Tests that creating a file with READ_WRITE_SYNC_CONTENT mode
+     * results in a RandomAccessFile opened with the "rwd" mode string.
+     */
+    @Test
+    public void createWithReadWriteSyncContentModeShouldUseCorrectRwdModeString() throws IOException {
+        // Arrange: Create a temporary file to be used by the test.
+        final File testFile = temporaryFolder.newFile("test-file.txt");
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+        final String expectedModeString = "rwd";
+
+        // Act & Assert: Create the RandomAccessFile and verify its internal mode.
+        // Using a try-with-resources statement ensures the file is properly closed.
+        try (RandomAccessFile raf = mode.create(testFile)) {
+            // The create() method returns an IORandomAccessFile, which exposes getMode().
+            // A cast is necessary to access this method.
+            IORandomAccessFile ioraf = (IORandomAccessFile) raf;
+            assertEquals(expectedModeString, ioraf.getMode());
+        }
     }
 }
