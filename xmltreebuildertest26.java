@@ -1,33 +1,33 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest26 {
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the internal state management of the {@link XmlTreeBuilder}.
+ */
+public class XmlTreeBuilderTest {
 
+    /**
+     * Verifies that the parser clears its internal state (reader and tokeniser) after a parse operation.
+     * This is crucial for preventing resource leaks and ensuring the parser instance can be safely reused
+     * without carrying over state from a previous run.
+     */
     @Test
-    public void readerClosedAfterParse() {
-        Document doc = Jsoup.parse("Hello", "", Parser.xmlParser());
-        TreeBuilder treeBuilder = doc.parser().getTreeBuilder();
-        assertNull(treeBuilder.reader);
-        assertNull(treeBuilder.tokeniser);
+    public void parserClearsInternalStateAfterParse() {
+        // Arrange
+        String xmlToParse = "<data>Some XML</data>";
+        Parser parser = Parser.xmlParser();
+
+        // Act: Parse the XML string. The Jsoup.parse method uses and modifies the state of the provided parser instance.
+        Jsoup.parse(xmlToParse, "", parser);
+
+        // Assert: After parsing, the internal TreeBuilder should have its state cleared.
+        TreeBuilder treeBuilder = parser.getTreeBuilder();
+        assertNull(treeBuilder.reader, "The internal reader should be null after parsing is complete.");
+        assertNull(treeBuilder.tokeniser, "The internal tokeniser should be null after parsing is complete.");
     }
 }
