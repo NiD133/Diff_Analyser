@@ -1,41 +1,57 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
+import org.junit.Test;
 import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest48 extends W3CDom_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Document.createShell("javax.xml.xpath.XPathFactory:jsoup");
-        DocumentImpl documentImpl0 = (DocumentImpl) w3CDom0.fromJsoup(document0);
-        Class<FormElement> class0 = FormElement.class;
-        w3CDom0.sourceNodes((NodeList) documentImpl0, class0);
-        assertTrue(w3CDom0.namespaceAware());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Tests for the W3CDom helper class, focusing on converting Jsoup nodes
+ * back from their W3C DOM representation.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that a new W3CDom instance is configured to be namespace-aware by default,
+     * which is its standard behavior.
+     */
+    @Test
+    public void newInstanceShouldBeNamespaceAwareByDefault() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+
+        // Act & Assert
+        assertTrue("A new W3CDom instance should be namespace-aware by default.", w3cDom.namespaceAware());
+    }
+
+    /**
+     * Tests that sourceNodes returns an empty list when asked to find nodes of a type
+     * that do not exist in the provided NodeList, ensuring it handles "not found" cases gracefully.
+     */
+    @Test
+    public void sourceNodesShouldReturnEmptyListForNonMatchingNodeType() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+        // A basic HTML document without any <form> elements.
+        Document jsoupDoc = Document.createShell("http://example.com");
+
+        // Act
+        // 1. Convert the Jsoup document to a W3C DOM document.
+        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+        // 2. Get a list of all W3C element nodes from the document.
+        NodeList allW3cNodes = w3cDoc.getElementsByTagName("*");
+        // 3. Attempt to retrieve the original Jsoup nodes, but filter for a type that doesn't exist.
+        List<FormElement> formElements = w3cDom.sourceNodes(allW3cNodes, FormElement.class);
+
+        // Assert
+        // The method should return a non-null, empty list.
+        assertNotNull("The returned list should not be null, even if no nodes match.", formElements);
+        assertEquals("The list should be empty as no FormElements exist in the source document.", 0, formElements.size());
     }
 }
