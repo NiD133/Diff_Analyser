@@ -1,32 +1,48 @@
 package org.mockito.internal.verification;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.exceptions.base.MockitoAssertionError;
-import org.mockito.exceptions.verification.opentest4j.ArgumentsAreDifferent;
+import org.mockito.internal.verification.api.VerificationData;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImplTestTest1 {
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
 
     @Mock
     private VerificationMode delegate;
 
-    private VerificationOverTimeImpl impl;
+    private VerificationOverTimeImpl verificationWithTimeout;
 
     @Before
     public void setUp() {
         openMocks(this);
-        impl = new VerificationOverTimeImpl(10, 1000, delegate, true);
+
+        // Configure VerificationOverTimeImpl to behave like Mockito.timeout(),
+        // which returns immediately upon successful verification.
+        long pollingPeriodMillis = 10;
+        long durationMillis = 1000;
+        boolean returnOnSuccess = true; // This flag makes it a "timeout" style verification
+        verificationWithTimeout =
+                new VerificationOverTimeImpl(pollingPeriodMillis, durationMillis, delegate, returnOnSuccess);
     }
 
     @Test
-    public void should_return_on_success() {
-        impl.verify(null);
-        verify(delegate).verify(null);
+    public void shouldSucceedByDelegatingToWrappedVerificationMode() {
+        // given
+        // The delegate is a mock, so its verify() method will succeed by default without throwing an exception.
+        VerificationData data = null;
+
+        // when
+        verificationWithTimeout.verify(data);
+
+        // then
+        // The primary behavior is to delegate the verification check to the wrapped mode.
+        verify(delegate).verify(data);
     }
 }
