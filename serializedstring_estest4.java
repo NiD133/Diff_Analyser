@@ -1,30 +1,33 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest4 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class, focusing on its
+ * writing capabilities.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream(14);
-        MockPrintStream mockPrintStream0 = new MockPrintStream(byteArrayOutputStream0, false);
-        BufferedOutputStream bufferedOutputStream0 = new BufferedOutputStream(mockPrintStream0, 65);
-        int int0 = serializedString0.writeQuotedUTF8(bufferedOutputStream0);
-        assertEquals(0, int0);
+    /**
+     * Tests that writing a quoted UTF-8 representation of an empty SerializedString
+     * to an OutputStream results in zero bytes being written. This is an important
+     * edge case to ensure correct handling of empty strings.
+     */
+    @Test
+    public void writeQuotedUTF8_withEmptyString_shouldWriteZeroBytes() throws IOException {
+        // Arrange: Create a SerializedString from an empty string and an output stream to capture the result.
+        SerializedString emptySerializedString = new SerializedString("");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Act: Write the quoted UTF-8 content to the stream.
+        int bytesWritten = emptySerializedString.writeQuotedUTF8(outputStream);
+
+        // Assert: Verify that the number of bytes written is zero and the stream is indeed empty.
+        assertEquals("The method should report that 0 bytes were written.", 0, bytesWritten);
+        assertEquals("The output stream should contain no data.", 0, outputStream.size());
     }
 }
