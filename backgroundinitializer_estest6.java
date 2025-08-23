@@ -1,33 +1,43 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class BackgroundInitializer_ESTestTest6 extends BackgroundInitializer_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BackgroundInitializer<Exception> backgroundInitializer0 = new BackgroundInitializer<Exception>();
-        backgroundInitializer0.start();
-        backgroundInitializer0.start();
-        backgroundInitializer0.get();
-        assertTrue(backgroundInitializer0.isStarted());
+/**
+ * Unit tests for {@link BackgroundInitializer}.
+ */
+public class BackgroundInitializerTest {
+
+    /**
+     * Tests that the start() method is idempotent, meaning it can be called multiple
+     * times without error, but only the first call actually starts the initialization.
+     * Subsequent calls should have no effect and return false.
+     */
+    @Test
+    public void startShouldBeIdempotentAndReturnFalseOnSubsequentCalls() throws Exception {
+        // Arrange: Create a new BackgroundInitializer.
+        // The type parameter <Object> is used as the actual initialized value is not relevant for this test.
+        final BackgroundInitializer<Object> initializer = new BackgroundInitializer<>();
+
+        // Act & Assert: First call to start()
+        // The first call should successfully start the initializer and return true.
+        boolean wasStarted = initializer.start();
+        assertTrue("First call to start() should return true.", wasStarted);
+        assertTrue("Initializer should be in a 'started' state.", initializer.isStarted());
+
+        // Act & Assert: Second call to start()
+        // A second call should be ignored and return false.
+        wasStarted = initializer.start();
+        assertFalse("Second call to start() should return false.", wasStarted);
+        assertTrue("Initializer should remain in a 'started' state.", initializer.isStarted());
+
+        // Act: Wait for the background task to complete to ensure the state is stable.
+        initializer.get();
+
+        // Assert: Final state check
+        // The initializer should still be considered 'started' after completion.
+        assertTrue("Initializer should remain 'started' after task completion.", initializer.isStarted());
     }
 }
