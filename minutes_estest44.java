@@ -1,18 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Minutes_ESTestTest44 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        Minutes minutes0 = Minutes.ONE;
-        boolean boolean0 = minutes0.isLessThan((Minutes) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that isLessThan() returns false when comparing a positive Minutes object to null.
+     * The Javadoc for isLessThan() specifies that a null input is treated as zero.
+     * This test verifies that ONE minute is not less than ZERO minutes.
+     */
+    @Test
+    public void isLessThan_shouldReturnFalse_whenComparingPositiveMinutesToNull() {
+        // Arrange
+        Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        // The isLessThan() method treats a null argument as a Minutes object with a value of zero.
+        boolean isLessThan = oneMinute.isLessThan(null);
+
+        // Assert
+        // Since 1 is not less than 0, the result must be false.
+        assertFalse("One minute should not be less than null (zero)", isLessThan);
     }
 }
