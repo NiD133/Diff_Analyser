@@ -1,49 +1,41 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest12 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        System.setCurrentTimeMillis(16L);
-        ZoneId zoneId0 = ZoneId.systemDefault();
-        InternationalFixedDate internationalFixedDate0 = internationalFixedChronology0.dateNow(zoneId0);
-        assertEquals(365, internationalFixedDate0.lengthOfYear());
+/**
+ * This test class verifies the behavior of the dateNow() method in InternationalFixedChronology.
+ * The original test was auto-generated and has been rewritten for clarity and maintainability.
+ */
+public class InternationalFixedChronology_ESTestTest12 {
+
+    /**
+     * Tests that dateNow() correctly identifies the year length for a date
+     * that falls within a non-leap year.
+     */
+    @Test
+    public void dateNowShouldReturnDateWithCorrectYearLengthForNonLeapYear() {
+        // Arrange: Set up a fixed clock pointing to a moment in 1970.
+        // The International Fixed calendar shares the same leap year rule as the Gregorian calendar,
+        // and 1970 is not a leap year.
+        final InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        final Instant instantIn1970 = Instant.ofEpochMilli(16); // 1970-01-01T00:00:00.016Z
+        final Clock fixedClock = Clock.fixed(instantIn1970, ZoneOffset.UTC);
+
+        // Act: Get the current date from the chronology using the fixed clock.
+        InternationalFixedDate currentDate = chronology.dateNow(fixedClock);
+
+        // Assert: Verify that the length of the year for the obtained date is 365 days.
+        int expectedYearLength = 365;
+        assertEquals(
+            "The year 1970 should have 365 days in the International Fixed calendar.",
+            expectedYearLength,
+            currentDate.lengthOfYear()
+        );
     }
 }
