@@ -1,48 +1,31 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
-public class W3CDom_ESTestTest18 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for the {@link W3CDom} class.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Element element0 = new Element("javax.xml.xpath.XPathFactory:jsoup", "javax.xml.xpath.XPathFactory:jsoup");
-        w3CDom0.factory = null;
-        // Undeclared exception!
-        try {
-            w3CDom0.fromJsoup(element0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.W3CDom", e);
-        }
+    /**
+     * Verifies that the fromJsoup method throws a NullPointerException
+     * if the internal DocumentBuilderFactory is null. This ensures the method
+     * fails fast in case of an invalid internal state.
+     */
+    @Test(expected = NullPointerException.class)
+    public void fromJsoupShouldThrowNPEWhenFactoryIsNull() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+        Element jsoupElement = new Element("p"); // A simple, standard element is sufficient.
+
+        // Simulate an invalid internal state by nullifying the factory.
+        // This is a white-box test to ensure robustness against internal errors.
+        w3cDom.factory = null;
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException, which is
+        // caught and verified by the @Test(expected=...) annotation.
+        w3cDom.fromJsoup(jsoupElement);
     }
 }
