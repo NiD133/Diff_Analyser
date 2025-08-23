@@ -1,87 +1,50 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.MutablePeriod;
 import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.junit.Test;
 
-public class StringConverterTestTest24 extends TestCase {
+/**
+ * Test class for {@link StringConverter}, focusing on setting a period from a String.
+ */
+public class StringConverterTest {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+    /**
+     * Tests that StringConverter can parse a complete ISO 8601 period format string
+     * and correctly populate a MutablePeriod instance.
+     */
+    @Test
+    public void setInto_shouldParseIsoPeriodString_whenAllFieldsArePresent() {
+        // Arrange
+        final String periodString = "P2Y4W3DT12H24M56.S";
+        final PeriodType periodType = PeriodType.yearWeekDayTime();
+        
+        // The MutablePeriod to be populated by the converter.
+        MutablePeriod actualPeriod = new MutablePeriod(periodType);
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+        // The expected state of the period after parsing the string.
+        // P2Y  -> 2 Years
+        // 4W   -> 4 Weeks
+        // 3D   -> 3 Days
+        // T    -> Time separator
+        // 12H  -> 12 Hours
+        // 24M  -> 24 Minutes
+        // 56.S -> 56 Seconds and 0 Milliseconds
+        MutablePeriod expectedPeriod = new MutablePeriod(periodType);
+        expectedPeriod.setYears(2);
+        expectedPeriod.setWeeks(4);
+        expectedPeriod.setDays(3);
+        expectedPeriod.setHours(12);
+        expectedPeriod.setMinutes(24);
+        expectedPeriod.setSeconds(56);
+        expectedPeriod.setMillis(0);
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // Act
+        StringConverter.INSTANCE.setInto(actualPeriod, periodString, null);
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testSetIntoPeriod_Object5() throws Exception {
-        MutablePeriod m = new MutablePeriod(PeriodType.yearWeekDayTime());
-        StringConverter.INSTANCE.setInto(m, "P2Y4W3DT12H24M56.S", null);
-        assertEquals(2, m.getYears());
-        assertEquals(4, m.getWeeks());
-        assertEquals(3, m.getDays());
-        assertEquals(12, m.getHours());
-        assertEquals(24, m.getMinutes());
-        assertEquals(56, m.getSeconds());
-        assertEquals(0, m.getMillis());
+        // Assert
+        assertEquals(expectedPeriod, actualPeriod);
     }
 }
