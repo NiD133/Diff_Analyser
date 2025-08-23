@@ -1,35 +1,33 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MeterNeedle_ESTestTest1 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class.
+ * This test uses a concrete subclass, {@link PlumNeedle}, to test the
+ * functionality inherited from the abstract MeterNeedle class.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        PlumNeedle plumNeedle0 = new PlumNeedle();
-        plumNeedle0.setRotateY((-2433.34177));
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        shipNeedle0.equals(plumNeedle0);
-        assertEquals((-2433.34177), plumNeedle0.getRotateY(), 0.01);
-        assertEquals(0.5, plumNeedle0.getRotateX(), 0.01);
+    /**
+     * Verifies that setRotateY() correctly updates the 'rotateY' property
+     * and does not cause unintended side effects on other properties like 'rotateX'.
+     */
+    @Test
+    public void setRotateYShouldUpdateYRotationPointWithoutSideEffects() {
+        // Arrange: Create a needle instance and define test values.
+        PlumNeedle needle = new PlumNeedle();
+        final double initialRotateX = needle.getRotateX(); // Capture the initial state.
+        final double newRotateY = -2433.34;
+
+        // Act: Call the method under test.
+        needle.setRotateY(newRotateY);
+
+        // Assert: Verify the outcome.
+        assertEquals("The rotateY value should be updated to the new value.",
+                newRotateY, needle.getRotateY(), 0.01);
+        assertEquals("The rotateX value should remain unchanged after setting rotateY.",
+                initialRotateX, needle.getRotateX(), 0.01);
     }
 }
