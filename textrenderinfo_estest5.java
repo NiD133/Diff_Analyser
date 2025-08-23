@@ -1,42 +1,58 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
+import org.junit.Test;
+
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
 
 public class TextRenderInfo_ESTestTest5 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        graphicsState0.characterSpacing = 1025.7177F;
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = new Matrix(2766.3F, 1543.6833F);
-        TreeSet<MarkedContentInfo> treeSet0 = new TreeSet<MarkedContentInfo>();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, treeSet0);
-        float float0 = textRenderInfo0.getSingleSpaceWidth();
-        assertEquals(1025.7175F, float0, 0.01F);
+    /**
+     * Verifies that getSingleSpaceWidth() correctly incorporates the character spacing
+     * defined in the GraphicsState.
+     * <p>
+     * The single space width is a combination of the font's default space width and
+     * the character spacing. This test uses a mock font with a default space width of zero,
+     * ensuring that the calculated width is determined solely by the character spacing.
+     */
+    @Test
+    public void getSingleSpaceWidth_shouldReflectCharacterSpacing() {
+        // Arrange
+        final float characterSpacing = 1025.7177F;
+        final float expectedSpaceWidth = 1025.7177F;
+        final float delta = 0.01F;
+
+        // Set up a graphics state with a specific character spacing.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.characterSpacing = characterSpacing;
+
+        // Use a default CMapAwareDocumentFont which acts as a mock font.
+        // Its width for a space character is effectively zero in this context.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        // Create the minimal required parameters for the TextRenderInfo constructor.
+        PdfString emptyText = new PdfString("");
+        Matrix identityMatrix = new Matrix(); // An identity matrix ensures no scaling affects the width.
+        Collection<MarkedContentInfo> noMarkedContent = Collections.emptyList();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                emptyText,
+                graphicsState,
+                identityMatrix,
+                noMarkedContent
+        );
+
+        // Act
+        float actualSpaceWidth = textRenderInfo.getSingleSpaceWidth();
+
+        // Assert
+        // The resulting width should match the character spacing, given the font's
+        // space width is zero. A delta is used for floating-point comparison.
+        assertEquals(expectedSpaceWidth, actualSpaceWidth, delta);
     }
 }
