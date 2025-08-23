@@ -1,56 +1,36 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
+import static org.junit.Assert.fail;
+
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.Collections;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest7 extends CollectionBag_ESTest_scaffolding {
+/**
+ * Tests for {@link CollectionBag} focusing on its interaction with decorated bags.
+ */
+public class CollectionBagTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        Integer integer0 = new Integer(1);
-        HashBag<Integer> hashBag0 = new HashBag<Integer>((Collection<? extends Integer>) collectionBag0);
-        hashBag0.add(integer0);
-        collectionBag0.addAll(hashBag0);
-        HashBag<ComparatorPredicate.Criterion> hashBag1 = new HashBag<ComparatorPredicate.Criterion>();
-        Bag<ComparatorPredicate.Criterion> bag0 = UnmodifiableBag.unmodifiableBag((Bag<? extends ComparatorPredicate.Criterion>) hashBag1);
-        CollectionBag<ComparatorPredicate.Criterion> collectionBag1 = new CollectionBag<ComparatorPredicate.Criterion>(bag0);
-        // Undeclared exception!
+    /**
+     * Tests that a modification attempt on a CollectionBag throws an exception
+     * if it decorates an unmodifiable underlying bag.
+     */
+    @Test
+    public void removeAllOnCollectionBagDecoratingUnmodifiableBagShouldThrowException() {
+        // Arrange: Create a CollectionBag that decorates an unmodifiable bag.
+        final Bag<String> unmodifiableBag = UnmodifiableBag.unmodifiableBag(new HashBag<>());
+        final Bag<String> collectionBag = new CollectionBag<>(unmodifiableBag);
+
+        // Create a collection of items to attempt to remove.
+        final Collection<String> itemsToRemove = Collections.singleton("item to remove");
+
+        // Act & Assert: Verify that calling a modification method throws an exception.
         try {
-            collectionBag1.removeAll(collectionBag0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bag.UnmodifiableBag", e);
+            collectionBag.removeAll(itemsToRemove);
+            fail("Expected an UnsupportedOperationException because the underlying bag is unmodifiable.");
+        } catch (final UnsupportedOperationException e) {
+            // This is the expected behavior. The test passes.
         }
     }
 }
