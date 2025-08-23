@@ -1,35 +1,54 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 
+/**
+ * Contains tests for the {@link JsonIgnoreProperties.Value} class, focusing on its factory and mutant methods.
+ * This class was refactored from an auto-generated test to improve clarity.
+ */
 public class JsonIgnoreProperties_ESTestTest14 extends JsonIgnoreProperties_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[5];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoreUnknown(false);
-        assertFalse(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        jsonIgnoreProperties_ValueArray0[2] = jsonIgnoreProperties_Value0;
-        Set<String> set0 = jsonIgnoreProperties_ValueArray0[2].findIgnoredForSerialization();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.construct(set0, true, false, true, false);
-        assertTrue(jsonIgnoreProperties_Value1.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value1.getAllowSetters());
-        jsonIgnoreProperties_ValueArray0[4] = jsonIgnoreProperties_Value1;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_ValueArray0[4].withMerge();
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertTrue(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertFalse(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value2.getMerge());
-        assertTrue(jsonIgnoreProperties_Value2.getIgnoreUnknown());
+    /**
+     * Verifies that the {@code withMerge()} method returns a new {@link JsonIgnoreProperties.Value}
+     * instance with the 'merge' property set to true, while keeping all other properties unchanged.
+     */
+    @Test
+    public void withMergeShouldCreateNewInstanceWithMergeEnabledAndPreserveOtherProperties() {
+        // Arrange: Create an initial Value instance with specific properties and merge disabled.
+        final Set<String> ignoredProperties = Collections.emptySet();
+        final boolean initialIgnoreUnknown = true;
+        final boolean initialAllowGetters = false;
+        final boolean initialAllowSetters = true;
+        final boolean initialMerge = false; // Explicitly start with merge disabled
+
+        JsonIgnoreProperties.Value originalValue = JsonIgnoreProperties.Value.construct(
+                ignoredProperties,
+                initialIgnoreUnknown,
+                initialAllowGetters,
+                initialAllowSetters,
+                initialMerge
+        );
+
+        // Act: Call the method under test to create a new instance with merge enabled.
+        JsonIgnoreProperties.Value mergedValue = originalValue.withMerge();
+
+        // Assert: Verify the new instance has the correct properties.
+        assertNotSame("A new instance should be created, not a modified one.", originalValue, mergedValue);
+
+        // 1. Verify the 'merge' property was enabled
+        assertTrue("The 'merge' property should now be true.", mergedValue.getMerge());
+
+        // 2. Verify all other properties were preserved from the original instance
+        assertEquals("Ignored properties should be unchanged.",
+                originalValue.getIgnored(), mergedValue.getIgnored());
+        assertEquals("'ignoreUnknown' property should be unchanged.",
+                originalValue.getIgnoreUnknown(), mergedValue.getIgnoreUnknown());
+        assertEquals("'allowGetters' property should be unchanged.",
+                originalValue.getAllowGetters(), mergedValue.getAllowGetters());
+        assertEquals("'allowSetters' property should be unchanged.",
+                originalValue.getAllowSetters(), mergedValue.getAllowSetters());
     }
 }
