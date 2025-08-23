@@ -1,32 +1,32 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Validate_ESTestTest27 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that calling notEmpty() with a null string argument
+     * throws an IllegalArgumentException with a specific message.
+     */
+    @Test
+    public void notEmptyThrowsIllegalArgumentExceptionForNullString() {
+        // Arrange: Define the expected exception type and message.
+        String expectedMessage = "String must not be empty";
+
         try {
+            // Act: Call the method that is expected to throw.
             Validate.notEmpty((String) null);
-            fail("Expecting exception: IllegalArgumentException");
+            
+            // Assert: Fail the test if no exception was thrown.
+            fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify that the caught exception has the correct message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
