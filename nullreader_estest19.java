@@ -1,27 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class NullReader_ESTestTest19 extends NullReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link NullReader} class.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        NullReader nullReader0 = new NullReader(959L, true, true);
+    /**
+     * Verifies that calling reset() before a position has been marked throws an IOException.
+     * The Reader contract specifies that reset() should throw an IOException if no
+     * mark has been set.
+     */
+    @Test
+    public void testResetShouldThrowIOExceptionWhenNotMarked() {
+        // Arrange: Create a NullReader that supports marking. The size is not relevant.
+        final NullReader reader = new NullReader(100L, true, false);
+
+        // Act & Assert
         try {
-            nullReader0.reset();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // No position has been marked
-            //
-            verifyException("org.apache.commons.io.input.NullReader", e);
+            reader.reset();
+            fail("Expected an IOException to be thrown because reset() was called before mark().");
+        } catch (final IOException e) {
+            // Assert that the exception has the expected message.
+            final String expectedMessage = "No position has been marked";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
