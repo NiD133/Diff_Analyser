@@ -1,37 +1,37 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest26 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * This test class focuses on the equality logic of MeterNeedle implementations.
+ * Note: The original test class name "MeterNeedle_ESTestTest26" is an artifact
+ * of a test generation tool. In a typical project, this test would be part of a
+ * more descriptively named class like "MiddlePinNeedleTest".
+ */
+public class MeterNeedle_ESTestTest26 {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        MiddlePinNeedle middlePinNeedle0 = new MiddlePinNeedle();
-        MiddlePinNeedle middlePinNeedle1 = (MiddlePinNeedle) middlePinNeedle0.clone();
-        assertTrue(middlePinNeedle1.equals((Object) middlePinNeedle0));
-        BasicStroke basicStroke0 = new BasicStroke();
-        middlePinNeedle1.setOutlineStroke(basicStroke0);
-        boolean boolean0 = middlePinNeedle0.equals(middlePinNeedle1);
-        assertFalse(middlePinNeedle1.equals((Object) middlePinNeedle0));
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false for two MiddlePinNeedle
+     * objects that differ only by their outline stroke.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenOutlineStrokesDiffer() {
+        // Arrange: Create a needle and a clone of it.
+        MiddlePinNeedle originalNeedle = new MiddlePinNeedle();
+        MiddlePinNeedle clonedNeedle = (MiddlePinNeedle) originalNeedle.clone();
+
+        // Sanity check: Ensure the clone is equal to the original initially.
+        assertEquals("A fresh clone should be equal to its original.", originalNeedle, clonedNeedle);
+
+        // Act: Modify the outline stroke of the cloned needle to be different.
+        BasicStroke differentStroke = new BasicStroke(1.0f); // Default is 2.0f
+        clonedNeedle.setOutlineStroke(differentStroke);
+
+        // Assert: The needles should no longer be considered equal.
+        assertNotEquals("Needles with different outline strokes should not be equal.", originalNeedle, clonedNeedle);
     }
 }
