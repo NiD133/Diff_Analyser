@@ -1,53 +1,54 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.util.Arrays;
 
-public class UTF8Writer_ESTestTest26 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.REDACTED_CONTENT;
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        CharBuffer charBuffer0 = CharBuffer.allocate(7989);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, (OutputStream) null);
-        Writer writer0 = uTF8Writer0.append((CharSequence) charBuffer0);
-        writer0.append('n');
-        Writer writer1 = uTF8Writer0.append('2');
-        writer0.write(1000);
-        uTF8Writer0.append('\u00F6');
-        writer1.write(1);
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link UTF8Writer} class.
+ */
+// The original class name 'UTF8Writer_ESTestTest26' is kept for context,
+// but in a real project, it would be merged into a single 'UTF8WriterTest' class.
+public class UTF8Writer_ESTestTest26 {
+
+    /**
+     * Tests that writing to a UTF8Writer configured with a null OutputStream
+     * throws a NullPointerException when the internal buffer is full and needs to be flushed.
+     */
+    @Test
+    public void write_whenBufferOverflowsWithNullOutputStream_shouldThrowNullPointerException() {
+        // Arrange
+        // The UTF8Writer needs an IOContext, primarily to allocate its internal buffer.
+        // We use a standard BufferRecycler for this. Other IOContext parameters are not
+        // relevant to this test and can be created from defaults.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(null, null, null, bufferRecycler, null, false);
+
+        // The key part of the test setup: instantiate UTF8Writer with a null OutputStream.
+        UTF8Writer writer = new UTF8Writer(ioContext, (OutputStream) null);
+
+        // The default buffer size for write encoding is 2000 bytes.
+        // We create a character array larger than this to guarantee a buffer flush attempt.
+        // Each 'a' character is a single byte in UTF-8, so 2001 chars will overflow a 2000-byte buffer.
+        char[] largeCharArray = new char[2001];
+        Arrays.fill(largeCharArray, 'a');
+
+        // Act & Assert
         try {
-            uTF8Writer0.write(2);
-            fail("Expecting exception: NullPointerException");
+            // This write operation will fill the internal buffer and attempt to flush it.
+            // Since the underlying OutputStream is null, a NullPointerException is expected.
+            writer.write(largeCharArray);
+            fail("Expected a NullPointerException because the underlying OutputStream is null and the buffer needs to be flushed.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
+            // This is the expected outcome. The test passes.
+        } catch (IOException e) {
+            // Fail the test if any other IO-related exception occurs.
+            fail("An unexpected IOException was thrown: " + e.getMessage());
         }
     }
 }
