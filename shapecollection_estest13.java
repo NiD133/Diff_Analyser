@@ -1,35 +1,45 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest13 extends ShapeCollection_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        Stack<ShapeCollection<JtsPoint>> stack0 = new Stack<ShapeCollection<JtsPoint>>();
-        stack0.add(shapeCollection0);
-        ShapeCollection<ShapeCollection<JtsPoint>> shapeCollection1 = new ShapeCollection<ShapeCollection<JtsPoint>>(stack0, spatialContext0);
-        ShapeCollection shapeCollection2 = shapeCollection1.getBuffered(938.8456, spatialContext0);
-        assertEquals(1, shapeCollection2.size());
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the {@link ShapeCollection} class.
+ */
+public class ShapeCollectionTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * Tests that buffering a ShapeCollection which contains a single, empty
+     * ShapeCollection results in a new collection with exactly one element.
+     * This element represents the buffered (but still empty) geometry of the inner collection.
+     */
+    @Test
+    public void getBufferedOnCollectionContainingOneEmptyCollectionReturnsCollectionWithOneElement() {
+        // Arrange
+        // 1. Create an empty ShapeCollection.
+        ShapeCollection<Shape> emptyCollection = new ShapeCollection<>(Collections.emptyList(), spatialContext);
+
+        // 2. Create a parent collection that contains only the empty collection.
+        List<Shape> shapes = Collections.singletonList(emptyCollection);
+        ShapeCollection<Shape> collectionContainingEmpty = new ShapeCollection<>(shapes, spatialContext);
+
+        double bufferDistance = 10.0; // An arbitrary distance for the buffer operation.
+
+        // Act
+        // Buffer the parent collection. The implementation should iterate through its
+        // contents, buffer each one, and create a new collection of the results.
+        ShapeCollection bufferedResult = collectionContainingEmpty.getBuffered(bufferDistance, spatialContext);
+
+        // Assert
+        // The resulting collection should contain a single shape, which is the result
+        // of buffering the inner empty collection.
+        assertEquals("The buffered collection should contain one element", 1, bufferedResult.size());
     }
 }
