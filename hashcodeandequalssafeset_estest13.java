@@ -1,29 +1,27 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest13 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
-        Object[] objectArray0 = new Object[6];
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet1 = HashCodeAndEqualsSafeSet.of(objectArray0);
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.containsAll(hashCodeAndEqualsSafeSet1);
-        assertFalse(boolean0);
+    @Test
+    public void containsAll_shouldReturnFalse_whenSetIsEmptyAndOtherCollectionIsNotEmpty() {
+        // Arrange
+        // Create an empty set using the factory method.
+        HashCodeAndEqualsSafeSet emptySet = HashCodeAndEqualsSafeSet.of((Iterable<Object>) null);
+        
+        // Create a non-empty set containing a single null element to check against.
+        HashCodeAndEqualsSafeSet setWithNull = HashCodeAndEqualsSafeSet.of((Object) null);
+
+        // Act
+        // Check if the empty set contains all elements of the non-empty set.
+        boolean result = emptySet.containsAll(setWithNull);
+
+        // Assert
+        assertFalse("An empty set cannot contain the elements of a non-empty set.", result);
     }
 }
