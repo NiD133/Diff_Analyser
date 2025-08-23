@@ -1,74 +1,44 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
 import static org.junit.Assert.assertThrows;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
 
-public class AtomicDoubleArrayTestTest7 extends JSR166TestCase {
+/**
+ * Tests for bounds checking in {@link AtomicDoubleArray}.
+ */
+@GwtIncompatible
+@J2ktIncompatible
+public class AtomicDoubleArrayBoundsTest extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
+  private static final int ARRAY_SIZE = 10;
 
-    static final long COUNTDOWN = 100000;
+  /**
+   * Verifies that all accessor and mutator methods of {@code AtomicDoubleArray} throw an
+   * {@code IndexOutOfBoundsException} when given an index that is out of bounds. The test checks
+   * two boundary conditions: -1 (below the lower bound) and the array's size (at the upper bound).
+   */
+  public void testOperationsOnOutOfBoundsIndicesThrowException() {
+    AtomicDoubleArray array = new AtomicDoubleArray(ARRAY_SIZE);
+    int[] outOfBoundsIndices = {-1, ARRAY_SIZE};
 
-    /**
-     * The notion of equality used by AtomicDoubleArray
-     */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
+    for (int invalidIndex : outOfBoundsIndices) {
+      // Test read operation
+      assertThrows(IndexOutOfBoundsException.class, () -> array.get(invalidIndex));
+
+      // Test write operations
+      assertThrows(IndexOutOfBoundsException.class, () -> array.set(invalidIndex, 1.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.lazySet(invalidIndex, 1.0));
+
+      // Test atomic read-modify-write operations
+      assertThrows(
+          IndexOutOfBoundsException.class, () -> array.compareAndSet(invalidIndex, 1.0, 2.0));
+      assertThrows(
+          IndexOutOfBoundsException.class,
+          () -> array.weakCompareAndSet(invalidIndex, 1.0, 2.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.getAndAdd(invalidIndex, 1.0));
+      assertThrows(IndexOutOfBoundsException.class, () -> array.addAndGet(invalidIndex, 1.0));
     }
-
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * get and set for out of bound indices throw IndexOutOfBoundsException
-     */
-    public void testIndexing() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(SIZE);
-        for (int index : new int[] { -1, SIZE }) {
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.get(index));
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.set(index, 1.0));
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.lazySet(index, 1.0));
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.compareAndSet(index, 1.0, 2.0));
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.weakCompareAndSet(index, 1.0, 2.0));
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.getAndAdd(index, 1.0));
-            assertThrows(IndexOutOfBoundsException.class, () -> aa.addAndGet(index, 1.0));
-        }
-    }
+  }
 }
