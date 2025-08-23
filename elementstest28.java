@@ -1,25 +1,31 @@
 package org.jsoup.select;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ElementsTestTest28 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+// The original class name `ElementsTestTest28` was redundant and uninformative.
+// Renaming it to `ElementsTest` aligns with standard testing conventions.
+public class ElementsTest {
 
     @Test
-    public void tagNameSet() {
-        Document doc = Jsoup.parse("<p>Hello <i>there</i> <i>now</i></p>");
+    // The original method name `tagNameSet` was ambiguous. This new name,
+    // `tagNameShouldChangeTagForAllSelectedElements`, clearly describes the
+    // behavior under test, following a "should" convention for test naming.
+    public void tagNameShouldChangeTagForAllSelectedElements() {
+        // Arrange: Set up the initial state and expected outcome.
+        String originalHtml = "<p>Hello <i>there</i> <i>now</i></p>";
+        Document doc = Jsoup.parse(originalHtml);
+        String expectedHtml = "<p>Hello <em>there</em> <em>now</em></p>";
+
+        // Act: Perform the action being tested.
+        // Select all 'i' elements and change their tag name to 'em'.
         doc.select("i").tagName("em");
-        assertEquals("<p>Hello <em>there</em> <em>now</em></p>", doc.body().html());
+
+        // Assert: Verify the action produced the expected outcome.
+        String actualHtml = doc.body().html();
+        assertEquals(expectedHtml, actualHtml);
     }
 }
