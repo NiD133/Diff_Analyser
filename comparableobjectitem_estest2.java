@@ -2,21 +2,33 @@ package org.jfree.data;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.mockito.Mockito.mock;
 
-public class ComparableObjectItem_ESTestTest2 extends ComparableObjectItem_ESTest_scaffolding {
+import java.lang.Comparable;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Comparable<Object> comparable0 = (Comparable<Object>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(comparable0).toString();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, comparable0);
-        Comparable comparable1 = comparableObjectItem0.getComparable();
-        assertNotNull(comparable1);
+/**
+ * Unit tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
+
+    /**
+     * Verifies that the getComparable() method correctly returns the
+     * 'comparable' object that was provided in the constructor.
+     */
+    @Test
+    public void getComparable_shouldReturnObjectProvidedInConstructor() {
+        // Arrange: Create a mock Comparable object to pass to the constructor.
+        // The second argument (the 'object' part of the item) is not relevant for this test.
+        Comparable<String> expectedComparable = mock(Comparable.class);
+        Object dummyObject = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(expectedComparable, dummyObject);
+
+        // Act: Call the method under test.
+        Comparable<?> actualComparable = item.getComparable();
+
+        // Assert: The returned object should be the exact same instance
+        // that was passed to the constructor.
+        assertSame("The getter should return the same instance provided to the constructor.",
+                expectedComparable, actualComparable);
     }
 }
