@@ -1,45 +1,51 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest20 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the Minutes class, focusing on the plus(int) method.
+ */
+public class MinutesTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void plus_shouldAddTheSpecifiedNumberOfMinutes() {
+        // Arrange
+        final Minutes twoMinutes = Minutes.minutes(2);
+        final int minutesToAdd = 3;
+        final int expectedTotalMinutes = 5;
+
+        // Act
+        Minutes result = twoMinutes.plus(minutesToAdd);
+
+        // Assert
+        // A new instance with the correct value should be returned.
+        assertEquals(expectedTotalMinutes, result.getMinutes());
+        
+        // The original instance should remain unchanged (verifying immutability).
+        assertEquals(2, twoMinutes.getMinutes());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void plus_whenAddingZero_shouldReturnAnEquivalentInstance() {
+        // Arrange
+        final Minutes oneMinute = Minutes.ONE;
+
+        // Act
+        Minutes result = oneMinute.plus(0);
+
+        // Assert
+        assertEquals(1, result.getMinutes());
     }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+    @Test(expected = ArithmeticException.class)
+    public void plus_whenResultingInOverflow_shouldThrowArithmeticException() {
+        // Arrange
+        final Minutes maxMinutes = Minutes.MAX_VALUE;
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testPlus_int() {
-        Minutes test2 = Minutes.minutes(2);
-        Minutes result = test2.plus(3);
-        assertEquals(2, test2.getMinutes());
-        assertEquals(5, result.getMinutes());
-        assertEquals(1, Minutes.ONE.plus(0).getMinutes());
-        try {
-            Minutes.MAX_VALUE.plus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act
+        // This action is expected to throw an ArithmeticException.
+        maxMinutes.plus(1);
     }
 }
