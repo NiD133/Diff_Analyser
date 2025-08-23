@@ -1,74 +1,68 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class LangCollectorsTestTest7 {
+/**
+ * Tests for {@link LangCollectors}.
+ *
+ * <p>This revised test suite focuses on clarity and maintainability by organizing tests
+ * based on the method under test and using descriptive names.
+ * </p>
+ */
+@DisplayName("LangCollectors")
+class LangCollectorsTest {
 
-    private static final Long _1L = Long.valueOf(1);
+    @Nested
+    @DisplayName("joining() collector")
+    class JoiningNoDelimiterTest {
 
-    private static final Long _2L = Long.valueOf(2);
+        @Test
+        @DisplayName("should return an empty string when collecting no elements")
+        void shouldReturnEmptyStringForNoElements() {
+            // Act: Collect from an empty set of elements.
+            final String result = LangCollectors.collect(LangCollectors.joining());
 
-    private static final Long _3L = Long.valueOf(3);
-
-    private static final Function<Object, String> TO_STRING = Objects::toString;
-
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
-    }
-
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
-
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
-
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
-    private static final class Fixture {
-
-        int value;
-
-        private Fixture(final int value) {
-            this.value = value;
+            // Assert
+            assertEquals("", result, "Collecting zero elements should result in an empty string.");
         }
 
-        @Override
-        public String toString() {
-            return Integer.toString(value);
+        @Test
+        @DisplayName("should return the element's string representation for a single element")
+        void shouldReturnStringForSingleElement() {
+            // Act: Collect from a single element.
+            final String result = LangCollectors.collect(LangCollectors.joining(), "1");
+
+            // Assert
+            assertEquals("1", result, "Collecting a single element should return its string representation.");
+        }
+
+        @Test
+        @DisplayName("should return concatenated element strings for multiple elements")
+        void shouldReturnConcatenatedStringsForMultipleElements() {
+            // Act: Collect from multiple elements.
+            final String result = LangCollectors.collect(LangCollectors.joining(), "1", "2", "3");
+
+            // Assert
+            assertEquals("123", result, "Collecting multiple elements should concatenate their string representations without a delimiter.");
+        }
+
+        @Test
+        @DisplayName("should convert null elements to the string 'null'")
+        void shouldConvertNullToStringLiteral() {
+            // Act: Collect from elements including a null.
+            final String result = LangCollectors.collect(LangCollectors.joining(), "1", null, "3");
+
+            // Assert
+            assertEquals("1null3", result, "A null element in the collection should be converted to the string 'null'.");
         }
     }
 
-    @Test
-    void testJoinCollectStrings0Arg() {
-        assertEquals("", join0());
-        assertEquals("1", join0("1"));
-        assertEquals("12", join0("1", "2"));
-        assertEquals("123", join0("1", "2", "3"));
-        assertEquals("1null3", join0("1", null, "3"));
-    }
+    // Tests for other LangCollectors.joining() overloads (e.g., with a delimiter) would go in their own nested classes here.
+    // @Nested
+    // @DisplayName("joining(delimiter) collector")
+    // class JoiningWithDelimiterTest { ... }
 }
