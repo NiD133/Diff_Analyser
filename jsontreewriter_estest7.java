@@ -1,25 +1,24 @@
 package com.google.gson.internal.bind;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest7 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setSerializeNulls(false);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value("(71Tx?>D*D^oE0!");
-        assertFalse(jsonWriter0.isHtmlSafe());
+    /**
+     * Verifies that a new JsonTreeWriter instance is not HTML-safe by default.
+     * The isHtmlSafe property is inherited from the parent JsonWriter class,
+     * where its default value is false.
+     */
+    @Test
+    public void isHtmlSafe_isFalseByDefault() {
+        // Arrange: Create a new JsonTreeWriter instance.
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act & Assert: Check the default state of the isHtmlSafe property.
+        assertFalse("A new JsonTreeWriter should not be HTML-safe by default", writer.isHtmlSafe());
     }
 }
