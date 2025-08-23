@@ -1,24 +1,31 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest10 extends JsonArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonArray} class, focusing on its convenience getter methods.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Float float0 = new Float(0.0);
-        jsonArray0.add((Number) float0);
-        long long0 = jsonArray0.getAsLong();
-        assertEquals(0L, long0);
+    /**
+     * Tests that getAsLong() on an array with a single float element
+     * returns the long value of that element, truncating the decimal part.
+     */
+    @Test
+    public void getAsLong_whenArrayContainsSingleFloat_returnsTruncatedLongValue() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        // Add a float value that will be truncated upon conversion to long.
+        // Using 0.9f is more explicit about testing truncation than 0.0f.
+        jsonArray.add(0.9f);
+
+        // Act
+        long result = jsonArray.getAsLong();
+
+        // Assert
+        // The method should convert the float to a long, which truncates the decimal part.
+        assertEquals(0L, result);
     }
 }
