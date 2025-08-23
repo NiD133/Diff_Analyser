@@ -1,27 +1,40 @@
 package org.apache.commons.codec.binary;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import org.junit.Test;
+
+/**
+ * Test suite for the Base16 class, focusing on exception handling for invalid input.
+ */
+// The original test class name and inheritance are preserved to maintain context.
 public class Base16_ESTestTest23 extends Base16_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Base16 base16_0 = new Base16();
-        // Undeclared exception!
+    /**
+     * Tests that decoding a string containing a character outside the Base16 alphabet
+     * throws an IllegalArgumentException.
+     */
+    @Test
+    public void decodeWithInvalidCharacterThrowsIllegalArgumentException() {
+        // Arrange: Set up the test case
+        final Base16 base16 = new Base16();
+        // The string "BDT" is invalid because the character 'T' is not part of the
+        // Base16 alphabet (0-9, A-F).
+        final String invalidInput = "BDT";
+        final char invalidChar = 'T';
+
+        // Act & Assert: Execute the code under test and verify the outcome
         try {
-            base16_0.decode("BDT");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid octet in encoded value: 84
-            //
-            verifyException("org.apache.commons.codec.binary.Base16", e);
+            base16.decode(invalidInput);
+            fail("Expected an IllegalArgumentException to be thrown due to an invalid character.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception was thrown for the correct reason by checking its message.
+            final String expectedMessageContent = "Invalid octet in encoded value: " + (int) invalidChar;
+            assertTrue(
+                "The exception message should indicate which character is invalid.",
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
