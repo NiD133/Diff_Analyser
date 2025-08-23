@@ -1,45 +1,78 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class MinutesTestTest24 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test suite for the {@link Minutes#multipliedBy(int)} method.
+ */
+public class MinutesTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void multipliedBy_withPositiveScalar_returnsCorrectProduct() {
+        // Arrange
+        final Minutes twoMinutes = Minutes.minutes(2);
+        final int scalar = 3;
+        final Minutes expected = Minutes.minutes(6);
+
+        // Act
+        final Minutes result = twoMinutes.multipliedBy(scalar);
+
+        // Assert
+        assertEquals(expected, result);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void multipliedBy_withNegativeScalar_returnsCorrectProduct() {
+        // Arrange
+        final Minutes twoMinutes = Minutes.minutes(2);
+        final int scalar = -3;
+        final Minutes expected = Minutes.minutes(-6);
+
+        // Act
+        final Minutes result = twoMinutes.multipliedBy(scalar);
+
+        // Assert
+        assertEquals(expected, result);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void multipliedBy_isImmutable() {
+        // Arrange
+        final Minutes twoMinutes = Minutes.minutes(2);
+        final Minutes originalState = Minutes.minutes(2);
+
+        // Act
+        twoMinutes.multipliedBy(3); // This should return a new instance
+
+        // Assert
+        assertEquals("Original Minutes object should not be mutated",
+                     originalState, twoMinutes);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @Test
+    public void multipliedBy_one_returnsSameInstance() {
+        // Arrange
+        final Minutes twoMinutes = Minutes.minutes(2);
+
+        // Act
+        final Minutes result = twoMinutes.multipliedBy(1);
+
+        // Assert
+        assertSame("Multiplying by 1 should return the same instance for optimization",
+                   twoMinutes, result);
     }
 
-    public void testMultipliedBy_int() {
-        Minutes test = Minutes.minutes(2);
-        assertEquals(6, test.multipliedBy(3).getMinutes());
-        assertEquals(2, test.getMinutes());
-        assertEquals(-6, test.multipliedBy(-3).getMinutes());
-        assertSame(test, test.multipliedBy(1));
-        Minutes halfMax = Minutes.minutes(Integer.MAX_VALUE / 2 + 1);
-        try {
-            halfMax.multipliedBy(2);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void multipliedBy_whenResultOverflows_throwsArithmeticException() {
+        // Arrange
+        final Minutes largeMinutes = Minutes.minutes(Integer.MAX_VALUE / 2 + 1);
+        final int scalar = 2;
+
+        // Act
+        // This call is expected to throw an ArithmeticException
+        largeMinutes.multipliedBy(scalar);
     }
 }
