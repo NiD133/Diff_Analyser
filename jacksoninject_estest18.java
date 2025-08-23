@@ -1,21 +1,29 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class JacksonInject_ESTestTest18 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Object object0 = new Object();
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.forId(object0);
-        jacksonInject_Value0.willUseInput(false);
-        assertTrue(jacksonInject_Value0.hasId());
+    /**
+     * Verifies that the `forId()` factory method correctly creates a 
+     * `JacksonInject.Value` instance that contains the specified ID.
+     */
+    @Test
+    public void forIdShouldCreateValueWithId() {
+        // Arrange: Define a clear and representative identifier.
+        final Object injectionId = "test-injection-id";
+
+        // Act: Create a Value instance using the factory method under test.
+        JacksonInject.Value value = JacksonInject.Value.forId(injectionId);
+
+        // Assert: Confirm that the instance correctly reports having an ID
+        // and that the ID matches the one provided.
+        assertTrue("The value should report that it has an ID.", value.hasId());
+        assertEquals("The stored ID should match the one used for creation.", injectionId, value.getId());
     }
 }
