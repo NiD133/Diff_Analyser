@@ -1,30 +1,32 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest65 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute#localName()} method.
+ */
+public class AttributeLocalNameTest {
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("XII YZ}5!", "async");
-        String string0 = attribute0.localName();
-        assertEquals("async", attribute0.getValue());
-        assertEquals("XII YZ}5!", string0);
+    /**
+     * Verifies that localName() returns the full attribute key
+     * when the key does not contain a namespace prefix.
+     */
+    @Test
+    public void localNameShouldReturnFullKeyWhenKeyHasNoPrefix() {
+        // Arrange: Create an attribute with a key that has no prefix (no colon).
+        // The key contains special characters to ensure they are handled correctly.
+        String keyWithoutPrefix = "XII YZ}5!";
+        String value = "async";
+        Attribute attribute = Attribute.createFromEncoded(keyWithoutPrefix, value);
+
+        // Act: Get the local name from the attribute.
+        String localName = attribute.localName();
+
+        // Assert: The local name should be identical to the original key.
+        assertEquals("The local name should be the full key when no prefix is present.", keyWithoutPrefix, localName);
+        
+        // Also, confirm the value was set correctly as a basic sanity check.
+        assertEquals("The attribute value should be correctly preserved.", value, attribute.getValue());
     }
 }
