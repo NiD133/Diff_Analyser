@@ -1,28 +1,36 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
-public class JsonParser_ESTestTest12 extends JsonParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonParser} class.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
+    /**
+     * Verifies that parsing a malformed JSON string throws a JsonSyntaxException.
+     */
+    @Test
+    public void parseString_shouldThrowExceptionForMalformedJson() {
+        // Arrange: An unquoted literal string that is not 'true', 'false', or 'null'
+        // is considered malformed JSON.
+        String malformedJson = "lP ?";
+
+        // Act & Assert
         try {
-            JsonParser.parseString("lP ?");
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // org.evosuite.runtime.mock.java.lang.MockThrowable: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 5 path $
-            // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
-            //
-            verifyException("com.google.gson.JsonParser", e);
+            JsonParser.parseString(malformedJson);
+            fail("Expected JsonSyntaxException was not thrown for malformed input.");
+        } catch (JsonSyntaxException e) {
+            // Success: The expected exception was caught.
+            // For a more robust test, we can verify that the exception message
+            // clearly indicates a parsing problem.
+            String expectedMessageFragment = "malformed JSON";
+            assertTrue(
+                "Exception message should indicate a syntax error. Actual: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
