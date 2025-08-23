@@ -2,22 +2,34 @@ package com.itextpdf.text.error_messages;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MessageLocalization_ESTestTest6 extends MessageLocalization_ESTest_scaffolding {
+/**
+ * Tests for the {@link MessageLocalization} class.
+ */
+public class MessageLocalizationTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        boolean boolean0 = MessageLocalization.setLanguage("en", "No message found for #N.value.1.is.not.supported");
-        assertTrue(boolean0);
-        String string0 = MessageLocalization.getMessage("No message found for #N.value.1.is.not.supported", false);
-        assertEquals("No message found for No message found for #N.value.1.is.not.supported", string0);
-        assertNotNull(string0);
+    /**
+     * Verifies that getMessage() returns a default "not found" message
+     * when the requested message key does not exist in the loaded language file.
+     */
+    @Test
+    public void getMessage_whenKeyNotFound_returnsDefaultNotFoundMessage() throws IOException {
+        // Arrange
+        // Set the language to English. Using a non-existent country code ("XX")
+        // ensures the system falls back to loading the base "en.lng" file.
+        boolean wasLanguageSet = MessageLocalization.setLanguage("en", "XX");
+        assertTrue("The base English language file should be found and loaded.", wasLanguageSet);
+
+        final String nonExistentKey = "a.message.key.that.does.not.exist";
+        final String expectedMessage = "No message found for " + nonExistentKey;
+
+        // Act
+        // Request a message for a key that is guaranteed not to exist.
+        String actualMessage = MessageLocalization.getMessage(nonExistentKey, false);
+
+        // Assert
+        assertEquals("Should return a default 'not found' message for a non-existent key.",
+                expectedMessage, actualMessage);
     }
 }
