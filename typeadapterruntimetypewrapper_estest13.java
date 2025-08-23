@@ -1,52 +1,48 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializer;
-import com.google.gson.ToNumberPolicy;
 import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.internal.Excluder;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import java.io.BufferedWriter;
-import java.io.CharArrayWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.time.temporal.ChronoField;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapterRuntimeTypeWrapper_ESTestTest13 extends TypeAdapterRuntimeTypeWrapper_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Gson gson0 = new Gson();
-        Class<Object> class0 = Object.class;
-        TypeAdapter<Object> typeAdapter0 = gson0.getAdapter(class0);
-        TypeAdapterRuntimeTypeWrapper<Object> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Object>(gson0, typeAdapter0, class0);
-        // Undeclared exception!
+/**
+ * Tests for {@link TypeAdapterRuntimeTypeWrapper}, focusing on its delegation behavior.
+ */
+public class TypeAdapterRuntimeTypeWrapperTest {
+
+    /**
+     * Verifies that when {@code write()} is called with a null {@link JsonWriter},
+     * the wrapper correctly delegates the call to the underlying {@link TypeAdapter}.
+     * The underlying adapter is then expected to throw a {@link NullPointerException}.
+     *
+     * <p>This test specifically checks that the exception originates from the
+     * delegate adapter (in this case, {@code ObjectTypeAdapter}), confirming the
+     * delegation mechanism works as intended.
+     */
+    @Test
+    public void write_withNullJsonWriter_throwsNpeFromDelegateAdapter() throws Exception {
+        // Arrange
+        Gson gson = new Gson();
+        Class<Object> objectType = Object.class;
+
+        // For Object.class, Gson's default adapter is ObjectTypeAdapter.
+        TypeAdapter<Object> delegateAdapter = gson.getAdapter(objectType);
+        TypeAdapter<Object> typeAdapterWrapper = new TypeAdapterRuntimeTypeWrapper<>(gson, delegateAdapter, objectType);
+
+        // Act & Assert
         try {
-            typeAdapterRuntimeTypeWrapper0.write((JsonWriter) null, (Object) null);
-            fail("Expecting exception: NullPointerException");
+            // Attempt to write a null value with a null writer.
+            // The wrapper should delegate to ObjectTypeAdapter, which will then throw
+            // a NullPointerException upon trying to use the null writer.
+            typeAdapterWrapper.write(null, null);
+            fail("A NullPointerException was expected but not thrown.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.ObjectTypeAdapter", e);
+            // Verify that the exception was thrown by the delegate adapter, as expected.
+            StackTraceElement topOfStack = e.getStackTrace()[0];
+            assertEquals("com.google.gson.internal.bind.ObjectTypeAdapter", topOfStack.getClassName());
         }
     }
 }
