@@ -1,23 +1,42 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JacksonInject_ESTestTest8 extends JacksonInject_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.EMPTY;
-        Boolean boolean0 = Boolean.valueOf(false);
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withUseInput(boolean0);
-        JacksonInject.Value jacksonInject_Value2 = jacksonInject_Value1.withUseInput((Boolean) null);
-        assertNotSame(jacksonInject_Value2, jacksonInject_Value1);
-        assertTrue(jacksonInject_Value2.equals((Object) jacksonInject_Value0));
+/**
+ * Unit tests for the {@link JacksonInject.Value} class, focusing on its immutability
+ * and factory methods.
+ */
+public class JacksonInjectValueTest {
+
+    @Test
+    public void withUseInput_whenSetToNull_revertsToEmptyState() {
+        // Arrange: Start with the default EMPTY value, where all properties are null.
+        final JacksonInject.Value emptyValue = JacksonInject.Value.EMPTY;
+
+        // Act:
+        // 1. Create a new Value instance by setting 'useInput' to false.
+        // This should result in a value that is different from the empty state.
+        JacksonInject.Value valueWithUseInputSet = emptyValue.withUseInput(false);
+
+        // 2. Create another instance by reverting 'useInput' back to null.
+        JacksonInject.Value revertedValue = valueWithUseInputSet.withUseInput(null);
+
+        // Assert:
+        // Verify that setting 'useInput' initially created a distinct value.
+        assertNotEquals("Setting useInput should create a value different from EMPTY",
+                emptyValue, valueWithUseInputSet);
+
+        // Verify that reverting 'useInput' to null creates a new object instance.
+        assertNotSame("Reverting to null should produce a new instance",
+                valueWithUseInputSet, revertedValue);
+
+        // Verify that the reverted value is now equal to the original EMPTY value,
+        // as the 'useInput' property is back to its default (null) state.
+        assertEquals("Reverting useInput to null should be equal to the EMPTY value",
+                emptyValue, revertedValue);
     }
 }
