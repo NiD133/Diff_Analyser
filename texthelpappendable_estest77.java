@@ -1,42 +1,38 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest77 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for the static utility method {@link TextHelpAppendable#indexOfWrap(CharSequence, int, int)}.
+ */
+public class TextHelpAppendableIndexOfWrapTest {
 
-    @Test(timeout = 4000)
-    public void test76() throws Throwable {
-        int int0 = TextHelpAppendable.indexOfWrap("Width must be greater than 0", 3, 3);
-        assertEquals(5, int0);
+    /**
+     * Tests that indexOfWrap correctly identifies the last whitespace character
+     * that falls within the search window defined by [startPos, startPos + width).
+     */
+    @Test
+    public void indexOfWrap_shouldReturnIndexOfLastSpace_whenSpaceExistsInSearchWindow() {
+        // Arrange
+        // The method searches for a wrap point in the substring starting at index 3
+        // with a maximum length of 3 characters (i.e., from index 3 to 6).
+        //
+        // Text:  W i d t h   m u s t ...
+        // Index: 0 1 2 3 4 5 6 7 8 9
+        // Window:      [t h  ]
+        //
+        // The last space character within this window is at index 5.
+        final String text = "Width must be greater than 0";
+        final int searchWidth = 3;
+        final int startPosition = 3;
+        final int expectedWrapIndex = 5;
+
+        // Act
+        final int actualWrapIndex = TextHelpAppendable.indexOfWrap(text, searchWidth, startPosition);
+
+        // Assert
+        assertEquals("The wrap index should be the position of the last space within the search window.",
+                expectedWrapIndex, actualWrapIndex);
     }
 }
