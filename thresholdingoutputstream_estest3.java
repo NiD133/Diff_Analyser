@@ -1,21 +1,37 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class ThresholdingOutputStream_ESTestTest3 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ThresholdingOutputStream}.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream(661);
-        thresholdingOutputStream0.thresholdReached();
-        assertEquals(661, thresholdingOutputStream0.getThreshold());
+    private static final int TEST_THRESHOLD = 661;
+
+    /**
+     * Tests that directly invoking the {@code thresholdReached()} method does not
+     * alter the configured threshold value of the stream.
+     *
+     * <p>The {@code thresholdReached()} method is a protected hook for subclasses to
+     * react when the threshold is exceeded. This test ensures that the default
+     * implementation has no unexpected side effects on the stream's configuration.</p>
+     */
+    @Test
+    public void thresholdReachedShouldNotChangeThresholdValue() throws IOException {
+        // Arrange: Create a stream with a specific threshold.
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(TEST_THRESHOLD);
+        assertEquals("Precondition: The initial threshold should be correctly set.",
+                TEST_THRESHOLD, stream.getThreshold());
+
+        // Act: Manually trigger the threshold reached event.
+        stream.thresholdReached();
+
+        // Assert: Verify that the threshold value remains unchanged after the event.
+        assertEquals("The threshold value should not change after thresholdReached() is called.",
+                TEST_THRESHOLD, stream.getThreshold());
     }
 }
