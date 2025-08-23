@@ -1,34 +1,28 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TaiInstant_ESTestTest55 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TaiInstant#parse(CharSequence)} method.
+ */
+public class TaiInstantParseTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        // Undeclared exception!
-        try {
-            TaiInstant.parse("0.000000000s(TAI)");
-            //  fail("Expecting exception: IllegalStateException");
-            // Unstable assertion
-        } catch (IllegalStateException e) {
-            //
-            // No match found
-            //
-            verifyException("java.util.regex.Matcher", e);
-        }
+    /**
+     * Tests that a valid string representing the TAI epoch is parsed correctly.
+     * The format requires a seconds part, a dot, exactly nine nanosecond digits,
+     * and the "s(TAI)" suffix.
+     */
+    @Test
+    public void parse_validEpochString_parsesSuccessfully() {
+        // Arrange: Define a valid string for the TAI epoch.
+        String epochString = "0.000000000s(TAI)";
+
+        // Act: Call the method under test.
+        TaiInstant parsedInstant = TaiInstant.parse(epochString);
+
+        // Assert: The resulting instant should have zero seconds and zero nanos.
+        assertEquals("Parsed seconds should be 0", 0L, parsedInstant.getTaiSeconds());
+        assertEquals("Parsed nanos should be 0", 0, parsedInstant.getNano());
     }
 }
