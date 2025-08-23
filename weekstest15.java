@@ -1,43 +1,36 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class WeeksTestTest15 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks} class, focusing on the toStandardDays() method.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    // A standard week has 7 days.
+    private static final int DAYS_PER_WEEK = 7;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void toStandardDays_shouldConvertWeeksToDaysForStandardCase() {
+        // Arrange
+        final int numberOfWeeks = 2;
+        final Weeks twoWeeks = Weeks.weeks(numberOfWeeks);
+        final Days expectedDays = Days.days(numberOfWeeks * DAYS_PER_WEEK);
+
+        // Act
+        final Days actualDays = twoWeeks.toStandardDays();
+
+        // Assert
+        assertEquals(expectedDays, actualDays);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToStandardDays() {
-        Weeks test = Weeks.weeks(2);
-        Days expected = Days.days(14);
-        assertEquals(expected, test.toStandardDays());
-        try {
-            Weeks.MAX_VALUE.toStandardDays();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    @Test(expected = ArithmeticException.class)
+    public void toStandardDays_shouldThrowExceptionWhenDayCalculationOverflows() {
+        // Act
+        // The following call is expected to throw an ArithmeticException because
+        // multiplying Weeks.MAX_VALUE (which is Integer.MAX_VALUE) by 7
+        // will cause an integer overflow.
+        Weeks.MAX_VALUE.toStandardDays();
     }
 }
