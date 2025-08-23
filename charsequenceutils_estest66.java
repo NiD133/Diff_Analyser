@@ -1,19 +1,34 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest66 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder();
-        int int0 = CharSequenceUtils.indexOf(stringBuilder0, 65571, (-2194));
-        assertEquals((-1), int0);
+    /**
+     * Tests that CharSequenceUtils.indexOf returns -1 when searching for a supplementary
+     * character in an empty CharSequence, even with a negative start index.
+     *
+     * According to the method's documentation, a negative start index is treated as 0,
+     * and searching any character in an empty sequence should result in "not found" (-1).
+     */
+    @Test
+    public void indexOf_withEmptySequenceAndNegativeStart_shouldReturnNotFound() {
+        // Arrange
+        final CharSequence emptySequence = new StringBuilder();
+        // A supplementary character (U+10023) to test code point handling.
+        final int supplementaryCharToFind = 65571;
+        // Per Javadoc, any negative start index is treated as 0.
+        final int negativeStartIndex = -2194;
+        final int expectedNotFoundIndex = -1;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.indexOf(emptySequence, supplementaryCharToFind, negativeStartIndex);
+
+        // Assert
+        assertEquals(expectedNotFoundIndex, actualIndex);
     }
 }
