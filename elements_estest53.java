@@ -1,36 +1,32 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest53 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test052() throws Throwable {
-        Document document0 = new Document("", "");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.addClass("");
-        assertSame(elements0, elements1);
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that calling {@link Elements#addClass(String)} with an empty string
+     * is a no-op and returns the same {@link Elements} instance. This ensures that
+     * method chaining is preserved.
+     */
+    @Test
+    public void addClassWithEmptyStringShouldReturnSameInstanceForChaining() {
+        // Arrange: Create a document and select its elements.
+        // A shell document contains <html>, <head>, and <body> elements.
+        Document doc = Document.createShell("");
+        Elements elements = doc.getAllElements();
+
+        // Act: Call addClass with an empty string.
+        Elements returnedElements = elements.addClass("");
+
+        // Assert: The returned object should be the same instance as the original,
+        // confirming the method supports chaining.
+        assertSame("The addClass method should return 'this' to allow for chaining.", elements, returnedElements);
     }
 }
