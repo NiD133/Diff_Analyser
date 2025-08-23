@@ -1,21 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest8 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        double[] doubleArray0 = new double[0];
-        double[] doubleArray1 = ArrayFill.fill(doubleArray0, (double) (-259));
-        assertEquals(0, doubleArray1.length);
+    /**
+     * Tests that ArrayFill.fill() correctly handles an empty double array
+     * by returning the same instance without modification.
+     */
+    @Test
+    public void testFillWithEmptyDoubleArray() {
+        // Arrange
+        final double[] emptyArray = new double[0];
+        final double fillValue = -259.0;
+
+        // Act
+        final double[] resultArray = ArrayFill.fill(emptyArray, fillValue);
+
+        // Assert
+        // The method should return the same array instance.
+        assertSame("The returned array should be the same instance as the input array", emptyArray, resultArray);
+        // The length of the array should, of course, remain 0.
+        assertEquals("The length of the empty array should not change", 0, resultArray.length);
     }
 }
