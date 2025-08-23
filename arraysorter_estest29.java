@@ -1,20 +1,26 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest29 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        byte[] byteArray0 = ArraySorter.sort((byte[]) null);
-        assertNull(byteArray0);
+    /**
+     * Tests that sorting a null byte array returns null, as specified by the Javadoc.
+     */
+    @Test
+    public void sort_givenNullByteArray_returnsNull() {
+        // Arrange: Define a null byte array. The cast is necessary to resolve the
+        // correct overloaded sort() method.
+        final byte[] inputArray = null;
+
+        // Act: Call the sort method with the null array.
+        final byte[] result = ArraySorter.sort(inputArray);
+
+        // Assert: Verify that the result is null.
+        assertNull("Sorting a null array should return null.", result);
     }
 }
