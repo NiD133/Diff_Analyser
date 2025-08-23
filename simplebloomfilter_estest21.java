@@ -1,31 +1,26 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest21 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Shape shape0 = Shape.fromKM(668, 668);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            simpleBloomFilter0.merge((IndexExtractor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // indexExtractor
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that merge() throws a NullPointerException when given a null IndexExtractor.
+     * A Bloom filter cannot merge indices from a null source, so the method must
+     * reject this invalid argument to ensure correctness and prevent runtime errors.
+     */
+    @Test(expected = NullPointerException.class)
+    public void mergeWithNullIndexExtractorShouldThrowNullPointerException() {
+        // Arrange: Create a filter with any valid shape. The specific parameters
+        // are not important for this null-check test.
+        Shape shape = Shape.fromKM(10, 100);
+        SimpleBloomFilter bloomFilter = new SimpleBloomFilter(shape);
+
+        // Act & Assert: Attempting to merge with a null extractor should throw
+        // a NullPointerException. The @Test(expected=...) annotation handles the assertion.
+        bloomFilter.merge((IndexExtractor) null);
     }
 }
