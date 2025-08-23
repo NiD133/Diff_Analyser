@@ -1,35 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest27 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray#readUnsignedByte()} method.
+ */
+public class RandomAccessFileOrArrayReadUnsignedByteTest {
 
-    @Test(timeout = 4000)
-    public void test026() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        byteArray0[0] = (byte) 16;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        int int0 = randomAccessFileOrArray0.readUnsignedByte();
-        assertEquals(1L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(16, int0);
+    @Test
+    public void readUnsignedByte_shouldReadByteAndAdvancePointer() throws IOException {
+        // Arrange: Create a data source with a known byte value at the start.
+        byte[] sourceData = new byte[]{16, 20, 30}; // The value 16 will be read.
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(sourceData);
+
+        int expectedValue = 16;
+        long expectedPointerPosition = 1L;
+
+        // Act: Read a single unsigned byte from the source.
+        int actualValue = reader.readUnsignedByte();
+        long actualPointerPosition = reader.getFilePointer();
+
+        // Assert: Verify that the correct value was read and the internal pointer advanced.
+        assertEquals("The method should return the correct unsigned byte value.", expectedValue, actualValue);
+        assertEquals("The file pointer should advance by one byte after reading.", expectedPointerPosition, actualPointerPosition);
     }
 }
