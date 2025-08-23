@@ -1,24 +1,30 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class QuotedPrintableCodec_ESTestTest11 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(charset0);
-        String string0 = quotedPrintableCodec0.encode("", charset0);
-        assertEquals("", string0);
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that encoding an empty string results in an empty string,
+     * which is the expected behavior for a no-op case.
+     */
+    @Test
+    public void encodeEmptyStringShouldReturnEmptyString() {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final String emptyString = "";
+
+        // Act
+        // The encode(String) method uses the codec's default charset (UTF-8).
+        final String encodedResult = codec.encode(emptyString);
+
+        // Assert
+        assertEquals("Encoding an empty string should produce an empty string.", emptyString, encodedResult);
     }
 }
