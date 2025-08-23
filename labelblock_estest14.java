@@ -1,45 +1,29 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest14 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class, focusing on its contract
+ * for handling invalid arguments.
+ */
+// Note: The original class name and inheritance from scaffolding were removed 
+// for a cleaner, more focused example. In a real-world scenario, you might
+// retain them if the scaffolding provides necessary setup.
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("EJ");
-        // Undeclared exception!
-        try {
-            labelBlock0.arrange((Graphics2D) null, (RectangleConstraint) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.block.LabelBlock", e);
-        }
+    /**
+     * Verifies that the arrange() method throws a NullPointerException when
+     * called with a null Graphics2D object. This ensures that the method
+     * correctly validates its inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void arrangeWithNullGraphics2DShouldThrowNullPointerException() {
+        // Arrange: Create a standard LabelBlock instance.
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+
+        // Act: Call the method with null arguments.
+        // The @Test annotation will assert that a NullPointerException is thrown.
+        labelBlock.arrange((Graphics2D) null, (RectangleConstraint) null);
     }
 }
