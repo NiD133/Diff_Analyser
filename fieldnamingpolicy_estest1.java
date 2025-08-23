@@ -1,18 +1,34 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldNamingPolicy_ESTestTest1 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link FieldNamingPolicy} enum.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        FieldNamingPolicy[] fieldNamingPolicyArray0 = FieldNamingPolicy.values();
-        assertEquals(7, fieldNamingPolicyArray0.length);
+    /**
+     * Tests that the values() method returns all expected enum constants.
+     *
+     * <p>This test acts as a change detector. If a new naming policy is added or an existing one
+     * is removed from the {@link FieldNamingPolicy} enum, this test will fail. This prompts the
+     * developer to consciously update the test, confirming the change is intentional.
+     */
+    @Test
+    public void values_shouldReturnAllDefinedPolicies() {
+        // Arrange: Define the expected number of policies.
+        // This number corresponds to the total count of enum constants in the FieldNamingPolicy class.
+        final int expectedPolicyCount = 7;
+
+        // Act: Retrieve all the enum constants.
+        FieldNamingPolicy[] actualPolicies = FieldNamingPolicy.values();
+
+        // Assert: Verify that the number of retrieved policies matches the expected count.
+        assertEquals(
+                "The number of FieldNamingPolicy constants has changed. "
+                        + "Please update this test if the change was intentional.",
+                expectedPolicyCount,
+                actualPolicies.length);
     }
 }
