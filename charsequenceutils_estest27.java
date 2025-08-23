@@ -1,26 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest27 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        // Undeclared exception!
-        try {
-            CharSequenceUtils.regionMatches((CharSequence) null, false, 12, (CharSequence) null, 12, 12);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.lang3.CharSequenceUtils", e);
-        }
+    /**
+     * Tests that calling regionMatches with a null for the first CharSequence argument
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testRegionMatchesWithNullFirstArgumentThrowsNullPointerException() {
+        // Define arguments for the method call.
+        // The second CharSequence is non-null to isolate the test's focus
+        // on the first argument being the cause of the exception.
+        final CharSequence other = "some string";
+        final int offset = 0;
+        final int len = 5;
+        final boolean ignoreCase = false;
+
+        // This call is expected to throw a NullPointerException because the first argument is null.
+        CharSequenceUtils.regionMatches(null, ignoreCase, offset, other, offset, len);
     }
 }
