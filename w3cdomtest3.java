@@ -1,114 +1,100 @@
 package org.jsoup.helper;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.integration.ParseTest;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-import java.util.Map;
+
 import java.util.stream.Stream;
-import static org.jsoup.TextUtil.normalizeSpaces;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax.xml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class W3CDomTestTest3 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private static Document parseXml(String xml, boolean nameSpaceAware) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(nameSpaceAware);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver((publicId, systemId) -> {
-                if (systemId.contains("about:legacy-compat")) {
-                    // <!doctype html>
-                    return new InputSource(new StringReader(""));
-                } else {
-                    return null;
-                }
-            });
-            Document dom = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-            dom.normalizeDocument();
-            return dom;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+/**
+ * Tests for security and edge-case handling in the W3CDom converter.
+ */
+public class W3CDomSecurityTest {
+
+    /**
+     * Provides HTML and XML parsers for parameterized tests.
+     */
+    private static Stream<Arguments> parserProvider() {
+        return Stream.of(
+            Arguments.of(Parser.htmlParser()),
+            Arguments.of(Parser.xmlParser())
+        );
     }
 
-    private NodeList xpath(Document w3cDoc, String query) throws XPathExpressionException {
-        XPathExpression xpath = XPathFactory.newInstance().newXPath().compile(query);
-        return ((NodeList) xpath.evaluate(w3cDoc, XPathConstants.NODE));
-    }
-
-    private String output(String in, boolean modeHtml) {
-        org.jsoup.nodes.Document jdoc = Jsoup.parse(in);
-        Document w3c = W3CDom.convert(jdoc);
-        Map<String, String> properties = modeHtml ? W3CDom.OutputHtml() : W3CDom.OutputXml();
-        return normalizeSpaces(W3CDom.asString(w3c, properties));
-    }
-
-    private void assertEqualsIgnoreCase(String want, String have) {
-        assertEquals(want.toLowerCase(Locale.ROOT), have.toLowerCase(Locale.ROOT));
-    }
-
+    /**
+     * Verifies that W3CDom does not expand XML entities, protecting against "Billion Laughs" style attacks.
+     * This is a safeguard test. Jsoup's parser does not process DTD entities, and this test confirms
+     * that behavior is preserved through the W3C conversion.
+     *
+     * @param parser The Jsoup parser (HTML or XML) to use.
+     */
     @ParameterizedTest
     @MethodSource("parserProvider")
     void doesNotExpandEntities(Parser parser) {
-        // Tests that the billion laughs attack doesn't expand entities; also for XXE
-        // Not impacted because jsoup doesn't parse the entities within the doctype, and so won't get to the w3c.
-        // Added to confirm, and catch if that ever changes
-        String billionLaughs = "<?xml version=\"1.0\"?>\n" + "<!DOCTYPE lolz [\n" + " <!ENTITY lol \"lol\">\n" + " <!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">\n" + "]>\n" + "<html><body><p>&lol1;</p></body></html>";
-        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughs, parser);
-        W3CDom w3cDom = new W3CDom();
-        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
-        assertNotNull(w3cDoc);
-        // select the p and make sure it's unexpanded
-        NodeList p = w3cDoc.getElementsByTagName("p");
-        assertEquals(1, p.getLength());
-        assertEquals("&lol1;", p.item(0).getTextContent());
-        // Check the string
-        String string = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
-        assertFalse(string.contains("lololol"));
-        assertTrue(string.contains("&amp;lol1;"));
+        // Arrange
+        // The "Billion Laughs" attack payload defines a recursive entity.
+        String billionLaughsXml =
+            "<?xml version=\"1.0\"?>" +
+            "<!DOCTYPE lolz [" +
+            " <!ENTITY lol \"lol\">" +
+            " <!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">" +
+            "]>" +
+            "<html><body><p>&lol1;</p></body></html>";
+
+        // Act
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(billionLaughsXml, parser);
+        Document w3cDoc = W3CDom.convert(jsoupDoc);
+        String outputString = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
+
+        // Assert
+        // 1. Verify the W3C DOM structure reflects the unexpanded entity.
+        NodeList pElements = w3cDoc.getElementsByTagName("p");
+        assertEquals(1, pElements.getLength(), "Should find exactly one <p> element.");
+        assertEquals("&lol1;", pElements.item(0).getTextContent(), "Entity in <p> tag should not be expanded in the DOM.");
+
+        // 2. Verify the serialized string output also shows the entity was not expanded.
+        assertFalse(outputString.contains("lololol"), "Output string should not contain the expanded entity payload.");
+        assertTrue(outputString.contains("&amp;lol1;"), "Output string should contain the escaped, unexpanded entity.");
     }
 
-    private static Stream<Arguments> parserProvider() {
-        return Stream.of(Arguments.of(Parser.htmlParser()), Arguments.of(Parser.xmlParser()));
-    }
-
+    /**
+     * Verifies that attribute names that are valid in HTML5 but invalid in XML
+     * (e.g., containing quotes) are sanitized during the conversion to a W3C DOM.
+     * The W3C DOM XML standards are stricter than HTML5 regarding attribute name characters.
+     */
     @Test
-    public void handlesInvalidAttributeNames() {
-        String html = "<html><head></head><body style=\"color: red\" \" name\"></body></html>";
-        org.jsoup.nodes.Document jsoupDoc;
-        jsoupDoc = Jsoup.parse(html);
-        Element body = jsoupDoc.select("body").first();
-        // actually an attribute with key '"'. Correct per HTML5 spec, but w3c xml dom doesn't dig it
-        assertTrue(body.hasAttr("\""));
-        assertTrue(body.hasAttr("name\""));
-        Document w3Doc = W3CDom.convert(jsoupDoc);
-        String xml = W3CDom.asString(w3Doc, W3CDom.OutputXml());
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?><html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body _=\"\" name_=\"\" style=\"color: red\"/></html>", xml);
+    void handlesInvalidAttributeNames() {
+        // Arrange
+        // This HTML has attributes `"` and `name"` which are valid in HTML5 but not in XML.
+        String htmlWithInvalidXmlAttrs = "<html><head></head><body style=\"color: red\" \" name\"></body></html>";
+        org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(htmlWithInvalidXmlAttrs);
+        Element body = jsoupDoc.selectFirst("body");
+
+        // Sanity check that Jsoup parsed the attributes as expected before conversion.
+        assertTrue(body.hasAttr("\""), "Jsoup should correctly parse the '\"' attribute.");
+        assertTrue(body.hasAttr("name\""), "Jsoup should correctly parse the 'name\"' attribute.");
+
+        // Act
+        Document w3cDoc = W3CDom.convert(jsoupDoc);
+        String outputXml = W3CDom.asString(w3cDoc, W3CDom.OutputXml());
+
+        // Assert
+        // The invalid attributes `"` and `name"` are expected to be sanitized to `_` and `name_` respectively.
+        String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                             "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
+                             "<head/>" +
+                             "<body _=\"\" name_=\"\" style=\"color: red\"/>" +
+                             "</html>";
+        assertEquals(expectedXml, outputXml, "Invalid XML attribute names should be sanitized on conversion.");
     }
 }
