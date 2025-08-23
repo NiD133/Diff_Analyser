@@ -1,32 +1,33 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import static org.junit.Assert.assertSame;
+
 import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TreeBag_ESTestTest2 extends TreeBag_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TreeBag} class.
+ */
+public class TreeBagTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        TreeBag<Locale.FilteringMode> treeBag0 = new TreeBag<Locale.FilteringMode>((Comparator<? super Locale.FilteringMode>) null);
-        Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.IGNORE_EXTENDED_RANGES;
-        treeBag0.add(locale_FilteringMode0);
-        Locale.FilteringMode locale_FilteringMode1 = treeBag0.last();
-        assertSame(locale_FilteringMode1, locale_FilteringMode0);
+    /**
+     * Tests that the {@link TreeBag#last()} method correctly returns the single element
+     * when the bag contains only one item.
+     */
+    @Test
+    public void last_shouldReturnTheOnlyElement_whenBagContainsOneItem() {
+        // Arrange
+        // A TreeBag uses the natural ordering of its elements by default.
+        // Locale.FilteringMode is an enum, which is Comparable.
+        final TreeBag<Locale.FilteringMode> bag = new TreeBag<>();
+        final Locale.FilteringMode singleElement = Locale.FilteringMode.IGNORE_EXTENDED_RANGES;
+        bag.add(singleElement);
+
+        // Act
+        final Locale.FilteringMode lastElement = bag.last();
+
+        // Assert
+        assertSame("The last element should be the only element present in the bag.",
+                     singleElement, lastElement);
     }
 }
