@@ -1,51 +1,41 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import org.junit.Test;
 
-public class TypeAdapterTestTest2 {
+/**
+ * Tests for the {@link TypeAdapter#nullSafe()} method.
+ */
+public class TypeAdapterNullSafeTest {
 
-    private static final TypeAdapter<String> assertionErrorAdapter = new TypeAdapter<>() {
-
+    /**
+     * A base adapter whose read/write methods are not meant to be called.
+     * This is used to verify that the {@link TypeAdapter#nullSafe()} wrapper
+     * is being tested, not the underlying adapter's logic.
+     */
+    private static final TypeAdapter<String> baseAdapter = new TypeAdapter<>() {
         @Override
         public void write(JsonWriter out, String value) {
-            throw new AssertionError("unexpected call");
+            throw new AssertionError("baseAdapter.write should not be called");
         }
 
         @Override
         public String read(JsonReader in) {
-            throw new AssertionError("unexpected call");
-        }
-
-        @Override
-        public String toString() {
-            return "assertionErrorAdapter";
-        }
-    };
-
-    private static final TypeAdapter<String> adapter = new TypeAdapter<>() {
-
-        @Override
-        public void write(JsonWriter out, String value) throws IOException {
-            out.value(value);
-        }
-
-        @Override
-        public String read(JsonReader in) throws IOException {
-            return in.nextString();
+            throw new AssertionError("baseAdapter.read should not be called");
         }
     };
 
     @Test
-    public void testNullSafe_ReturningSameInstanceOnceNullSafe() {
-        TypeAdapter<?> nullSafeAdapter = assertionErrorAdapter.nullSafe();
+    public void nullSafe_isIdempotent() {
+        // Arrange: Create a null-safe adapter by wrapping a base adapter.
+        TypeAdapter<String> nullSafeAdapter = baseAdapter.nullSafe();
+
+        // Act & Assert: Calling nullSafe() again on an already null-safe adapter
+        // should return the exact same instance, not a new wrapper.
         assertThat(nullSafeAdapter.nullSafe()).isSameInstanceAs(nullSafeAdapter);
-        assertThat(nullSafeAdapter.nullSafe().nullSafe()).isSameInstanceAs(nullSafeAdapter);
-        assertThat(nullSafeAdapter.nullSafe().nullSafe().nullSafe()).isSameInstanceAs(nullSafeAdapter);
     }
 }
