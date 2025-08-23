@@ -1,26 +1,26 @@
 package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class BoundedIteratorTestTest11<E> extends AbstractIteratorTest<E> {
+/**
+ * Tests for {@link BoundedIterator}.
+ * Note: The original class name "BoundedIteratorTestTest11" was simplified to "BoundedIteratorTest"
+ * to remove redundancy and improve clarity.
+ */
+public class BoundedIteratorTest<E> extends AbstractIteratorTest<E> {
 
-    /**
-     * Test array of size 7
-     */
-    private final String[] testArray = { "a", "b", "c", "d", "e", "f", "g" };
-
+    private final String[] testArray = {"a", "b", "c", "d", "e", "f", "g"};
     private List<E> testList;
 
     @Override
@@ -30,32 +30,49 @@ public class BoundedIteratorTestTest11<E> extends AbstractIteratorTest<E> {
 
     @Override
     public Iterator<E> makeObject() {
+        // BoundedIterator that skips the first element and includes the rest.
         return new BoundedIterator<>(new ArrayList<>(testList).iterator(), 1, testList.size() - 1);
     }
 
     @SuppressWarnings("unchecked")
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         testList = Arrays.asList((E[]) testArray);
     }
 
     /**
-     * Test the case if the decorated iterator does not support the
-     * {@code remove()} method and throws an {@link UnsupportedOperationException}.
+     * Tests that BoundedIterator correctly propagates an UnsupportedOperationException
+     * from the decorated iterator's remove() method.
      */
     @Test
-    void testRemoveUnsupported() {
-        final Iterator<E> mockIterator = new AbstractIteratorDecorator<E>(testList.iterator()) {
-
+    void removeShouldPropagateExceptionWhenDecoratedIteratorIsUnmodifiable() {
+        // Arrange
+        // 1. Create a decorated iterator that does not support the remove() operation.
+        final Iterator<E> unmodifiableIterator = new AbstractIteratorDecorator<E>(testList.iterator()) {
             @Override
             public void remove() {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("remove() is not supported on the decorated iterator");
             }
         };
-        final Iterator<E> iter = new BoundedIterator<>(mockIterator, 1, 5);
-        assertTrue(iter.hasNext());
-        assertEquals("b", iter.next());
-        final UnsupportedOperationException thrown = assertThrows(UnsupportedOperationException.class, () -> iter.remove());
-        assertNull(thrown.getMessage());
+
+        // 2. Create the BoundedIterator instance to test.
+        // It will skip 1 element ("a") and is bounded to a max of 5 elements.
+        final Iterator<E> boundedIterator = new BoundedIterator<>(unmodifiableIterator, 1, 5);
+
+        // 3. Advance the iterator past the first element to enable the remove() call.
+        assertTrue(boundedIterator.hasNext(), "Iterator should have elements before calling next()");
+        assertEquals(testList.get(1), boundedIterator.next(), "Iterator should return the second element of the list ('b')");
+
+        // Act & Assert
+        // Check that calling remove() on the BoundedIterator propagates the exception from the decorated iterator.
+        final UnsupportedOperationException thrown = assertThrows(
+            UnsupportedOperationException.class,
+            boundedIterator::remove,
+            "BoundedIterator should throw UnsupportedOperationException."
+        );
+
+        // Verify that the propagated exception is the one we expect.
+        assertEquals("remove() is not supported on the decorated iterator", thrown.getMessage(),
+            "The exception message should be propagated from the decorated iterator.");
     }
 }
