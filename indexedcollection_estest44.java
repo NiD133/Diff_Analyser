@@ -1,64 +1,52 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
 import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
+/**
+ * Test suite for {@link IndexedCollection}.
+ * This class contains a specific test case that was improved for understandability.
+ */
 public class IndexedCollection_ESTestTest44 extends IndexedCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Transformer<Object, Object> transformer0 = NOPTransformer.nopTransformer();
-        IndexedCollection<Object, Object> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-        // Undeclared exception!
-        try {
-            indexedCollection0.add(linkedList0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that adding the backing collection to itself causes a StackOverflowError
+     * when an identity-based transformer is used.
+     *
+     * <p>This scenario occurs when an {@link IndexedCollection} is configured with a
+     * transformer that uses the element itself as the key (e.g., {@link NOPTransformer}).
+     * The {@code add(object)} operation involves two main steps:</p>
+     * <ol>
+     *   <li>Updating an internal index map, which requires using the object as a key.
+     *       This may trigger a call to the key's {@code hashCode()} or {@code equals()} method.</li>
+     *   <li>Adding the object to the backing collection.</li>
+     * </ol>
+     * <p>When the backing collection is added to itself, it becomes self-referential.
+     * If its {@code hashCode()} method is called *after* this self-reference is established
+     * (e.g., during the indexing step), it will lead to infinite recursion, resulting
+     * in a {@link StackOverflowError}. This test verifies this specific edge case.</p>
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void addBackingCollectionToItselfWithIdentityTransformerThrowsStackOverflowError() {
+        // Arrange
+        // The collection that backs the IndexedCollection.
+        Collection<Object> backingList = new LinkedList<>();
+
+        // A transformer that returns the input object itself as the key.
+        Transformer<Object, Object> identityTransformer = NOPTransformer.nopTransformer();
+
+        // The IndexedCollection under test, configured with the backing list and transformer.
+        IndexedCollection<Object, Object> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(backingList, identityTransformer);
+
+        // Act & Assert
+        // Attempt to add the backing list to the collection it backs. This action
+        // is expected to cause a StackOverflowError due to recursive hashCode calculation
+        // on the now self-referential list during the indexing process.
+        indexedCollection.add(backingList);
     }
 }
