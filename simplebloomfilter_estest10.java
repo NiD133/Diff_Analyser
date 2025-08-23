@@ -1,23 +1,33 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest10 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the merge operations in {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Shape shape0 = Shape.fromKM(22, 22);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        boolean boolean0 = simpleBloomFilter0.merge((IndexExtractor) simpleBloomFilter0);
-        assertTrue(boolean0);
+    /**
+     * Tests that merging an empty IndexExtractor into a Bloom filter does not change the filter
+     * and correctly returns {@code false}.
+     *
+     * <p>The {@code merge(IndexExtractor)} method should return {@code true} only if the filter's
+     * state is potentially modified. Merging an empty set of indices results in no change.
+     * In this test, an empty SimpleBloomFilter is used as the IndexExtractor to provide
+     * no indices.</p>
+     */
+    @Test
+    public void testMergeWithEmptyIndexExtractorReturnsFalse() {
+        // Arrange: Create a standard shape and an empty Bloom filter.
+        Shape shape = Shape.fromKM(22, 22);
+        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Act: Merge the filter with itself. Since the filter is empty,
+        // it acts as an empty IndexExtractor, providing no indices to merge.
+        boolean isChanged = filter.merge((IndexExtractor) filter);
+
+        // Assert: The merge operation should report that no change occurred.
+        assertFalse("Merging an empty IndexExtractor should return false", isChanged);
     }
 }
