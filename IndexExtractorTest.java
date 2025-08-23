@@ -16,39 +16,30 @@
  */
 package org.apache.commons.collections4.bloomfilter;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.LongPredicate;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-/**
- * Tests for the {@link IndexExtractor}.
- */
 class IndexExtractorTest {
 
-    /**
-     * A test implementation of BitMapExtractor that uses a long array as the source of bitmaps.
-     */
     private static final class TestingBitMapExtractor implements BitMapExtractor {
-        private final long[] bitMaps;
+        long[] values;
 
-        TestingBitMapExtractor(final long[] bitMaps) {
-            this.bitMaps = bitMaps;
+        TestingBitMapExtractor(final long[] values) {
+            this.values = values;
         }
 
         @Override
         public boolean processBitMaps(final LongPredicate consumer) {
-            for (final long bitMap : bitMaps) {
-                if (!consumer.test(bitMap)) {
+            for (final long l : values) {
+                if (!consumer.test(l)) {
                     return false;
                 }
             }
@@ -56,68 +47,41 @@ class IndexExtractorTest {
         }
     }
 
-    /**
-     * Tests that the default {@code asIndexArray()} implementation correctly captures all
-     * indices passed to the consumer, including duplicates. The parameterized values
-     * test behavior around potential collection resizing boundaries.
-     *
-     * @param numberOfDuplicates The number of times to report the same index.
-     */
     @ParameterizedTest
     @ValueSource(ints = {32, 33})
-    void asIndexArray_shouldReturnAllProcessedIndicesIncludingDuplicates(final int numberOfDuplicates) {
-        // An extractor that reports the index '0' a specific number of times.
-        final IndexExtractor extractorWithDuplicates = indexConsumer -> {
-            for (int j = 0; j < numberOfDuplicates; j++) {
-                // Stop if the consumer returns false, per the contract.
-                if (!indexConsumer.test(0)) {
-                    return false;
-                }
+    void testAsIndexArray(final int n) {
+        final IndexExtractor ip = i -> {
+            for (int j = 0; j < n; j++) {
+                // Always test index zero
+                i.test(0);
             }
             return true;
         };
-
-        final int[] result = extractorWithDuplicates.asIndexArray();
-
-        // The resulting array should contain '0' repeated 'numberOfDuplicates' times.
-        final int[] expected = new int[numberOfDuplicates]; // An array of zeros.
-        assertArrayEquals(expected, result);
+        Assertions.assertArrayEquals(new int[n], ip.asIndexArray());
     }
 
     @Test
-    void fromBitMapExtractor_shouldCorrectlyConvertSparseBitMapsToIndices() {
-        // Each long in the array is a 64-bit map. The index of the long in the
-        // array determines the offset (in multiples of 64) for the indices.
-        // - 1L (binary ...001) at array index 0 -> on-bit at position 0 -> final index 0
-        // - 2L (binary ...010) at array index 1 -> on-bit at position 1 -> final index 1 + 64*1 = 65
-        // - 3L (binary ...011) at array index 2 -> on-bits at pos 0, 1 -> final indices 0 + 64*2 = 128, 1 + 64*2 = 129
-        final long[] bitMaps = {1L, 2L, 3L};
-        final BitMapExtractor bitMapExtractor = new TestingBitMapExtractor(bitMaps);
+    void testFromBitMapExtractor() {
+        TestingBitMapExtractor testingBitMapExtractor = new TestingBitMapExtractor(new long[] {1L, 2L, 3L});
+        IndexExtractor underTest = IndexExtractor.fromBitMapExtractor(testingBitMapExtractor);
+        List<Integer> lst = new ArrayList<>();
 
-        final IndexExtractor indexExtractor = IndexExtractor.fromBitMapExtractor(bitMapExtractor);
-        final List<Integer> actualIndices = new ArrayList<>();
-        indexExtractor.processIndices(actualIndices::add);
+        underTest.processIndices(lst::add);
+        assertEquals(4, lst.size());
+        assertEquals(Integer.valueOf(0), lst.get(0));
+        assertEquals(Integer.valueOf(1 + 64), lst.get(1));
+        assertEquals(Integer.valueOf(0 + 128), lst.get(2));
+        assertEquals(Integer.valueOf(1 + 128), lst.get(3));
 
-        final List<Integer> expectedIndices = Arrays.asList(0, 65, 128, 129);
+        testingBitMapExtractor = new TestingBitMapExtractor(new long[] {0xFFFFFFFFFFFFFFFFL});
+        underTest = IndexExtractor.fromBitMapExtractor(testingBitMapExtractor);
+        lst = new ArrayList<>();
 
-        assertEquals(expectedIndices, actualIndices);
-    }
+        underTest.processIndices(lst::add);
 
-    @Test
-    void fromBitMapExtractor_shouldCorrectlyConvertDenseBitMapToIndices() {
-        // A bitmap with all 64 bits set.
-        final long[] bitMaps = {0xFFFFFFFFFFFFFFFFL};
-        final BitMapExtractor bitMapExtractor = new TestingBitMapExtractor(bitMaps);
-
-        final IndexExtractor indexExtractor = IndexExtractor.fromBitMapExtractor(bitMapExtractor);
-        final List<Integer> actualIndices = new ArrayList<>();
-        indexExtractor.processIndices(actualIndices::add);
-
-        // We expect all indices from 0 to 63.
-        final List<Integer> expectedIndices = IntStream.range(0, 64)
-            .boxed()
-            .collect(Collectors.toList());
-
-        assertEquals(expectedIndices, actualIndices);
+        assertEquals(64, lst.size());
+        for (int i = 0; i < 64; i++) {
+            assertEquals(Integer.valueOf(i), lst.get(i));
+        }
     }
 }
