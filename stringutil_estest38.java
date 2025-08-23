@@ -1,30 +1,26 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest38 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil builder pool functionality.
+ */
+public class StringUtilBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        StringUtil.StringJoiner stringUtil_StringJoiner0 = new StringUtil.StringJoiner("H5OE=&4p F0oe@7Fl1");
-        StringBuilder stringBuilder0 = stringUtil_StringJoiner0.sb;
-        StringUtil.releaseBuilderVoid(stringBuilder0);
-        assertEquals("", stringBuilder0.toString());
+    @Test
+    public void releaseBuilderVoidClearsTheStringBuilder() {
+        // Arrange: Borrow a StringBuilder from the pool and add some content to it.
+        // This ensures we are testing the clearing mechanism, not just a new, empty builder.
+        StringBuilder builder = StringUtil.borrowBuilder();
+        builder.append("some initial content");
+        assertTrue("Builder should have content before being released", builder.length() > 0);
+
+        // Act: Release the builder back to the pool using the void method.
+        StringUtil.releaseBuilderVoid(builder);
+
+        // Assert: The builder should be empty after being released, ready for reuse.
+        assertEquals("The builder's content should be cleared upon release", 0, builder.length());
     }
 }
