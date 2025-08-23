@@ -1,17 +1,23 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest7 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        boolean boolean0 = PatternOptionBuilder.isValueCode('#');
-        assertTrue(boolean0);
+    /**
+     * Tests that the character '#' is correctly identified as a value code.
+     * In the pattern string, '#' represents a {@link java.util.Date} type.
+     */
+    @Test
+    public void isValueCodeShouldReturnTrueForDateValueCode() {
+        // The '#' character is the value code used to specify an option argument of type Date.
+        final char dateValueCode = '#';
+        
+        assertTrue("The character '#' should be recognized as a valid value code.",
+                   PatternOptionBuilder.isValueCode(dateValueCode));
     }
 }
