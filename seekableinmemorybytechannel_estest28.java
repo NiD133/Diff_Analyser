@@ -1,30 +1,35 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest28 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel(byteArray0);
+/**
+ * Tests for {@link SeekableInMemoryByteChannel}.
+ */
+public class SeekableInMemoryByteChannelTest {
+
+    /**
+     * Verifies that attempting to set a negative position on the channel
+     * throws an IOException with a specific, informative message.
+     */
+    @Test
+    public void shouldThrowIOExceptionWhenSettingNegativePosition() {
+        // Arrange: Create a channel. The initial content is not relevant for this test.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+        final long negativePosition = -1L;
+
         try {
-            seekableInMemoryByteChannel0.position((-429L));
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Position must be in range [0..2147483647]
-            //
-            verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
+            // Act: Attempt to set the position to a negative value.
+            channel.position(negativePosition);
+            fail("Expected an IOException to be thrown for a negative position, but none was.");
+        } catch (final IOException e) {
+            // Assert: Verify that the correct exception was thrown with the expected message.
+            final String expectedMessage = "Position must be in range [0.." + Integer.MAX_VALUE + "]";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
