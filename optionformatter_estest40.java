@@ -1,30 +1,25 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest40 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
-        // Undeclared exception!
-        try {
-            optionFormatter0.getSince();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.OptionFormatter", e);
-        }
+    /**
+     * Verifies that getSince() throws a NullPointerException if the formatter
+     * was created with a null Option. This is expected because any attempt to
+     * access properties of the null underlying Option will fail.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getSinceShouldThrowNullPointerExceptionWhenCreatedWithNullOption() {
+        // Arrange: Create a formatter with a null Option.
+        // The cast to (Option) is necessary to resolve the correct method overload.
+        OptionFormatter formatter = OptionFormatter.from((Option) null);
+
+        // Act: Calling getSince() should trigger the expected exception.
+        formatter.getSince();
     }
 }
