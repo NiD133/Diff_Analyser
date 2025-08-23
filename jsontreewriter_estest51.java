@@ -1,33 +1,31 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import com.google.gson.internal.bind.JsonTreeWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest51 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginArray();
-        // Undeclared exception!
+    @Test
+    public void name_whenInArrayContext_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a writer and start an array.
+        // In an array context, only values can be written, not names.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginArray();
+
+        // Act & Assert: Attempting to write a name should fail.
         try {
-            jsonTreeWriter0.name("");
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Please begin an object before writing a name.
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+            writer.name("someName");
+            fail("Expected an IllegalStateException because a name cannot be written inside an array.");
+        } catch (IllegalStateException expected) {
+            // Verify the exception message is helpful and correct.
+            assertEquals("Please begin an object before writing a name.", expected.getMessage());
         }
     }
 }
