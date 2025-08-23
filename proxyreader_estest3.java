@@ -1,24 +1,36 @@
 package org.apache.commons.io.input;
 
+import org.apache.commons.io.input.ProxyReader;
+import org.apache.commons.io.input.TaggedReader;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.StringReader;
+
+/**
+ * Tests for {@link ProxyReader}.
+ * This test focuses on the proxying behavior of the reset() method.
+ */
+// The original test class name and inheritance are preserved for context.
 public class ProxyReader_ESTestTest3 extends ProxyReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        StringReader stringReader0 = new StringReader("*=jeP");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        taggedReader0.reset();
+    /**
+     * Tests that calling reset() on a proxied reader delegates the call correctly,
+     * and throws an IOException if the underlying reader does not support reset()
+     * without a prior mark().
+     *
+     * @see StringReader#reset()
+     */
+    @Test(expected = IOException.class)
+    public void resetShouldThrowIOExceptionWhenUnderlyingReaderIsNotMarked() throws IOException {
+        // Arrange: Create a ProxyReader wrapping a StringReader.
+        // A StringReader will throw an IOException if reset() is called before mark().
+        StringReader underlyingReader = new StringReader("test-data");
+        // TaggedReader is a concrete implementation of the abstract ProxyReader.
+        ProxyReader proxyReader = new TaggedReader(underlyingReader);
+
+        // Act & Assert: Calling reset() should be proxied to the underlying
+        // StringReader, which is expected to throw an IOException.
+        proxyReader.reset();
     }
 }
