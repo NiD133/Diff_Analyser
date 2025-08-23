@@ -1,41 +1,36 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest162 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on invalid argument handling.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test161() throws Throwable {
-        byte[] byteArray0 = new byte[15];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readString((-940), "\"O:pU~");
-            fail("Expecting exception: NegativeArraySizeException");
-        } catch (NegativeArraySizeException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that calling readString() with a negative length
+     * throws a NegativeArraySizeException.
+     * <p>
+     * This is the expected behavior because the method likely attempts to allocate a
+     * byte array using the provided length, and Java does not permit arrays with a
+     * negative size.
+     */
+    @Test(expected = NegativeArraySizeException.class)
+    public void readStringWithNegativeLengthThrowsException() throws IOException {
+        // Arrange: Create an instance of RandomAccessFileOrArray with dummy data.
+        // The content of the byte array is irrelevant for this test case.
+        byte[] dummyData = new byte[10];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(dummyData);
+
+        int invalidLength = -1;
+        String anyEncoding = "UTF-8";
+
+        // Act: Attempt to read a string with a negative length.
+        // This action is expected to throw a NegativeArraySizeException.
+        fileOrArray.readString(invalidLength, anyEncoding);
+
+        // Assert: The test passes if the expected NegativeArraySizeException is thrown.
+        // This is handled declaratively by the @Test(expected=...) annotation.
     }
 }
