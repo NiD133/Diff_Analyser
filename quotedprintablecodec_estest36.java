@@ -1,30 +1,33 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest36 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = null;
-        try {
-            quotedPrintableCodec0 = new QuotedPrintableCodec("4>&$1^)O:\"");
-            fail("Expecting exception: IllegalCharsetNameException");
-        } catch (IllegalCharsetNameException e) {
-            //
-            // 4>&$1^)O:\"
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+/**
+ * Tests for the constructor of {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that the constructor taking a charset name throws
+     * an IllegalCharsetNameException when provided with a syntactically invalid name.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForInvalidCharsetName() {
+        // Arrange: An invalid charset name containing illegal characters.
+        final String invalidCharsetName = "4 >&$1^)O:\"";
+
+        // Act & Assert: Verify that creating a codec with the invalid name throws the expected exception.
+        // The assertThrows method executes the lambda and asserts that it throws the specified exception type.
+        IllegalCharsetNameException thrown = assertThrows(
+            IllegalCharsetNameException.class,
+            () -> new QuotedPrintableCodec(invalidCharsetName)
+        );
+
+        // Assert: Further verify that the exception message correctly reports the invalid name.
+        assertEquals(invalidCharsetName, thrown.getMessage());
     }
 }
