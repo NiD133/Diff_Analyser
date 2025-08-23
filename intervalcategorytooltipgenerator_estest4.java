@@ -1,36 +1,33 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IntervalCategoryToolTipGenerator_ESTestTest4 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link IntervalCategoryToolTipGenerator} class, focusing on exception handling.
+ */
+public class IntervalCategoryToolTipGenerator_ESTestTest4 {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        double[][] doubleArray0 = new double[14][4];
-        DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
-        // Undeclared exception!
-        try {
-            intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 13, 13);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // Index 13 out of bounds for length 4
-            //
-            verifyException("org.jfree.data.category.DefaultIntervalCategoryDataset", e);
-        }
+    /**
+     * Verifies that createItemArray throws an ArrayIndexOutOfBoundsException
+     * when the provided column index is out of bounds for the dataset.
+     * The exception is expected to originate from the dataset itself when the
+     * generator attempts to access data.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void createItemArrayShouldThrowExceptionForInvalidColumnIndex() {
+        // Arrange: Create a dataset with a known size and a tooltip generator.
+        final int numberOfRows = 14;
+        final int numberOfColumns = 4;
+        double[][] data = new double[numberOfRows][numberOfColumns];
+        DefaultIntervalCategoryDataset dataset = new DefaultIntervalCategoryDataset(data, data);
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+
+        int validRowIndex = 13;
+        int invalidColumnIndex = 13; // This index is out of bounds (valid: 0-3)
+
+        // Act: Attempt to create the item array with an invalid column index.
+        // The @Test(expected) annotation will assert that the correct exception is thrown.
+        generator.createItemArray(dataset, validRowIndex, invalidColumnIndex);
     }
 }
