@@ -1,46 +1,25 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest29 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for the {@link W3CDom} helper class, focusing on edge cases and invalid inputs.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        // Undeclared exception!
-        try {
-            w3CDom0.contextNode((org.w3c.dom.Document) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.W3CDom", e);
-        }
+    /**
+     * Verifies that the {@link W3CDom#contextNode(org.w3c.dom.Document)} method
+     * throws a {@link NullPointerException} when passed a null document.
+     * This is the expected behavior as the method cannot operate on a null input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void contextNodeShouldThrowNullPointerExceptionWhenDocumentIsNull() {
+        // Arrange: Create an instance of the class under test.
+        W3CDom w3cDom = new W3CDom();
+
+        // Act & Assert: Call the method with a null argument.
+        // The @Test(expected) annotation handles the assertion,
+        // ensuring a NullPointerException is thrown.
+        w3cDom.contextNode(null);
     }
 }
