@@ -1,37 +1,36 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest122 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray#read(byte[], int, int)} method.
+ */
+public class RandomAccessFileOrArrayReadTest {
 
-    @Test(timeout = 4000)
-    public void test121() throws Throwable {
-        byte[] byteArray0 = new byte[14];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.read(byteArray0, 8, 8);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the read(byte[], int, int) method throws an ArrayIndexOutOfBoundsException
+     * if the combination of the offset and length parameters would cause a write
+     * past the end of the destination buffer.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void read_whenWritingPastEndOfDestinationBuffer_throwsException() throws IOException {
+        // Arrange: Create a source with enough data to fulfill the read request.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray randomAccessFileOrArray = new RandomAccessFileOrArray(sourceData);
+
+        // Arrange: Define a destination buffer and read parameters that will cause an overflow.
+        // The destination buffer has a size of 14.
+        byte[] destinationBuffer = new byte[14];
+        int offset = 8;
+        int lengthToRead = 8;
+
+        // Act: Attempt to read data into the destination buffer.
+        // This should fail because writing 8 bytes at an offset of 8 requires a
+        // buffer of at least size 16 (8 + 8), but the buffer is only size 14.
+        randomAccessFileOrArray.read(destinationBuffer, offset, lengthToRead);
+
+        // Assert: The test expects an ArrayIndexOutOfBoundsException, which is
+        // handled by the @Test(expected=...) annotation.
     }
 }
