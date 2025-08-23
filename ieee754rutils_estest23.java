@@ -1,17 +1,23 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest23 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * A test suite for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        double double0 = IEEE754rUtils.max((-4398.39854599338), 564.128287262);
-        assertEquals(564.128287262, double0, 0.01);
+    @Test
+    public void testMaxDoubleReturnsGreaterOfTwoValues() {
+        // Arrange: Define the input values for the test.
+        final double smallerValue = -4398.39854599338;
+        final double largerValue = 564.128287262;
+
+        // Act: Call the method under test.
+        final double result = IEEE754rUtils.max(smallerValue, largerValue);
+
+        // Assert: Verify the result is the expected larger value.
+        assertEquals(largerValue, result, 0.0);
     }
 }
