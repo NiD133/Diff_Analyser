@@ -1,48 +1,39 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest48 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateNow(clock0);
-        assertNotNull(britishCutoverDate0);
+/**
+ * Unit tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Verifies that dateNow(Clock) returns the correct date based on the state of the provided clock.
+     * This test uses a fixed clock to ensure the test is deterministic and its outcome is predictable.
+     */
+    @Test
+    public void dateNow_withFixedClock_shouldReturnCorrectDate() {
+        // Arrange: Set up a fixed clock for a specific, known date (e.g., 2023-10-26 UTC).
+        // Using the singleton instance is the recommended practice.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        
+        ZoneId utc = ZoneId.of("UTC");
+        Instant fixedInstant = LocalDate.of(2023, 10, 26).atStartOfDay(utc).toInstant();
+        Clock fixedClock = Clock.fixed(fixedInstant, utc);
+
+        // The expected date in the BritishCutoverChronology for the given instant.
+        BritishCutoverDate expectedDate = BritishCutoverDate.of(2023, 10, 26);
+
+        // Act: Call the method under test to get the "current" date from our fixed clock.
+        BritishCutoverDate actualDate = chronology.dateNow(fixedClock);
+
+        // Assert: Verify that the returned date is exactly what we expect.
+        assertEquals("The date should match the date of the fixed clock", expectedDate, actualDate);
     }
 }
