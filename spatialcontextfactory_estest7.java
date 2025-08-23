@@ -1,26 +1,33 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
+import java.util.Collections;
+import static org.junit.Assert.assertNull;
 
-public class SpatialContextFactory_ESTestTest7 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Unit tests for the SpatialContextFactory class.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        spatialContextFactory0.args = (Map<String, String>) hashMap0;
-        spatialContextFactory0.initCalculator();
-        assertTrue(spatialContextFactory0.geo);
-        assertFalse(spatialContextFactory0.hasFormatConfig);
-        assertFalse(spatialContextFactory0.normWrapLongitude);
+    /**
+     * Verifies that the distance calculator is not initialized when the configuration
+     * arguments do not specify one. The method should complete without errors
+     * and leave the `distCalc` field as its default null value.
+     */
+    @Test
+    public void initCalculator_whenNoDistCalcArgumentIsProvided_shouldNotSetCalculator() {
+        // Arrange
+        SpatialContextFactory factory = new SpatialContextFactory();
+        // The 'args' map is normally populated by the public factory method.
+        // We set it directly here to test the protected initCalculator() method in isolation.
+        factory.args = Collections.emptyMap();
+
+        // Act
+        factory.initCalculator();
+
+        // Assert
+        // The distance calculator should remain uninitialized (null) because the
+        // 'distCalculator' key was absent from the arguments.
+        assertNull("Expected distCalc to be null when no 'distCalculator' argument is provided", factory.distCalc);
     }
 }
