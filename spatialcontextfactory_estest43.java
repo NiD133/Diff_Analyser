@@ -1,24 +1,36 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
+import static org.junit.Assert.assertFalse;
 
-public class SpatialContextFactory_ESTestTest43 extends SpatialContextFactory_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("geo", "geo");
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        assertFalse(spatialContext0.isNormWrapLongitude());
+    /**
+     * Tests that creating a non-geodetic (i.e., planar) SpatialContext results in
+     * the 'normWrapLongitude' property being false by default.
+     */
+    @Test
+    public void makeSpatialContext_withGeoSetToFalse_shouldDefaultToNormWrapLongitudeFalse() {
+        // Arrange: Create configuration arguments for a non-geodetic context.
+        // The 'geo' property, when set to "false", configures a planar context.
+        Map<String, String> config = new HashMap<>();
+        config.put("geo", "false");
+
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act: Create the SpatialContext using the factory with the specified configuration.
+        SpatialContext spatialContext = SpatialContextFactory.makeSpatialContext(config, classLoader);
+
+        // Assert: Verify that normWrapLongitude is false, which is the expected default
+        // for non-geodetic contexts when not explicitly overridden.
+        assertFalse(
+            "normWrapLongitude should be false by default for a non-geodetic context",
+            spatialContext.isNormWrapLongitude()
+        );
     }
 }
