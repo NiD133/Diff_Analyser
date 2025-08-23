@@ -1,47 +1,43 @@
 package org.jfree.chart.title;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.RectangleConstraint;
-import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.jfree.chart.plot.XYPlot;
+import org.junit.Test;
 
-public class ShortTextTitle_ESTestTest1 extends ShortTextTitle_ESTest_scaffolding {
+import java.awt.image.BufferedImage;
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle("");
-        CombinedDomainXYPlot<ChronoLocalDate> combinedDomainXYPlot0 = new CombinedDomainXYPlot<ChronoLocalDate>();
-        JFreeChart jFreeChart0 = new JFreeChart("", combinedDomainXYPlot0);
-        List<Title> list0 = List.of((Title) shortTextTitle0);
-        jFreeChart0.setSubtitles(list0);
-        BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(1, 10, (ChartRenderingInfo) null);
-        assertEquals(1, bufferedImage0.getTileWidth());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Provides tests for the {@link ShortTextTitle} class.
+ */
+public class ShortTextTitleTest {
+
+    /**
+     * Verifies that a chart containing a ShortTextTitle can be rendered successfully
+     * without throwing an exception. This acts as a basic integration and smoke test,
+     * ensuring the title's drawing logic is sound.
+     */
+    @Test
+    public void renderChartWithShortTextTitleSucceeds() {
+        // Arrange: Create a chart and add a ShortTextTitle as a subtitle.
+        // The original test used an empty string, which is a good edge case to keep.
+        ShortTextTitle title = new ShortTextTitle("");
+        JFreeChart chart = new JFreeChart("Chart Title", new XYPlot());
+        chart.setSubtitles(Collections.singletonList(title));
+
+        // Act: Render the chart to a small buffered image. The primary goal is to
+        // ensure this operation completes without throwing an exception.
+        final int imageWidth = 10;
+        final int imageHeight = 10;
+        BufferedImage chartImage = chart.createBufferedImage(imageWidth, imageHeight, null);
+
+        // Assert: Confirm that a valid image was created with the correct dimensions.
+        // This implicitly verifies that the rendering process completed successfully.
+        assertNotNull("The rendered image should not be null.", chartImage);
+        assertEquals("Image width should match the requested width.", imageWidth, chartImage.getWidth());
+        assertEquals("Image height should match the requested height.", imageHeight, chartImage.getHeight());
     }
 }
