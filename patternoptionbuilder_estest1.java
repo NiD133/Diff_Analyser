@@ -1,18 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest1 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Object object0 = PatternOptionBuilder.getValueClass(':');
-        assertNotNull(object0);
-        assertEquals("class java.lang.String", object0.toString());
+    @Test
+    public void getValueType_shouldReturnStringClass_forStringPatternCharacter() {
+        // The Javadoc for PatternOptionBuilder specifies that the ':' character
+        // represents an option argument of type String.
+
+        // Arrange
+        final char stringPatternChar = ':';
+
+        // Act
+        // Note: The original test used the deprecated `getValueClass`.
+        // This improved test uses the current, type-safe `getValueType` method.
+        Class<?> actualValueType = PatternOptionBuilder.getValueType(stringPatternChar);
+
+        // Assert
+        assertEquals(String.class, actualValueType);
     }
 }
