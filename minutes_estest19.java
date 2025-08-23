@@ -1,18 +1,26 @@
 package org.joda.time;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Minutes_ESTestTest19 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Minutes minutes0 = Minutes.THREE;
-        Minutes minutes1 = minutes0.negated();
-        assertEquals((-3), minutes1.getMinutes());
+    /**
+     * Tests that the negated() method correctly inverts the sign of a positive Minutes value.
+     */
+    @Test
+    public void testNegated_convertsPositiveToNegative() {
+        // Arrange: Create an instance of Minutes with a positive value.
+        final Minutes threeMinutes = Minutes.THREE;
+        final int expectedNegativeValue = -3;
+
+        // Act: Call the method under test.
+        final Minutes result = threeMinutes.negated();
+
+        // Assert: Verify that the result has the expected negative value.
+        assertEquals(expectedNegativeValue, result.getMinutes());
     }
 }
