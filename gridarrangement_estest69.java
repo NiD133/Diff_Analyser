@@ -1,91 +1,40 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest69 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Contains an improved test case for the {@link GridArrangement} class.
+ * The original test was auto-generated and difficult to comprehend.
+ */
+public class GridArrangement_ESTestTest69 {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        Range range0 = new Range(97, 97);
-        assertFalse(range0.isNaNRange());
-        assertEquals(97.0, range0.getCentralValue(), 0.01);
-        assertEquals(97.0, range0.getUpperBound(), 0.01);
-        assertEquals(97.0, range0.getLowerBound(), 0.01);
-        assertEquals("Range[97.0,97.0]", range0.toString());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertFalse(range0.isNaNRange());
-        assertEquals(97.0, range0.getCentralValue(), 0.01);
-        assertEquals(97.0, range0.getUpperBound(), 0.01);
-        assertEquals(97.0, range0.getLowerBound(), 0.01);
-        assertEquals("Range[97.0,97.0]", range0.toString());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        CenterArrangement centerArrangement0 = new CenterArrangement();
-        assertNotNull(centerArrangement0);
-        BlockContainer blockContainer1 = new BlockContainer(centerArrangement0);
-        assertEquals(0.0, blockContainer1.getWidth(), 0.01);
-        assertTrue(blockContainer1.isEmpty());
-        assertNull(blockContainer1.getID());
-        assertEquals(0.0, blockContainer1.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getHeight(), 0.01);
-        assertNotNull(blockContainer1);
-        assertFalse(blockContainer1.equals((Object) blockContainer0));
-        blockContainer0.add((Block) blockContainer1);
-        assertNotSame(blockContainer0, blockContainer1);
-        assertNotSame(blockContainer1, blockContainer0);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer1.getWidth(), 0.01);
-        assertTrue(blockContainer1.isEmpty());
-        assertNull(blockContainer1.getID());
-        assertEquals(0.0, blockContainer1.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getHeight(), 0.01);
-        assertFalse(blockContainer0.equals((Object) blockContainer1));
-        assertFalse(blockContainer1.equals((Object) blockContainer0));
-        GridArrangement gridArrangement0 = new GridArrangement(105, 60);
-        assertNotNull(gridArrangement0);
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrange(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the arrange() method throws an IndexOutOfBoundsException when
+     * the container holds fewer blocks than the number of cells defined in the grid.
+     * The implementation likely attempts to access a block for each grid cell,
+     * leading to the exception when the block list is exhausted.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void arrangeShouldThrowExceptionWhenBlockCountIsLessThanGridSize() {
+        // Arrange: Create a 2x2 grid arrangement, which expects 4 blocks.
+        // Using small, clear numbers makes the test's intent easier to grasp.
+        GridArrangement arrangement = new GridArrangement(2, 2);
+
+        // Arrange: Create a container with only one block, which is insufficient for the 2x2 grid.
+        BlockContainer containerWithInsufficientBlocks = new BlockContainer();
+        containerWithInsufficientBlocks.add(new EmptyBlock(0, 0));
+
+        // Arrange: Define a simple constraint for the arrangement. The specific values are not
+        // critical for this test, as the exception is expected to occur before the
+        // constraint is fully utilized.
+        RectangleConstraint constraint = new RectangleConstraint(new Range(0, 100), new Range(0, 100));
+
+        // Act: Attempt to arrange the container. This call is expected to fail.
+        arrangement.arrange(containerWithInsufficientBlocks, (Graphics2D) null, constraint);
+
+        // Assert: The test passes if an IndexOutOfBoundsException is thrown,
+        // as declared by the @Test annotation. No further assertions are needed.
     }
 }
