@@ -2,32 +2,28 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class DefaultPieDataset_ESTestTest7 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultPieDataset0.setValue(integer0, (Number) null);
-        Number number0 = defaultPieDataset0.getValue(integer0);
-        assertNull(number0);
+    /**
+     * Verifies that if a null value is associated with a key,
+     * the getValue() method correctly returns null for that key.
+     */
+    @Test
+    public void getValue_whenKeyHasNullValue_shouldReturnNull() {
+        // Arrange
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+        String key = "Test Key";
+
+        // Act
+        // Set the value for the key to null.
+        dataset.setValue(key, null);
+        Number retrievedValue = dataset.getValue(key);
+
+        // Assert
+        assertNull("The value retrieved should be null, as that was the value set.", retrievedValue);
     }
 }
