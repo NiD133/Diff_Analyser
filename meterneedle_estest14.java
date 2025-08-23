@@ -2,33 +2,41 @@ package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest14 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class, using the concrete 
+ * {@link WindNeedle} subclass for instantiation.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        WindNeedle windNeedle0 = new WindNeedle();
-        windNeedle0.equals(windNeedle0);
-        assertEquals(0.5, windNeedle0.getRotateY(), 0.01);
-        assertEquals(5, windNeedle0.getSize());
-        assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
+    /**
+     * Verifies that the default constructor initializes the needle with the
+     * correct default property values.
+     */
+    @Test
+    public void testDefaultConstructor_shouldSetDefaultValues() {
+        // Arrange: Create a new WindNeedle instance. Since MeterNeedle is abstract,
+        // we use a concrete subclass to test the base functionality.
+        WindNeedle needle = new WindNeedle();
+
+        // Act: No action is needed as we are testing the state after construction.
+
+        // Assert: Check that the properties are set to their expected default values.
+        assertEquals("Default size should be 5", 5, needle.getSize());
+        assertEquals("Default rotateX should be 0.5", 0.5, needle.getRotateX(), 0.01);
+        assertEquals("Default rotateY should be 0.5", 0.5, needle.getRotateY(), 0.01);
+    }
+
+    /**
+     * Tests the reflexive property of the equals() method, ensuring that an
+     * object is always equal to itself.
+     */
+    @Test
+    public void testEquals_withSameInstance_shouldReturnTrue() {
+        // Arrange
+        WindNeedle needle = new WindNeedle();
+
+        // Act & Assert: An object must be equal to itself.
+        assertTrue("An object should be equal to itself.", needle.equals(needle));
     }
 }
