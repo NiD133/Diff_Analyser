@@ -1,42 +1,22 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest31 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        // Undeclared exception!
-        try {
-            ByteUtils.fromLittleEndian((DataInput) null, 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Verifies that the fromLittleEndian(DataInput, int) method throws a
+     * NullPointerException when the DataInput argument is null. This ensures
+     * the method correctly handles invalid input by failing fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void fromLittleEndianWithNullDataInputThrowsNullPointerException() {
+        // The 'length' argument can be any valid integer (e.g., 1), as the
+        // null check on the DataInput parameter should be performed first.
+        ByteUtils.fromLittleEndian((DataInput) null, 1);
     }
 }
