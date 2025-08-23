@@ -1,29 +1,25 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTreeReader_ESTestTest91 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test090() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        boolean boolean0 = jsonTreeReader0.hasNext();
-        assertFalse(boolean0);
+    @Test
+    public void hasNext_whenReadingAnEmptyArray_returnsFalse() throws IOException {
+        // Arrange: Create a reader for an empty JSON array.
+        JsonArray emptyArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyArray);
+
+        // Act: Start reading the array.
+        reader.beginArray();
+
+        // Assert: Verify that the reader reports it has no more elements.
+        assertFalse("hasNext() should return false for an empty array", reader.hasNext());
     }
 }
