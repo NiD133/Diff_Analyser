@@ -1,39 +1,27 @@
 package org.apache.commons.collections4.bag;
 
+import org.apache.commons.collections4.SortedBag;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
+
 import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TreeBag_ESTestTest17 extends TreeBag_ESTest_scaffolding {
+/**
+ * Unit tests for {@link TreeBag}.
+ */
+// The original class name 'TreeBag_ESTestTest17' is kept for context,
+// but in a real-world scenario, it would be part of a single 'TreeBagTest' class.
+public class TreeBag_ESTestTest17 {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        TreeBag<AbstractMapBag.MutableInteger> treeBag0 = new TreeBag<AbstractMapBag.MutableInteger>(comparator0);
-        // Undeclared exception!
-        try {
-            treeBag0.last();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
-        }
+    /**
+     * Tests that calling last() on an empty TreeBag throws a NoSuchElementException.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void lastShouldThrowNoSuchElementExceptionWhenBagIsEmpty() {
+        // Arrange: Create an empty TreeBag.
+        // Using the interface 'SortedBag' is a good practice.
+        SortedBag<String> emptyBag = new TreeBag<>();
+
+        // Act & Assert: Calling last() on the empty bag should throw the expected exception.
+        emptyBag.last();
     }
 }
