@@ -1,49 +1,52 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
+import org.junit.Test;
+
 import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class TextRenderInfo_ESTestTest40 extends TextRenderInfo_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = graphicsState0.ctm;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString("Helvetica", ".notdef");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
-        try {
-            textRenderInfo0.getDescentLine();
-            fail("Expecting exception: IllegalCharsetNameException");
-        } catch (IllegalCharsetNameException e) {
-            //
-            // .notdef
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Verifies that getDescentLine() throws an IllegalCharsetNameException
+     * when the underlying PdfString was created with an invalid character encoding.
+     *
+     * The text rendering process requires decoding the PdfString, which fails
+     * if the specified encoding name is not a valid charset.
+     */
+    @Test(expected = IllegalCharsetNameException.class)
+    public void getDescentLine_whenPdfStringHasInvalidEncoding_throwsIllegalCharsetNameException() {
+        // --- Arrange ---
+        // Create a PdfString with an encoding that is not a valid Java charset name.
+        // ".notdef" is a special name in PDF fonts but is not a valid charset.
+        String invalidEncoding = ".notdef";
+        PdfString pdfStringWithInvalidEncoding = new PdfString("any text", invalidEncoding);
+
+        // Set up the minimum required dependencies to construct a TextRenderInfo instance.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+        Matrix textMatrix = graphicsState.ctm;
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                pdfStringWithInvalidEncoding,
+                graphicsState,
+                textMatrix,
+                Collections.emptyList()
+        );
+
+        // --- Act ---
+        // This call is expected to trigger the decoding of the PdfString,
+        // which will fail due to the invalid encoding.
+        textRenderInfo.getDescentLine();
+
+        // --- Assert ---
+        // The test will pass if the expected IllegalCharsetNameException is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
