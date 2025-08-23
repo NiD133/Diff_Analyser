@@ -1,19 +1,30 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NodeKey_ESTestTest10 extends NodeKey_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NodeKey} class.
+ */
+public class NodeKeyTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Integer integer0 = new Integer(3);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-        String string0 = nodeKey0.toString();
-        assertEquals("[NodeKey: 2281, 3]", string0);
+    /**
+     * Verifies that the toString() method returns a correctly formatted string
+     * representation of the NodeKey, including its stage and node value.
+     */
+    @Test
+    public void toString_shouldReturnFormattedStringRepresentation() {
+        // Arrange: Create a NodeKey with a specific stage and node value.
+        int stage = 2281;
+        Integer nodeValue = 3;
+        NodeKey<Integer> nodeKey = new NodeKey<>(stage, nodeValue);
+        
+        String expectedString = "[NodeKey: 2281, 3]";
+
+        // Act: Call the toString() method.
+        String actualString = nodeKey.toString();
+
+        // Assert: Verify that the output matches the expected format.
+        assertEquals(expectedString, actualString);
     }
 }
