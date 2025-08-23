@@ -1,20 +1,32 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DeprecatedAttributes_ESTestTest9 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for {@link DeprecatedAttributes}.
+ */
+public class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test8() throws Throwable {
-        DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-        deprecatedAttributes_Builder0.setDescription(",");
-        DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-        String string0 = deprecatedAttributes0.toString();
-        assertEquals("Deprecated: ,", string0);
-        assertEquals(",", deprecatedAttributes0.getDescription());
+    /**
+     * Tests that the toString() method correctly formats the output when only a description is provided.
+     * It also verifies that the description getter returns the correct value.
+     */
+    @Test
+    public void testToStringWithDescriptionOnly() {
+        // Arrange
+        final String description = "This option is obsolete.";
+        final DeprecatedAttributes attributes = DeprecatedAttributes.builder()
+                .setDescription(description)
+                .get();
+
+        // Act
+        final String actualToString = attributes.toString();
+
+        // Assert
+        final String expectedToString = "Deprecated: " + description;
+        assertEquals(expectedToString, actualToString);
+        assertEquals("The description getter should return the value set in the builder.",
+                description, attributes.getDescription());
     }
 }
