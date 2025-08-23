@@ -1,44 +1,55 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class WeeksTestTest22 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks#minus(int)} method.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void minus_shouldSubtractValueCorrectly() {
+        // Arrange
+        final Weeks twoWeeks = Weeks.weeks(2);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        final Weeks result = twoWeeks.minus(3);
+
+        // Assert
+        final Weeks expected = Weeks.weeks(-1);
+        assertEquals(expected, result);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    @Test
+    public void minus_shouldNotModifyOriginalObject() {
+        // Arrange
+        final Weeks twoWeeks = Weeks.weeks(2);
+
+        // Act
+        twoWeeks.minus(3); // The result of the operation is ignored
+
+        // Assert
+        assertEquals("The original Weeks object should remain unchanged (be immutable).", 2, twoWeeks.getWeeks());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void minus_shouldReturnSameValueWhenSubtractingZero() {
+        // Arrange
+        final Weeks oneWeek = Weeks.ONE;
+
+        // Act
+        final Weeks result = oneWeek.minus(0);
+
+        // Assert
+        assertEquals(Weeks.ONE, result);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test(expected = ArithmeticException.class)
+    public void minus_shouldThrowExceptionOnIntegerOverflow() {
+        // Act: Attempting to subtract 1 from MIN_VALUE will cause an overflow.
+        Weeks.MIN_VALUE.minus(1);
 
-    public void testMinus_int() {
-        Weeks test2 = Weeks.weeks(2);
-        Weeks result = test2.minus(3);
-        assertEquals(2, test2.getWeeks());
-        assertEquals(-1, result.getWeeks());
-        assertEquals(1, Weeks.ONE.minus(0).getWeeks());
-        try {
-            Weeks.MIN_VALUE.minus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Assert: The test passes if an ArithmeticException is thrown.
     }
 }
