@@ -1,71 +1,89 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class GregorianChronologyTestTest8 extends TestCase {
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Tests for the toString() method of {@link GregorianChronology}.
+ * This test class focuses on verifying that the string representation of a GregorianChronology
+ * instance correctly reflects its configuration, such as its time zone and minimum days in the first week.
+ */
+public class GregorianChronologyToStringTest {
 
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    private DateTimeZone originalDefaultZone;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
+    @Before
+    public void setUp() {
+        // Store the original default time zone to restore it after the test.
+        originalDefaultZone = DateTimeZone.getDefault();
+        // Set a known default time zone for tests that rely on the default.
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    @After
+    public void tearDown() {
+        // Restore the original default time zone to avoid side effects on other tests.
+        DateTimeZone.setDefault(originalDefaultZone);
     }
 
-    public void testToString() {
-        assertEquals("GregorianChronology[Europe/London]", GregorianChronology.getInstance(LONDON).toString());
-        assertEquals("GregorianChronology[Asia/Tokyo]", GregorianChronology.getInstance(TOKYO).toString());
-        assertEquals("GregorianChronology[Europe/London]", GregorianChronology.getInstance().toString());
-        assertEquals("GregorianChronology[UTC]", GregorianChronology.getInstanceUTC().toString());
-        assertEquals("GregorianChronology[UTC,mdfw=2]", GregorianChronology.getInstance(DateTimeZone.UTC, 2).toString());
+    @Test
+    public void toString_withSpecificZone_shouldReturnChronologyNameWithZoneId() {
+        // Arrange
+        Chronology chrono = GregorianChronology.getInstance(TOKYO);
+        String expected = "GregorianChronology[Asia/Tokyo]";
+
+        // Act
+        String actual = chrono.toString();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toString_withUTCZone_shouldReturnChronologyNameWithUTC() {
+        // Arrange
+        Chronology chrono = GregorianChronology.getInstanceUTC();
+        String expected = "GregorianChronology[UTC]";
+
+        // Act
+        String actual = chrono.toString();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toString_withDefaultZone_shouldReturnChronologyNameWithDefaultZoneId() {
+        // This test relies on the @Before setup, which sets the default zone to LONDON.
+        // Arrange
+        Chronology chrono = GregorianChronology.getInstance();
+        String expected = "GregorianChronology[Europe/London]";
+
+        // Act
+        String actual = chrono.toString();
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toString_withZoneAndMinDays_shouldReturnNameWithZoneAndMinDays() {
+        // Arrange
+        Chronology chrono = GregorianChronology.getInstance(DateTimeZone.UTC, 2);
+        String expected = "GregorianChronology[UTC,mdfw=2]";
+
+        // Act
+        String actual = chrono.toString();
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
