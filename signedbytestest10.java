@@ -1,60 +1,33 @@
 package com.google.common.primitives;
 
-import static com.google.common.primitives.ReflectionFreeAssertThrows.assertThrows;
-import static com.google.common.primitives.SignedBytes.max;
-import static com.google.common.primitives.SignedBytes.min;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
+
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.collect.testing.Helpers;
-import com.google.common.testing.NullPointerTester;
 import com.google.common.testing.SerializableTester;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class SignedBytesTestTest10 extends TestCase {
+/**
+ * Tests for the serialization behavior of {@link SignedBytes#lexicographicalComparator()}.
+ */
+@GwtIncompatible // SerializableTester is not GWT-compatible.
+@RunWith(JUnit4.class)
+public class SignedBytesLexicographicalComparatorTest {
 
-    private static final byte[] EMPTY = {};
-
-    private static final byte[] ARRAY1 = { (byte) 1 };
-
-    private static final byte LEAST = Byte.MIN_VALUE;
-
-    private static final byte GREATEST = Byte.MAX_VALUE;
-
-    private static final byte[] VALUES = { LEAST, -1, 0, 1, GREATEST };
-
-    private static void assertCastFails(long value) {
-        try {
-            SignedBytes.checkedCast(value);
-            fail("Cast to byte should have failed: " + value);
-        } catch (IllegalArgumentException ex) {
-            assertWithMessage(value + " not found in exception text: " + ex.getMessage()).that(ex.getMessage().contains(String.valueOf(value))).isTrue();
-        }
-    }
-
-    private static void testSortDescending(byte[] input, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    private static void testSortDescending(byte[] input, int fromIndex, int toIndex, byte[] expectedOutput) {
-        input = Arrays.copyOf(input, input.length);
-        SignedBytes.sortDescending(input, fromIndex, toIndex);
-        assertThat(input).isEqualTo(expectedOutput);
-    }
-
-    @J2ktIncompatible
-    // SerializableTester
-    @GwtIncompatible
-    public void testLexicographicalComparatorSerializable() {
+    @Test
+    @J2ktIncompatible // SerializableTester is not J2KT-compatible.
+    public void lexicographicalComparator_serialization_preservesSingletonInstance() {
+        // GIVEN the lexicographical comparator, which is implemented as a singleton.
         Comparator<byte[]> comparator = SignedBytes.lexicographicalComparator();
-        assertThat(SerializableTester.reserialize(comparator)).isSameInstanceAs(comparator);
+
+        // WHEN the comparator is serialized and then deserialized.
+        Comparator<byte[]> reserializedComparator = SerializableTester.reserialize(comparator);
+
+        // THEN the deserialized instance is the same canonical instance as the original.
+        // This is an expected and important property of using an enum for the singleton pattern.
+        assertThat(reserializedComparator).isSameInstanceAs(comparator);
     }
 }
