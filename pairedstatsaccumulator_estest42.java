@@ -1,21 +1,24 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest42 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        PairedStats pairedStats0 = pairedStatsAccumulator0.snapshot();
-        pairedStatsAccumulator0.addAll(pairedStats0);
-        assertEquals(0L, pairedStats0.count());
+    @Test
+    public void addAll_withEmptyStats_onEmptyAccumulator_remainsEmpty() {
+        // Arrange: Create an empty accumulator and an empty PairedStats object.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        // A snapshot of a new accumulator is a convenient way to get an empty PairedStats instance.
+        PairedStats emptyStats = new PairedStatsAccumulator().snapshot();
+
+        // Act: Add the empty stats to the empty accumulator.
+        accumulator.addAll(emptyStats);
+
+        // Assert: The accumulator should still be empty.
+        assertEquals("Count should remain zero after adding empty stats.", 0L, accumulator.count());
     }
 }
