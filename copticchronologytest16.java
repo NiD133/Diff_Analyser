@@ -1,120 +1,112 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.junit.Test;
 
-public class CopticChronologyTestTest16 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * Tests the behavior of the year duration field in CopticChronology,
+ * particularly its handling of leap years.
+ *
+ * <p>The Coptic calendar has a leap year every four years, specifically when (year % 4 == 3).
+ * This test focuses on a 4-year cycle starting from Coptic year 1720,
+ * where 1723 is the leap year.
+ */
+public class CopticChronologyYearDurationFieldTest {
 
     private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
+    private static final long MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
+    private static final long COMMON_YEAR_MILLIS = 365L * MILLIS_PER_DAY;
+    private static final long LEAP_YEAR_MILLIS = 366L * MILLIS_PER_DAY;
+    private static final long FOUR_YEAR_CYCLE_MILLIS = 3 * COMMON_YEAR_MILLIS + LEAP_YEAR_MILLIS;
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+    // A date within a Coptic year that is not a leap year.
+    // Coptic year 1723 is the leap year in the 1720-1723 cycle.
+    private static final DateTime CYCLE_START_DATE = new DateTime(1720, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
+    private static final DurationField yearDurationField = CYCLE_START_DATE.year().getDurationField();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void testIsYearsField() {
+        // The duration field for a 'year' property should be the same as the chronology's 'years' field.
+        assertSame(COPTIC_UTC.years(), yearDurationField);
     }
 
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
+    @Test
+    public void testGetUnitMillis_isAverageYearDuration() {
+        // getUnitMillis should return the average length of a year in the Coptic calendar (365.25 days).
+        long expectedAverageMillis = FOUR_YEAR_CYCLE_MILLIS / 4;
+        assertEquals(expectedAverageMillis, yearDurationField.getUnitMillis());
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
+    @Test
+    public void testGetMillis_calculatesAverageDuration() {
+        // getMillis(long) calculates duration based on the average year length.
+        long expectedAverageMillis = FOUR_YEAR_CYCLE_MILLIS / 4;
+        assertEquals(expectedAverageMillis, yearDurationField.getMillis(1));
+        assertEquals(expectedAverageMillis * 2, yearDurationField.getMillis(2));
+        assertEquals(expectedAverageMillis, yearDurationField.getMillis(1L));
+        assertEquals(expectedAverageMillis * 2, yearDurationField.getMillis(2L));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    @Test
+    public void testGetMillis_calculatesPreciseDurationFromInstant() {
+        // getMillis(long, long) calculates the precise duration from a specific start instant,
+        // accounting for the exact placement of leap years.
+        long startMillis = CYCLE_START_DATE.getMillis();
+
+        // Years 1720, 1721, 1722 are common years.
+        assertEquals(COMMON_YEAR_MILLIS, yearDurationField.getMillis(1, startMillis));
+        assertEquals(COMMON_YEAR_MILLIS * 2, yearDurationField.getMillis(2, startMillis));
+        assertEquals(COMMON_YEAR_MILLIS * 3, yearDurationField.getMillis(3, startMillis));
+
+        // The 4-year duration from 1720 includes the leap year 1723.
+        assertEquals(FOUR_YEAR_CYCLE_MILLIS, yearDurationField.getMillis(4, startMillis));
+
+        // Also test the long overload
+        assertEquals(FOUR_YEAR_CYCLE_MILLIS, yearDurationField.getMillis(4L, startMillis));
     }
 
-    public void testDurationYear() {
-        // Leap 1723
-        DateTime dt20 = new DateTime(1720, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt21 = new DateTime(1721, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt22 = new DateTime(1722, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt23 = new DateTime(1723, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DateTime dt24 = new DateTime(1724, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
-        DurationField fld = dt20.year().getDurationField();
-        assertEquals(COPTIC_UTC.years(), fld);
-        assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1, dt20.getMillis()));
-        assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2, dt20.getMillis()));
-        assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3, dt20.getMillis()));
-        assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4, dt20.getMillis()));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2));
-        assertEquals(1L * 365L * MILLIS_PER_DAY, fld.getMillis(1L, dt20.getMillis()));
-        assertEquals(2L * 365L * MILLIS_PER_DAY, fld.getMillis(2L, dt20.getMillis()));
-        assertEquals(3L * 365L * MILLIS_PER_DAY, fld.getMillis(3L, dt20.getMillis()));
-        assertEquals((4L * 365L + 1L) * MILLIS_PER_DAY, fld.getMillis(4L, dt20.getMillis()));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getMillis(1L));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 2, fld.getMillis(2L));
-        assertEquals(((4L * 365L + 1L) * MILLIS_PER_DAY) / 4, fld.getUnitMillis());
-        assertEquals(0, fld.getValue(1L * 365L * MILLIS_PER_DAY - 1L, dt20.getMillis()));
-        assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY, dt20.getMillis()));
-        assertEquals(1, fld.getValue(1L * 365L * MILLIS_PER_DAY + 1L, dt20.getMillis()));
-        assertEquals(1, fld.getValue(2L * 365L * MILLIS_PER_DAY - 1L, dt20.getMillis()));
-        assertEquals(2, fld.getValue(2L * 365L * MILLIS_PER_DAY, dt20.getMillis()));
-        assertEquals(2, fld.getValue(2L * 365L * MILLIS_PER_DAY + 1L, dt20.getMillis()));
-        assertEquals(2, fld.getValue(3L * 365L * MILLIS_PER_DAY - 1L, dt20.getMillis()));
-        assertEquals(3, fld.getValue(3L * 365L * MILLIS_PER_DAY, dt20.getMillis()));
-        assertEquals(3, fld.getValue(3L * 365L * MILLIS_PER_DAY + 1L, dt20.getMillis()));
-        assertEquals(3, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY - 1L, dt20.getMillis()));
-        assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY, dt20.getMillis()));
-        assertEquals(4, fld.getValue((4L * 365L + 1L) * MILLIS_PER_DAY + 1L, dt20.getMillis()));
-        assertEquals(dt21.getMillis(), fld.add(dt20.getMillis(), 1));
-        assertEquals(dt22.getMillis(), fld.add(dt20.getMillis(), 2));
-        assertEquals(dt23.getMillis(), fld.add(dt20.getMillis(), 3));
-        assertEquals(dt24.getMillis(), fld.add(dt20.getMillis(), 4));
-        assertEquals(dt21.getMillis(), fld.add(dt20.getMillis(), 1L));
-        assertEquals(dt22.getMillis(), fld.add(dt20.getMillis(), 2L));
-        assertEquals(dt23.getMillis(), fld.add(dt20.getMillis(), 3L));
-        assertEquals(dt24.getMillis(), fld.add(dt20.getMillis(), 4L));
+    @Test
+    public void testGetValue_convertsMillisToYearsFromInstant() {
+        // getValue(long, long) determines how many full years fit into a given millisecond duration
+        // starting from a specific instant.
+        long startMillis = CYCLE_START_DATE.getMillis();
+
+        // Test durations around the 1-year mark (common year)
+        assertEquals(0, yearDurationField.getValue(COMMON_YEAR_MILLIS - 1, startMillis));
+        assertEquals(1, yearDurationField.getValue(COMMON_YEAR_MILLIS, startMillis));
+        assertEquals(1, yearDurationField.getValue(COMMON_YEAR_MILLIS + 1, startMillis));
+
+        // Test durations around the 4-year cycle mark (3 common + 1 leap)
+        assertEquals(3, yearDurationField.getValue(FOUR_YEAR_CYCLE_MILLIS - 1, startMillis));
+        assertEquals(4, yearDurationField.getValue(FOUR_YEAR_CYCLE_MILLIS, startMillis));
+        assertEquals(4, yearDurationField.getValue(FOUR_YEAR_CYCLE_MILLIS + 1, startMillis));
+    }
+
+    @Test
+    public void testAdd_addsYearsToInstant() {
+        // add() should correctly add years to an instant, preserving the date fields.
+        long startMillis = CYCLE_START_DATE.getMillis();
+
+        DateTime expectedAfter1Year = new DateTime(1721, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
+        DateTime expectedAfter2Years = new DateTime(1722, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
+        DateTime expectedAfter3Years = new DateTime(1723, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
+        DateTime expectedAfter4Years = new DateTime(1724, 10, 2, 0, 0, 0, 0, COPTIC_UTC);
+
+        // Test with int parameter
+        assertEquals(expectedAfter1Year.getMillis(), yearDurationField.add(startMillis, 1));
+        assertEquals(expectedAfter2Years.getMillis(), yearDurationField.add(startMillis, 2));
+        assertEquals(expectedAfter3Years.getMillis(), yearDurationField.add(startMillis, 3));
+        assertEquals(expectedAfter4Years.getMillis(), yearDurationField.add(startMillis, 4));
+
+        // Test with long parameter
+        assertEquals(expectedAfter4Years.getMillis(), yearDurationField.add(startMillis, 4L));
     }
 }
