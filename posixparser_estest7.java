@@ -1,31 +1,49 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class PosixParser_ESTestTest7 extends PosixParser_ESTest_scaffolding {
+/**
+ * This test class contains refactored tests for the PosixParser class,
+ * focusing on clarity and maintainability.
+ */
+public class PosixParserTest {
 
+    /**
+     * Tests that flatten() throws a ParseException when a long option
+     * token is provided in a way that matches all defined long options.
+     * <p>
+     * The PosixParser interprets an argument like "--=value" as a search for a
+     * long option with an empty name (""). This matches every long option defined.
+     * If more than one long option exists, the parser cannot resolve the ambiguity
+     * and throws an exception.
+     */
     @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Options options0 = new Options();
-        Options options1 = options0.addRequiredOption("j", "j", false, "j");
-        Options options2 = options1.addOption("j", "--WS", false, "--WS");
-        String[] stringArray0 = new String[12];
-        stringArray0[10] = "--=<ibn";
-        PosixParser posixParser0 = new PosixParser();
+    public void flattenShouldThrowExceptionForAmbiguousLongOptionFromEmptyPrefix() throws Exception {
+        // Arrange
+        Options options = new Options();
+        options.addOption("a", "alpha", false, "The first option");
+        options.addOption("b", "beta", false, "The second option");
+
+        // An argument starting with "--=" is treated as a long option with an empty name,
+        // which ambiguously matches all long options defined above.
+        String[] arguments = {"--=some-value"};
+        PosixParser parser = new PosixParser();
+
+        // Act & Assert
         try {
-            posixParser0.flatten(options2, stringArray0, false);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Ambiguous option: '--'  (could be: 'j', '--WS')
-            //
-            verifyException("org.apache.commons.cli.PosixParser", e);
+            parser.flatten(options, arguments, false);
+            fail("Expected a ParseException to be thrown for an ambiguous option.");
+        } catch (ParseException e) {
+            // Verify that the exception message correctly identifies the ambiguity.
+            // The order of 'alpha' and 'beta' in the message is not guaranteed,
+            // so we check for the presence of all expected parts.
+            String message = e.getMessage();
+            assertTrue("Message should indicate an ambiguous option for '--'.",
+                message.startsWith("Ambiguous option: '--'"));
+            assertTrue("Message should list 'alpha' as a possibility.", message.contains("'alpha'"));
+            assertTrue("Message should list 'beta' as a possibility.", message.contains("'beta'"));
         }
     }
 }
