@@ -1,36 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class PdfDictionary_ESTestTest14 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Test suite for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        PdfResources pdfResources0 = new PdfResources();
-        PdfWriter pdfWriter0 = new PdfWriter();
-        // Undeclared exception!
-        try {
-            pdfResources0.toPdf(pdfWriter0, (OutputStream) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.PdfDictionary", e);
-        }
+    /**
+     * Verifies that calling the toPdf() method with a null OutputStream
+     * throws a NullPointerException.
+     * <p>
+     * This test ensures that the method correctly handles invalid input by
+     * failing fast, which is a critical contract for methods that perform I/O operations.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toPdf_whenOutputStreamIsNull_throwsNullPointerException() throws IOException {
+        // Arrange
+        // PdfResources is a concrete subclass of PdfDictionary, suitable for testing.
+        PdfDictionary dictionary = new PdfResources();
+        
+        // A PdfWriter instance is required by the method signature. Since the test
+        // triggers an error before the writer is used, a default instance is sufficient.
+        PdfWriter writer = new PdfWriter();
+
+        // Act & Assert
+        // The method is called with a null OutputStream.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        dictionary.toPdf(writer, null);
     }
 }
