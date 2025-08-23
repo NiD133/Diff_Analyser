@@ -1,19 +1,20 @@
 package org.jsoup.nodes;
 
-import org.jsoup.Jsoup;
-import org.jsoup.parser.Parser;
-import org.junit.jupiter.api.Test;
-import static org.jsoup.nodes.Document.OutputSettings;
-import static org.jsoup.nodes.Entities.EscapeMode.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.jsoup.nodes.Entities;
 
-public class EntitiesTestTest8 {
+/**
+ * This test suite is responsible for verifying the behavior of the {@link Entities} class.
+ */
+public class EntitiesTest {
 
-    @Test
-    public void notMissingMultis() {
-        String text = "&nparsl;";
-        String un = "\u2AFD\u20E5";
-        assertEquals(un, Entities.unescape(text));
+    /**
+     * Verifies that the unescape method throws a NullPointerException when the input string is null.
+     * This is the expected behavior, as the method does not perform a null check before processing the input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void unescape_withNullInput_shouldThrowNullPointerException() {
+        Entities.unescape(null);
     }
 }
