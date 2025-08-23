@@ -1,35 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite focuses on the SerializedString class.
+ * This specific test case verifies the behavior of the writeUnquotedUTF8 method.
+ */
 public class SerializedString_ESTestTest19 extends SerializedString_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        // Undeclared exception!
-        try {
-            serializedString0.writeUnquotedUTF8((OutputStream) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.SerializedString", e);
-        }
+    /**
+     * Verifies that writeUnquotedUTF8 throws a NullPointerException
+     * when the provided OutputStream is null.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void writeUnquotedUTF8ShouldThrowNullPointerExceptionWhenOutputStreamIsNull() throws IOException {
+        // Arrange: Create a SerializedString instance. The content is irrelevant for this test.
+        SerializedString serializedString = new SerializedString("any-value");
+
+        // Act: Attempt to write to a null OutputStream.
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
+        serializedString.writeUnquotedUTF8(null);
     }
 }
