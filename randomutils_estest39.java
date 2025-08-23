@@ -1,19 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class RandomUtils_ESTestTest39 extends RandomUtils_ESTest_scaffolding {
+/**
+ * A test suite for the {@link RandomUtils} class.
+ * This class focuses on verifying the contract of the static methods.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        byte[] byteArray0 = RandomUtils.nextBytes(1);
-        //  // Unstable assertion: assertArrayEquals(new byte[] {(byte)14}, byteArray0);
+    /**
+     * Tests that {@code RandomUtils.nextBytes(int)} returns a byte array
+     * of the specified length.
+     */
+    @Test
+    public void nextBytesShouldReturnArrayOfCorrectLength() {
+        // Arrange: Define the expected length of the byte array.
+        final int expectedLength = 5;
+
+        // Act: Call the method under test.
+        final byte[] result = RandomUtils.nextBytes(expectedLength);
+
+        // Assert: Verify the properties of the returned array.
+        // We cannot test for specific random values, but we can test the contract.
+        assertNotNull("The returned byte array should not be null", result);
+        assertEquals("The returned byte array should have the requested length",
+                     expectedLength, result.length);
     }
 }
