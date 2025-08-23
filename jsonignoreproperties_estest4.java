@@ -1,22 +1,31 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonIgnoreProperties_ESTestTest4 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class, focusing on its behavior and state representation.
+ */
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
-        String string0 = jsonIgnoreProperties_Value0.toString();
-        assertEquals("JsonIgnoreProperties.Value(ignored=[],ignoreUnknown=true,allowGetters=false,allowSetters=false,merge=true)", string0);
+    /**
+     * Verifies that the toString() method correctly represents a Value instance
+     * created to ignore unknown properties.
+     */
+    @Test
+    public void toStringShouldReflectThatUnknownPropertiesAreIgnored() {
+        // Arrange: Create a Value instance configured to ignore unknown properties.
+        // All other properties should retain their default values.
+        JsonIgnoreProperties.Value value = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
+
+        // The expected string representation includes the configured 'ignoreUnknown=true'
+        // and default values for all other fields.
+        String expectedToString = "JsonIgnoreProperties.Value(ignored=[],ignoreUnknown=true,allowGetters=false,allowSetters=false,merge=true)";
+
+        // Act: Generate the string representation of the Value object.
+        String actualToString = value.toString();
+
+        // Assert: The actual string should match the expected format and content.
+        assertEquals(expectedToString, actualToString);
     }
 }
