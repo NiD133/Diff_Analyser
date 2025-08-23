@@ -1,35 +1,28 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest67 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link LinkedTreeMap} class.
+ * This particular test focuses on the behavior of the find() method.
+ */
+public class LinkedTreeMapFindTest {
 
-    @Test(timeout = 4000)
-    public void test66() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = new Integer((-1179));
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        // Undeclared exception!
-        try {
-            linkedTreeMap0.find((Integer) null, true);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.LinkedTreeMap$1", e);
-        }
+    /**
+     * Verifies that find() throws a NullPointerException when called with a null key
+     * on a map that uses the natural order comparator. The natural order comparator
+     * does not support null keys, as it would lead to calling compareTo() on a null reference.
+     */
+    @Test(expected = NullPointerException.class)
+    public void findWithNullKeyOnNaturalOrderMapThrowsNullPointerException() {
+        // Arrange: Create a map that uses natural ordering and add an element.
+        // An element must be present to ensure the comparison logic inside find() is executed.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        map.put(10, "some value");
+
+        // Act & Assert: Attempting to find a null key should trigger a NullPointerException
+        // because the natural order comparator will try to call compareTo(..) on null.
+        // The 'create' flag is set to true, consistent with the original test's scenario.
+        map.find(null, true);
     }
 }
