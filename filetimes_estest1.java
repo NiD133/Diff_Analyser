@@ -1,24 +1,28 @@
 package org.apache.commons.io.file.attribute;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest1 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        boolean boolean0 = FileTimes.isUnixTime(2147483647L);
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link FileTimes#isUnixTime(long)} correctly identifies the maximum
+     * 32-bit signed integer value as a valid Unix time. This is a significant
+     * boundary case, often associated with the "Year 2038 problem".
+     */
+    @Test
+    public void isUnixTime_with32BitIntegerMaxValue_shouldReturnTrue() {
+        // Arrange: The maximum value for a 32-bit signed integer, a known
+        // boundary for traditional Unix time.
+        final long max32BitIntValue = Integer.MAX_VALUE;
+
+        // Act: Check if this value is considered a valid Unix time.
+        final boolean result = FileTimes.isUnixTime(max32BitIntValue);
+
+        // Assert: The result should be true.
+        assertTrue("The maximum 32-bit signed integer should be a valid Unix time", result);
     }
 }
