@@ -2,18 +2,32 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JacksonInject_ESTestTest31 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JacksonInject} annotation and its inner {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.from((JacksonInject) null);
-        assertNull(jacksonInject_Value0.getOptional());
+    /**
+     * Verifies that creating a {@link JacksonInject.Value} from a null annotation
+     * returns the canonical empty instance, which correctly reports its 'optional'
+     * property as null.
+     */
+    @Test
+    public void testFrom_withNullAnnotation_shouldReturnEmptyValue() {
+        // Arrange: The input is a null JacksonInject annotation.
+        JacksonInject nullAnnotation = null;
+
+        // Act: Create a Value instance from the null annotation.
+        JacksonInject.Value result = JacksonInject.Value.from(nullAnnotation);
+
+        // Assert: The result should be the canonical empty instance.
+        assertSame("from(null) should return the singleton empty instance",
+                JacksonInject.Value.empty(), result);
+
+        // The empty instance should have null for all its properties.
+        assertNull("The 'optional' property of an empty Value should be null", result.getOptional());
+        assertNull("The 'id' property of an empty Value should be null", result.getId());
+        assertNull("The 'useInput' property of an empty Value should be null", result.getUseInput());
     }
 }
