@@ -1,18 +1,21 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest2 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        byte byte0 = SignedBytes.saturatedCast(127L);
-        assertEquals((byte) 127, byte0);
+    @Test
+    public void saturatedCast_withLongAtUpperBoundary_shouldReturnMaxValue() {
+        // The saturatedCast method should correctly handle a long value that is
+        // exactly at the upper boundary of the byte range.
+        long input = Byte.MAX_VALUE; // 127L
+        
+        byte result = SignedBytes.saturatedCast(input);
+        
+        assertEquals(Byte.MAX_VALUE, result);
     }
 }
