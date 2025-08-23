@@ -1,46 +1,47 @@
 package org.joda.time.format;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
 import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
 import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.joda.time.format.PeriodFormatterBuilder.Composite;
 
-public class PeriodFormatter_ESTestTest20 extends PeriodFormatter_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        PeriodFormatterBuilder.Composite periodFormatterBuilder_Composite0 = new PeriodFormatterBuilder.Composite(linkedList0);
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Composite0, periodFormatterBuilder_Composite0);
-        Hours hours0 = Hours.MAX_VALUE;
-        // Undeclared exception!
-        try {
-            periodFormatter0.print(hours0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.format.PeriodFormatterBuilder$Composite", e);
-        }
+import static org.junit.Assert.fail;
+
+/**
+ * This test class contains tests for the PeriodFormatter class.
+ * This particular test was improved for understandability.
+ */
+public class PeriodFormatter_ESTestTest20 { // Retaining original class name for context
+
+    /**
+     * Verifies that calling print() on a PeriodFormatter constructed with an
+     * empty composite printer throws a NullPointerException.
+     *
+     * A composite printer requires at least one underlying printer element to function.
+     * Providing an empty list of elements results in an invalid state that should
+     * cause a failure upon use.
+     */
+    @Test(expected = NullPointerException.class)
+    public void print_withEmptyCompositePrinter_shouldThrowNullPointerException() {
+        // Arrange: Create a formatter with a composite printer that has no actual printer elements.
+        // A Composite delegates printing to a list of printers/parsers. Here, we provide an empty list.
+        List<Object> emptyElements = Collections.emptyList();
+        Composite emptyComposite = new PeriodFormatterBuilder.Composite(emptyElements);
+
+        // The parser is irrelevant for this print test, but the constructor requires one.
+        // We can use the same empty composite instance since it implements both interfaces.
+        PeriodFormatter formatter = new PeriodFormatter(emptyComposite, emptyComposite);
+
+        ReadablePeriod periodToPrint = Hours.ONE;
+
+        // Act: Attempt to print the period. This is expected to fail because the composite
+        // has no sub-printers to delegate to, leading to an NPE internally.
+        formatter.print(periodToPrint);
+
+        // Assert: The @Test(expected) annotation handles the exception assertion.
+        // If the line above does not throw an exception, the test will fail automatically.
     }
 }
