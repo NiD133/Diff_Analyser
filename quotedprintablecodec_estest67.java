@@ -1,27 +1,31 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest67 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * This test case verifies the behavior of the QuotedPrintableCodec's decode method
+ * when the codec is constructed with a null charset.
+ */
+public class QuotedPrintableCodecExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test66() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec((Charset) null);
-        // Undeclared exception!
-        try {
-            quotedPrintableCodec0.decode((Object) "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Tests that calling decode(Object) with a String on a codec initialized
+     * with a null charset throws a NullPointerException.
+     *
+     * The internal call to decode the string requires a charset to construct the
+     * final string. Passing a null charset to the underlying String constructor
+     * results in an NPE, which is the expected behavior in this scenario.
+     */
+    @Test(expected = NullPointerException.class)
+    public void decodeObjectAsStringWithNullCharsetShouldThrowNullPointerException() throws Exception {
+        // Arrange: Create a codec with a null charset.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec((Charset) null);
+        final Object input = "";
+
+        // Act: Attempt to decode the object, which is a String.
+        codec.decode(input);
+
+        // Assert: A NullPointerException is expected, as specified by the @Test annotation.
     }
 }
