@@ -1,37 +1,49 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest15 extends TypeAdapter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Gson.FutureTypeAdapter<Integer> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Integer>();
-        TypeAdapter<Integer> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        StringReader stringReader0 = new StringReader("");
-        stringReader0.close();
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
+/**
+ * Tests for the {@link TypeAdapter} class, focusing on I/O error handling.
+ */
+public class TypeAdapterTest {
+
+    /**
+     * Verifies that calling read() on a TypeAdapter backed by a closed reader
+     * throws an IOException.
+     */
+    @Test
+    public void readFromClosedReaderThrowsIOException() {
+        // Arrange
+        // Create a TypeAdapter and wrap it with nullSafe() to test the wrapper's behavior.
+        // The specific adapter (FutureTypeAdapter) is not important, as the exception
+        // occurs before its read() method is ever called.
+        TypeAdapter<Integer> delegateAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Integer> nullSafeAdapter = delegateAdapter.nullSafe();
+
+        // Create a reader and immediately close it to simulate a closed stream.
+        StringReader closedReader = new StringReader("");
         try {
-            typeAdapter0.read(jsonReader0);
-            fail("Expecting exception: IOException");
+            closedReader.close();
         } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
+            // This should not happen with a StringReader, but we fail fast if it does.
+            fail("Test setup failed: " + e.getMessage());
+        }
+        JsonReader jsonReader = new JsonReader(closedReader);
+
+        // Act & Assert
+        try {
+            nullSafeAdapter.read(jsonReader);
+            fail("Expected an IOException because the underlying reader is closed.");
+        } catch (IOException e) {
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals("Stream closed", e.getMessage());
         }
     }
 }
