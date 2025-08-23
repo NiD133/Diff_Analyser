@@ -1,35 +1,26 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
-public class Elements_ESTestTest170 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class, focusing on edge cases for traversal methods.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test169() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.prevAll((String) null);
-        assertNotSame(elements1, elements0);
+    @Test
+    public void prevAllOnEmptyListWithNullSelectorReturnsNewEmptyList() {
+        // Arrange: Create an empty Elements collection.
+        Elements emptyElements = new Elements();
+
+        // Act: Call prevAll() with a null selector string. This tests the edge case
+        // where the method receives null input on an empty collection.
+        Elements result = emptyElements.prevAll((String) null);
+
+        // Assert: The method should return a new, empty Elements instance,
+        // rather than modifying or returning the original instance.
+        assertNotSame("prevAll should return a new instance, not the original.", emptyElements, result);
+        assertTrue("The resulting list of elements should be empty.", result.isEmpty());
     }
 }
