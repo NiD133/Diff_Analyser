@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class DateTimeComparator_ESTestTest15 extends DateTimeComparator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DateTimeComparator} class.
+ */
+public class DateTimeComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.monthOfYear();
-        DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance((DateTimeFieldType) null, dateTimeFieldType0);
-        assertNotNull(dateTimeComparator0);
+    /**
+     * Verifies that getInstance(lower, upper) successfully creates a comparator
+     * when the lower limit is null and the upper limit is valid.
+     */
+    @Test
+    public void getInstance_withNullLowerLimit_shouldCreateComparator() {
+        // Arrange
+        DateTimeFieldType upperLimit = DateTimeFieldType.monthOfYear();
+
+        // Act
+        DateTimeComparator comparator = DateTimeComparator.getInstance(null, upperLimit);
+
+        // Assert
+        assertNotNull("The factory method should return a non-null instance.", comparator);
+        assertNull("The lower limit should be null, as provided.", comparator.getLowerLimit());
+        assertEquals("The upper limit should be correctly set.", upperLimit, comparator.getUpperLimit());
     }
 }
