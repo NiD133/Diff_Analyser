@@ -1,23 +1,25 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest15 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.encode("");
-        assertEquals("", string0);
+    @Test
+    public void encodeEmptyStringShouldReturnEmptyString() throws EncoderException {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final String input = "";
+
+        // Act
+        final String encodedString = codec.encode(input);
+
+        // Assert
+        assertEquals("Encoding an empty string should result in an empty string.", "", encodedString);
     }
 }
