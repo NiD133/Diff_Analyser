@@ -1,19 +1,24 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeConstants;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CopticChronology_ESTestTest10 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CopticChronology} class.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance((DateTimeZone) null, 1);
-        assertEquals(1, CopticChronology.AM);
+    /**
+     * Tests that the constant for the Coptic era, 'Anno Martyrum' (AM),
+     * has the correct value, which should be equivalent to the Common Era (CE).
+     */
+    @Test
+    public void testAmEraConstantIsCorrect() {
+        // The CopticChronology.AM constant represents the 'Anno Martyrum' era.
+        // According to the class documentation, this is equivalent to the
+        // Common Era (CE) constant defined in DateTimeConstants.
+        assertEquals("The AM era constant should be equal to CE.",
+                DateTimeConstants.CE, CopticChronology.AM);
     }
 }
