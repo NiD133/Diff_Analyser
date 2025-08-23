@@ -1,54 +1,37 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * Tests for the {@link StringConverter} class, focusing on its exception-handling capabilities.
+ * This version has been refactored from an auto-generated test for improved clarity.
+ */
 public class StringConverter_ESTestTest1 extends StringConverter_ESTest_scaffolding {
 
+    /**
+     * Verifies that getDurationMillis() throws an IllegalArgumentException when provided
+     * with a string that does not conform to the ISO 8601 duration format.
+     * <p>
+     * The standard format must start with 'P', optionally followed by date components,
+     * then 'T', followed by time components (e.g., "PT5S" for 5 seconds). The input
+     * string "Pt,v.y" is invalid because it uses a lowercase 't'.
+     */
     @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        // Undeclared exception!
+    public void getDurationMillis_shouldThrowIllegalArgumentException_forInvalidFormatString() {
+        // Arrange
+        StringConverter converter = StringConverter.INSTANCE;
+        String invalidDurationString = "Pt,v.y";
+
+        // Act & Assert
         try {
-            stringConverter0.getDurationMillis("Pt,v.y");
-            fail("Expecting exception: IllegalArgumentException");
+            converter.getDurationMillis(invalidDurationString);
+            fail("Expected an IllegalArgumentException to be thrown for the invalid format.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \"Pt,v.y\"
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
+            // Verify that the exception message is clear and correctly identifies the invalid input.
+            String expectedMessage = "Invalid format: \"" + invalidDurationString + "\"";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
