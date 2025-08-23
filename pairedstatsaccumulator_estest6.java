@@ -1,23 +1,44 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class PairedStatsAccumulator_ESTestTest6 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+@RunWith(JUnit4.class)
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        Stats stats0 = new Stats((-8253L), (-8253L), (-8253L), 2242.352921728372, (-8253L));
-        PairedStats pairedStats0 = new PairedStats(stats0, stats0, (-8253L));
-        pairedStatsAccumulator0.addAll(pairedStats0);
-        double double0 = pairedStatsAccumulator0.populationCovariance();
-        assertEquals(1.0, double0, 0.01);
+    // A small tolerance for floating-point comparisons.
+    private static final double TOLERANCE = 1e-9;
+
+    @Test
+    public void populationCovariance_afterAddingAllFromPairedStats_isCalculatedCorrectly() {
+        // Arrange: Create a PairedStats object with known statistical properties
+        // from a simple dataset: (1, 2) and (3, 4).
+        //
+        // For this data:
+        //   - count = 2
+        //   - x-mean = (1 + 3) / 2 = 2.0
+        //   - y-mean = (2 + 4) / 2 = 3.0
+        //   - Sum of products of deltas = (1-2)*(2-3) + (3-2)*(4-3) = (-1)*(-1) + (1)*(1) = 2.0
+        //   - Expected population covariance = (Sum of products of deltas) / count = 2.0 / 2 = 1.0
+        PairedStatsAccumulator sourceAccumulator = new PairedStatsAccumulator();
+        sourceAccumulator.add(1.0, 2.0);
+        sourceAccumulator.add(3.0, 4.0);
+        PairedStats statsToAdd = sourceAccumulator.snapshot();
+
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        double expectedCovariance = 1.0;
+
+        // Act: Add the pre-computed stats to the accumulator under test.
+        accumulator.addAll(statsToAdd);
+        double actualCovariance = accumulator.populationCovariance();
+
+        // Assert: The calculated covariance should match the expected value.
+        assertEquals(expectedCovariance, actualCovariance, TOLERANCE);
     }
 }
