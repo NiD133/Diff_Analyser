@@ -1,46 +1,35 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.apache.commons.io.file.Counters.PathCounters;
+import org.junit.Test;
+
+/**
+ * Tests for {@link CountingPathVisitor}.
+ * This test focuses on constructor validation.
+ */
 public class CountingPathVisitor_ESTestTest30 extends CountingPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
-        CountingPathVisitor countingPathVisitor0 = null;
+    /**
+     * Tests that the constructor throws a NullPointerException when the fileFilter argument is null.
+     */
+    @Test
+    public void constructorShouldThrowNullPointerExceptionForNullFileFilter() {
+        // Arrange: Create a valid PathCounters instance. The filters will be null.
+        final PathCounters counters = CountingPathVisitor.defaultPathCounters();
+
+        // Act & Assert: Attempt to create an instance with a null fileFilter and expect an exception.
         try {
-            countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, (PathFilter) null, (PathFilter) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // fileFilter
-            //
-            verifyException("java.util.Objects", e);
+            // The constructor validates that fileFilter is not null.
+            // The directoryFilter is also null, but the check for fileFilter comes first.
+            new CountingPathVisitor(counters, null, null);
+            fail("Expected a NullPointerException because the fileFilter argument was null.");
+        } catch (final NullPointerException e) {
+            // The constructor uses Objects.requireNonNull(fileFilter, "fileFilter"),
+            // so we expect the exception message to be "fileFilter".
+            assertEquals("fileFilter", e.getMessage());
         }
     }
 }
