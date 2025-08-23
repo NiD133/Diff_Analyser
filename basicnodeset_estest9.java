@@ -1,20 +1,28 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class BasicNodeSet_ESTestTest9 extends BasicNodeSet_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link BasicNodeSet} class.
+ */
+public class BasicNodeSetTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        basicNodeSet0.remove((Pointer) null);
+    /**
+     * Tests that attempting to remove a null pointer from an empty BasicNodeSet
+     * does not cause an error and leaves the set unchanged.
+     */
+    @Test
+    public void remove_withNullPointerOnEmptySet_shouldBeIgnored() {
+        // Arrange: Create an empty node set.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+
+        // Act: Attempt to remove a null pointer. This action should be handled
+        // gracefully without throwing an exception.
+        nodeSet.remove(null);
+
+        // Assert: The node set should remain empty.
+        assertTrue("The node set should still be empty after attempting to remove null.",
+                nodeSet.getPointers().isEmpty());
     }
 }
