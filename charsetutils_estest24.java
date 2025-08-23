@@ -1,17 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSetUtils_ESTestTest24 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSetUtils}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        String[] stringArray0 = new String[2];
-        int int0 = CharSetUtils.count("&", stringArray0);
-        assertEquals(0, int0);
+    /**
+     * Tests that CharSetUtils.count() returns 0 when the character set array
+     * contains only null elements. An array of nulls is treated as an empty set,
+     * so no characters should be counted.
+     */
+    @Test
+    public void testCountWithSetContainingOnlyNullsReturnsZero() {
+        // Arrange
+        final String inputString = "hello";
+        final String[] characterSetWithNulls = {null, null};
+
+        // Act
+        final int count = CharSetUtils.count(inputString, characterSetWithNulls);
+
+        // Assert
+        assertEquals("The count should be 0 for a set containing only nulls.", 0, count);
     }
 }
