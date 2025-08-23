@@ -1,27 +1,39 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest47 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        Strictness strictness0 = Strictness.LENIENT;
-        jsonTreeWriter0.setStrictness(strictness0);
-        Float float0 = new Float(1831.27507);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.value((Number) float0);
-        assertSame(jsonTreeWriter0, jsonWriter0);
+/**
+ * Test suite for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    /**
+     * Verifies that writing a Number value correctly creates a JsonPrimitive
+     * and that the method supports a fluent interface by returning itself.
+     */
+    @Test
+    public void value_whenWritingNumber_buildsJsonPrimitiveAndReturnsSelf() {
+        // Arrange
+        JsonTreeWriter jsonTreeWriter = new JsonTreeWriter();
+        Number testNumber = 1831.275f;
+
+        // Act
+        JsonWriter resultWriter = jsonTreeWriter.value(testNumber);
+
+        // Assert
+        // 1. The method should return the same instance to allow for method chaining.
+        assertSame("The writer instance should be returned for chaining.", jsonTreeWriter, resultWriter);
+
+        // 2. The writer should produce the correct JsonElement.
+        JsonElement writtenElement = jsonTreeWriter.get();
+        JsonPrimitive expectedPrimitive = new JsonPrimitive(testNumber);
+        assertEquals("The written element should be a JsonPrimitive representing the number.",
+                expectedPrimitive, writtenElement);
     }
 }
