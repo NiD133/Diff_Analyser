@@ -1,26 +1,38 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertFalse;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ProxyReader_ESTestTest6 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Contains tests for the ProxyReader class, using CloseShieldReader as a concrete implementation.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        StringReader stringReader0 = new StringReader("$^pT");
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
-        closeShieldReader0.close();
-        boolean boolean0 = closeShieldReader0.ready();
-        assertFalse(boolean0);
+    /**
+     * Verifies that a CloseShieldReader reports itself as "not ready" after its close() method is called.
+     * <p>
+     * The {@link CloseShieldReader#close()} method is designed to prevent the underlying
+     * reader from being closed. It achieves this by internally replacing the delegate
+     * with a closed reader instance, making the proxy itself behave as if it were closed.
+     * </p>
+     *
+     * @throws IOException Should not be thrown in this test case.
+     */
+    @Test
+    public void readyShouldReturnFalseAfterProxyReaderIsClosed() throws IOException {
+        // Arrange: Create a reader and wrap it in a CloseShieldReader, which is a type of ProxyReader.
+        final StringReader sourceReader = new StringReader("test data");
+        final CloseShieldReader shieldedReader = CloseShieldReader.wrap(sourceReader);
+
+        // Act: Close the proxy reader. This action makes the shieldedReader behave as if closed,
+        // without affecting the underlying sourceReader.
+        shieldedReader.close();
+        final boolean isReady = shieldedReader.ready();
+
+        // Assert: The proxy reader should now report that it is not ready for reading.
+        assertFalse("A reader wrapped by a closed CloseShieldReader should not be ready.", isReady);
     }
 }
