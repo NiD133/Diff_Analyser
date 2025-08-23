@@ -1,26 +1,26 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest33 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for {@link TokenQueue}.
+ * This class contains tests for the TokenQueue's state and behavior.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("COdx'!Y");
-        tokenQueue0.close();
-        // Undeclared exception!
-        try {
-            tokenQueue0.consumeWhitespace();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to use a TokenQueue after it has been closed
+     * results in a NullPointerException. This ensures that the queue correctly
+     * invalidates its state upon closure and prevents further operations.
+     */
+    @Test(expected = NullPointerException.class)
+    public void callingConsumeWhitespaceOnClosedQueueThrowsException() {
+        // Arrange: Create a TokenQueue and then immediately close it.
+        TokenQueue queue = new TokenQueue("some data");
+        queue.close();
+
+        // Act & Assert: Attempt to consume whitespace from the closed queue.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        queue.consumeWhitespace();
     }
 }
