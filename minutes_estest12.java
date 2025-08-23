@@ -1,18 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest12 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Minutes minutes0 = Minutes.MIN_VALUE;
-        Duration duration0 = minutes0.toStandardDuration();
-        assertEquals((-2147483648L), duration0.getStandardMinutes());
+    @Test
+    public void toStandardDuration_forMinValue_convertsToDurationWithSameNumberOfMinutes() {
+        // Arrange: Create a Minutes instance representing the minimum possible value.
+        // Minutes.MIN_VALUE is backed by Integer.MIN_VALUE.
+        Minutes minValueMinutes = Minutes.MIN_VALUE;
+        long expectedMinutes = Integer.MIN_VALUE;
+
+        // Act: Convert the Minutes object to a standard Duration.
+        Duration resultingDuration = minValueMinutes.toStandardDuration();
+
+        // Assert: Verify that the resulting Duration holds the same number of minutes.
+        // Duration.getStandardMinutes() returns a long, so we compare against a long.
+        assertEquals(
+            "The duration should correctly represent the minimum number of minutes.",
+            expectedMinutes,
+            resultingDuration.getStandardMinutes()
+        );
     }
 }
