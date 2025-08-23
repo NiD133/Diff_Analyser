@@ -1,27 +1,45 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class PdfDictionary_ESTestTest54 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class, focusing on the isPages() method.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        boolean boolean0 = pdfDictionary0.isPages();
-        assertFalse(boolean0);
+    /**
+     * Verifies that isPages() returns false for a dictionary that does not have
+     * its /Type entry set to /Pages.
+     * <p>
+     * A newly created, empty dictionary is used as the test case.
+     */
+    @Test
+    public void isPages_returnsFalse_forDictionaryWithoutPagesType() {
+        // Arrange: Create a new, empty dictionary. By default, it has no /Type entry.
+        PdfDictionary dictionary = new PdfDictionary();
+
+        // Act: Check if the dictionary is of type /Pages.
+        boolean isPages = dictionary.isPages();
+
+        // Assert: The result should be false because the /Type is not /Pages.
+        assertFalse("A dictionary without a /Type should not be identified as a Pages dictionary.", isPages);
+    }
+
+    /**
+     * Verifies that isPages() returns true for a dictionary that has its /Type
+     * entry explicitly set to /Pages.
+     */
+    @Test
+    public void isPages_returnsTrue_forDictionaryWithPagesType() {
+        // Arrange: Create a dictionary with its type explicitly set to PAGES.
+        PdfDictionary pagesDictionary = new PdfDictionary(PdfDictionary.PAGES);
+
+        // Act: Check if the dictionary is of type /Pages.
+        boolean isPages = pagesDictionary.isPages();
+
+        // Assert: The result should be true.
+        assertTrue("A dictionary with /Type /Pages should be identified as a Pages dictionary.", isPages);
     }
 }
