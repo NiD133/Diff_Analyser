@@ -1,35 +1,55 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
+
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
+import java.util.concurrent.Executors;
 
-public class MultiBackgroundInitializer_ESTestTest4 extends MultiBackgroundInitializer_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer();
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor0 = new ScheduledThreadPoolExecutor(0);
-        scheduledThreadPoolExecutor0.purge();
-        BackgroundInitializer<Object> backgroundInitializer0 = new BackgroundInitializer<Object>(scheduledThreadPoolExecutor0);
-        multiBackgroundInitializer0.addInitializer("ogf-d", backgroundInitializer0);
-        multiBackgroundInitializer0.close();
-        multiBackgroundInitializer0.close();
-        MultiBackgroundInitializer.MultiBackgroundInitializerResults multiBackgroundInitializer_MultiBackgroundInitializerResults0 = multiBackgroundInitializer0.initialize();
-        multiBackgroundInitializer_MultiBackgroundInitializerResults0.isException("ogf-d");
+/**
+ * Contains tests for {@link MultiBackgroundInitializer}.
+ */
+public class MultiBackgroundInitializerTest {
+
+    /**
+     * Tests that initialization can still succeed for a child initializer that has its own
+     * external executor, even after the parent MultiBackgroundInitializer has been closed.
+     * Closing the parent shuts down its internal executor, but should not affect children
+     * that do not rely on it.
+     */
+    @Test
+    public void initializeSucceedsForChildWithOwnExecutorEvenAfterParentIsClosed() throws Exception {
+        // Arrange
+        final String childInitializerName = "childWithOwnExecutor";
+        final MultiBackgroundInitializer multiInitializer = new MultiBackgroundInitializer();
+
+        // Create a child initializer with its own dedicated executor service.
+        // The default initialize() for a raw BackgroundInitializer simply returns null.
+        final ExecutorService childExecutor = Executors.newSingleThreadExecutor();
+        final BackgroundInitializer<Object> childInitializer = new BackgroundInitializer<>(childExecutor);
+        multiInitializer.addInitializer(childInitializerName, childInitializer);
+
+        // Act
+        // Close the parent initializer *before* starting it. This creates and then
+        // immediately shuts down the parent's internal executor service.
+        // A second call is made to ensure the close() operation is idempotent.
+        multiInitializer.close();
+        multiInitializer.close();
+
+        // Directly invoke the protected initialize() method for this white-box test.
+        // This is expected to succeed because the child uses its own executor,
+        // which was not affected by the parent's close() call.
+        final MultiBackgroundInitializer.MultiBackgroundInitializerResults results = multiInitializer.initialize();
+
+        // Assert
+        assertTrue("Overall initialization should be successful.", results.isSuccessful());
+        assertFalse("Child initializer should not have thrown an exception.", results.isException(childInitializerName));
+        assertNull("Result from the child initializer should be null, as per its default implementation.", results.getResultObject(childInitializerName));
+
+        // Cleanup
+        childExecutor.shutdown();
     }
 }
