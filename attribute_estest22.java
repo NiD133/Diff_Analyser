@@ -1,38 +1,51 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
+
+import java.io.IOException;
 import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest22 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        PipedWriter pipedWriter0 = new PipedWriter();
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that the static {@code Attribute.html()} method wraps any {@link IOException}
+     * from the provided {@link Appendable} into an unchecked {@link RuntimeException}.
+     * This ensures that callers don't have to handle checked IOExceptions for a method
+     * that is primarily used for string building.
+     */
+    @Test
+    public void htmlMethodShouldWrapIOExceptionInRuntimeException() {
+        // Arrange: Create an Appendable that is guaranteed to throw an IOException on write.
+        // An unconnected PipedWriter is a standard way to achieve this for testing.
+        PipedWriter failingWriter = new PipedWriter();
+        OutputSettings settings = new OutputSettings();
+
+        // Act & Assert
         try {
-            Attribute.html("SAJSG]wWsB0C#[5", "9v/CARD0_U64t>:3", (Appendable) pipedWriter0, document_OutputSettings0);
-            fail("Expecting exception: RuntimeException");
+            // The html() method uses an internal QuietAppendable that catches IOExceptions
+            // and re-throws them as RuntimeExceptions.
+            Attribute.html("key", "value", failingWriter, settings);
+            fail("A RuntimeException was expected but not thrown.");
         } catch (RuntimeException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("org.jsoup.internal.QuietAppendable$BaseAppendable", e);
+            // Verify that the thrown exception is a RuntimeException
+            // and that its cause is the original IOException.
+            Throwable cause = e.getCause();
+            assertNotNull("The RuntimeException should have a cause.", cause);
+            assertTrue("The cause of the RuntimeException should be an IOException.", cause instanceof IOException);
+            assertEquals("Pipe not connected", cause.getMessage());
+        } catch (IOException e) {
+            // This block should not be reached. It's included to explicitly fail the test
+            // if an unwrapped IOException is thrown, which would violate the method's contract.
+            fail("The IOException should have been wrapped in a RuntimeException.");
         }
     }
 }
