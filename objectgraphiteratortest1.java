@@ -2,157 +2,91 @@ package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.collections4.Transformer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ObjectGraphIteratorTestTest1 extends AbstractIteratorTest<Object> {
+/**
+ * Tests the ObjectGraphIterator's ability to "flatten" an iterator of iterators.
+ * <p>
+ * This class focuses on the constructor {@link ObjectGraphIterator#ObjectGraphIterator(Iterator)},
+ * which is designed to chain multiple iterators together sequentially.
+ * </p>
+ */
+@DisplayName("ObjectGraphIterator (Chaining)")
+class ObjectGraphIteratorChainingTest extends AbstractIteratorTest<Object> {
 
-    protected String[] testArray = { "One", "Two", "Three", "Four", "Five", "Six" };
+    /** The expected sequence of elements after chaining the iterators. */
+    private static final List<String> EXPECTED_ELEMENTS = List.of("One", "Two", "Three", "Four", "Five", "Six");
 
-    protected List<String> list1;
-
-    protected List<String> list2;
-
-    protected List<String> list3;
-
-    protected List<Iterator<String>> iteratorList;
-
-    @Override
-    public ObjectGraphIterator<Object> makeEmptyIterator() {
-        final ArrayList<Object> list = new ArrayList<>();
-        return new ObjectGraphIterator<>(list.iterator());
-    }
-
-    @Override
-    public ObjectGraphIterator<Object> makeObject() {
-        setUp();
-        return new ObjectGraphIterator<>(iteratorList.iterator());
-    }
+    /** A list of iterators that will be chained together by the ObjectGraphIterator. */
+    private List<Iterator<String>> iteratorsToChain;
 
     @BeforeEach
-    public void setUp() {
-        list1 = new ArrayList<>();
-        list1.add("One");
-        list1.add("Two");
-        list1.add("Three");
-        list2 = new ArrayList<>();
-        list2.add("Four");
-        list3 = new ArrayList<>();
-        list3.add("Five");
-        list3.add("Six");
-        iteratorList = new ArrayList<>();
-        iteratorList.add(list1.iterator());
-        iteratorList.add(list2.iterator());
-        iteratorList.add(list3.iterator());
+    void setUp() {
+        final List<String> list1 = List.of("One", "Two", "Three");
+        final List<String> list2 = List.of("Four");
+        final List<String> list3 = List.of("Five", "Six");
+
+        iteratorsToChain = new ArrayList<>();
+        iteratorsToChain.add(list1.iterator());
+        iteratorsToChain.add(list2.iterator());
+        iteratorsToChain.add(list3.iterator());
     }
 
-    static class Branch {
-
-        List<Leaf> leaves = new ArrayList<>();
-
-        Leaf addLeaf() {
-            leaves.add(new Leaf());
-            return getLeaf(leaves.size() - 1);
-        }
-
-        Leaf getLeaf(final int index) {
-            return leaves.get(index);
-        }
-
-        Iterator<Leaf> leafIterator() {
-            return leaves.iterator();
-        }
+    /**
+     * Creates an ObjectGraphIterator that chains together multiple iterators.
+     * This is the primary subject of the tests in this class.
+     */
+    @Override
+    public ObjectGraphIterator<Object> makeObject() {
+        // setUp() is called by the test runner before this method
+        return new ObjectGraphIterator<>(iteratorsToChain.iterator());
     }
 
-    static class Forest {
-
-        List<Tree> trees = new ArrayList<>();
-
-        Tree addTree() {
-            trees.add(new Tree());
-            return getTree(trees.size() - 1);
-        }
-
-        Tree getTree(final int index) {
-            return trees.get(index);
-        }
-
-        Iterator<Tree> treeIterator() {
-            return trees.iterator();
-        }
-    }
-
-    static class Leaf {
-
-        String color;
-
-        String getColor() {
-            return color;
-        }
-
-        void setColor(final String color) {
-            this.color = color;
-        }
-    }
-
-    static class LeafFinder implements Transformer<Object, Object> {
-
-        @Override
-        public Object transform(final Object input) {
-            if (input instanceof Forest) {
-                return ((Forest) input).treeIterator();
-            }
-            if (input instanceof Tree) {
-                return ((Tree) input).branchIterator();
-            }
-            if (input instanceof Branch) {
-                return ((Branch) input).leafIterator();
-            }
-            if (input instanceof Leaf) {
-                return input;
-            }
-            throw new ClassCastException();
-        }
-    }
-
-    static class Tree {
-
-        List<Branch> branches = new ArrayList<>();
-
-        Branch addBranch() {
-            branches.add(new Branch());
-            return getBranch(branches.size() - 1);
-        }
-
-        Iterator<Branch> branchIterator() {
-            return branches.iterator();
-        }
-
-        Branch getBranch(final int index) {
-            return branches.get(index);
-        }
+    /**
+     * Creates an empty ObjectGraphIterator.
+     */
+    @Override
+    public ObjectGraphIterator<Object> makeEmptyIterator() {
+        return new ObjectGraphIterator<>(IteratorUtils.emptyIterator());
     }
 
     @Test
-    void testIteration_IteratorOfIterators() {
-        final List<Iterator<String>> iteratorList = new ArrayList<>();
-        iteratorList.add(list1.iterator());
-        iteratorList.add(list2.iterator());
-        iteratorList.add(list3.iterator());
-        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator(), null);
-        for (int i = 0; i < 6; i++) {
-            assertTrue(it.hasNext());
-            assertEquals(testArray[i], it.next());
-        }
-        assertFalse(it.hasNext());
+    @DisplayName("Should traverse all elements from a sequence of iterators")
+    void shouldTraverseAllElementsFromSequenceOfIterators() {
+        // Arrange: Create the iterator that chains the iterators prepared in setUp.
+        final Iterator<Object> chainedIterator = makeObject();
+
+        // Act: Collect all elements from the chained iterator.
+        final List<Object> actualElements = IteratorUtils.toList(chainedIterator);
+
+        // Assert: The collected elements must match the expected sequence.
+        assertEquals(EXPECTED_ELEMENTS, actualElements);
     }
+
+    @Test
+    @DisplayName("hasNext should return false after full iteration")
+    void hasNextShouldReturnFalseAfterFullIteration() {
+        // Arrange
+        final Iterator<Object> chainedIterator = makeObject();
+
+        // Act: Exhaust the iterator.
+        IteratorUtils.drain(chainedIterator);
+
+        // Assert
+        assertFalse(chainedIterator.hasNext(), "Iterator should be exhausted after traversing all elements");
+    }
+
+    // Note: The original test contained a large number of unused inner classes
+    // (Forest, Tree, Branch, Leaf, LeafFinder). These were likely intended for testing
+    // the graph traversal capabilities of ObjectGraphIterator with a Transformer,
+    // which is a separate use case. They have been removed from this file to reduce
+    // clutter and focus solely on the iterator-chaining functionality being tested here.
 }
