@@ -1,42 +1,44 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
 
-public class WeeksTestTest18 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test suite for the {@link Weeks} class, focusing on conversions to standard units.
+ */
+public class WeeksTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Tests that a standard conversion from weeks to seconds yields the correct result.
+     */
+    @Test
+    public void toStandardSeconds_forPositiveWeeks_convertsCorrectly() {
+        // Arrange
+        Weeks twoWeeks = Weeks.weeks(2);
+        Seconds expectedSeconds = Seconds.seconds(2 * DateTimeConstants.SECONDS_PER_WEEK);
+
+        // Act
+        Seconds actualSeconds = twoWeeks.toStandardSeconds();
+
+        // Assert
+        assertEquals(expectedSeconds, actualSeconds, "2 weeks should convert to the correct number of standard seconds.");
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
+    /**
+     * Tests that converting the maximum possible number of weeks to seconds
+     * throws an ArithmeticException due to integer overflow.
+     */
+    @Test
+    public void toStandardSeconds_forMaxValue_throwsArithmeticException() {
+        // Arrange
+        Weeks maxWeeks = Weeks.MAX_VALUE;
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardSeconds() {
-        Weeks test = Weeks.weeks(2);
-        Seconds expected = Seconds.seconds(2 * 7 * 24 * 60 * 60);
-        assertEquals(expected, test.toStandardSeconds());
-        try {
-            Weeks.MAX_VALUE.toStandardSeconds();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act & Assert
+        // The conversion should cause an integer overflow.
+        assertThrows(ArithmeticException.class, () -> {
+            maxWeeks.toStandardSeconds();
+        }, "Conversion of MAX_VALUE weeks to seconds should cause an overflow.");
     }
 }
