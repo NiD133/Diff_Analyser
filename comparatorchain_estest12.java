@@ -1,45 +1,45 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains an improved version of a test for the ComparatorChain.
+ * The original test was functionally correct but difficult to understand.
+ * This version focuses on clarity and maintainability.
+ */
 public class ComparatorChain_ESTestTest12 extends ComparatorChain_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Comparator<ComparatorChain<Object>> comparator0 = Comparator.nullsLast((Comparator<? super ComparatorChain<Object>>) null);
-        ComparatorChain<ComparatorChain<Object>> comparatorChain0 = new ComparatorChain<ComparatorChain<Object>>(comparator0);
-        LinkedList<Comparator<Object>> linkedList0 = new LinkedList<Comparator<Object>>();
-        ComparatorChain<Object> comparatorChain1 = new ComparatorChain<Object>(linkedList0, (BitSet) null);
-        comparatorChain0.compare(comparatorChain1, comparatorChain1);
-        // Undeclared exception!
+    /**
+     * Tests that attempting to modify a ComparatorChain after it has been used
+     * for a comparison (and is thus "locked") results in an UnsupportedOperationException.
+     */
+    @Test
+    public void setComparator_onLockedChain_throwsUnsupportedOperationException() {
+        // Arrange: Create a ComparatorChain with a single, simple comparator.
+        final Comparator<String> initialComparator = String.CASE_INSENSITIVE_ORDER;
+        final ComparatorChain<String> chain = new ComparatorChain<>(initialComparator);
+
+        // Act: The first call to compare() locks the chain, preventing further modifications.
+        // The actual result of the comparison is not important for this test.
+        chain.compare("a", "b");
+
+        // Sanity check to confirm the chain is now locked.
+        assertTrue("The chain should be locked after the first comparison.", chain.isLocked());
+
+        // Assert: Attempting to replace a comparator in the locked chain should throw an exception.
         try {
-            comparatorChain0.setComparator((-67), comparator0);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // Comparator ordering cannot be changed after the first comparison is performed
-            //
-            verifyException("org.apache.commons.collections4.comparators.ComparatorChain", e);
+            chain.setComparator(0, Comparator.naturalOrder());
+            fail("Expected an UnsupportedOperationException because the chain is locked.");
+        } catch (final UnsupportedOperationException e) {
+            // This is the expected outcome.
+            // We also verify the exception message to ensure it's failing for the right reason.
+            final String expectedMessage =
+                "Comparator ordering cannot be changed after the first comparison is performed";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
