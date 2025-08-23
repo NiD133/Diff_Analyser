@@ -1,31 +1,38 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest3 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("readers", "%{Y,*MT'j<t9mHJr/M_");
-        // Undeclared exception!
+/**
+ * Unit tests for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
+
+    /**
+     * Tests that makeSpatialContext throws a RuntimeException when the 'readers'
+     * configuration property contains a class name that does not exist.
+     */
+    @Test
+    public void makeSpatialContext_withInvalidReaderClassName_throwsRuntimeException() {
+        // Arrange: Create configuration with a non-existent class name for the 'readers' property.
+        // Using a descriptive, fully-qualified name makes the test's intent clear.
+        final String invalidClassName = "com.example.NonExistentShapeReader";
+        Map<String, String> config = new HashMap<>();
+        config.put("readers", invalidClassName);
+
+        // Act & Assert
         try {
-            SpatialContextFactory.makeSpatialContext(hashMap0, (ClassLoader) null);
-            fail("Expecting exception: RuntimeException");
+            SpatialContextFactory.makeSpatialContext(config, null);
+            fail("Expected a RuntimeException because the specified reader class cannot be found.");
         } catch (RuntimeException e) {
-            //
-            // Unable to find format class
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // Verify that the exception message clearly indicates which class failed to load.
+            String expectedMessage = "Unable to find format class: " + invalidClassName;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
