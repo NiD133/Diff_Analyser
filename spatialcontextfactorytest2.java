@@ -1,23 +1,27 @@
 package org.locationtech.spatial4j.context;
 
-import org.locationtech.spatial4j.context.jts.DatelineRule;
-import org.locationtech.spatial4j.context.jts.JtsSpatialContext;
 import org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory;
-import org.locationtech.spatial4j.context.jts.ValidationRule;
 import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.io.ShapeIO;
-import org.locationtech.spatial4j.io.WKTReader;
+import org.locationtech.spatial4j.shape.Rectangle;
 import org.locationtech.spatial4j.shape.impl.RectangleImpl;
 import org.junit.After;
 import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SpatialContextFactoryTestTest2 {
+/**
+ * Tests for {@link SpatialContextFactory} focusing on creating contexts from string arguments.
+ */
+public class SpatialContextFactoryTest {
 
+    // A system property that can be used to specify the factory class.
+    // The tearDown method ensures this property is cleared after each test.
     public static final String PROP = "SpatialContextFactory";
 
     @After
@@ -25,47 +29,85 @@ public class SpatialContextFactoryTestTest2 {
         System.getProperties().remove(PROP);
     }
 
-    private SpatialContext call(String... argsStr) {
-        Map<String, String> args = new HashMap<>();
-        for (int i = 0; i < argsStr.length; i += 2) {
-            String key = argsStr[i];
-            String val = argsStr[i + 1];
-            args.put(key, val);
-        }
-        return SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
-    }
-
-    public static class DSCF extends SpatialContextFactory {
-
-        @Override
-        public SpatialContext newSpatialContext() {
-            geo = false;
-            return new SpatialContext(this);
-        }
-    }
-
-    public static class CustomWktShapeParser extends WKTReader {
-
-        //cheap way to test it was created
-        static boolean once = false;
-
-        public CustomWktShapeParser(JtsSpatialContext ctx, JtsSpatialContextFactory factory) {
-            super(ctx, factory);
-            once = true;
-        }
-    }
-
+    /**
+     * Tests that the factory correctly creates a non-geodetic (planar) context
+     * when "geo" is set to "false".
+     */
     @Test
-    public void testCustom() {
-        SpatialContext ctx = call("geo", "false");
-        assertTrue(!ctx.isGeo());
-        assertEquals(new CartesianDistCalc(), ctx.getDistCalc());
-        ctx = call("geo", "false", "distCalculator", "cartesian^2", "worldBounds", //xMin, xMax, yMax, yMin
-        "ENVELOPE(-100, 75, 200, 0)");
-        assertEquals(new CartesianDistCalc(true), ctx.getDistCalc());
-        assertEquals(new RectangleImpl(-100, 75, 0, 200, ctx), ctx.getWorldBounds());
-        ctx = call("geo", "true", "distCalculator", "lawOfCosines");
-        assertTrue(ctx.isGeo());
-        assertEquals(new GeodesicSphereDistCalc.LawOfCosines(), ctx.getDistCalc());
+    public void factory_withGeoFalse_createsNonGeodeticContext() {
+        // Arrange
+        Map<String, String> args = buildArgs("geo", "false");
+
+        // Act
+        SpatialContext context = SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
+
+        // Assert
+        assertFalse("Context should be non-geodetic", context.isGeo());
+        assertEquals("Default calculator for non-geo should be Cartesian",
+                new CartesianDistCalc(), context.getDistCalc());
+    }
+
+    /**
+     * Tests that the factory correctly configures a non-geodetic context with
+     * a custom distance calculator and world bounds.
+     */
+    @Test
+    public void factory_withCustomNonGeodeticSettings_createsCorrectContext() {
+        // Arrange
+        Map<String, String> args = buildArgs(
+                "geo", "false",
+                "distCalculator", "cartesian^2",
+                "worldBounds", "ENVELOPE(-100, 75, 200, 0)" // xMin, xMax, yMax, yMin
+        );
+
+        // Act
+        SpatialContext context = SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
+
+        // Assert
+        assertFalse("Context should be non-geodetic", context.isGeo());
+        assertEquals("Calculator should be Cartesian squared",
+                new CartesianDistCalc(true), context.getDistCalc());
+
+        Rectangle expectedBounds = new RectangleImpl(-100, 75, 0, 200, context);
+        assertEquals("World bounds should be parsed from ENVELOPE string",
+                expectedBounds, context.getWorldBounds());
+    }
+
+    /**
+     * Tests that the factory correctly configures a geodetic context with a
+     * specific distance calculator.
+     */
+    @Test
+    public void factory_withCustomGeodeticSettings_createsCorrectContext() {
+        // Arrange
+        Map<String, String> args = buildArgs(
+                "geo", "true",
+                "distCalculator", "lawOfCosines"
+        );
+
+        // Act
+        SpatialContext context = SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
+
+        // Assert
+        assertTrue("Context should be geodetic", context.isGeo());
+        assertEquals("Calculator should be LawOfCosines",
+                new GeodesicSphereDistCalc.LawOfCosines(), context.getDistCalc());
+    }
+
+    /**
+     * Helper method to construct a map of arguments from key-value pairs.
+     *
+     * @param keyValuePairs A sequence of key-value strings. Must be even in number.
+     * @return A map containing the provided arguments.
+     */
+    private Map<String, String> buildArgs(String... keyValuePairs) {
+        if (keyValuePairs.length % 2 != 0) {
+            throw new IllegalArgumentException("Key-value pairs must be even.");
+        }
+        Map<String, String> args = new HashMap<>();
+        for (int i = 0; i < keyValuePairs.length; i += 2) {
+            args.put(keyValuePairs[i], keyValuePairs[i + 1]);
+        }
+        return args;
     }
 }
