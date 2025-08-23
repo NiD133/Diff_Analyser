@@ -1,38 +1,50 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlTreeBuilder_ESTestTest4 extends XmlTreeBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Document document0 = xmlTreeBuilder0.parse(">: ", ">: ");
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        streamParser0.parseFragment("http://www.w3.org/2000/svg", (Element) document0, "http://www.w3.org/XML/1998/namespace");
-        assertEquals(">: ", document0.location());
-        Token.EndTag token_EndTag0 = new Token.EndTag(xmlTreeBuilder0);
-        xmlTreeBuilder0.popStackToClose(token_EndTag0);
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
+/**
+ * Test suite for {@link XmlTreeBuilder}.
+ * This class focuses on specific behaviors of the XML tree construction process.
+ */
+public class XmlTreeBuilderTest {
+
+    /**
+     * Verifies that calling popStackToClose with a tag name that is not on the
+     * element stack does not alter the builder's current default namespace.
+     * This ensures that non-matching end tags are safely ignored without corrupting
+     * the parser's state.
+     */
+    @Test
+    public void popStackToCloseWithUnmatchedTagDoesNotAffectDefaultNamespace() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        Parser parser = new Parser(xmlTreeBuilder);
+        Document context = Document.createShell(""); // Use a clean document as the parsing context.
+        String expectedNamespace = "http://www.w3.org/2000/svg";
+
+        // Parse a fragment to establish a default namespace. This puts the builder
+        // into a state where a default namespace is active.
+        String fragmentWithNamespace = "<svg xmlns='" + expectedNamespace + "'><path/></svg>";
+        parser.parseFragmentInput(fragmentWithNamespace, context, "http://example.com");
+
+        // Sanity check to ensure the namespace was set correctly during the setup.
+        assertEquals("Pre-condition failed: Default namespace was not set correctly.",
+                expectedNamespace, xmlTreeBuilder.defaultNamespace());
+
+        // Create an end tag for an element that is not on the stack.
+        Token.EndTag unmatchedEndTag = new Token.EndTag();
+        unmatchedEndTag.name("div"); // The stack contains html, body, svg. 'div' is not present.
+
+        // Act
+        // Attempt to pop the stack to the non-existent 'div' tag. This should be a no-op.
+        xmlTreeBuilder.popStackToClose(unmatchedEndTag);
+
+        // Assert
+        // The key assertion: the default namespace should remain unchanged.
+        assertEquals("Default namespace should not be changed by an unmatched popStackToClose call.",
+                expectedNamespace, xmlTreeBuilder.defaultNamespace());
     }
 }
