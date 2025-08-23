@@ -1,23 +1,37 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class EndpointPair_ESTestTest2 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+@RunWith(JUnit4.class)
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        GraphBuilder<Object> graphBuilder0 = GraphBuilder.undirected();
-        StandardMutableGraph<Integer> standardMutableGraph0 = new StandardMutableGraph<Integer>(graphBuilder0);
-        Integer integer0 = new Integer(0);
-        Integer integer1 = new Integer(0);
-        EndpointPair<Integer> endpointPair0 = EndpointPair.of((Graph<?>) standardMutableGraph0, integer0, integer1);
-        assertNotNull(endpointPair0);
+    @Test
+    public void of_forUndirectedGraph_returnsUnorderedPair() {
+        // Arrange: Create an undirected graph, as EndpointPair.of() uses its properties
+        // to determine the type of pair to create.
+        Graph<Integer> undirectedGraph = GraphBuilder.undirected().build();
+        Integer nodeU = 1;
+        Integer nodeV = 2;
+
+        // Act: Create an EndpointPair using the factory method for a generic graph.
+        EndpointPair<Integer> endpointPair = EndpointPair.of(undirectedGraph, nodeU, nodeV);
+
+        // Assert: Verify that the factory method produced the correct type of EndpointPair.
+        // For an undirected graph, the resulting pair should be unordered.
+        assertFalse(
+            "EndpointPair for an undirected graph should be unordered", endpointPair.isOrdered());
+
+        // The created pair should be equal to an explicitly created unordered pair.
+        // This is a robust check, as it relies on the EndpointPair's own equals() logic,
+        // which correctly handles that the internal order of nodes is not guaranteed.
+        assertEquals(EndpointPair.unordered(nodeU, nodeV), endpointPair);
     }
 }
