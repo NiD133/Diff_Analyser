@@ -1,26 +1,19 @@
 package com.google.common.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.ParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HostSpecifier_ESTestTest9 extends HostSpecifier_ESTest_scaffolding {
+/**
+ * Tests for {@link HostSpecifier}.
+ */
+public class HostSpecifierTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        // Undeclared exception!
-        try {
-            HostSpecifier.fromValid(":7");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that {@code fromValid()} rejects specifiers that are syntactically invalid,
+     * such as a string that starts with a colon. This format is invalid because it
+     * resembles a port number without a preceding host.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void fromValid_whenSpecifierStartsWithColon_throwsIllegalArgumentException() {
+        HostSpecifier.fromValid(":7");
     }
 }
