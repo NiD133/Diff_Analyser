@@ -1,35 +1,40 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTreeBuilderTestTest30 {
-
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Test suite for the XmlTreeBuilder.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    void xmlValidAttributes() {
-        String xml = "<a bB1-_:.=foo _9!=bar xmlns:p1=qux>One</a>";
-        Document doc = Jsoup.parse(xml, Parser.xmlParser());
+    void handlesValidAndCoercedAttributeNamesInXml() {
+        // The purpose of this test is to verify that the XML parser correctly handles various attribute names.
+        // Specifically, it checks that:
+        // 1. A valid attribute name containing a mix of allowed characters ("bB1-_:.") is preserved.
+        // 2. An attribute name with an invalid character ('!') is coerced into a valid name,
+        //    where "_9!" becomes "_9_".
+
+        // Arrange
+        String inputXml = "<a bB1-_:.=foo _9!=bar xmlns:p1=qux>One</a>";
+        String expectedXml = "<a bB1-_:.=\"foo\" _9_=\"bar\" xmlns:p1=\"qux\">One</a>";
+
+        // Act
+        // The base URI is empty as it's not relevant for this parsing test.
+        Document doc = Jsoup.parse(inputXml, "", Parser.xmlParser());
+        String actualXml = doc.html();
+
+        // Assert
+        // First, confirm the document was parsed in XML mode.
         assertEquals(Syntax.xml, doc.outputSettings().syntax());
-        String out = doc.html();
-        // first is same, second coerced
-        assertEquals("<a bB1-_:.=\"foo\" _9_=\"bar\" xmlns:p1=\"qux\">One</a>", out);
+
+        // Second, verify the serialized output matches the expected XML,
+        // confirming the attribute name coercion.
+        assertEquals(expectedXml, actualXml);
     }
 }
