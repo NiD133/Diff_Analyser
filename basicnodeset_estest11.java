@@ -1,22 +1,33 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class BasicNodeSet_ESTestTest11 extends BasicNodeSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BasicNodeSet} class.
+ */
+public class BasicNodeSetTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        List<Pointer> list0 = basicNodeSet0.getPointers();
-        List<Pointer> list1 = basicNodeSet0.getPointers();
-        assertSame(list1, list0);
+    /**
+     * Tests that getPointers() returns a cached, identical list instance on subsequent calls.
+     * <p>
+     * The BasicNodeSet is expected to create an unmodifiable view of its internal pointers
+     * list on the first call to getPointers() and return that same cached instance on all
+     * subsequent calls until the underlying set is modified.
+     */
+    @Test
+    public void getPointersShouldReturnSameInstanceOnSubsequentCalls() {
+        // Arrange: Create a new BasicNodeSet.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+
+        // Act: Call getPointers() twice to retrieve the list of pointers.
+        List<Pointer> firstCallResult = nodeSet.getPointers();
+        List<Pointer> secondCallResult = nodeSet.getPointers();
+
+        // Assert: Verify that both calls returned the exact same list instance,
+        // confirming the caching behavior of the method.
+        assertSame("Expected subsequent calls to getPointers() to return the same cached list instance",
+                firstCallResult, secondCallResult);
     }
 }
