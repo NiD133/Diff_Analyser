@@ -1,33 +1,35 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Entities;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTreeBuilderTestTest27 {
+/**
+ * Tests for the settings and behavior of the {@link XmlTreeBuilder} when used via {@link Parser#xmlParser()}.
+ */
+public class XmlTreeBuilderTest {
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
-
+    /**
+     * Verifies that when a document is parsed using the XML parser, its output settings
+     * are correctly configured for XML. Specifically, the syntax should be XML
+     * and the entity escape mode should be XHTML.
+     */
     @Test
-    public void xmlParserEnablesXmlOutputAndEscapes() {
-        // Test that when using the XML parser, the output mode and escape mode default to XHTML entities
-        Document doc = Jsoup.parse("<root/>", "", Parser.xmlParser());
-        assertEquals(doc.outputSettings().syntax(), Syntax.xml);
-        assertEquals(doc.outputSettings().escapeMode(), Entities.EscapeMode.xhtml);
+    public void whenParsingWithXmlParser_shouldDefaultToXmlOutputSettings() {
+        // Arrange
+        String xmlInput = "<root/>";
+        Parser xmlParser = Parser.xmlParser();
+
+        // Act
+        Document doc = Jsoup.parse(xmlInput, "", xmlParser);
+        Document.OutputSettings outputSettings = doc.outputSettings();
+
+        // Assert
+        assertEquals(Syntax.xml, outputSettings.syntax(), "Output syntax should be configured to XML");
+        assertEquals(Entities.EscapeMode.xhtml, outputSettings.escapeMode(), "Escape mode should be configured to XHTML");
     }
 }
