@@ -1,29 +1,27 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LeafNode_ESTestTest42 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode abstract class.
+ */
+class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("1");
-        // Undeclared exception!
-        try {
-            cDataNode0.hasAttr((String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    @Test
+    void hasAttrShouldThrowIllegalArgumentExceptionWhenKeyIsNull() {
+        // Arrange: Create a concrete instance of a LeafNode.
+        LeafNode node = new CDataNode("some data");
+
+        // Act & Assert: Verify that calling hasAttr with a null key throws the expected exception.
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> node.hasAttr(null),
+            "Expected hasAttr(null) to throw IllegalArgumentException, but it did not."
+        );
+
+        // Assert: Verify the exception message is correct.
+        assertEquals("Object must not be null", exception.getMessage());
     }
 }
