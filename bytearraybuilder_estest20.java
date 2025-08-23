@@ -1,20 +1,28 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class ByteArrayBuilder_ESTestTest20 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JsonRecyclerPools.NonRecyclingPool jsonRecyclerPools_NonRecyclingPool0 = new JsonRecyclerPools.NonRecyclingPool();
-        BufferRecycler bufferRecycler0 = jsonRecyclerPools_NonRecyclingPool0.acquirePooled();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0, 1);
-        BufferRecycler bufferRecycler1 = byteArrayBuilder0.bufferRecycler();
-        assertEquals(3, BufferRecycler.CHAR_NAME_COPY_BUFFER);
+    /**
+     * Verifies that the bufferRecycler() method returns the same BufferRecycler
+     * instance that was provided during the ByteArrayBuilder's construction.
+     */
+    @Test
+    public void shouldReturnTheSameBufferRecyclerInstanceProvidedInConstructor() {
+        // Arrange: Create a BufferRecycler and a ByteArrayBuilder that uses it.
+        BufferRecycler expectedRecycler = new BufferRecycler();
+        ByteArrayBuilder builder = new ByteArrayBuilder(expectedRecycler);
+
+        // Act: Retrieve the BufferRecycler from the builder.
+        BufferRecycler actualRecycler = builder.bufferRecycler();
+
+        // Assert: The retrieved recycler should be the exact same instance as the one provided.
+        assertSame("The bufferRecycler() method should return the instance supplied in the constructor.",
+                expectedRecycler, actualRecycler);
     }
 }
