@@ -1,36 +1,55 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
+import org.jfree.chart.ui.Size2D;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test suite contains tests for the {@link GridArrangement} class.
+ * This particular test was improved for understandability.
+ */
 public class GridArrangement_ESTestTest91 extends GridArrangement_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test90() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(105, 105);
-        BlockContainer blockContainer0 = new BlockContainer();
-        Range range0 = new Range(105, 105);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        SystemColor systemColor0 = SystemColor.activeCaption;
-        ColorBlock colorBlock0 = new ColorBlock(systemColor0, 0.0, Double.NEGATIVE_INFINITY);
-        blockContainer0.add((Block) colorBlock0);
-        Size2D size2D0 = gridArrangement0.arrangeRF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals("Size2D[width=105.0, height=105.0]", size2D0.toString());
+    /**
+     * Tests that the arrangeRF method returns a size that strictly adheres to the
+     * provided constraint when that constraint specifies a fixed width and height.
+     *
+     * The method under test, `arrangeRF`, is designed for a width range and a
+     * fixed height. This test verifies its behavior at the edge case where the
+     * width "range" is a single fixed value.
+     */
+    @Test
+    public void arrangeRFWithFixedSizeConstraintShouldReturnConstrainedSize() {
+        // Arrange
+        // Create a simple 1x1 grid arrangement. The number of rows/cols is not
+        // critical for this test's assertion on the final container size.
+        GridArrangement gridArrangement = new GridArrangement(1, 1);
+
+        // Create a container and add a single block to it. The block's preferred
+        // size is irrelevant as the fixed constraint should override it.
+        BlockContainer container = new BlockContainer();
+        container.add(new ColorBlock(Color.BLUE, 10.0, 10.0));
+
+        // Define a constraint that fixes both width and height to a specific value.
+        final double fixedDimension = 105.0;
+        Range fixedSizeRange = new Range(fixedDimension, fixedDimension);
+        RectangleConstraint constraint = new RectangleConstraint(fixedSizeRange, fixedSizeRange);
+
+        // Act
+        // Arrange the container. A null Graphics2D object is acceptable as it's
+        // not used in this particular arrangement calculation.
+        Size2D arrangedSize = gridArrangement.arrangeRF(container, (Graphics2D) null, constraint);
+
+        // Assert
+        // The resulting size should exactly match the dimensions from the constraint.
+        assertEquals("Width should match the fixed constraint",
+                fixedDimension, arrangedSize.getWidth(), 0.0);
+        assertEquals("Height should match the fixed constraint",
+                fixedDimension, arrangedSize.getHeight(), 0.0);
     }
 }
