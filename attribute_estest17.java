@@ -1,37 +1,34 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest17 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Attribute attribute0 = new Attribute("kgU@cbsv&}$~/K5", "kgU@cbsv&}$~/K5");
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Attribute} class.
+ * This is an improved version of an automatically generated test.
+ */
+// The original class name "Attribute_ESTestTest17" is kept, but a more conventional
+// name would be "AttributeTest".
+public class Attribute_ESTestTest17 {
+
+    /**
+     * Verifies that calling {@link Attribute#setKey(String)} with an empty string
+     * throws an {@link IllegalArgumentException}, as attribute keys must not be empty.
+     */
+    @Test
+    public void setKeyWithEmptyStringShouldThrowIllegalArgumentException() {
+        // Arrange: Create an attribute with a valid initial key.
+        Attribute attribute = new Attribute("initial-key", "value");
+
+        // Act & Assert: Attempt to set the key to an empty string and verify the resulting exception.
         try {
-            attribute0.setKey("");
-            fail("Expecting exception: IllegalArgumentException");
+            attribute.setKey("");
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify the exception message is as expected, confirming the correct validation is in place.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
