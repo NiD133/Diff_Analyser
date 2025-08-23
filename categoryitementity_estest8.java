@@ -1,39 +1,66 @@
 package org.jfree.chart.entity;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import javax.swing.JLayeredPane;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryItemEntity_ESTestTest8 extends CategoryItemEntity_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        DefaultStatisticalCategoryDataset<Integer, Integer> defaultStatisticalCategoryDataset0 = new DefaultStatisticalCategoryDataset<Integer, Integer>();
-        CategoryItemEntity<Integer, Integer> categoryItemEntity0 = new CategoryItemEntity<Integer, Integer>(rectangle2D_Double0, "'2zliUz|", "'2zliUz|", defaultStatisticalCategoryDataset0, (Integer) 0, (Integer) 0);
-        Integer integer0 = JLayeredPane.POPUP_LAYER;
-        CategoryItemEntity<Integer, Integer> categoryItemEntity1 = new CategoryItemEntity<Integer, Integer>(rectangle2D_Double0, "t.s&<g6o`/(5QNh", "'2zliUz|", defaultStatisticalCategoryDataset0, (Integer) 0, integer0);
-        Object object0 = categoryItemEntity0.clone();
-        boolean boolean0 = categoryItemEntity1.equals(object0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertNotEquals;
+
+/**
+ * Tests for the {@link CategoryItemEntity} class, focusing on the equals() method.
+ */
+public class CategoryItemEntityTest {
+
+    /**
+     * Tests that two CategoryItemEntity objects with different column keys are not considered equal.
+     * This also implicitly tests that an entity is not equal to a clone of a different entity.
+     */
+    @Test
+    public void testEqualsShouldReturnFalseForDifferentColumnKeys() {
+        // Arrange
+        Rectangle2D.Double area = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+        DefaultStatisticalCategoryDataset<String, String> dataset = new DefaultStatisticalCategoryDataset<>();
+        String rowKey = "Row 1";
+
+        // Create a base entity.
+        CategoryItemEntity<String, String> entity1 = new CategoryItemEntity<>(
+                area, "Tooltip", "URL", dataset, rowKey, "Column 1");
+
+        // Create a second entity that differs only by its column key.
+        CategoryItemEntity<String, String> entity2 = new CategoryItemEntity<>(
+                area, "Tooltip", "URL", dataset, rowKey, "Column 2");
+
+        // Act & Assert
+        // The two entities should not be equal because their column keys are different.
+        assertNotEquals(entity1, entity2);
+    }
+
+    /**
+     * This test preserves the logic of the original test (comparing one entity to a clone of another)
+     * but with improved readability.
+     */
+    @Test
+    public void testEqualsShouldReturnFalseWhenComparingToCloneOfDifferentEntity() {
+        // Arrange
+        Rectangle2D.Double area = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+        DefaultStatisticalCategoryDataset<Integer, Integer> dataset = new DefaultStatisticalCategoryDataset<>();
+        Integer rowKey = 1;
+
+        // Create the first entity.
+        CategoryItemEntity<Integer, Integer> entity1 = new CategoryItemEntity<>(
+                area, "Tooltip 1", "URL 1", dataset, rowKey, 10);
+
+        // Create a second, different entity.
+        CategoryItemEntity<Integer, Integer> entity2 = new CategoryItemEntity<>(
+                area, "Tooltip 2", "URL 2", dataset, rowKey, 20);
+
+        // Act
+        // Clone the first entity. The clone() method returns an Object.
+        Object clonedEntity1 = entity1.clone();
+
+        // Assert
+        // The second entity should not be equal to the clone of the first entity.
+        assertNotEquals(entity2, clonedEntity1);
     }
 }
