@@ -1,30 +1,26 @@
 package org.apache.commons.io;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileMode_ESTestTest6 extends RandomAccessFileMode_ESTest_scaffolding {
+/**
+ * Tests for the {@link RandomAccessFileMode#implies(RandomAccessFileMode)} method.
+ * This test class is focused on a specific scenario from a larger generated test suite.
+ */
+public class RandomAccessFileMode_ESTestTest6 { // Retaining original class name for context
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
-        boolean boolean0 = randomAccessFileMode0.implies(randomAccessFileMode0);
-        assertTrue(boolean0);
+    /**
+     * Tests that a mode always implies itself, verifying the reflexive property of the method.
+     * For example, READ_WRITE should imply READ_WRITE.
+     */
+    @Test
+    public void testImplies_WithSameMode_ShouldReturnTrue() {
+        // Arrange
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+
+        // Act & Assert
+        // A mode must be considered to imply itself.
+        assertTrue("A mode should always imply itself.", mode.implies(mode));
     }
 }
