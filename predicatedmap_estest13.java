@@ -1,57 +1,62 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
 import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest13 extends PredicatedMap_ESTest_scaffolding {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        HashMap<Object, HashMap<Integer, Integer>> hashMap0 = new HashMap<Object, HashMap<Integer, Integer>>();
-        UniquePredicate<Object> uniquePredicate0 = new UniquePredicate<Object>();
-        PredicatedMap<Object, HashMap<Integer, Integer>> predicatedMap0 = new PredicatedMap<Object, HashMap<Integer, Integer>>(hashMap0, uniquePredicate0, uniquePredicate0);
-        HashMap<Object, Integer> hashMap1 = new HashMap<Object, Integer>();
-        PredicatedMap<Object, Integer> predicatedMap1 = PredicatedMap.predicatedMap((Map<Object, Integer>) hashMap1, (Predicate<? super Object>) uniquePredicate0, (Predicate<? super Integer>) uniquePredicate0);
-        HashMap<Integer, Integer> hashMap2 = new HashMap<Integer, Integer>();
-        hashMap0.put(predicatedMap0, hashMap2);
-        Integer integer0 = new Integer(0);
-        // Undeclared exception!
-        try {
-            predicatedMap1.put(predicatedMap0, integer0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+import static org.junit.Assert.assertThrows;
+
+/**
+ * Contains tests for edge cases in {@link PredicatedMap}.
+ */
+public class PredicatedMapTest {
+
+    /**
+     * Tests that a StackOverflowError is thrown when a map's predicate
+     * triggers a recursive hashCode() calculation on a key.
+     *
+     * <p>This scenario is created by:
+     * <ol>
+     *   <li>Creating a map ('mapWithSelfAsKey') that contains itself as a key in its
+     *       underlying decorated map.</li>
+     *   <li>Using a predicate ('UniquePredicate') that invokes hashCode() on the elements
+     *       it evaluates to check for uniqueness.</li>
+     *   <li>Attempting to add 'mapWithSelfAsKey' as a key to another predicated map
+     *       ('targetMap') that uses this same predicate.</li>
+     * </ol>
+     * The call to {@code targetMap.put()} triggers the predicate, which in turn calls
+     * {@code hashCode()} on 'mapWithSelfAsKey'. The hash code of a map decorator is based
+     * on its underlying map's contents. Since the underlying map contains the decorator
+     * itself, this leads to an infinite recursion and a {@code StackOverflowError}.
+     */
+    @Test
+    public void putWithSelfReferencingKeyInPredicateShouldCauseStackOverflow() {
+        // Arrange: Create a predicate that will be shared between two maps.
+        // The UniquePredicate relies on hashCode() to check for uniqueness.
+        final Predicate<Object> uniquePredicate = new UniquePredicate<>();
+
+        // Arrange: Create a map that will contain a reference to itself as a key.
+        final Map<Object, String> underlyingMapForSelfReference = new HashMap<>();
+        final PredicatedMap<Object, String> mapWithSelfAsKey =
+                new PredicatedMap<>(underlyingMapForSelfReference, uniquePredicate, uniquePredicate);
+
+        // This is the crucial step that creates the circular reference. The decorator
+        // map is added as a key to the very map it decorates.
+        underlyingMapForSelfReference.put(mapWithSelfAsKey, "a-value");
+
+        // Arrange: Create the target map that will receive the self-referencing map.
+        final Map<Object, Integer> targetUnderlyingMap = new HashMap<>();
+        final PredicatedMap<Object, Integer> targetMap =
+                PredicatedMap.predicatedMap(targetUnderlyingMap, uniquePredicate, uniquePredicate);
+
+        // Act & Assert: Attempting to put the self-referencing map as a key
+        // into another map using the same UniquePredicate. This triggers the
+        // predicate, which calls hashCode() on the key, leading to a StackOverflowError.
+        assertThrows(StackOverflowError.class, () -> {
+            targetMap.put(mapWithSelfAsKey, 123);
+        });
     }
 }
