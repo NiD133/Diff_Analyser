@@ -1,31 +1,30 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class MultiFilteredRenderListener_ESTestTest7 extends MultiFilteredRenderListener_ESTest_scaffolding {
+/**
+ * Test suite for the {@link MultiFilteredRenderListener} class, focusing on its exception-handling behavior.
+ */
+public class MultiFilteredRenderListenerTest extends MultiFilteredRenderListener_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test6() throws Throwable {
-        MultiFilteredRenderListener multiFilteredRenderListener0 = new MultiFilteredRenderListener();
-        RenderFilter[] renderFilterArray0 = new RenderFilter[1];
-        multiFilteredRenderListener0.attachRenderListener((LocationTextExtractionStrategy) null, renderFilterArray0);
-        // Undeclared exception!
-        try {
-            multiFilteredRenderListener0.renderText((TextRenderInfo) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.MultiFilteredRenderListener", e);
-        }
+    /**
+     * Verifies that {@link MultiFilteredRenderListener#renderText(TextRenderInfo)} throws a
+     * {@link NullPointerException} if it was configured with a filter array containing a null element.
+     *
+     * The listener's internal logic is expected to iterate over the filters and invoke methods on them.
+     * If a filter is null, this interaction should fail fast with an NPE.
+     */
+    @Test(expected = NullPointerException.class)
+    public void renderText_whenAttachedFilterIsNull_throwsNullPointerException() {
+        // Arrange: Create a listener and attach a delegate with a filter array
+        // that contains a null element.
+        MultiFilteredRenderListener multiListener = new MultiFilteredRenderListener();
+        RenderFilter[] filtersWithNull = { null };
+        multiListener.attachRenderListener(null, filtersWithNull);
+
+        // Act & Assert: When renderText is called, it should attempt to process the
+        // filters. Accessing the null filter will cause a NullPointerException.
+        // The TextRenderInfo argument can be null as the code fails before it's used.
+        multiListener.renderText(null);
     }
 }
