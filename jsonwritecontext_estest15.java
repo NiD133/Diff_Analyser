@@ -2,32 +2,42 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
+
+/**
+ * This test class contains the refactored test case.
+ * The original class name `JsonWriteContext_ESTestTest15` and scaffolding are kept for context.
+ */
 public class JsonWriteContext_ESTestTest15 extends JsonWriteContext_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        jsonWriteContext0.writeValue();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext();
-        jsonWriteContext0.writeValue();
-        jsonWriteContext1.getParent();
-        assertEquals(1, jsonWriteContext0.getCurrentIndex());
-        assertTrue(jsonWriteContext0.hasCurrentIndex());
+    /**
+     * Tests that a parent context's value index is correctly maintained
+     * even after a child context is created and the parent is modified again.
+     */
+    @Test
+    public void parentContextIndexShouldUpdateCorrectlyAfterChildCreation() {
+        // Arrange: Create a root context, which behaves like a JSON array.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+        assertEquals("Initially, the index should be -1", -1, rootContext.getCurrentIndex());
+
+        // Act: Write the first value to the root context.
+        rootContext.writeValue();
+        assertEquals("After one value, the index should be 0", 0, rootContext.getCurrentIndex());
+
+        // Arrange: Create a child context from the root.
+        JsonWriteContext childContext = rootContext.createChildObjectContext();
+        
+        // Assert: Verify the parent-child relationship is established correctly.
+        assertNotNull("Child context should be successfully created", childContext);
+        assertSame("The parent of the child should be the root context", rootContext, childContext.getParent());
+
+        // Act: Write a second value to the PARENT (root) context. This is the key
+        // action being tested—modifying the parent while a child context exists.
+        rootContext.writeValue();
+
+        // Assert: The parent's index should be incremented, unaffected by the child's creation.
+        assertEquals("After the second value, the parent index should be 1", 1, rootContext.getCurrentIndex());
+        assertTrue("Parent context should report having a current index", rootContext.hasCurrentIndex());
     }
 }
