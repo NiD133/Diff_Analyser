@@ -1,23 +1,34 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest6 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the {@link RFC1522Codec} class, using the concrete {@link BCodec} implementation.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        String string0 = bCodec0.decodeText("=?UTF-8?B??=");
-        assertEquals("", string0);
+    /**
+     * Tests that decoding an RFC 1522 encoded-word with an empty payload
+     * correctly results in an empty string.
+     *
+     * <p>The input "=?UTF-8?B??=" follows the RFC 1522 format:
+     * {@code =?charset?encoding?encoded-text?=}. In this case, the encoded-text
+     * part is empty, which should decode to an empty string.
+     * </p>
+     */
+    @Test
+    public void decodeTextWithEmptyPayloadShouldReturnEmptyString() throws Exception {
+        // Arrange
+        final BCodec codec = new BCodec();
+        final String encodedEmptyString = "=?UTF-8?B??=";
+
+        // Act
+        final String decodedString = codec.decodeText(encodedEmptyString);
+
+        // Assert
+        assertEquals("Decoding an encoded word with an empty payload should result in an empty string.",
+                     "", decodedString);
     }
 }
