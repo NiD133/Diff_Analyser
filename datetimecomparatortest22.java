@@ -1,234 +1,90 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
 
-public class DateTimeComparatorTestTest22 extends TestCase {
-
-    private static final Chronology ISO = ISOChronology.getInstance();
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
+/**
+ * Unit tests for {@link DateTimeComparator} focusing on comparisons
+ * limited to the day-of-year field.
+ *
+ * <p>This test class clarifies and isolates the behavior originally tested in
+ * the {@code testDOY} method of a larger test suite.
+ */
+public class DateTimeComparatorDayOfYearTest {
 
     /**
-     * A reference to a DateTime object.
+     * A comparator that only considers the day-of-year field.
+     * It is configured to compare fields from {@code dayOfYear} up to (but not including) {@code year}.
+     * This means the year, and any larger fields, are ignored in the comparison.
      */
-    DateTime bDateTime = null;
+    private static final Comparator<Object> DAY_OF_YEAR_COMPARATOR =
+            DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
-     */
-    Comparator cMillis = null;
+    private static final DateTimeZone UTC = DateTimeZone.UTC;
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
+    @Test
+    public void compare_returnsCorrectSign_forDifferentDaysInSameYear() {
+        // Arrange
+        ReadableInstant april12 = new DateTime("2002-04-12T10:00:00", UTC); // Day 102
+        ReadableInstant april13 = new DateTime("2002-04-13T08:00:00", UTC); // Day 103
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
+        // Act & Assert
+        // Test that april12 is "less than" april13
+        assertTrue(
+                "Comparator should return negative when first date's day-of-year is smaller",
+                DAY_OF_YEAR_COMPARATOR.compare(april12, april13) < 0
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Test the symmetric case: april13 is "greater than" april12
+        assertTrue(
+                "Comparator should return positive when first date's day-of-year is larger",
+                DAY_OF_YEAR_COMPARATOR.compare(april13, april12) > 0
+        );
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
+    @Test
+    public void compare_ignoresYearField_whenYearIsTheExclusiveUpperLimit() {
+        // Arrange
+        // dateOnFeb29 is day 60 of a leap year.
+        ReadableInstant dateOnFeb29 = new DateTime("2000-02-29T00:00:00", UTC);
+        // dateOnNov30 is day 334 of the year.
+        ReadableInstant dateOnNov30 = new DateTime("1814-11-30T00:00:00", UTC);
+
+        // Act & Assert
+        // The comparison should be based on the day of the year (60 vs 334), ignoring the
+        // absolute instant and the year (2000 vs 1814).
+
+        // Test that day 60 is "less than" day 334
+        assertTrue(
+                "Comparison should be negative as day 60 is before day 334, ignoring the year",
+                DAY_OF_YEAR_COMPARATOR.compare(dateOnFeb29, dateOnNov30) < 0
+        );
+
+        // Test the symmetric case: day 334 is "greater than" day 60
+        assertTrue(
+                "Comparison should be positive as day 334 is after day 60, ignoring the year",
+                DAY_OF_YEAR_COMPARATOR.compare(dateOnNov30, dateOnFeb29) > 0
+        );
     }
 
-    /**
-     * Junit <code>setUp()</code> method.
-     */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
-    }
+    @Test
+    public void compare_returnsZero_forSameDayOfYearInDifferentYears() {
+        // Arrange
+        // Both dates are on April 12th, but in different years and at different times.
+        ReadableInstant date1 = new DateTime("2000-04-12T10:00:00", UTC);
+        ReadableInstant date2 = new DateTime("2008-04-12T20:00:00", UTC);
 
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
+        // Act
+        int result = DAY_OF_YEAR_COMPARATOR.compare(date1, date2);
 
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
-
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test unequal comparisons with day of year comparators.
-     */
-    public void testDOY() {
-        aDateTime = getADate("2002-04-12T00:00:00");
-        bDateTime = getADate("2002-04-13T00:00:00");
-        assertEquals("DOYM1a", -1, cDayOfYear.compare(aDateTime, bDateTime));
-        assertEquals("DOYP1a", 1, cDayOfYear.compare(bDateTime, aDateTime));
-        aDateTime = getADate("2000-02-29T00:00:00");
-        bDateTime = getADate("1814-11-30T00:00:00");
-        assertEquals("DOYM1b", -1, cDayOfYear.compare(aDateTime, bDateTime));
-        assertEquals("DOYP1b", 1, cDayOfYear.compare(bDateTime, aDateTime));
+        // Assert
+        assertEquals(
+                "Comparator should return zero for the same day-of-year, ignoring other fields",
+                0,
+                result
+        );
     }
 }
