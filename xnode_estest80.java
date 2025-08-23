@@ -1,31 +1,36 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
+import static org.junit.Assert.assertNull;
 
 public class XNode_ESTestTest80 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test079() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode(" />\n");
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Float float0 = xNode0.getFloatBody((Float) null);
-        assertNull(float0);
+    /**
+     * Tests that getFloatBody returns the provided default value when the node's body is empty.
+     * An empty string cannot be parsed into a Float, so the method should fall back to the default.
+     */
+    @Test
+    public void shouldReturnDefaultFloatWhenBodyIsEmpty() {
+        // Arrange
+        // Create a DOM Node that will result in an empty body in the XNode.
+        // An IIOMetadataNode with no children is a simple way to achieve this.
+        Node nodeWithEmptyBody = new IIOMetadataNode("node");
+        
+        // The XNode constructor requires an XPathParser and Properties, which can be dummies for this test.
+        XPathParser dummyParser = new XPathParser((Document) null, false);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(dummyParser, nodeWithEmptyBody, variables);
+
+        Float defaultValue = null;
+
+        // Act
+        Float actualValue = xNode.getFloatBody(defaultValue);
+
+        // Assert
+        assertNull("getFloatBody should return the default value for an unparsable (empty) body.", actualValue);
     }
 }
