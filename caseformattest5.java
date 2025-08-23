@@ -2,23 +2,22 @@ package com.google.common.base;
 
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import com.google.common.testing.SerializableTester;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
+import junit.framework.TestCase;
+
+/**
+ * Tests for {@link CaseFormat} conversions from {@code LOWER_HYPHEN} to {@code LOWER_CAMEL}.
+ */
 public class CaseFormatTestTest5 extends TestCase {
 
-    public void testLowerHyphenToLowerCamel() {
-        assertThat(LOWER_HYPHEN.to(LOWER_CAMEL, "foo")).isEqualTo("foo");
-        assertThat(LOWER_HYPHEN.to(LOWER_CAMEL, "foo-bar")).isEqualTo("fooBar");
-    }
+  public void testLowerHyphenToLowerCamel_singleWordRemainsUnchanged() {
+    String result = LOWER_HYPHEN.to(LOWER_CAMEL, "foo");
+    assertThat(result).isEqualTo("foo");
+  }
+
+  public void testLowerHyphenToLowerCamel_convertsMultipleWords() {
+    String result = LOWER_HYPHEN.to(LOWER_CAMEL, "foo-bar");
+    assertThat(result).isEqualTo("fooBar");
+  }
 }
