@@ -40,5 +40,187 @@ public class NodeIterator_ESTest extends NodeIterator_ESTest_scaffolding {
       assertTrue(boolean0);
   }
 
-  // ... (rest of the original, hard-to-read tests)
+  @Test(timeout = 4000)
+  public void test02()  throws Throwable  {
+      Document document0 = Parser.parseBodyFragment("", "");
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(document0, class0);
+      boolean boolean0 = nodeIterator0.hasNext();
+      assertFalse(boolean0);
+  }
+
+  @Test(timeout = 4000)
+  public void test03()  throws Throwable  {
+      Document document0 = new Document("org.jsoup.nodes.NodeIterator", "");
+      Element element0 = document0.doClone(document0);
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(element0, class0);
+      // Undeclared exception!
+      try { 
+        nodeIterator0.remove();
+        fail("Expecting exception: IndexOutOfBoundsException");
+      
+      } catch(IndexOutOfBoundsException e) {
+         //
+         // Index: 0, Size: 0
+         //
+         verifyException("java.util.ArrayList", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test04()  throws Throwable  {
+      Document document0 = Parser.parseBodyFragment("   ", "   ");
+      Element element0 = document0.prependChild(document0);
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(element0, class0);
+      // Undeclared exception!
+      nodeIterator0.next();
+  }
+
+  @Test(timeout = 4000)
+  public void test05()  throws Throwable  {
+      Document document0 = new Document("", (String) null);
+      Class<FormElement> class0 = FormElement.class;
+      document0.childNodes = null;
+      NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(document0, class0);
+      // Undeclared exception!
+      try { 
+        nodeIterator0.next();
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test06()  throws Throwable  {
+      // Undeclared exception!
+      try { 
+        NodeIterator.from((Node) null);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Object must not be null
+         //
+         verifyException("org.jsoup.helper.Validate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test07()  throws Throwable  {
+      Document document0 = Document.createShell("org.jsoup.nodes.NodeIterator");
+      CDataNode cDataNode0 = new CDataNode("org.jsoup.nodes.NodeIterator");
+      Element element0 = document0.doClone(cDataNode0);
+      // Undeclared exception!
+      try { 
+        NodeIterator.from(element0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test08()  throws Throwable  {
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = null;
+      try {
+        nodeIterator0 = new NodeIterator<FormElement>((Node) null, class0);
+        fail("Expecting exception: IllegalArgumentException");
+      
+      } catch(IllegalArgumentException e) {
+         //
+         // Object must not be null
+         //
+         verifyException("org.jsoup.helper.Validate", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test09()  throws Throwable  {
+      Document document0 = Document.createShell("et\"yoy;tZU`>?U[");
+      CDataNode cDataNode0 = new CDataNode("et\"yoy;tZU`>?U[");
+      Element element0 = document0.doClone(cDataNode0);
+      document0.parentNode = (Node) element0;
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = null;
+      try {
+        nodeIterator0 = new NodeIterator<FormElement>(document0.parentNode, class0);
+        fail("Expecting exception: ClassCastException");
+      
+      } catch(ClassCastException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test10()  throws Throwable  {
+      Document document0 = Parser.parseBodyFragment("", "");
+      NodeIterator<Node> nodeIterator0 = NodeIterator.from(document0);
+      nodeIterator0.restart(document0);
+      assertFalse(document0.isBlock());
+  }
+
+  @Test(timeout = 4000)
+  public void test11()  throws Throwable  {
+      Document document0 = Parser.parse("http://www.w3.org/1999/xhtml", "http://www.w3.org/2000/svg");
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(document0, class0);
+      // Undeclared exception!
+      try { 
+        nodeIterator0.restart((Node) null);
+        fail("Expecting exception: NullPointerException");
+      
+      } catch(NullPointerException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jsoup.nodes.NodeIterator", e);
+      }
+  }
+
+  @Test(timeout = 4000)
+  public void test12()  throws Throwable  {
+      Document document0 = Document.createShell("org.jsoup.>odes.NodeIterator");
+      document0.appendElement("org.jsoup.>odes.NodeIterator");
+      String string0 = document0.wholeText();
+      assertEquals("", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test13()  throws Throwable  {
+      Document document0 = new Document("org.jsoup.>odes.NodeIterator", "org.jsoup.>odes.NodeIterator");
+      String string0 = document0.wholeText();
+      assertEquals("", string0);
+  }
+
+  @Test(timeout = 4000)
+  public void test14()  throws Throwable  {
+      Document document0 = Parser.parseBodyFragment("org.jsoup.nodes.NodeIterator", "org.jsoup.nodes.NodeIterator");
+      Element element0 = document0.doClone(document0);
+      Class<FormElement> class0 = FormElement.class;
+      NodeIterator<FormElement> nodeIterator0 = new NodeIterator<FormElement>(element0, class0);
+      nodeIterator0.remove();
+      // Undeclared exception!
+      try { 
+        nodeIterator0.next();
+        fail("Expecting exception: NoSuchElementException");
+      
+      } catch(NoSuchElementException e) {
+         //
+         // no message in exception (getMessage() returned null)
+         //
+         verifyException("org.jsoup.nodes.NodeIterator", e);
+      }
+  }
 }
