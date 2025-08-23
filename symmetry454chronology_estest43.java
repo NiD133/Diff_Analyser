@@ -1,44 +1,27 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest43 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        ChronoField chronoField0 = ChronoField.EPOCH_DAY;
-        ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+/**
+ * Unit tests for {@link Symmetry454Chronology}.
+ */
+public class Symmetry454ChronologyTest {
+
+    @Test
+    public void range_forEpochDay_returnsCorrectRange() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        // The expected range is defined as a package-private constant in the chronology.
+        ValueRange expectedRange = Symmetry454Chronology.EPOCH_DAY_RANGE;
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.EPOCH_DAY);
+
+        // Assert
+        assertEquals("The range for EPOCH_DAY should match the predefined constant.", expectedRange, actualRange);
     }
 }
