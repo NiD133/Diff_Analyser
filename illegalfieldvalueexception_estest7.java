@@ -1,25 +1,21 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IllegalFieldValueException_ESTestTest7 extends IllegalFieldValueException_ESTest_scaffolding {
+/**
+ * Unit tests for {@link IllegalFieldValueException}.
+ */
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        IllegalFieldValueException illegalFieldValueException0 = null;
-        try {
-            illegalFieldValueException0 = new IllegalFieldValueException((DurationFieldType) null, "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.IllegalFieldValueException", e);
-        }
+    /**
+     * Tests that the constructor throws a NullPointerException when the
+     * DurationFieldType is null. The constructor attempts to access the name
+     * of the field type, which is not possible on a null reference.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructor_withNullDurationFieldType_throwsNullPointerException() {
+        // Call the constructor with a null DurationFieldType, which is expected to fail.
+        // The string value provided is arbitrary and does not affect this test's outcome.
+        new IllegalFieldValueException((DurationFieldType) null, "some illegal value");
     }
 }
