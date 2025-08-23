@@ -1,24 +1,36 @@
 package com.google.common.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest8 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        double[] doubleArray0 = new double[4];
-        doubleArray0[1] = 540.0;
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        double double0 = atomicDoubleArray0.getAndSet(1, 2806.574374631918);
-        assertEquals(540.0, double0, 0.01);
+    @Test
+    public void getAndSet_shouldReturnPreviousValueAndUpdateArray() {
+        // Arrange
+        final int indexToUpdate = 1;
+        final double initialValue = 540.0;
+        final double newValue = 2806.57;
+
+        // Initialize an array with a specific value at the index we plan to test.
+        double[] sourceArray = {0.0, initialValue, 0.0, 0.0};
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(sourceArray);
+
+        // Act
+        // Atomically set a new value and get the old one back.
+        double previousValue = atomicArray.getAndSet(indexToUpdate, newValue);
+
+        // Assert
+        // 1. Verify that the method returned the original value.
+        assertEquals("getAndSet should return the value before the update",
+            initialValue, previousValue, 0.0);
+
+        // 2. Verify that the value at the index was successfully updated.
+        assertEquals("The value in the array should be updated to the new value",
+            newValue, atomicArray.get(indexToUpdate), 0.0);
     }
 }
