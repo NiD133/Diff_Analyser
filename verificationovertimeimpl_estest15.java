@@ -1,0 +1,31 @@
+package org.mockito.internal.verification;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.util.NoSuchElementException;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.junit.runner.RunWith;
+import org.mockito.internal.creation.MockSettingsImpl;
+import org.mockito.internal.invocation.InvocationMatcher;
+import org.mockito.internal.stubbing.InvocationContainerImpl;
+import org.mockito.internal.util.Timer;
+import org.mockito.internal.verification.api.VerificationData;
+import org.mockito.verification.After;
+import org.mockito.verification.Timeout;
+import org.mockito.verification.VerificationMode;
+
+public class VerificationOverTimeImpl_ESTestTest15 extends VerificationOverTimeImpl_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test14() throws Throwable {
+        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
+        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(2161L, 2161L, noMoreInteractions0, false);
+        MockSettingsImpl<Object> mockSettingsImpl0 = new MockSettingsImpl<Object>();
+        InvocationContainerImpl invocationContainerImpl0 = new InvocationContainerImpl(mockSettingsImpl0);
+        VerificationDataImpl verificationDataImpl0 = new VerificationDataImpl(invocationContainerImpl0, (InvocationMatcher) null);
+        // Undeclared exception!
+        verificationOverTimeImpl0.verify(verificationDataImpl0);
+    }
+}
