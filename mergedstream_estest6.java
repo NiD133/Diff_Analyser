@@ -1,47 +1,50 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest6 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.rawReference(false, (Object) streamReadConstraints0);
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0, 20000000);
-        byte[] byteArray0 = new byte[2];
-        byteArray0[0] = (byte) (-25);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, pipedInputStream0, byteArray0, 0, 2);
-        int int0 = mergedStream0.read();
-        assertEquals(231, int0);
+/**
+ * Contains tests for the {@link MergedStream} class.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Tests that the read() method correctly reads the first byte from the
+     * prepended buffer and returns it as an unsigned integer value.
+     * InputStream.read() is specified to return a value in the range 0-255.
+     */
+    @Test
+    public void read_whenBufferHasData_returnsFirstByteAsUnsignedInt() throws IOException {
+        // Arrange
+        // The IOContext is not used by the read() method, so we can pass null.
+        IOContext ioContext = null;
+
+        // The underlying stream is not used in this test, as we only read from the buffer.
+        // An empty stream is sufficient and simpler than a PipedInputStream.
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]);
+
+        // The buffer to be "prepended" to the underlying stream.
+        // We use a negative byte value to explicitly test the signed-to-unsigned conversion.
+        byte firstByte = -25;
+        byte[] buffer = { firstByte, 42 }; // The second byte is arbitrary.
+
+        // The MergedStream should first read from the provided buffer (from index 0 to 2).
+        MergedStream mergedStream = new MergedStream(ioContext, underlyingStream, buffer, 0, buffer.length);
+
+        // The InputStream.read() method returns a byte as an unsigned int (0-255).
+        // The bitwise AND with 0xFF converts the signed byte (-25) to its unsigned representation (231).
+        int expectedValue = firstByte & 0xFF;
+
+        // Act
+        int actualValue = mergedStream.read();
+
+        // Assert
+        assertEquals("The byte should be read and converted to its unsigned integer equivalent.",
+                expectedValue, actualValue);
     }
 }
