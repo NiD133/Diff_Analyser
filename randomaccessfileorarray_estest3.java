@@ -1,35 +1,39 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest3 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test002() throws Throwable {
-        byte[] byteArray0 = new byte[6];
-        byteArray0[2] = (byte) 94;
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        long long0 = randomAccessFileOrArray0.readUnsignedIntLE();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(6160384L, long0);
+    /**
+     * Verifies that readUnsignedIntLE() correctly reads a 32-bit unsigned integer
+     * in little-endian byte order and advances the internal pointer by 4 bytes.
+     */
+    @Test
+    public void readUnsignedIntLE_shouldReadFourBytesInLittleEndianOrderAndAdvancePointer() throws IOException {
+        // Arrange
+        // The test value is 6,160,384, which is 0x005E0000 in hexadecimal.
+        // In little-endian byte order, the least significant byte comes first,
+        // so the byte representation is [0x00, 0x00, 0x5E, 0x00].
+        // We add extra bytes at the end to ensure the method only reads the required four bytes.
+        byte[] littleEndianData = {0x00, 0x00, 0x5E, 0x00, (byte) 0xAA, (byte) 0xBB};
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(littleEndianData);
+
+        long expectedValue = 6160384L; // 0x005E0000L
+        long expectedPointerPosition = 4L;
+
+        // Act
+        long actualValue = reader.readUnsignedIntLE();
+
+        // Assert
+        // 1. Verify that the correct numeric value was returned.
+        assertEquals("The unsigned integer should be read correctly in little-endian format.", expectedValue, actualValue);
+
+        // 2. Verify that the internal pointer advanced by 4 bytes.
+        assertEquals("The file pointer should advance by 4 bytes after reading an int.", expectedPointerPosition, reader.getFilePointer());
     }
 }
