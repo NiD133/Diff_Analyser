@@ -1,27 +1,45 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
+
 import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ConstructorUtils_ESTestTest16 extends ConstructorUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 1);
-        Class<Integer> class0 = Integer.class;
-        try {
-            ConstructorUtils.invokeConstructor(class0, (Object[]) classArray0, (Class<?>[]) classArray0);
-            fail("Expecting exception: InvocationTargetException");
-        } catch (InvocationTargetException e) {
-        }
+public class ConstructorUtils_ESTestTest16 {
+
+    /**
+     * Tests that {@link ConstructorUtils#invokeConstructor(Class, Object[], Class[])}
+     * wraps exceptions thrown by the underlying constructor in an {@link InvocationTargetException}.
+     *
+     * <p>This test specifically checks the scenario where a constructor is matched using a
+     * {@code null} parameter type (which acts as a wildcard for any non-primitive type) and
+     * is then invoked with a {@code null} argument, causing the constructor itself to throw
+     * an exception.</p>
+     */
+    @Test
+    public void invokeConstructorShouldWrapExceptionFromUnderlyingConstructor() {
+        // Arrange
+        // We want to invoke a constructor of the Integer class. The Integer(String) constructor
+        // is known to throw a NumberFormatException when passed a null argument.
+        final Class<Integer> classToInstantiate = Integer.class;
+        final Object[] args = { null };
+
+        // A 'null' in the parameterTypes array acts as a wildcard that matches any
+        // non-primitive parameter. This will cause ConstructorUtils to find and match the
+        // public Integer(String val) constructor.
+        final Class<?>[] parameterTypes = { null };
+
+        // Act & Assert
+        // We expect the call to throw an InvocationTargetException, which is a wrapper
+        // around the actual exception thrown by the constructor.
+        InvocationTargetException thrown = assertThrows(InvocationTargetException.class, () -> {
+            ConstructorUtils.invokeConstructor(classToInstantiate, args, parameterTypes);
+        });
+
+        // Verify that the cause of the InvocationTargetException is the NumberFormatException
+        // from the Integer(String) constructor, confirming the correct exception was wrapped.
+        assertTrue(thrown.getCause() instanceof NumberFormatException);
     }
 }
