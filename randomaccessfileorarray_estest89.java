@@ -1,40 +1,38 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
+import com.itextpdf.text.io.RandomAccessSourceFactory;
+import org.junit.Test;
+
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest89 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Test suite for {@link RandomAccessFileOrArray}.
+ * This class demonstrates an improved, more understandable version of the original generated test case.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test088() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        try {
-            randomAccessFileOrArray0.readDoubleLE();
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that attempting to read a little-endian double (8 bytes) from a data source
+     * that is too short correctly throws an EOFException.
+     *
+     * This test ensures the method correctly handles unexpected end-of-file scenarios.
+     */
+    @Test(expected = EOFException.class)
+    public void readDoubleLEShouldThrowEOFExceptionWhenDataSourceIsTooShort() throws IOException {
+        // Arrange: Create a data source with fewer bytes than required for a double.
+        // Using Double.BYTES makes the intent clear and avoids magic numbers.
+        byte[] insufficientData = new byte[Double.BYTES - 1]; // 7 bytes
+        
+        // Use the recommended factory method to create the source, avoiding deprecated constructors.
+        RandomAccessSource source = new RandomAccessSourceFactory().createSource(insufficientData);
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(source);
+
+        // Act: Attempt to read a double from the undersized data source.
+        reader.readDoubleLE();
+
+        // Assert: The test passes if an EOFException is thrown. This is handled by the
+        // @Test(expected = EOFException.class) annotation, making the test's purpose explicit.
     }
 }
