@@ -1,56 +1,49 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest7 extends TransformedMultiValuedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Predicate<Integer> predicate0 = NullPredicate.nullPredicate();
-        Transformer<Object, Predicate<Integer>> transformer0 = ConstantTransformer.constantTransformer(predicate0);
-        LinkedHashSetValuedLinkedHashMap<Predicate<Integer>, Object> linkedHashSetValuedLinkedHashMap0 = new LinkedHashSetValuedLinkedHashMap<Predicate<Integer>, Object>();
-        TransformedMultiValuedMap<Predicate<Integer>, Object> transformedMultiValuedMap0 = TransformedMultiValuedMap.transformingMap((MultiValuedMap<Predicate<Integer>, Object>) linkedHashSetValuedLinkedHashMap0, (Transformer<? super Predicate<Integer>, ? extends Predicate<Integer>>) transformer0, (Transformer<? super Object, ?>) transformer0);
-        Predicate<Integer> predicate1 = transformedMultiValuedMap0.transformKey(predicate0);
-        assertSame(predicate0, predicate1);
+/**
+ * Contains tests for {@link TransformedMultiValuedMap}.
+ */
+public class TransformedMultiValuedMapTest {
+
+    /**
+     * Tests that the {@code transformKey} method correctly delegates the transformation
+     * logic to the provided key transformer.
+     */
+    @Test
+    public void transformKeyShouldDelegateToKeyTransformer() {
+        // Arrange
+        final String expectedTransformedKey = "TRANSFORMED_KEY";
+
+        // Use a ConstantTransformer which ignores its input and always returns a predefined object.
+        // This allows us to verify that the transformKey method is indeed using our transformer.
+        final Transformer<String, String> keyTransformer =
+                ConstantTransformer.constantTransformer(expectedTransformedKey);
+
+        // The base map to be decorated. It can be empty as we are only testing the transformation logic.
+        final MultiValuedMap<String, Object> baseMap = new LinkedHashSetValuedLinkedHashMap<>();
+
+        // Create the map under test, providing the key transformer.
+        // The value transformer is not relevant for this test, so it can be null.
+        final TransformedMultiValuedMap<String, Object> transformedMap =
+                TransformedMultiValuedMap.transformingMap(baseMap, keyTransformer, null);
+
+        // An arbitrary input key to pass to the method.
+        final String inputKey = "ORIGINAL_KEY";
+
+        // Act
+        final String actualTransformedKey = transformedMap.transformKey(inputKey);
+
+        // Assert
+        // The result must be the exact same object returned by the transformer,
+        // confirming that the delegation occurred as expected.
+        assertSame("The transformed key should be the instance returned by the key transformer",
+                     expectedTransformedKey, actualTransformedKey);
     }
 }
