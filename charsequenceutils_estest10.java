@@ -1,23 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest10 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("");
-        StringBuilder stringBuilder1 = stringBuilder0.append(1937);
-        stringBuilder0.append(true);
-        CharBuffer charBuffer0 = CharBuffer.wrap((CharSequence) stringBuilder1);
-        StringBuilder stringBuilder2 = stringBuilder1.insert(0, (CharSequence) charBuffer0);
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuilder1, stringBuilder2, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that lastIndexOf returns 0 when the search sequence is the same as the
+     * source sequence and the search starts at index 0.
+     */
+    @Test
+    public void testLastIndexOf_whenSearchingForSelfFromStartIndexZero_shouldReturnZero() {
+        // Arrange
+        // The original test created a complex CharSequence "1937true1937true"
+        // and searched for itself within itself. We simplify the setup to make the
+        // inputs and the purpose of the test clear.
+        final CharSequence text = "1937true1937true";
+        final CharSequence searchSequence = text; // The search sequence is the text itself.
+        final int startIndex = 0;
+        final int expectedIndex = 0;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(text, searchSequence, startIndex);
+
+        // Assert
+        // The method should find the sequence at the beginning of the text.
+        assertEquals(expectedIndex, actualIndex);
     }
 }
