@@ -1,38 +1,36 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class WeeksTestTest13 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks#toString()} method.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void toString_returnsCorrectISO8601FormatForPositiveWeeks() {
+        // Arrange
+        Weeks twentyWeeks = Weeks.weeks(20);
+        String expectedString = "P20W";
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        String actualString = twentyWeeks.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
+    @Test
+    public void toString_returnsCorrectISO8601FormatForNegativeWeeks() {
+        // Arrange
+        Weeks negativeTwentyWeeks = Weeks.weeks(-20);
+        String expectedString = "P-20W";
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        String actualString = negativeTwentyWeeks.toString();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToString() {
-        Weeks test = Weeks.weeks(20);
-        assertEquals("P20W", test.toString());
-        test = Weeks.weeks(-20);
-        assertEquals("P-20W", test.toString());
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
