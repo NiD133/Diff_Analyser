@@ -1,63 +1,52 @@
 package org.locationtech.spatial4j.context;
 
-import org.locationtech.spatial4j.context.jts.DatelineRule;
+import org.junit.Test;
 import org.locationtech.spatial4j.context.jts.JtsSpatialContext;
 import org.locationtech.spatial4j.context.jts.JtsSpatialContextFactory;
-import org.locationtech.spatial4j.context.jts.ValidationRule;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.io.ShapeIO;
+import org.locationtech.spatial4j.io.ShapeReader;
 import org.locationtech.spatial4j.io.WKTReader;
-import org.locationtech.spatial4j.shape.impl.RectangleImpl;
-import org.junit.After;
-import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class SpatialContextFactoryTestTest4 {
+/**
+ * Tests for {@link SpatialContextFactory} focusing on its ability to configure
+ * components like custom format readers.
+ */
+public class SpatialContextFactoryTest {
 
-    public static final String PROP = "SpatialContextFactory";
-
-    @After
-    public void tearDown() {
-        System.getProperties().remove(PROP);
-    }
-
-    private SpatialContext call(String... argsStr) {
-        Map<String, String> args = new HashMap<>();
-        for (int i = 0; i < argsStr.length; i += 2) {
-            String key = argsStr[i];
-            String val = argsStr[i + 1];
-            args.put(key, val);
-        }
-        return SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
-    }
-
-    public static class DSCF extends SpatialContextFactory {
-
-        @Override
-        public SpatialContext newSpatialContext() {
-            geo = false;
-            return new SpatialContext(this);
-        }
-    }
-
-    public static class CustomWktShapeParser extends WKTReader {
-
-        //cheap way to test it was created
-        static boolean once = false;
-
-        public CustomWktShapeParser(JtsSpatialContext ctx, JtsSpatialContextFactory factory) {
+    /**
+     * A test-specific implementation of WKTReader to verify that the factory
+     * can instantiate and register custom format readers.
+     */
+    public static class CustomWktReader extends WKTReader {
+        public CustomWktReader(JtsSpatialContext ctx, JtsSpatialContextFactory factory) {
             super(ctx, factory);
-            once = true;
         }
     }
 
     @Test
-    public void testFormatsConfig() {
-        JtsSpatialContext ctx = (JtsSpatialContext) call("spatialContextFactory", JtsSpatialContextFactory.class.getName(), "readers", CustomWktShapeParser.class.getName());
-        assertTrue(ctx.getFormats().getReader(ShapeIO.WKT) instanceof CustomWktShapeParser);
+    public void factoryShouldCreateContextWithCustomReader() {
+        // Arrange: Define configuration to use a JTS context and our custom WKT reader.
+        Map<String, String> args = new HashMap<>();
+        args.put("spatialContextFactory", JtsSpatialContextFactory.class.getName());
+        args.put("readers", CustomWktReader.class.getName());
+
+        // Act: Create the SpatialContext using the factory with the specified arguments.
+        SpatialContext context = SpatialContextFactory.makeSpatialContext(args, getClass().getClassLoader());
+
+        // Assert: Verify the context is a JTS context and uses the specified custom reader.
+        assertTrue("Context should be a JtsSpatialContext", context instanceof JtsSpatialContext);
+
+        ShapeReader wktReader = context.getFormats().getReader(ShapeIO.WKT);
+        assertNotNull("A WKT reader should be available", wktReader);
+        assertTrue(
+                "The registered WKT reader should be our custom implementation",
+                wktReader instanceof CustomWktReader
+        );
     }
 }
