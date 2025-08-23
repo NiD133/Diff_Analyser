@@ -1,31 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest11 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Tests for {@link ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Object[] objectArray0 = new Object[4];
-        Object object0 = new Object();
-        objectArray0[1] = object0;
-        // Undeclared exception!
-        try {
-            ArraySorter.sort(objectArray0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // java.lang.Object cannot be cast to java.lang.Comparable
-            //
-            verifyException("java.util.ComparableTimSort", e);
-        }
+    /**
+     * Tests that calling sort() on an array containing non-Comparable objects
+     * throws a ClassCastException, as there is no natural order to use.
+     */
+    @Test(expected = ClassCastException.class)
+    public void sortArrayWithNonComparableElementShouldThrowClassCastException() {
+        // Arrange: Create an array containing an element that does not implement Comparable.
+        // The java.lang.Object class itself does not implement the Comparable interface.
+        final Object[] array = new Object[]{new Object()};
+
+        // Act: Attempt to sort the array. This should fail because the element
+        // cannot be cast to Comparable for sorting.
+        ArraySorter.sort(array);
+
+        // Assert: The test passes if a ClassCastException is thrown, as specified
+        // by the 'expected' parameter in the @Test annotation.
     }
 }
