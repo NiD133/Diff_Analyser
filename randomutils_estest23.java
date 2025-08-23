@@ -1,28 +1,32 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RandomUtils_ESTestTest23 extends RandomUtils_ESTest_scaffolding {
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.insecure();
-        // Undeclared exception!
-        try {
-            randomUtils0.randomDouble((double) (-5), (double) (-5));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Both range values must be non-negative.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
-        }
+/**
+ * Tests for {@link RandomUtils}.
+ */
+class RandomUtilsTest {
+
+    @Test
+    @DisplayName("randomDouble() should throw IllegalArgumentException for negative range values")
+    void randomDoubleShouldThrowExceptionForNegativeRange() {
+        // Arrange
+        final RandomUtils randomUtils = RandomUtils.insecure();
+        final double negativeStart = -5.0;
+        final double negativeEnd = -5.0;
+        final String expectedMessage = "Both range values must be non-negative.";
+
+        // Act & Assert
+        // Verify that the expected exception is thrown
+        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            randomUtils.randomDouble(negativeStart, negativeEnd);
+        });
+
+        // Verify that the exception has the correct message for more precise testing
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
