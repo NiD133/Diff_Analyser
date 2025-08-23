@@ -1,54 +1,39 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest30 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Tests for the {@link OrderedProperties} class.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        HashMap<Integer, Integer> hashMap0 = new HashMap<Integer, Integer>();
-        Integer integer0 = new Integer(0);
-        ConstantTransformer<Object, Integer> constantTransformer0 = new ConstantTransformer<Object, Integer>(integer0);
-        Object object0 = orderedProperties0.computeIfAbsent(hashMap0, constantTransformer0);
-        assertEquals(0, object0);
+    /**
+     * Tests that computeIfAbsent adds a new key-value pair and returns the new value
+     * when the key is not already present in the properties.
+     */
+    @Test
+    public void computeIfAbsentShouldAddValueWhenKeyIsMissing() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final Map<String, String> key = new HashMap<>(); // A complex object to use as a key
+        final Integer valueToCompute = 123;
+
+        assertTrue("Precondition: The properties map should be empty.", properties.isEmpty());
+
+        // Act
+        final Object result = properties.computeIfAbsent(key, k -> valueToCompute);
+
+        // Assert
+        // 1. Verify the returned value
+        assertEquals("The method should return the newly computed value.", valueToCompute, result);
+
+        // 2. Verify the state of the properties map
+        assertEquals("The map size should be 1 after adding the new entry.", 1, properties.size());
+        assertEquals("The map should contain the new value for the given key.", valueToCompute, properties.get(key));
     }
 }
