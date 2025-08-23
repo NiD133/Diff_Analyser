@@ -1,22 +1,38 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.Reader;
+import org.junit.Test;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class JsonParser_ESTestTest4 extends JsonParser_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonParser}.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StringReader stringReader0 = new StringReader("{}3+1M-tu;%QX!~Y");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        JsonElement jsonElement0 = JsonParser.parseReader(jsonReader0);
-        assertFalse(jsonElement0.isJsonNull());
+    /**
+     * Tests that {@link JsonParser#parseReader(JsonReader)} successfully parses the first
+     * valid JSON element from a stream and ignores any subsequent, non-JSON trailing characters.
+     * This is the documented behavior for this specific method overload.
+     */
+    @Test
+    public void parseReaderWithJsonReaderShouldIgnoreTrailingData() {
+        // Arrange
+        String jsonWithTrailingGarbage = "{}extra-characters";
+        StringReader reader = new StringReader(jsonWithTrailingGarbage);
+        JsonReader jsonReader = new JsonReader(reader);
+
+        JsonObject expectedObject = new JsonObject();
+
+        // Act
+        JsonElement parsedElement = JsonParser.parseReader(jsonReader);
+
+        // Assert
+        // Verify that the parser correctly identified the element as a JsonObject.
+        assertTrue(parsedElement.isJsonObject());
+        // Verify that the parsed object is the expected empty object, confirming
+        // that the trailing data was successfully ignored.
+        assertEquals(expectedObject, parsedElement);
     }
 }
