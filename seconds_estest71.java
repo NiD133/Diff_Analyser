@@ -1,18 +1,26 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest71 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        Seconds seconds0 = Seconds.ZERO;
-        Seconds seconds1 = Seconds.standardSecondsIn(seconds0);
-        assertEquals(0, seconds1.getSeconds());
+    /**
+     * Verifies that calling standardSecondsIn with a zero-length period
+     * returns a Seconds object representing zero.
+     */
+    @Test
+    public void standardSecondsIn_withZeroPeriod_returnsZeroSeconds() {
+        // Arrange: Create a period representing zero seconds.
+        ReadablePeriod zeroPeriod = Seconds.ZERO;
+
+        // Act: Convert the period to a Seconds instance.
+        Seconds result = Seconds.standardSecondsIn(zeroPeriod);
+
+        // Assert: The result should be the constant for zero seconds.
+        assertEquals(Seconds.ZERO, result);
     }
 }
