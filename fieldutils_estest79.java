@@ -1,23 +1,29 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest79 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test78() throws Throwable {
-        long long0 = FieldUtils.safeSubtract(0L, 2147483647L);
-        assertEquals((-2147483647L), long0);
+    /**
+     * Tests that {@code safeSubtract} correctly computes the difference
+     * when subtracting a positive value from zero. This covers a basic
+     * subtraction case with no risk of overflow.
+     */
+    @Test
+    public void safeSubtract_shouldCorrectlySubtractPositiveValueFromZero() {
+        // Arrange
+        final long minuend = 0L;
+        final long subtrahend = Integer.MAX_VALUE; // Using a large positive value
+        final long expectedResult = -(long) Integer.MAX_VALUE;
+
+        // Act
+        final long actualResult = FieldUtils.safeSubtract(minuend, subtrahend);
+
+        // Assert
+        assertEquals(expectedResult, actualResult);
     }
 }
