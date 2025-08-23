@@ -1,16 +1,27 @@
 package org.apache.commons.compress.archivers.cpio;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class CpioUtil_ESTestTest15 extends CpioUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link CpioUtil} class.
+ */
+public class CpioUtilTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        CpioUtil cpioUtil0 = new CpioUtil();
+    /**
+     * Verifies that an instance of the CpioUtil class can be created.
+     * <p>
+     * CpioUtil is a utility class containing only static methods and is not
+     * typically instantiated. This test serves as a basic smoke test for the
+     * constructor and helps achieve full code coverage.
+     * </p>
+     */
+    @Test
+    public void shouldCreateInstanceSuccessfully() {
+        // Arrange & Act: Attempt to create an instance of the utility class.
+        CpioUtil cpioUtilInstance = new CpioUtil();
+
+        // Assert: Ensure the instance was created successfully.
+        assertNotNull("The instance of CpioUtil should not be null.", cpioUtilInstance);
     }
 }
