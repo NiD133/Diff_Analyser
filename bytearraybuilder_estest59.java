@@ -1,20 +1,34 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class ByteArrayBuilder_ESTestTest59 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class, focusing on specific state-related behaviors.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0, 2);
-        byteArrayBuilder0.getClearAndRelease();
-        byte[] byteArray0 = byteArrayBuilder0.getClearAndRelease();
-        assertEquals(0, byteArray0.length);
+    /**
+     * Verifies that getClearAndRelease() can be called multiple times on an empty builder
+     * without causing errors, and that it consistently returns an empty byte array.
+     * This ensures the method correctly resets the builder's state.
+     */
+    @Test
+    public void getClearAndReleaseOnEmptyBuilderShouldBeRepeatable() {
+        // Arrange: Create an empty ByteArrayBuilder.
+        // A BufferRecycler is used as per the original test's setup.
+        BufferRecycler recycler = new BufferRecycler();
+        ByteArrayBuilder builder = new ByteArrayBuilder(recycler);
+
+        // Act: Call getClearAndRelease() once to clear the builder.
+        // The result of this first call is intentionally ignored.
+        builder.getClearAndRelease();
+
+        // Call it a second time to test the behavior on an already-cleared builder.
+        byte[] result = builder.getClearAndRelease();
+
+        // Assert: The second call should return an empty byte array, confirming
+        // that the builder was correctly reset and the operation is safe to repeat.
+        assertArrayEquals(ByteArrayBuilder.NO_BYTES, result);
     }
 }
