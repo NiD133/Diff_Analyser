@@ -1,31 +1,37 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest10 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the RFC1522Codec class, using BCodec as a concrete implementation.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        // Undeclared exception!
+    /**
+     * Tests that encodeText(String, String) throws an IllegalArgumentException
+     * when the provided charset name is null. The underlying java.nio.charset.Charset
+     * class is responsible for this behavior.
+     */
+    @Test
+    public void encodeTextWithNullCharsetNameShouldThrowIllegalArgumentException() {
+        // Arrange
+        final BCodec bCodec = new BCodec();
+        final String textToEncode = "Any text can be used here";
+
+        // Act & Assert
         try {
-            bCodec0.encodeText("0T5`BTkU*|f-hr", (String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null charset name
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // The cast to (String) is necessary to avoid ambiguity with the
+            // encodeText(String, Charset) method overload.
+            bCodec.encodeText(textToEncode, (String) null);
+            fail("Expected an IllegalArgumentException to be thrown for a null charset name.");
+        } catch (final IllegalArgumentException e) {
+            // This is the expected outcome.
+            // We verify the exception message to ensure it's the one we expect
+            // from Charset.forName(null).
+            assertEquals("Null charset name", e.getMessage());
         }
     }
 }
