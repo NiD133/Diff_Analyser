@@ -1,21 +1,33 @@
 package com.google.common.hash;
 
+import static org.junit.Assert.assertSame;
+
+import com.google.common.hash.Crc32cHashFunction.Crc32cHasher;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AbstractStreamingHasher_ESTestTest24 extends AbstractStreamingHasher_ESTest_scaffolding {
+/**
+ * Tests for the base functionality of {@link AbstractStreamingHasher}.
+ */
+public class AbstractStreamingHasherTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Crc32cHashFunction.Crc32cHasher crc32cHashFunction_Crc32cHasher0 = new Crc32cHashFunction.Crc32cHasher();
-        Hasher hasher0 = crc32cHashFunction_Crc32cHasher0.putByte((byte) (-115));
-        assertSame(hasher0, crc32cHashFunction_Crc32cHasher0);
+    /**
+     * Verifies that the {@code putByte} method returns the same {@link Hasher} instance,
+     * which is essential for supporting a fluent API (method chaining).
+     */
+    @Test
+    public void putByte_shouldReturnSameInstance_forMethodChaining() {
+        // Arrange: Create a concrete instance of an AbstractStreamingHasher.
+        Hasher hasher = new Crc32cHasher();
+        byte testByte = (byte) 0xAB;
+
+        // Act: Call the putByte method.
+        Hasher returnedHasher = hasher.putByte(testByte);
+
+        // Assert: The returned hasher must be the same instance as the original.
+        // This fluent-style return is crucial for chaining calls (e.g., hasher.putByte(a).putInt(b)).
+        assertSame(
+                "The put...() methods should return the same Hasher instance to allow for method chaining.",
+                hasher,
+                returnedHasher);
     }
 }
