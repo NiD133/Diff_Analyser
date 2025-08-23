@@ -1,18 +1,26 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest19 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('%');
-        assertEquals(1025, class0.getModifiers());
-        assertNotNull(class0);
+    /**
+     * Tests that the getValueType method correctly identifies the '%' character
+     * as representing the Number class.
+     */
+    @Test
+    public void getValueType_forNumberChar_shouldReturnNumberClass() {
+        // Arrange: The pattern character for a Number type is '%'.
+        final char numberPatternChar = '%';
+
+        // Act: Retrieve the class associated with the pattern character.
+        Class<?> valueType = PatternOptionBuilder.getValueType(numberPatternChar);
+
+        // Assert: The returned type should be Number.class.
+        assertEquals(Number.class, valueType);
     }
 }
