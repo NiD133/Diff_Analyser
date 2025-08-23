@@ -1,26 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest71 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on edge cases and error handling.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        char[] charArray0 = new char[4];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(9999999999969L, charArray0, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 4
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that {@code outputLong} throws an {@link ArrayIndexOutOfBoundsException}
+     * when the provided character buffer is too small to hold the string representation
+     * of the long value.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLong_shouldThrowExceptionWhenBufferIsTooSmall() {
+        // Arrange: A long value whose string representation requires more space than the buffer provides.
+        // The number 12345L requires 5 characters, but the buffer only has a capacity of 4.
+        long numberTooLargeForBuffer = 12345L;
+        char[] smallBuffer = new char[4];
+        int offset = 0;
+
+        // Act & Assert: Attempting to write the long into the small buffer should throw an exception.
+        // The @Test(expected=...) annotation handles the assertion.
+        NumberOutput.outputLong(numberTooLargeForBuffer, smallBuffer, offset);
     }
 }
