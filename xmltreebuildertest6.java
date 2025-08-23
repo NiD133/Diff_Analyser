@@ -1,34 +1,35 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest6 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Test suite for the {@link XmlTreeBuilder}.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    public void testDoesNotForceSelfClosingKnownTags() {
-        // html will force "<br>one</br>" to logically "<br />One<br />". XML should be stay "<br>one</br> -- don't recognise tag.
-        Document htmlDoc = Jsoup.parse("<br>one</br>");
-        assertEquals("<br>\none\n<br>", htmlDoc.body().html());
-        Document xmlDoc = Jsoup.parse("<br>one</br>", "", Parser.xmlParser());
-        assertEquals("<br>one</br>", xmlDoc.html());
+    @DisplayName("XML parser should not treat HTML void tags like <br> as self-closing")
+    void xmlParserShouldNotSelfCloseHtmlVoidTags() {
+        // This test verifies that the XML parser, unlike the HTML parser, does not have
+        // special knowledge of HTML's "void" or "self-closing" tags.
+        String input = "<br>one</br>";
+
+        // Part 1: Demonstrate HTML parser behavior for context.
+        // The HTML parser recognizes <br> as a void tag and auto-corrects the mismatched </br>.
+        Document htmlDoc = Jsoup.parse(input);
+        String expectedHtmlOutput = "<br>\none\n<br>";
+        assertEquals(expectedHtmlOutput, htmlDoc.body().html(), "For context: HTML parser should 'fix' the input");
+
+        // Part 2: Test the XML parser's behavior (the actual subject of the test).
+        // The XML parser should treat <br> as a standard tag that requires a proper closing tag.
+        // It should preserve the original structure without any special handling.
+        Document xmlDoc = Jsoup.parse(input, "", Parser.xmlParser());
+        String expectedXmlOutput = "<br>one</br>";
+        assertEquals(expectedXmlOutput, xmlDoc.html(), "XML parser should preserve the tag structure");
     }
 }
