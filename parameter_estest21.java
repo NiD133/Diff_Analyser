@@ -1,30 +1,37 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Test for {@link Parameter#getAnnotatedType()}.
+ *
+ * NOTE: The original class name and inheritance were artifacts from a test generation tool.
+ * In a typical, manually written test suite, this class would be named {@code ParameterTest}.
+ */
 public class Parameter_ESTestTest21 extends Parameter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
-        // Undeclared exception!
-        try {
-            parameter0.getAnnotatedType();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Verifies that getAnnotatedType() throws a NullPointerException if the Parameter
+     * was constructed with a null Invokable, as the method relies on it for its operation.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getAnnotatedType_whenConstructedWithNullInvokable_throwsNullPointerException() {
+        // Arrange: Create a Parameter instance with a null Invokable.
+        // The constructor allows this, but methods that rely on the Invokable should fail.
+        Annotation[] noAnnotations = new Annotation[0];
+        Parameter parameterWithNullInvokable = new Parameter(
+            /* declaration */ null,
+            /* position */ 0,
+            /* type */ null,
+            /* annotations */ noAnnotations,
+            /* annotatedType */ null);
+
+        // Act: Calling getAnnotatedType() is expected to throw a NullPointerException
+        // because the declaring Invokable is null.
+        parameterWithNullInvokable.getAnnotatedType();
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // in the @Test(expected=...) annotation.
     }
 }
