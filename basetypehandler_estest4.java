@@ -1,30 +1,42 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import org.junit.Test;
+
+/**
+ * This test class contains tests for BaseTypeHandler and its concrete implementations.
+ * Note: The original test class name `BaseTypeHandler_ESTestTest4` and its scaffolding
+ * suggest it was auto-generated. This refactored version focuses on clarity and maintainability,
+ * using EnumOrdinalTypeHandler as a concrete implementation of the abstract BaseTypeHandler.
+ */
 public class BaseTypeHandler_ESTestTest4 extends BaseTypeHandler_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn(0).when(callableStatement0).getInt(anyInt());
-        doReturn(false).when(callableStatement0).wasNull();
-        JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(callableStatement0, 807);
-        PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
-        enumOrdinalTypeHandler0.setNonNullParameter(preparedStatement0, 0, jdbcType0, jdbcType0);
+    /**
+     * Tests that EnumOrdinalTypeHandler correctly sets a non-null enum parameter
+     * on a PreparedStatement using the enum's ordinal value.
+     */
+    @Test
+    public void shouldSetEnumByOrdinalOnPreparedStatement() throws SQLException {
+        // Arrange
+        // The EnumOrdinalTypeHandler persists an enum by its ordinal (integer) value.
+        // We'll use JdbcType.ARRAY, which is the first constant and has an ordinal of 0.
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        EnumOrdinalTypeHandler<JdbcType> typeHandler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+        
+        JdbcType parameterToSet = JdbcType.ARRAY;
+        int parameterIndex = 1;
+
+        // Act
+        // Call the method under test. The final jdbcType argument is not used by this handler.
+        typeHandler.setNonNullParameter(mockPreparedStatement, parameterIndex, parameterToSet, null);
+
+        // Assert
+        // Verify that the PreparedStatement's setInt method was called with the correct
+        // index and the enum's ordinal value.
+        verify(mockPreparedStatement).setInt(parameterIndex, parameterToSet.ordinal());
     }
 }
