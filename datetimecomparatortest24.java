@@ -1,234 +1,63 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import org.junit.Test;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
+import static org.junit.Assert.assertEquals;
 
-public class DateTimeComparatorTestTest24 extends TestCase {
+/**
+ * Tests for {@link DateTimeComparator} specifically focusing on the weekyear field.
+ *
+ * <p>This test class clarifies the behavior of the weekyear comparator, especially
+ * around the boundary of a calendar year, which can be non-intuitive.
+ * According to the ISO 8601 standard, the weekyear can differ from the calendar year
+ * for dates at the beginning or end of the year.
+ */
+public class DateTimeComparatorWeekyearTest {
 
-    private static final Chronology ISO = ISOChronology.getInstance();
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime bDateTime = null;
+    private static final DateTimeZone UTC = DateTimeZone.UTC;
 
     /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
+     * Tests that the weekyear comparator correctly handles dates across a calendar year boundary
+     * where the weekyear remains the same.
+     *
+     * <p>The ISO 8601 standard defines the first week of a year as the one containing the first
+     * Thursday. Consequently, dates like Dec 31st and Jan 1st can belong to the same weekyear.
+     * For example, Friday, Jan 1st, 1999, is part of week 53 of the weekyear 1998. The new
+     * weekyear (1999) doesn't start until Monday, Jan 4th, 1999.
      */
-    Comparator cMillis = null;
+    @Test
+    public void testCompare_Weekyear_AcrossYearBoundary() {
+        // A comparator that only considers the weekyear field.
+        // It ignores fields finer than weekyear (e.g., weekOfWeekyear, dayOfWeek, time).
+        Comparator<Object> weekyearComparator = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
+        // Test case 1: Dates in different calendar years but the same weekyear.
+        // Thursday, 31st Dec 1998 is in week 53 of weekyear 1998.
+        DateTime dateIn1998 = new DateTime("1998-12-31T23:59:59", UTC);
+        // Friday, 1st Jan 1999 is also in week 53 of weekyear 1998.
+        DateTime dateInSameWeekyear = new DateTime("1999-01-01T00:00:00", UTC);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
+        assertEquals(
+            "Dates in the same weekyear should be considered equal",
+            0,
+            weekyearComparator.compare(dateIn1998, dateInSameWeekyear)
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
+        // Test case 2: Dates in different weekyears.
+        // Monday, 4th Jan 1999 is the start of week 1 of weekyear 1999.
+        DateTime dateInNextWeekyear = new DateTime("1999-01-04T00:00:00", UTC);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
+        assertEquals(
+            "A date in weekyear 1998 should be less than a date in weekyear 1999",
+            -1,
+            weekyearComparator.compare(dateIn1998, dateInNextWeekyear)
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
-    }
-
-    /**
-     * Junit <code>setUp()</code> method.
-     */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
-    }
-
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
-
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
-
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test unequal comparisons with year given the week comparators.
-     */
-    public void testWOYY() {
-        // How do I test the end conditions of this?
-        // Don't understand ......
-        aDateTime = getADate("1998-12-31T23:59:59");
-        bDateTime = getADate("1999-01-01T00:00:00");
-        assertEquals("YOYYZ", 0, cWeekyear.compare(aDateTime, bDateTime));
-        bDateTime = getADate("1999-01-04T00:00:00");
-        assertEquals("YOYYM1", -1, cWeekyear.compare(aDateTime, bDateTime));
-        assertEquals("YOYYP1", 1, cWeekyear.compare(bDateTime, aDateTime));
+        // Test case 3: Test the reverse comparison for symmetry.
+        assertEquals(
+            "A date in weekyear 1999 should be greater than a date in weekyear 1998",
+            1,
+            weekyearComparator.compare(dateInNextWeekyear, dateIn1998)
+        );
     }
 }
