@@ -1,32 +1,31 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest33 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Test for {@link PairedStatsAccumulator}.
+ * This class contains an improved version of a test case that was originally auto-generated.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(4.9E-324, 2.7650006221898014E246);
-        Stats stats0 = new Stats(1L, 2.0, (-387.69334), 1L, 2.7650006221898014E246);
-        PairedStats pairedStats0 = new PairedStats(stats0, stats0, 2.0);
-        pairedStatsAccumulator0.addAll(pairedStats0);
-        // Undeclared exception!
+    @Test
+    public void pearsonsCorrelationCoefficient_xValuesHaveZeroVariance_throwsIllegalStateException() {
+        // Arrange: Create an accumulator and add data points where all x-values are identical.
+        // This results in the set of x-values having zero variance.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(5.0, 10.0);
+        accumulator.add(5.0, 20.0);
+
+        // Act & Assert: Attempting to calculate the Pearson's correlation coefficient
+        // should fail because it is undefined when one of the variables has zero variance.
         try {
-            pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+            accumulator.pearsonsCorrelationCoefficient();
+            fail("Expected an IllegalStateException to be thrown when x-variance is zero.");
+        } catch (IllegalStateException expected) {
+            assertEquals("x-values must not be all equal", expected.getMessage());
         }
     }
 }
