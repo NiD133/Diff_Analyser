@@ -16,6 +16,7 @@
  */
 package org.apache.commons.collections4.bag;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -24,10 +25,9 @@ import org.apache.commons.collections4.SortedBag;
 import org.junit.jupiter.api.Test;
 
 /**
- * Extension of {@link AbstractBagTest} for exercising the {@link TreeBag}
- * implementation.
+ * Tests for {@link TreeBag}.
  */
-public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
+public class TreeBagTest extends AbstractSortedBagTest<String> {
 
     @Override
     public String getCompatibilityVersion() {
@@ -35,56 +35,67 @@ public class TreeBagTest<T> extends AbstractSortedBagTest<T> {
     }
 
     @Override
-    public SortedBag<T> makeObject() {
+    public SortedBag<String> makeObject() {
         return new TreeBag<>();
     }
 
-    @SuppressWarnings("unchecked")
-    public SortedBag<T> setupBag() {
-        final SortedBag<T> bag = makeObject();
-        bag.add((T) "C");
-        bag.add((T) "A");
-        bag.add((T) "B");
-        bag.add((T) "D");
+    /**
+     * Creates a new sorted bag pre-populated with the given elements.
+     */
+    private SortedBag<String> newStringBag(final String... elements) {
+        final SortedBag<String> bag = makeObject();
+        for (final String e : elements) {
+            bag.add(e);
+        }
         return bag;
     }
 
     @Test
-    void testCollections265() {
+    void add_nonComparableToNaturallyOrderedBag_throwsIllegalArgumentException() {
+        // See COLLECTIONS-265: Natural ordering requires Comparable elements.
         final Bag<Object> bag = new TreeBag<>();
 
         assertThrows(IllegalArgumentException.class, () -> bag.add(new Object()));
     }
 
     @Test
-    void testCollections555() {
+    void add_nullToNaturallyOrderedBag_throwsNullPointerException() {
+        // See COLLECTIONS-555: Natural ordering in TreeMap does not permit null keys.
         final Bag<Object> bag = new TreeBag<>();
 
         assertThrows(NullPointerException.class, () -> bag.add(null));
-
-        final Bag<String> bag2 = new TreeBag<>(String::compareTo);
-        // jdk bug: adding null to an empty TreeMap works
-        // thus ensure that the bag is not empty before adding null
-        bag2.add("a");
-
-        assertThrows(NullPointerException.class, () -> bag2.add(null));
     }
 
     @Test
-    void testOrdering() {
-        final Bag<T> bag = setupBag();
-        assertEquals("A", bag.toArray()[0], "Should get elements in correct order");
-        assertEquals("B", bag.toArray()[1], "Should get elements in correct order");
-        assertEquals("C", bag.toArray()[2], "Should get elements in correct order");
-        assertEquals("A", ((SortedBag<T>) bag).first(), "Should get first key");
-        assertEquals("D", ((SortedBag<T>) bag).last(), "Should get last key");
+    void add_nullToComparatorBackedBag_throwsNullPointerException_evenWhenNotEmpty() {
+        // See COLLECTIONS-555:
+        // Historically, adding null to an empty TreeMap with a custom comparator may "succeed"
+        // because no comparison is needed yet. Ensure the bag is non-empty so a comparison occurs.
+        final Bag<String> bag = new TreeBag<>(String::compareTo);
+        bag.add("a"); // make non-empty
+
+        assertThrows(NullPointerException.class, () -> bag.add(null));
     }
 
+    @Test
+    void iterationAndEndpoints_followNaturalOrdering() {
+        // Given a bag with elements in unsorted insertion order
+        final SortedBag<String> bag = newStringBag("C", "A", "B", "D");
+
+        // Then iteration order should be natural (sorted) order
+        assertArrayEquals(new Object[] {"A", "B", "C", "D"}, bag.toArray(), "Elements should be returned in sorted order");
+
+        // And first/last should reflect natural ordering
+        assertEquals("A", bag.first(), "first() should return the smallest element");
+        assertEquals("D", bag.last(), "last() should return the largest element");
+    }
+
+//    // Helper to (re)generate serialized compatibility resources.
+//    // Run manually when updating test serialization forms.
 //    void testCreate() throws Exception {
-//        Bag<T> bag = makeObject();
+//        Bag<String> bag = makeObject();
 //        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TreeBag.emptyCollection.version4.obj");
 //        bag = makeFullCollection();
 //        writeExternalFormToDisk((java.io.Serializable) bag, "src/test/resources/data/test/TreeBag.fullCollection.version4.obj");
 //    }
-
 }
