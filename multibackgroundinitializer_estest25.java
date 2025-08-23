@@ -1,29 +1,29 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class MultiBackgroundInitializer_ESTestTest25 extends MultiBackgroundInitializer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link MultiBackgroundInitializer}.
+ */
+public class MultiBackgroundInitializerTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        MultiBackgroundInitializer multiBackgroundInitializer0 = new MultiBackgroundInitializer();
-        multiBackgroundInitializer0.close();
-        assertFalse(multiBackgroundInitializer0.isStarted());
+    /**
+     * Tests that calling close() on an initializer that has not been started
+     * does not change its "started" state.
+     */
+    @Test
+    public void isStartedShouldReturnFalseWhenCloseIsCalledBeforeStart() {
+        // Arrange: Create a new, unstarted MultiBackgroundInitializer.
+        final MultiBackgroundInitializer initializer = new MultiBackgroundInitializer();
+
+        // Act: Call the close() method. Since the initializer hasn't started and has
+        // no child initializers, this should effectively be a no-op.
+        initializer.close();
+
+        // Assert: Verify that the initializer is still not considered "started".
+        // The isStarted() flag should only become true after the start() method is invoked.
+        assertFalse("The initializer should not be in a started state if close() is called before start()",
+                initializer.isStarted());
     }
 }
