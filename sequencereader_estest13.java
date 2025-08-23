@@ -1,37 +1,51 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+import org.junit.Test;
 
-public class SequenceReader_ESTestTest13 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Tests for the {@link SequenceReader} class, focusing on edge cases for the read method.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        char[] charArray0 = new char[0];
-        // Undeclared exception!
-        try {
-            sequenceReader0.read(charArray0, (-1), 825);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Array Size=0, offset=-1, length=825
-            //
-            verifyException("org.apache.commons.io.input.SequenceReader", e);
-        }
+    /**
+     * Verifies that the read(buffer, offset, length) method throws an
+     * IndexOutOfBoundsException when a negative offset is provided,
+     * which is consistent with the contract of {@link java.io.Reader}.
+     */
+    @Test
+    public void testReadWithNegativeOffsetThrowsIndexOutOfBoundsException() {
+        // Arrange: Create a SequenceReader. Its internal state (e.g., being empty)
+        // is not relevant for this specific boundary check.
+        final SequenceReader sequenceReader = new SequenceReader(Collections.<Reader>emptyList());
+        final char[] buffer = new char[10];
+        final int negativeOffset = -1;
+        final int validLength = 5;
+
+        // Act & Assert: Expect an IndexOutOfBoundsException when calling read with the invalid offset.
+        // Using assertThrows is a modern and clear way to test for expected exceptions.
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            sequenceReader.read(buffer, negativeOffset, validLength);
+        });
+    }
+
+    /**
+     * Below is an alternative implementation using the @Test(expected) attribute,
+     * which is common in older JUnit 4 codebases.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testReadWithNegativeOffsetThrowsIndexOutOfBoundsException_alternative() throws IOException {
+        // Arrange
+        final SequenceReader sequenceReader = new SequenceReader(Collections.<Reader>emptyList());
+        final char[] buffer = new char[10];
+        final int negativeOffset = -1;
+        final int validLength = 5;
+
+        // Act: This call is expected to throw the exception.
+        sequenceReader.read(buffer, negativeOffset, validLength);
     }
 }
