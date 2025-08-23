@@ -1,31 +1,39 @@
 package com.google.common.graph;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.evosuite.runtime.EvoRunner;
+
+// The class name and runner are kept to match the original test suite's structure.
+// In a real-world scenario, the class name would also be improved for clarity.
+@RunWith(EvoRunner.class)
 public class EndpointPair_ESTestTest33 extends EndpointPair_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.unordered(locale_Category0, locale_Category0);
-        NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
-        StandardNetwork<Object, Object> standardNetwork0 = new StandardNetwork<Object, Object>(networkBuilder0);
-        // Undeclared exception!
+    /**
+     * Verifies that calling {@code incidentNodes()} on a network with an object
+     * that is not an edge in the network throws an {@link IllegalArgumentException}.
+     */
+    @Test
+    public void incidentNodes_whenEdgeIsNotInGraph_throwsIllegalArgumentException() {
+        // Arrange: Create an empty network. The node and edge types are illustrative.
+        MutableNetwork<String, Integer> network = NetworkBuilder.directed().build();
+
+        // Create an EndpointPair to represent a potential edge. This object itself is valid,
+        // but it has not been added as an edge to the network.
+        EndpointPair<String> nonExistentEdge = EndpointPair.unordered("A", "A");
+
+        // Act & Assert: Verify that the operation fails with a clear, descriptive error message.
         try {
-            standardNetwork0.incidentNodes(endpointPair0);
-            fail("Expecting exception: IllegalArgumentException");
+            // The incidentNodes() method requires an edge object that is an element of the network.
+            network.incidentNodes(nonExistentEdge);
+            fail("Expected an IllegalArgumentException because the edge is not in the graph.");
         } catch (IllegalArgumentException e) {
-            //
-            // Edge [DISPLAY, DISPLAY] is not an element of this graph.
-            //
-            verifyException("com.google.common.graph.StandardNetwork", e);
+            // The exception message should clearly state that the edge is not an element of the graph.
+            String expectedMessage = "Edge " + nonExistentEdge + " is not an element of this graph.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
