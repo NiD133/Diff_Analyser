@@ -1,30 +1,33 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class CustomCategoryURLGenerator_ESTestTest6 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        ArrayList<String> arrayList0 = new ArrayList<String>();
-        customCategoryURLGenerator0.addURLSeries(arrayList0);
-        customCategoryURLGenerator0.addURLSeries((List<String>) null);
-        customCategoryURLGenerator0.addURLSeries((List<String>) null);
-        customCategoryURLGenerator0.addURLSeries((List<String>) null);
-        customCategoryURLGenerator0.addURLSeries(arrayList0);
-        String string0 = customCategoryURLGenerator0.getURL(5, (-1785));
-        assertNull(string0);
+    /**
+     * Verifies that getURL() returns null when the requested series index is
+     * out of bounds (i.e., greater than or equal to the number of series added).
+     */
+    @Test
+    public void getURL_whenSeriesIndexIsOutOfBounds_shouldReturnNull() {
+        // Arrange: Create a generator and add a single series of URLs.
+        // This establishes a known state where the only valid series index is 0.
+        CustomCategoryURLGenerator urlGenerator = new CustomCategoryURLGenerator();
+        urlGenerator.addURLSeries(List.of("http://example.com/item0"));
+
+        // Define an index that is one greater than the highest valid index.
+        int outOfBoundsSeriesIndex = 1;
+        int anyItemIndex = 0; // The item index is irrelevant if the series index is invalid.
+
+        // Act: Attempt to retrieve a URL using the out-of-bounds series index.
+        String actualUrl = urlGenerator.getURL(outOfBoundsSeriesIndex, anyItemIndex);
+
+        // Assert: The result should be null because the requested series does not exist.
+        assertNull("getURL should return null for an out-of-bounds series index.", actualUrl);
     }
 }
