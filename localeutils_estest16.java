@@ -1,20 +1,25 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import static org.junit.Assert.assertNull;
+
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LocaleUtils_ESTestTest16 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale((String) null);
-        assertNull(locale0);
+    /**
+     * Tests that {@link LocaleUtils#toLocale(String)} returns null when the input string is null.
+     * This is the documented behavior for null inputs.
+     */
+    @Test
+    public void toLocaleShouldReturnNullForNullInput() {
+        // Act: Call the method under test with a null argument.
+        final Locale result = LocaleUtils.toLocale(null);
+
+        // Assert: Verify that the method returns null as expected.
+        assertNull("Calling toLocale with a null string should return null.", result);
     }
 }
