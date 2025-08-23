@@ -2,20 +2,31 @@ package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Vector_ESTestTest23 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Vector vector0 = new Vector(0.0F, 0.0F, 3.3516045F);
-        Matrix matrix0 = new Matrix(0.0F, 0);
-        Vector vector1 = vector0.cross(matrix0);
-        boolean boolean0 = vector0.equals(vector1);
-        assertTrue(boolean0);
-        assertEquals(11.233253F, vector0.lengthSquared(), 0.01F);
+    /**
+     * Tests that multiplying a vector by an identity matrix results in the original,
+     * unchanged vector. This is a fundamental property of vector-matrix multiplication.
+     * The 'cross' method in this context performs this multiplication.
+     */
+    @Test
+    public void crossWithIdentityMatrix_shouldReturnEqualVector() {
+        // Arrange: Create a sample vector and an identity matrix.
+        // The default Matrix() constructor creates an identity matrix.
+        Vector originalVector = new Vector(15.0f, -25.5f, 10.0f);
+        Matrix identityMatrix = new Matrix();
+
+        // Act: Perform the vector-matrix multiplication.
+        Vector resultVector = originalVector.cross(identityMatrix);
+
+        // Assert: The resulting vector should be equal to the original.
+        assertEquals(originalVector, resultVector);
+
+        // Also assert that a new instance is returned, not the original object.
+        assertNotSame("The cross method should return a new Vector instance.", originalVector, resultVector);
     }
 }
