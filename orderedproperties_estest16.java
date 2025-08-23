@@ -1,62 +1,42 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.util.Set;
+import java.util.function.BiFunction;
+
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for the {@link OrderedProperties} class.
+ * Note: The original test class name and inheritance structure are preserved for context.
+ */
 public class OrderedProperties_ESTestTest16 extends OrderedProperties_ESTest_scaffolding {
 
+    /**
+     * Tests that a StackOverflowError is thrown when attempting to use the property set's
+     * own keySet as a key in a merge operation.
+     * <p>
+     * This self-referential operation causes an infinite recursion. The merge operation
+     * attempts to add the keySet to the underlying map. This requires calculating the
+     * key's hash code. The hash code calculation for the keySet iterates over its
+     * elements. If the keySet contains itself, this leads to a recursive call
+     * to {@code hashCode()}, ultimately causing a StackOverflowError.
+     */
     @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Set<Object> set0 = orderedProperties0.keySet();
-        DefaultEquator<Object> defaultEquator0 = DefaultEquator.defaultEquator();
-        Predicate<Object> predicate0 = EqualPredicate.equalPredicate((Object) set0, (Equator<Object>) defaultEquator0);
-        BiFunction<Object, Object, Integer> biFunction0 = (BiFunction<Object, Object, Integer>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        // Undeclared exception!
+    public void mergeWithKeySetAsKeyThrowsStackOverflowError() {
+        // Arrange: Create properties and get its keySet, which will be used as a self-referential key.
+        final OrderedProperties properties = new OrderedProperties();
+        final Set<Object> keySetAsKey = properties.keySet();
+        final String value = "anyValue";
+        final BiFunction<Object, Object, Object> remappingFunction = (oldValue, newValue) -> newValue;
+
+        // Act & Assert: Expect a StackOverflowError when merging the keySet into itself.
         try {
-            orderedProperties0.merge(set0, predicate0, biFunction0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            properties.merge(keySetAsKey, value, remappingFunction);
+            fail("A StackOverflowError was expected but not thrown.");
+        } catch (final StackOverflowError e) {
+            // This is the expected outcome, so the test passes.
         }
     }
 }
