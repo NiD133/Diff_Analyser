@@ -1,26 +1,31 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.concurrent.LinkedBlockingQueue;
+import org.junit.Test;
 
-public class QueueInputStream_ESTestTest8 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link QueueInputStream}.
+ */
+public class QueueInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-        QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-        byte[] byteArray0 = new byte[8];
-        int int0 = queueInputStream0.read(byteArray0, (int) (byte) 0, (int) (byte) 0);
-        assertEquals(0, int0);
+    @Test
+    public void readToByteArrayWithZeroLengthShouldReturnZero() throws IOException {
+        // Arrange
+        // An empty queue and an input stream reading from it.
+        final BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+        final QueueInputStream inputStream = new QueueInputStream(queue);
+        final byte[] buffer = new byte[8];
+
+        // Act
+        // Attempt to read 0 bytes into the buffer.
+        final int bytesRead = inputStream.read(buffer, 0, 0);
+
+        // Assert
+        // The read method should return 0, as per the InputStream contract.
+        assertEquals("Reading zero bytes should return 0", 0, bytesRead);
     }
 }
