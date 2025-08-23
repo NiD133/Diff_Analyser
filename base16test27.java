@@ -2,77 +2,77 @@ package org.apache.commons.codec.binary;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class Base16TestTest27 {
+/**
+ * Tests for the {@link Base16} class.
+ *
+ * <p>This test suite focuses on verifying the correctness of the Base16 encoding
+ * and the integrity of the encode-decode round-trip process.
+ */
+public class Base16Test {
 
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+    private final Base16 base16 = new Base16();
 
     /**
-     * @return the random.
+     * Provides a stream of arguments for the parameterized test, mapping byte values
+     * to their expected Base16 string representation when prefixed with a zero byte.
+     *
+     * @return A stream of {@link Arguments} containing the test data.
      */
-    public Random getRandom() {
-        return this.random;
+    private static Stream<Arguments> knownBytePairsProvider() {
+        return Stream.of(
+            arguments((byte) 0, "0000"),
+            arguments((byte) 1, "0001"),
+            arguments((byte) 2, "0002"),
+            arguments((byte) 3, "0003"),
+            arguments((byte) 4, "0004"),
+            arguments((byte) 5, "0005"),
+            arguments((byte) 6, "0006"),
+            arguments((byte) 7, "0007"),
+            arguments((byte) 8, "0008"),
+            arguments((byte) 9, "0009"),
+            arguments((byte) 10, "000A"),
+            arguments((byte) 11, "000B"),
+            arguments((byte) 12, "000C"),
+            arguments((byte) 13, "000D"),
+            arguments((byte) 14, "000E"),
+            arguments((byte) 15, "000F"),
+            arguments((byte) 16, "0010"),
+            arguments((byte) 17, "0011")
+        );
     }
 
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
+    @DisplayName("Should encode a byte array of [0, x] to the correct Base16 string")
+    @ParameterizedTest(name = "input byte: {0} -> expected: \"{1}\"")
+    @MethodSource("knownBytePairsProvider")
+    void testEncodeWithKnownValues(final byte secondByte, final String expectedHex) {
+        final byte[] dataToEncode = {0, secondByte};
+        final String actualHex = new String(base16.encode(dataToEncode));
+        assertEquals(expectedHex, actualHex);
     }
 
     @Test
-    void testPairs() {
-        assertEquals("0000", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 0 })));
-        assertEquals("0001", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 1 })));
-        assertEquals("0002", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 2 })));
-        assertEquals("0003", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 3 })));
-        assertEquals("0004", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 4 })));
-        assertEquals("0005", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 5 })));
-        assertEquals("0006", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 6 })));
-        assertEquals("0007", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 7 })));
-        assertEquals("0008", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 8 })));
-        assertEquals("0009", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 9 })));
-        assertEquals("000A", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 10 })));
-        assertEquals("000B", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 11 })));
-        assertEquals("000C", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 12 })));
-        assertEquals("000D", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 13 })));
-        assertEquals("000E", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 14 })));
-        assertEquals("000F", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 15 })));
-        assertEquals("0010", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 16 })));
-        assertEquals("0011", new String(new Base16().encode(new byte[] { (byte) 0, (byte) 17 })));
-        for (int i = -128; i <= 127; i++) {
-            final byte[] test = { (byte) i, (byte) i };
-            assertArrayEquals(test, new Base16().decode(new Base16().encode(test)));
-        }
+    @DisplayName("Encode then decode should return the original data for all possible byte values")
+    void testEncodeDecodeRoundTripForAllByteValues() {
+        // This test iterates through all possible byte values (-128 to 127).
+        // For each value, it creates a two-byte array, encodes it, decodes it,
+        // and asserts that the result is identical to the original array.
+        // This ensures the codec's integrity for the full byte range.
+        IntStream.rangeClosed(Byte.MIN_VALUE, Byte.MAX_VALUE).forEach(i -> {
+            final byte[] originalData = {(byte) i, (byte) i};
+            final byte[] encodedData = base16.encode(originalData);
+            final byte[] decodedData = base16.decode(encodedData);
+            assertArrayEquals(originalData, decodedData,
+                () -> "Round-trip failed for byte value: " + i);
+        });
     }
 }
