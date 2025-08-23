@@ -1,31 +1,38 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest34 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 953.644844306585, spatialContext0);
-        boolean boolean0 = bufferedLineString0.equals(bufferedLineString0);
-        assertTrue(boolean0);
-        assertEquals(953.644844306585, bufferedLineString0.getBuf(), 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link BufferedLineString} class.
+ */
+public class BufferedLineStringTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * Tests the reflexive property of the equals() method.
+     * An object must be equal to itself.
+     */
+    @Test
+    public void equals_givenSameObjectInstance_shouldReturnTrue() {
+        // Arrange
+        final double bufferDistance = 10.0;
+        final List<Point> emptyPoints = Collections.emptyList();
+        final BufferedLineString lineString = new BufferedLineString(emptyPoints, bufferDistance, spatialContext);
+
+        // Act & Assert
+        // According to the Java contract for Object.equals(), an object must equal itself.
+        // assertEquals(a, a) is an idiomatic way to test this property.
+        assertEquals(lineString, lineString);
+
+        // We can also add a sanity check to ensure the object was constructed as expected.
+        assertEquals("Buffer distance should be correctly set", bufferDistance, lineString.getBuf(), 0.0);
     }
 }
