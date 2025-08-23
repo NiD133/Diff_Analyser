@@ -1,28 +1,28 @@
 package com.google.gson.internal.bind;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+
 import com.google.gson.JsonObject;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeReaderTestTest1 {
+/**
+ * Test for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
 
     @Test
-    public void testSkipValue_emptyJsonObject() throws IOException {
-        JsonTreeReader in = new JsonTreeReader(new JsonObject());
-        in.skipValue();
-        assertThat(in.peek()).isEqualTo(JsonToken.END_DOCUMENT);
-        assertThat(in.getPath()).isEqualTo("$");
+    public void skipValue_onEmptyJsonObject_reachesEndDocument() throws IOException {
+        // Arrange: Create a reader for an empty JSON object.
+        JsonTreeReader reader = new JsonTreeReader(new JsonObject());
+
+        // Act: Skip the entire value, which is the object itself.
+        reader.skipValue();
+
+        // Assert: The reader should now be at the end of the document.
+        assertThat(reader.peek()).isEqualTo(JsonToken.END_DOCUMENT);
+        // The path should reflect the root object that was just consumed.
+        assertThat(reader.getPath()).isEqualTo("$");
     }
 }
