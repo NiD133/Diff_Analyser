@@ -1,41 +1,38 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest12 {
-
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
-    }
+/**
+ * Tests for the static methods of {@link URLCodec}.
+ */
+class URLCodecStaticTest {
 
     @Test
-    void testEncodeUrlWithNullBitSet() throws Exception {
-        final URLCodec urlCodec = new URLCodec();
-        final String plain = "Hello there!";
-        final String encoded = new String(URLCodec.encodeUrl(null, plain.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("Hello+there%21", encoded, "Basic URL encoding test");
-        assertEquals(plain, urlCodec.decode(encoded), "Basic URL decoding test");
-        validateState(urlCodec);
+    @DisplayName("The static encodeUrl method should use default safe characters when the provided BitSet is null")
+    void staticEncodeUrlWithNullBitSetShouldUseDefaultEncoding() throws DecoderException {
+        // Arrange
+        final String plainText = "Hello there!";
+        final byte[] plainTextBytes = plainText.getBytes(StandardCharsets.UTF_8);
+        final String expectedEncodedText = "Hello+there%21";
+
+        // Act: Call the static encodeUrl method with a null BitSet, which should
+        // trigger the default encoding behavior (e.g., space to '+', '!' to '%21').
+        final byte[] encodedBytes = URLCodec.encodeUrl(null, plainTextBytes);
+        final String actualEncodedText = new String(encodedBytes, StandardCharsets.UTF_8);
+
+        // Assert: Verify that the encoding is correct.
+        assertEquals(expectedEncodedText, actualEncodedText, "Encoding with a null BitSet should produce the default URL-encoded string.");
+
+        // Arrange for decoding
+        final URLCodec codec = new URLCodec();
+
+        // Act & Assert: Verify that the encoded string can be decoded back to the original.
+        final String decodedText = codec.decode(actualEncodedText);
+        assertEquals(plainText, decodedText, "Decoding the result should return the original string.");
     }
 }
