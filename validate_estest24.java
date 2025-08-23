@@ -1,32 +1,29 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest24 extends Validate_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        // Undeclared exception!
-        try {
-            Validate.notEmptyParam((String) null, "");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The '' parameter must not be empty.
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+/**
+ * Tests for {@link Validate}.
+ */
+public class ValidateTest {
+
+    @Test
+    public void notEmptyParamWithNullStringThrowsIllegalArgumentException() {
+        // Arrange
+        String nullString = null;
+        String paramName = ""; // The original test used an empty string for the parameter name
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> Validate.notEmptyParam(nullString, paramName)
+        );
+
+        // Further assert on the exception message for correctness
+        String expectedMessage = "The '' parameter must not be empty.";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
