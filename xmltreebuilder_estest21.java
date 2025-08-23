@@ -1,40 +1,32 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class XmlTreeBuilder_ESTestTest21 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmlTreeBuilder}.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        // Undeclared exception!
+    /**
+     * Verifies that the parse method throws an IllegalArgumentException
+     * when the provided base URI is null, as this is a required parameter.
+     */
+    @Test
+    public void parseWithNullBaseUriShouldThrowIllegalArgumentException() {
+        // Arrange
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        String irrelevantXml = "<data>test</data>";
+        String expectedErrorMessage = "The parameter 'baseUri' must not be null.";
+
+        // Act & Assert
         try {
-            xmlTreeBuilder0.parse(",Ix<T(pi#>?mbGzH", (String) null);
-            fail("Expecting exception: IllegalArgumentException");
+            xmlTreeBuilder.parse(irrelevantXml, null);
+            fail("An IllegalArgumentException should have been thrown for a null baseUri.");
         } catch (IllegalArgumentException e) {
-            //
-            // The parameter 'baseUri' must not be null.
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
