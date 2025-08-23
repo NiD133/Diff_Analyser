@@ -1,31 +1,36 @@
 package com.google.common.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+// The test class name is preserved from the original context.
 public class CharSequenceReader_ESTestTest30 extends CharSequenceReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        char[] charArray0 = new char[3];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        charSequenceReader0.close();
-        try {
-            charSequenceReader0.read(charArray0, 0, 0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // reader closed
-            //
-            verifyException("com.google.common.io.CharSequenceReader", e);
-        }
+    /**
+     * Verifies that attempting to read from a reader after it has been closed
+     * throws an IOException.
+     */
+    @Test
+    public void readIntoBuffer_whenReaderIsClosed_throwsIOException() throws IOException {
+        // Arrange: Create a reader and then close it.
+        CharSequence sequence = CharBuffer.wrap(new char[3]);
+        CharSequenceReader reader = new CharSequenceReader(sequence);
+        reader.close();
+
+        char[] destinationBuffer = new char[3];
+
+        // Act & Assert: Attempting to read should throw an IOException.
+        // We use assertThrows for a clear and concise exception check.
+        IOException thrown = assertThrows(
+            IOException.class,
+            () -> reader.read(destinationBuffer, 0, 0)
+        );
+
+        // Further assert on the exception details for more precise testing.
+        assertEquals("reader closed", thrown.getMessage());
     }
 }
