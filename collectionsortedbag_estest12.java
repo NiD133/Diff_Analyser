@@ -1,56 +1,35 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test case focuses on the behavior of {@link CollectionSortedBag}
+ * when decorating a {@link TreeBag} that uses natural ordering.
+ */
 public class CollectionSortedBag_ESTestTest12 extends CollectionSortedBag_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>((Comparator<? super Integer>) null);
-        CollectionSortedBag<Integer> collectionSortedBag0 = new CollectionSortedBag<Integer>(treeBag0);
-        // Undeclared exception!
-        try {
-            collectionSortedBag0.remove((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
-        }
+    /**
+     * Tests that attempting to remove a null element from a CollectionSortedBag
+     * throws a NullPointerException if the underlying decorated bag (a TreeBag
+     * with natural ordering) does not support nulls.
+     * <p>
+     * The TreeBag, when constructed without a specific comparator, relies on
+     * the natural ordering of its elements. Natural ordering does not permit
+     * null elements, and operations involving null will result in a
+     * NullPointerException. This test verifies that the decorator correctly
+     * propagates this exception from the decorated bag.
+     */
+    @Test(expected = NullPointerException.class)
+    public void removeNullFromBagWithNaturalOrderingShouldThrowNPE() {
+        // Arrange: Create a CollectionSortedBag decorating a TreeBag.
+        // The default TreeBag() constructor creates a bag that uses natural ordering
+        // and consequently does not allow null elements.
+        final SortedBag<Integer> backingBag = new TreeBag<>();
+        final SortedBag<Integer> collectionSortedBag = new CollectionSortedBag<>(backingBag);
+
+        // Act & Assert: Attempting to remove null should throw a NullPointerException.
+        // The assertion is handled by the 'expected' attribute of the @Test annotation.
+        collectionSortedBag.remove(null);
     }
 }
