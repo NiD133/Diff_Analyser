@@ -1,31 +1,28 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.data.Range;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-    private static final double EPSILON = 0.000000001;
-
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
+/**
+ * Tests for the {@link GridArrangement} class, focusing on its contract and behavior.
+ */
+class GridArrangementTest {
 
     /**
-     * Immutable - cloning is not necessary.
+     * The GridArrangement class is designed to be immutable. This test verifies
+     * that it does not implement the Cloneable interface, as cloning is
+     * unnecessary and discouraged for immutable objects.
      */
     @Test
-    public void testCloning() {
-        GridArrangement f1 = new GridArrangement(1, 2);
-        assertFalse(f1 instanceof Cloneable);
+    @DisplayName("GridArrangement should not be cloneable")
+    void isNotCloneable() {
+        // Arrange: Create an instance of the class under test.
+        GridArrangement arrangement = new GridArrangement(1, 2);
+
+        // Assert: Verify that the instance is not cloneable.
+        assertFalse(arrangement instanceof Cloneable,
+                "GridArrangement is immutable and should not implement Cloneable.");
     }
 }
