@@ -2,41 +2,58 @@ package org.joda.time.format;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
+
 import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
 import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
 
 public class PeriodFormatter_ESTestTest50 extends PeriodFormatter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        PeriodFormatterBuilder.SimpleAffix periodFormatterBuilder_SimpleAffix0 = new PeriodFormatterBuilder.SimpleAffix("");
-        PeriodFormatterBuilder.CompositeAffix periodFormatterBuilder_CompositeAffix0 = new PeriodFormatterBuilder.CompositeAffix(periodFormatterBuilder_SimpleAffix0, periodFormatterBuilder_SimpleAffix0);
-        PeriodFormatterBuilder.FieldFormatter periodFormatterBuilder_FieldFormatter0 = new PeriodFormatterBuilder.FieldFormatter(11, 11, 1350, true, (-1158), (PeriodFormatterBuilder.FieldFormatter[]) null, periodFormatterBuilder_CompositeAffix0, periodFormatterBuilder_SimpleAffix0);
-        Locale locale0 = Locale.GERMANY;
-        PeriodType periodType0 = PeriodType.time();
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_FieldFormatter0, periodFormatterBuilder_FieldFormatter0, locale0, periodType0);
-        MutablePeriod mutablePeriod0 = periodFormatter0.parseMutablePeriod("");
-        StringBuffer stringBuffer0 = new StringBuffer();
-        periodFormatter0.printTo(stringBuffer0, (ReadablePeriod) mutablePeriod0);
-        assertEquals(0, stringBuffer0.length());
+    /**
+     * Tests that a custom formatter, built with an apparently invalid field type,
+     * can parse an empty string into a zero-length period and subsequently print
+     * that period back into an empty string. This verifies a specific edge case
+     * in the formatter's round-trip behavior.
+     */
+    @Test
+    public void testRoundTripOfEmptyPeriodWithCustomFormatter() {
+        // Arrange: Create a highly specific formatter.
+        // The key is the FieldFormatter constructed with an invalid field type (-1158),
+        // which causes it to parse an empty string into a zero period and print
+        // a zero period as an empty string.
+        PeriodFormatterBuilder.SimpleAffix emptyAffix = new PeriodFormatterBuilder.SimpleAffix("");
+        PeriodFormatterBuilder.CompositeAffix emptyCompositeAffix = new PeriodFormatterBuilder.CompositeAffix(emptyAffix, emptyAffix);
+
+        // This FieldFormatter uses an invalid field type, which is central to the test's behavior.
+        final int invalidFieldType = -1158;
+        PeriodFormatterBuilder.FieldFormatter customFieldFormatter = new PeriodFormatterBuilder.FieldFormatter(
+                11,   // minPrintedDigits
+                11,   // printZeroSetting
+                1350, // maxParsedDigits
+                true, // rejectSignedValues
+                invalidFieldType,
+                null, // otherFormatters
+                emptyCompositeAffix,
+                emptyAffix
+        );
+
+        PeriodFormatter formatter = new PeriodFormatter(
+                customFieldFormatter, // printer
+                customFieldFormatter, // parser
+                Locale.GERMANY,
+                PeriodType.time()
+        );
+
+        // Act: Parse an empty string and then print the resulting period.
+        MutablePeriod parsedPeriod = formatter.parseMutablePeriod("");
+        StringBuffer outputBuffer = new StringBuffer();
+        formatter.printTo(outputBuffer, (ReadablePeriod) parsedPeriod);
+
+        // Assert: The parsed period should be zero, and the printed output should be an empty string.
+        assertEquals("Parsing an empty string should result in a zero-length period.",
+                new MutablePeriod(), parsedPeriod);
+        assertEquals("Printing a zero-length period with this custom formatter should produce an empty string.",
+                "", outputBuffer.toString());
     }
 }
