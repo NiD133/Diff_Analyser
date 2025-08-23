@@ -1,37 +1,27 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
+
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class CountingPathVisitor_ESTestTest8 extends CountingPathVisitor_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        UnaryOperator<Path> unaryOperator0 = CountingPathVisitor.defaultDirectoryTransformer();
-        assertNotNull(unaryOperator0);
+/**
+ * Tests for the default factory methods in {@link CountingPathVisitor}.
+ */
+public class CountingPathVisitorDefaultsTest {
+
+    /**
+     * Tests that the {@link CountingPathVisitor#defaultDirectoryTransformer()} method
+     * returns a non-null operator, ensuring a safe default is always provided.
+     */
+    @Test
+    public void defaultDirectoryTransformer_shouldReturnNonNullOperator() {
+        // Act: Call the static factory method to get the default transformer.
+        final UnaryOperator<Path> transformer = CountingPathVisitor.defaultDirectoryTransformer();
+
+        // Assert: Verify that the returned transformer is not null.
+        assertNotNull("The default directory transformer should never be null.", transformer);
     }
 }
