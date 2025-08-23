@@ -1,130 +1,135 @@
 package org.apache.commons.io.input;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ObservableInputStream.Observer;
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.test.CustomIOException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class ObservableInputStreamTestTest4 {
+/**
+ * Tests for {@link ObservableInputStream}.
+ * This suite focuses on observer notifications and error handling scenarios.
+ */
+public class ObservableInputStreamTest {
 
-    private ObservableInputStream brokenObservableInputStream() {
+    // =================================================================================
+    // Test Methods
+    // =================================================================================
+
+    @Test
+    @DisplayName("read() on a broken stream should throw IOException")
+    void read_onBrokenStream_throwsIOException() {
+        try (ObservableInputStream ois = createBrokenObservableInputStream()) {
+            assertThrows(IOException.class, ois::read, "Reading from a broken stream should fail.");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 128, IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.DEFAULT_BUFFER_SIZE + 1})
+    @DisplayName("Observers should be correctly notified during a full stream copy")
+    void copy_notifiesObserversCorrectly(final int copyBufferSize) throws IOException {
+        // Arrange
+        final byte[] data = new byte[IOUtils.DEFAULT_BUFFER_SIZE]; // A buffer of known size
+        final LengthObserver lengthObserver = new LengthObserver();
+        final MethodCountObserver methodCountObserver = new MethodCountObserver();
+
+        // Act
+        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(data), lengthObserver, methodCountObserver)) {
+            IOUtils.copy(ois, NullOutputStream.INSTANCE, copyBufferSize);
+        }
+
+        // Assert
+        final long expectedBufferDataCallbacks = (data.length + copyBufferSize - 1) / copyBufferSize;
+
+        assertAll("Verify observer notifications",
+            () -> assertEquals(data.length, lengthObserver.getTotalBytes(), "LengthObserver should count all bytes."),
+            () -> assertEquals(1, methodCountObserver.getClosedCount(), "closed() should be called once."),
+            () -> assertEquals(1, methodCountObserver.getFinishedCount(), "finished() should be called once."),
+            () -> assertEquals(0, methodCountObserver.getErrorCount(), "error() should not be called."),
+            () -> assertEquals(0, methodCountObserver.getSingleByteDataCount(), "data(int) should not be called for buffered copy."),
+            () -> assertEquals(expectedBufferDataCallbacks, methodCountObserver.getBufferDataCount(), "data(byte[],...) should be called for each buffer read.")
+        );
+    }
+
+    // =================================================================================
+    // Helper Methods
+    // =================================================================================
+
+    /**
+     * Creates an {@link ObservableInputStream} that wraps a {@link BrokenInputStream},
+     * which throws an {@link IOException} on any read operation.
+     *
+     * @return A new instance of {@link ObservableInputStream} for error testing.
+     */
+    private ObservableInputStream createBrokenObservableInputStream() {
         return new ObservableInputStream(BrokenInputStream.INSTANCE);
     }
 
-    private InputStream createInputStream() {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        return createInputStream(new ByteArrayInputStream(buffer));
-    }
+    // =================================================================================
+    // Helper Inner Classes
+    // =================================================================================
 
-    private ObservableInputStream createInputStream(final InputStream origin) {
-        return new ObservableInputStream(origin);
-    }
-
-    private void testNotificationCallbacks(final int bufferSize) throws IOException {
-        final byte[] buffer = IOUtils.byteArray();
-        final LengthObserver lengthObserver = new LengthObserver();
-        final MethodCountObserver methodCountObserver = new MethodCountObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lengthObserver, methodCountObserver)) {
-            assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize));
-        }
-        assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, lengthObserver.getTotal());
-        assertEquals(1, methodCountObserver.getClosedCount());
-        assertEquals(1, methodCountObserver.getFinishedCount());
-        assertEquals(0, methodCountObserver.getErrorCount());
-        assertEquals(0, methodCountObserver.getDataCount());
-        assertEquals(buffer.length / bufferSize, methodCountObserver.getDataBufferCount());
-    }
-
-    private static final class DataViewObserver extends MethodCountObserver {
-
-        private byte[] buffer;
-
-        private int lastValue = -1;
-
-        private int length = -1;
-
-        private int offset = -1;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.buffer = buffer;
-            this.offset = offset;
-            this.length = length;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            super.data(value);
-            lastValue = value;
-        }
-    }
-
+    /**
+     * An observer that calculates the total number of bytes observed from the stream.
+     */
     private static final class LengthObserver extends Observer {
-
-        private long total;
+        private long totalBytes;
 
         @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.total += length;
+        public void data(final byte[] buffer, final int offset, final int length) {
+            this.totalBytes += length;
         }
 
         @Override
-        public void data(final int value) throws IOException {
-            total++;
+        public void data(final int value) {
+            totalBytes++;
         }
 
-        public long getTotal() {
-            return total;
+        public long getTotalBytes() {
+            return totalBytes;
         }
     }
 
+    /**
+     * An observer that counts the number of times each callback method is invoked.
+     */
     private static class MethodCountObserver extends Observer {
-
         private long closedCount;
-
-        private long dataBufferCount;
-
-        private long dataCount;
-
+        private long bufferDataCount;
+        private long singleByteDataCount;
         private long errorCount;
-
         private long finishedCount;
 
         @Override
-        public void closed() throws IOException {
+        public void closed() {
             closedCount++;
         }
 
         @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            dataBufferCount++;
+        public void data(final byte[] buffer, final int offset, final int length) {
+            bufferDataCount++;
         }
 
         @Override
-        public void data(final int value) throws IOException {
-            dataCount++;
+        public void data(final int value) {
+            singleByteDataCount++;
         }
 
         @Override
-        public void error(final IOException exception) throws IOException {
+        public void error(final IOException exception) {
             errorCount++;
         }
 
         @Override
-        public void finished() throws IOException {
+        public void finished() {
             finishedCount++;
         }
 
@@ -132,12 +137,12 @@ public class ObservableInputStreamTestTest4 {
             return closedCount;
         }
 
-        public long getDataBufferCount() {
-            return dataBufferCount;
+        public long getBufferDataCount() {
+            return bufferDataCount;
         }
 
-        public long getDataCount() {
-            return dataCount;
+        public long getSingleByteDataCount() {
+            return singleByteDataCount;
         }
 
         public long getErrorCount() {
@@ -146,13 +151,6 @@ public class ObservableInputStreamTestTest4 {
 
         public long getFinishedCount() {
             return finishedCount;
-        }
-    }
-
-    @Test
-    void testBrokenInputStreamRead() throws IOException {
-        try (ObservableInputStream ois = brokenObservableInputStream()) {
-            assertThrows(IOException.class, ois::read);
         }
     }
 }
