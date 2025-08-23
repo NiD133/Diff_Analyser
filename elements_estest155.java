@@ -1,43 +1,35 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest155 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test154() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements#expectFirst(String)} method.
+ */
+public class ElementsExpectFirstTest {
+
+    /**
+     * Verifies that calling expectFirst() with an invalid CSS selector query
+     * throws an IllegalStateException. The underlying QueryParser should fail
+     * to parse the invalid syntax.
+     */
+    @Test
+    public void expectFirstWithInvalidQueryThrowsIllegalStateException() {
+        // Arrange: An empty Elements list is sufficient as the query parsing
+        // happens before any elements are evaluated.
+        Elements elements = new Elements();
+        String invalidQuery = ")XEN M$jX~$HL\"kq-_^";
+        String expectedErrorMessage = "Could not parse query '" + invalidQuery + "': unexpected token at '" + invalidQuery + "'";
+
+        // Act & Assert
         try {
-            elements0.expectFirst(")XEN M$jX~$HL\"kq-_^");
-            fail("Expecting exception: IllegalStateException");
+            elements.expectFirst(invalidQuery);
+            fail("Expected an IllegalStateException to be thrown for the invalid query.");
         } catch (IllegalStateException e) {
-            //
-            // Could not parse query ')XEN M$jX~$HL\"kq-_^': unexpected token at ')XEN M$jX~$HL\"kq-_^'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Verify that the exception message correctly identifies the parsing error.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
