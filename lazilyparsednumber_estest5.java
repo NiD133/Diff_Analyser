@@ -1,18 +1,27 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LazilyParsedNumber_ESTestTest5 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("3");
-        long long0 = lazilyParsedNumber0.longValue();
-        assertEquals(3L, long0);
+    /**
+     * Verifies that the longValue() method correctly parses a string
+     * representing a valid long integer.
+     */
+    @Test
+    public void longValueShouldReturnCorrectLongForIntegerString() {
+        // Arrange: Create a LazilyParsedNumber with a simple integer string.
+        LazilyParsedNumber number = new LazilyParsedNumber("3");
+        long expectedLong = 3L;
+
+        // Act: Call the method under test.
+        long actualLong = number.longValue();
+
+        // Assert: Verify that the returned long matches the expected value.
+        assertEquals(expectedLong, actualLong);
     }
 }
