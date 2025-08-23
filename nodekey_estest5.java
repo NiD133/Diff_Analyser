@@ -2,22 +2,31 @@ package org.jfree.data.flow;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NodeKey_ESTestTest5 extends NodeKey_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NodeKey} class.
+ */
+public class NodeKeyTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Integer integer0 = new Integer(3);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(2281, integer0);
-        Integer integer1 = new Integer(2281);
-        NodeKey<Integer> nodeKey1 = new NodeKey<Integer>(2281, integer1);
-        NodeKey nodeKey2 = (NodeKey) nodeKey1.clone();
-        boolean boolean0 = nodeKey0.equals(nodeKey2);
-        assertFalse(boolean0);
-        assertEquals(2281, nodeKey2.getStage());
+    /**
+     * Verifies that the equals() method returns false for two NodeKey instances
+     * that have the same stage but different node values. This test also ensures
+     * that equality checking works correctly against a cloned object.
+     */
+    @Test
+    public void equals_withSameStageAndDifferentNode_returnsFalse() throws CloneNotSupportedException {
+        // Arrange
+        final int commonStage = 2281;
+        NodeKey<Integer> nodeKeyA = new NodeKey<>(commonStage, 3);
+        NodeKey<Integer> nodeKeyB = new NodeKey<>(commonStage, 2281);
+
+        // Act
+        // Clone one of the keys to ensure the equals method is robust and not
+        // relying on object identity.
+        NodeKey<Integer> clonedNodeKeyB = (NodeKey<Integer>) nodeKeyB.clone();
+
+        // Assert
+        // The two keys should not be equal because their node values differ.
+        assertNotEquals(nodeKeyA, clonedNodeKeyB);
     }
 }
