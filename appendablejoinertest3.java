@@ -2,53 +2,67 @@ package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.AppendableJoiner.Builder;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.commons.text.TextStringBuilder;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class AppendableJoinerTestTest3 {
+/**
+ * Tests for {@link AppendableJoiner}.
+ */
+@DisplayName("Tests for AppendableJoiner")
+public class AppendableJoinerTest {
 
-    // Test own StrBuilder
-    @SuppressWarnings("deprecation")
-    @ParameterizedTest
-    @ValueSource(classes = { StringBuilder.class, StringBuffer.class, StringWriter.class, StrBuilder.class, TextStringBuilder.class })
-    void testDelimiterAppendable(final Class<? extends Appendable> clazz) throws Exception {
-        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
-        final Appendable sbuilder = clazz.newInstance();
-        sbuilder.append("A");
-        // throws IOException
-        assertEquals("AB.C", joiner.joinA(sbuilder, "B", "C").toString());
-        sbuilder.append("1");
-        // throws IOException
-        assertEquals("AB.C1D.E", joiner.joinA(sbuilder, Arrays.asList("D", "E")).toString());
+    /**
+     * Provides instances of various Appendable implementations for parameterized tests.
+     *
+     * @return a stream of Appendable instances.
+     */
+    @SuppressWarnings("deprecation") // For StrBuilder constructor, which is used for comprehensive testing.
+    private static Stream<Appendable> appendableProvider() {
+        return Stream.of(
+            new StringBuilder(),
+            new StringBuffer(),
+            new StringWriter(),
+            new StrBuilder(),
+            new TextStringBuilder()
+        );
     }
 
-    static class Fixture {
+    @DisplayName("joinA should correctly append items to various Appendable types")
+    @ParameterizedTest(name = "for {0}")
+    @MethodSource("appendableProvider")
+    void joinA_should_appendToVariousAppendableTypes(final Appendable appendable) throws IOException {
+        // Arrange
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().setDelimiter(".").get();
+        appendable.append("A");
 
-        private final String name;
+        // Act & Assert: First join with varargs
+        joiner.joinA(appendable, "B", "C");
+        assertEquals("AB.C", appendable.toString(), "Should join varargs to the existing content.");
 
-        Fixture(final String name) {
-            this.name = name;
-        }
-
-        /**
-         * Renders myself onto an Appendable to avoid creating intermediary strings.
-         */
-        void render(final Appendable appendable) throws IOException {
-            appendable.append(name);
-            appendable.append('!');
-        }
+        // Act & Assert: Second join with an Iterable on the same Appendable
+        appendable.append("1");
+        joiner.joinA(appendable, Arrays.asList("D", "E"));
+        assertEquals("AB.C1D.E", appendable.toString(), "Should join an iterable to the modified content.");
     }
 
     @Test
-    void testBuilder() {
-        assertNotSame(AppendableJoiner.builder(), AppendableJoiner.builder());
+    @DisplayName("builder() factory method should return a new Builder instance on each call")
+    void builder_should_returnNewInstance_onEachCall() {
+        // Act
+        final Builder<Object> builder1 = AppendableJoiner.builder();
+        final Builder<Object> builder2 = AppendableJoiner.builder();
+
+        // Assert
+        assertNotSame(builder1, builder2, "Each call to builder() should produce a new instance.");
     }
 }
