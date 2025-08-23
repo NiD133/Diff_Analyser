@@ -1,26 +1,33 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest21 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for the conversion logic between {@link UtcInstant} and {@link TaiInstant}.
+ */
+public class UtcInstantConversionTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay((-127L), 41317L);
-        TaiInstant taiInstant0 = TaiInstant.of(utcInstant0);
-        UtcInstant.of(taiInstant0);
-        assertEquals((-3138998390L), taiInstant0.getTaiSeconds());
-        assertEquals((-127L), utcInstant0.getModifiedJulianDay());
+    /**
+     * Tests that converting a UtcInstant to a TaiInstant and back
+     * results in an equivalent UtcInstant.
+     *
+     * This test verifies the consistency of the conversion logic, ensuring that
+     * the round-trip operation is lossless.
+     */
+    @Test
+    public void conversionToTaiInstantAndBackIsLossless() {
+        // Arrange: Create an arbitrary UtcInstant.
+        // The specific values are not significant, only that they are valid.
+        long modifiedJulianDay = -127L;
+        long nanoOfDay = 41317L;
+        UtcInstant originalUtcInstant = UtcInstant.ofModifiedJulianDay(modifiedJulianDay, nanoOfDay);
+
+        // Act: Convert the UtcInstant to a TaiInstant and then convert it back.
+        TaiInstant intermediateTaiInstant = originalUtcInstant.toTaiInstant();
+        UtcInstant roundTripUtcInstant = UtcInstant.of(intermediateTaiInstant);
+
+        // Assert: The UtcInstant after the round-trip conversion should be equal to the original.
+        assertEquals(originalUtcInstant, roundTripUtcInstant);
     }
 }
