@@ -1,42 +1,62 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfGState;
+import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextRenderInfo_ESTestTest12 extends TextRenderInfo_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        graphicsState0.rise = (float) 2;
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        LineSegment lineSegment0 = textRenderInfo0.getUnscaledBaseline();
-        assertNotNull(lineSegment0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Unit tests for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that the getUnscaledBaseline() method correctly incorporates the
+     * 'rise' property from the GraphicsState. The 'rise' dictates a vertical
+     * shift of the text from its normal baseline.
+     */
+    @Test
+    public void getUnscaledBaselineShouldIncorporateTextRise() {
+        // Arrange
+        final float expectedTextRise = 2.0f;
+
+        // Set up a graphics state with a specific "rise" value.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.rise = expectedTextRise;
+
+        // A font is required by the TextRenderInfo constructor. We can use a
+        // simple dummy font, as its specific properties are not relevant to this test.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfDictionary());
+
+        // Create the TextRenderInfo instance with the configured graphics state.
+        // The other parameters can be default or empty values for this test case.
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                new PdfString(""),
+                graphicsState,
+                new Matrix(), // Use a default identity matrix
+                Collections.<MarkedContentInfo>emptyList()
+        );
+
+        // Act
+        // Retrieve the unscaled baseline, which should be vertically shifted by the text rise.
+        LineSegment unscaledBaseline = textRenderInfo.getUnscaledBaseline();
+
+        // Assert
+        // 1. The baseline segment should be successfully created.
+        assertNotNull("The unscaled baseline should not be null.", unscaledBaseline);
+
+        // 2. The vertical position (Y-coordinate) of the baseline is determined by the 'rise' property.
+        //    Verify that both the start and end points of the baseline segment have a Y-coordinate
+        //    equal to the specified text rise. A small delta is used for float comparison.
+        float delta = 0.001f;
+        assertEquals("The Y-coordinate of the baseline's start point should equal the text rise.",
+                expectedTextRise, unscaledBaseline.getStartPoint().get(Vector.I2), delta);
+        assertEquals("The Y-coordinate of the baseline's end point should equal the text rise.",
+                expectedTextRise, unscaledBaseline.getEndPoint().get(Vector.I2), delta);
     }
 }
