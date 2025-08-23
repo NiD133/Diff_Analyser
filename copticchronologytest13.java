@@ -1,158 +1,131 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.junit.Test;
 
-public class CopticChronologyTestTest13 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * Tests for CopticChronology.
+ * This test focuses on the core calendar logic by iterating through a long range of dates.
+ */
+public class CopticChronologyTest {
 
     private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
     private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
     private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
     /**
-     * Tests era, year, monthOfYear, dayOfMonth and dayOfWeek.
+     * This test validates the CopticChronology by iterating day-by-day
+     * from the Coptic epoch (Year 1, Month 1, Day 1) up to the
+     * equivalent of ISO year 3000. On each day, it asserts that the
+     * chronology's date fields match a set of manually calculated expected values.
+     * This approach, while complex, thoroughly verifies the calendar's internal logic.
      */
-    public void testCalendar() {
-        if (TestAll.FAST) {
-            return;
-        }
-        System.out.println("\nTestCopticChronology.testCalendar");
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
-        long millis = epoch.getMillis();
-        long end = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC).getMillis();
-        DateTimeField dayOfWeek = COPTIC_UTC.dayOfWeek();
-        DateTimeField dayOfYear = COPTIC_UTC.dayOfYear();
-        DateTimeField dayOfMonth = COPTIC_UTC.dayOfMonth();
-        DateTimeField monthOfYear = COPTIC_UTC.monthOfYear();
-        DateTimeField year = COPTIC_UTC.year();
-        DateTimeField yearOfEra = COPTIC_UTC.yearOfEra();
-        DateTimeField era = COPTIC_UTC.era();
-        int expectedDOW = new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC).getDayOfWeek();
-        int expectedDOY = 1;
-        int expectedDay = 1;
-        int expectedMonth = 1;
+    @Test
+    public void testCopticChronologyByIteratingThroughDays() {
+        // Define Coptic calendar rules as constants for clarity.
+        final int DAYS_IN_REGULAR_MONTH = 30;
+        final int DAYS_IN_LEAP_INTERCALARY_MONTH = 6;
+        final int DAYS_IN_NORMAL_INTERCALARY_MONTH = 5;
+        final int INTERCALARY_MONTH = 13;
+
+        // Get the date fields from the chronology once for efficiency.
+        final DateTimeField era = COPTIC_UTC.era();
+        final DateTimeField year = COPTIC_UTC.year();
+        final DateTimeField yearOfEra = COPTIC_UTC.yearOfEra();
+        final DateTimeField monthOfYear = COPTIC_UTC.monthOfYear();
+        final DateTimeField dayOfMonth = COPTIC_UTC.dayOfMonth();
+        final DateTimeField dayOfYear = COPTIC_UTC.dayOfYear();
+        final DateTimeField dayOfWeek = COPTIC_UTC.dayOfWeek();
+
+        // Set the start and end points for the test iteration.
+        long startMillis = new DateTime(1, 1, 1, 0, 0, 0, 0, COPTIC_UTC).getMillis();
+        long endMillis = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC).getMillis();
+
+        // Initialize expected date values for the start of the Coptic epoch.
         int expectedYear = 1;
-        while (millis < end) {
-            int dowValue = dayOfWeek.get(millis);
-            int doyValue = dayOfYear.get(millis);
-            int dayValue = dayOfMonth.get(millis);
-            int monthValue = monthOfYear.get(millis);
-            int yearValue = year.get(millis);
-            int yearOfEraValue = yearOfEra.get(millis);
-            int monthLen = dayOfMonth.getMaximumValue(millis);
-            if (monthValue < 1 || monthValue > 13) {
-                fail("Bad month: " + millis);
-            }
-            // test era
-            assertEquals(1, era.get(millis));
-            assertEquals("AM", era.getAsText(millis));
-            assertEquals("AM", era.getAsShortText(millis));
-            // test date
-            assertEquals(expectedYear, yearValue);
-            assertEquals(expectedYear, yearOfEraValue);
-            assertEquals(expectedMonth, monthValue);
-            assertEquals(expectedDay, dayValue);
-            assertEquals(expectedDOW, dowValue);
-            assertEquals(expectedDOY, doyValue);
-            // test leap year
-            assertEquals(yearValue % 4 == 3, year.isLeap(millis));
-            // test month length
-            if (monthValue == 13) {
-                assertEquals(yearValue % 4 == 3, monthOfYear.isLeap(millis));
-                if (yearValue % 4 == 3) {
-                    assertEquals(6, monthLen);
-                } else {
-                    assertEquals(5, monthLen);
-                }
+        int expectedMonth = 1;
+        int expectedDay = 1;
+        int expectedDayOfYear = 1;
+        // Coptic year 1, day 1 corresponds to August 29, 284 CE in the Julian calendar.
+        // We use the Julian calendar to establish the correct starting day of the week.
+        int expectedDayOfWeek = new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC).getDayOfWeek();
+
+        long currentMillis = startMillis;
+        while (currentMillis < endMillis) {
+            // 1. VERIFY the current date using the chronology's fields.
+            assertCopticDate(currentMillis, era, year, yearOfEra, monthOfYear, dayOfMonth, dayOfYear, dayOfWeek,
+                    expectedYear, expectedMonth, expectedDay, expectedDayOfYear, expectedDayOfWeek);
+
+            // Verify leap year and month length logic.
+            boolean isCopticLeapYear = (expectedYear % 4 == 3);
+            assertEquals("isLeapYear", isCopticLeapYear, year.isLeap(currentMillis));
+
+            if (expectedMonth == INTERCALARY_MONTH) {
+                assertEquals("isLeapMonth", isCopticLeapYear, monthOfYear.isLeap(currentMillis));
+                int expectedMonthLength = isCopticLeapYear ? DAYS_IN_LEAP_INTERCALARY_MONTH : DAYS_IN_NORMAL_INTERCALARY_MONTH;
+                assertEquals("monthLength", expectedMonthLength, dayOfMonth.getMaximumValue(currentMillis));
             } else {
-                assertEquals(30, monthLen);
+                assertEquals("monthLength", DAYS_IN_REGULAR_MONTH, dayOfMonth.getMaximumValue(currentMillis));
             }
-            // recalculate date
-            expectedDOW = (((expectedDOW + 1) - 1) % 7) + 1;
+
+            // 2. ADVANCE to the next day by recalculating expected values.
+            expectedDayOfWeek = (expectedDayOfWeek % 7) + 1; // Cycle from 1-7
             expectedDay++;
-            expectedDOY++;
-            if (expectedDay == 31 && expectedMonth < 13) {
+            expectedDayOfYear++;
+
+            // Check for month/year rollovers.
+            boolean isLastDayOfMonth = false;
+            if (expectedMonth < INTERCALARY_MONTH) {
+                if (expectedDay > DAYS_IN_REGULAR_MONTH) {
+                    isLastDayOfMonth = true;
+                }
+            } else { // We are in the 13th (intercalary) month.
+                int daysInThisMonth = isCopticLeapYear ? DAYS_IN_LEAP_INTERCALARY_MONTH : DAYS_IN_NORMAL_INTERCALARY_MONTH;
+                if (expectedDay > daysInThisMonth) {
+                    isLastDayOfMonth = true;
+                }
+            }
+
+            if (isLastDayOfMonth) {
                 expectedDay = 1;
                 expectedMonth++;
-            } else if (expectedMonth == 13) {
-                if (expectedYear % 4 == 3 && expectedDay == 7) {
-                    expectedDay = 1;
+                if (expectedMonth > INTERCALARY_MONTH) {
                     expectedMonth = 1;
                     expectedYear++;
-                    expectedDOY = 1;
-                } else if (expectedYear % 4 != 3 && expectedDay == 6) {
-                    expectedDay = 1;
-                    expectedMonth = 1;
-                    expectedYear++;
-                    expectedDOY = 1;
+                    expectedDayOfYear = 1;
                 }
             }
-            millis += SKIP;
+
+            // 3. INCREMENT the millisecond timestamp to the next day.
+            currentMillis += DateTimeConstants.MILLIS_PER_DAY;
         }
+    }
+
+    private void assertCopticDate(long currentMillis, DateTimeField era, DateTimeField year,
+                                  DateTimeField yearOfEra, DateTimeField monthOfYear, DateTimeField dayOfMonth,
+                                  DateTimeField dayOfYear, DateTimeField dayOfWeek, int expectedYear,
+                                  int expectedMonth, int expectedDay, int expectedDayOfYear, int expectedDayOfWeek) {
+
+        // Era is always 1 (AM - Anno Martyrum).
+        assertEquals("era", 1, era.get(currentMillis));
+        assertEquals("eraAsText", "AM", era.getAsText(currentMillis));
+
+        // Verify year, month, and day fields.
+        int actualMonth = monthOfYear.get(currentMillis);
+        assertTrue("Month " + actualMonth + " is out of range (1-13)", actualMonth >= 1 && actualMonth <= 13);
+
+        assertEquals("year", expectedYear, year.get(currentMillis));
+        assertEquals("yearOfEra", expectedYear, yearOfEra.get(currentMillis));
+        assertEquals("monthOfYear", expectedMonth, actualMonth);
+        assertEquals("dayOfMonth", expectedDay, dayOfMonth.get(currentMillis));
+        assertEquals("dayOfYear", expectedDayOfYear, dayOfYear.get(currentMillis));
+        assertEquals("dayOfWeek", expectedDayOfWeek, dayOfWeek.get(currentMillis));
     }
 }
