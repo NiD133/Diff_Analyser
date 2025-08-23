@@ -1,38 +1,38 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class WeeksTestTest12 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the isLessThan() method of the Weeks class.
+ */
+public class WeeksTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void isLessThan_shouldReturnTrue_whenThisIsSmaller() {
+        assertTrue("Two weeks should be less than three weeks", Weeks.TWO.isLessThan(Weeks.THREE));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    @Test
+    public void isLessThan_shouldReturnFalse_whenThisIsGreater() {
+        assertFalse("Three weeks should not be less than two weeks", Weeks.THREE.isLessThan(Weeks.TWO));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void isLessThan_shouldReturnFalse_whenValuesAreEqual() {
+        assertFalse("Three weeks should not be less than three weeks", Weeks.THREE.isLessThan(Weeks.THREE));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testIsLessThan() {
-        assertEquals(false, Weeks.THREE.isLessThan(Weeks.TWO));
-        assertEquals(false, Weeks.THREE.isLessThan(Weeks.THREE));
-        assertEquals(true, Weeks.TWO.isLessThan(Weeks.THREE));
-        assertEquals(false, Weeks.ONE.isLessThan(null));
-        assertEquals(true, Weeks.weeks(-1).isLessThan(null));
+    @Test
+    public void isLessThan_shouldTreatNullAsZero() {
+        // The isLessThan method's contract specifies that a null parameter is treated as Weeks.ZERO.
+        
+        // Case 1: A positive value (1) compared to null (0). 1 is not less than 0.
+        assertFalse("A positive Weeks value should not be less than null", Weeks.ONE.isLessThan(null));
+        
+        // Case 2: A negative value (-1) compared to null (0). -1 is less than 0.
+        assertTrue("A negative Weeks value should be less than null", Weeks.weeks(-1).isLessThan(null));
     }
 }
