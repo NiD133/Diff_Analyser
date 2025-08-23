@@ -1,40 +1,42 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BoundedIterator_ESTestTest1 extends BoundedIterator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BoundedIterator}.
+ */
+public class BoundedIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Iterator<Predicate<Object>> iterator0 = (Iterator<Predicate<Object>>) mock(Iterator.class, new ViolatedAssumptionAnswer());
-        doReturn(true, true, false, false).when(iterator0).hasNext();
-        doReturn((Object) null, (Object) null, (Object) null).when(iterator0).next();
-        BoundedIterator<Predicate<Object>> boundedIterator0 = new BoundedIterator<Predicate<Object>>(iterator0, 1031L, 1031L);
-        boundedIterator0.next();
-        BoundedIterator<Predicate<Object>> boundedIterator1 = new BoundedIterator<Predicate<Object>>(boundedIterator0, 1031L, 0L);
-        // Undeclared exception!
+    /**
+     * Tests that calling remove() before next() throws an IllegalStateException,
+     * as required by the Iterator contract.
+     */
+    @Test
+    public void removeShouldThrowIllegalStateExceptionWhenNextHasNotBeenCalled() {
+        // Arrange
+        // Create a mock for the underlying iterator. No behavior needs to be stubbed
+        // for this test case, as the constructor with offset=0 does not use it.
+        @SuppressWarnings("unchecked") // Mockito's mock() returns a raw type
+        final Iterator<Object> mockUnderlyingIterator = mock(Iterator.class);
+
+        // Create the iterator under test. We use a zero offset and a non-zero max
+        // to create the simplest test case.
+        final BoundedIterator<Object> boundedIterator =
+                new BoundedIterator<>(mockUnderlyingIterator, 0L, 10L);
+
+        // Act & Assert
+        // We expect an IllegalStateException because next() has not yet been called.
         try {
-            boundedIterator1.remove();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // remove() cannot be called before calling next()
-            //
-            verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+            boundedIterator.remove();
+            fail("An IllegalStateException should have been thrown.");
+        } catch (final IllegalStateException e) {
+            // Verify that the exception has the expected message.
+            assertEquals("remove() cannot be called before calling next()", e.getMessage());
         }
     }
 }
