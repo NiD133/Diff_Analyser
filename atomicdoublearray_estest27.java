@@ -1,31 +1,32 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
+
 import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest27 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(1027);
-        DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-        // Undeclared exception!
-        try {
-            atomicDoubleArray0.getAndUpdate(1027, doubleUnaryOperator0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 1027
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-        }
+    /**
+     * Verifies that getAndUpdate() throws an IndexOutOfBoundsException when the provided
+     * index is equal to the array's length, which is an invalid, out-of-bounds index.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getAndUpdate_withOutOfBoundsIndex_throwsIndexOutOfBoundsException() {
+        // Arrange: Create an array and an operator. The index to be tested is deliberately
+        // set to the array's size, which is the first invalid index.
+        int size = 10;
+        int invalidIndex = size;
+        AtomicDoubleArray array = new AtomicDoubleArray(size);
+        DoubleUnaryOperator identityOperator = DoubleUnaryOperator.identity();
+
+        // Act: Attempt to update the array at the out-of-bounds index.
+        // This call is expected to throw an IndexOutOfBoundsException.
+        array.getAndUpdate(invalidIndex, identityOperator);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
