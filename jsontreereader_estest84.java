@@ -1,29 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest84 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test083() throws Throwable {
-        Long long0 = new Long((-1977L));
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive(long0);
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        String string0 = jsonTreeReader0.nextString();
-        assertNotNull(string0);
+/**
+ * Test suite for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    @Test
+    public void nextString_onNumberPrimitive_returnsStringRepresentation() throws IOException {
+        // Arrange: Create a JsonTreeReader with a JSON primitive representing a number.
+        JsonPrimitive numberPrimitive = new JsonPrimitive(-1977L);
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(numberPrimitive);
+
+        // Act: Read the value as a string.
+        String result = jsonTreeReader.nextString();
+
+        // Assert: The returned string should be the correct string representation of the number.
+        assertEquals("-1977", result);
     }
 }
