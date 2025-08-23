@@ -1,33 +1,35 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest48 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test047() throws Throwable {
-        byte[] byteArray0 = new byte[14];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        double double0 = randomAccessFileOrArray0.readDouble();
-        assertEquals(0.0, double0, 0.01);
+    /**
+     * Verifies that readDouble() correctly interprets a byte array of all zeros as the double value 0.0.
+     * <p>
+     * According to the IEEE 754 standard for floating-point arithmetic, a 64-bit (8-byte)
+     * representation with all bits set to zero corresponds to the value 0.0. This test ensures
+     * that {@code readDouble} correctly handles this fundamental case.
+     * </p>
+     */
+    @Test
+    public void readDouble_givenAllZeroBytes_shouldReturnZero() throws IOException {
+        // Arrange: Create a source containing 8 zero-bytes. A double is 8 bytes long.
+        // A new byte array in Java is automatically initialized with zeros.
+        byte[] allZeroBytes = new byte[8];
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(allZeroBytes);
+
+        // Act: Read a double value from the beginning of the source.
+        double actualValue = reader.readDouble();
+
+        // Assert: The read value should be 0.0.
+        double expectedValue = 0.0;
+        assertEquals("Reading 8 zero-bytes should be interpreted as the double value 0.0",
+                expectedValue, actualValue, 0.0);
     }
 }
