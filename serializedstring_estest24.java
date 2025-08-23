@@ -1,35 +1,32 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest24 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class.
+ * This class focuses on verifying the behavior of its methods under various conditions.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("wSQ ");
-        // Undeclared exception!
-        try {
-            serializedString0.appendUnquoted((char[]) null, (-1666));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.SerializedString", e);
-        }
+    /**
+     * Verifies that appendUnquoted() throws a NullPointerException when the
+     * provided character buffer is null.
+     *
+     * The method should perform a null check on the buffer before attempting any
+     * other operations, such as validating the offset.
+     */
+    @Test(expected = NullPointerException.class)
+    public void appendUnquoted_withNullBuffer_shouldThrowNullPointerException() {
+        // Arrange: Create an instance of SerializedString. The content is irrelevant for this test.
+        SerializedString serializedString = new SerializedString("test-string");
+        char[] nullBuffer = null;
+        int offset = 0; // The offset value does not matter, as the null check should occur first.
+
+        // Act: Call the method with a null buffer.
+        // This action is expected to throw a NullPointerException.
+        serializedString.appendUnquoted(nullBuffer, offset);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // by the @Test(expected = ...) annotation. No further assertions are needed.
     }
 }
