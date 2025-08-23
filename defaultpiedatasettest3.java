@@ -1,41 +1,54 @@
 package org.jfree.data.general;
 
-import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class DefaultPieDatasetTestTest3 implements DatasetChangeListener {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private DatasetChangeEvent lastEvent;
+/**
+ * A test suite for the getIndex() method in the DefaultPieDataset class.
+ */
+@DisplayName("DefaultPieDataset.getIndex()")
+class DefaultPieDatasetGetIndexTest {
 
-    /**
-     * Records the last event.
-     *
-     * @param event  the last event.
-     */
-    @Override
-    public void datasetChanged(DatasetChangeEvent event) {
-        this.lastEvent = event;
+    private DefaultPieDataset<String> dataset;
+
+    @BeforeEach
+    void setUp() {
+        dataset = new DefaultPieDataset<>();
+        dataset.setValue("A", 1.0);
+        dataset.setValue("B", 2.0);
     }
 
-    /**
-     * Some checks for the getIndex() method.
-     */
     @Test
-    public void testGetIndex() {
-        DefaultPieDataset<String> d = new DefaultPieDataset<>();
-        d.setValue("A", 1.0);
-        d.setValue("B", 2.0);
-        assertEquals(0, d.getIndex("A"));
-        assertEquals(1, d.getIndex("B"));
-        assertEquals(-1, d.getIndex("XX"));
-        boolean pass = false;
-        try {
-            d.getIndex(null);
-        } catch (IllegalArgumentException e) {
-            pass = true;
-        }
-        assertTrue(pass);
+    @DisplayName("should return the correct index for an existing key")
+    void getIndex_withExistingKey_shouldReturnCorrectIndex() {
+        // Act & Assert
+        assertEquals(0, dataset.getIndex("A"), "The index of the first key 'A' should be 0.");
+        assertEquals(1, dataset.getIndex("B"), "The index of the second key 'B' should be 1.");
+    }
+
+    @Test
+    @DisplayName("should return -1 for a non-existent key")
+    void getIndex_withNonExistentKey_shouldReturnNegativeOne() {
+        // Arrange
+        String nonExistentKey = "XX";
+
+        // Act
+        int index = dataset.getIndex(nonExistentKey);
+
+        // Assert
+        assertEquals(-1, index, "The index for a non-existent key should be -1.");
+    }
+
+    @Test
+    @DisplayName("should throw IllegalArgumentException for a null key")
+    void getIndex_withNullKey_shouldThrowIllegalArgumentException() {
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            dataset.getIndex(null);
+        }, "Passing a null key to getIndex() should throw an IllegalArgumentException.");
     }
 }
