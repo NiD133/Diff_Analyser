@@ -1,29 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest33 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("8+19.:23Vy=-x");
-        serializedString0.asUnquotedUTF8();
-        ByteBuffer byteBuffer0 = ByteBuffer.allocateDirect(0);
-        int int0 = serializedString0.putUnquotedUTF8(byteBuffer0);
-        assertEquals((-1), int0);
+    /**
+     * Verifies that putUnquotedUTF8 returns -1 when the target ByteBuffer has no
+     * remaining capacity, correctly indicating that no bytes could be written.
+     */
+    @Test
+    public void putUnquotedUTF8ShouldReturnNegativeOneWhenBufferHasNoRemainingSpace() {
+        // Arrange
+        SerializedString serializedString = new SerializedString("some-text");
+        // A buffer with zero capacity has no space for any data.
+        ByteBuffer emptyBuffer = ByteBuffer.allocate(0);
+
+        // Act
+        int bytesWritten = serializedString.putUnquotedUTF8(emptyBuffer);
+
+        // Assert
+        // The method should return -1 to signal that the buffer is full.
+        assertEquals("Expected -1 when buffer has no space", -1, bytesWritten);
     }
 }
