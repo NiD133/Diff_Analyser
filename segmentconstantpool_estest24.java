@@ -1,20 +1,29 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SegmentConstantPool_ESTestTest24 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in {@link SegmentConstantPool}.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        boolean boolean0 = SegmentConstantPool.regexMatches(".*", ".*");
-        assertTrue(boolean0);
+    /**
+     * Tests that the custom regexMatches method correctly identifies the "match all"
+     * pattern (".*") and returns true for any given input string. The source code
+     * documentation for regexMatches explicitly states it's a simplified implementation
+     * that only handles a few specific patterns, including this one.
+     */
+    @Test
+    public void regexMatchesWithMatchAllPatternShouldAlwaysReturnTrue() {
+        // Arrange: Use the "match all" pattern and an arbitrary string to test against.
+        final String matchAllPattern = SegmentConstantPool.REGEX_MATCH_ALL;
+        final String anyString = "this could be any string";
+
+        // Act: Call the method under test.
+        boolean result = SegmentConstantPool.regexMatches(matchAllPattern, anyString);
+
+        // Assert: The result should always be true for the "match all" pattern.
+        assertTrue("The '.*' pattern should match any string", result);
     }
 }
