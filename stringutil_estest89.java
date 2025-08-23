@@ -1,28 +1,26 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest89 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test88() throws Throwable {
-        String string0 = StringUtil.padding(0, (-1));
-        assertEquals("", string0);
+    @Test
+    public void paddingWithZeroWidthShouldReturnEmptyString() {
+        // Arrange: Define the input parameters for the test.
+        // A requested padding width of 0 should always result in an empty string.
+        // The maxPaddingWidth of -1 signifies unlimited padding, which is a valid but
+        // irrelevant parameter when the requested width is zero.
+        int requestedWidth = 0;
+        int maxPaddingWidth = -1;
+
+        // Act: Call the method under test.
+        String actualPadding = StringUtil.padding(requestedWidth, maxPaddingWidth);
+
+        // Assert: Verify the result is an empty string.
+        assertEquals("", actualPadding);
     }
 }
