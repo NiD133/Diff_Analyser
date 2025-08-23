@@ -1,21 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest32 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the LeafNode abstract class.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("6'z rm]|lT");
-        Node node0 = cDataNode0.attr("#cdata", "Accept-Encoding");
-        assertEquals(0, node0.childNodeSize());
+    /**
+     * Verifies that setting an attribute on a LeafNode does not change its
+     * fundamental characteristic of having no children.
+     */
+    @Test
+    public void settingAttributeOnLeafNodeDoesNotAddChildren() {
+        // Arrange: Create a CDataNode, which is a concrete implementation of LeafNode.
+        CDataNode cdataNode = new CDataNode("Initial content");
+
+        // Act: Set an attribute on the node.
+        cdataNode.attr("test-key", "test-value");
+
+        // Assert: The node should remain a leaf node with zero children.
+        assertEquals(0, cdataNode.childNodeSize());
     }
 }
