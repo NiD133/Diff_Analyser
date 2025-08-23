@@ -1,22 +1,25 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest27 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        Locale.Category locale_Category1 = Locale.Category.FORMAT;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.ordered(locale_Category0, locale_Category1);
-        Locale.Category locale_Category2 = endpointPair0.adjacentNode(locale_Category1);
-        assertEquals(Locale.Category.DISPLAY, locale_Category2);
+    @Test
+    public void adjacentNode_forOrderedPair_shouldReturnOppositeNode() {
+        // Arrange: Create an ordered pair of two distinct nodes.
+        String source = "U";
+        String target = "V";
+        EndpointPair<String> orderedPair = EndpointPair.ordered(source, target);
+
+        // Act: Get the node adjacent to the target node.
+        String adjacentNode = orderedPair.adjacentNode(target);
+
+        // Assert: The adjacent node to the target should be the source.
+        assertEquals("The node adjacent to the target should be the source.", source, adjacentNode);
     }
 }
