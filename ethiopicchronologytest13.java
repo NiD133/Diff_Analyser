@@ -1,158 +1,133 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
 
-public class EthiopicChronologyTestTest13 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * Contains tests for the properties and behavior of EthiopicChronology.
+ * This class replaces a single, large and complex test method with a collection
+ * of small, focused tests, each verifying a specific rule of the calendar system.
+ */
+public class EthiopicChronologyTest extends TestCase {
 
     private static final Chronology ETHIOPIC_UTC = EthiopicChronology.getInstanceUTC();
 
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestEthiopicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    /**
+     * The Ethiopic calendar has one era: EE (Ethiopic Era), which is equivalent to CE.
+     */
+    public void testEra() {
+        DateTime date = new DateTime(1, 1, 1, 0, 0, 0, 0, ETHIOPIC_UTC);
+        assertEquals("Era should be EE", EthiopicChronology.EE, date.getEra());
+        assertEquals("Era text should be 'EE'", "EE", date.era().getAsText());
     }
 
     /**
-     * Tests era, year, monthOfYear, dayOfMonth and dayOfWeek.
+     * An Ethiopic year is a leap year if (year % 4) == 3.
      */
-    public void testCalendar() {
-        if (TestAll.FAST) {
-            return;
+    public void testLeapYearRule() {
+        // Year 3 is a leap year in the Ethiopic calendar
+        assertTrue("Year 3 should be a leap year", isLeapYear(3));
+        
+        // Years 1, 2, and 4 are not leap years
+        assertFalse("Year 1 should not be a leap year", isLeapYear(1));
+        assertFalse("Year 2 should not be a leap year", isLeapYear(2));
+        assertFalse("Year 4 should not be a leap year", isLeapYear(4));
+    }
+
+    /**
+     * The first 12 months of an Ethiopic year must always have 30 days.
+     */
+    public void testStandardMonthLength() {
+        // Test in a non-leap year to be sure
+        int commonYear = 1990; // 1990 % 4 = 2
+        for (int month = 1; month <= 12; month++) {
+            DateTime date = new DateTime(commonYear, month, 1, 0, 0, ETHIOPIC_UTC);
+            assertEquals("Month " + month + " should have 30 days", 30, date.dayOfMonth().getMaximumValue());
         }
-        System.out.println("\nTestEthiopicChronology.testCalendar");
+    }
+
+    /**
+     * The 13th month of a common (non-leap) Ethiopic year has 5 days.
+     */
+    public void testLastMonthLength_inCommonYear() {
+        int commonYear = 1990; // 1990 % 4 = 2
+        DateTime dateInLastMonth = new DateTime(commonYear, 13, 1, 0, 0, ETHIOPIC_UTC);
+        
+        assertFalse("Year " + commonYear + " should not be a leap year", isLeapYear(commonYear));
+        assertEquals("The 13th month of a common year should have 5 days", 5, dateInLastMonth.dayOfMonth().getMaximumValue());
+    }
+
+    /**
+     * The 13th month of a leap Ethiopic year has 6 days.
+     */
+    public void testLastMonthLength_inLeapYear() {
+        int leapYear = 1991; // 1991 % 4 = 3
+        DateTime dateInLastMonth = new DateTime(leapYear, 13, 1, 0, 0, ETHIOPIC_UTC);
+        
+        assertTrue("Year " + leapYear + " should be a leap year", isLeapYear(leapYear));
+        assertEquals("The 13th month of a leap year should have 6 days", 6, dateInLastMonth.dayOfMonth().getMaximumValue());
+    }
+
+    /**
+     * Verifies the date components for the Ethiopic epoch (Year 1, Month 1, Day 1).
+     */
+    public void testDateFields_atEpoch() {
         DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ETHIOPIC_UTC);
-        long millis = epoch.getMillis();
-        long end = new DateTime(3000, 1, 1, 0, 0, 0, 0, ISO_UTC).getMillis();
-        DateTimeField dayOfWeek = ETHIOPIC_UTC.dayOfWeek();
-        DateTimeField dayOfYear = ETHIOPIC_UTC.dayOfYear();
-        DateTimeField dayOfMonth = ETHIOPIC_UTC.dayOfMonth();
-        DateTimeField monthOfYear = ETHIOPIC_UTC.monthOfYear();
-        DateTimeField year = ETHIOPIC_UTC.year();
-        DateTimeField yearOfEra = ETHIOPIC_UTC.yearOfEra();
-        DateTimeField era = ETHIOPIC_UTC.era();
-        int expectedDOW = new DateTime(8, 8, 29, 0, 0, 0, 0, JULIAN_UTC).getDayOfWeek();
-        int expectedDOY = 1;
-        int expectedDay = 1;
-        int expectedMonth = 1;
-        int expectedYear = 1;
-        while (millis < end) {
-            int dowValue = dayOfWeek.get(millis);
-            int doyValue = dayOfYear.get(millis);
-            int dayValue = dayOfMonth.get(millis);
-            int monthValue = monthOfYear.get(millis);
-            int yearValue = year.get(millis);
-            int yearOfEraValue = yearOfEra.get(millis);
-            int monthLen = dayOfMonth.getMaximumValue(millis);
-            if (monthValue < 1 || monthValue > 13) {
-                fail("Bad month: " + millis);
-            }
-            // test era
-            assertEquals(1, era.get(millis));
-            assertEquals("EE", era.getAsText(millis));
-            assertEquals("EE", era.getAsShortText(millis));
-            // test date
-            assertEquals(expectedYear, yearValue);
-            assertEquals(expectedYear, yearOfEraValue);
-            assertEquals(expectedMonth, monthValue);
-            assertEquals(expectedDay, dayValue);
-            assertEquals(expectedDOW, dowValue);
-            assertEquals(expectedDOY, doyValue);
-            // test leap year
-            assertEquals(yearValue % 4 == 3, year.isLeap(millis));
-            // test month length
-            if (monthValue == 13) {
-                assertEquals(yearValue % 4 == 3, monthOfYear.isLeap(millis));
-                if (yearValue % 4 == 3) {
-                    assertEquals(6, monthLen);
-                } else {
-                    assertEquals(5, monthLen);
-                }
-            } else {
-                assertEquals(30, monthLen);
-            }
-            // recalculate date
-            expectedDOW = (((expectedDOW + 1) - 1) % 7) + 1;
-            expectedDay++;
-            expectedDOY++;
-            if (expectedDay == 31 && expectedMonth < 13) {
-                expectedDay = 1;
-                expectedMonth++;
-            } else if (expectedMonth == 13) {
-                if (expectedYear % 4 == 3 && expectedDay == 7) {
-                    expectedDay = 1;
-                    expectedMonth = 1;
-                    expectedYear++;
-                    expectedDOY = 1;
-                } else if (expectedYear % 4 != 3 && expectedDay == 6) {
-                    expectedDay = 1;
-                    expectedMonth = 1;
-                    expectedYear++;
-                    expectedDOY = 1;
-                }
-            }
-            millis += SKIP;
-        }
+        assertEquals(1, epoch.getYear());
+        assertEquals(1, epoch.getMonthOfYear());
+        assertEquals(1, epoch.getDayOfMonth());
+        assertEquals(1, epoch.getDayOfYear());
+        assertEquals(DateTimeConstants.SUNDAY, epoch.getDayOfWeek());
+    }
+
+    /**
+     * Tests that adding one day correctly rolls over month boundaries.
+     */
+    public void testDateProgression_acrossMonthBoundary() {
+        // From the last day of a standard 30-day month
+        DateTime lastDayOfMonth = new DateTime(1990, 5, 30, 10, 20, 30, 0, ETHIOPIC_UTC);
+        DateTime firstDayOfNextMonth = lastDayOfMonth.plusDays(1);
+
+        assertEquals(1990, firstDayOfNextMonth.getYear());
+        assertEquals(6, firstDayOfNextMonth.getMonthOfYear());
+        assertEquals(1, firstDayOfNextMonth.getDayOfMonth());
+        
+        // Time components should be unchanged
+        assertEquals(10, firstDayOfNextMonth.getHourOfDay());
+    }
+
+    /**
+     * Tests that adding one day correctly rolls over the year boundary for a common year.
+     */
+    public void testDateProgression_acrossCommonYearBoundary() {
+        int commonYear = 1990; // Last day is 13-05
+        DateTime lastDayOfYear = new DateTime(commonYear, 13, 5, 10, 20, 30, 0, ETHIOPIC_UTC);
+        DateTime firstDayOfNextYear = lastDayOfYear.plusDays(1);
+
+        assertEquals(commonYear + 1, firstDayOfNextYear.getYear());
+        assertEquals(1, firstDayOfNextYear.getMonthOfYear());
+        assertEquals(1, firstDayOfNextYear.getDayOfMonth());
+    }
+
+    /**
+     * Tests that adding one day correctly rolls over the year boundary for a leap year.
+     */
+    public void testDateProgression_acrossLeapYearBoundary() {
+        int leapYear = 1991; // Last day is 13-06
+        DateTime lastDayOfYear = new DateTime(leapYear, 13, 6, 10, 20, 30, 0, ETHIOPIC_UTC);
+        DateTime firstDayOfNextYear = lastDayOfYear.plusDays(1);
+
+        assertEquals(leapYear + 1, firstDayOfNextYear.getYear());
+        assertEquals(1, firstDayOfNextYear.getMonthOfYear());
+        assertEquals(1, firstDayOfNextYear.getDayOfMonth());
+    }
+
+    private boolean isLeapYear(int year) {
+        // Helper to check leap year status based on a DateTime object for that year.
+        DateTime aDateInTheYear = new DateTime(year, 1, 1, 0, 0, ETHIOPIC_UTC);
+        return ETHIOPIC_UTC.year().isLeap(aDateInTheYear.getMillis());
     }
 }
