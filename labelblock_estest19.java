@@ -1,41 +1,34 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+/**
+ * This test class focuses on the behavior of the equals() method in the LabelBlock class.
+ * Note: This is an improved version of a single test case, likely from a larger, generated test suite.
+ */
 public class LabelBlock_ESTestTest19 extends LabelBlock_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("Sg~6fAVv>P)");
-        LabelBlock labelBlock1 = new LabelBlock("Sg~6fAVv>P)");
-        assertTrue(labelBlock1.equals((Object) labelBlock0));
-        TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.TOP_RIGHT;
-        labelBlock1.setContentAlignmentPoint(textBlockAnchor0);
-        boolean boolean0 = labelBlock0.equals(labelBlock1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false if two LabelBlock objects
+     * differ only by their content alignment point.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenContentAlignmentPointIsDifferent() {
+        // Arrange: Create two LabelBlock instances that are identical in every way.
+        LabelBlock block1 = new LabelBlock("Test Label");
+        LabelBlock block2 = new LabelBlock("Test Label");
+
+        // Assert: The two blocks should be considered equal initially.
+        assertEquals("Initially, the two identical blocks should be equal.", block1, block2);
+
+        // Act: Modify the content alignment point of the second block.
+        block2.setContentAlignmentPoint(TextBlockAnchor.TOP_RIGHT);
+
+        // Assert: After the modification, the blocks should no longer be equal.
+        assertNotEquals("Blocks should not be equal after changing the content alignment point.", block1, block2);
     }
 }
