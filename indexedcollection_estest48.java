@@ -1,58 +1,54 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest48 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collection;
+import java.util.LinkedList;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        ConstantTransformer<Object, Integer> constantTransformer0 = new ConstantTransformer<Object, Integer>((Integer) null);
-        IndexedCollection<Integer, Object> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, (Transformer<Object, Integer>) constantTransformer0);
-        Object object0 = new Object();
-        linkedList0.push(object0);
-        indexedCollection0.reindex();
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for the {@link IndexedCollection} class, focusing on its indexing capabilities.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that reindex() correctly updates the index after the underlying
+     * collection has been modified directly. The Javadoc for IndexedCollection
+     * explicitly states this is the intended use case for reindex().
+     */
+    @Test
+    public void reindexShouldUpdateIndexWhenUnderlyingCollectionIsModifiedDirectly() {
+        // Arrange: Create an IndexedCollection and an object to be added.
+        // The transformer is configured to map every element to a 'null' key.
+        final Collection<Object> underlyingCollection = new LinkedList<>();
+        final Transformer<Object, Integer> nullKeyTransformer = new ConstantTransformer<>(null);
+        final IndexedCollection<Integer, Object> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(underlyingCollection, nullKeyTransformer);
+
+        // The index is initially empty.
+        assertNull("The index should be empty before any modifications", indexedCollection.get(null));
+
+        // Act (Part 1): Modify the underlying collection directly.
+        // This action makes the index out of sync with the collection's actual content.
+        final Object newItem = "newItem";
+        underlyingCollection.add(newItem);
+
+        // Assert (Part 1): Verify the index is now out of sync.
+        // The object exists in the collection but is not yet findable via the index.
+        assertTrue("Underlying collection should contain the new item", underlyingCollection.contains(newItem));
+        assertNull("Index should not contain the new item before reindexing", indexedCollection.get(null));
+
+        // Act (Part 2): Call reindex() to synchronize the index with the collection.
+        indexedCollection.reindex();
+
+        // Assert (Part 2): Verify the index now correctly reflects the collection's state.
+        final Collection<Object> valuesForNullKey = indexedCollection.values(null);
+        assertEquals("Index should now contain one value for the null key", 1, valuesForNullKey.size());
+        assertTrue("Index should contain the newly added item after reindex", valuesForNullKey.contains(newItem));
     }
 }
