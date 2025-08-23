@@ -1,36 +1,47 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest23 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for the SerializedCache decorator.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        perpetualCache0.putObject("", "");
-        SerializedCache serializedCache0 = new SerializedCache(perpetualCache0);
-        // Undeclared exception!
-        try {
-            serializedCache0.getObject("");
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // class java.lang.String cannot be cast to class [B (java.lang.String and [B are in module java.base of loader 'bootstrap')
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
-        }
+    /**
+     * Verifies that getObject() throws a ClassCastException if the underlying
+     * delegate cache contains a value that is not a byte array.
+     *
+     * The SerializedCache decorator assumes that all values stored in its delegate
+     * are byte arrays representing serialized objects. This test simulates a corrupt
+     * or improperly-used cache state where the delegate holds a raw String.
+     * The decorator should fail when it attempts to cast this String to a byte[]
+     * for deserialization.
+     */
+    @Test(expected = ClassCastException.class)
+    public void getObjectShouldThrowClassCastExceptionWhenDelegateCacheContainsNonByteArrayValue() {
+        // Arrange:
+        // 1. Create a delegate cache.
+        Cache delegateCache = new PerpetualCache("test-delegate");
+
+        // 2. Directly add a non-serialized (String) value to the delegate.
+        //    This bypasses the SerializedCache's serialization logic, simulating
+        //    a scenario where the cache holds an invalid value type.
+        String key = "testKey";
+        String rawValue = "this is not a serialized byte array";
+        delegateCache.putObject(key, rawValue);
+
+        // 3. Decorate the cache. The delegate now contains a value that SerializedCache
+        //    is not designed to handle.
+        Cache serializedCache = new SerializedCache(delegateCache);
+
+        // Act:
+        // Attempt to retrieve the object. This will fetch the raw String from the
+        // delegate and try to cast it to a byte[], which is expected to fail.
+        serializedCache.getObject(key);
+
+        // Assert (implicit):
+        // The @Test(expected) annotation asserts that a ClassCastException is thrown.
     }
 }
