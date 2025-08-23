@@ -1,25 +1,28 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ConverterSet_ESTestTest5 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Converter[] converterArray0 = new Converter[1];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        int int0 = converterSet0.size();
-        assertEquals(1, int0);
+    /**
+     * Tests that the size() method correctly returns the number of converters
+     * the set was initialized with.
+     */
+    @Test
+    public void size_shouldReturnNumberOfConvertersProvidedAtConstruction() {
+        // Arrange: Create a ConverterSet with a single converter.
+        // The test verifies the count, so the element itself can be null for this test case.
+        Converter[] converters = new Converter[1];
+        ConverterSet converterSet = new ConverterSet(converters);
+
+        // Act: Get the size of the converter set.
+        int actualSize = converterSet.size();
+
+        // Assert: The size should be equal to the number of converters passed in.
+        assertEquals(1, actualSize);
     }
 }
