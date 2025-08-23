@@ -1,72 +1,69 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.YearMonthDay;
+import static org.junit.Assert.assertSame;
 
-public class GregorianChronologyTestTest5 extends TestCase {
+import org.joda.time.DateTimeZone;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Tests the factory methods of GregorianChronology, focusing on its caching and singleton behavior.
+ */
+public class GregorianChronologyGetInstanceTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
     private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
     private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+    private DateTimeZone originalDefaultZone;
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestGregorianChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
+    @Before
+    public void setUp() {
+        // Save the original default time zone to restore it after the test.
+        originalDefaultZone = DateTimeZone.getDefault();
+        // Set a known default time zone for tests that depend on it.
         DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
+    @After
+    public void tearDown() {
+        // Restore the original default time zone.
+        DateTimeZone.setDefault(originalDefaultZone);
     }
 
-    //-----------------------------------------------------------------------
-    public void testEquality() {
-        assertSame(GregorianChronology.getInstance(TOKYO), GregorianChronology.getInstance(TOKYO));
-        assertSame(GregorianChronology.getInstance(LONDON), GregorianChronology.getInstance(LONDON));
-        assertSame(GregorianChronology.getInstance(PARIS), GregorianChronology.getInstance(PARIS));
-        assertSame(GregorianChronology.getInstanceUTC(), GregorianChronology.getInstanceUTC());
-        assertSame(GregorianChronology.getInstance(), GregorianChronology.getInstance(LONDON));
+    /**
+     * Tests that getInstance(DateTimeZone) returns a cached instance for the same zone.
+     */
+    @Test
+    public void testGetInstance_withZone_returnsCachedInstances() {
+        // The factory method should return the same, cached instance for a given time zone.
+        assertSame("Instances for TOKYO should be cached",
+                GregorianChronology.getInstance(TOKYO), GregorianChronology.getInstance(TOKYO));
+        assertSame("Instances for LONDON should be cached",
+                GregorianChronology.getInstance(LONDON), GregorianChronology.getInstance(LONDON));
+        assertSame("Instances for PARIS should be cached",
+                GregorianChronology.getInstance(PARIS), GregorianChronology.getInstance(PARIS));
+    }
+
+    /**
+     * Tests that getInstanceUTC() consistently returns the same singleton instance.
+     */
+    @Test
+    public void testGetInstanceUTC_returnsSingletonInstance() {
+        // The UTC instance is a singleton and should always be the same object.
+        assertSame("UTC instance should be a singleton",
+                GregorianChronology.getInstanceUTC(), GregorianChronology.getInstanceUTC());
+    }
+
+    /**
+     * Tests that getInstance() returns the chronology for the default system time zone.
+     */
+    @Test
+    public void testGetInstance_noArgs_returnsInstanceForDefaultZone() {
+        // This test relies on the setUp method, which sets the default time zone to LONDON.
+        // We verify that getInstance() correctly picks up this default.
+        assertSame("getInstance() should return the instance for the default zone",
+                GregorianChronology.getInstance(), GregorianChronology.getInstance(LONDON));
     }
 }
