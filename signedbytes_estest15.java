@@ -1,26 +1,18 @@
 package com.google.common.primitives;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest15 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        // Undeclared exception!
-        try {
-            SignedBytes.max((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.primitives.SignedBytes", e);
-        }
+    /**
+     * Tests that calling SignedBytes.max() with a null array throws a NullPointerException,
+     * as null is not a valid input for this method.
+     */
+    @Test(expected = NullPointerException.class)
+    public void max_withNullArray_shouldThrowNullPointerException() {
+        SignedBytes.max(null);
     }
 }
