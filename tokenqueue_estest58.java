@@ -1,17 +1,26 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest58 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the static helper methods in {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        String string0 = TokenQueue.escapeCssIdentifier("");
-        assertEquals("", string0);
+    /**
+     * Tests that escaping an empty CSS identifier results in an empty string.
+     * This is the expected behavior as there are no characters to escape.
+     */
+    @Test
+    public void escapeCssIdentifierShouldReturnEmptyStringForEmptyInput() {
+        // Arrange
+        String emptyInput = "";
+
+        // Act
+        String result = TokenQueue.escapeCssIdentifier(emptyInput);
+
+        // Assert
+        assertEquals("Escaping an empty string should result in an empty string.", "", result);
     }
 }
