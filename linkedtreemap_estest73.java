@@ -1,27 +1,32 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+// The original test class structure is preserved.
 public class LinkedTreeMap_ESTestTest73 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>(false);
-        LinkedTreeMap.KeySet linkedTreeMap_KeySet0 = linkedTreeMap0.new KeySet();
-        boolean boolean0 = linkedTreeMap_KeySet0.contains(linkedTreeMap0);
-        assertEquals(0, linkedTreeMap_KeySet0.size());
-        assertFalse(boolean0);
+    /**
+     * Verifies that calling `contains()` on a key set with an object of an
+     * incompatible type returns `false` instead of throwing a ClassCastException.
+     * This behavior is part of the contract for java.util.Set.
+     */
+    @Test
+    public void keySetContainsShouldReturnFalseForIncompatibleType() {
+        // Arrange
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+        Set<Integer> keySet = map.keySet();
+
+        // Act
+        // Check for containment of the map itself. Since the key set expects Integers,
+        // the map is an object of an incompatible type. The `contains` method
+        // should handle this gracefully.
+        boolean contains = keySet.contains(map);
+
+        // Assert
+        assertFalse("keySet.contains() should return false for an incompatible type.", contains);
+        assertEquals("The key set of an empty map should have a size of 0.", 0, keySet.size());
     }
 }
