@@ -1,58 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
-import java.util.Random;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class NumberOutputTestTest4 {
+/**
+ * Unit tests for the number-to-string conversion utility class {@link NumberOutput}.
+ * This suite focuses on testing specific utility methods within the class.
+ */
+public class NumberOutputTest {
 
-    private void assertIntPrint(int value) {
-        String exp = "" + value;
-        String act = printToString(value);
-        if (!exp.equals(act)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + ")");
-        }
-        String alt = NumberOutput.toString(value);
-        if (!exp.equals(alt)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + ")");
-        }
-    }
-
-    private void assertLongPrint(long value, int index) {
-        String exp = "" + value;
-        String act = printToString(value);
-        if (!exp.equals(act)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + "; number index " + index + ")");
-        }
-        String alt = NumberOutput.toString(value);
-        if (!exp.equals(alt)) {
-            assertEquals(exp, act, "Expected conversion (exp '" + exp + "', len " + exp.length() + "; act len " + act.length() + "; number index " + index + ")");
-        }
-    }
-
-    private String printToString(int value) {
-        char[] buffer = new char[12];
-        int offset = NumberOutput.outputInt(value, buffer, 0);
-        return new String(buffer, 0, offset);
-    }
-
-    private String printToString(long value) {
-        char[] buffer = new char[22];
-        int offset = NumberOutput.outputLong(value, buffer, 0);
-        return new String(buffer, 0, offset);
-    }
-
+    /**
+     * Tests the {@link NumberOutput#divBy1000(int)} method with a wide range of
+     * positive integer inputs to ensure its correctness against standard integer division.
+     */
     @Test
-    void divBy1000Sampled() {
+    void divBy1000_withSampledPositiveIntegers_returnsCorrectQuotient() {
+        // This loop samples a wide range of positive integers.
+        // It starts at 1,000,000 and increments by a prime number (7)
+        // until integer overflow occurs, at which point `number` becomes negative
+        // and the loop terminates. This effectively tests values up to Integer.MAX_VALUE.
         for (int number = 1_000_000; number > 0; number += 7) {
-            int expected = number / 1000;
-            int actual = NumberOutput.divBy1000(number);
-            if (expected != actual) {
-                // only construct String if fail
-                fail("With " + number + " should get " + expected + ", got: " + actual);
-            }
+            int expectedQuotient = number / 1000;
+            int actualQuotient = NumberOutput.divBy1000(number);
+
+            assertEquals(expectedQuotient, actualQuotient,
+                    () -> "Division by 1000 failed for number: " + number);
         }
     }
 }
