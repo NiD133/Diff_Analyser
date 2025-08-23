@@ -1,22 +1,27 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import java.nio.ByteBuffer;
+import static org.junit.Assert.assertTrue;
 
-public class MappedRandomAccessFile_ESTestTest20 extends MappedRandomAccessFile_ESTest_scaffolding {
+/**
+ * Test suite for the static utility methods in {@link MappedRandomAccessFile}.
+ */
+public class MappedRandomAccessFileTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        java.nio.ByteBuffer byteBuffer0 = java.nio.ByteBuffer.allocateDirect((byte) 0);
-        boolean boolean0 = MappedRandomAccessFile.clean(byteBuffer0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the clean() method successfully processes a direct ByteBuffer
+     * with zero capacity and returns true, indicating a successful operation.
+     */
+    @Test
+    public void clean_shouldReturnTrue_whenCleaningZeroCapacityDirectBuffer() {
+        // Arrange: Create a direct ByteBuffer with zero capacity. This is a valid edge case.
+        ByteBuffer zeroCapacityBuffer = ByteBuffer.allocateDirect(0);
+
+        // Act: Attempt to clean the buffer using the method under test.
+        boolean wasCleanSuccessful = MappedRandomAccessFile.clean(zeroCapacityBuffer);
+
+        // Assert: The clean operation should report success.
+        assertTrue("The clean operation on a zero-capacity direct buffer should succeed.", wasCleanSuccessful);
     }
 }
