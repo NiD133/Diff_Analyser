@@ -1,38 +1,36 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class YearsTestTest12 extends TestCase {
+/**
+ * Unit tests for the string representation of the {@link Years} class.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void toString_shouldReturnISO8601FormatForPositiveYears() {
+        // Arrange
+        final Years twentyYears = Years.years(20);
+        final String expectedFormat = "P20Y";
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        final String actualFormat = twentyYears.toString();
+
+        // Assert
+        assertEquals(expectedFormat, actualFormat);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
-    }
+    @Test
+    public void toString_shouldReturnISO8601FormatForNegativeYears() {
+        // Arrange
+        final Years minusTwentyYears = Years.years(-20);
+        final String expectedFormat = "P-20Y";
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        final String actualFormat = minusTwentyYears.toString();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testToString() {
-        Years test = Years.years(20);
-        assertEquals("P20Y", test.toString());
-        test = Years.years(-20);
-        assertEquals("P-20Y", test.toString());
+        // Assert
+        assertEquals(expectedFormat, actualFormat);
     }
 }
