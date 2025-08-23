@@ -1,23 +1,29 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest51 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(true);
-        Object object0 = quotedPrintableCodec0.encode((Object) null);
-        assertNull(object0);
+/**
+ * Contains tests for the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that the {@code encode(Object)} method returns null when the input is null.
+     * This is a standard behavior for encoders in the library.
+     */
+    @Test
+    public void encode_withNullObject_shouldReturnNull() throws EncoderException {
+        // Arrange: Create a codec instance. The strictness flag is irrelevant for this test case.
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        Object nullObject = null;
+
+        // Act: Call the method under test with a null input.
+        Object result = codec.encode(nullObject);
+
+        // Assert: Verify that the output is null.
+        assertNull("Encoding a null object should return null.", result);
     }
 }
