@@ -1,28 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest32 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("L,3EO8LyQHon");
-        ByteBuffer byteBuffer0 = ByteBuffer.allocate(0);
-        int int0 = serializedString0.putUnquotedUTF8(byteBuffer0);
-        assertEquals((-1), int0);
+    /**
+     * Verifies that putUnquotedUTF8() returns -1 when the target ByteBuffer has no
+     * remaining capacity. This return value signals that no bytes could be written.
+     */
+    @Test
+    public void putUnquotedUTF8_shouldReturnNegativeOne_whenBufferHasNoRemainingSpace() {
+        // Arrange
+        SerializedString content = new SerializedString("any-non-empty-string");
+        ByteBuffer fullBuffer = ByteBuffer.allocate(0);
+
+        // Act
+        int bytesWritten = content.putUnquotedUTF8(fullBuffer);
+
+        // Assert
+        assertEquals("Should return -1 to indicate the buffer is full", -1, bytesWritten);
     }
 }
