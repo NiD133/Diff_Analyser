@@ -1,24 +1,38 @@
 package org.apache.ibatis.mapping;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Properties;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.decorators.BlockingCache;
-import org.apache.ibatis.cache.decorators.SynchronizedCache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CacheBuilder_ESTestTest7 extends CacheBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        CacheBuilder cacheBuilder0 = new CacheBuilder("org.apache.ibatis.mapping.CacheBuilder");
-        CacheBuilder cacheBuilder1 = cacheBuilder0.blocking(true);
-        BlockingCache blockingCache0 = (BlockingCache) cacheBuilder1.build();
-        assertEquals(0L, blockingCache0.getTimeout());
+/**
+ * Test suite for {@link CacheBuilder}.
+ */
+public class CacheBuilderTest {
+
+    /**
+     * Verifies that enabling the 'blocking' option on the CacheBuilder
+     * results in a cache decorated with BlockingCache. It also confirms
+     * that the decorator is created with its default timeout value.
+     */
+    @Test
+    public void shouldBuildBlockingCacheWithDefaultTimeoutWhenBlockingIsEnabled() {
+        // Arrange: Create a CacheBuilder and enable the blocking option.
+        final String cacheId = "test-blocking-cache";
+        CacheBuilder cacheBuilder = new CacheBuilder(cacheId)
+                .blocking(true);
+
+        // Act: Build the cache instance.
+        Cache cache = cacheBuilder.build();
+
+        // Assert: Verify the cache is a BlockingCache and has the correct default timeout.
+        assertTrue("The built cache should be an instance of BlockingCache.",
+                cache instanceof BlockingCache);
+
+        BlockingCache blockingCache = (BlockingCache) cache;
+        assertEquals("A BlockingCache decorator should have a default timeout of 0.",
+                0L, blockingCache.getTimeout());
     }
 }
