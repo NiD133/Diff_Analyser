@@ -1,34 +1,21 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Entities_ESTestTest10 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for exception handling within the {@link Entities} class.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        // Undeclared exception!
-        try {
-            Entities.isBaseNamedEntity((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that isBaseNamedEntity() throws a NullPointerException when
+     * the input name is null. This confirms that the method correctly
+     * rejects invalid null input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isBaseNamedEntityShouldThrowNullPointerExceptionForNullInput() {
+        // The method is expected to throw a NullPointerException as it does not
+        // perform an explicit null check before using the input argument.
+        Entities.isBaseNamedEntity(null);
     }
 }
