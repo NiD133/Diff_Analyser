@@ -1,48 +1,32 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class InternationalFixedChronology_ESTestTest55 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for the range of fields in {@link InternationalFixedChronology}.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        ChronoField chronoField0 = ChronoField.DAY_OF_MONTH;
-        ValueRange valueRange0 = internationalFixedChronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+    /**
+     * Tests that the valid range for the DAY_OF_MONTH field is correct.
+     * <p>
+     * In the International Fixed calendar, most months have 28 days, but some
+     * can have a 29th day (e.g., in a leap year). Therefore, the overall valid
+     * range for the day-of-month is 1 to 29.
+     */
+    @Test
+    public void range_forDayOfMonth_returnsCorrectRange() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        ValueRange expectedRange = ValueRange.of(1, 29);
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.DAY_OF_MONTH);
+
+        // Assert
+        assertEquals("The range for DAY_OF_MONTH should be 1-29", expectedRange, actualRange);
     }
 }
