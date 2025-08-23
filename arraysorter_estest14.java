@@ -1,21 +1,26 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertSame;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest14 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArraySorter}.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Integer[] integerArray0 = new Integer[0];
-        Integer[] integerArray1 = ArraySorter.sort(integerArray0);
-        assertSame(integerArray0, integerArray1);
+    /**
+     * Tests that sorting an empty array returns the same array instance,
+     * as the sort operation should be performed in-place.
+     */
+    @Test
+    public void sort_withEmptyArray_returnsSameInstance() {
+        // Arrange: Create an empty array.
+        final Integer[] emptyArray = new Integer[0];
+
+        // Act: Call the sort method.
+        final Integer[] result = ArraySorter.sort(emptyArray);
+
+        // Assert: The returned array should be the same instance as the input.
+        assertSame("Sorting an empty array should return the same instance.", emptyArray, result);
     }
 }
