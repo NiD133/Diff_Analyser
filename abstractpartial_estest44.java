@@ -1,46 +1,60 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest44 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstanceUTC();
-        LocalDate localDate0 = new LocalDate((long) 1, (Chronology) gregorianChronology0);
-        localDate0.hashCode();
+/**
+ * This is a refactored version of an auto-generated test for the AbstractPartial class.
+ * The original test class name "AbstractPartial_ESTestTest44" is kept for context,
+ * but a more descriptive name like "AbstractPartialHashCodeTest" would be preferable.
+ */
+public class AbstractPartial_ESTestTest44 { // Note: Original class name is preserved.
+
+    /**
+     * Tests that the hashCode() implementation in AbstractPartial (via its subclass LocalDate)
+     * adheres to the general contract for Object.hashCode().
+     * <p>
+     * The contract states:
+     * 1. If two objects are equal according to the equals() method, then calling hashCode()
+     *    on each of the two objects must produce the same integer result.
+     * 2. The hashCode() must be consistent, returning the same value for an object
+     *    across multiple invocations.
+     */
+    @Test
+    public void hashCodeShouldAdhereToEqualsContract() {
+        // Arrange: Create two equal LocalDate instances and one that is different.
+        // LocalDate is a concrete subclass of AbstractPartial, so this tests the
+        // inherited hashCode() implementation.
+        Chronology chronology = GregorianChronology.getInstanceUTC();
+        
+        // Two instances representing the same partial date: January 1, 1970.
+        // These two objects should be equal.
+        LocalDate date1 = new LocalDate(1L, chronology);
+        LocalDate date2 = new LocalDate(1L, chronology);
+
+        // A third instance representing a different date: January 2, 1970.
+        long oneDayInMillis = 24 * 60 * 60 * 1000;
+        LocalDate differentDate = new LocalDate(1L + oneDayInMillis, chronology);
+
+        // Act & Assert
+
+        // Pre-condition check: ensure the objects have the expected equality.
+        assertEquals("Instances created with the same parameters should be equal", date1, date2);
+        assertNotEquals("Instances created with different parameters should not be equal", date1, differentDate);
+
+        // 1. Test the core hashCode contract: equal objects must have equal hash codes.
+        assertEquals("Equal objects must have the same hash code", date1.hashCode(), date2.hashCode());
+
+        // 2. Test for consistency: hashCode must return the same value on multiple invocations.
+        assertEquals("hashCode must be consistent across multiple calls", date1.hashCode(), date1.hashCode());
+
+        // 3. (Optional but good practice) Test that unequal objects have different hash codes.
+        // While not a strict requirement of the contract, it's a key property of a good hash function.
+        assertNotEquals("Unequal objects should ideally have different hash codes", date1.hashCode(), differentDate.hashCode());
     }
 }
