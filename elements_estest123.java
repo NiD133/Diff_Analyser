@@ -1,44 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest123 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test122() throws Throwable {
-        Document document0 = new Document("No elements matched the query '%s' in the elements.");
-        Elements elements0 = document0.getAllElements();
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    @Test
+    public void beforeShouldThrowExceptionWhenAnElementHasNoParent() {
+        // Arrange
+        // Create a document. The getAllElements() method returns a list that includes
+        // the root Document node itself. A root node has no parent.
+        Document doc = new Document("");
+        Elements elementsContainingRoot = doc.getAllElements();
+        String htmlToInsert = "<p>Some new HTML</p>";
+
+        // Act & Assert
         try {
-            elements0.before("No elements matched the query '%s' in the elements.");
-            fail("Expecting exception: IllegalArgumentException");
+            // The before() method inserts HTML before each element in the collection.
+            // This operation is invalid for a node without a parent, like the document root.
+            elementsContainingRoot.before(htmlToInsert);
+            fail("Expected an IllegalArgumentException because the root node has no parent.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // The underlying implementation validates that an element's parent is not null
+            // before inserting a sibling.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
