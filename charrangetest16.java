@@ -1,23 +1,35 @@
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.lang.reflect.Modifier;
+
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CharRangeTestTest16 extends AbstractLangTest {
+/**
+ * Tests for the iterator of {@link CharRange}.
+ *
+ * <p>This class was renamed from the original {@code CharRangeTestTest16}
+ * to better reflect its specific focus on the iterator's behavior.</p>
+ */
+class CharRangeIteratorTest {
 
+    /**
+     * Verifies that the iterator's remove() method throws an
+     * UnsupportedOperationException. This is the correct behavior because
+     * CharRange is an immutable class, and its iterator should not
+     * permit modifications.
+     */
     @Test
-    void testIteratorRemove() {
-        final CharRange a = CharRange.is('a');
-        final Iterator<Character> aIt = a.iterator();
-        assertThrows(UnsupportedOperationException.class, aIt::remove);
+    @DisplayName("Iterator.remove() should throw UnsupportedOperationException")
+    void iteratorRemoveShouldThrowException() {
+        // Arrange: Create a simple CharRange and get its iterator.
+        final CharRange range = CharRange.is('a');
+        final Iterator<Character> iterator = range.iterator();
+
+        // Act & Assert: Attempting to call remove() on the iterator should fail.
+        assertThrows(UnsupportedOperationException.class,
+            iterator::remove,
+            "The iterator for an immutable CharRange should not support the remove operation.");
     }
 }
