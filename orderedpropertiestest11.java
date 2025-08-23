@@ -1,90 +1,113 @@
 package org.apache.commons.collections4.properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class OrderedPropertiesTestTest11 {
+/**
+ * Tests for {@link OrderedProperties} focusing on order preservation
+ * with the {@code putIfAbsent} method.
+ */
+@DisplayName("OrderedProperties.putIfAbsent")
+class OrderedPropertiesTest {
 
-    private void assertAscendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 1;
-        final int last = 11;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i++) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-    }
+    private static final int NUM_PROPERTIES = 11;
 
-    private OrderedProperties assertDescendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 11;
-        final int last = 1;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i--) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-        return orderedProperties;
-    }
+    /**
+     * Verifies that the order of properties is maintained across different access methods.
+     * It checks against keySet, entrySet, keys (Enumeration), and propertyNames (Enumeration).
+     *
+     * @param properties The OrderedProperties instance to check.
+     * @param expectedKeys The list of keys in their expected insertion order.
+     */
+    private void assertPropertyOrderIsPreserved(final OrderedProperties properties, final List<String> expectedKeys) {
+        // 1. Verify keySet() order
+        final List<Object> actualKeys = new ArrayList<>(properties.keySet());
+        assertEquals(expectedKeys, actualKeys, "keySet() should preserve insertion order.");
 
-    private OrderedProperties loadOrderedKeysReverse() throws FileNotFoundException, IOException {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties")) {
-            orderedProperties.load(reader);
+        // 2. Verify entrySet() order for both keys and values
+        final List<Map.Entry<Object, Object>> actualEntries = new ArrayList<>(properties.entrySet());
+        assertEquals(expectedKeys.size(), actualEntries.size(), "entrySet() size should match expected size.");
+        for (int i = 0; i < expectedKeys.size(); i++) {
+            final String expectedKey = expectedKeys.get(i);
+            final String expectedValue = expectedKey.replace("key", "value");
+            final Map.Entry<Object, Object> actualEntry = actualEntries.get(i);
+
+            assertEquals(expectedKey, actualEntry.getKey(), "Entry key at index " + i + " should be correct.");
+            assertEquals(expectedValue, actualEntry.getValue(), "Entry value at index " + i + " should be correct.");
         }
-        return assertDescendingOrder(orderedProperties);
+
+        // 3. Verify keys() Enumeration order
+        final List<Object> keysFromEnumeration = Collections.list(properties.keys());
+        assertEquals(expectedKeys, keysFromEnumeration, "keys() enumeration should preserve insertion order.");
+
+        // 4. Verify propertyNames() Enumeration order
+        final List<Object> propertyNamesFromEnumeration = Collections.list(properties.propertyNames());
+        assertEquals(expectedKeys, propertyNamesFromEnumeration, "propertyNames() enumeration should preserve insertion order.");
     }
 
     @Test
-    void testPutIfAbsent() {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        int first = 1;
-        int last = 11;
-        for (int i = first; i <= last; i++) {
-            orderedProperties.putIfAbsent("key" + i, "value" + i);
-        }
-        assertAscendingOrder(orderedProperties);
-        orderedProperties.clear();
-        first = 11;
-        last = 1;
-        for (int i = first; i >= last; i--) {
-            orderedProperties.putIfAbsent("key" + i, "value" + i);
-        }
-        assertDescendingOrder(orderedProperties);
+    @DisplayName("should preserve insertion order when keys are added sequentially")
+    void putIfAbsentShouldPreserveAscendingInsertionOrder() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final List<String> expectedKeys = IntStream.rangeClosed(1, NUM_PROPERTIES)
+            .mapToObj(i -> "key" + i)
+            .collect(Collectors.toList());
+
+        // Act
+        expectedKeys.forEach(key -> {
+            final String value = key.replace("key", "value");
+            properties.putIfAbsent(key, value);
+        });
+
+        // Assert
+        assertPropertyOrderIsPreserved(properties, expectedKeys);
+    }
+
+    @Test
+    @DisplayName("should preserve insertion order when keys are added in reverse")
+    void putIfAbsentShouldPreserveDescendingInsertionOrder() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        final List<String> expectedKeys = IntStream.rangeClosed(1, NUM_PROPERTIES)
+            .map(i -> NUM_PROPERTIES - i + 1) // Generates 11, 10, ..., 1
+            .mapToObj(i -> "key" + i)
+            .collect(Collectors.toList());
+
+        // Act
+        expectedKeys.forEach(key -> {
+            final String value = key.replace("key", "value");
+            properties.putIfAbsent(key, value);
+        });
+
+        // Assert
+        assertPropertyOrderIsPreserved(properties, expectedKeys);
+    }
+
+    @Test
+    @DisplayName("should not add, update, or reorder an element if the key already exists")
+    void putIfAbsentShouldNotAffectExistingKeys() {
+        // Arrange
+        final OrderedProperties properties = new OrderedProperties();
+        properties.put("key2", "value2");
+        properties.put("key1", "value1");
+
+        final List<String> expectedKeys = List.of("key2", "key1");
+
+        // Act
+        final Object oldValue = properties.putIfAbsent("key1", "newValue1");
+
+        // Assert
+        assertEquals("value1", oldValue, "Should return the existing value.");
+        assertEquals("value1", properties.get("key1"), "Value should not be updated.");
+        assertPropertyOrderIsPreserved(properties, expectedKeys);
     }
 }
