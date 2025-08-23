@@ -1,63 +1,41 @@
 package org.apache.commons.collections4.set;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This class contains improved versions of test cases for CompositeSet.
+ * The original test was auto-generated and has been rewritten for clarity.
+ */
 public class CompositeSet_ESTestTest56 extends CompositeSet_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        CompositeSet<Object> compositeSet0 = new CompositeSet<Object>();
-        assertNotNull(compositeSet0);
-        CompositeSet<Object> compositeSet1 = new CompositeSet<Object>(compositeSet0);
-        assertNotNull(compositeSet1);
-        assertTrue(compositeSet1.equals((Object) compositeSet0));
-        boolean boolean0 = compositeSet0.remove(compositeSet1);
-        assertNotSame(compositeSet0, compositeSet1);
-        assertNotSame(compositeSet1, compositeSet0);
-        assertTrue(compositeSet0.equals((Object) compositeSet1));
-        assertTrue(compositeSet1.equals((Object) compositeSet0));
-        assertFalse(boolean0);
+    /**
+     * Tests that calling remove() on an empty CompositeSet always returns false,
+     * even when the object to be removed is another, equal CompositeSet.
+     */
+    @Test
+    public void removeNonContainedObjectFromEmptySetShouldReturnFalse() {
+        // Arrange
+        // Create an empty composite set.
+        final CompositeSet<Object> emptySet = new CompositeSet<>();
+
+        // Create another empty composite set to use as the object for removal.
+        // Note: This object is .equals() to the first set, but it is not an
+        // element *within* the first set.
+        final CompositeSet<Object> objectToRemove = new CompositeSet<>();
+        assertEquals("Precondition: The two empty sets must be equal.", emptySet, objectToRemove);
+
+        // Act
+        // Attempt to remove the object from the empty set.
+        final boolean wasRemoved = emptySet.remove(objectToRemove);
+
+        // Assert
+        // The remove operation should return false as the set is empty and does not contain the object.
+        assertFalse("remove() should return false when called on an empty set.", wasRemoved);
+        
+        // The set's state should not have changed.
+        assertTrue("The set should remain empty after the failed remove operation.", emptySet.isEmpty());
     }
 }
