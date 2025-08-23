@@ -17,24 +17,37 @@ import org.jspecify.annotations.Nullable;
 
 public class AbstractIteratorTestTest5 extends TestCase {
 
-    public void testSneakyThrow() throws Exception {
-        Iterator<Integer> iter = new AbstractIterator<Integer>() {
+    /**
+     * Tests that when {@code computeNext()} throws an exception, the iterator propagates that
+     * exception on the first call, then enters a failed state where subsequent calls throw
+     * {@code IllegalStateException}.
+     */
+    public void testIterator_whenComputeNextThrows_propagatesExceptionThenFails() {
+        // Arrange: Create an iterator designed to throw an exception from computeNext().
+        Iterator<Integer> iteratorThatThrows =
+                new AbstractIterator<Integer>() {
+                    private boolean hasThrown = false;
 
-            boolean haveBeenCalled;
+                    @Override
+                    protected Integer computeNext() {
+                        if (hasThrown) {
+                            // This assertion confirms that AbstractIterator does not call computeNext()
+                            // again after the first exception.
+                            throw new AssertionError("computeNext() should not be called after it throws.");
+                        }
+                        hasThrown = true;
+                        // Use sneakyThrow to test that AbstractIterator correctly handles any Throwable,
+                        // including checked exceptions that aren't declared.
+                        throw sneakyThrow(new SomeCheckedException());
+                    }
+                };
 
-            @Override
-            public Integer computeNext() {
-                if (haveBeenCalled) {
-                    throw new AssertionError("Should not have been called again");
-                } else {
-                    haveBeenCalled = true;
-                    throw sneakyThrow(new SomeCheckedException());
-                }
-            }
-        };
-        // The first time, the sneakily-thrown exception comes out
-        assertThrows(SomeCheckedException.class, iter::hasNext);
-        // But the second time, AbstractIterator itself throws an ISE
-        assertThrows(IllegalStateException.class, iter::hasNext);
+        // Act & Assert: The first call to hasNext() should trigger computeNext() and
+        // propagate the original checked exception.
+        assertThrows(SomeCheckedException.class, iteratorThatThrows::hasNext);
+
+        // Act & Assert: The iterator should now be in a FAILED state. Any subsequent call
+        // to hasNext() must throw an IllegalStateException, not the original exception.
+        assertThrows(IllegalStateException.class, iteratorThatThrows::hasNext);
     }
 }
