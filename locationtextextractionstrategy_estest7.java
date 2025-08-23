@@ -1,30 +1,36 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocationTextExtractionStrategy_ESTestTest7 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LocationTextExtractionStrategy.TextChunk} inner class.
+ */
+public class LocationTextExtractionStrategyTextChunkTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Vector vector0 = new Vector(551.0283F, Float.NaN, 0);
-        LocationTextExtractionStrategy.TextChunk locationTextExtractionStrategy_TextChunk0 = new LocationTextExtractionStrategy.TextChunk("CIDSystemInfo", vector0, vector0, 2);
-        assertEquals(2.0F, locationTextExtractionStrategy_TextChunk0.getCharSpaceWidth(), 0.01F);
+    /**
+     * Verifies that the getCharSpaceWidth method of a TextChunk
+     * correctly returns the character space width value provided during its construction.
+     */
+    @Test
+    public void getCharSpaceWidth_shouldReturnWidthSetInConstructor() {
+        // Arrange
+        // The specific values for text and locations are not relevant for this test,
+        // as we are only verifying the charSpaceWidth.
+        Vector startLocation = new Vector(0, 0, 0);
+        Vector endLocation = new Vector(50, 0, 0);
+        float expectedCharSpaceWidth = 2.0f;
+
+        // Act
+        LocationTextExtractionStrategy.TextChunk textChunk = new LocationTextExtractionStrategy.TextChunk(
+                "any text",
+                startLocation,
+                endLocation,
+                expectedCharSpaceWidth
+        );
+        float actualCharSpaceWidth = textChunk.getCharSpaceWidth();
+
+        // Assert
+        assertEquals(expectedCharSpaceWidth, actualCharSpaceWidth, 0.01f);
     }
 }
