@@ -1,18 +1,29 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RefinedSoundex_ESTestTest8 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class, focusing on the US English implementation.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex("org.apache.commons.codec.language.RefinedSoundex");
-        String string0 = refinedSoundex0.US_ENGLISH.soundex("org.apache.commons.codec.language.RefinedSoundex");
-        assertEquals("O09401030308083060370840409020806308605", string0);
+    /**
+     * Tests that the soundex algorithm correctly encodes a complex string containing
+     * mixed-case letters and non-alphabetic characters (dots). The algorithm is
+     * expected to ignore non-letters and process letters in a case-insensitive manner.
+     */
+    @Test
+    public void shouldCorrectlyEncodeComplexStringWithMixedCaseAndNonLetters() {
+        // Arrange
+        final RefinedSoundex soundexEncoder = RefinedSoundex.US_ENGLISH;
+        final String input = "org.apache.commons.codec.language.RefinedSoundex";
+        final String expectedEncoding = "O09401030308083060370840409020806308605";
+
+        // Act
+        final String actualEncoding = soundexEncoder.soundex(input);
+
+        // Assert
+        assertEquals("The complex string was not encoded as expected.", expectedEncoding, actualEncoding);
     }
 }
