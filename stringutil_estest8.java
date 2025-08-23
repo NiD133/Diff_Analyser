@@ -1,28 +1,43 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest8 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        boolean boolean0 = StringUtil.isAsciiLetter('a');
-        assertTrue(boolean0);
+    /**
+     * Verifies that isAsciiLetter returns true for a standard lowercase ASCII letter.
+     */
+    @Test
+    public void isAsciiLetter_shouldReturnTrue_forLowercaseLetter() {
+        assertTrue("'a' should be recognized as an ASCII letter", StringUtil.isAsciiLetter('a'));
+    }
+
+    /**
+     * Verifies that isAsciiLetter returns true for a standard uppercase ASCII letter.
+     */
+    @Test
+    public void isAsciiLetter_shouldReturnTrue_forUppercaseLetter() {
+        assertTrue("'Z' should be recognized as an ASCII letter", StringUtil.isAsciiLetter('Z'));
+    }
+
+    /**
+     * Verifies that isAsciiLetter returns false for a character that is not a letter.
+     */
+    @Test
+    public void isAsciiLetter_shouldReturnFalse_forNonLetterCharacter() {
+        assertFalse("'$' should not be recognized as an ASCII letter", StringUtil.isAsciiLetter('$'));
+    }
+
+    /**
+     * Verifies that isAsciiLetter returns false for a digit.
+     */
+    @Test
+    public void isAsciiLetter_shouldReturnFalse_forDigit() {
+        assertFalse("'7' should not be recognized as an ASCII letter", StringUtil.isAsciiLetter('7'));
     }
 }
