@@ -1,24 +1,27 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldUtils_ESTestTest49 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the utility methods in {@link FieldUtils}.
+ */
+public class FieldUtilsTest { // Renamed from FieldUtils_ESTestTest49 for clarity
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.weekOfWeekyear();
-        FieldUtils.verifyValueBounds(dateTimeFieldType0, 1537, (-2144353229), 1537);
-        assertEquals("weekOfWeekyear", dateTimeFieldType0.getName());
+    /**
+     * Tests that verifyValueBounds() does not throw an exception when the value
+     * being checked is equal to the maximum allowed value (the upper bound).
+     */
+    @Test
+    public void verifyValueBounds_shouldNotThrowException_whenValueIsAtUpperBound() {
+        // Arrange: Define the field type, bounds, and a value at the upper bound.
+        final DateTimeFieldType fieldType = DateTimeFieldType.weekOfWeekyear();
+        final int lowerBound = -2144353229;
+        final int upperBound = 1537;
+        final int value = upperBound; // The value to check is the upper bound itself.
+
+        // Act & Assert: The method should execute without throwing an exception.
+        // The test will fail automatically if an IllegalFieldValueException is thrown.
+        FieldUtils.verifyValueBounds(fieldType, value, lowerBound, upperBound);
     }
 }
