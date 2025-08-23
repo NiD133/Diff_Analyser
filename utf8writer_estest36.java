@@ -1,39 +1,49 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import static org.junit.Assert.assertArrayEquals;
+
+// Note: The original test class name and scaffolding are preserved for context.
 public class UTF8Writer_ESTestTest36 extends UTF8Writer_ESTest_scaffolding {
 
+    /**
+     * Verifies that writing a single ASCII character correctly writes its
+     * corresponding UTF-8 byte representation to the underlying output stream.
+     */
     @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream(50000);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, byteArrayOutputStream0);
-        uTF8Writer0.write("@");
-        assertEquals((-56613888), UTF8Writer.SURROGATE_BASE);
+    public void write_whenWritingSingleAsciiCharacter_writesCorrectByteToStream() throws IOException {
+        // Arrange: Set up the necessary IOContext and a UTF8Writer connected to a byte stream.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        // IOContext setup is boilerplate but necessary for the UTF8Writer constructor.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                ContentReference.unknown(),
+                true); // `true` indicates buffer recycling is managed by IOContext
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, outputStream);
+
+        // Act: Write a single character and flush the writer's internal buffer to the stream.
+        utf8Writer.write("@");
+        utf8Writer.flush();
+
+        // Assert: The byte stream should contain the single UTF-8 byte for '@'.
+        // The ASCII and UTF-8 representation for '@' is the byte 64 (0x40).
+        byte[] expectedBytes = new byte[]{ 64 };
+        assertArrayEquals(expectedBytes, outputStream.toByteArray());
+
+        // Clean up resources.
+        utf8Writer.close();
     }
 }
