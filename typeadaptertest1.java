@@ -1,50 +1,57 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import org.junit.Test;
 
-public class TypeAdapterTestTest1 {
+/**
+ * Tests for the {@link TypeAdapter#nullSafe()} wrapper.
+ */
+public class TypeAdapterNullSafeTest {
 
-    private static final TypeAdapter<String> assertionErrorAdapter = new TypeAdapter<>() {
-
+    /**
+     * A test-only TypeAdapter that throws an {@link AssertionError} if its read or write
+     * methods are called. This is used to verify that the {@link TypeAdapter#nullSafe()}
+     * wrapper correctly handles nulls without delegating to the wrapped adapter.
+     */
+    private static final TypeAdapter<String> FAILING_ADAPTER = new TypeAdapter<>() {
         @Override
         public void write(JsonWriter out, String value) {
-            throw new AssertionError("unexpected call");
+            throw new AssertionError("Wrapped adapter should not be called for null value");
         }
 
         @Override
         public String read(JsonReader in) {
-            throw new AssertionError("unexpected call");
-        }
-
-        @Override
-        public String toString() {
-            return "assertionErrorAdapter";
-        }
-    };
-
-    private static final TypeAdapter<String> adapter = new TypeAdapter<>() {
-
-        @Override
-        public void write(JsonWriter out, String value) throws IOException {
-            out.value(value);
-        }
-
-        @Override
-        public String read(JsonReader in) throws IOException {
-            return in.nextString();
+            throw new AssertionError("Wrapped adapter should not be called for null value");
         }
     };
 
     @Test
-    public void testNullSafe() throws IOException {
-        TypeAdapter<String> adapter = assertionErrorAdapter.nullSafe();
-        assertThat(adapter.toJson(null)).isEqualTo("null");
-        assertThat(adapter.fromJson("null")).isNull();
+    public void nullSafe_whenSerializingNull_writesJsonNull() throws IOException {
+        // Arrange
+        TypeAdapter<String> nullSafeAdapter = FAILING_ADAPTER.nullSafe();
+
+        // Act
+        String json = nullSafeAdapter.toJson(null);
+
+        // Assert
+        assertThat(json).isEqualTo("null");
+        // The test implicitly verifies that FAILING_ADAPTER.write() was not called.
+    }
+
+    @Test
+    public void nullSafe_whenDeserializingNull_returnsNull() throws IOException {
+        // Arrange
+        TypeAdapter<String> nullSafeAdapter = FAILING_ADAPTER.nullSafe();
+
+        // Act
+        String value = nullSafeAdapter.fromJson("null");
+
+        // Assert
+        assertThat(value).isNull();
+        // The test implicitly verifies that FAILING_ADAPTER.read() was not called.
     }
 }
