@@ -1,28 +1,19 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest49 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil class, focusing on character-checking methods.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        boolean boolean0 = StringUtil.isHexDigit('\"');
-        assertFalse(boolean0);
+    @Test
+    public void isHexDigitShouldReturnFalseForNonHexCharacter() {
+        // The isHexDigit method should return false for characters that are not
+        // in the ranges '0'-'9', 'a'-'f', or 'A'-'F'.
+        // The double-quote character ('"') is used as a representative non-hexadecimal symbol.
+        assertFalse("A double-quote character should not be classified as a hex digit.",
+            StringUtil.isHexDigit('\"'));
     }
 }
