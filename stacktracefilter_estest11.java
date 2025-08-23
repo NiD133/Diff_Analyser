@@ -1,22 +1,29 @@
 package org.mockito.internal.exceptions.stacktrace;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class StackTraceFilter_ESTestTest11 extends StackTraceFilter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StackTraceFilter} class.
+ */
+public class StackTraceFilterTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
-        StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[0];
-        MockThrowable mockThrowable0 = new MockThrowable();
-        mockThrowable0.setStackTrace(stackTraceElementArray0);
-        StackTraceElement stackTraceElement0 = stackTraceFilter0.filterFirst(mockThrowable0, false);
-        assertNull(stackTraceElement0);
+    /**
+     * Verifies that filterFirst() returns null when the throwable's stack trace is empty,
+     * as there is no "first" element to filter.
+     */
+    @Test
+    public void filterFirst_shouldReturnNull_whenStackTraceIsEmpty() {
+        // Arrange: Create a StackTraceFilter and a throwable with an empty stack trace.
+        StackTraceFilter stackTraceFilter = new StackTraceFilter();
+        Throwable throwableWithEmptyStackTrace = new Throwable();
+        throwableWithEmptyStackTrace.setStackTrace(new StackTraceElement[0]);
+        boolean isInline = false;
+
+        // Act: Call the method under test.
+        StackTraceElement firstFilteredElement = stackTraceFilter.filterFirst(throwableWithEmptyStackTrace, isInline);
+
+        // Assert: Verify that the result is null.
+        assertNull("Expected null when filtering a throwable with an empty stack trace", firstFilteredElement);
     }
 }
