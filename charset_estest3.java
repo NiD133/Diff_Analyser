@@ -1,19 +1,38 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class CharSet_ESTestTest3 extends CharSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSet}.
+ */
+public class CharSetTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        String[] stringArray0 = new String[1];
-        stringArray0[0] = "a-z";
-        CharSet charSet0 = CharSet.getInstance(stringArray0);
-        assertNotNull(charSet0);
+    /**
+     * Tests that {@link CharSet#getInstance(String...)} correctly creates a set
+     * from a single string defining a character range like "a-z".
+     */
+    @Test
+    public void testGetInstanceWithCharacterRange() {
+        // Arrange: Define the input for the character set, representing all lowercase letters.
+        final String[] setDefinition = {"a-z"};
+
+        // Act: Create the CharSet instance.
+        final CharSet lowerCaseLetters = CharSet.getInstance(setDefinition);
+
+        // Assert: Verify that the created set behaves as expected.
+        assertNotNull("The created CharSet should not be null.", lowerCaseLetters);
+
+        // Verify that characters within the range are included.
+        assertTrue("'a' should be in the set 'a-z'.", lowerCaseLetters.contains('a'));
+        assertTrue("'m' should be in the set 'a-z'.", lowerCaseLetters.contains('m'));
+        assertTrue("'z' should be in the set 'a-z'.", lowerCaseLetters.contains('z'));
+
+        // Verify that characters outside the range are excluded.
+        assertFalse("'A' (uppercase) should not be in the set 'a-z'.", lowerCaseLetters.contains('A'));
+        assertFalse("'5' (a digit) should not be in the set 'a-z'.", lowerCaseLetters.contains('5'));
+        assertFalse("'$' (a symbol) should not be in the set 'a-z'.", lowerCaseLetters.contains('$'));
     }
 }
