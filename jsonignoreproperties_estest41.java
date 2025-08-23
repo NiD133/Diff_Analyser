@@ -1,31 +1,43 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 
-public class JsonIgnoreProperties_ESTestTest41 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link JsonIgnoreProperties.Value} class.
+ * Note: The original test was auto-generated. This version has been refactored for clarity.
+ */
+public class JsonIgnoreProperties_ESTestTest41 {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        String[] stringArray0 = new String[1];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withAllowSetters();
-        Set<String> set0 = jsonIgnoreProperties_Value1.findIgnoredForDeserialization();
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertNotSame(jsonIgnoreProperties_Value1, jsonIgnoreProperties_Value0);
-        assertEquals(0, set0.size());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertTrue(jsonIgnoreProperties_Value1.getMerge());
+    /**
+     * Tests that `findIgnoredForDeserialization()` returns an empty set
+     * when `allowSetters` is configured to be true.
+     *
+     * This behavior is expected because `allowSetters=true` effectively disables
+     * the ignoring of any specified properties during the deserialization process.
+     */
+    @Test
+    public void findIgnoredForDeserialization_whenAllowSettersIsEnabled_shouldReturnEmptySet() {
+        // Arrange: Create a Value instance configured to ignore "internalId".
+        // By default, allowSetters is false.
+        final String[] propertiesToIgnore = {"internalId"};
+        JsonIgnoreProperties.Value initialValue = JsonIgnoreProperties.Value.forIgnoredProperties(propertiesToIgnore);
+
+        // Act: Create a new Value instance with allowSetters enabled, and then
+        // retrieve the set of properties to be ignored for deserialization.
+        JsonIgnoreProperties.Value valueWithAllowSetters = initialValue.withAllowSetters();
+        Set<String> ignoredForDeserialization = valueWithAllowSetters.findIgnoredForDeserialization();
+
+        // Assert: The returned set should be empty because setters are explicitly allowed.
+        assertTrue("Set of ignored properties for deserialization should be empty when allowSetters is true.",
+                   ignoredForDeserialization.isEmpty());
+
+        // Also, verify the state of the new and old Value objects to ensure correctness and immutability.
+        assertTrue("The new instance should have allowSetters enabled.", valueWithAllowSetters.getAllowSetters());
+        assertNotSame("withAllowSetters() should return a new, distinct instance.",
+                      initialValue, valueWithAllowSetters);
+        assertFalse("The original instance's allowSetters property should remain unchanged.",
+                    initialValue.getAllowSetters());
     }
 }
