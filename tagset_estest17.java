@@ -1,29 +1,30 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TagSet_ESTestTest17 extends TagSet_ESTest_scaffolding {
+/**
+ * Tests for the {@link TagSet} class, focusing on its public API.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        TagSet tagSet0 = TagSet.initHtmlDefault();
-        // Undeclared exception!
+    /**
+     * Verifies that attempting to register a null customizer via onNewTag
+     * throws an IllegalArgumentException, as this is an invalid argument.
+     */
+    @Test
+    public void onNewTagWithNullCustomizerThrowsIllegalArgumentException() {
+        // Arrange: Create a standard HTML TagSet instance.
+        TagSet tagSet = TagSet.Html();
+
         try {
-            tagSet0.onNewTag((Consumer<Tag>) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Attempt to register a null consumer.
+            tagSet.onNewTag(null);
+            fail("Expected an IllegalArgumentException to be thrown for a null customizer, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify the exception message is as expected from the validation check.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
