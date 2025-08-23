@@ -1,34 +1,31 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FixedOrderComparator_ESTestTest12 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Tests for {@link FixedOrderComparator}.
+ * This test focuses on the constructor's handling of null input.
+ */
+public class FixedOrderComparator_ESTestTest12 { // Note: Class name kept for consistency with the original file.
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior> fixedOrderComparator0 = null;
+    /**
+     * Tests that the constructor throws a NullPointerException when initialized with a null list.
+     * The constructor should reject null inputs to ensure valid state.
+     */
+    @Test
+    public void constructorWithNullListShouldThrowNullPointerException() {
         try {
-            fixedOrderComparator0 = new FixedOrderComparator<FixedOrderComparator.UnknownObjectBehavior>((List<FixedOrderComparator.UnknownObjectBehavior>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // items
-            //
-            verifyException("java.util.Objects", e);
+            // Act: Attempt to create a comparator with a null list of items.
+            new FixedOrderComparator<>((List<String>) null);
+            fail("Expected a NullPointerException to be thrown for a null list.");
+        } catch (final NullPointerException e) {
+            // Assert: Verify that the exception message clearly indicates the cause.
+            // The source class uses Objects.requireNonNull(items, "items"), so "items" is the expected message.
+            assertEquals("The exception message should identify the null parameter.", "items", e.getMessage());
         }
     }
 }
