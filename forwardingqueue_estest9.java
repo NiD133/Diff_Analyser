@@ -1,29 +1,25 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ForwardingQueue_ESTestTest9 extends ForwardingQueue_ESTest_scaffolding {
+import java.util.Queue;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(2);
-        // Undeclared exception!
-        try {
-            evictingQueue0.offer((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+/**
+ * Tests for {@link ForwardingQueue}, using {@link EvictingQueue} as a concrete implementation.
+ */
+public class ForwardingQueueTest {
+
+    /**
+     * Verifies that attempting to offer a null element to the queue
+     * results in a NullPointerException, as per the collection contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void offer_whenElementIsNull_throwsNullPointerException() {
+        // Arrange: Create a concrete instance of a ForwardingQueue implementation.
+        // EvictingQueue is used here as it's a non-abstract subclass.
+        Queue<Object> queue = EvictingQueue.create(2);
+
+        // Act: Attempt to offer a null element, which should trigger the exception.
+        queue.offer(null);
     }
 }
