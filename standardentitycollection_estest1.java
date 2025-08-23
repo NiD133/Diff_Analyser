@@ -1,28 +1,32 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class StandardEntityCollection_ESTestTest1 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        Dimension dimension0 = new Dimension((-1), 0);
-        Rectangle rectangle0 = new Rectangle(dimension0);
-        ChartEntity chartEntity0 = new ChartEntity(rectangle0, ">", (String) null);
-        standardEntityCollection0.add(chartEntity0);
-        ChartEntity chartEntity1 = standardEntityCollection0.getEntity(1.0, 674.587836228879);
-        assertNull(chartEntity1);
+    /**
+     * Verifies that getEntity(x, y) returns null when no entity in the
+     * collection contains the specified coordinates. This scenario is tested
+     * by adding an entity with an empty area.
+     */
+    @Test
+    public void getEntityByCoordinates_WhenNoEntityContainsPoint_ShouldReturnNull() {
+        // Arrange: Create a collection and add a single chart entity.
+        // The entity's area is an empty rectangle (negative width), so it cannot contain any point.
+        StandardEntityCollection collection = new StandardEntityCollection();
+        Rectangle emptyArea = new Rectangle(0, 0, -1, 0);
+        ChartEntity entityWithEmptyArea = new ChartEntity(emptyArea, "Test Tooltip");
+        collection.add(entityWithEmptyArea);
+
+        // Act: Attempt to retrieve an entity at an arbitrary point.
+        ChartEntity foundEntity = collection.getEntity(10.0, 20.0);
+
+        // Assert: Verify that no entity was found, as the point is not inside any entity's area.
+        assertNull("Expected getEntity() to return null for coordinates outside any entity's area.", foundEntity);
     }
 }
