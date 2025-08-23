@@ -1,20 +1,27 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertFalse;
+
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest40 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        List<Locale> list0 = LocaleUtils.availableLocaleList();
-        assertFalse(list0.isEmpty());
+    /**
+     * Tests that availableLocaleList() returns a non-empty list.
+     * This is a basic sanity check to ensure the method is successfully retrieving
+     * locales from the Java runtime environment.
+     */
+    @Test
+    public void availableLocaleList_shouldReturnNonEmptyList() {
+        // When: The list of available locales is retrieved.
+        final List<Locale> availableLocales = LocaleUtils.availableLocaleList();
+
+        // Then: The list should contain at least one locale.
+        assertFalse("The list of available locales should not be empty", availableLocales.isEmpty());
     }
 }
