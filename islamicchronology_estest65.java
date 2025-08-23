@@ -1,22 +1,31 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IslamicChronology_ESTestTest65 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test64() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        int int0 = islamicChronology0.getMaxYear();
-        assertEquals(292271022, int0);
+    // The expected maximum year value is a hard-coded constant in IslamicChronology
+    // to prevent calculation overflows.
+    private static final int EXPECTED_MAX_YEAR = 292271022;
+
+    /**
+     * Verifies that getMaxYear() returns the correct, predefined maximum year value.
+     */
+    @Test
+    public void getMaxYear_shouldReturnConstantMaxValue() {
+        // Arrange: Get a standard instance of the IslamicChronology.
+        // The time zone does not affect the result of getMaxYear().
+        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
+
+        // Act: Call the method under test.
+        int actualMaxYear = chronology.getMaxYear();
+
+        // Assert: Check if the returned value matches the expected constant.
+        assertEquals("The maximum year should be the predefined constant value.",
+                EXPECTED_MAX_YEAR, actualMaxYear);
     }
 }
