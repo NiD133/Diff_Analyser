@@ -1,35 +1,60 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
+
+// The original test used a mock file, which is a good practice to avoid
+// actual file system interactions. We'll continue to use it.
 import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest2 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * An improved test suite for {@link ArArchiveOutputStream}.
+ *
+ * This version clarifies the intent of the original auto-generated test by
+ * using descriptive names, explaining magic numbers, and focusing on a single,
+ * clear objective per test.
+ */
+// The original class name "ArArchiveOutputStream_ESTestTest2" is kept for context,
+// but a name like "ArArchiveOutputStreamTest" would be more conventional.
+public class ArArchiveOutputStream_ESTestTest2 {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("*m{4/p6", false);
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(mockFileOutputStream0);
-        MockFile mockFile0 = new MockFile("*m{4/p6");
-        ArArchiveEntry arArchiveEntry0 = arArchiveOutputStream0.createArchiveEntry((File) mockFile0, "*m{4/p6");
-        arArchiveOutputStream0.setLongFileMode((-2628));
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-        assertEquals(68L, mockFile0.length());
-        assertEquals(68L, arArchiveOutputStream0.getBytesWritten());
+    /**
+     * Verifies that the first call to putArchiveEntry writes both the global AR
+     * archive header and the specific entry's header to the output stream.
+     */
+    @Test
+    public void firstPutArchiveEntryWritesGlobalAndEntryHeaders() throws IOException {
+        // --- Arrange ---
+        final String entryName = "test-entry.txt";
+
+        // A mock file is used to create the ArArchiveEntry. Its content is irrelevant
+        // for this test, as we are only checking the writing of the headers.
+        final File inputFile = new MockFile(entryName);
+
+        // Use a ByteArrayOutputStream to capture the raw bytes of the archive in memory.
+        // This is cleaner than writing to a mock file on the file system.
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final ArArchiveOutputStream archiveOutputStream = new ArArchiveOutputStream(byteArrayOutputStream);
+
+        final ArArchiveEntry archiveEntry = archiveOutputStream.createArchiveEntry(inputFile, entryName);
+
+        // --- Act ---
+        // Add the new entry to the archive. This single action should trigger writing the headers.
+        archiveOutputStream.putArchiveEntry(archiveEntry);
+
+        // --- Assert ---
+        // The total bytes written should be the sum of the global header and the entry header.
+        // 1. Global AR header ("!<arch>\n"): 8 bytes.
+        // 2. Standard AR entry header (name, timestamp, uid, gid, mode, size, etc.): 60 bytes.
+        final long expectedBytesWritten = 8L + 60L;
+
+        assertEquals("The total bytes written should be the size of the global and entry headers.",
+                expectedBytesWritten, archiveOutputStream.getBytesWritten());
+        assertEquals("The underlying stream should contain the written header bytes.",
+                (int) expectedBytesWritten, byteArrayOutputStream.size());
     }
 }
