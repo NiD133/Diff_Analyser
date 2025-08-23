@@ -1,32 +1,25 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest2 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on exception-handling scenarios.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("8+19.:23Vy=-x");
-        byte[] byteArray0 = serializedString0.asUnquotedUTF8();
-        // Undeclared exception!
-        try {
-            serializedString0.appendQuotedUTF8(byteArray0, (-1));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling {@code appendQuotedUTF8} with a negative offset
+     * throws an {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void appendQuotedUTF8_shouldThrowException_whenOffsetIsNegative() {
+        // Arrange: Create a SerializedString and a destination buffer.
+        SerializedString serializedString = new SerializedString("any-string-value");
+        byte[] destinationBuffer = new byte[100];
+        int invalidOffset = -1;
+
+        // Act: Attempt to append the string's data at a negative offset.
+        // The @Test(expected=...) annotation will assert that the expected exception is thrown.
+        serializedString.appendQuotedUTF8(destinationBuffer, invalidOffset);
     }
 }
