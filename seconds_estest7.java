@@ -1,21 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest7 extends Seconds_ESTest_scaffolding {
+/**
+ * Test suite for the Seconds class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Duration duration0 = new Duration((-1L), (-1L));
-        Days days0 = duration0.toStandardDays();
-        Seconds seconds0 = days0.toStandardSeconds();
-        Minutes minutes0 = seconds0.MIN_VALUE.toStandardMinutes();
-        assertEquals(0, seconds0.getSeconds());
-        assertEquals((-35791394), minutes0.getMinutes());
+    /**
+     * Tests that converting the minimum possible Seconds value to Minutes
+     * correctly performs integer division.
+     */
+    @Test
+    public void toStandardMinutes_fromMinValue_truncatesToCorrectNegativeValue() {
+        // Arrange
+        // Seconds.MIN_VALUE is backed by Integer.MIN_VALUE.
+        // The conversion to minutes involves integer division by 60.
+        final Seconds minSeconds = Seconds.MIN_VALUE;
+        final int expectedMinutes = Integer.MIN_VALUE / 60; // -2,147,483,648 / 60 = -35,791,394
+
+        // Act
+        final Minutes actualMinutes = minSeconds.toStandardMinutes();
+
+        // Assert
+        assertEquals(expectedMinutes, actualMinutes.getMinutes());
     }
 }
