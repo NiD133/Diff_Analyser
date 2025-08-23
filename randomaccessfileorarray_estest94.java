@@ -1,38 +1,32 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
+
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest94 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test093() throws Throwable {
-        byte[] byteArray0 = new byte[7];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArrayInputStream0);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.read((byte[]) null, 437, 437);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Verifies that the read(byte[], int, int) method throws a NullPointerException
+     * when the provided buffer is null. This is a standard contract for read methods
+     * in Java I/O that should be upheld.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readWithNullBufferThrowsNullPointerException() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray from a dummy input stream.
+        // The content of the stream is irrelevant for this test.
+        byte[] dummyData = new byte[10];
+        InputStream inputStream = new ByteArrayInputStream(dummyData);
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(inputStream);
+
+        // Act & Assert: Attempt to read into a null buffer.
+        // The method should throw a NullPointerException before attempting to read.
+        // The offset and length values are arbitrary as the null check happens first.
+        fileOrArray.read(null, 0, 1);
     }
 }
