@@ -1,27 +1,26 @@
 package org.jsoup.internal;
 
-import org.jsoup.Jsoup;
-import org.junit.jupiter.api.Test;
-import java.util.Arrays;
-import java.util.Collections;
-import static org.jsoup.internal.StringUtil.normaliseWhitespace;
-import static org.jsoup.internal.StringUtil.resolve;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class StringUtilTestTest13 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Test
-    void isAsciiLetter() {
-        assertTrue(StringUtil.isAsciiLetter('a'));
-        assertTrue(StringUtil.isAsciiLetter('n'));
-        assertTrue(StringUtil.isAsciiLetter('z'));
-        assertTrue(StringUtil.isAsciiLetter('A'));
-        assertTrue(StringUtil.isAsciiLetter('N'));
-        assertTrue(StringUtil.isAsciiLetter('Z'));
-        assertFalse(StringUtil.isAsciiLetter(' '));
-        assertFalse(StringUtil.isAsciiLetter('-'));
-        assertFalse(StringUtil.isAsciiLetter('0'));
-        assertFalse(StringUtil.isAsciiLetter('ß'));
-        assertFalse(StringUtil.isAsciiLetter('Ě'));
+/**
+ * Test suite for the {@link StringUtil#isAsciiLetter(char)} method.
+ */
+// The class was renamed from StringUtilTestTest13 to the more conventional StringUtilTest.
+public class StringUtilTest {
+
+    @ParameterizedTest(name = "For char ''{0}'', should return true")
+    @ValueSource(chars = {'a', 'n', 'z', 'A', 'N', 'Z'})
+    void isAsciiLetter_shouldReturnTrue_forAsciiLetters(char letter) {
+        assertTrue(StringUtil.isAsciiLetter(letter));
+    }
+
+    @ParameterizedTest(name = "For char ''{0}'', should return false")
+    @ValueSource(chars = {' ', '-', '0', 'ß', 'Ě'})
+    void isAsciiLetter_shouldReturnFalse_forNonAsciiLetters(char nonLetter) {
+        assertFalse(StringUtil.isAsciiLetter(nonLetter));
     }
 }
