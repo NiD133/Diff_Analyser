@@ -1,18 +1,30 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest4 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        long long0 = MurmurHash2.hash64(byteArray0, (int) (byte) 0, (int) (byte) 0);
-        assertEquals(0L, long0);
+    /**
+     * Tests that hash64 returns 0 when the specified length of the input data is zero,
+     * regardless of the actual content of the byte array.
+     */
+    @Test
+    public void hash64ShouldReturnZeroForZeroLengthInput() {
+        // Arrange
+        // The content of the data array is irrelevant when the length to hash is zero.
+        final byte[] data = new byte[] { 0x1, 0x2, 0x3, 0x4 };
+        final int lengthToHash = 0;
+        final int seed = 0; // A zero seed is used for this specific test case.
+        final long expectedHash = 0L;
+
+        // Act
+        final long actualHash = MurmurHash2.hash64(data, lengthToHash, seed);
+
+        // Assert
+        assertEquals("Hashing zero bytes should result in a hash of 0", expectedHash, actualHash);
     }
 }
