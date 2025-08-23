@@ -1,22 +1,40 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Separators_ESTestTest18 extends Separators_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Separators} class, focusing on its construction and default state.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Separators separators0 = new Separators();
-        separators0.getObjectEmptySeparator();
-        assertEquals(',', separators0.getArrayValueSeparator());
-        assertEquals(',', separators0.getObjectEntrySeparator());
-        assertEquals(Separators.Spacing.BOTH, separators0.getObjectFieldValueSpacing());
-        assertEquals(Separators.Spacing.NONE, separators0.getArrayValueSpacing());
-        assertEquals(Separators.Spacing.NONE, separators0.getObjectEntrySpacing());
-        assertEquals(':', separators0.getObjectFieldValueSeparator());
+    /**
+     * Verifies that creating a {@link Separators} instance with its default constructor
+     * correctly initializes all properties to their expected default values.
+     */
+    @Test
+    public void shouldInitializeWithDefaultValuesOnDefaultConstruction() {
+        // Arrange: Create a Separators instance using the default constructor.
+        Separators separators = new Separators();
+
+        // Act: No action is needed, as we are testing the state immediately after construction.
+
+        // Assert: Verify that all properties match the documented defaults.
+        // Assertions are grouped by functionality for improved readability.
+
+        // --- Object Separators ---
+        assertEquals(':', separators.getObjectFieldValueSeparator());
+        assertEquals(Separators.Spacing.BOTH, separators.getObjectFieldValueSpacing());
+        assertEquals(',', separators.getObjectEntrySeparator());
+        assertEquals(Separators.Spacing.NONE, separators.getObjectEntrySpacing());
+        assertEquals(" ", separators.getObjectEmptySeparator());
+
+        // --- Array Separators ---
+        assertEquals(',', separators.getArrayValueSeparator());
+        assertEquals(Separators.Spacing.NONE, separators.getArrayValueSpacing());
+        assertEquals(" ", separators.getArrayEmptySeparator());
+
+        // --- Root Separator ---
+        assertEquals(" ", separators.getRootSeparator());
     }
 }
