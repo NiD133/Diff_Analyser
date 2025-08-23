@@ -1,42 +1,47 @@
 package org.mockito.internal.util.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
-import org.junit.Rule;
+
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
-public class HashCodeAndEqualsSafeSetTestTest2 {
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet}.
+ */
+// Renamed from HashCodeAndEqualsSafeSetTestTest2 for clarity and to follow conventions.
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Rule
-    public MockitoRule r = MockitoJUnit.rule();
-
-    @Mock
-    private UnmockableHashCodeAndEquals mock1;
-
-    private static class UnmockableHashCodeAndEquals {
+    /**
+     * A helper class that simulates an object whose hashCode() and equals() methods
+     * are broken or not stubbed on a mock, causing them to throw an exception when invoked.
+     */
+    private static class ObjectWithFailingHashCodeAndEquals {
 
         @Override
         public final int hashCode() {
-            throw new NullPointerException("I'm failing on hashCode and I don't care");
+            throw new UnsupportedOperationException("hashCode() is designed to fail for this test");
         }
 
         @Override
         public final boolean equals(Object obj) {
-            throw new NullPointerException("I'm failing on equals and I don't care");
+            throw new UnsupportedOperationException("equals() is designed to fail for this test");
         }
     }
 
     @Test
-    public void mock_with_failing_hashCode_method_can_be_added() throws Exception {
-        new HashCodeAndEqualsSafeSet().add(mock1);
+    // Renamed from "mock_with_failing_hashCode_method_can_be_added" for convention and clarity.
+    // The test now explicitly verifies the state of the set after the operation.
+    public void shouldAddObjectWhoseHashCodeAndEqualsFail() {
+        // Arrange
+        HashCodeAndEqualsSafeSet set = new HashCodeAndEqualsSafeSet();
+        Object elementWithFailingHashCode = new ObjectWithFailingHashCodeAndEquals();
+
+        // Act
+        boolean wasAdded = set.add(elementWithFailingHashCode);
+
+        // Assert
+        // Verify that the element was added successfully without invoking its problematic methods.
+        assertThat(wasAdded).isTrue();
+        assertThat(set).hasSize(1);
+        assertThat(set).contains(elementWithFailingHashCode);
     }
 }
