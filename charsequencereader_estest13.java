@@ -1,31 +1,31 @@
 package com.google.common.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceReader_ESTestTest13 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ * This class contains a more understandable version of a previously auto-generated test.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        char[] charArray0 = new char[6];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        // Undeclared exception!
-        try {
-            charSequenceReader0.read(charArray0, (-1), (-1));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // java.lang.String@0000000002 (java.lang.Integer@0000000003) must not be negative
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that the read(char[], int, int) method throws an IndexOutOfBoundsException
+     * when called with a negative offset and a negative length.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void read_withNegativeOffsetAndLength_throwsIndexOutOfBoundsException() throws IOException {
+        // Arrange
+        CharSequenceReader reader = new CharSequenceReader("test data");
+        char[] destinationBuffer = new char[10];
+
+        // Act
+        // Attempt to read into the buffer with invalid negative arguments.
+        // This call is expected to fail with an IndexOutOfBoundsException due to precondition checks.
+        reader.read(destinationBuffer, -1, -1);
+
+        // Assert
+        // The test passes if the expected IndexOutOfBoundsException is thrown.
+        // This is handled by the @Test(expected = ...) annotation.
     }
 }
