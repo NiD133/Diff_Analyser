@@ -1,62 +1,44 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InstantiateFactory;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedBag_ESTestTest17 extends TransformedBag_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TransformedBag} class, focusing on its behavior
+ * when interacting with underlying collections that have type constraints.
+ */
+public class TransformedBagTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Transformer<Integer, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        TransformedSortedBag<Integer> transformedSortedBag0 = TransformedSortedBag.transformingSortedBag((SortedBag<Integer>) treeBag0, (Transformer<? super Integer, ? extends Integer>) transformer0);
-        // Undeclared exception!
-        try {
-            transformedSortedBag0.remove((Object) treeBag0, (-1));
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling remove() with an object of an incompatible type throws a
+     * ClassCastException.
+     * <p>
+     * The exception is not thrown by TransformedBag itself, but is propagated from
+     * the decorated TreeBag, which cannot compare the incompatible object type.
+     */
+    @Test(expected = ClassCastException.class)
+    public void testRemoveWithIncompatibleTypeThrowsClassCastException() {
+        // Arrange
+        final SortedBag<Integer> underlyingBag = new TreeBag<>();
+
+        // The transformer is required by the factory method, but its specific
+        // behavior is irrelevant here because the remove() method does not transform
+        // the object being removed.
+        final Transformer<Integer, Integer> identityTransformer = ConstantTransformer.nullTransformer();
+        final Bag<Integer> transformedBag =
+                TransformedSortedBag.transformingSortedBag(underlyingBag, identityTransformer);
+
+        final Object objectOfIncompatibleType = "This is not an Integer";
+
+        // Act
+        // The remove operation is delegated to the underlying TreeBag. The TreeBag
+        // will attempt to compare the incompatible object ("a string") with its
+        // elements (Integers), which results in a ClassCastException.
+        transformedBag.remove(objectOfIncompatibleType, 1);
+
+        // Assert: The test will pass if a ClassCastException is thrown.
     }
 }
