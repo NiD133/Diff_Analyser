@@ -1,53 +1,41 @@
 package org.apache.commons.cli.help;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest38 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textHelpAppendable0.resize(textStyle_Builder0, (-1606.83));
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.printWrapped("/");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Width must be greater than 0
-            //
-            verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * The printWrapped method relies on the internal TextStyle, which defines the line width.
+     * This test ensures that if the width is set to a negative value (via the resize method),
+     * printWrapped will throw an IllegalArgumentException, preventing invalid operations.
+     */
+    @Test
+    public void printWrappedShouldThrowExceptionWhenWidthIsNegative() throws IOException {
+        // Arrange
+        // Use a StringBuilder for an isolated test environment, avoiding console output.
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(new StringBuilder());
+        TextStyle.Builder styleBuilder = helpAppendable.getTextStyleBuilder();
+        double negativeFraction = -2.0;
+
+        // The resize method will calculate a new width for the style builder.
+        // A negative fraction results in a negative width.
+        helpAppendable.resize(styleBuilder, negativeFraction);
+
+        // Assert: Expect an exception with a specific message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Width must be greater than 0");
+
+        // Act: This call should fail because the internal style now has a negative width.
+        helpAppendable.printWrapped("Attempting to wrap text with an invalid width.");
     }
 }
