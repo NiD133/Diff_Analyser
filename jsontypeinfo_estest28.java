@@ -1,20 +1,27 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTypeInfo_ESTestTest28 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonTypeInfo.Value} class, focusing on the
+ * properties of its default instances.
+ */
+public class JsonTypeInfoValueTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.EMPTY;
-        boolean boolean0 = jsonTypeInfo_Value0.getIdVisible();
-        assertFalse(boolean0);
+    /**
+     * Verifies that the default 'idVisible' property of the
+     * {@link JsonTypeInfo.Value#EMPTY} constant is correctly set to false.
+     */
+    @Test
+    public void emptyInstanceShouldHaveIdVisibleFalse() {
+        // Arrange: The EMPTY constant is a pre-configured, default instance.
+        JsonTypeInfo.Value emptyValue = JsonTypeInfo.Value.EMPTY;
+
+        // Act: Retrieve the value of the idVisible property.
+        boolean isIdVisible = emptyValue.getIdVisible();
+
+        // Assert: The default value for idVisible should be false.
+        assertFalse("The 'idVisible' property for JsonTypeInfo.Value.EMPTY should be false by default.", isIdVisible);
     }
 }
