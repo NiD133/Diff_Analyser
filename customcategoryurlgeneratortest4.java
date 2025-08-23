@@ -1,32 +1,37 @@
 package org.jfree.chart.urls;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
-import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class CustomCategoryURLGeneratorTestTest4 {
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class, focusing on serialization.
+ */
+class CustomCategoryURLGeneratorTest {
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a CustomCategoryURLGenerator instance can be serialized and
+     * deserialized, resulting in an object that is equal to the original.
      */
     @Test
-    public void testSerialization() {
-        List<String> u1 = new ArrayList<>();
-        u1.add("URL A1");
-        u1.add("URL A2");
-        u1.add("URL A3");
-        List<String> u2 = new ArrayList<>();
-        u2.add("URL B1");
-        u2.add("URL B2");
-        u2.add("URL B3");
-        CustomCategoryURLGenerator g1 = new CustomCategoryURLGenerator();
-        g1.addURLSeries(u1);
-        g1.addURLSeries(u2);
-        CustomCategoryURLGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
+    @DisplayName("A generator is equal to its serialized-deserialized counterpart")
+    void serialization_restoresEqualObject() {
+        // Arrange: Create a generator with multiple URL series.
+        List<String> series1Urls = List.of("URL A1", "URL A2", "URL A3");
+        List<String> series2Urls = List.of("URL B1", "URL B2", "URL B3");
+
+        CustomCategoryURLGenerator originalGenerator = new CustomCategoryURLGenerator();
+        originalGenerator.addURLSeries(series1Urls);
+        originalGenerator.addURLSeries(series2Urls);
+
+        // Act: Serialize and then deserialize the generator.
+        CustomCategoryURLGenerator deserializedGenerator = TestUtils.serialised(originalGenerator);
+
+        // Assert: The deserialized generator should be equal to the original.
+        assertEquals(originalGenerator, deserializedGenerator);
     }
 }
