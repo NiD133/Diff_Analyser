@@ -1,55 +1,39 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
+import java.time.DateTimeException;
+import java.time.chrono.HijrahDate;
+import java.time.temporal.Temporal;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+// The original test class extended a scaffolding class.
+// This is preserved to maintain compatibility with the original test suite structure.
 public class DayOfYear_ESTestTest29 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        HijrahDate hijrahDate0 = MockHijrahDate.now();
-        // Undeclared exception!
+    /**
+     * Tests that adjustInto() throws a DateTimeException when attempting to adjust a
+     * temporal object that does not use the ISO calendar system.
+     *
+     * The specification for DayOfYear.adjustInto() requires the temporal object to be
+     * based on the ISO chronology. This test verifies that using a non-ISO date,
+     * such as HijrahDate, correctly triggers this exception.
+     */
+    @Test
+    public void adjustInto_withNonIsoChronology_throwsException() {
+        // Arrange: Create a DayOfYear instance and a date from a non-ISO calendar system.
+        DayOfYear dayOfYear = DayOfYear.of(150);
+        Temporal nonIsoDate = HijrahDate.of(1440, 1, 1); // HijrahDate uses a non-ISO chronology.
+
+        // Act & Assert: Verify that calling adjustInto with the non-ISO date throws the correct exception.
         try {
-            dayOfYear0.adjustInto(hijrahDate0);
-            fail("Expecting exception: DateTimeException");
+            dayOfYear.adjustInto(nonIsoDate);
+            fail("Expected a DateTimeException to be thrown, but no exception was thrown.");
         } catch (DateTimeException e) {
-            //
-            // Adjustment only supported on ISO date-time
-            //
-            verifyException("org.threeten.extra.DayOfYear", e);
+            // Assert that the exception message matches the expected message for this error condition.
+            assertEquals("Adjustment only supported on ISO date-time", e.getMessage());
         }
     }
 }
