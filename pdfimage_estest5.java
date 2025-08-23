@@ -1,35 +1,46 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.ImgJBIG2;
-import com.itextpdf.text.ImgTemplate;
-import com.itextpdf.text.Rectangle;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PdfImage_ESTestTest5 extends PdfImage_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        ImgJBIG2 imgJBIG2_0 = new ImgJBIG2(484, 484, byteArray0, byteArray0);
-        imgJBIG2_0.makeMask();
-        PdfIndirectReference pdfIndirectReference0 = new PdfIndirectReference(9496, 29, 5);
-        PdfImage pdfImage0 = new PdfImage(imgJBIG2_0, "", pdfIndirectReference0);
-        Image image0 = pdfImage0.getImage();
-        assertEquals(484.0F, image0.getWidth(), 0.01F);
+/**
+ * This test verifies the behavior of the PdfImage class, specifically its ability
+ * to wrap an existing iText Image object and preserve its properties.
+ */
+public class PdfImageTest {
+
+    /**
+     * Tests that the getImage() method correctly returns the original Image object
+     * from which the PdfImage was created, preserving its properties like width.
+     */
+    @Test
+    public void getImage_shouldReturnOriginalImageWithCorrectWidth() throws Exception {
+        // Arrange
+        final int expectedWidth = 484;
+        final int expectedHeight = 484;
+        final byte[] emptyImageData = new byte[0];
+
+        // Create a JBIG2 image instance to be wrapped by PdfImage.
+        // This image is also configured as a mask to test a specific constructor path.
+        Image sourceImage = new ImgJBIG2(expectedWidth, expectedHeight, emptyImageData, emptyImageData);
+        sourceImage.makeMask();
+
+        // The PdfImage constructor requires a mask reference when the image is a mask.
+        // We provide a dummy reference as its specific values are not relevant to this test.
+        PdfIndirectReference dummyMaskReference = new PdfIndirectReference(0, 0);
+
+        // Act
+        // Create the PdfImage instance, which is the object under test.
+        PdfImage pdfImage = new PdfImage(sourceImage, "testImageName", dummyMaskReference);
+        Image retrievedImage = pdfImage.getImage();
+
+        // Assert
+        assertNotNull("The retrieved image should not be null.", retrievedImage);
+        assertEquals("The width of the retrieved image should match the source image.",
+                (float) expectedWidth, retrievedImage.getWidth(), 0.01f);
     }
 }
