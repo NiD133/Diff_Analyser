@@ -1,20 +1,29 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest23 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.ArraySorter}.
+ * 
+ * Note: This class demonstrates the improvement of a single test case. In a real-world
+ * scenario, it would contain multiple tests for the ArraySorter class.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        float[] floatArray0 = ArraySorter.sort((float[]) null);
-        assertNull(floatArray0);
+    /**
+     * Tests that {@code ArraySorter.sort(float[])} correctly handles a null input array
+     * by returning null, as specified by its contract.
+     */
+    @Test
+    public void testSortFloatArrayWithNullInput() {
+        // Arrange: The input array is explicitly null.
+        final float[] inputArray = null;
+
+        // Act: Call the sort method with the null array.
+        final float[] result = ArraySorter.sort(inputArray);
+
+        // Assert: Verify that the method returns null.
+        assertNull("Sorting a null array should return null.", result);
     }
 }
