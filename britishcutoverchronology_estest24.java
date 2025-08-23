@@ -1,55 +1,38 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
+import org.junit.Test;
+
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ * This class focuses on the behavior of the date(TemporalAccessor) method.
+ */
+// The original test class name and inheritance are preserved to show a direct refactoring.
+// In a real-world scenario, this might be renamed to "BritishCutoverChronologyTest".
 public class BritishCutoverChronology_ESTestTest24 extends BritishCutoverChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        // Undeclared exception!
-        try {
-            britishCutoverChronology0.date((TemporalAccessor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // temporal
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that calling date(TemporalAccessor) with a null input
+     * throws a NullPointerException as per the method's contract.
+     */
+    @Test
+    public void date_withNullTemporalAccessor_throwsNullPointerException() {
+        // Arrange: Get the singleton instance of the chronology.
+        // Using the singleton is preferred over the deprecated constructor.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+
+        // Act & Assert: Verify that a NullPointerException is thrown.
+        // The assertThrows method is a standard, clear way to test for exceptions.
+        // It ensures the test fails if the expected exception is NOT thrown.
+        NullPointerException exception = assertThrows(
+            NullPointerException.class,
+            () -> chronology.date(null)
+        );
+
+        // Optional but recommended: Assert on the exception message for more specific testing.
+        // This confirms the exception originates from the expected parameter validation.
+        assertEquals("temporal", exception.getMessage());
     }
 }
