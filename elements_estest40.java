@@ -1,36 +1,33 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest40 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
-    @Test(timeout = 4000)
-    public void test039() throws Throwable {
-        Elements elements0 = new Elements();
-        NodeFilter nodeFilter0 = mock(NodeFilter.class, new ViolatedAssumptionAnswer());
-        Elements elements1 = elements0.filter(nodeFilter0);
-        assertTrue(elements1.isEmpty());
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that applying a filter to an empty Elements collection
+     * results in the same empty collection and does not interact with the filter.
+     */
+    @Test
+    public void filterOnEmptyElementsReturnsSameEmptyInstance() {
+        // Arrange: Create an empty Elements collection and a mock filter.
+        Elements emptyElements = new Elements();
+        NodeFilter mockFilter = mock(NodeFilter.class);
+
+        // Act: Apply the filter to the empty collection.
+        Elements result = emptyElements.filter(mockFilter);
+
+        // Assert: The result should be the same empty collection, and the filter should never be called.
+        assertTrue("The filtered collection should remain empty.", result.isEmpty());
+        assertSame("The filter method should return the same instance for chaining.", emptyElements, result);
+        verifyNoInteractions(mockFilter); // Explicitly verify the filter was never used.
     }
 }
