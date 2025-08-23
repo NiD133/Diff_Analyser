@@ -1,31 +1,45 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest48 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIgnoreProperties.Value} class, focusing on its immutability and fluent API.
+ */
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        String[] stringArray0 = new String[1];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withAllowSetters();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_Value1.withAllowSetters();
-        assertFalse(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value0.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value0.getMerge());
-        assertTrue(jsonIgnoreProperties_Value2.getMerge());
-        assertFalse(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
+    /**
+     * This test verifies that the {@code withAllowSetters()} method is idempotent.
+     * When called on an instance that already has {@code allowSetters} set to true,
+     * it should return the same instance rather than creating a new one.
+     * This is an important optimization for immutable objects.
+     */
+    @Test
+    public void withAllowSetters_whenAlreadyEnabled_shouldReturnSameInstance() {
+        // Arrange: Create an initial Value instance where allowSetters is false by default.
+        JsonIgnoreProperties.Value initialValue = JsonIgnoreProperties.Value.forIgnoredProperties("anyProperty");
+        assertFalse("Precondition: initialValue should have allowSetters as false",
+                initialValue.getAllowSetters());
+
+        // Act:
+        // 1. First call should create a new instance with allowSetters enabled.
+        JsonIgnoreProperties.Value valueWithSettersEnabled = initialValue.withAllowSetters();
+        // 2. Second call on the already-configured instance.
+        JsonIgnoreProperties.Value resultOfSecondCall = valueWithSettersEnabled.withAllowSetters();
+
+        // Assert:
+        // Verify that the first call correctly enabled the property.
+        assertTrue("withAllowSetters() should enable the allowSetters property",
+                valueWithSettersEnabled.getAllowSetters());
+
+        // The main assertion: verify that the second call returned the exact same instance.
+        assertSame("Calling withAllowSetters() again should be idempotent and return the same instance",
+                valueWithSettersEnabled, resultOfSecondCall);
+
+        // Also, verify that other properties were not affected.
+        assertFalse("allowGetters should remain unchanged", resultOfSecondCall.getAllowGetters());
+        assertFalse("ignoreUnknown should remain unchanged", resultOfSecondCall.getIgnoreUnknown());
+        assertTrue("merge should remain unchanged", resultOfSecondCall.getMerge());
     }
 }
