@@ -1,45 +1,64 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class SecondsTestTest20 extends TestCase {
-
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
+/**
+ * Test cases for the plus(int) method of the Seconds class.
+ */
+public class SecondsTest {
 
     //-----------------------------------------------------------------------
-    public void testPlus_int() {
-        Seconds test2 = Seconds.seconds(2);
-        Seconds result = test2.plus(3);
-        assertEquals(2, test2.getSeconds());
-        assertEquals(5, result.getSeconds());
-        assertEquals(1, Seconds.ONE.plus(0).getSeconds());
-        try {
-            Seconds.MAX_VALUE.plus(1);
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    // plus(int)
+    //-----------------------------------------------------------------------
+
+    @Test
+    public void plus_shouldAddPositiveValue() {
+        // Arrange
+        final Seconds initial = Seconds.seconds(2);
+        final Seconds expected = Seconds.seconds(5);
+
+        // Act
+        Seconds result = initial.plus(3);
+
+        // Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void plus_shouldBeImmutable() {
+        // Arrange
+        final Seconds initial = Seconds.seconds(2);
+        final Seconds expected = Seconds.seconds(2); // The initial object should not change
+
+        // Act
+        initial.plus(3); // The return value is ignored, we are testing the original object
+
+        // Assert
+        assertEquals(expected, initial);
+    }
+
+    @Test
+    public void plus_shouldReturnSameInstanceWhenAddingZero() {
+        // Arrange
+        final Seconds initial = Seconds.ONE;
+
+        // Act
+        Seconds result = initial.plus(0);
+
+        // Assert
+        // The implementation is optimized to return the same instance for a zero add.
+        assertSame(initial, result);
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void plus_shouldThrowExceptionOnOverflow() {
+        // Arrange
+        Seconds max = Seconds.MAX_VALUE;
+
+        // Act
+        // This operation should cause an integer overflow and throw an exception.
+        max.plus(1);
     }
 }
