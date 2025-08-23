@@ -19,7 +19,7 @@ import org.joda.time.chrono.EthiopicChronology;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.GregorianChronology;
 import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
+import org.jota.time.chrono.JulianChronology;
 import org.joda.time.chrono.LenientChronology;
 import org.joda.time.chrono.ZonedChronology;
 import org.junit.runner.RunWith;
