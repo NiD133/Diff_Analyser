@@ -1,17 +1,27 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QueryParser_ESTestTest49 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the CSS selector parsing in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        Evaluator evaluator0 = QueryParser.parse("*");
-        assertEquals("*", evaluator0.toString());
+    @Test
+    public void parse_whenQueryIsUniversalSelector_shouldReturnAllElementsEvaluator() {
+        // Arrange
+        String universalSelectorQuery = "*";
+        String expectedStringRepresentation = "*";
+
+        // Act
+        Evaluator evaluator = QueryParser.parse(universalSelectorQuery);
+
+        // Assert
+        assertEquals(
+            "The string representation of the parsed universal selector should be '*'.",
+            expectedStringRepresentation,
+            evaluator.toString()
+        );
     }
 }
