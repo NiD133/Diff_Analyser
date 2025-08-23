@@ -1,36 +1,36 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
 
-public class PdfDictionary_ESTestTest19 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link PdfDictionary} class, focusing on its
+ * robustness and error handling in edge-case scenarios.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.hashMap = null;
-        // Undeclared exception!
+    /**
+     * Verifies that getAsNumber() throws a NullPointerException if the dictionary's
+     * internal map is null.
+     *
+     * <p>This is a white-box test that simulates an invalid internal state. While this
+     * state should not occur during normal operation, this test ensures that the method
+     * fails predictably with a clear exception rather than causing a more obscure error
+     * downstream. This guards against potential regressions or unexpected state corruption.
+     */
+    @Test
+    public void getAsNumber_whenInternalMapIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create a PdfDictionary and force its internal map to be null to
+        // simulate an invalid, corrupted state.
+        PdfDictionary dictionary = new PdfDictionary();
+        dictionary.hashMap = null; // This is the specific condition under test.
+
+        // Act & Assert: Attempt to retrieve a value and verify that the expected exception is thrown.
         try {
-            pdfResources0.getAsNumber(pdfResources0.FONT);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.PdfDictionary", e);
+            dictionary.getAsNumber(PdfName.FONT);
+            fail("A NullPointerException was expected but was not thrown.");
+        } catch (NullPointerException expected) {
+            // Success: The expected exception was caught, confirming the method's behavior.
         }
     }
 }
