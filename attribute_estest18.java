@@ -1,32 +1,21 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest18 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the static helper methods in the {@link Attribute} class.
+ */
+public class AttributeStaticTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        // Undeclared exception!
-        try {
-            Attribute.isDataAttribute((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Verifies that calling {@code Attribute.isDataAttribute(null)} throws a
+     * NullPointerException. This confirms the method's behavior with invalid input,
+     * as it does not perform an explicit null check.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isDataAttributeThrowsNullPointerExceptionForNullInput() {
+        // The static isDataAttribute method is expected to throw a NullPointerException
+        // when called with a null key, as it directly attempts to operate on the input.
+        Attribute.isDataAttribute(null);
     }
 }
