@@ -1,36 +1,27 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest8 extends TestCase {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    /**
+     * Tests that the getMinutes() method correctly returns the value
+     * used to initialize the Minutes instance.
+     */
+    @Test
+    public void getMinutes_shouldReturnTheCorrectValue() {
+        // Arrange: Create a Minutes instance with a specific value.
+        final int expectedMinutes = 20;
+        Minutes minutesInstance = Minutes.minutes(expectedMinutes);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Call the method under test.
+        int actualMinutes = minutesInstance.getMinutes();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testGetMethods() {
-        Minutes test = Minutes.minutes(20);
-        assertEquals(20, test.getMinutes());
+        // Assert: Verify that the returned value is correct.
+        assertEquals(expectedMinutes, actualMinutes);
     }
 }
