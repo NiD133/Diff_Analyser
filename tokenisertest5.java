@@ -1,30 +1,53 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.junit.jupiter.api.Test;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+
 import static org.jsoup.parser.CharacterReader.BufferSize;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TokeniserTestTest5 {
+/**
+ * Tests for the {@link Tokeniser}.
+ * This class focuses on specific tokenisation scenarios.
+ */
+// The original class name 'TokeniserTestTest5' was renamed for clarity and convention.
+public class TokeniserTest {
 
+    /**
+     * Tests that the parser can handle comments that are larger than the internal read buffer.
+     * This ensures that the tokeniser correctly buffers and processes data when a token
+     * spans across buffer boundaries, preventing data loss or corruption.
+     */
     @Test
-    public void handleLargeComment() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("Quite a comment ");
-        } while (sb.length() < BufferSize);
-        String comment = sb.toString();
-        String html = "<p><!-- " + comment + " --></p>";
+    void parsesCommentLargerThanReadBuffer() {
+        // Arrange
+        // Create a comment string that is deliberately larger than the tokeniser's internal buffer
+        // to verify correct buffer management.
+        StringBuilder commentBuilder = new StringBuilder(BufferSize * 2);
+        while (commentBuilder.length() < BufferSize + 20) {
+            commentBuilder.append("This is a part of a very large comment. ");
+        }
+        String largeCommentText = commentBuilder.toString();
+        String html = "<p><!-- " + largeCommentText + " --></p>";
+        String expectedCommentData = " " + largeCommentText + " ";
+
+        // Act
         Document doc = Jsoup.parse(html);
-        Elements els = doc.select("p");
-        assertEquals(1, els.size());
-        Element el = els.first();
-        assertNotNull(el);
-        Comment child = (Comment) el.childNode(0);
-        assertEquals(" " + comment + " ", child.getData());
+
+        // Assert
+        Element pElement = doc.selectFirst("p");
+        assertNotNull(pElement, "The <p> element should be parsed successfully.");
+        
+        assertTrue(pElement.childNodeSize() > 0, "The <p> element should contain a child node.");
+        Node childNode = pElement.childNode(0);
+
+        assertInstanceOf(Comment.class, childNode, "The child node of <p> should be a Comment.");
+        Comment commentNode = (Comment) childNode;
+
+        assertEquals(expectedCommentData, commentNode.getData(), "The comment data should be parsed completely and correctly.");
     }
 }
