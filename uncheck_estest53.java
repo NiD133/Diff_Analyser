@@ -1,30 +1,28 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest53 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        IOPredicate<String> iOPredicate0 = IOPredicate.alwaysFalse();
-        boolean boolean0 = Uncheck.test(iOPredicate0, "6 P)'Sdhh");
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link Uncheck#test(IOPredicate, Object)} correctly returns false
+     * when the provided predicate evaluates to false.
+     */
+    @Test
+    public void testWithPredicateReturningFalse() {
+        // Arrange: Create a predicate that always returns false.
+        final IOPredicate<String> alwaysFalsePredicate = IOPredicate.alwaysFalse();
+        final String irrelevantInput = "test-input";
+
+        // Act: Call the Uncheck.test method with the predicate.
+        final boolean result = Uncheck.test(alwaysFalsePredicate, irrelevantInput);
+
+        // Assert: The result should be false, matching the predicate's behavior.
+        assertFalse("The result should be false when the predicate is always false.", result);
     }
 }
