@@ -1,56 +1,29 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest19 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
-        JulianEra julianEra0 = JulianEra.BC;
-        // Undeclared exception!
-        try {
-            britishCutoverChronology0.dateYearDay((Era) julianEra0, 1778, (-5738));
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid value for DayOfYear (valid values 1 - 365/366): -5738
-            //
-            verifyException("java.time.temporal.ValueRange", e);
-        }
+    /**
+     * Tests that creating a date with an invalid day-of-year throws an exception.
+     * The day-of-year must be a positive number within the valid range for the year.
+     */
+    @Test(expected = DateTimeException.class)
+    public void dateYearDay_withNegativeDayOfYear_throwsException() {
+        // Arrange
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        JulianEra era = JulianEra.BC;
+        int year = 1778; // A valid year after the cutover
+        int invalidDayOfYear = -5738;
+
+        // Act
+        // This call is expected to throw DateTimeException due to the invalid day-of-year.
+        chronology.dateYearDay(era, year, invalidDayOfYear);
+
+        // Assert: The exception is verified by the @Test(expected=...) annotation.
     }
 }
