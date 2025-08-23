@@ -1,26 +1,30 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LoopingListIterator_ESTestTest30 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link LoopingListIterator}.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LoopingListIterator<Object> loopingListIterator0 = new LoopingListIterator<Object>(linkedList0);
-        loopingListIterator0.reset();
-        assertFalse(loopingListIterator0.hasNext());
+    /**
+     * Verifies that hasNext() returns false for an iterator over an empty list,
+     * even after the reset() method is called.
+     */
+    @Test
+    public void hasNextShouldReturnFalseForEmptyListAfterReset() {
+        // Arrange: Create an iterator for an empty list.
+        final List<Object> emptyList = Collections.emptyList();
+        final LoopingListIterator<Object> iterator = new LoopingListIterator<>(emptyList);
+
+        // Act: Reset the iterator.
+        iterator.reset();
+
+        // Assert: The iterator should still report that it has no next element.
+        assertFalse("An iterator over an empty list should not have a next element after being reset.", iterator.hasNext());
     }
 }
