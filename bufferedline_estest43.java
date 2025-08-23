@@ -1,30 +1,50 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest43 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.017453292519943295, 0.017453292519943295, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.017453292519943295, spatialContext0);
-        RectangleImpl rectangleImpl0 = new RectangleImpl((-13.424214), 0.017453292519943295, 0.017453292519943295, 0.017453292519943295, spatialContext0);
-        SpatialRelation spatialRelation0 = bufferedLine0.relate((Rectangle) rectangleImpl0);
-        assertEquals(SpatialRelation.INTERSECTS, spatialRelation0);
-        assertTrue(bufferedLine0.hasArea());
+/**
+ * Unit tests for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
+
+    // Use a single, shared SpatialContext for all tests in this class.
+    // GEO context means units are in degrees.
+    private final SpatialContext ctx = SpatialContext.GEO;
+
+    /**
+     * Tests that a BufferedLine correctly identifies an intersection with a rectangle.
+     *
+     * <p>This test case covers a specific scenario where the BufferedLine is defined
+     * by the same start and end points, effectively creating a buffered point (a circle).
+     * The test verifies that this circle correctly reports an INTERSECTS relationship
+     * with a rectangle whose edge touches the circle's center.
+     */
+    @Test
+    public void bufferedPointShouldIntersectWithTouchingRectangle() {
+        // Arrange
+        // A BufferedLine with identical start and end points behaves like a circle.
+        Point centerPoint = ctx.makePoint(10, 20);
+        double bufferDistance = 5.0;
+        BufferedLine bufferedPoint = new BufferedLine(centerPoint, centerPoint, bufferDistance, ctx);
+
+        // Create a rectangle whose right edge (at x=10) passes through the circle's center (10, 20).
+        Rectangle intersectingRectangle = ctx.makeRectangle(0, 10, 15, 25);
+
+        // Act
+        SpatialRelation relation = bufferedPoint.relate(intersectingRectangle);
+
+        // Assert
+        // The rectangle's boundary touches the center of the buffered point, so they must intersect.
+        assertEquals(SpatialRelation.INTERSECTS, relation);
+
+        // Also, verify a fundamental property: a buffered line must have an area.
+        assertTrue("A buffered line should always have an area", bufferedPoint.hasArea());
     }
 }
