@@ -1,36 +1,34 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteUtils_ESTestTest15 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[5] = (byte) (-5);
-        long long0 = ByteUtils.fromLittleEndian(byteArray0);
-        assertEquals(275977418571776L, long0);
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(byte[])} correctly converts an 8-byte array
+     * in little-endian format to a long value.
+     */
+    @Test
+    public void fromLittleEndianWithFullByteArrayShouldConvertCorrectly() {
+        // Arrange
+        // Create an 8-byte array to represent a little-endian long.
+        // We set the byte at index 5 to 0xFB. In little-endian, the byte at index `i`
+        // corresponds to the i-th power of 256.
+        byte[] littleEndianBytes = new byte[8];
+        littleEndianBytes[5] = (byte) 0xFB; // 0xFB is -5 in signed byte representation
+
+        // The expected long value is 0xFB shifted left by 40 bits (5 * 8).
+        // Hex representation is much clearer than the decimal equivalent (275977418571776L).
+        long expectedValue = 0xFB0000000000L;
+
+        // Act
+        long actualValue = ByteUtils.fromLittleEndian(littleEndianBytes);
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
