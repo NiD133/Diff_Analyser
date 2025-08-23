@@ -1,57 +1,39 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
-import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SimplePathInterpreter_ESTestTest5 extends SimplePathInterpreter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Locale locale0 = Locale.JAPANESE;
-        NullPointer nullPointer0 = new NullPointer(locale0, "");
-        nullPointer0.setIndex(133);
-        Step[] stepArray0 = new Step[0];
-        NullPointer nullPointer1 = (NullPointer) SimplePathInterpreter.interpretSimpleLocationPath((EvalContext) null, nullPointer0, stepArray0);
-        assertFalse(nullPointer1.isDynamicPropertyDeclarationSupported());
+import static org.junit.Assert.assertSame;
+
+/**
+ * Contains tests for the {@link SimplePathInterpreter} class, focusing on specific path interpretation scenarios.
+ */
+public class SimplePathInterpreterTest {
+
+    /**
+     * Tests that interpretSimpleLocationPath returns the original root pointer
+     * unmodified when the path (steps array) is empty.
+     */
+    @Test
+    public void interpretSimpleLocationPathWithEmptyStepsReturnsRootPointer() {
+        // Arrange
+        // Create a root pointer with a specific state (an index) to ensure it's returned unchanged.
+        NodePointer rootPointer = new NullPointer(Locale.JAPANESE, "testID");
+        rootPointer.setIndex(133);
+
+        // An empty array of steps represents an empty path.
+        Step[] emptySteps = new Step[0];
+
+        // Act
+        // The EvalContext is not used in this specific code path, so null is acceptable.
+        NodePointer resultPointer = SimplePathInterpreter.interpretSimpleLocationPath(null, rootPointer, emptySteps);
+
+        // Assert
+        // The method should return the exact same object instance it was given.
+        assertSame("When the steps array is empty, the original root pointer should be returned.", rootPointer, resultPointer);
     }
 }
