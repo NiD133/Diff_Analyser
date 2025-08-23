@@ -1,41 +1,50 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
+import org.junit.Test;
+
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TextRenderInfo_ESTestTest25 extends TextRenderInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = graphicsState0.ctm;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        List<TextRenderInfo> list0 = textRenderInfo0.getCharacterRenderInfos();
-        assertFalse(list0.contains(textRenderInfo0));
+/**
+ * Test suite for the {@link TextRenderInfo} class.
+ */
+public class TextRenderInfoTest {
+
+    /**
+     * Verifies that getCharacterRenderInfos() returns an empty list
+     * when the TextRenderInfo is created with an empty PdfString.
+     */
+    @Test
+    public void getCharacterRenderInfos_withEmptyString_returnsEmptyList() {
+        // Arrange: Set up the necessary objects for creating a TextRenderInfo instance.
+        // A GraphicsState with a font is required by the constructor.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        PdfString emptyPdfString = new PdfString();
+        Matrix initialTextMatrix = graphicsState.ctm;
+        Collection<MarkedContentInfo> markedContent = new Stack<>();
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+            emptyPdfString,
+            graphicsState,
+            initialTextMatrix,
+            markedContent
+        );
+
+        // Act: Call the method under test.
+        List<TextRenderInfo> characterRenderInfos = textRenderInfo.getCharacterRenderInfos();
+
+        // Assert: Verify that the returned list is empty.
+        assertTrue(
+            "The list of character render infos should be empty for an empty input string.",
+            characterRenderInfos.isEmpty()
+        );
     }
 }
