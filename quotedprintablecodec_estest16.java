@@ -1,23 +1,28 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest16 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertArrayEquals;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        byte[] byteArray1 = QuotedPrintableCodec.decodeQuotedPrintable(byteArray0);
-        assertFalse(byteArray1.equals((Object) byteArray0));
+/**
+ * Unit tests for the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that decoding an empty byte array results in a new, empty byte array.
+     */
+    @Test
+    public void decodeQuotedPrintableWithEmptyArrayReturnsEmptyArray() throws DecoderException {
+        // Arrange: Create an empty byte array as input.
+        final byte[] emptyInput = new byte[0];
+        final byte[] expectedOutput = new byte[0];
+
+        // Act: Decode the empty byte array.
+        final byte[] actualOutput = QuotedPrintableCodec.decodeQuotedPrintable(emptyInput);
+
+        // Assert: Verify that the result is an empty byte array.
+        assertArrayEquals("Decoding an empty array should produce an empty array.", expectedOutput, actualOutput);
     }
 }
