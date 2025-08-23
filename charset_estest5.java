@@ -1,25 +1,22 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSet_ESTestTest5 extends CharSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharSet}.
+ */
+public class CharSetTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        CharSet charSet0 = null;
-        try {
-            charSet0 = new CharSet((String[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Arrays", e);
-        }
+    /**
+     * Tests that the CharSet constructor throws a NullPointerException
+     * when passed a null array, as is expected by its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullArrayThrowsNullPointerException() {
+        // The constructor is protected, but this test class, being in the same package,
+        // can invoke it directly to test this edge case.
+        // The cast to (String[]) is necessary to distinguish the call from
+        // a call with a single null String.
+        new CharSet((String[]) null);
     }
 }
