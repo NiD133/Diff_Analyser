@@ -3,75 +3,108 @@ package org.apache.commons.io.input;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class WindowsLineEndingInputStreamTestTest3 {
+/**
+ * Tests for {@link WindowsLineEndingInputStream}.
+ */
+class WindowsLineEndingInputStreamTest {
 
-    private String roundtripReadByte(final String msg) throws IOException {
-        return roundtripReadByte(msg, true);
+    /**
+     * Creates a {@link WindowsLineEndingInputStream} for a given string input.
+     *
+     * @param input The string to be used as the source for the input stream.
+     * @param ensureLineFeedAtEos Corresponds to the constructor parameter of the class under test.
+     * @return A new {@link WindowsLineEndingInputStream}.
+     */
+    private WindowsLineEndingInputStream createInputStream(final String input, final boolean ensureLineFeedAtEos) {
+        return new WindowsLineEndingInputStream(
+            CharSequenceInputStream.builder()
+                .setCharSequence(input)
+                .setCharset(StandardCharsets.UTF_8)
+                .get(),
+            ensureLineFeedAtEos);
     }
 
-    private String roundtripReadByte(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            int i = 0;
-            while (i < buf.length) {
-                final int read = lf.read();
-                if (read < 0) {
-                    break;
-                }
-                buf[i++] = (byte) read;
-            }
-            return new String(buf, 0, i, StandardCharsets.UTF_8);
+    /**
+     * Reads the entire content of a given stream using the single-byte {@code read()} method.
+     */
+    private String readFullyUsingByteByByteRead(final InputStream in) throws IOException {
+        final byte[] buffer = new byte[1024];
+        int bytesRead = 0;
+        int b;
+        while ((b = in.read()) != -1) {
+            buffer[bytesRead++] = (byte) b;
         }
+        return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
     }
 
-    private String roundtripReadByteArray(final String msg) throws IOException {
-        return roundtripReadByteArray(msg, true);
+    /**
+     * Reads the entire content of a given stream using the {@code read(byte[])} method.
+     */
+    private String readFullyUsingByteArrayRead(final InputStream in) throws IOException {
+        final byte[] buffer = new byte[1024];
+        final int bytesRead = in.read(buffer);
+        return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
     }
 
-    private String roundtripReadByteArray(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
-        }
+    /**
+     * Reads the entire content of a given stream using the {@code read(byte[], int, int)} method.
+     */
+    private String readFullyUsingByteArrayReadWithOffset(final InputStream in) throws IOException {
+        final byte[] buffer = new byte[1024];
+        final int bytesRead = in.read(buffer, 0, buffer.length);
+        return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
     }
 
-    private String roundtripReadByteArrayIndex(final String msg) throws IOException {
-        return roundtripReadByteArrayIndex(msg, true);
-    }
-
-    private String roundtripReadByteArrayIndex(final String msg, final boolean ensure) throws IOException {
-        // read(byte[])
-        try (WindowsLineEndingInputStream lf = new WindowsLineEndingInputStream(CharSequenceInputStream.builder().setCharSequence(msg).setCharset(StandardCharsets.UTF_8).get(), ensure)) {
-            final byte[] buf = new byte[100];
-            final int read = lf.read(buf, 0, 100);
-            return new String(buf, 0, read, StandardCharsets.UTF_8);
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    @DisplayName("mark() should throw UnsupportedOperationException regardless of constructor parameters")
+    void mark_shouldThrowUnsupportedOperationException(final boolean ensureLineFeedAtEos) {
+        try (final InputStream in = createInputStream("", ensureLineFeedAtEos)) {
+            assertThrows(UnsupportedOperationException.class, () -> in.mark(1));
         }
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void testMark(final boolean ensureLineFeedAtEndOfFile) {
-        assertThrows(UnsupportedOperationException.class, () -> new WindowsLineEndingInputStream(new NullInputStream(), true).mark(1));
-    }
-
-    @SuppressWarnings("resource")
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void testMarkSupported(final boolean ensureLineFeedAtEndOfFile) {
-        assertFalse(new WindowsLineEndingInputStream(new NullInputStream(), true).markSupported());
+    @ValueSource(booleans = {false, true})
+    @DisplayName("markSupported() should return false regardless of constructor parameters")
+    void markSupported_shouldReturnFalse(final boolean ensureLineFeedAtEos) {
+        try (final InputStream in = createInputStream("", ensureLineFeedAtEos)) {
+            assertFalse(in.markSupported());
+        }
     }
 
     @Test
-    void testInTheMiddleOfTheLine_ByteArrayIndex() throws Exception {
-        assertEquals("a\r\nbc\r\n", roundtripReadByteArrayIndex("a\r\nbc"));
+    @DisplayName("Should add CRLF at end of stream if ensureLineFeedAtEos is true and input does not end with a newline")
+    void shouldAddCrlfAtEndWhenEnsureIsTrue() throws Exception {
+        final String input = "a\r\nbc";
+        final String expectedOutput = "a\r\nbc\r\n";
+        final boolean ensureLineFeedAtEos = true;
+
+        // Test behavior for all three read() method variants
+        assertEquals(expectedOutput, readFullyUsingByteByByteRead(createInputStream(input, ensureLineFeedAtEos)));
+        assertEquals(expectedOutput, readFullyUsingByteArrayRead(createInputStream(input, ensureLineFeedAtEos)));
+        assertEquals(expectedOutput, readFullyUsingByteArrayReadWithOffset(createInputStream(input, ensureLineFeedAtEos)));
+    }
+
+    @Test
+    @DisplayName("Should NOT add CRLF at end of stream if ensureLineFeedAtEos is false")
+    void shouldNotAddCrlfAtEndWhenEnsureIsFalse() throws Exception {
+        final String input = "a\r\nbc";
+        final String expectedOutput = "a\r\nbc"; // Expect no change
+        final boolean ensureLineFeedAtEos = false;
+
+        // Test behavior for all three read() method variants
+        assertEquals(expectedOutput, readFullyUsingByteByByteRead(createInputStream(input, ensureLineFeedAtEos)));
+        assertEquals(expectedOutput, readFullyUsingByteArrayRead(createInputStream(input, ensureLineFeedAtEos)));
+        assertEquals(expectedOutput, readFullyUsingByteArrayReadWithOffset(createInputStream(input, ensureLineFeedAtEos)));
     }
 }
