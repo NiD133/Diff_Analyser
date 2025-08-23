@@ -1,22 +1,27 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class BCodec_ESTestTest1 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link BCodec}.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        String string0 = bCodec0.getEncoding();
-        assertEquals("B", string0);
+    /**
+     * Tests that the getEncoding() method returns the correct encoding scheme identifier, "B",
+     * as specified by RFC 1522 for B-encoding.
+     */
+    @Test
+    public void getEncodingShouldReturnB() {
+        // Arrange
+        final BCodec codec = new BCodec();
+        final String expectedEncoding = "B";
+
+        // Act
+        final String actualEncoding = codec.getEncoding();
+
+        // Assert
+        assertEquals("The encoding identifier should be 'B'", expectedEncoding, actualEncoding);
     }
 }
