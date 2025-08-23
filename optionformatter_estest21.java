@@ -1,23 +1,30 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class OptionFormatter_ESTestTest21 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link OptionFormatter} class.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Option option0 = new Option("7", "TjJ+)m", false, "");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getOpt();
-        assertEquals("-7", string0);
+    /**
+     * Tests that the getOpt() method correctly formats a short option
+     * by prepending the default prefix "-".
+     */
+    @Test
+    public void getOptShouldReturnShortOptionWithDefaultPrefix() {
+        // Arrange: Create an option with a short name and get a default formatter for it.
+        Option option = new Option("v", "verbose", false, "Enable verbose output");
+        OptionFormatter formatter = OptionFormatter.from(option);
+        String expectedFormattedOpt = "-v";
+
+        // Act: Call the method under test.
+        String actualFormattedOpt = formatter.getOpt();
+
+        // Assert: Verify that the output matches the expected prefixed format.
+        assertEquals("The formatted short option should be prepended with the default '-' prefix.",
+                expectedFormattedOpt, actualFormattedOpt);
     }
 }
