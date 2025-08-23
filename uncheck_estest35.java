@@ -1,37 +1,20 @@
 package org.apache.commons.io.function;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest35 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class, focusing on exception handling.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        // Undeclared exception!
-        try {
-            Uncheck.accept((IOIntConsumer) null, Integer.MAX_VALUE);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.function.Uncheck", e);
-        }
+    /**
+     * Tests that Uncheck.accept(IOIntConsumer, int) throws a NullPointerException
+     * when the provided IOIntConsumer is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void acceptIntConsumerShouldThrowNullPointerExceptionWhenConsumerIsNull() {
+        // The integer value is arbitrary as it's not relevant to the null check.
+        final int anyIntValue = 42;
+        Uncheck.accept(null, anyIntValue);
     }
 }
