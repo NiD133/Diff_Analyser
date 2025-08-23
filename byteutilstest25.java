@@ -1,34 +1,36 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
 import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest25 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+class ByteUtilsTest {
 
+    /**
+     * Tests that {@link ByteUtils#toLittleEndian(OutputStream, long, int)}
+     * correctly writes a multi-byte value to an OutputStream in little-endian byte order.
+     */
     @Test
-    void testToLittleEndianToStream() throws IOException {
-        final byte[] byteArray;
-        final byte[] expected = { 2, 3, 4 };
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            toLittleEndian(bos, 2 + 3 * 256 + 4 * 256 * 256, 3);
-            byteArray = bos.toByteArray();
-            assertArrayEquals(expected, byteArray);
-        }
-        assertArrayEquals(expected, byteArray);
+    void toLittleEndianShouldWriteValueToStreamInLittleEndianOrder() throws IOException {
+        // Arrange
+        // The value 0x040302L is chosen because its byte representation in big-endian
+        // is {0x04, 0x03, 0x02}, making it easy to verify the little-endian conversion.
+        final long valueToWrite = 0x040302L;
+        final byte[] expectedLittleEndianBytes = { 0x02, 0x03, 0x04 };
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Act
+        toLittleEndian(outputStream, valueToWrite, expectedLittleEndianBytes.length);
+
+        // Assert
+        final byte[] actualBytes = outputStream.toByteArray();
+        assertArrayEquals(expectedLittleEndianBytes, actualBytes,
+            "The long value should be written to the stream as a 3-byte little-endian sequence.");
     }
 }
