@@ -1,39 +1,48 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest119 extends XNode_ESTest_scaffolding {
+/**
+ * This test verifies the error-handling behavior of the XNode class.
+ * It ensures that evaluating an invalid XPath expression results in a descriptive RuntimeException.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test118() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
+    @Test
+    public void evalNodeWithInvalidXPathShouldThrowRuntimeException() {
+        // Arrange
+        // An invalid XPath expression that cannot be parsed or evaluated as a number.
+        final String invalidXPathExpression = "2iY";
+
+        // Create minimal dependencies to instantiate an XNode.
+        Node dummyNode = new IIOMetadataNode();
+        Properties variables = new Properties();
+
+        // The XPathParser is initialized with a null document. This is sufficient for this test
+        // as the error occurs during expression evaluation, not node traversal in a document.
+        XPathParser parser = new XPathParser((Document) null, false);
+        XNode xNode = new XNode(parser, dummyNode, variables);
+
+        // Act & Assert
         try {
-            xNode0.evalNode("2iY");
-            fail("Expecting exception: RuntimeException");
+            xNode.evalNode(invalidXPathExpression);
+            fail("Expected a RuntimeException for an invalid XPath expression, but none was thrown.");
         } catch (RuntimeException e) {
-            //
-            // Error evaluating XPath.  Cause: javax.xml.xpath.XPathExpressionException: javax.xml.transform.TransformerException: 2iY could not be formatted to a number!
-            //
-            verifyException("org.apache.ibatis.parsing.XPathParser", e);
+            // The exception is expected. We verify its message to ensure it's the correct error.
+            String actualMessage = e.getMessage();
+            String expectedRootCauseText = "could not be formatted to a number";
+
+            assertTrue("Exception message should indicate an XPath evaluation error. Actual: " + actualMessage,
+                    actualMessage.contains("Error evaluating XPath"));
+            assertTrue("Exception message should explain the root cause of the failure. Actual: " + actualMessage,
+                    actualMessage.contains(expectedRootCauseText));
         }
     }
 }
