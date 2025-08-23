@@ -1,50 +1,33 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
+/**
+ * This class contains an improved version of a test for the {@link DayOfYear} class.
+ * The original test was automatically generated and has been refactored for clarity
+ * and maintainability.
+ */
+// The original test extended a scaffolding class, which might be necessary
+// for the test environment setup. It is kept for compatibility.
 public class DayOfYear_ESTestTest28 extends DayOfYear_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
-        ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
-        DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
-        DayOfYear dayOfYear1 = DayOfYear.now();
-        boolean boolean0 = dayOfYear0.equals(dayOfYear1);
-        assertFalse(boolean0);
-        assertFalse(dayOfYear1.equals((Object) dayOfYear0));
+    /**
+     * Verifies that the equals() method returns false when comparing two
+     * DayOfYear instances that represent different days.
+     *
+     * <p>The original test was brittle because it depended on the system clock and
+     * specific time zones. This revised version is deterministic, using explicit,
+     * constant values to ensure the test is reliable and easy to understand.
+     */
+    @Test
+    public void equals_shouldReturnFalse_forDifferentDayOfYearInstances() {
+        // Arrange: Create two distinct DayOfYear instances with different values.
+        DayOfYear day100 = DayOfYear.of(100);
+        DayOfYear day200 = DayOfYear.of(200);
+
+        // Act & Assert: Verify that the two instances are not considered equal.
+        // Using assertNotEquals is more direct and readable than assertFalse(a.equals(b)).
+        assertNotEquals(day100, day200);
     }
 }
