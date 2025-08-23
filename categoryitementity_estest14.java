@@ -1,36 +1,47 @@
 package org.jfree.chart.entity;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import javax.swing.JLayeredPane;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryItemEntity_ESTestTest14 extends CategoryItemEntity_ESTest_scaffolding {
+import java.awt.Rectangle;
+import java.awt.Shape;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        DefaultMultiValueCategoryDataset<Integer, Integer> defaultMultiValueCategoryDataset0 = new DefaultMultiValueCategoryDataset<Integer, Integer>();
-        CategoryItemEntity<Integer, Integer> categoryItemEntity0 = new CategoryItemEntity<Integer, Integer>(defaultCaret0, "A!=WtVt`q", "A!=WtVt`q", defaultMultiValueCategoryDataset0, (Integer) 0, (Integer) 0);
-        CategoryDataset<Integer, Integer> categoryDataset0 = categoryItemEntity0.getDataset();
-        assertNotNull(categoryDataset0);
+import static org.junit.Assert.assertSame;
+
+/**
+ * Tests for the {@link CategoryItemEntity} class, focusing on the getDataset method.
+ */
+public class CategoryItemEntityTest {
+
+    /**
+     * Verifies that the getDataset() method returns the same dataset instance
+     * that was provided in the constructor.
+     */
+    @Test
+    public void getDataset_shouldReturnDatasetFromConstructor() {
+        // Arrange: Create the necessary objects for the entity.
+        Shape testArea = new Rectangle(10, 20, 30, 40);
+        String tooltipText = "Test Tooltip";
+        String urlText = "http://www.jfree.org/jfreechart/";
+        CategoryDataset<String, String> expectedDataset = new DefaultMultiValueCategoryDataset<>();
+        String rowKey = "Row 1";
+        String columnKey = "Column A";
+
+        CategoryItemEntity<String, String> entity = new CategoryItemEntity<>(
+                testArea,
+                tooltipText,
+                urlText,
+                expectedDataset,
+                rowKey,
+                columnKey
+        );
+
+        // Act: Call the method under test.
+        CategoryDataset<String, String> actualDataset = entity.getDataset();
+
+        // Assert: Verify that the returned dataset is the exact same instance.
+        assertSame("The dataset returned by getDataset() should be the same instance provided to the constructor.",
+                expectedDataset, actualDataset);
     }
 }
