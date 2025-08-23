@@ -1,20 +1,30 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest34 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        StringBuilder stringBuilder0 = new StringBuilder((CharSequence) "");
-        jsonLocation0.appendOffsetDescription(stringBuilder0);
-        assertEquals("byte offset: #UNKNOWN", stringBuilder0.toString());
+    /**
+     * Verifies that appending the offset description for the special "Not Available" (NA)
+     * location results in a specific "UNKNOWN" placeholder text.
+     */
+    @Test
+    public void appendOffsetDescriptionForNALocationShouldAppendUnknownByteOffset() {
+        // Arrange: Set up the test conditions.
+        // JsonLocation.NA represents an unknown or unavailable location.
+        JsonLocation naLocation = JsonLocation.NA;
+        StringBuilder stringBuilder = new StringBuilder();
+        String expectedDescription = "byte offset: #UNKNOWN";
+
+        // Act: Call the method under test.
+        naLocation.appendOffsetDescription(stringBuilder);
+
+        // Assert: Verify the outcome.
+        // The StringBuilder should now contain the expected placeholder text.
+        assertEquals(expectedDescription, stringBuilder.toString());
     }
 }
