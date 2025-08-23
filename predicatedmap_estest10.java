@@ -1,56 +1,47 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
 import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest10 extends PredicatedMap_ESTest_scaffolding {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Predicate<Object> predicate0 = NotNullPredicate.notNullPredicate();
-        HashMap<Object, Transformer<Object, Integer>> hashMap0 = new HashMap<Object, Transformer<Object, Integer>>();
-        PredicatedMap<Object, Transformer<Object, Integer>> predicatedMap0 = new PredicatedMap<Object, Transformer<Object, Integer>>(hashMap0, predicate0, predicate0);
-        Transformer<Object, Integer> transformer0 = ConstantTransformer.constantTransformer((Integer) null);
-        Integer integer0 = new Integer(1);
-        predicatedMap0.put(integer0, transformer0);
-        hashMap0.put(predicatedMap0, transformer0);
-        // Undeclared exception!
-        try {
-            predicatedMap0.putAll(hashMap0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+/**
+ * Tests for {@link PredicatedMap} focusing on recursive scenarios.
+ */
+public class PredicatedMapTest {
+
+    /**
+     * This test verifies the behavior of {@code putAll} when the source map
+     * contains the {@code PredicatedMap} instance itself as a key.
+     * <p>
+     * This setup creates a circular dependency for hashCode calculation. When
+     * {@code putAll} attempts to add the entry where the key is the map itself,
+     * the underlying HashMap implementation calls {@code hashCode()} on the key.
+     * The {@code PredicatedMap}'s hashCode implementation delegates to the
+     * underlying map's hashCode, which in turn needs to compute the hashCode of
+     * its keys, leading to an infinite recursion and a {@link StackOverflowError}.
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void putAllWithSelfReferencingKeyInSourceShouldCauseStackOverflow() {
+        // Arrange: Create a map that contains itself as a key.
+        final Map<Object, Object> underlyingMap = new HashMap<>();
+        final Predicate<Object> nonNullPredicate = NotNullPredicate.notNullPredicate();
+        final PredicatedMap<Object, Object> predicatedMap =
+            new PredicatedMap<>(underlyingMap, nonNullPredicate, nonNullPredicate);
+
+        // Add a standard entry to the map.
+        predicatedMap.put("anyKey", "anyValue");
+
+        // Create the self-referencing condition by putting the decorated map
+        // into its own underlying map. This is the crucial step that sets up
+        // the recursive hashCode() call.
+        underlyingMap.put(predicatedMap, "anotherValue");
+
+        // Act: Attempt to add all entries from the underlying map back into the
+        // predicated map. This will trigger the recursive hashCode calculation
+        // when processing the self-referencing entry.
+        predicatedMap.putAll(underlyingMap);
     }
 }
