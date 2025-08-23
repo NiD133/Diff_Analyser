@@ -1,20 +1,28 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.CharEncoding;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class URLCodec_ESTestTest51 extends URLCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link URLCodec} class.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        String string0 = uRLCodec0.getDefaultCharset();
-        assertEquals("UTF-8", string0);
+    /**
+     * Tests that a URLCodec instance created with the default constructor
+     * correctly reports UTF-8 as its default charset.
+     */
+    @Test
+    public void testDefaultConstructorSetsCharsetToUTF8() {
+        // Arrange: Create a URLCodec instance using the default constructor.
+        final URLCodec urlCodec = new URLCodec();
+        final String expectedCharset = CharEncoding.UTF_8;
+
+        // Act: Get the default charset from the instance.
+        final String actualCharset = urlCodec.getDefaultCharset();
+
+        // Assert: Verify that the default charset is UTF-8.
+        assertEquals("The default charset should be UTF-8", expectedCharset, actualCharset);
     }
 }
