@@ -1,32 +1,51 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.Test;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+
 import static org.jsoup.parser.CharacterReader.BufferSize;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TokeniserTestTest7 {
+/**
+ * Contains tests for the {@link Tokeniser}, focusing on its handling of specific edge cases.
+ */
+public class TokeniserTest {
 
+    /**
+     * Tests the parser's ability to handle a title text that is longer than the internal
+     * character reader's buffer. This is a white-box test to ensure that the tokeniser
+     * correctly accumulates character tokens across multiple buffer reads without losing data.
+     */
     @Test
-    public void handleLargeTitle() {
-        StringBuilder sb = new StringBuilder(BufferSize);
-        do {
-            sb.append("Quite a long title");
-        } while (sb.length() < BufferSize);
-        String title = sb.toString();
-        String html = "<title>" + title + "</title>";
+    void parsesTitleLongerThanBufferCorrectly() {
+        // Arrange: Create a title string that is intentionally longer than the parser's internal buffer.
+        final String titleFragment = "A very, very long title ";
+        final StringBuilder titleBuilder = new StringBuilder(BufferSize * 2);
+        while (titleBuilder.length() <= BufferSize) {
+            titleBuilder.append(titleFragment);
+        }
+        final String expectedTitle = titleBuilder.toString();
+        final String html = "<title>" + expectedTitle + "</title>";
+
+        // Act: Parse the HTML containing the long title.
         Document doc = Jsoup.parse(html);
-        Elements els = doc.select("title");
-        assertEquals(1, els.size());
-        Element el = els.first();
-        assertNotNull(el);
-        TextNode child = (TextNode) el.childNode(0);
-        assertEquals(title, el.text());
-        assertEquals(title, child.getWholeText());
-        assertEquals(title, doc.title());
+
+        // Assert: Verify that the title was parsed correctly, despite its length.
+        Element titleElement = doc.selectFirst("title");
+        assertNotNull(titleElement, "The <title> element should be found.");
+
+        // 1. Check the title content through the high-level Document.title() accessor.
+        assertEquals(expectedTitle, doc.title(), "Document's title should match the expected long string.");
+
+        // 2. Check the title content directly from the element's text.
+        assertEquals(expectedTitle, titleElement.text(), "The <title> element's text should match.");
+
+        // 3. Verify the underlying TextNode to ensure its integrity.
+        assertTrue(titleElement.childNode(0) instanceof TextNode, "The first child of <title> should be a TextNode.");
+        TextNode titleTextNode = (TextNode) titleElement.childNode(0);
+        assertEquals(expectedTitle, titleTextNode.getWholeText(), "The TextNode's content should match.");
     }
 }
