@@ -1,43 +1,59 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.Array;
-import java.sql.CallableStatement;
-import java.sql.Date;
+import static org.mockito.Mockito.mock;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class ArrayTypeHandler_ESTestTest3 extends ArrayTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for {@link ArrayTypeHandler}.
+ *
+ * This class focuses on testing the behavior of the ArrayTypeHandler,
+ * particularly its handling of parameter types.
+ */
+public class ArrayTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        ArrayTypeHandler arrayTypeHandler0 = new ArrayTypeHandler();
-        PreparedStatement preparedStatement0 = mock(PreparedStatement.class, new ViolatedAssumptionAnswer());
-        Time time0 = new Time(226);
-        JdbcType jdbcType0 = JdbcType.BINARY;
-        // Undeclared exception!
-        try {
-            arrayTypeHandler0.setNonNullParameter(preparedStatement0, 1577, time0, jdbcType0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ArrayType Handler requires SQL array or java array parameter and does not support type class java.sql.Time
-            //
-            verifyException("org.apache.ibatis.type.ArrayTypeHandler", e);
-        }
+    // The ExpectedException rule allows for more readable exception testing in JUnit 4.
+    // It clearly states the expected exception type and message before the action is performed.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    private final ArrayTypeHandler arrayTypeHandler = new ArrayTypeHandler();
+
+    /**
+     * Verifies that setNonNullParameter throws a RuntimeException when the parameter
+     * is not a supported array type.
+     *
+     * The original test name "test02" was not descriptive. This name clearly states
+     * the method under test, the expected outcome, and the condition that causes it.
+     */
+    @Test
+    public void setNonNullParameterShouldThrowExceptionForUnsupportedType() throws SQLException {
+        // Arrange
+        // Use descriptive variable names instead of "preparedStatement0" or "time0".
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+
+        // The handler is designed for arrays. We use java.sql.Time as an example of an
+        // unsupported, non-array type to trigger the exception.
+        Time unsupportedParameter = new Time(0L);
+
+        // Use a conventional index '1' instead of a magic number like '1577'.
+        int parameterIndex = 1;
+
+        // The specific JdbcType is not critical for this test's logic.
+        JdbcType jdbcType = JdbcType.BINARY;
+
+        // Assert - Define expectations for the exception.
+        // This approach is cleaner and more declarative than a try-catch block with fail().
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("ArrayType Handler requires SQL array or java array parameter and does not support type class java.sql.Time");
+
+        // Act - Call the method under test.
+        // This call is expected to throw the configured exception, causing the test to pass.
+        arrayTypeHandler.setNonNullParameter(mockStatement, parameterIndex, unsupportedParameter, jdbcType);
     }
 }
