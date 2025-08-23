@@ -1,20 +1,29 @@
 package com.itextpdf.text.error_messages;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MessageLocalization_ESTestTest4 extends MessageLocalization_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MessageLocalization} class.
+ */
+public class MessageLocalizationTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        String string0 = MessageLocalization.getMessage("you.can.only.add.cells.to.rows.no.objects.of.type.1", true);
-        assertEquals("You can only add cells to rows, no objects of type {1}", string0);
+    /**
+     * Verifies that getMessage() correctly retrieves a message from the default
+     * language resource file when a valid key is provided.
+     */
+    @Test
+    public void getMessage_withValidKey_returnsCorrespondingMessageFromDefaultLanguage() {
+        // Arrange: Define the message key and the expected output.
+        // This key corresponds to an error message in the default (English) language properties.
+        String messageKey = "you.can.only.add.cells.to.rows.no.objects.of.type.1";
+        String expectedMessage = "You can only add cells to rows, no objects of type {1}";
+
+        // Act: Call the method under test.
+        // The 'true' parameter ensures that the default language is used as a fallback.
+        String actualMessage = MessageLocalization.getMessage(messageKey, true);
+
+        // Assert: Verify that the actual message matches the expected message.
+        assertEquals("The retrieved message should match the expected text.", expectedMessage, actualMessage);
     }
 }
