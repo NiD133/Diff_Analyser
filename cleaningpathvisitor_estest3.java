@@ -1,38 +1,27 @@
 package org.apache.commons.io.file;
 
+import org.apache.commons.io.file.Counters.PathCounters;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class CleaningPathVisitor_ESTestTest3 extends CleaningPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for the constructor of {@link CleaningPathVisitor}.
+ */
+public class CleaningPathVisitor_ESTestTest3 {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
-        DeleteOption[] deleteOptionArray0 = new DeleteOption[2];
-        String[] stringArray0 = new String[3];
-        CleaningPathVisitor cleaningPathVisitor0 = null;
-        try {
-            cleaningPathVisitor0 = new CleaningPathVisitor(counters_PathCounters0, deleteOptionArray0, stringArray0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that the CleaningPathVisitor constructor throws a NullPointerException
+     * if the 'skip' var-args array contains a null element.
+     * The constructor internally sorts this array, which fails on nulls.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testConstructorThrowsNpeWhenSkipArrayContainsNull() {
+        // Arrange: Set up the arguments for the constructor.
+        final PathCounters counters = CountingPathVisitor.defaultPathCounters();
+        final DeleteOption[] deleteOptions = {}; // Use a valid, empty array to isolate the cause.
+        final String[] skipPathsWithNull = {"path/to/keep", null, "another/path"};
+
+        // Act & Assert: Instantiating the visitor with a null in the skip array
+        // is expected to throw a NullPointerException. The @Test annotation handles the assertion.
+        new CleaningPathVisitor(counters, deleteOptions, skipPathsWithNull);
     }
 }
