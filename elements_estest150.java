@@ -2,42 +2,39 @@ package org.jsoup.select;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest150 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#select(String)} method.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test149() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+    /**
+     * Verifies that calling select() with a syntactically invalid CSS query
+     * throws an IllegalStateException.
+     */
+    @Test
+    public void selectWithInvalidSelectorSyntaxShouldThrowIllegalStateException() {
+        // Arrange: Create an empty Elements collection and define an invalid query.
+        Elements elements = new Elements();
+        String invalidQuery = "<_+];Lxz(u?A|i1x";
+
         try {
-            elements0.select("<_+];Lxz(u?A|i1x");
-            fail("Expecting exception: IllegalStateException");
+            // Act: Attempt to select elements using the invalid query.
+            elements.select(invalidQuery);
+            
+            // Assert: If no exception is thrown, the test should fail.
+            fail("Expected an IllegalStateException to be thrown due to invalid selector syntax.");
         } catch (IllegalStateException e) {
-            //
-            // Could not parse query '<_+];Lxz(u?A|i1x': unexpected token at '<_+];Lxz(u?A|i1x'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Assert: Verify that the correct exception was thrown and its message is informative.
+            String expectedMessage = "Could not parse query";
+            assertTrue(
+                "The exception message should indicate that the query could not be parsed.",
+                e.getMessage().contains(expectedMessage)
+            );
+            assertTrue(
+                "The exception message should include the invalid query string.",
+                e.getMessage().contains(invalidQuery)
+            );
         }
     }
 }
