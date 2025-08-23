@@ -1,29 +1,30 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertFalse;
+
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class BoundedIterator_ESTestTest10 extends BoundedIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the BoundedIterator class.
+ */
+public class BoundedIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Iterator<Object> iterator0 = linkedList0.iterator();
-        BoundedIterator<Object> boundedIterator0 = new BoundedIterator<Object>(iterator0, 0L, 0L);
-        boolean boolean0 = boundedIterator0.hasNext();
-        assertFalse(boolean0);
+    /**
+     * Tests that hasNext() returns false when the iterator is bounded
+     * with a maximum size of zero. An iterator with a zero-length bound
+     * should always be empty, regardless of the underlying iterator.
+     */
+    @Test
+    public void hasNextShouldReturnFalseWhenMaxIsZero() {
+        // Arrange: Create an iterator and wrap it in a BoundedIterator
+        // with a maximum size (max) of 0.
+        final Iterator<String> emptyIterator = Collections.emptyIterator();
+        final BoundedIterator<String> boundedIterator = new BoundedIterator<>(emptyIterator, 0L, 0L);
+
+        // Act & Assert: Verify that hasNext() returns false, as no elements
+        // should be returned when the maximum size is zero.
+        assertFalse("An iterator with a max size of 0 should not have a next element.", boundedIterator.hasNext());
     }
 }
