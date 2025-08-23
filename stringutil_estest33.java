@@ -1,36 +1,36 @@
 package org.jsoup.internal;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
+/**
+ * Tests for the {@link StringUtil#isAscii(String)} method, focusing on invalid inputs.
+ *
+ * Note: The class name and inheritance are preserved from the original auto-generated test file.
+ */
 public class StringUtil_ESTestTest33 extends StringUtil_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        // Undeclared exception!
-        try {
-            StringUtil.isAscii((String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    // The ExpectedException rule is a clean, declarative way to assert that
+    // a piece of code throws a specific exception.
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that isAscii() throws an IllegalArgumentException when the input is null.
+     * This is the expected behavior as the method relies on a non-null input.
+     */
+    @Test
+    public void isAscii_whenInputIsNull_throwsIllegalArgumentException() {
+        // Arrange: Define the expected exception type and message.
+        // This makes the test's purpose clear from the start.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Object must not be null");
+
+        // Act: Call the method with the problematic (null) input.
+        StringUtil.isAscii(null);
+
+        // Assert: The test passes if the expected exception is thrown by the 'Act' step.
+        // The ExpectedException rule handles this assertion implicitly.
     }
 }
