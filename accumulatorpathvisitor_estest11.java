@@ -1,34 +1,27 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.apache.commons.io.filefilter.CanExecuteFileFilter;
-import org.apache.commons.io.filefilter.CanReadFileFilter;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
+import org.apache.commons.io.file.AccumulatorPathVisitor.Builder;
+import org.junit.Test;
+
+/**
+ * Tests for {@link AccumulatorPathVisitor.Builder}.
+ *
+ * Note: This class retains the original name and inheritance structure for context,
+ * while the test method inside has been rewritten for clarity.
+ */
 public class AccumulatorPathVisitor_ESTestTest11 extends AccumulatorPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        AccumulatorPathVisitor.Builder accumulatorPathVisitor_Builder0 = new AccumulatorPathVisitor.Builder();
+    /**
+     * Tests that a new instance of the {@link Builder} can be created successfully.
+     */
+    @Test
+    public void builderShouldBeCreatedSuccessfully() {
+        // Act
+        final Builder builder = new AccumulatorPathVisitor.Builder();
+
+        // Assert
+        assertNotNull("A new Builder instance should not be null.", builder);
     }
 }
