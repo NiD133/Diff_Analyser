@@ -1,38 +1,35 @@
 package org.jfree.chart.renderer.category;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardBarPainter_ESTestTest4 extends StandardBarPainter_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        StackedBarRenderer stackedBarRenderer0 = new StackedBarRenderer(true);
-        Rectangle2D.Float rectangle2D_Float0 = new Rectangle2D.Float(0.0F, 1.0F, 707.9548F, 1.0F);
-        RectangleEdge rectangleEdge0 = RectangleEdge.BOTTOM;
-        // Undeclared exception!
-        try {
-            standardBarPainter0.paintBarShadow((Graphics2D) null, stackedBarRenderer0, (-1233), (-1795), rectangle2D_Float0, rectangleEdge0, false);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.renderer.category.StandardBarPainter", e);
-        }
+/**
+ * Unit tests for the {@link StandardBarPainter} class, focusing on exception handling.
+ */
+public class StandardBarPainterTest {
+
+    /**
+     * Verifies that paintBarShadow() throws a NullPointerException when the Graphics2D context is null.
+     * This is expected behavior, as the method cannot perform drawing operations without a valid graphics context.
+     */
+    @Test(expected = NullPointerException.class)
+    public void paintBarShadowShouldThrowNullPointerExceptionWhenGraphicsContextIsNull() {
+        // Arrange: Set up the test objects and parameters.
+        StandardBarPainter painter = new StandardBarPainter();
+        BarRenderer renderer = new StackedBarRenderer(); // A concrete renderer instance for the test.
+        Rectangle2D bar = new Rectangle2D.Double(10.0, 20.0, 30.0, 40.0);
+        RectangleEdge baseEdge = RectangleEdge.BOTTOM;
+        int row = 0;
+        int column = 0;
+        boolean pegShadow = false;
+
+        // Act: Call the method under test with a null Graphics2D context.
+        // This is the action that is expected to cause an exception.
+        painter.paintBarShadow(null, renderer, row, column, bar, baseEdge, pegShadow);
+
+        // Assert: The test passes if a NullPointerException is thrown, as specified
+        // by the @Test(expected = ...) annotation. No further assertions are needed.
     }
 }
