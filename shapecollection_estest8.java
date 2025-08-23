@@ -1,33 +1,33 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest8 extends ShapeCollection_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Vector<JtsPoint> vector0 = new Vector<JtsPoint>();
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(vector0, spatialContext0);
-        int int0 = shapeCollection0.size();
-        assertEquals(0, int0);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link ShapeCollection} class.
+ */
+public class ShapeCollectionTest {
+
+    @Test
+    public void size_shouldReturnZero_whenCollectionIsEmpty() {
+        // Arrange: Set up the test objects and preconditions.
+        // Use a standard, readily available spatial context.
+        SpatialContext spatialContext = SpatialContext.GEO;
+        
+        // Create an empty list of shapes for the collection.
+        List<Shape> emptyShapes = Collections.emptyList();
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(emptyShapes, spatialContext);
+
+        // Act: Execute the method under test.
+        int actualSize = shapeCollection.size();
+
+        // Assert: Verify the outcome.
+        int expectedSize = 0;
+        assertEquals("The size of an empty ShapeCollection should be 0", expectedSize, actualSize);
     }
 }
