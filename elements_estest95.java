@@ -1,35 +1,30 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Elements_ESTestTest95 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#remove(Object)} method.
+ */
+public class ElementsTest {
 
-    @Test(timeout = 4000)
-    public void test094() throws Throwable {
-        Elements elements0 = new Elements();
-        boolean boolean0 = elements0.remove((Object) elements0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that calling remove(Object) on an empty Elements collection
+     * returns false, as the collection remains unchanged.
+     */
+    @Test
+    public void removeObjectFromEmptyListReturnsFalse() {
+        // Arrange: Create an empty Elements collection.
+        Elements elements = new Elements();
+        
+        // An object that is guaranteed not to be in the collection.
+        // The original test used the collection itself, which is a valid choice.
+        Object objectToRemove = new Object();
+
+        // Act: Attempt to remove the object from the empty collection.
+        boolean wasRemoved = elements.remove(objectToRemove);
+
+        // Assert: The method should return false, indicating the collection was not modified.
+        assertFalse("Removing an object from an empty list should return false.", wasRemoved);
     }
 }
