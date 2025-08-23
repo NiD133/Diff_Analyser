@@ -1,25 +1,28 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest31 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on specific edge cases.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial((byte[]) null, 2000);
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.finishCurrentSegment();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling {@link ByteArrayBuilder#finishCurrentSegment()} throws a
+     * {@link NullPointerException} when the builder has been initialized with a null
+     * internal buffer.
+     *
+     * This scenario tests the handling of an internally inconsistent state, which can be
+     * created via the package-private {@code fromInitial} factory method.
+     */
+    @Test(expected = NullPointerException.class)
+    public void finishCurrentSegmentShouldThrowExceptionWhenInitializedWithNullBuffer() {
+        // Arrange: Create a ByteArrayBuilder with a null internal buffer.
+        // The fromInitial() method allows creating this specific state for testing.
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(null, 2000);
+
+        // Act: Attempt to finish the current segment, which is null.
+        // This is expected to throw a NullPointerException.
+        builder.finishCurrentSegment();
     }
 }
