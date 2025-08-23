@@ -1,37 +1,27 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
+
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
 
-public class XNode_ESTestTest108 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test107() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.getFloatAttribute((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that getFloatAttribute throws a NullPointerException when the attribute name is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getFloatAttributeShouldThrowNullPointerExceptionWhenNameIsNull() {
+        // Arrange: Create an XNode instance with a mock node and empty properties.
+        // The XPathParser is not needed for this test, so it can be null.
+        IIOMetadataNode dummyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, dummyNode, new Properties());
+
+        // Act: Call the method under test with a null argument.
+        // The @Test(expected) annotation will handle the assertion.
+        xNode.getFloatAttribute(null);
     }
 }
