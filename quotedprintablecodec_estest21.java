@@ -1,23 +1,28 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QuotedPrintableCodec_ESTestTest21 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.decode("UTF-8", "UTF-8");
-        assertEquals("UTF-8", string0);
+    /**
+     * Tests that decoding a string that contains only printable ASCII characters
+     * (and thus is not actually Quoted-Printable encoded) returns the original string.
+     * This is effectively a "no-op" decoding scenario.
+     */
+    @Test
+    public void decodeUnencodedStringShouldReturnOriginalString() throws Exception {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final String originalString = "UTF-8"; // A simple string with no characters that need decoding.
+
+        // Act
+        final String decodedString = codec.decode(originalString, "UTF-8");
+
+        // Assert
+        assertEquals("The decoded string should be identical to the original.", originalString, decodedString);
     }
 }
