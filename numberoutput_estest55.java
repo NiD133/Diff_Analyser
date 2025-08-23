@@ -1,26 +1,34 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest55 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on exception scenarios.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        char[] charArray0 = new char[9];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(833495342724150664L, charArray0, 1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 9
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that outputLong() throws an ArrayIndexOutOfBoundsException when the
+     * provided character buffer is too small to hold the string representation of the number.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLongShouldThrowExceptionWhenBufferIsTooSmall() {
+        // Arrange
+        // A long value that requires 18 characters to represent.
+        long longValue = 833495342724150664L;
+        
+        // A buffer that is intentionally too small. The number requires 18 characters,
+        // but the buffer only has 9.
+        char[] buffer = new char[9];
+        int offset = 1;
+
+        // Act
+        // This call is expected to throw an ArrayIndexOutOfBoundsException because
+        // writing 18 digits starting at offset 1 requires a buffer of at least size 19.
+        NumberOutput.outputLong(longValue, buffer, offset);
+
+        // Assert
+        // The test will pass if the expected ArrayIndexOutOfBoundsException is thrown.
+        // This is handled by the @Test(expected = ...) annotation.
     }
 }
