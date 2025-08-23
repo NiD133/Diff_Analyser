@@ -1,30 +1,36 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest17 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Contains understandable tests for the {@link GzipCompressorOutputStream} class.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("Y[6ArI`U! H_`79@4");
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(mockFileOutputStream0);
-        ObjectOutputStream objectOutputStream0 = new ObjectOutputStream(gzipCompressorOutputStream0);
+    /**
+     * Verifies that a GzipCompressorOutputStream can be instantiated and subsequently
+     * wrapped by another OutputStream, like ObjectOutputStream, without errors.
+     * This test confirms the constructor's basic functionality and its compatibility
+     * as a standard Java OutputStream.
+     */
+    @Test
+    public void shouldAllowWrappingInAnotherOutputStream() throws IOException {
+        // Arrange: Set up an in-memory byte stream to capture the output. This avoids
+        // writing to the actual file system, making the test faster and more reliable.
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        // Act & Assert: Create the Gzip stream and wrap it. The test passes if no
+        // exceptions are thrown during construction and the final stream is not null.
+        // Using try-with-resources ensures proper stream closure.
+        try (GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(byteArrayOutputStream);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream)) {
+
+            assertNotNull("The wrapped ObjectOutputStream should be successfully created.", objectOutputStream);
+        }
     }
 }
