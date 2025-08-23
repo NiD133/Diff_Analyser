@@ -1,43 +1,32 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ObservableInputStream_ESTestTest12 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ObservableInputStream} class, focusing on basic read functionality.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        byteArray0[0] = (byte) 77;
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(byteArrayInputStream0);
-        int int0 = observableInputStream0.read();
-        assertEquals(77, int0);
+    /**
+     * Tests that the basic {@code read()} method correctly reads and returns a single byte
+     * from the underlying input stream.
+     */
+    @Test
+    public void readShouldReturnSingleByteFromUnderlyingStream() throws IOException {
+        // Arrange: Create an input stream with a single byte 'M'.
+        final byte[] sourceData = { 'M' }; // ASCII value is 77
+        final InputStream underlyingStream = new ByteArrayInputStream(sourceData);
+        final ObservableInputStream observableStream = new ObservableInputStream(underlyingStream);
+
+        // Act: Read one byte from the observable stream.
+        final int byteRead = observableStream.read();
+
+        // Assert: The byte read should be the one from the source data.
+        assertEquals("The read byte should match the source byte.", 'M', byteRead);
     }
 }
