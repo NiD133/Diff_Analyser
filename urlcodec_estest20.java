@@ -1,21 +1,32 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest20 extends URLCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        URLCodec uRLCodec0 = new URLCodec();
-        Object object0 = uRLCodec0.decode((Object) "UTF-8");
-        assertEquals("UTF-8", object0);
-        assertNotNull(object0);
+/**
+ * Tests for the {@link URLCodec} class.
+ */
+public class URLCodecTest {
+
+    /**
+     * Tests that decoding an object which is a simple string (containing no
+     * URL-encoded characters) returns the original string.
+     */
+    @Test
+    public void decodeObjectWithUnencodedStringShouldReturnOriginalString() throws DecoderException {
+        // Arrange
+        URLCodec urlCodec = new URLCodec();
+        String inputString = "UTF-8";
+
+        // Act
+        // The decode(Object) method should delegate to decode(String) for String inputs.
+        Object result = urlCodec.decode((Object) inputString);
+
+        // Assert
+        // Since the input string contains no encoded characters ('%' or '+'),
+        // the decoded result should be identical to the input.
+        assertEquals(inputString, result);
     }
 }
