@@ -1,45 +1,30 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
 import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link ObservableInputStream} focusing on construction via its builder.
+ */
 public class ObservableInputStream_ESTestTest29 extends ObservableInputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        ObservableInputStream.Builder observableInputStream_Builder0 = new ObservableInputStream.Builder();
-        observableInputStream_Builder0.setPath("PZkNv|C6'u*&le;,");
-        ObservableInputStream observableInputStream0 = null;
-        try {
-            observableInputStream0 = new ObservableInputStream(observableInputStream_Builder0);
-            fail("Expecting exception: NoSuchFileException");
-        } catch (Throwable e) {
-        }
+    /**
+     * Verifies that the ObservableInputStream constructor throws a NoSuchFileException
+     * when its builder is configured with a path to a non-existent file.
+     */
+    @Test(expected = NoSuchFileException.class)
+    public void constructorWithBuilderForNonExistentPathThrowsException() throws IOException {
+        // Arrange: Create a builder and configure it with a path that does not exist.
+        final String nonExistentPath = "PZkNv|C6'u*&le;,"; // An invalid and unlikely to exist path
+        final ObservableInputStream.Builder builder = new ObservableInputStream.Builder();
+        builder.setPath(nonExistentPath);
+
+        // Act: Attempt to construct the ObservableInputStream from the builder.
+        // This action is expected to throw a NoSuchFileException.
+        new ObservableInputStream(builder);
+
+        // Assert: The test succeeds if the expected NoSuchFileException is thrown,
+        // which is handled by the @Test(expected) annotation.
     }
 }
