@@ -2,30 +2,26 @@ package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest18 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its initial state.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        jsonWriteContext0.getCurrentName();
-        assertEquals(0, jsonWriteContext0.getEntryCount());
-        assertEquals(0, jsonWriteContext0.getNestingDepth());
-        assertEquals("ROOT", jsonWriteContext0.getTypeDesc());
+    /**
+     * Verifies that a newly created root context is initialized with the correct default values.
+     * A root context should have a null name, a nesting depth of 0, an entry count of 0,
+     * and a type description of "ROOT".
+     */
+    @Test
+    public void rootContextShouldBeInitializedCorrectly() {
+        // Arrange: Create a new root-level write context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+
+        // Assert: Verify the initial state of the root context.
+        assertNull("A new root context should not have a current name.", rootContext.getCurrentName());
+        assertEquals("A new root context should have an entry count of 0.", 0, rootContext.getEntryCount());
+        assertEquals("A new root context should have a nesting depth of 0.", 0, rootContext.getNestingDepth());
+        assertEquals("The type description for a root context should be 'ROOT'.", "ROOT", rootContext.getTypeDesc());
     }
 }
