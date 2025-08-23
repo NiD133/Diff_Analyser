@@ -1,31 +1,37 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class PhoneticEngine_ESTestTest7 extends PhoneticEngine_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        RuleType ruleType0 = RuleType.APPROX;
-        NameType nameType0 = NameType.ASHKENAZI;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false, (-1141));
-        // Undeclared exception!
+    /**
+     * Tests that the encode() method throws an IllegalArgumentException if the
+     * PhoneticEngine was constructed with a negative value for maxPhonemes.
+     *
+     * The constructor itself does not validate the parameter, so the failure
+     * is expected during the encoding process.
+     */
+    @Test
+    public void encodeShouldThrowExceptionWhenEngineConfiguredWithNegativeMaxPhonemes() {
+        // Arrange: Create a PhoneticEngine with an invalid, negative maxPhonemes value.
+        final int negativeMaxPhonemes = -1;
+        final PhoneticEngine engine = new PhoneticEngine(NameType.ASHKENAZI,
+                                                         RuleType.APPROX,
+                                                         false,
+                                                         negativeMaxPhonemes);
+
+        // Act & Assert: Attempting to encode should trigger the exception.
         try {
-            phoneticEngine0.encode("c)mY)");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal initial capacity: -1141
-            //
-            verifyException("java.util.HashMap", e);
+            engine.encode("test");
+            fail("Expected an IllegalArgumentException because maxPhonemes is negative.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception is the one we expect, which is thrown when
+            // attempting to create a collection with a negative initial capacity.
+            final String expectedMessage = "Illegal initial capacity: " + negativeMaxPhonemes;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
