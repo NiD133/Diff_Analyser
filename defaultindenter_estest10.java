@@ -1,57 +1,52 @@
 package com.fasterxml.jackson.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.io.ContentReference;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
-import com.fasterxml.jackson.core.json.WriterBasedJsonGenerator;
-import java.io.File;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class DefaultIndenter_ESTestTest10 extends DefaultIndenter_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DefaultIndenter defaultIndenter0 = DefaultIndenter.SYSTEM_LINEFEED_INSTANCE;
-        JsonFactory jsonFactory0 = new JsonFactory();
-        MockFile mockFile0 = new MockFile("\n", "\n");
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream(mockFile0, false);
-        MockPrintStream mockPrintStream0 = new MockPrintStream(mockFileOutputStream0, true);
-        JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((OutputStream) mockPrintStream0);
-        TokenFilter tokenFilter0 = TokenFilter.INCLUDE_ALL;
-        TokenFilter.Inclusion tokenFilter_Inclusion0 = TokenFilter.Inclusion.ONLY_INCLUDE_ALL;
-        FilteringGeneratorDelegate filteringGeneratorDelegate0 = new FilteringGeneratorDelegate(jsonGenerator0, tokenFilter0, tokenFilter_Inclusion0, false);
+/**
+ * Contains tests for the {@link DefaultIndenter} class, focusing on edge cases.
+ */
+public class DefaultIndenterTest {
+
+    /**
+     * This test verifies that providing a very large indentation level causes an
+     * integer overflow when calculating the number of characters to write.
+     * The SYSTEM_LINEFEED_INSTANCE uses 2 characters for indentation. Multiplying
+     * the large level by 2 results in a negative number, which causes the
+     * underlying JsonGenerator to throw an IOException.
+     */
+    @Test
+    public void writeIndentation_withLargeLevelCausingIntegerOverflow_shouldThrowIOException() throws IOException {
+        // Arrange
+        DefaultIndenter indenter = DefaultIndenter.SYSTEM_LINEFEED_INSTANCE;
+
+        // Use a level so large that (level * 2) overflows the integer capacity.
+        // Specifically, 2147483645 * 2 wraps around to -6.
+        int largeLevelThatCausesOverflow = 2147483645;
+
+        JsonFactory factory = new JsonFactory();
+        Writer writer = new StringWriter();
+        JsonGenerator generator = factory.createGenerator(writer);
+
+        // Act & Assert
         try {
-            defaultIndenter0.writeIndentation(filteringGeneratorDelegate0, 2147483645);
-            fail("Expecting exception: IOException");
+            indenter.writeIndentation(generator, largeLevelThatCausesOverflow);
+            fail("Expected an IOException because the calculated indentation length is negative due to integer overflow.");
         } catch (IOException e) {
-            //
-            // Invalid 'offset' (0) and/or 'len' (-6) arguments for `char[]` of length 32
-            //
-            verifyException("com.fasterxml.jackson.core.JsonGenerator", e);
+            // The JsonGenerator correctly rejects requests to write a negative number of characters.
+            String message = e.getMessage();
+            assertTrue("Exception message should indicate an invalid length argument.",
+                    message.contains("Invalid") && message.contains("len"));
+        } finally {
+            generator.close();
         }
     }
 }
