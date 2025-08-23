@@ -1,31 +1,30 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest9 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        charSequenceReader0.close();
+    @Test
+    public void skip_onClosedReader_throwsIOException() throws IOException {
+        // Arrange: Create a reader and then immediately close it.
+        // The actual content of the sequence is not important for this test.
+        CharSequenceReader reader = new CharSequenceReader("test-data");
+        reader.close();
+
+        // Act & Assert: Verify that skipping on a closed reader throws an IOException.
         try {
-            charSequenceReader0.skip(2031L);
-            fail("Expecting exception: IOException");
+            reader.skip(10L);
+            fail("Expected an IOException to be thrown when skipping on a closed reader.");
         } catch (IOException e) {
-            //
-            // reader closed
-            //
-            verifyException("com.google.common.io.CharSequenceReader", e);
+            // Assert that the exception has the expected message.
+            assertEquals("Reader closed", e.getMessage());
         }
     }
 }
