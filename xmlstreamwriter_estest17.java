@@ -1,38 +1,35 @@
 package org.apache.commons.io.output;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+// The original test class name is retained for context.
 public class XmlStreamWriter_ESTestTest17 extends XmlStreamWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        MockFile mockFile0 = new MockFile("", "");
-        XmlStreamWriter xmlStreamWriter0 = null;
-        try {
-            xmlStreamWriter0 = new XmlStreamWriter(mockFile0);
-            fail("Expecting exception: FileNotFoundException");
-        } catch (Throwable e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockFileOutputStream", e);
-        }
+    /**
+     * Tests that creating an {@link XmlStreamWriter} for a file that is actually a directory
+     * results in a {@link FileNotFoundException}.
+     */
+    @Test
+    public void creatingWriterForDirectoryThrowsFileNotFoundException() {
+        // Arrange: Create a mock File that represents a directory.
+        // The constructor for XmlStreamWriter is expected to fail because it cannot
+        // open a FileOutputStream on a directory.
+        final File directory = new MockFile("", "");
+
+        // Act & Assert: Expect a FileNotFoundException when constructing the writer.
+        final FileNotFoundException e = assertThrows(
+            FileNotFoundException.class,
+            () -> new XmlStreamWriter(directory)
+        );
+
+        // The original auto-generated test verified that the mock environment throws
+        // an exception with a null message. This assertion is kept for equivalence.
+        assertNull("The exception message from the mock environment should be null.", e.getMessage());
     }
 }
