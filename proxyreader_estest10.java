@@ -1,26 +1,39 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedReader;
+import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ProxyReader_ESTestTest10 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Tests for the {@link ProxyReader} class.
+ * This test uses {@link TaggedReader}, a concrete subclass, to test the proxying behavior.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StringReader stringReader0 = new StringReader("6+pe[XK?~jcz*N&o]");
-        TaggedReader taggedReader0 = new TaggedReader(stringReader0);
-        char[] charArray0 = new char[6];
-        int int0 = taggedReader0.read(charArray0);
-        assertEquals(6, int0);
+    /**
+     * Tests that the read(char[]) method correctly reads a full buffer of characters
+     * from the underlying reader when sufficient data is available.
+     */
+    @Test
+    public void readIntoCharArrayShouldFillBufferWhenDataIsAvailable() throws IOException {
+        // Arrange
+        final String inputData = "abcdefghijkl";
+        final Reader sourceReader = new StringReader(inputData);
+        final ProxyReader proxyReader = new TaggedReader(sourceReader); // Use a concrete implementation for the test
+
+        final int bufferSize = 6;
+        final char[] buffer = new char[bufferSize];
+        final char[] expectedContent = "abcdef".toCharArray();
+
+        // Act
+        final int charsRead = proxyReader.read(buffer);
+
+        // Assert
+        assertEquals("The number of characters read should match the buffer size.", bufferSize, charsRead);
+        assertArrayEquals("The buffer should be filled with the first characters from the source.", expectedContent, buffer);
     }
 }
