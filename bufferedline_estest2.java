@@ -1,30 +1,45 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest2 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        RectangleImpl rectangleImpl0 = new RectangleImpl(1869.69281314934, 0.0, (-548.9229133084503), Double.POSITIVE_INFINITY, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, Double.POSITIVE_INFINITY, spatialContext0);
-        SpatialRelation spatialRelation0 = bufferedLine0.relate((Rectangle) rectangleImpl0);
-        assertEquals(SpatialRelation.CONTAINS, spatialRelation0);
-        assertEquals(Double.POSITIVE_INFINITY, bufferedLine0.getBuf(), 0.01);
+/**
+ * Unit tests for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    /**
+     * A BufferedLine with an infinite buffer should conceptually cover the entire space
+     * and therefore contain any other shape.
+     */
+    @Test
+    public void relate_withInfiniteBuffer_shouldReturnContains() {
+        // Arrange
+        // Use the geodetic context (though for this test, Cartesian would also work).
+        SpatialContext ctx = SpatialContext.GEO;
+
+        // A BufferedLine created from a single point is a degenerate case. The key is the buffer.
+        Point point = ctx.makePoint(0, 0);
+        double infiniteBuffer = Double.POSITIVE_INFINITY;
+        BufferedLine infinitelyBufferedLine = new BufferedLine(point, point, infiniteBuffer, ctx);
+
+        // An arbitrary, simple rectangle to test against.
+        Rectangle anyRectangle = ctx.makeRectangle(10, 20, 30, 40);
+
+        // Act
+        // Check the spatial relationship between the infinitely buffered line and the rectangle.
+        SpatialRelation relation = infinitelyBufferedLine.relate(anyRectangle);
+
+        // Assert
+        // The infinitely buffered line is expected to contain any other shape.
+        assertEquals(SpatialRelation.CONTAINS, relation);
+        
+        // Also, verify the buffer size was set correctly.
+        assertEquals("Buffer should be infinite", infiniteBuffer, infinitelyBufferedLine.getBuf(), 0.0);
     }
 }
