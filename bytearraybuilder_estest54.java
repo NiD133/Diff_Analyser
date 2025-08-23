@@ -1,18 +1,29 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class ByteArrayBuilder_ESTestTest54 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byteArrayBuilder0.reset();
-        assertEquals(0, byteArrayBuilder0.size());
+    /**
+     * Verifies that the reset() method correctly clears any existing content
+     * in the builder and sets its size back to zero.
+     */
+    @Test
+    public void reset_onNonEmptyBuilder_shouldClearContentAndSetSizeToZero() {
+        // Arrange: Create a builder and add some data to make it non-empty.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        builder.append(42);
+        assertTrue("Pre-condition failed: Builder should not be empty after appending data.", builder.size() > 0);
+
+        // Act: Reset the builder.
+        builder.reset();
+
+        // Assert: The size should be 0 after the reset.
+        assertEquals("The builder's size should be 0 after being reset.", 0, builder.size());
     }
 }
