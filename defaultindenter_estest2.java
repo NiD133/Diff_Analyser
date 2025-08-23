@@ -2,41 +2,38 @@ package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.io.ContentReference;
-import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
-import com.fasterxml.jackson.core.json.WriterBasedJsonGenerator;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class DefaultIndenter_ESTestTest2 extends DefaultIndenter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultIndenter} class.
+ */
+public class DefaultIndenterTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        DefaultIndenter defaultIndenter0 = new DefaultIndenter("", "As4M!C");
-        DefaultIndenter defaultIndenter1 = defaultIndenter0.withLinefeed("JSON");
-        assertEquals("JSON", defaultIndenter1.getEol());
+    /**
+     * Verifies that the `withLinefeed` method correctly creates a new indenter
+     * instance with the specified linefeed, while leaving the original instance unchanged.
+     */
+    @Test
+    public void withLinefeed_shouldCreateNewInstanceWithSpecifiedLinefeed() {
+        // Arrange: Create an initial indenter with a specific indent and linefeed (CRLF).
+        final String originalIndent = "  ";
+        final String originalLinefeed = "\r\n";
+        DefaultIndenter originalIndenter = new DefaultIndenter(originalIndent, originalLinefeed);
+
+        // Act: Call withLinefeed to create a new indenter with a different linefeed (LF).
+        final String newLinefeed = "\n";
+        DefaultIndenter updatedIndenter = originalIndenter.withLinefeed(newLinefeed);
+
+        // Assert: Verify the state of both the new and original indenters.
+        // 1. The new instance should have the updated linefeed.
+        assertEquals("The new indenter should have the specified linefeed.", newLinefeed, updatedIndenter.getEol());
+
+        // 2. The new instance should retain the original indentation string.
+        assertEquals("Indentation should be preserved.", originalIndent, updatedIndenter.getIndent());
+
+        // 3. The original instance should remain unchanged, confirming immutability.
+        assertEquals("The original indenter's linefeed should not be modified.", originalLinefeed, originalIndenter.getEol());
+
+        // 4. The method should return a new object instance.
+        assertNotSame("A new instance should be returned.", originalIndenter, updatedIndenter);
     }
 }
