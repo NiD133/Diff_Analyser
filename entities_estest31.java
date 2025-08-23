@@ -1,30 +1,33 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest31 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities} class, focusing on escaping behavior.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        Document.OutputSettings document_OutputSettings1 = document_OutputSettings0.syntax(document_OutputSettings_Syntax0);
-        String string0 = Entities.escape("&c\n/*]]>*/", document_OutputSettings1);
-        assertEquals("&amp;c\n/*]]&gt;*/", string0);
+    /**
+     * Verifies that when using XML syntax, the escape method correctly handles
+     * characters that have special meaning in XML. Specifically, it should escape
+     * the ampersand ('&') and the greater-than symbol ('>') when it is part of a
+     * CDATA section terminator (']]>').
+     */
+    @Test
+    public void escapeWithXmlSyntaxCorrectlyHandlesAmpersandAndCdataTerminator() {
+        // Arrange
+        String input = "&c\n/*]]>*/";
+        String expectedOutput = "&amp;c\n/*]]&gt;*/";
+
+        OutputSettings xmlOutputSettings = new OutputSettings()
+                .syntax(OutputSettings.Syntax.xml);
+
+        // Act
+        String escapedString = Entities.escape(input, xmlOutputSettings);
+
+        // Assert
+        assertEquals(expectedOutput, escapedString);
     }
 }
