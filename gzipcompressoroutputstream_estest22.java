@@ -1,33 +1,52 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest22 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link GzipCompressorOutputStream}.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipParameters gzipParameters0 = new GzipParameters();
-        gzipParameters0.setHeaderCRC(true);
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0, gzipParameters0);
-        assertEquals(12, byteArrayOutputStream0.size());
-        assertEquals("\u001F\uFFFD\b\u0002\u0000\u0000\u0000\u0000\u0000\uFFFD\uFFFD\uFFFD", byteArrayOutputStream0.toString());
+    /**
+     * Verifies that the GZIP header, including a header CRC, is written to the
+     * stream immediately upon instantiation when the corresponding GzipParameter is set.
+     *
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc1952#page-5">GZIP Header Spec</a>
+     */
+    @Test
+    public void constructorWritesHeaderWithCrcWhenEnabled() throws IOException {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        GzipParameters parameters = new GzipParameters();
+        parameters.setHeaderCRC(true);
+
+        // Act: The GZIP header is written by the constructor.
+        new GzipCompressorOutputStream(outputStream, parameters);
+
+        // Assert
+        // The expected header consists of:
+        // 2 bytes: magic number (0x1f, 0x8b)
+        // 1 byte: compression method (0x08 for DEFLATE)
+        // 1 byte: flags (0x02 for FHCRC, indicating a header CRC is present)
+        // 4 bytes: modification time (not set, defaults to 0)
+        // 1 byte: extra flags (0)
+        // 1 byte: operating system (255 for unknown)
+        // 2 bytes: header CRC-16 (calculated over the preceding 10 bytes)
+        byte[] expectedHeader = {
+            (byte) 0x1f, (byte) 0x8b, // Magic number
+            (byte) 0x08,              // Compression method: DEFLATE
+            (byte) 0x02,              // Flags: FHCRC
+            0, 0, 0, 0,               // Modification time
+            0,                        // Extra flags
+            (byte) 0xff,              // Operating System: unknown
+            (byte) 0x26, (byte) 0x9a  // Header CRC
+        };
+
+        assertArrayEquals("The GZIP header with CRC was not written correctly.",
+            expectedHeader, outputStream.toByteArray());
     }
 }
