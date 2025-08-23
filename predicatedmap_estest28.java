@@ -1,54 +1,43 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
+
+import org.apache.commons.collections4.FunctorException;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest28 extends PredicatedMap_ESTest_scaffolding {
+/**
+ * Contains tests for the exception-handling behavior of {@link PredicatedMap}.
+ */
+public class PredicatedMapExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Predicate<Object> predicate0 = ExceptionPredicate.exceptionPredicate();
-        HashMap<HashMap<Object, Integer>, Object> hashMap0 = new HashMap<HashMap<Object, Integer>, Object>();
-        PredicatedMap<HashMap<Object, Integer>, Object> predicatedMap0 = PredicatedMap.predicatedMap((Map<HashMap<Object, Integer>, Object>) hashMap0, (Predicate<? super HashMap<Object, Integer>>) predicate0, (Predicate<? super Object>) predicate0);
-        HashMap<Object, Integer> hashMap1 = new HashMap<Object, Integer>();
-        // Undeclared exception!
+    /**
+     * Tests that if the key predicate throws an exception, the {@code put} method
+     * propagates that exception.
+     */
+    @Test
+    public void putShouldPropagateExceptionFromKeyPredicate() {
+        // Arrange: Create a map decorated with a predicate that always throws an exception.
+        final Predicate<String> exceptionPredicate = ExceptionPredicate.exceptionPredicate();
+        final Map<String, String> baseMap = new HashMap<>();
+
+        // The value predicate is irrelevant here, as the key predicate is evaluated first.
+        final PredicatedMap<String, String> predicatedMap =
+            PredicatedMap.predicatedMap(baseMap, exceptionPredicate, null);
+
+        // Act & Assert: Verify that calling put() results in the expected exception.
         try {
-            predicatedMap0.put(hashMap1, hashMap1);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionPredicate invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionPredicate", e);
+            predicatedMap.put("anyKey", "anyValue");
+            fail("Expected a FunctorException to be thrown because the key predicate is an ExceptionPredicate.");
+        } catch (final FunctorException e) {
+            // This is the expected behavior.
+            // The ExceptionPredicate is documented to throw a FunctorException with this specific message.
+            assertEquals("ExceptionPredicate invoked", e.getMessage());
         }
     }
 }
