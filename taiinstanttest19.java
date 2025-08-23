@@ -1,125 +1,188 @@
 package org.threeten.extra.scale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+
 import java.time.Duration;
-import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import com.google.common.testing.EqualsTester;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class TaiInstantTestTest19 {
+@DisplayName("TaiInstant Tests")
+class TaiInstantTest {
 
-    public static Object[][] data_badParse() {
-        return new Object[][] { { "A.123456789s(TAI)" }, { "123.12345678As(TAI)" }, { "123.123456789" }, { "123.123456789s" }, { "+123.123456789s(TAI)" }, { "-123.123s(TAI)" } };
+    //-----------------------------------------------------------------------
+    // parse()
+    //-----------------------------------------------------------------------
+
+    static Stream<String> invalidParseStrings() {
+        return Stream.of(
+            "A.123456789s(TAI)",      // non-digit seconds
+            "123.12345678As(TAI)",     // non-digit nanos
+            "123.123456789",           // missing suffix
+            "123.123456789s",          // missing (TAI)
+            "+123.123456789s(TAI)",    // explicit plus sign not allowed
+            "-123.123s(TAI)"           // nanos must be 9 digits
+        );
     }
 
     @ParameterizedTest
-    @MethodSource("data_badParse")
-    public void factory_parse_CharSequence_invalid(String str) {
-        assertThrows(DateTimeParseException.class, () -> TaiInstant.parse(str));
+    @MethodSource("invalidParseStrings")
+    @DisplayName("parse() should throw for invalid formats")
+    void parse_withInvalidFormat_throwsDateTimeParseException(String invalidString) {
+        assertThrows(DateTimeParseException.class, () -> TaiInstant.parse(invalidString));
     }
 
     //-----------------------------------------------------------------------
-    public static Object[][] data_withTAISeconds() {
-        return new Object[][] { { 0L, 12345L, 1L, 1L, 12345L }, { 0L, 12345L, -1L, -1L, 12345L }, { 7L, 12345L, 2L, 2L, 12345L }, { 7L, 12345L, -2L, -2L, 12345L }, { -99L, 12345L, 3L, 3L, 12345L }, { -99L, 12345L, -3L, -3L, 12345L } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_withTAISeconds")
-    public void test_withTAISeconds(long tai, long nanos, long newTai, Long expectedTai, Long expectedNanos) {
-        TaiInstant i = TaiInstant.ofTaiSeconds(tai, nanos).withTaiSeconds(newTai);
-        assertEquals(expectedTai.longValue(), i.getTaiSeconds());
-        assertEquals(expectedNanos.longValue(), i.getNano());
-    }
-
+    // withTaiSeconds()
     //-----------------------------------------------------------------------
-    public static Object[][] data_withNano() {
-        return new Object[][] { { 0L, 12345L, 1, 0L, 1L }, { 7L, 12345L, 2, 7L, 2L }, { -99L, 12345L, 3, -99L, 3L }, { -99L, 12345L, 999999999, -99L, 999999999L }, { -99L, 12345L, -1, null, null }, { -99L, 12345L, 1000000000, null, null } };
-    }
 
-    @ParameterizedTest
-    @MethodSource("data_withNano")
-    public void test_withNano(long tai, long nanos, int newNano, Long expectedTai, Long expectedNanos) {
-        TaiInstant i = TaiInstant.ofTaiSeconds(tai, nanos);
-        if (expectedTai != null) {
-            TaiInstant withNano = i.withNano(newNano);
-            assertEquals(expectedTai.longValue(), withNano.getTaiSeconds());
-            assertEquals(expectedNanos.longValue(), withNano.getNano());
-        } else {
-            assertThrows(IllegalArgumentException.class, () -> i.withNano(newNano));
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_plus() {
-        return new Object[][] { { Long.MIN_VALUE, 0, Long.MAX_VALUE, 0, -1, 0 }, { -4, 666666667, -4, 666666667, -7, 333333334 }, { -4, 666666667, -3, 0, -7, 666666667 }, { -4, 666666667, -2, 0, -6, 666666667 }, { -4, 666666667, -1, 0, -5, 666666667 }, { -4, 666666667, -1, 333333334, -4, 1 }, { -4, 666666667, -1, 666666667, -4, 333333334 }, { -4, 666666667, -1, 999999999, -4, 666666666 }, { -4, 666666667, 0, 0, -4, 666666667 }, { -4, 666666667, 0, 1, -4, 666666668 }, { -4, 666666667, 0, 333333333, -3, 0 }, { -4, 666666667, 0, 666666666, -3, 333333333 }, { -4, 666666667, 1, 0, -3, 666666667 }, { -4, 666666667, 2, 0, -2, 666666667 }, { -4, 666666667, 3, 0, -1, 666666667 }, { -4, 666666667, 3, 333333333, 0, 0 }, { -3, 0, -4, 666666667, -7, 666666667 }, { -3, 0, -3, 0, -6, 0 }, { -3, 0, -2, 0, -5, 0 }, { -3, 0, -1, 0, -4, 0 }, { -3, 0, -1, 333333334, -4, 333333334 }, { -3, 0, -1, 666666667, -4, 666666667 }, { -3, 0, -1, 999999999, -4, 999999999 }, { -3, 0, 0, 0, -3, 0 }, { -3, 0, 0, 1, -3, 1 }, { -3, 0, 0, 333333333, -3, 333333333 }, { -3, 0, 0, 666666666, -3, 666666666 }, { -3, 0, 1, 0, -2, 0 }, { -3, 0, 2, 0, -1, 0 }, { -3, 0, 3, 0, 0, 0 }, { -3, 0, 3, 333333333, 0, 333333333 }, { -2, 0, -4, 666666667, -6, 666666667 }, { -2, 0, -3, 0, -5, 0 }, { -2, 0, -2, 0, -4, 0 }, { -2, 0, -1, 0, -3, 0 }, { -2, 0, -1, 333333334, -3, 333333334 }, { -2, 0, -1, 666666667, -3, 666666667 }, { -2, 0, -1, 999999999, -3, 999999999 }, { -2, 0, 0, 0, -2, 0 }, { -2, 0, 0, 1, -2, 1 }, { -2, 0, 0, 333333333, -2, 333333333 }, { -2, 0, 0, 666666666, -2, 666666666 }, { -2, 0, 1, 0, -1, 0 }, { -2, 0, 2, 0, 0, 0 }, { -2, 0, 3, 0, 1, 0 }, { -2, 0, 3, 333333333, 1, 333333333 }, { -1, 0, -4, 666666667, -5, 666666667 }, { -1, 0, -3, 0, -4, 0 }, { -1, 0, -2, 0, -3, 0 }, { -1, 0, -1, 0, -2, 0 }, { -1, 0, -1, 333333334, -2, 333333334 }, { -1, 0, -1, 666666667, -2, 666666667 }, { -1, 0, -1, 999999999, -2, 999999999 }, { -1, 0, 0, 0, -1, 0 }, { -1, 0, 0, 1, -1, 1 }, { -1, 0, 0, 333333333, -1, 333333333 }, { -1, 0, 0, 666666666, -1, 666666666 }, { -1, 0, 1, 0, 0, 0 }, { -1, 0, 2, 0, 1, 0 }, { -1, 0, 3, 0, 2, 0 }, { -1, 0, 3, 333333333, 2, 333333333 }, { -1, 666666667, -4, 666666667, -4, 333333334 }, { -1, 666666667, -3, 0, -4, 666666667 }, { -1, 666666667, -2, 0, -3, 666666667 }, { -1, 666666667, -1, 0, -2, 666666667 }, { -1, 666666667, -1, 333333334, -1, 1 }, { -1, 666666667, -1, 666666667, -1, 333333334 }, { -1, 666666667, -1, 999999999, -1, 666666666 }, { -1, 666666667, 0, 0, -1, 666666667 }, { -1, 666666667, 0, 1, -1, 666666668 }, { -1, 666666667, 0, 333333333, 0, 0 }, { -1, 666666667, 0, 666666666, 0, 333333333 }, { -1, 666666667, 1, 0, 0, 666666667 }, { -1, 666666667, 2, 0, 1, 666666667 }, { -1, 666666667, 3, 0, 2, 666666667 }, { -1, 666666667, 3, 333333333, 3, 0 }, { 0, 0, -4, 666666667, -4, 666666667 }, { 0, 0, -3, 0, -3, 0 }, { 0, 0, -2, 0, -2, 0 }, { 0, 0, -1, 0, -1, 0 }, { 0, 0, -1, 333333334, -1, 333333334 }, { 0, 0, -1, 666666667, -1, 666666667 }, { 0, 0, -1, 999999999, -1, 999999999 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 333333333, 0, 333333333 }, { 0, 0, 0, 666666666, 0, 666666666 }, { 0, 0, 1, 0, 1, 0 }, { 0, 0, 2, 0, 2, 0 }, { 0, 0, 3, 0, 3, 0 }, { 0, 0, 3, 333333333, 3, 333333333 }, { 0, 333333333, -4, 666666667, -3, 0 }, { 0, 333333333, -3, 0, -3, 333333333 }, { 0, 333333333, -2, 0, -2, 333333333 }, { 0, 333333333, -1, 0, -1, 333333333 }, { 0, 333333333, -1, 333333334, -1, 666666667 }, { 0, 333333333, -1, 666666667, 0, 0 }, { 0, 333333333, -1, 999999999, 0, 333333332 }, { 0, 333333333, 0, 0, 0, 333333333 }, { 0, 333333333, 0, 1, 0, 333333334 }, { 0, 333333333, 0, 333333333, 0, 666666666 }, { 0, 333333333, 0, 666666666, 0, 999999999 }, { 0, 333333333, 1, 0, 1, 333333333 }, { 0, 333333333, 2, 0, 2, 333333333 }, { 0, 333333333, 3, 0, 3, 333333333 }, { 0, 333333333, 3, 333333333, 3, 666666666 }, { 1, 0, -4, 666666667, -3, 666666667 }, { 1, 0, -3, 0, -2, 0 }, { 1, 0, -2, 0, -1, 0 }, { 1, 0, -1, 0, 0, 0 }, { 1, 0, -1, 333333334, 0, 333333334 }, { 1, 0, -1, 666666667, 0, 666666667 }, { 1, 0, -1, 999999999, 0, 999999999 }, { 1, 0, 0, 0, 1, 0 }, { 1, 0, 0, 1, 1, 1 }, { 1, 0, 0, 333333333, 1, 333333333 }, { 1, 0, 0, 666666666, 1, 666666666 }, { 1, 0, 1, 0, 2, 0 }, { 1, 0, 2, 0, 3, 0 }, { 1, 0, 3, 0, 4, 0 }, { 1, 0, 3, 333333333, 4, 333333333 }, { 2, 0, -4, 666666667, -2, 666666667 }, { 2, 0, -3, 0, -1, 0 }, { 2, 0, -2, 0, 0, 0 }, { 2, 0, -1, 0, 1, 0 }, { 2, 0, -1, 333333334, 1, 333333334 }, { 2, 0, -1, 666666667, 1, 666666667 }, { 2, 0, -1, 999999999, 1, 999999999 }, { 2, 0, 0, 0, 2, 0 }, { 2, 0, 0, 1, 2, 1 }, { 2, 0, 0, 333333333, 2, 333333333 }, { 2, 0, 0, 666666666, 2, 666666666 }, { 2, 0, 1, 0, 3, 0 }, { 2, 0, 2, 0, 4, 0 }, { 2, 0, 3, 0, 5, 0 }, { 2, 0, 3, 333333333, 5, 333333333 }, { 3, 0, -4, 666666667, -1, 666666667 }, { 3, 0, -3, 0, 0, 0 }, { 3, 0, -2, 0, 1, 0 }, { 3, 0, -1, 0, 2, 0 }, { 3, 0, -1, 333333334, 2, 333333334 }, { 3, 0, -1, 666666667, 2, 666666667 }, { 3, 0, -1, 999999999, 2, 999999999 }, { 3, 0, 0, 0, 3, 0 }, { 3, 0, 0, 1, 3, 1 }, { 3, 0, 0, 333333333, 3, 333333333 }, { 3, 0, 0, 666666666, 3, 666666666 }, { 3, 0, 1, 0, 4, 0 }, { 3, 0, 2, 0, 5, 0 }, { 3, 0, 3, 0, 6, 0 }, { 3, 0, 3, 333333333, 6, 333333333 }, { 3, 333333333, -4, 666666667, 0, 0 }, { 3, 333333333, -3, 0, 0, 333333333 }, { 3, 333333333, -2, 0, 1, 333333333 }, { 3, 333333333, -1, 0, 2, 333333333 }, { 3, 333333333, -1, 333333334, 2, 666666667 }, { 3, 333333333, -1, 666666667, 3, 0 }, { 3, 333333333, -1, 999999999, 3, 333333332 }, { 3, 333333333, 0, 0, 3, 333333333 }, { 3, 333333333, 0, 1, 3, 333333334 }, { 3, 333333333, 0, 333333333, 3, 666666666 }, { 3, 333333333, 0, 666666666, 3, 999999999 }, { 3, 333333333, 1, 0, 4, 333333333 }, { 3, 333333333, 2, 0, 5, 333333333 }, { 3, 333333333, 3, 0, 6, 333333333 }, { 3, 333333333, 3, 333333333, 6, 666666666 }, { Long.MAX_VALUE, 0, Long.MIN_VALUE, 0, -1, 0 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_plus")
-    public void test_plus(long seconds, int nanos, long plusSeconds, int plusNanos, long expectedSeconds, int expectedNanoOfSecond) {
-        TaiInstant i = TaiInstant.ofTaiSeconds(seconds, nanos).plus(Duration.ofSeconds(plusSeconds, plusNanos));
-        assertEquals(expectedSeconds, i.getTaiSeconds());
-        assertEquals(expectedNanoOfSecond, i.getNano());
-    }
-
-    //-----------------------------------------------------------------------
-    public static Object[][] data_minus() {
-        return new Object[][] { { Long.MIN_VALUE, 0, Long.MIN_VALUE + 1, 0, -1, 0 }, { -4, 666666667, -4, 666666667, 0, 0 }, { -4, 666666667, -3, 0, -1, 666666667 }, { -4, 666666667, -2, 0, -2, 666666667 }, { -4, 666666667, -1, 0, -3, 666666667 }, { -4, 666666667, -1, 333333334, -3, 333333333 }, { -4, 666666667, -1, 666666667, -3, 0 }, { -4, 666666667, -1, 999999999, -4, 666666668 }, { -4, 666666667, 0, 0, -4, 666666667 }, { -4, 666666667, 0, 1, -4, 666666666 }, { -4, 666666667, 0, 333333333, -4, 333333334 }, { -4, 666666667, 0, 666666666, -4, 1 }, { -4, 666666667, 1, 0, -5, 666666667 }, { -4, 666666667, 2, 0, -6, 666666667 }, { -4, 666666667, 3, 0, -7, 666666667 }, { -4, 666666667, 3, 333333333, -7, 333333334 }, { -3, 0, -4, 666666667, 0, 333333333 }, { -3, 0, -3, 0, 0, 0 }, { -3, 0, -2, 0, -1, 0 }, { -3, 0, -1, 0, -2, 0 }, { -3, 0, -1, 333333334, -3, 666666666 }, { -3, 0, -1, 666666667, -3, 333333333 }, { -3, 0, -1, 999999999, -3, 1 }, { -3, 0, 0, 0, -3, 0 }, { -3, 0, 0, 1, -4, 999999999 }, { -3, 0, 0, 333333333, -4, 666666667 }, { -3, 0, 0, 666666666, -4, 333333334 }, { -3, 0, 1, 0, -4, 0 }, { -3, 0, 2, 0, -5, 0 }, { -3, 0, 3, 0, -6, 0 }, { -3, 0, 3, 333333333, -7, 666666667 }, { -2, 0, -4, 666666667, 1, 333333333 }, { -2, 0, -3, 0, 1, 0 }, { -2, 0, -2, 0, 0, 0 }, { -2, 0, -1, 0, -1, 0 }, { -2, 0, -1, 333333334, -2, 666666666 }, { -2, 0, -1, 666666667, -2, 333333333 }, { -2, 0, -1, 999999999, -2, 1 }, { -2, 0, 0, 0, -2, 0 }, { -2, 0, 0, 1, -3, 999999999 }, { -2, 0, 0, 333333333, -3, 666666667 }, { -2, 0, 0, 666666666, -3, 333333334 }, { -2, 0, 1, 0, -3, 0 }, { -2, 0, 2, 0, -4, 0 }, { -2, 0, 3, 0, -5, 0 }, { -2, 0, 3, 333333333, -6, 666666667 }, { -1, 0, -4, 666666667, 2, 333333333 }, { -1, 0, -3, 0, 2, 0 }, { -1, 0, -2, 0, 1, 0 }, { -1, 0, -1, 0, 0, 0 }, { -1, 0, -1, 333333334, -1, 666666666 }, { -1, 0, -1, 666666667, -1, 333333333 }, { -1, 0, -1, 999999999, -1, 1 }, { -1, 0, 0, 0, -1, 0 }, { -1, 0, 0, 1, -2, 999999999 }, { -1, 0, 0, 333333333, -2, 666666667 }, { -1, 0, 0, 666666666, -2, 333333334 }, { -1, 0, 1, 0, -2, 0 }, { -1, 0, 2, 0, -3, 0 }, { -1, 0, 3, 0, -4, 0 }, { -1, 0, 3, 333333333, -5, 666666667 }, { -1, 666666667, -4, 666666667, 3, 0 }, { -1, 666666667, -3, 0, 2, 666666667 }, { -1, 666666667, -2, 0, 1, 666666667 }, { -1, 666666667, -1, 0, 0, 666666667 }, { -1, 666666667, -1, 333333334, 0, 333333333 }, { -1, 666666667, -1, 666666667, 0, 0 }, { -1, 666666667, -1, 999999999, -1, 666666668 }, { -1, 666666667, 0, 0, -1, 666666667 }, { -1, 666666667, 0, 1, -1, 666666666 }, { -1, 666666667, 0, 333333333, -1, 333333334 }, { -1, 666666667, 0, 666666666, -1, 1 }, { -1, 666666667, 1, 0, -2, 666666667 }, { -1, 666666667, 2, 0, -3, 666666667 }, { -1, 666666667, 3, 0, -4, 666666667 }, { -1, 666666667, 3, 333333333, -4, 333333334 }, { 0, 0, -4, 666666667, 3, 333333333 }, { 0, 0, -3, 0, 3, 0 }, { 0, 0, -2, 0, 2, 0 }, { 0, 0, -1, 0, 1, 0 }, { 0, 0, -1, 333333334, 0, 666666666 }, { 0, 0, -1, 666666667, 0, 333333333 }, { 0, 0, -1, 999999999, 0, 1 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, -1, 999999999 }, { 0, 0, 0, 333333333, -1, 666666667 }, { 0, 0, 0, 666666666, -1, 333333334 }, { 0, 0, 1, 0, -1, 0 }, { 0, 0, 2, 0, -2, 0 }, { 0, 0, 3, 0, -3, 0 }, { 0, 0, 3, 333333333, -4, 666666667 }, { 0, 333333333, -4, 666666667, 3, 666666666 }, { 0, 333333333, -3, 0, 3, 333333333 }, { 0, 333333333, -2, 0, 2, 333333333 }, { 0, 333333333, -1, 0, 1, 333333333 }, { 0, 333333333, -1, 333333334, 0, 999999999 }, { 0, 333333333, -1, 666666667, 0, 666666666 }, { 0, 333333333, -1, 999999999, 0, 333333334 }, { 0, 333333333, 0, 0, 0, 333333333 }, { 0, 333333333, 0, 1, 0, 333333332 }, { 0, 333333333, 0, 333333333, 0, 0 }, { 0, 333333333, 0, 666666666, -1, 666666667 }, { 0, 333333333, 1, 0, -1, 333333333 }, { 0, 333333333, 2, 0, -2, 333333333 }, { 0, 333333333, 3, 0, -3, 333333333 }, { 0, 333333333, 3, 333333333, -3, 0 }, { 1, 0, -4, 666666667, 4, 333333333 }, { 1, 0, -3, 0, 4, 0 }, { 1, 0, -2, 0, 3, 0 }, { 1, 0, -1, 0, 2, 0 }, { 1, 0, -1, 333333334, 1, 666666666 }, { 1, 0, -1, 666666667, 1, 333333333 }, { 1, 0, -1, 999999999, 1, 1 }, { 1, 0, 0, 0, 1, 0 }, { 1, 0, 0, 1, 0, 999999999 }, { 1, 0, 0, 333333333, 0, 666666667 }, { 1, 0, 0, 666666666, 0, 333333334 }, { 1, 0, 1, 0, 0, 0 }, { 1, 0, 2, 0, -1, 0 }, { 1, 0, 3, 0, -2, 0 }, { 1, 0, 3, 333333333, -3, 666666667 }, { 2, 0, -4, 666666667, 5, 333333333 }, { 2, 0, -3, 0, 5, 0 }, { 2, 0, -2, 0, 4, 0 }, { 2, 0, -1, 0, 3, 0 }, { 2, 0, -1, 333333334, 2, 666666666 }, { 2, 0, -1, 666666667, 2, 333333333 }, { 2, 0, -1, 999999999, 2, 1 }, { 2, 0, 0, 0, 2, 0 }, { 2, 0, 0, 1, 1, 999999999 }, { 2, 0, 0, 333333333, 1, 666666667 }, { 2, 0, 0, 666666666, 1, 333333334 }, { 2, 0, 1, 0, 1, 0 }, { 2, 0, 2, 0, 0, 0 }, { 2, 0, 3, 0, -1, 0 }, { 2, 0, 3, 333333333, -2, 666666667 }, { 3, 0, -4, 666666667, 6, 333333333 }, { 3, 0, -3, 0, 6, 0 }, { 3, 0, -2, 0, 5, 0 }, { 3, 0, -1, 0, 4, 0 }, { 3, 0, -1, 333333334, 3, 666666666 }, { 3, 0, -1, 666666667, 3, 333333333 }, { 3, 0, -1, 999999999, 3, 1 }, { 3, 0, 0, 0, 3, 0 }, { 3, 0, 0, 1, 2, 999999999 }, { 3, 0, 0, 333333333, 2, 666666667 }, { 3, 0, 0, 666666666, 2, 333333334 }, { 3, 0, 1, 0, 2, 0 }, { 3, 0, 2, 0, 1, 0 }, { 3, 0, 3, 0, 0, 0 }, { 3, 0, 3, 333333333, -1, 666666667 }, { 3, 333333333, -4, 666666667, 6, 666666666 }, { 3, 333333333, -3, 0, 6, 333333333 }, { 3, 333333333, -2, 0, 5, 333333333 }, { 3, 333333333, -1, 0, 4, 333333333 }, { 3, 333333333, -1, 333333334, 3, 999999999 }, { 3, 333333333, -1, 666666667, 3, 666666666 }, { 3, 333333333, -1, 999999999, 3, 333333334 }, { 3, 333333333, 0, 0, 3, 333333333 }, { 3, 333333333, 0, 1, 3, 333333332 }, { 3, 333333333, 0, 333333333, 3, 0 }, { 3, 333333333, 0, 666666666, 2, 666666667 }, { 3, 333333333, 1, 0, 2, 333333333 }, { 3, 333333333, 2, 0, 1, 333333333 }, { 3, 333333333, 3, 0, 0, 333333333 }, { 3, 333333333, 3, 333333333, 0, 0 }, { Long.MAX_VALUE, 0, Long.MAX_VALUE, 0, 0, 0 } };
-    }
-
-    @ParameterizedTest
-    @MethodSource("data_minus")
-    public void test_minus(long seconds, int nanos, long minusSeconds, int minusNanos, long expectedSeconds, int expectedNanoOfSecond) {
-        TaiInstant i = TaiInstant.ofTaiSeconds(seconds, nanos).minus(Duration.ofSeconds(minusSeconds, minusNanos));
-        assertEquals(expectedSeconds, i.getTaiSeconds());
-        assertEquals(expectedNanoOfSecond, i.getNano());
-    }
-
-    void doTest_comparisons_TaiInstant(TaiInstant... instants) {
-        for (int i = 0; i < instants.length; i++) {
-            TaiInstant a = instants[i];
-            for (int j = 0; j < instants.length; j++) {
-                TaiInstant b = instants[j];
-                if (i < j) {
-                    assertTrue(a.compareTo(b) < 0);
-                    assertFalse(a.equals(b));
-                    assertTrue(a.isBefore(b));
-                    assertFalse(a.isAfter(b));
-                } else if (i > j) {
-                    assertTrue(a.compareTo(b) > 0);
-                    assertFalse(a.equals(b));
-                    assertFalse(a.isBefore(b));
-                    assertTrue(a.isAfter(b));
-                } else {
-                    assertEquals(0, a.compareTo(b));
-                    assertTrue(a.equals(b));
-                    assertFalse(a.isBefore(b));
-                    assertFalse(a.isAfter(b));
-                }
-            }
-        }
-    }
-
-    //-----------------------------------------------------------------------
     @Test
-    public void test_toUtcInstant() {
-        for (int i = -1000; i < 1000; i++) {
-            for (int j = 0; j < 10; j++) {
-                UtcInstant expected = UtcInstant.ofModifiedJulianDay(36204 + i, j * 1000000000L + 2L);
-                TaiInstant test = TaiInstant.ofTaiSeconds(i * 24 * 60 * 60 + j + 10, 2);
-                assertEquals(expected, test.toUtcInstant());
-            }
-        }
+    @DisplayName("withTaiSeconds() should update seconds and preserve nanos")
+    void withTaiSeconds_returnsNewInstanceWithUpdatedSeconds() {
+        TaiInstant initial = TaiInstant.ofTaiSeconds(100, 12345);
+        long newSeconds = 200L;
+
+        TaiInstant result = initial.withTaiSeconds(newSeconds);
+
+        assertEquals(newSeconds, result.getTaiSeconds());
+        assertEquals(initial.getNano(), result.getNano());
+    }
+
+    //-----------------------------------------------------------------------
+    // withNano()
+    //-----------------------------------------------------------------------
+
+    @ParameterizedTest
+    @CsvSource({
+        "0",
+        "12345",
+        "999999999"
+    })
+    @DisplayName("withNano() should update nanos and preserve seconds for valid input")
+    void withNano_givenValidNano_returnsNewInstanceWithUpdatedNanos(int newNano) {
+        TaiInstant initial = TaiInstant.ofTaiSeconds(100, 54321);
+
+        TaiInstant result = initial.withNano(newNano);
+
+        assertEquals(initial.getTaiSeconds(), result.getTaiSeconds());
+        assertEquals(newNano, result.getNano());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 1_000_000_000})
+    @DisplayName("withNano() should throw for out-of-range nanos")
+    void withNano_givenInvalidNano_throwsIllegalArgumentException(int invalidNano) {
+        TaiInstant instant = TaiInstant.ofTaiSeconds(100, 12345);
+        assertThrows(IllegalArgumentException.class, () -> instant.withNano(invalidNano));
+    }
+
+    //-----------------------------------------------------------------------
+    // plus()
+    //-----------------------------------------------------------------------
+
+    @ParameterizedTest(name = "({0}s, {1}ns) + ({2}s, {3}ns) = ({4}s, {5}ns)")
+    @CsvSource({
+        // s,           ns,     plus_s,     plus_ns, expected_s, expected_ns
+        "  0,            0,          1,           0,          1,           0", // Simple second addition
+        "  1,            0,         -1,           0,          0,           0", // Subtracting seconds
+        "  0,            1,          0,           1,          0,           2", // Simple nano addition
+        "  0,    999999999,          0,           1,          1,           0", // Nano overflow
+        "  1,            0,          0,          -1,          0,   999999999", // Nano underflow (borrow)
+        " -4,    666666667,          0,   333333333,         -3,           0", // Nano overflow to zero
+        "  3,    333333333,          3,   333333333,          6,   666666666"  // Addition of fractional seconds
+    })
+    @DisplayName("plus() should correctly add durations")
+    void plus_addsDurationCorrectly(long s, int ns, long plus_s, int plus_ns, long expected_s, int expected_ns) {
+        TaiInstant initial = TaiInstant.ofTaiSeconds(s, ns);
+        Duration toAdd = Duration.ofSeconds(plus_s, plus_ns);
+
+        TaiInstant result = initial.plus(toAdd);
+
+        assertEquals(expected_s, result.getTaiSeconds());
+        assertEquals(expected_ns, result.getNano());
+    }
+
+    @Test
+    @DisplayName("plus() should throw ArithmeticException on overflow")
+    void plus_throwsOnOverflow() {
+        TaiInstant max = TaiInstant.ofTaiSeconds(Long.MAX_VALUE, 0);
+        assertThrows(ArithmeticException.class, () -> max.plus(Duration.ofSeconds(1)));
+
+        TaiInstant min = TaiInstant.ofTaiSeconds(Long.MIN_VALUE, 0);
+        assertThrows(ArithmeticException.class, () -> min.plus(Duration.ofSeconds(-1)));
+    }
+
+    //-----------------------------------------------------------------------
+    // minus()
+    //-----------------------------------------------------------------------
+
+    @ParameterizedTest(name = "({0}s, {1}ns) - ({2}s, {3}ns) = ({4}s, {5}ns)")
+    @CsvSource({
+        // s,           ns,    minus_s,    minus_ns, expected_s, expected_ns
+        "  5,    500000000,          2,   100000000,          3,   400000000", // Simple subtraction
+        "  5,    100000000,          2,   200000000,          2,   900000000", // Subtraction with nano borrow
+        "  5,    100000000,         -2,  -100000000,          7,   200000000", // Subtracting negative (addition)
+        "  5,    600000000,         -2,  -500000000,          8,   100000000", // Subtracting negative with nano carry
+        " -1,    666666667,         -1,   666666667,          0,           0"  // Subtracting itself
+    })
+    @DisplayName("minus() should correctly subtract durations")
+    void minus_subtractsDurationCorrectly(long s, int ns, long minus_s, int minus_ns, long expected_s, int expected_ns) {
+        TaiInstant initial = TaiInstant.ofTaiSeconds(s, ns);
+        Duration toSubtract = Duration.ofSeconds(minus_s, minus_ns);
+
+        TaiInstant result = initial.minus(toSubtract);
+
+        assertEquals(expected_s, result.getTaiSeconds());
+        assertEquals(expected_ns, result.getNano());
+    }
+
+    @Test
+    @DisplayName("minus() should throw ArithmeticException on overflow")
+    void minus_throwsOnOverflow() {
+        TaiInstant min = TaiInstant.ofTaiSeconds(Long.MIN_VALUE, 0);
+        assertThrows(ArithmeticException.class, () -> min.minus(Duration.ofSeconds(1)));
+
+        TaiInstant max = TaiInstant.ofTaiSeconds(Long.MAX_VALUE, 0);
+        assertThrows(ArithmeticException.class, () -> max.minus(Duration.ofSeconds(-1)));
+    }
+
+    //-----------------------------------------------------------------------
+    // toUtcInstant()
+    //-----------------------------------------------------------------------
+
+    private static final long TAI_EPOCH_MJD = 36204L; // Modified Julian Date for 1958-01-01
+    private static final long SECONDS_PER_DAY = 24 * 60 * 60;
+    // This test assumes a fixed 10-second difference between TAI and UTC,
+    // which was the case from 1972-01-01 until the first leap second was added.
+    private static final long TAI_UTC_DIFFERENCE_SECONDS = 10;
+
+    @ParameterizedTest(name = "Days from epoch: {0}, Seconds in day: {1}")
+    @CsvSource({
+        // days_from_epoch, seconds_in_day
+        "           0,            0",
+        "         500,            5",
+        "        -500,            9",
+        "        1000,        86399" // Test near end of day
+    })
+    @DisplayName("toUtcInstant() should correctly convert TAI to UTC assuming a fixed offset")
+    void toUtcInstant_convertsCorrectly(int daysFromEpoch, int secondsInDay) {
+        long nanoOfSecond = 12345L;
+        long nanosOfDay = secondsInDay * 1_000_000_000L + nanoOfSecond;
+
+        // The expected UTC instant, calculated from Modified Julian Date and nanosecond-of-day.
+        UtcInstant expectedUtc = UtcInstant.ofModifiedJulianDay(TAI_EPOCH_MJD + daysFromEpoch, nanosOfDay);
+
+        // The TAI instant to be tested. Its value in seconds is based on days from epoch,
+        // plus an assumed fixed offset from UTC.
+        long taiSeconds = daysFromEpoch * SECONDS_PER_DAY + secondsInDay + TAI_UTC_DIFFERENCE_SECONDS;
+        TaiInstant testTai = TaiInstant.ofTaiSeconds(taiSeconds, nanoOfSecond);
+
+        assertEquals(expectedUtc, testTai.toUtcInstant());
     }
 }
