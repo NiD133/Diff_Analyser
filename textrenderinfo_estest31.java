@@ -1,49 +1,54 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.Stack;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+// The test class structure (e.g., runner, scaffolding) is preserved from the original.
 public class TextRenderInfo_ESTestTest31 extends TextRenderInfo_ESTest_scaffolding {
 
+    /**
+     * Verifies that methods requiring string decoding, like getUnscaledBaseline(),
+     * throw an UnsupportedCharsetException when the underlying PdfString was created
+     * with an encoding not supported by the standard Java Charset library.
+     */
     @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Matrix matrix0 = new Matrix();
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        PdfString pdfString0 = new PdfString("Cp1252", "Identity-H");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
+    public void getUnscaledBaseline_shouldThrowUnsupportedCharsetException_whenPdfStringHasUnsupportedEncoding() {
+        // Arrange: Set up the necessary objects to create a TextRenderInfo instance.
+        GraphicsState graphicsState = new GraphicsState();
+        // A font is a required part of the graphics state for text operations.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        Matrix textMatrix = new Matrix();
+        Stack<MarkedContentInfo> markedContentStack = new Stack<>();
+
+        // "Identity-H" is a PDF-specific encoding for horizontal writing, which is not a standard Java charset.
+        // This is expected to cause an exception when the string content needs to be decoded.
+        String unsupportedEncoding = "Identity-H";
+        PdfString pdfStringWithUnsupportedEncoding = new PdfString("test content", unsupportedEncoding);
+
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                pdfStringWithUnsupportedEncoding,
+                graphicsState,
+                textMatrix,
+                markedContentStack
+        );
+
+        // Act & Assert: Verify that calling a method that decodes the string throws the correct exception.
         try {
-            textRenderInfo0.getUnscaledBaseline();
-            fail("Expecting exception: UnsupportedCharsetException");
+            textRenderInfo.getUnscaledBaseline();
+            fail("Expected an UnsupportedCharsetException because the encoding '" + unsupportedEncoding + "' is not supported.");
         } catch (UnsupportedCharsetException e) {
-            //
-            // Identity-H
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // The exception is expected. Verify its property for correctness.
+            assertEquals("The exception should report the name of the unsupported charset.",
+                         unsupportedEncoding, e.getCharsetName());
         }
     }
 }
