@@ -1,31 +1,54 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest5 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = new SpatialContext(spatialContextFactory0);
-        PointImpl pointImpl0 = new PointImpl((-1697.31376), (-512.1), spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 3478.012754255683, spatialContext0);
-        InfBufLine infBufLine0 = bufferedLine0.getLinePrimary();
-        assertEquals((-512.1), infBufLine0.getIntercept(), 0.01);
-        assertEquals(3478.012754255683, bufferedLine0.getBuf(), 0.01);
-        assertEquals(3478.012754255683, infBufLine0.getBuf(), 0.01);
+/**
+ * Unit tests for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    // A non-geodetic (Euclidean) context is used because BufferedLine operates in a 2D plane.
+    private final SpatialContext spatialContext = new SpatialContext(new SpatialContextFactory());
+
+    /**
+     * This test verifies the properties of the internal "primary line" when a BufferedLine
+     * is created from a single point (i.e., its start and end points are the same).
+     * This is a degenerate case, effectively representing a buffered point.
+     */
+    @Test
+    public void getLinePrimary_whenLineIsDegenerate_returnsCorrectlyConfiguredLine() {
+        // ARRANGE
+        // Define test data with descriptive names to avoid magic numbers.
+        final double coordinateX = -1697.31;
+        final double coordinateY = -512.1;
+        final double bufferDistance = 3478.01;
+
+        // A BufferedLine created from two identical points is a degenerate case.
+        Point singlePoint = new PointImpl(coordinateX, coordinateY, spatialContext);
+        BufferedLine bufferedLine = new BufferedLine(singlePoint, singlePoint, bufferDistance, spatialContext);
+
+        // ACT
+        // Retrieve the internal primary line used for calculations.
+        InfBufLine primaryLine = bufferedLine.getLinePrimary();
+
+        // ASSERT
+        // For a degenerate line, the implementation treats the primary line as horizontal (slope=0).
+        // Therefore, its y-intercept should be the y-coordinate of the point.
+        final double expectedIntercept = coordinateY;
+        assertEquals("Intercept should be the Y-coordinate of the point",
+                expectedIntercept, primaryLine.getIntercept(), 0.01);
+
+        // Verify the buffer distance was stored correctly in the parent BufferedLine.
+        assertEquals("Buffer of BufferedLine should match the input buffer",
+                bufferDistance, bufferedLine.getBuf(), 0.01);
+
+        // Verify the buffer distance was propagated correctly to the internal primary line.
+        assertEquals("Buffer of internal InfBufLine should match the input buffer",
+                bufferDistance, primaryLine.getBuf(), 0.01);
     }
 }
