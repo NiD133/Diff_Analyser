@@ -2,58 +2,64 @@ package org.apache.commons.io.output;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-public class ThresholdingOutputStreamTestTest3 {
-
-    /**
-     * Asserts initial state without changing it.
-     *
-     * @param out the stream to test.
-     * @param expectedThreshold the expected threshold.
-     * @param expectedByeCount the expected byte count.
-     */
-    static void assertThresholdingInitialState(final ThresholdingOutputStream out, final int expectedThreshold, final int expectedByeCount) {
-        assertFalse(out.isThresholdExceeded());
-        assertEquals(expectedThreshold, out.getThreshold());
-        assertEquals(expectedByeCount, out.getByteCount());
-    }
+/**
+ * Tests for {@link ThresholdingOutputStream}.
+ */
+class ThresholdingOutputStreamTest {
 
     @Test
-    void testSetByteCountOutputStream() throws IOException {
-        final AtomicBoolean reached = new AtomicBoolean();
-        final int initCount = 2;
+    void setByteCount_whenUsed_correctlyAffectsThresholdTrigger() throws IOException {
+        // Arrange: Set up a stream with a threshold and a flag to track when it's reached.
         final int threshold = 3;
-        try (ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
+        final int initialByteCount = 2;
+        final AtomicBoolean thresholdReachedFlag = new AtomicBoolean(false);
 
-            {
-                setByteCount(initCount);
+        // Create an anonymous subclass to monitor the thresholdReached() callback.
+        // The try-with-resources block ensures the stream is closed automatically.
+        try (final ThresholdingOutputStream out = new ThresholdingOutputStream(threshold) {
+            @Override
+            protected OutputStream getOutputStream() {
+                // The actual output destination is not important for this test, so we discard it.
+                return NullOutputStream.INSTANCE;
             }
 
             @Override
-            protected OutputStream getOutputStream() throws IOException {
-                return new ByteArrayOutputStream(4);
-            }
-
-            @Override
-            protected void thresholdReached() throws IOException {
-                reached.set(true);
+            protected void thresholdReached() {
+                // Set the flag when the threshold is exceeded.
+                thresholdReachedFlag.set(true);
             }
         }) {
-            assertThresholdingInitialState(out, threshold, initCount);
+            // Manually set the byte count to simulate a stream that already contains data.
+            out.setByteCount(initialByteCount);
+
+            // Assert: Verify the initial state is correct after setting the byte count.
+            assertFalse(out.isThresholdExceeded(), "Pre-condition: Threshold should not be exceeded.");
+            assertEquals(initialByteCount, out.getByteCount(), "Pre-condition: Byte count should match the set value.");
+            assertFalse(thresholdReachedFlag.get(), "Pre-condition: thresholdReached() should not have been called yet.");
+
+            // Act: Write one byte. The new count will be 3, which equals the threshold.
+            // The threshold is only exceeded if count > threshold, not count >= threshold.
             out.write('a');
-            assertFalse(reached.get());
-            assertFalse(out.isThresholdExceeded());
-            out.write('a');
-            assertTrue(reached.get());
-            assertTrue(out.isThresholdExceeded());
+
+            // Assert: The threshold has not been exceeded yet.
+            assertFalse(thresholdReachedFlag.get(), "Callback should not trigger when byte count equals threshold.");
+            assertFalse(out.isThresholdExceeded(), "isThresholdExceeded should be false when count equals threshold.");
+            assertEquals(3, out.getByteCount(), "Byte count should now be 3.");
+
+            // Act: Write another byte. The new count will be 4, which is > threshold.
+            out.write('b');
+
+            // Assert: The threshold is now exceeded.
+            assertTrue(thresholdReachedFlag.get(), "Callback should trigger when byte count exceeds threshold.");
+            assertTrue(out.isThresholdExceeded(), "isThresholdExceeded should be true when count exceeds threshold.");
+            assertEquals(4, out.getByteCount(), "Byte count should now be 4.");
         }
     }
 }
