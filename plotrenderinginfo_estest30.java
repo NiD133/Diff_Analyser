@@ -1,29 +1,30 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class PlotRenderingInfo_ESTestTest30 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the subplot management features of the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-        plotRenderingInfo0.addSubplotInfo(plotRenderingInfo0);
-        int int0 = plotRenderingInfo0.getSubplotCount();
-        assertEquals(1, int0);
+    /**
+     * Verifies that getSubplotCount() correctly reflects the number of subplots
+     * after a new subplot info object has been added.
+     */
+    @Test
+    public void getSubplotCount_shouldReturnOne_afterAddingOneSubplot() {
+        // Arrange: Create a main PlotRenderingInfo object.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
+
+        // Act: Add a subplot and retrieve the count.
+        // Note: For simplicity, we add the plotInfo to its own list of subplots.
+        plotInfo.addSubplotInfo(plotInfo);
+        int subplotCount = plotInfo.getSubplotCount();
+
+        // Assert: The count should be 1.
+        assertEquals("The subplot count should be 1 after adding a single subplot.", 1, subplotCount);
     }
 }
