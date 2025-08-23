@@ -1,28 +1,51 @@
 package com.google.gson.internal.bind;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.Strictness;
 import com.google.gson.common.MoreAsserts;
 import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeWriterTestTest22 {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
     /**
-     * {@link JsonTreeWriter} effectively replaces the complete writing logic of {@link JsonWriter} to
-     * create a {@link JsonElement} tree instead of writing to a {@link Writer}. Therefore all
-     * relevant methods of {@code JsonWriter} must be overridden.
+     * JsonTreeWriter is a custom JsonWriter that builds a JsonElement tree in memory
+     * instead of writing to an output stream. To achieve this, it must override all
+     * core writing methods from the base {@link JsonWriter}.
+     *
+     * <p>This test verifies that all relevant methods are indeed overridden. This ensures
+     * that no writing operations accidentally fall back to the base JsonWriter implementation,
+     * which would fail because JsonTreeWriter is initialized with an unusable Writer.
      */
     @Test
-    public void testOverrides() {
-        List<String> ignoredMethods = Arrays.asList("setLenient(boolean)", "isLenient()", "setStrictness(com.google.gson.Strictness)", "getStrictness()", "setIndent(java.lang.String)", "setHtmlSafe(boolean)", "isHtmlSafe()", "setFormattingStyle(com.google.gson.FormattingStyle)", "getFormattingStyle()", "setSerializeNulls(boolean)", "getSerializeNulls()");
-        MoreAsserts.assertOverridesMethods(JsonWriter.class, JsonTreeWriter.class, ignoredMethods);
+    public void allWriterMethodsAreOverridden() {
+        // These methods from JsonWriter are not relevant to JsonTreeWriter because they
+        // configure the output format (e.g., indentation, HTML safety), which does not
+        // apply when building an in-memory JSON tree.
+        List<String> nonOverriddenMethods = Arrays.asList(
+            // Leniency and Strictness settings
+            "setLenient(boolean)",
+            "isLenient()",
+            "setStrictness(com.google.gson.Strictness)",
+            "getStrictness()",
+
+            // Output formatting settings
+            "setIndent(java.lang.String)",
+            "setHtmlSafe(boolean)",
+            "isHtmlSafe()",
+            "setFormattingStyle(com.google.gson.FormattingStyle)",
+            "getFormattingStyle()",
+
+            // Null serialization setting
+            "setSerializeNulls(boolean)",
+            "getSerializeNulls()"
+        );
+
+        // Verify that JsonTreeWriter overrides all methods from JsonWriter,
+        // except for the configuration methods listed above.
+        MoreAsserts.assertOverridesMethods(JsonWriter.class, JsonTreeWriter.class, nonOverriddenMethods);
     }
 }
