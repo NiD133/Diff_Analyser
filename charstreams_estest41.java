@@ -1,53 +1,44 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharStreams_ESTestTest41 extends CharStreams_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CharStreams} utility class.
+ */
+public class CharStreamsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        Writer writer0 = CharStreams.nullWriter();
-        StringBuilder stringBuilder0 = new StringBuilder(2342);
-        // Undeclared exception!
+    /**
+     * Verifies that the Writer from {@link CharStreams#nullWriter()} accepts and
+     * discards all forms of input without throwing an exception. This ensures
+     * it behaves like a "/dev/null" for character streams.
+     */
+    @Test
+    public void nullWriter_shouldAcceptAndDiscardAllInputWithoutError() {
+        // Arrange: Obtain the writer that should discard all output.
+        Writer nullWriter = CharStreams.nullWriter();
+        assertNotNull("CharStreams.nullWriter() should not return null.", nullWriter);
+
         try {
-            stringBuilder0.insert(1, (Object) writer0);
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-            //
-            // String index out of range: 1
-            //
-            verifyException("java.lang.AbstractStringBuilder", e);
+            // Act: Perform a series of write, append, flush, and close operations.
+            nullWriter.write('a');
+            nullWriter.write("a test string");
+            nullWriter.write("another string".toCharArray(), 2, 5); // writes "other"
+            nullWriter.append("a char sequence");
+            nullWriter.append('z');
+            nullWriter.flush();
+            nullWriter.close();
+
+            // Assert: The test succeeds if no exceptions were thrown.
+            // The try-catch block explicitly enforces this assertion.
+
+        } catch (IOException e) {
+            // The nullWriter should never throw an IOException.
+            fail("CharStreams.nullWriter() should not have thrown an IOException, but it did: " + e.getMessage());
         }
     }
 }
