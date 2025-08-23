@@ -1,234 +1,78 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.joda.time.ReadablePartial;
 import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest40 extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+/**
+ * Tests for the PreciseDurationDateTimeField class.
+ * This test focuses on the behavior of methods inherited from BaseDateTimeField.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    /**
+     * Tests that getMaximumValue(ReadablePartial) delegates to getMaximumValue().
+     * <p>
+     * The implementation of getMaximumValue(ReadablePartial) in the superclass (BaseDateTimeField)
+     * simply calls the no-argument getMaximumValue(). This test creates a mock field with a known
+     * maximum value and confirms that this value is returned, regardless of the partial instance provided.
+     */
+    @Test
+    public void getMaximumValue_withReadablePartial_returnsFieldMaximumValue() {
+        // Arrange
+        // Create a concrete implementation of the abstract class under test.
+        BaseDateTimeField field = new MockFieldWithKnownMaximumValue();
+
+        // The specific ReadablePartial instance should be ignored by the method.
+        ReadablePartial dummyPartial = new TimeOfDay();
+
+        // Act
+        int actualMaximum = field.getMaximumValue(dummyPartial);
+
+        // Assert
+        int expectedMaximum = 59; // This is the hardcoded maximum value in our mock.
+        assertEquals(expectedMaximum, actualMaximum);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
-    }
+    /**
+     * A mock implementation of PreciseDurationDateTimeField for testing purposes.
+     * It simulates a "second of minute" field with a fixed maximum value of 59.
+     */
+    private static class MockFieldWithKnownMaximumValue extends PreciseDurationDateTimeField {
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
-
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+        /**
+         * Constructs the mock field.
+         * Uses a real, precise duration field from ISOChronology to satisfy the superclass constructor.
+         */
+        MockFieldWithKnownMaximumValue() {
+            super(DateTimeFieldType.secondOfMinute(), ISOChronology.getInstanceUTC().seconds());
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
-        @Override
-        public int get(long instant) {
-            return (int) (instant / 60L);
-        }
-
-        @Override
-        public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
-        }
-
+        /**
+         * This is the key method for the test, providing a known maximum value.
+         */
         @Override
         public int getMaximumValue() {
             return 59;
         }
-    }
 
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
-
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
+        // --- Dummy implementations for abstract methods not used in this test ---
 
         @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
+        public int get(long instant) {
+            // Not relevant for this test.
+            return 0;
         }
 
         @Override
         public DurationField getRangeDurationField() {
+            // Return a sensible, non-null value.
             return ISOChronology.getInstanceUTC().minutes();
         }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_getMaximumValue_RP() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals(59, field.getMaximumValue(new TimeOfDay()));
     }
 }
