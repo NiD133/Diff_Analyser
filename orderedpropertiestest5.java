@@ -1,86 +1,100 @@
 package org.apache.commons.collections4.properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.io.FileNotFoundException;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
-public class OrderedPropertiesTestTest5 {
+/**
+ * Tests for {@link OrderedProperties} to ensure that the insertion order of properties is preserved.
+ */
+class OrderedPropertiesTest {
 
-    private void assertAscendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 1;
-        final int last = 11;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i++) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-    }
-
-    private OrderedProperties assertDescendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 11;
-        final int last = 1;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i--) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-        return orderedProperties;
-    }
-
-    private OrderedProperties loadOrderedKeysReverse() throws FileNotFoundException, IOException {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties")) {
-            orderedProperties.load(reader);
-        }
-        return assertDescendingOrder(orderedProperties);
-    }
-
+    /**
+     * Tests that properties added programmatically are returned in their insertion order
+     * across all relevant views (keySet, entrySet, keys, and propertyNames).
+     */
     @Test
-    void testKeys() {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        final char first = 'Z';
-        final char last = 'A';
-        for (char ch = first; ch >= last; ch--) {
-            orderedProperties.put(String.valueOf(ch), "Value" + ch);
+    void shouldPreserveInsertionOrderForProgrammaticallyAddedProperties() {
+        // Arrange: Create properties and define the expected order.
+        // We add keys in reverse alphabetical order ('Z' down to 'A').
+        final OrderedProperties properties = new OrderedProperties();
+        final List<String> expectedKeys = new ArrayList<>();
+        final List<Entry<Object, Object>> expectedEntries = new ArrayList<>();
+
+        for (char ch = 'Z'; ch >= 'A'; ch--) {
+            final String key = String.valueOf(ch);
+            final String value = "Value" + ch;
+            properties.put(key, value);
+
+            // Build expected lists in parallel to ensure order matches insertion.
+            expectedKeys.add(key);
+            expectedEntries.add(new SimpleEntry<>(key, value));
         }
-        final Enumeration<Object> keys = orderedProperties.keys();
-        for (char ch = first; ch <= last; ch++) {
-            assertEquals(String.valueOf(ch), keys.nextElement());
+
+        // Act & Assert: Verify that all views return elements in the insertion order.
+
+        // 1. Test keySet()
+        assertIterableEquals(expectedKeys, properties.keySet(),
+            "keySet() should preserve insertion order.");
+
+        // 2. Test entrySet()
+        assertIterableEquals(expectedEntries, properties.entrySet(),
+            "entrySet() should preserve insertion order.");
+
+        // 3. Test keys() Enumeration
+        final List<Object> actualKeysFromEnum = Collections.list(properties.keys());
+        assertIterableEquals(expectedKeys, actualKeysFromEnum,
+            "keys() enumeration should preserve insertion order.");
+
+        // 4. Test propertyNames() Enumeration
+        final List<Object> actualPropertyNames = Collections.list(properties.propertyNames());
+        assertIterableEquals(expectedKeys, actualPropertyNames,
+            "propertyNames() enumeration should preserve insertion order.");
+    }
+
+    /**
+     * Tests that properties loaded from a file are maintained in the order they appear in the file.
+     * This test relies on 'test-reverse.properties', which is expected to list keys
+     * from "key11" down to "key1".
+     */
+    @Test
+    void shouldPreserveOrderWhenLoadingFromFile() throws IOException {
+        // Arrange: Define the expected order based on the 'test-reverse.properties' file content.
+        // The file is assumed to contain keys in descending order (key11, key10, ..., key1).
+        final List<String> expectedKeys = IntStream.rangeClosed(1, 11)
+            .map(i -> 12 - i) // Generates 11, 10, ..., 1
+            .mapToObj(i -> "key" + i)
+            .collect(Collectors.toList());
+
+        final List<Entry<Object, Object>> expectedEntries = IntStream.rangeClosed(1, 11)
+            .map(i -> 12 - i) // Generates 11, 10, ..., 1
+            .mapToObj(i -> new SimpleEntry<>("key" + i, "value" + i))
+            .collect(Collectors.toList());
+
+        final OrderedProperties properties = new OrderedProperties();
+        final String propertiesFilePath = "src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties";
+
+        // Act: Load properties from the file.
+        try (FileReader reader = new FileReader(propertiesFilePath)) {
+            properties.load(reader);
         }
+
+        // Assert: Verify that all views return elements in the file's order.
+        assertEquals(11, properties.size());
+        assertIterableEquals(expectedKeys, properties.keySet(), "keySet() should preserve order from file.");
+        assertIterableEquals(expectedEntries, properties.entrySet(), "entrySet() should preserve order from file.");
+        assertIterableEquals(expectedKeys, Collections.list(properties.keys()), "keys() should preserve order from file.");
+        assertIterableEquals(expectedKeys, Collections.list(properties.propertyNames()), "propertyNames() should preserve order from file.");
     }
 }
