@@ -1,30 +1,25 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
-public class TaiInstant_ESTestTest43 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Test class for {@link TaiInstant}.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(0L, 0L);
-        TaiInstant taiInstant1 = taiInstant0.withTaiSeconds(5495L);
-        boolean boolean0 = taiInstant1.equals(taiInstant0);
-        assertEquals(5495L, taiInstant1.getTaiSeconds());
-        assertFalse(taiInstant0.equals((Object) taiInstant1));
-        assertEquals(0, taiInstant1.getNano());
-        assertFalse(boolean0);
+    @Test
+    public void equals_returnsFalseForInstantsWithDifferentSeconds() {
+        // Arrange: Create two TaiInstant objects with different second values but the same nano value.
+        TaiInstant baseInstant = TaiInstant.ofTaiSeconds(0L, 0L);
+        TaiInstant differentSecondsInstant = baseInstant.withTaiSeconds(5495L);
+
+        // Assert: Verify that the two instants are not considered equal.
+        assertNotEquals(baseInstant, differentSecondsInstant);
+        
+        // Also assert the state of the newly created instant is correct.
+        assertEquals(5495L, differentSecondsInstant.getTaiSeconds());
+        assertEquals(0, differentSecondsInstant.getNano());
     }
 }
