@@ -1,31 +1,32 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest4 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PhoneticEngine} class, focusing on exception handling.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        RuleType ruleType0 = RuleType.EXACT;
-        NameType nameType0 = NameType.GENERIC;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false);
-        // Undeclared exception!
-        try {
-            phoneticEngine0.encode("8C?#]", (Languages.LanguageSet) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.codec.language.bm.Rule", e);
-        }
+    /**
+     * Tests that the encode method throws a NullPointerException when called with a null LanguageSet.
+     * The PhoneticEngine relies on a valid LanguageSet to process the input, and a null value
+     * is an illegal argument that should result in an immediate failure.
+     */
+    @Test(expected = NullPointerException.class)
+    public void encodeWithNullLanguageSetShouldThrowNullPointerException() {
+        // Arrange: Create a PhoneticEngine with standard configuration.
+        final NameType nameType = NameType.GENERIC;
+        final RuleType ruleType = RuleType.EXACT;
+        final boolean concat = false;
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, concat);
+
+        final String input = "test";
+
+        // Act: Call the encode method with a null LanguageSet.
+        // This action is expected to throw a NullPointerException.
+        engine.encode(input, (Languages.LanguageSet) null);
+
+        // Assert: The test will pass if a NullPointerException is thrown, as declared
+        // by the @Test(expected=...) annotation.
     }
 }
