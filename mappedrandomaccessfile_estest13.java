@@ -1,32 +1,50 @@
 package com.itextpdf.text.pdf;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.FileNotFoundException;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class MappedRandomAccessFile_ESTestTest13 extends MappedRandomAccessFile_ESTest_scaffolding {
+/**
+ * Test suite for the MappedRandomAccessFile class.
+ */
+public class MappedRandomAccessFileTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        MappedRandomAccessFile mappedRandomAccessFile0 = new MappedRandomAccessFile("rw", "rw");
-        mappedRandomAccessFile0.seek((-1934028347));
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
+    // Use a JUnit Rule to create and manage a temporary folder for test files.
+    // This ensures tests are isolated and don't leave files behind.
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    /**
+     * Verifies that the read() method throws an ArrayIndexOutOfBoundsException
+     * when called with a negative offset.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void read_withNegativeOffset_shouldThrowException() throws IOException {
+        // Arrange: Create a temporary file and instantiate the class under test.
+        File tempFile = temporaryFolder.newFile("test.data");
+        MappedRandomAccessFile mappedFile = null;
+
         try {
-            mappedRandomAccessFile0.read(byteArray0, (-1934028347), 841);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -1
-            //
-            verifyException("com.itextpdf.text.pdf.MappedRandomAccessFile", e);
+            mappedFile = new MappedRandomAccessFile(tempFile.getAbsolutePath(), "rw");
+            byte[] buffer = new byte[10];
+            int negativeOffset = -1; // The invalid offset that should cause the exception.
+            int readLength = 5;
+
+            // Act: Attempt to read from the file using the invalid negative offset.
+            // This call is expected to throw the exception.
+            mappedFile.read(buffer, negativeOffset, readLength);
+
+        } finally {
+            // Assert: The test passes if the expected ArrayIndexOutOfBoundsException is thrown.
+            // This is handled by the @Test(expected=...) annotation.
+
+            // Cleanup: Ensure the file resource is always closed.
+            if (mappedFile != null) {
+                mappedFile.close();
+            }
         }
     }
 }
