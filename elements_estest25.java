@@ -1,36 +1,39 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class Elements_ESTestTest25 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#parents()} method.
+ */
+public class ElementsParentsTest {
 
-    @Test(timeout = 4000)
-    public void test024() throws Throwable {
-        Document document0 = Document.createShell("");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.parents();
-        assertFalse(elements1.isEmpty());
+    /**
+     * Tests that the parents() method correctly finds the unique parent element
+     * from a collection of elements that share the same parent.
+     */
+    @Test
+    public void parentsFindsUniqueParentOfMultipleElements() {
+        // Arrange
+        // A shell document creates a basic HTML structure: <html><head></head><body></body></html>
+        Document doc = Document.createShell("");
+        
+        // This collection will contain the <html>, <head>, and <body> elements.
+        Elements elements = doc.getAllElements();
+
+        // Act
+        // The parents() method should find all unique parents of the elements in the collection.
+        // - The parent of <head> is <html>.
+        // - The parent of <body> is <html>.
+        // - <html> has no element parent (its parent is the document node).
+        // The result should be a unique set containing just the <html> element.
+        Elements parents = elements.parents();
+
+        // Assert
+        // Verify that only one unique parent was found.
+        assertEquals("Should find one unique parent.", 1, parents.size());
+        // Verify that the unique parent is the <html> element.
+        assertEquals("The unique parent should be the 'html' element.", "html", parents.first().tagName());
     }
 }
