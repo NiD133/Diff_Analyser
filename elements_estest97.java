@@ -1,35 +1,31 @@
 package org.jsoup.select;
 
+import org.jsoup.nodes.Element;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest97 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test096() throws Throwable {
-        Elements elements0 = new Elements(115);
-        Elements elements1 = new Elements((Collection<Element>) elements0);
-        assertEquals(0, elements1.size());
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that the Elements constructor correctly creates an empty Elements object
+     * when initialized with an empty source collection.
+     */
+    @Test
+    public void constructorWithCollectionCreatesEmptyElementsFromEmptySource() {
+        // Arrange: Create an empty source collection of elements.
+        Collection<Element> emptySourceCollection = new ArrayList<>();
+
+        // Act: Create a new Elements object using the empty collection.
+        Elements elements = new Elements(emptySourceCollection);
+
+        // Assert: The newly created Elements object should be empty.
+        assertTrue("The Elements object initialized from an empty collection should be empty.", elements.isEmpty());
     }
 }
