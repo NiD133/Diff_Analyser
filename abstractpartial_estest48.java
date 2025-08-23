@@ -1,46 +1,28 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest48 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        YearMonth yearMonth0 = new YearMonth();
-        boolean boolean0 = yearMonth0.equals(yearMonth0);
-        assertTrue(boolean0);
+/**
+ * This test suite verifies the behavior of the AbstractPartial class.
+ * Note: The original class name "AbstractPartial_ESTestTest48" was preserved,
+ * but a more descriptive name like "AbstractPartialTest" would be preferable.
+ */
+public class AbstractPartial_ESTestTest48 {
+
+    /**
+     * Tests that the equals() method is reflexive, meaning an object is always
+     * equal to itself. This is a fundamental contract of the Object.equals() method.
+     */
+    @Test
+    public void equals_shouldBeReflexive() {
+        // Arrange: Create an instance of YearMonth, a concrete subclass of AbstractPartial.
+        YearMonth yearMonth = new YearMonth();
+
+        // Act & Assert: Verify that the object is equal to itself.
+        // The assertEquals method internally uses the .equals() method for comparison.
+        assertEquals("An object must be equal to itself.", yearMonth, yearMonth);
     }
 }
