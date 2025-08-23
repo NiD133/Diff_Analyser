@@ -1,33 +1,25 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest11 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ConverterSet} class, focusing on the remove-by-index functionality.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Converter[] converterArray0 = new Converter[0];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        // Undeclared exception!
-        try {
-            converterSet0.remove((-785), converterArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -785
-            //
-            verifyException("org.joda.time.convert.ConverterSet", e);
-        }
+    /**
+     * Verifies that calling remove() with a negative index throws an
+     * ArrayIndexOutOfBoundsException, as the index must be within the bounds of the
+     * internal converter array.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void removeByIndex_withNegativeIndex_throwsArrayIndexOutOfBoundsException() {
+        // Arrange: Create an empty ConverterSet.
+        ConverterSet emptyConverterSet = new ConverterSet(new Converter[0]);
+        int negativeIndex = -1;
+
+        // Act: Attempt to remove a converter using a negative index.
+        // The expected exception is declared in the @Test annotation.
+        emptyConverterSet.remove(negativeIndex, null);
     }
 }
