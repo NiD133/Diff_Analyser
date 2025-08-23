@@ -1,26 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest45 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ByteArrayBuilder}, focusing on its constructor logic
+ * and interaction with {@link BufferRecycler}.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        BufferRecycler bufferRecycler0 = new BufferRecycler(1, 1);
-        ByteArrayBuilder byteArrayBuilder0 = null;
-        try {
-            byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 2
-            //
-            verifyException("java.util.concurrent.atomic.AtomicReferenceArray", e);
-        }
+    /**
+     * Verifies that the ByteArrayBuilder constructor throws an IndexOutOfBoundsException
+     * if it's provided with a BufferRecycler that is too small to supply the
+     * required buffer type.
+     * <p>
+     * The constructor requests a buffer of type {@code BufferRecycler.BYTE_WRITE_CONCAT_BUFFER},
+     * which corresponds to index 2. This test provides a BufferRecycler configured with
+     * internal arrays of size 1, which cannot satisfy the request.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void constructorWithInsufficientlySizedBufferRecyclerShouldThrowException() {
+        // Arrange: Create a BufferRecycler with internal arrays of size 1, which is
+        // smaller than the required buffer index (2).
+        BufferRecycler smallBufferRecycler = new BufferRecycler(1, 1);
+
+        // Act: Attempt to construct a ByteArrayBuilder. This will try to allocate
+        // a buffer at an index that is out of bounds for the small recycler.
+        // Assert: The @Test(expected=...) annotation verifies that the expected
+        // IndexOutOfBoundsException is thrown.
+        new ByteArrayBuilder(smallBufferRecycler);
     }
 }
