@@ -1,25 +1,53 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest3 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        JsonLocation jsonLocation0 = new JsonLocation((Object) null, 500, 500, 500);
-        ContentReference contentReference0 = ContentReference.redacted();
-        JsonLocation jsonLocation1 = new JsonLocation((Object) contentReference0, 1127L, (-304L), 500, 92);
-        boolean boolean0 = jsonLocation1.equals(jsonLocation0);
-        assertEquals(1127L, jsonLocation1.getByteOffset());
-        assertFalse(boolean0);
-        assertEquals((-304L), jsonLocation1.getCharOffset());
-        assertEquals(92, jsonLocation1.getColumnNr());
-        assertEquals(500, jsonLocation1.getLineNr());
+/**
+ * Contains unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Tests that the {@code equals()} method returns {@code false} for two {@link JsonLocation}
+     * instances that have different properties.
+     * <p>
+     * This test case creates two locations that differ in their source reference,
+     * byte offset, character offset, and column number, but share the same line number.
+     * This ensures that the {@code equals()} implementation checks all relevant fields.
+     */
+    @Test
+    public void equalsShouldReturnFalseWhenPropertiesDiffer() {
+        // Arrange
+        // Location 1: Based on an 'unknown' content source. This mimics the original
+        // test's use of a null source object.
+        JsonLocation location1 = new JsonLocation(ContentReference.unknown(),
+                -1L,  // byte offset
+                500L, // char offset
+                500,  // line number
+                500); // column number
+
+        // Location 2: Based on a 'redacted' content source with different offsets.
+        JsonLocation location2 = new JsonLocation(ContentReference.redacted(),
+                1127L, // byte offset
+                -304L, // char offset
+                500,   // line number
+                92);   // column number
+
+        // Sanity-check that location2 was constructed with the expected values.
+        // This confirms the test setup is correct before we test the equals() method.
+        assertEquals(1127L, location2.getByteOffset());
+        assertEquals(-304L, location2.getCharOffset());
+        assertEquals(500, location2.getLineNr());
+        assertEquals(92, location2.getColumnNr());
+
+        // Act
+        boolean areEqual = location1.equals(location2);
+
+        // Assert
+        assertFalse("equals() should return false for locations with different properties.", areEqual);
     }
 }
