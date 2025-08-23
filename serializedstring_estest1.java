@@ -1,32 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest1 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on invalid argument scenarios.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("Q");
-        char[] charArray0 = new char[0];
-        // Undeclared exception!
-        try {
-            serializedString0.appendUnquoted(charArray0, (-1));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling {@link SerializedString#appendUnquoted(char[], int)} with a negative
+     * offset correctly throws an {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void appendUnquoted_whenGivenNegativeOffset_shouldThrowException() {
+        // Arrange: Create a SerializedString and a destination buffer.
+        // The offset is intentionally negative to trigger the expected exception.
+        SerializedString serializedString = new SerializedString("any-string");
+        char[] destinationBuffer = new char[10];
+        int negativeOffset = -1;
+
+        // Act: Attempt to append the string to the buffer at the invalid negative offset.
+        // This call is expected to throw the exception.
+        serializedString.appendUnquoted(destinationBuffer, negativeOffset);
+
+        // Assert: The test framework verifies that an ArrayIndexOutOfBoundsException was thrown,
+        // as specified by the @Test(expected=...) annotation. No further assertions are needed.
     }
 }
