@@ -1,42 +1,77 @@
 package org.apache.commons.jxpath.ri.compiler;
 
+import org.apache.commons.jxpath.JXPathException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.ParentContext;
-import org.apache.commons.jxpath.ri.axes.PrecedingOrFollowingContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.axes.SelfContext;
-import org.apache.commons.jxpath.ri.axes.UnionContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class CoreOperation_ESTestTest7 extends CoreOperation_ESTest_scaffolding {
+/**
+ * Contains tests for the computation logic within CoreOperation subclasses,
+ * particularly focusing on exception handling for invalid expressions.
+ */
+public class CoreOperationTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Expression[] expressionArray0 = new Expression[9];
-        CoreFunction coreFunction0 = new CoreFunction(15, expressionArray0);
-        CoreOperationMultiply coreOperationMultiply0 = new CoreOperationMultiply(coreFunction0, coreFunction0);
-        expressionArray0[0] = (Expression) coreOperationMultiply0;
-        CoreOperationAdd coreOperationAdd0 = new CoreOperationAdd(expressionArray0);
-        // Undeclared exception!
+    /**
+     * Tests that computing a complex expression tree throws a JXPathException
+     * when a nested function is called with an incorrect number of arguments.
+     *
+     * This test verifies that the JXPath engine correctly identifies an invalid
+     * function call (string-length() with 9 arguments instead of 0 or 1)
+     * deep within a nested expression and reports it with a descriptive error message.
+     */
+    @Test
+    public void computeShouldThrowExceptionForNestedFunctionWithIncorrectArgumentCount() {
+        // Arrange: Build a complex expression tree containing an invalid function call.
+        // The expression structure is effectively:
+        // (string-length(...) * string-length(...)) + null + null + ...
+        // where the string-length function itself is invalid.
+
+        // 1. The 'string-length' function expects 0 or 1 arguments, but we provide 9.
+        Expression[] invalidArgsForStringLength = new Expression[9];
+
+        // 2. Create the 'string-length' function call. We use the Function interface
+        // constant instead of the magic number 15 for clarity.
+        CoreFunction stringLengthFunction = new CoreFunction(
+            Function.CORE_FUNCTION_STRING_LENGTH,
+            invalidArgsForStringLength
+        );
+
+        // 3. Nest the invalid function inside a multiplication operation.
+        CoreOperationMultiply multiplyOperation = new CoreOperationMultiply(
+            stringLengthFunction,
+            stringLengthFunction
+        );
+
+        // 4. Create a self-referential expression to test the string representation
+        // in the exception message. The function's first argument is the operation
+        // that contains the function itself.
+        invalidArgsForStringLength[0] = multiplyOperation;
+
+        // 5. Create a top-level 'add' operation. Its computation will trigger the
+        // evaluation of its arguments, including the invalid nested function.
+        CoreOperationAdd rootOperation = new CoreOperationAdd(invalidArgsForStringLength);
+
+        // Act & Assert
         try {
-            coreOperationAdd0.compute((EvalContext) null);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Incorrect number of arguments: string-length(org.apache.commons.jxpath.ri.compiler.CoreFunction@0000000001 * org.apache.commons.jxpath.ri.compiler.CoreFunction@0000000001, null, null, null, null, null, null, null, null)
-            //
-            verifyException("org.apache.commons.jxpath.ri.compiler.CoreFunction", e);
+            // The compute call is expected to fail when it evaluates the stringLengthFunction.
+            // The EvalContext can be null as the error occurs before it's used.
+            rootOperation.compute(null);
+            fail("Expected a JXPathException because string-length() was called with too many arguments.");
+        } catch (JXPathException e) {
+            // Verify that the exception message clearly indicates the problem.
+            String errorMessage = e.getMessage();
+            assertTrue(
+                "Error message should identify the incorrect argument count.",
+                errorMessage.startsWith("Incorrect number of arguments:")
+            );
+            assertTrue(
+                "Error message should name the function 'string-length'.",
+                errorMessage.contains("string-length")
+            );
+            assertTrue(
+                "Error message should include the stringified nested expression.",
+                errorMessage.contains(" * ") // Verifies the multiplication was part of the string representation.
+            );
         }
     }
 }
