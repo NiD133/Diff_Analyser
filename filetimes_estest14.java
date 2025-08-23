@@ -1,25 +1,32 @@
 package org.apache.commons.io.file.attribute;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest14 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        BigDecimal bigDecimal0 = BigDecimal.TEN;
-        Instant instant0 = FileTimes.ntfsTimeToInstant(bigDecimal0);
-        assertNotNull(instant0);
+    /**
+     * Tests that {@link FileTimes#ntfsTimeToInstant(BigDecimal)} correctly converts a small
+     * positive NTFS time value to the corresponding Instant.
+     */
+    @Test
+    public void ntfsTimeToInstant_shouldConvertSmallPositiveValueCorrectly() {
+        // Arrange
+        // NTFS time is the number of 100-nanosecond intervals since the NTFS epoch (1601-01-01 00:00:00 UTC).
+        // An input of 10 represents 10 * 100 = 1000 nanoseconds (or 1 microsecond) after the epoch.
+        BigDecimal ntfsTime = BigDecimal.TEN;
+        Instant expectedInstant = Instant.parse("1601-01-01T00:00:00.000001Z");
+
+        // Act
+        Instant actualInstant = FileTimes.ntfsTimeToInstant(ntfsTime);
+
+        // Assert
+        assertEquals(expectedInstant, actualInstant);
     }
 }
