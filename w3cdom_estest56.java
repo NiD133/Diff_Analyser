@@ -1,40 +1,30 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class W3CDom_ESTestTest56 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for the W3CDom helper class.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        assertTrue(w3CDom0.namespaceAware());
-        W3CDom w3CDom1 = w3CDom0.namespaceAware(false);
-        boolean boolean0 = w3CDom1.namespaceAware();
-        assertFalse(boolean0);
+    /**
+     * Verifies that the namespace-aware flag can be configured.
+     * It should be true by default and can be updated.
+     */
+    @Test
+    public void namespaceAwareCanBeConfigured() {
+        // Arrange: Create a new W3CDom instance.
+        W3CDom w3cDom = new W3CDom();
+
+        // Assert: The default setting for namespace awareness should be true.
+        assertTrue("W3CDom should be namespace-aware by default.", w3cDom.namespaceAware());
+
+        // Act: Disable namespace awareness.
+        w3cDom.namespaceAware(false);
+
+        // Assert: The setting should now be updated to false.
+        assertFalse("The namespace-aware flag should be updated to false after setting.", w3cDom.namespaceAware());
     }
 }
