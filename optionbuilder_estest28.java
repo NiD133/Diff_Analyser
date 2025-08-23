@@ -1,25 +1,22 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class OptionBuilder_ESTestTest28 extends OptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionBuilder} class, focusing on exception-handling scenarios.
+ */
+public class OptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        // Undeclared exception!
-        try {
-            OptionBuilder.withType((Object) "");
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // java.lang.String cannot be cast to java.lang.Class
-            //
-            verifyException("org.apache.commons.cli.OptionBuilder", e);
-        }
+    /**
+     * Tests that the deprecated {@code withType(Object)} method throws a
+     * {@code ClassCastException} when passed an argument that is not an
+     * instance of {@link java.lang.Class}. This confirms the behavior documented
+     * for this legacy method, which performs an internal cast.
+     */
+    @Test(expected = ClassCastException.class)
+    public void withType_whenArgumentIsNotAClass_shouldThrowClassCastException() {
+        // The withType(Object) method is expected to cast its argument to a Class.
+        // Providing a simple String should therefore cause a ClassCastException.
+        OptionBuilder.withType("not a class object");
     }
 }
