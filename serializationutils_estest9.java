@@ -1,42 +1,47 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
+
+import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializationUtils_ESTestTest9 extends SerializationUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        HashMap<MockFileInputStream, Object> hashMap0 = new HashMap<MockFileInputStream, Object>();
-        File file0 = MockFile.createTempFile("4*54", "4*54");
-        MockFileInputStream mockFileInputStream0 = new MockFileInputStream(file0);
-        hashMap0.put(mockFileInputStream0, file0);
-        // Undeclared exception!
+/**
+ * Unit tests for {@link org.apache.commons.lang3.SerializationUtils}.
+ */
+public class SerializationUtilsTest {
+
+    /**
+     * A simple helper class that does not implement Serializable,
+     * used to test serialization failure.
+     */
+    private static class NonSerializableObject {
+        // This class is intentionally not serializable.
+    }
+
+    /**
+     * Tests that serialize() throws a SerializationException when trying to serialize
+     * an object graph that contains a non-serializable object.
+     */
+    @Test
+    public void testSerializeThrowsExceptionForNonSerializableContent() {
+        // Arrange: Create a serializable HashMap that contains a non-serializable object.
+        final HashMap<String, Object> map = new HashMap<>();
+        map.put("key", new NonSerializableObject());
+
+        // Act & Assert
         try {
-            SerializationUtils.serialize((Serializable) hashMap0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // java.io.NotSerializableException: org.evosuite.runtime.mock.java.io.MockFileInputStream
-            //
-            verifyException("org.apache.commons.lang3.SerializationUtils", e);
+            SerializationUtils.serialize(map);
+            fail("Expected a SerializationException to be thrown due to non-serializable content.");
+        } catch (final SerializationException e) {
+            // Verify that the underlying cause is the expected NotSerializableException.
+            final Throwable cause = e.getCause();
+            assertNotNull("The exception should have a cause.", cause);
+            assertTrue("The cause should be a NotSerializableException.", cause instanceof NotSerializableException);
         }
     }
 }
