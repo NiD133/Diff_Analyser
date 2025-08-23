@@ -2,27 +2,33 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest31 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonIgnoreProperties.Value} class, focusing on its static merge logic.
+ */
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        String[] stringArray0 = new String[5];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.merge((JsonIgnoreProperties.Value) null, jsonIgnoreProperties_Value0);
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value1.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getMerge());
-        assertNotNull(jsonIgnoreProperties_Value1);
-        assertSame(jsonIgnoreProperties_Value1, jsonIgnoreProperties_Value0);
+    /**
+     * Verifies that when merging a null 'base' value with a non-null 'overrides' value,
+     * the merge method returns the 'overrides' instance directly.
+     */
+    @Test
+    public void merge_shouldReturnOverridesInstance_whenBaseIsNull() {
+        // Arrange: Define a non-null 'overrides' configuration and a null 'base'.
+        JsonIgnoreProperties.Value overrides = JsonIgnoreProperties.Value.forIgnoredProperties("prop1", "prop2");
+        JsonIgnoreProperties.Value base = null;
+
+        // Act: Perform the merge operation.
+        JsonIgnoreProperties.Value result = JsonIgnoreProperties.Value.merge(base, overrides);
+
+        // Assert: The result should be the exact same instance as the 'overrides' object,
+        // not just an equal one.
+        assertSame("When the base value is null, the overrides instance should be returned.", overrides, result);
+
+        // Further Assert: Confirm the properties of the returned instance are correct.
+        assertFalse("ignoreUnknown should be false by default", result.getIgnoreUnknown());
+        assertFalse("allowGetters should be false by default", result.getAllowGetters());
+        assertFalse("allowSetters should be false by default", result.getAllowSetters());
+        assertTrue("merge should be true by default", result.getMerge());
     }
 }
