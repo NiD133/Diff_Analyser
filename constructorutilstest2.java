@@ -1,142 +1,98 @@
 package org.apache.commons.lang3.reflect;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import org.apache.commons.lang3.ArrayUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Constructor;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang3.AbstractLangTest;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-public class ConstructorUtilsTestTest2 extends AbstractLangTest {
+/**
+ * Tests for {@link ConstructorUtils#getAccessibleConstructor(java.lang.reflect.Constructor)}
+ * and {@link ConstructorUtils#getAccessibleConstructor(Class, Class...)}.
+ */
+class ConstructorUtilsTest {
 
-    private final Map<Class<?>, Class<?>[]> classCache;
-
-    private void expectMatchingAccessibleConstructorParameterTypes(final Class<?> cls, final Class<?>[] requestTypes, final Class<?>[] actualTypes) {
-        final Constructor<?> c = ConstructorUtils.getMatchingAccessibleConstructor(cls, requestTypes);
-        assertArrayEquals(actualTypes, c.getParameterTypes(), toString(c.getParameterTypes()) + " not equals " + toString(actualTypes));
-    }
-
-    @BeforeEach
-    public void setUp() {
-        classCache.clear();
-    }
-
-    private Class<?>[] singletonArray(final Class<?> c) {
-        Class<?>[] result = classCache.get(c);
-        if (result == null) {
-            result = new Class[] { c };
-            classCache.put(c, result);
+    // Test fixture: A private static nested class for accessibility tests.
+    private static class PrivateClass {
+        // This constructor is public, but its declaring class is private.
+        public PrivateClass() {
         }
-        return result;
-    }
 
-    private String toString(final Class<?>[] c) {
-        return Arrays.asList(c).toString();
-    }
-
-    private static class BaseClass {
-    }
-
-    static class PrivateClass {
-
-        @SuppressWarnings("unused")
+        // Test fixture: A public inner class within a private class.
         public static class PublicInnerClass {
-
             public PublicInnerClass() {
             }
         }
+    }
 
-        @SuppressWarnings("unused")
-        public PrivateClass() {
+    @Nested
+    @DisplayName("getAccessibleConstructor(Constructor<T>)")
+    class GetAccessibleConstructorByConstructor {
+
+        @Test
+        void shouldReturnConstructorWhenItIsPubliclyAccessible() throws NoSuchMethodException {
+            // Arrange
+            final Constructor<Object> publicConstructor = Object.class.getConstructor();
+
+            // Act
+            final Constructor<Object> result = ConstructorUtils.getAccessibleConstructor(publicConstructor);
+
+            // Assert
+            assertNotNull(result, "A public constructor should be considered accessible.");
+            assertEquals(publicConstructor, result);
+        }
+
+        @Test
+        void shouldReturnNullWhenConstructorIsInaccessibleDueToPrivateClass() throws NoSuchMethodException {
+            // Arrange
+            final Constructor<PrivateClass> constructorInPrivateClass = PrivateClass.class.getConstructor();
+
+            // Act
+            final Constructor<PrivateClass> result = ConstructorUtils.getAccessibleConstructor(constructorInPrivateClass);
+
+            // Assert
+            assertNull(result, "A constructor in a private class should not be accessible.");
         }
     }
 
-    private static final class SubClass extends BaseClass {
-    }
+    @Nested
+    @DisplayName("getAccessibleConstructor(Class<T>, Class<?>...)")
+    class GetAccessibleConstructorByClass {
 
-    public static class TestBean {
+        @Test
+        void shouldFindAndReturnPublicConstructor() {
+            // Act
+            final Constructor<String> result = ConstructorUtils.getAccessibleConstructor(String.class);
 
-        private final String toString;
-
-        final String[] varArgs;
-
-        public TestBean() {
-            toString = "()";
-            varArgs = null;
+            // Assert
+            assertNotNull(result, "Should find the public no-arg constructor of String.");
+            assertEquals(0, result.getParameterCount());
         }
 
-        public TestBean(final BaseClass bc, final String... s) {
-            toString = "(BaseClass, String...)";
-            varArgs = s;
+        @Test
+        void shouldReturnNullForPublicInnerClassOfPrivateClass() {
+            // Arrange: PublicInnerClass is public, but its enclosing class (PrivateClass) is private.
+            final Class<PrivateClass.PublicInnerClass> classInPrivateClass = PrivateClass.PublicInnerClass.class;
+
+            // Act
+            final Constructor<PrivateClass.PublicInnerClass> result = ConstructorUtils.getAccessibleConstructor(classInPrivateClass);
+
+            // Assert
+            assertNull(result, "A constructor in a public inner class of a private class should not be accessible.");
         }
 
-        public TestBean(final double d) {
-            toString = "(double)";
-            varArgs = null;
-        }
+        @Test
+        void shouldReturnNullForNonExistentConstructor() {
+            // Act
+            final Constructor<String> result = ConstructorUtils.getAccessibleConstructor(String.class, Integer.class);
 
-        public TestBean(final int i) {
-            toString = "(int)";
-            varArgs = null;
+            // Assert
+            assertNull(result, "Should return null if no constructor matches the given parameter types.");
         }
-
-        public TestBean(final Integer i) {
-            toString = "(Integer)";
-            varArgs = null;
-        }
-
-        public TestBean(final Integer first, final int... args) {
-            toString = "(Integer, String...)";
-            varArgs = new String[args.length];
-            for (int i = 0; i < args.length; ++i) {
-                varArgs[i] = Integer.toString(args[i]);
-            }
-        }
-
-        public TestBean(final Integer i, final String... s) {
-            toString = "(Integer, String...)";
-            varArgs = s;
-        }
-
-        public TestBean(final Object o) {
-            toString = "(Object)";
-            varArgs = null;
-        }
-
-        public TestBean(final String s) {
-            toString = "(String)";
-            varArgs = null;
-        }
-
-        public TestBean(final String... s) {
-            toString = "(String...)";
-            varArgs = s;
-        }
-
-        @Override
-        public String toString() {
-            return toString;
-        }
-
-        void verify(final String str, final String[] args) {
-            assertEquals(str, toString);
-            assertArrayEquals(args, varArgs);
-        }
-    }
-
-    @Test
-    void testGetAccessibleConstructor() throws Exception {
-        assertNotNull(ConstructorUtils.getAccessibleConstructor(Object.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.class.getConstructor(ArrayUtils.EMPTY_CLASS_ARRAY)));
-        assertNull(ConstructorUtils.getAccessibleConstructor(PrivateClass.PublicInnerClass.class));
     }
 }
