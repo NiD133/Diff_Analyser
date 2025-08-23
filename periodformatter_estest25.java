@@ -1,54 +1,51 @@
 package org.joda.time.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PeriodFormatter_ESTestTest25 extends PeriodFormatter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        String[] stringArray0 = new String[5];
-        stringArray0[0] = "";
-        stringArray0[1] = "qn";
-        stringArray0[2] = "qn";
-        stringArray0[3] = "qn";
-        stringArray0[4] = "qn";
-        PeriodFormatterBuilder.Separator periodFormatterBuilder_Separator0 = new PeriodFormatterBuilder.Separator("qn", "", stringArray0, periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0, true, false);
-        Locale locale0 = Locale.ENGLISH;
-        PeriodType periodType0 = PeriodType.yearDayTime();
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Separator0, locale0, periodType0);
-        PeriodFormat.DynamicWordBased periodFormat_DynamicWordBased0 = new PeriodFormat.DynamicWordBased(periodFormatter0);
-        periodFormatterBuilder_Separator0.finish(periodFormatterBuilder_Literal0, periodFormat_DynamicWordBased0);
-        // Undeclared exception!
-        try {
-            periodFormatter0.parseMutablePeriod("qn");
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+/**
+ * Tests for {@link PeriodFormatter}, focusing on specific parsing scenarios.
+ */
+public class PeriodFormatterTest {
+
+    /**
+     * Verifies that attempting to parse with a recursively defined formatter
+     * correctly results in a StackOverflowError.
+     * <p>
+     * A circular dependency is intentionally created where a PeriodFormatter's parser
+     * indirectly calls itself, leading to infinite recursion during the parsing process.
+     */
+    @Test(expected = StackOverflowError.class)
+    public void parseMutablePeriodWithRecursiveParserShouldThrowStackOverflowError() {
+        // Arrange: Create a formatter with a parser that recursively calls itself.
+
+        // 1. Define a base literal component that does nothing. It serves as a placeholder.
+        PeriodFormatterBuilder.Literal emptyLiteral = PeriodFormatterBuilder.Literal.EMPTY;
+
+        // 2. Create a separator. This component will be made recursive later.
+        String[] separatorVariants = new String[]{"", "qn", "qn", "qn", "qn"};
+        PeriodFormatterBuilder.Separator recursiveSeparator = new PeriodFormatterBuilder.Separator(
+                "qn", "", separatorVariants, emptyLiteral, emptyLiteral, true, false);
+
+        // 3. Create a formatter that uses the separator as its parser.
+        PeriodFormatter formatterWithRecursiveParser = new PeriodFormatter(
+                emptyLiteral, recursiveSeparator, Locale.ENGLISH, PeriodType.yearDayTime());
+
+        // 4. Create a dynamic parser that wraps the base formatter.
+        PeriodParser dynamicParser = new PeriodFormat.DynamicWordBased(formatterWithRecursiveParser);
+
+        // 5. This is the crucial step that creates the circular dependency.
+        // We configure the separator (from step 2) to use the dynamic parser (from step 4).
+        // The parsing chain is now:
+        // formatter -> recursiveSeparator -> dynamicParser -> formatter -> ...
+        recursiveSeparator.finish(emptyLiteral, dynamicParser);
+
+        // Act: Attempt to parse a string with the formatter.
+        // This will trigger the infinite recursion.
+        formatterWithRecursiveParser.parseMutablePeriod("qn");
+
+        // Assert: The expected StackOverflowError is verified by the @Test annotation.
     }
 }
