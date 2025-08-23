@@ -2,62 +2,39 @@ package org.apache.commons.compress.archivers.zip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.zip.ZipException;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ExtraFieldUtilsTestTest5 implements UnixStat {
+/**
+ * Tests error handling scenarios for {@link ExtraFieldUtils}.
+ */
+class ExtraFieldUtilsTest {
 
     /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress.
-     *
-     * <p>
-     * Used to be ZipShort(1) but this is the ID of the Zip64 extra field.
-     * </p>
+     * A mock {@link ZipExtraField} that always throws an {@link ArrayIndexOutOfBoundsException}
+     * from its parse methods. This is used to verify that {@link ExtraFieldUtils} correctly
+     * wraps such low-level parsing errors into a {@link ZipException}.
      */
-    static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
+    private static class ExceptionThrowingExtraField implements ZipExtraField {
 
-    /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress used for the ArrayIndexOutOfBoundsTest.
-     */
-    static final ZipShort AIOB_HEADER = new ZipShort(0x1000);
-
-    private AsiExtraField a;
-
-    private UnrecognizedExtraField dummy;
-
-    private byte[] data;
-
-    private byte[] aLocal;
-
-    @BeforeEach
-    public void setUp() {
-        a = new AsiExtraField();
-        a.setMode(0755);
-        a.setDirectory(true);
-        dummy = new UnrecognizedExtraField();
-        dummy.setHeaderId(UNRECOGNIZED_HEADER);
-        dummy.setLocalFileDataData(new byte[] { 0 });
-        dummy.setCentralDirectoryData(new byte[] { 0 });
-        aLocal = a.getLocalFileDataData();
-        final byte[] dummyLocal = dummy.getLocalFileDataData();
-        data = new byte[4 + aLocal.length + 4 + dummyLocal.length];
-        System.arraycopy(a.getHeaderId().getBytes(), 0, data, 0, 2);
-        System.arraycopy(a.getLocalFileDataLength().getBytes(), 0, data, 2, 2);
-        System.arraycopy(aLocal, 0, data, 4, aLocal.length);
-        System.arraycopy(dummy.getHeaderId().getBytes(), 0, data, 4 + aLocal.length, 2);
-        System.arraycopy(dummy.getLocalFileDataLength().getBytes(), 0, data, 4 + aLocal.length + 2, 2);
-        System.arraycopy(dummyLocal, 0, data, 4 + aLocal.length + 4, dummyLocal.length);
-    }
-
-    public static class AiobThrowingExtraField implements ZipExtraField {
-
-        static final int LENGTH = 4;
+        static final ZipShort HEADER_ID = new ZipShort(0x1000);
+        private static final int DATA_LENGTH = 4;
 
         @Override
-        public byte[] getCentralDirectoryData() {
-            return getLocalFileDataData();
+        public ZipShort getHeaderId() {
+            return HEADER_ID;
+        }
+
+        @Override
+        public ZipShort getLocalFileDataLength() {
+            return new ZipShort(DATA_LENGTH);
+        }
+
+        @Override
+        public byte[] getLocalFileDataData() {
+            return new byte[DATA_LENGTH];
         }
 
         @Override
@@ -66,40 +43,62 @@ public class ExtraFieldUtilsTestTest5 implements UnixStat {
         }
 
         @Override
-        public ZipShort getHeaderId() {
-            return AIOB_HEADER;
+        public byte[] getCentralDirectoryData() {
+            return getLocalFileDataData();
         }
 
         @Override
-        public byte[] getLocalFileDataData() {
-            return new byte[LENGTH];
-        }
-
-        @Override
-        public ZipShort getLocalFileDataLength() {
-            return new ZipShort(LENGTH);
+        public void parseFromLocalFileData(final byte[] buffer, final int offset, final int length) {
+            throw new ArrayIndexOutOfBoundsException("Simulating a parsing error.");
         }
 
         @Override
         public void parseFromCentralDirectoryData(final byte[] buffer, final int offset, final int length) {
             parseFromLocalFileData(buffer, offset, length);
         }
-
-        @Override
-        public void parseFromLocalFileData(final byte[] buffer, final int offset, final int length) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
     }
 
     @Test
-    void testParseTurnsArrayIndexOutOfBoundsIntoZipException() {
-        ExtraFieldUtils.register(AiobThrowingExtraField.class);
-        final AiobThrowingExtraField f = new AiobThrowingExtraField();
-        final byte[] d = new byte[4 + AiobThrowingExtraField.LENGTH];
-        System.arraycopy(f.getHeaderId().getBytes(), 0, d, 0, 2);
-        System.arraycopy(f.getLocalFileDataLength().getBytes(), 0, d, 2, 2);
-        System.arraycopy(f.getLocalFileDataData(), 0, d, 4, AiobThrowingExtraField.LENGTH);
-        final ZipException e = assertThrows(ZipException.class, () -> ExtraFieldUtils.parse(d), "data should be invalid");
-        assertEquals("Failed to parse corrupt ZIP extra field of type 1000", e.getMessage(), "message");
+    @DisplayName("parse() should wrap an ArrayIndexOutOfBoundsException from a field's parser in a ZipException")
+    void parseShouldWrapUnderlyingParsingException() {
+        // This test relies on the deprecated static registration method to inject
+        // a custom ZipExtraField implementation for testing purposes.
+        ExtraFieldUtils.register(ExceptionThrowingExtraField.class);
+
+        // Arrange
+        final ExceptionThrowingExtraField faultyField = new ExceptionThrowingExtraField();
+        final byte[] extraFieldData = buildExtraFieldData(faultyField);
+
+        // The SUT is expected to format the header ID as a hex string in the exception message.
+        final String expectedMessage = "Failed to parse corrupt ZIP extra field of type "
+            + Integer.toHexString(ExceptionThrowingExtraField.HEADER_ID.getValue());
+
+        // Act & Assert
+        final ZipException thrown = assertThrows(ZipException.class,
+            () -> ExtraFieldUtils.parse(extraFieldData),
+            "Parsing data from a field that throws an exception should result in a ZipException.");
+
+        assertEquals(expectedMessage, thrown.getMessage(), "The exception message should identify the faulty field type.");
+    }
+
+    /**
+     * Creates a raw byte array representing the data for a single extra field.
+     * The format is: [Header ID (2 bytes)][Data Length (2 bytes)][Data].
+     *
+     * @param field The extra field to serialize.
+     * @return A byte array with the serialized extra field data.
+     */
+    private byte[] buildExtraFieldData(final ZipExtraField field) {
+        final byte[] headerId = field.getHeaderId().getBytes();
+        final byte[] dataLength = field.getLocalFileDataLength().getBytes();
+        final byte[] data = field.getLocalFileDataData();
+
+        final byte[] rawData = new byte[headerId.length + dataLength.length + data.length];
+
+        System.arraycopy(headerId, 0, rawData, 0, headerId.length);
+        System.arraycopy(dataLength, 0, rawData, headerId.length, dataLength.length);
+        System.arraycopy(data, 0, rawData, headerId.length + dataLength.length, data.length);
+
+        return rawData;
     }
 }
