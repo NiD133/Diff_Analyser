@@ -1,23 +1,38 @@
 package com.google.common.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
+import java.lang.annotation.Annotation;
+
+/**
+ * This class contains the refactored test case.
+ * The original class name and extension are preserved to maintain context.
+ */
 public class Parameter_ESTestTest24 extends Parameter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-3591), (TypeToken<?>) null, annotationArray0, (Object) null);
-        Class<Annotation> class0 = Annotation.class;
-        Annotation annotation0 = parameter0.getDeclaredAnnotation(class0);
-        assertNull(annotation0);
+    /**
+     * Tests that getDeclaredAnnotation() returns null when the parameter has no annotations.
+     */
+    @Test
+    public void getDeclaredAnnotation_whenNoAnnotationsPresent_returnsNull() {
+        // Arrange: Create a Parameter instance with an empty annotation array.
+        // The other constructor arguments are irrelevant to this test's purpose
+        // (verifying annotation lookup) and are supplied with placeholder values.
+        Annotation[] noAnnotations = new Annotation[0];
+        Parameter parameterWithNoAnnotations = new Parameter(
+                /* declaration= */ null,
+                /* position= */ 0,
+                /* type= */ null,
+                /* annotations= */ noAnnotations,
+                /* annotatedType= */ null);
+
+        // Act: Attempt to retrieve an annotation from the parameter.
+        Annotation foundAnnotation = parameterWithNoAnnotations.getDeclaredAnnotation(Annotation.class);
+
+        // Assert: Verify that the result is null, as expected.
+        assertNull(
+            "Expected null when searching for an annotation on a parameter with no annotations.",
+            foundAnnotation);
     }
 }
