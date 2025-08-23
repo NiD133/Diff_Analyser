@@ -1,21 +1,29 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest4 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ThresholdingOutputStream} class.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream(76);
-        int int0 = thresholdingOutputStream0.getThreshold();
-        assertEquals(76, int0);
+    /**
+     * Tests that the getThreshold() method correctly returns the value
+     * provided in the constructor.
+     */
+    @Test
+    public void getThreshold_shouldReturnThresholdSetInConstructor() {
+        // Arrange: Define a threshold and create the stream
+        final int expectedThreshold = 76;
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(expectedThreshold);
+
+        // Act: Call the method under test
+        final int actualThreshold = stream.getThreshold();
+
+        // Assert: Verify the result
+        assertEquals("The returned threshold should match the one set in the constructor.",
+                     expectedThreshold, actualThreshold);
     }
 }
