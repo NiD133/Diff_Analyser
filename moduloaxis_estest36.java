@@ -1,44 +1,50 @@
 package org.jfree.chart.axis;
 
+import org.jfree.data.Range;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
-import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class ModuloAxis_ESTestTest36 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Tests for the {@link ModuloAxis} class, focusing on its equality contract
+ * and constructor behavior.
+ */
+public class ModuloAxisTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        TickType tickType0 = TickType.MINOR;
-        boolean boolean0 = moduloAxis0.equals(tickType0);
-        assertEquals(270.0, moduloAxis0.getDisplayStart(), 0.01);
-        assertFalse(boolean0);
-        assertEquals(90.0, moduloAxis0.getDisplayEnd(), 0.01);
+    /**
+     * Verifies that the constructor correctly initializes the default display range.
+     * The default display should start at 270.0 and end at 90.0, which is
+     * typical for a compass-like display where 0/360 is at the top.
+     */
+    @Test
+    public void constructorShouldSetDefaultDisplayStartAndEnd() {
+        // Arrange: Create a ModuloAxis with a standard range.
+        Range fixedRange = new Range(0.0, 360.0);
+        ModuloAxis axis = new ModuloAxis("Angle", fixedRange);
+
+        // Act: The constructor has already acted, so we just get the values.
+        double displayStart = axis.getDisplayStart();
+        double displayEnd = axis.getDisplayEnd();
+
+        // Assert: Check that the display range is set to its default values.
+        assertEquals("Default display start should be 270.0", 270.0, displayStart, 0.0);
+        assertEquals("Default display end should be 90.0", 90.0, displayEnd, 0.0);
+    }
+
+    /**
+     * Verifies that the equals() method returns false when a ModuloAxis
+     * is compared with an object of a different, incompatible type.
+     */
+    @Test
+    public void equalsShouldReturnFalseForIncompatibleObjectType() {
+        // Arrange: Create a ModuloAxis instance and an object of a different type.
+        Range fixedRange = new Range(0.0, 360.0);
+        ModuloAxis axis = new ModuloAxis("Test Axis", fixedRange);
+        Object incompatibleObject = TickType.MINOR;
+
+        // Act: Compare the axis with the incompatible object.
+        boolean isEqual = axis.equals(incompatibleObject);
+
+        // Assert: The result should be false.
+        assertFalse("equals() should return false when comparing with a different object type.", isEqual);
     }
 }
