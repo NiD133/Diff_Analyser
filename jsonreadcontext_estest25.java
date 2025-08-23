@@ -1,28 +1,37 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest25 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(dupDetector0);
-        jsonReadContext0.setCurrentName("K{/Yj{U");
-        jsonReadContext0.getCurrentName();
-        assertTrue(jsonReadContext0.hasCurrentName());
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its name-handling capabilities.
+ */
+public class JsonReadContextTest {
+
+    /**
+     * Verifies that after setting a current name on a JsonReadContext,
+     * both hasCurrentName() and getCurrentName() report the correct state.
+     */
+    @Test
+    public void setCurrentName_shouldUpdateCurrentNameAndState() throws JsonProcessingException {
+        // Arrange: Create a root context. The DupDetector is required but its behavior
+        // is not the focus of this test.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonReadContext context = JsonReadContext.createRootContext(dupDetector);
+        String expectedFieldName = "testField";
+
+        // Assert initial state (optional but good practice)
+        assertFalse("Context should not have a current name initially", context.hasCurrentName());
+        assertNull("Current name should be null initially", context.getCurrentName());
+
+        // Act: Set the current name on the context.
+        context.setCurrentName(expectedFieldName);
+
+        // Assert: Verify that the context now has the correct current name.
+        assertTrue("hasCurrentName() should return true after a name is set", context.hasCurrentName());
+        assertEquals("getCurrentName() should return the name that was set", expectedFieldName, context.getCurrentName());
     }
 }
