@@ -1,21 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest31 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        boolean[] booleanArray0 = new boolean[4];
-        boolean[] booleanArray1 = ArrayFill.fill(booleanArray0, true);
-        assertTrue(Arrays.equals(new boolean[] { true, true, true, true }, booleanArray1));
+    @Test
+    public void testFillBooleanArray() {
+        // Arrange
+        final boolean[] actualArray = new boolean[4]; // Initial state: {false, false, false, false}
+        final boolean[] expectedArray = {true, true, true, true};
+
+        // Act
+        final boolean[] resultArray = ArrayFill.fill(actualArray, true);
+
+        // Assert
+        // 1. Verify that the method returns the same array instance that was passed in.
+        assertSame("The method should return the same array instance.", actualArray, resultArray);
+
+        // 2. Verify that the array contents are correctly filled.
+        assertArrayEquals("The array should be filled with 'true'.", expectedArray, resultArray);
     }
 }
