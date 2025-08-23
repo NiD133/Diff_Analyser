@@ -1,33 +1,38 @@
 package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonWriteContext_ESTestTest1 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on its state management
+ * within different JSON structures.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildArrayContext((Object) "");
-        jsonWriteContext1.writeValue();
-        jsonWriteContext1.writeValue();
-        int int0 = jsonWriteContext1.writeValue();
-        assertEquals(2, jsonWriteContext1.getCurrentIndex());
-        assertEquals(1, int0);
+    /**
+     * Verifies that writing multiple values into an array context correctly increments
+     * the internal index and returns the expected status. For any element after the
+     * first, the status should indicate that a comma separator is required.
+     */
+    @Test
+    public void writeValue_inArrayContext_shouldIncrementIndexAndReturnStatusOkAfterComma() {
+        // Arrange: Create a root context and a child array context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(null);
+        JsonWriteContext arrayContext = rootContext.createChildArrayContext();
+
+        // Act: Write three values. The status of the first two are ignored as we
+        // are interested in the state after the first element.
+        arrayContext.writeValue(); // Writes the first value, index becomes 0.
+        arrayContext.writeValue(); // Writes the second value, index becomes 1.
+        int statusAfterThirdValue = arrayContext.writeValue(); // Writes the third value, index becomes 2.
+
+        // Assert: Check the index and the status returned by the third write.
+        // The index is 0-based, so after writing three values, it should be 2.
+        assertEquals("After writing three values, the current index should be 2",
+                2, arrayContext.getCurrentIndex());
+
+        // For any element after the first in an array, the status should be STATUS_OK_AFTER_COMMA.
+        assertEquals("Status for a subsequent array element should indicate a comma is needed",
+                JsonWriteContext.STATUS_OK_AFTER_COMMA, statusAfterThirdValue);
     }
 }
