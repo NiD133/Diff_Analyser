@@ -1,20 +1,26 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ImmutableNetwork_ESTestTest8 extends ImmutableNetwork_ESTest_scaffolding {
+/**
+ * Tests for {@link ImmutableNetwork}.
+ */
+public class ImmutableNetworkTest {
 
-    @Test(timeout = 4000)
-    public void test7() throws Throwable {
-        NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
-        StandardMutableNetwork<Object, Object> standardMutableNetwork0 = new StandardMutableNetwork<Object, Object>(networkBuilder0);
-        ImmutableNetwork<Object, Object> immutableNetwork0 = ImmutableNetwork.copyOf((Network<Object, Object>) standardMutableNetwork0);
-        ImmutableNetwork<Object, Object> immutableNetwork1 = ImmutableNetwork.copyOf(immutableNetwork0);
-        assertSame(immutableNetwork0, immutableNetwork1);
+    @Test
+    public void copyOf_onImmutableNetwork_returnsSameInstance() {
+        // Arrange: Create an initial ImmutableNetwork.
+        // The specific contents of the network are not important for this test.
+        ImmutableNetwork<Object, Object> originalNetwork =
+            ImmutableNetwork.copyOf(NetworkBuilder.directed().build());
+
+        // Act: Call copyOf() on the already-immutable network.
+        ImmutableNetwork<Object, Object> newNetwork = ImmutableNetwork.copyOf(originalNetwork);
+
+        // Assert: The method should return the exact same instance as an optimization,
+        // rather than creating a new copy.
+        assertSame("copyOf(ImmutableNetwork) should return the same instance", originalNetwork, newNetwork);
     }
 }
