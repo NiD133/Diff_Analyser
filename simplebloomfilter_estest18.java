@@ -1,31 +1,25 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest18 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link SimpleBloomFilter#processBitMaps(java.util.function.LongPredicate)}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Shape shape0 = Shape.fromKM(1, 1);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            simpleBloomFilter0.processBitMaps((LongPredicate) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // consumer
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that processBitMaps() throws a NullPointerException when the provided consumer is null.
+     * The method contract requires a non-null consumer to process the bit maps.
+     */
+    @Test(expected = NullPointerException.class)
+    public void processBitMapsShouldThrowNullPointerExceptionWhenConsumerIsNull() {
+        // Arrange: Create a filter with any valid shape.
+        // The shape's specific values do not affect this test's outcome.
+        Shape shape = Shape.fromKM(1, 1);
+        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Act & Assert: Calling processBitMaps with a null argument should throw.
+        // The @Test(expected=...) annotation handles the assertion.
+        filter.processBitMaps(null);
     }
 }
