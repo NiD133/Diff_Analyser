@@ -1,133 +1,35 @@
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.LangAssertions.assertIndexOutOfBoundsException;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
+
 import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CharSequenceUtilsTestTest2 extends AbstractLangTest {
+/**
+ * Tests for {@link CharSequenceUtils#lastIndexOf(CharSequence, CharSequence, int)}.
+ *
+ * <p>This class focuses on two main areas of testing for {@code lastIndexOf}:
+ * <ol>
+ *     <li>Correctness with various {@link CharSequence} implementations (String, StringBuilder, etc.).</li>
+ *     <li>Equivalence with the behavior of {@link String#lastIndexOf(String, int)} across a wide range of inputs,
+ *     including edge cases and randomized long strings.</li>
+ * </ol>
+ */
+public class CharSequenceUtilsLastIndexOfTest {
 
-    private static final TestData[] TEST_DATA = { // @formatter:off
-    //           Source  IgnoreCase Offset Other  Offset Length Result
-    new TestData("", true, -1, "", -1, -1, false), new TestData("", true, 0, "", 0, 1, false), new TestData("a", true, 0, "abc", 0, 0, true), new TestData("a", true, 0, "abc", 0, 1, true), new TestData("a", true, 0, null, 0, 0, NullPointerException.class), new TestData(null, true, 0, null, 0, 0, NullPointerException.class), new TestData(null, true, 0, "", 0, 0, NullPointerException.class), new TestData("Abc", true, 0, "abc", 0, 3, true), new TestData("Abc", false, 0, "abc", 0, 3, false), new TestData("Abc", true, 1, "abc", 1, 2, true), new TestData("Abc", false, 1, "abc", 1, 2, true), new TestData("Abcd", true, 1, "abcD", 1, 2, true), new TestData("Abcd", false, 1, "abcD", 1, 2, true) // @formatter:on
-    };
-
-    static Stream<Arguments> lastIndexWithStandardCharSequence() {
-        // @formatter:off
-        return Stream.of(arguments("abc", "b", 2, 1), arguments(new StringBuilder("abc"), "b", 2, 1), arguments(new StringBuffer("abc"), "b", 2, 1), arguments("abc", new StringBuilder("b"), 2, 1), arguments(new StringBuilder("abc"), new StringBuilder("b"), 2, 1), arguments(new StringBuffer("abc"), new StringBuffer("b"), 2, 1), arguments(new StringBuilder("abc"), new StringBuffer("b"), 2, 1));
-        // @formatter:on
-    }
-
-    @ParameterizedTest
-    @MethodSource("lastIndexWithStandardCharSequence")
-    void testLastIndexOfWithDifferentCharSequences(final CharSequence cs, final CharSequence search, final int start, final int expected) {
-        assertEquals(expected, CharSequenceUtils.lastIndexOf(cs, search, start));
-    }
-
-    private void testNewLastIndexOfSingle(final CharSequence a, final CharSequence b) {
-        final int maxa = Math.max(a.length(), b.length());
-        for (int i = -maxa - 10; i <= maxa + 10; i++) {
-            testNewLastIndexOfSingle(a, b, i);
-        }
-        testNewLastIndexOfSingle(a, b, Integer.MIN_VALUE);
-        testNewLastIndexOfSingle(a, b, Integer.MAX_VALUE);
-    }
-
-    private void testNewLastIndexOfSingle(final CharSequence a, final CharSequence b, final int start) {
-        testNewLastIndexOfSingleSingle(a, b, start);
-        testNewLastIndexOfSingleSingle(b, a, start);
-    }
-
-    private void testNewLastIndexOfSingleSingle(final CharSequence a, final CharSequence b, final int start) {
-        assertEquals(a.toString().lastIndexOf(b.toString(), start), CharSequenceUtils.lastIndexOf(new WrapperString(a.toString()), new WrapperString(b.toString()), start), "testNewLastIndexOf fails! original : " + a + " seg : " + b + " start : " + start);
-    }
-
-    private abstract static class RunTest {
-
-        abstract boolean invoke();
-
-        void run(final TestData data, final String id) {
-            if (data.throwable != null) {
-                assertThrows(data.throwable, this::invoke, id + " Expected " + data.throwable);
-            } else {
-                final boolean stringCheck = invoke();
-                assertEquals(data.expected, stringCheck, id + " Failed test " + data);
-            }
-        }
-    }
-
-    static class TestData {
-
-        final String source;
-
-        final boolean ignoreCase;
-
-        final int toffset;
-
-        final String other;
-
-        final int ooffset;
-
-        final int len;
-
-        final boolean expected;
-
-        final Class<? extends Throwable> throwable;
-
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len, final boolean expected) {
-            this.source = source;
-            this.ignoreCase = ignoreCase;
-            this.toffset = toffset;
-            this.other = other;
-            this.ooffset = ooffset;
-            this.len = len;
-            this.expected = expected;
-            this.throwable = null;
-        }
-
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len, final Class<? extends Throwable> throwable) {
-            this.source = source;
-            this.ignoreCase = ignoreCase;
-            this.toffset = toffset;
-            this.other = other;
-            this.ooffset = ooffset;
-            this.len = len;
-            this.expected = false;
-            this.throwable = throwable;
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(source).append("[").append(toffset).append("]");
-            sb.append(ignoreCase ? " caseblind " : " samecase ");
-            sb.append(other).append("[").append(ooffset).append("]");
-            sb.append(" ").append(len).append(" => ");
-            if (throwable != null) {
-                sb.append(throwable);
-            } else {
-                sb.append(expected);
-            }
-            return sb.toString();
-        }
-    }
-
-    static class WrapperString implements CharSequence {
-
+    /**
+     * A simple wrapper for a CharSequence. This is used to ensure that the code under test
+     * uses the generic {@link CharSequence} logic rather than any potential optimizations
+     * for specific implementations like {@link String}.
+     */
+    private static class WrapperString implements CharSequence {
         private final CharSequence inner;
 
         WrapperString(final CharSequence inner) {
@@ -137,16 +39,6 @@ public class CharSequenceUtilsTestTest2 extends AbstractLangTest {
         @Override
         public char charAt(final int index) {
             return inner.charAt(index);
-        }
-
-        @Override
-        public IntStream chars() {
-            return inner.chars();
-        }
-
-        @Override
-        public IntStream codePoints() {
-            return inner.codePoints();
         }
 
         @Override
@@ -163,41 +55,135 @@ public class CharSequenceUtilsTestTest2 extends AbstractLangTest {
         public String toString() {
             return inner.toString();
         }
+
+        // The following methods are not strictly required by CharSequenceUtils but are
+        // part of the CharSequence interface since Java 8.
+        @Override
+        public IntStream chars() {
+            return inner.chars();
+        }
+
+        @Override
+        public IntStream codePoints() {
+            return inner.codePoints();
+        }
+    }
+
+    static Stream<Arguments> lastIndexOfWithStandardCharSequenceSource() {
+        return Stream.of(
+            arguments("abc", "b", 2, 1),
+            arguments(new StringBuilder("abc"), "b", 2, 1),
+            arguments(new StringBuffer("abc"), "b", 2, 1),
+            arguments("abc", new StringBuilder("b"), 2, 1),
+            arguments(new StringBuilder("abc"), new StringBuilder("b"), 2, 1),
+            arguments(new StringBuffer("abc"), new StringBuffer("b"), 2, 1),
+            arguments(new StringBuilder("abc"), new StringBuffer("b"), 2, 1)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("lastIndexOfWithStandardCharSequenceSource")
+    @DisplayName("Test lastIndexOf with different CharSequence implementations")
+    void testLastIndexOf_withDifferentCharSequenceImplementations(final CharSequence charSequence, final CharSequence searchSequence, final int start, final int expected) {
+        assertEquals(expected, CharSequenceUtils.lastIndexOf(charSequence, searchSequence, start));
+    }
+
+    static Stream<Arguments> lastIndexOfEquivalenceTestCases() {
+        return Stream.of(
+            arguments("808087847-1321060740-635567660180086727-925755305", "-1321060740-635567660"),
+            arguments("", ""),
+            arguments("1", ""),
+            arguments("", "1"),
+            arguments("1", "1"),
+            arguments("11", "1"),
+            arguments("1", "11"),
+            arguments("apache", "a"),
+            arguments("apache", "p"),
+            arguments("apache", "e"),
+            arguments("apache", "x"),
+            arguments("oraoraoraora", "r"),
+            arguments("mudamudamudamuda", "d"),
+            // This case tests a specific code path where a partial match ("st")
+            // occurs earlier in the string than the full match.
+            arguments("junk-ststarting", "starting")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("lastIndexOfEquivalenceTestCases")
+    @DisplayName("Test lastIndexOf behaves like String.lastIndexOf for various cases")
+    void testLastIndexOf_behavesLikeStringLastIndexOf(final String text, final String searchText) {
+        assertLastIndexOfAgreesWithString(text, searchText);
     }
 
     @Test
-    void testNewLastIndexOf() {
-        testNewLastIndexOfSingle("808087847-1321060740-635567660180086727-925755305", "-1321060740-635567660", 21);
-        testNewLastIndexOfSingle("", "");
-        testNewLastIndexOfSingle("1", "");
-        testNewLastIndexOfSingle("", "1");
-        testNewLastIndexOfSingle("1", "1");
-        testNewLastIndexOfSingle("11", "1");
-        testNewLastIndexOfSingle("1", "11");
-        testNewLastIndexOfSingle("apache", "a");
-        testNewLastIndexOfSingle("apache", "p");
-        testNewLastIndexOfSingle("apache", "e");
-        testNewLastIndexOfSingle("apache", "x");
-        testNewLastIndexOfSingle("oraoraoraora", "r");
-        testNewLastIndexOfSingle("mudamudamudamuda", "d");
-        // There is a route through checkLaterThan1#checkLaterThan1
-        // which only gets touched if there is a two letter (or more) partial match
-        // (in this case "st") earlier in the searched string.
-        testNewLastIndexOfSingle("junk-ststarting", "starting");
+    @DisplayName("Test lastIndexOf behaves like String.lastIndexOf with randomized long strings")
+    void testLastIndexOf_withRandomizedLongStrings() {
         final Random random = new Random();
-        final StringBuilder seg = new StringBuilder();
-        while (seg.length() <= CharSequenceUtils.TO_STRING_LIMIT) {
-            seg.append(random.nextInt());
+        final StringBuilder searchTextBuilder = new StringBuilder();
+
+        // Create a search text that is longer than the internal toString limit in CharSequenceUtils
+        // to exercise the code path for longer sequences.
+        while (searchTextBuilder.length() <= CharSequenceUtils.TO_STRING_LIMIT) {
+            searchTextBuilder.append(random.nextInt());
         }
-        StringBuilder original = new StringBuilder(seg);
-        testNewLastIndexOfSingle(original, seg);
+        final String searchText = searchTextBuilder.toString();
+
+        // Start with the text being the same as the search text
+        final StringBuilder textBuilder = new StringBuilder(searchText);
+        assertLastIndexOfAgreesWithString(textBuilder.toString(), searchText);
+
+        // Randomly add characters to the text to search in and re-test
         for (int i = 0; i < 100; i++) {
-            if (random.nextDouble() < 0.5) {
-                original.append(random.nextInt() % 10);
+            if (random.nextBoolean()) {
+                // Append a short random string
+                textBuilder.append(random.nextInt(10));
             } else {
-                original = new StringBuilder().append(random.nextInt() % 100).append(original);
+                // Prepend a short random string
+                textBuilder.insert(0, random.nextInt(100));
             }
-            testNewLastIndexOfSingle(original, seg);
+            assertLastIndexOfAgreesWithString(textBuilder.toString(), searchText);
         }
+    }
+
+    /**
+     * Asserts that {@link CharSequenceUtils#lastIndexOf(CharSequence, CharSequence, int)} returns the
+     * same result as {@link String#lastIndexOf(String, int)} for the given strings.
+     * <p>
+     * This method exhaustively checks a wide range of start indices, including edge cases like
+     * {@link Integer#MIN_VALUE} and {@link Integer#MAX_VALUE}, to ensure behavioral equivalence.
+     * It also checks for symmetry by swapping the text and searchText.
+     * </p>
+     *
+     * @param text       the text to be searched.
+     * @param searchText the text to search for.
+     */
+    private void assertLastIndexOfAgreesWithString(final String text, final String searchText) {
+        final int maxLength = Math.max(text.length(), searchText.length());
+        // Check a wide range of start indices around the string lengths
+        for (int i = -maxLength - 10; i <= maxLength + 10; i++) {
+            assertLastIndexOfAgreesWithStringAtIndex(text, searchText, i);
+            assertLastIndexOfAgreesWithStringAtIndex(searchText, text, i); // Symmetric check
+        }
+        // Check boundary start indices
+        assertLastIndexOfAgreesWithStringAtIndex(text, searchText, Integer.MIN_VALUE);
+        assertLastIndexOfAgreesWithStringAtIndex(searchText, text, Integer.MIN_VALUE);
+        assertLastIndexOfAgreesWithStringAtIndex(text, searchText, Integer.MAX_VALUE);
+        assertLastIndexOfAgreesWithStringAtIndex(searchText, text, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Asserts that CharSequenceUtils.lastIndexOf and String.lastIndexOf produce the same result
+     * for a specific start index.
+     */
+    private void assertLastIndexOfAgreesWithStringAtIndex(final String text, final String searchText, final int startIndex) {
+        final int expected = text.lastIndexOf(searchText, startIndex);
+
+        // Use WrapperString to ensure we are testing the CharSequence overload
+        final int actual = CharSequenceUtils.lastIndexOf(new WrapperString(text), new WrapperString(searchText), startIndex);
+
+        assertEquals(expected, actual, () -> String.format(
+            "Mismatch for lastIndexOf(\"%s\", \"%s\", %d). Expected: %d, Actual: %d",
+            text, searchText, startIndex, expected, actual));
     }
 }
