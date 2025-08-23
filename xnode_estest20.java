@@ -1,31 +1,34 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest20 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test019() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Integer integer0 = new Integer((-1150));
-        Integer integer1 = xNode0.getIntBody(integer0);
-        assertEquals((-1150), (int) integer1);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getIntBody(defaultValue) returns the provided default value
+     * when the underlying XML node has no text content (i.e., an empty body).
+     */
+    @Test
+    public void getIntBodyShouldReturnDefaultValueWhenBodyIsEmpty() {
+        // Arrange: Create an XNode that wraps an empty DOM node.
+        // An empty node results in a null body, which cannot be parsed as an integer.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNodeWithEmptyBody = new XNode(null, emptyNode, new Properties());
+        Integer defaultValue = -1150;
+
+        // Act: Call the method under test with the default value.
+        Integer actualValue = xNodeWithEmptyBody.getIntBody(defaultValue);
+
+        // Assert: The result should be the default value we provided.
+        assertEquals(defaultValue, actualValue);
     }
 }
