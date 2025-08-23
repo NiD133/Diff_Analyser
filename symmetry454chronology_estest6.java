@@ -1,43 +1,28 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Symmetry454Chronology_ESTestTest6 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Symmetry454Chronology} class, focusing on leap year calculations.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        boolean boolean0 = symmetry454Chronology0.isLeapYear(3L);
-        assertTrue(boolean0);
+    @Test
+    public void isLeapYear_shouldReturnTrue_forKnownLeapYear() {
+        // The Symmetry454 leap year formula is defined as: (52 > ((52 * year + 146) % 293)).
+        // For the year 3, the calculation is:
+        // (52 * 3 + 146) % 293 = (156 + 146) % 293 = 302 % 293 = 9.
+        // Since 52 > 9, the year 3 is a leap year.
+
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        long leapYear = 3L;
+
+        // Act
+        boolean isLeap = chronology.isLeapYear(leapYear);
+
+        // Assert
+        assertTrue("Year 3 should be correctly identified as a leap year.", isLeap);
     }
 }
