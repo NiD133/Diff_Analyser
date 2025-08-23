@@ -1,51 +1,37 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
+import java.time.temporal.TemporalField;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This class contains tests for the {@link DayOfMonth#range(TemporalField)} method.
+ * Note: The original class name and structure from the EvoSuite-generated test
+ * have been preserved to facilitate integration.
+ */
 public class DayOfMonth_ESTestTest25 extends DayOfMonth_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        // Undeclared exception!
+    /**
+     * Tests that calling range() with a null argument throws a NullPointerException.
+     * This verifies the method's input validation.
+     */
+    @Test
+    public void testRangeWithNullFieldThrowsNullPointerException() {
+        // Arrange: Create a DayOfMonth instance. The specific value is not important for this test,
+        // but using a fixed value is better than DayOfMonth.now() for test determinism.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+
+        // Act & Assert: Call the method with a null argument and expect an exception.
         try {
-            dayOfMonth0.range((TemporalField) null);
-            fail("Expecting exception: NullPointerException");
+            dayOfMonth.range((TemporalField) null);
+            fail("Expected NullPointerException was not thrown.");
         } catch (NullPointerException e) {
-            //
-            // field
-            //
-            verifyException("java.util.Objects", e);
+            // Verify that the exception is the one we expect, not an accidental NPE from elsewhere.
+            // The message "field" is expected from a standard Objects.requireNonNull(field, "field") check.
+            assertEquals("field", e.getMessage());
         }
     }
 }
