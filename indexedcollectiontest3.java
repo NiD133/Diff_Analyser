@@ -1,44 +1,37 @@
 package org.apache.commons.collections4.collection;
 
-import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.apache.commons.collections4.Transformer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class IndexedCollectionTestTest3 extends AbstractCollectionTest<String> {
+/**
+ * Tests for IndexedCollection.
+ * <p>
+ * This class extends AbstractCollectionTest, which provides a comprehensive suite
+ * of tests for the Collection interface. The methods overridden here are used to
+ * configure the test harness for IndexedCollection.
+ * </p>
+ */
+@DisplayName("IndexedCollection Test")
+public class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
-    protected Collection<String> decorateCollection(final Collection<String> collection) {
-        return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
-    }
+    /**
+     * The transformer used to generate keys from elements (String -> Integer).
+     */
+    private static final Transformer<String, Integer> INTEGER_TRANSFORMER = new IntegerTransformer();
 
-    protected IndexedCollection<Integer, String> decorateUniqueCollection(final Collection<String> collection) {
-        return IndexedCollection.uniqueIndexedCollection(collection, new IntegerTransformer());
-    }
-
-    @Override
-    public String[] getFullElements() {
-        return new String[] { "1", "3", "5", "7", "2", "4", "6" };
-    }
-
-    @Override
-    public String[] getOtherElements() {
-        return new String[] { "9", "88", "678", "87", "98", "78", "99" };
-    }
+    //--- Test Harness Methods (required by AbstractCollectionTest) ---
 
     @Override
-    public Collection<String> makeConfirmedCollection() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public Collection<String> makeConfirmedFullCollection() {
-        return new ArrayList<>(Arrays.asList(getFullElements()));
+    public Collection<String> makeObject() {
+        return decorateCollection(new ArrayList<>());
     }
 
     @Override
@@ -47,16 +40,13 @@ public class IndexedCollectionTestTest3 extends AbstractCollectionTest<String> {
     }
 
     @Override
-    public Collection<String> makeObject() {
-        return decorateCollection(new ArrayList<>());
+    public String[] getFullElements() {
+        return new String[]{"1", "3", "5", "7", "2", "4", "6"};
     }
 
-    public Collection<String> makeTestCollection() {
-        return decorateCollection(new ArrayList<>());
-    }
-
-    public Collection<String> makeUniqueTestCollection() {
-        return decorateUniqueCollection(new ArrayList<>());
+    @Override
+    public String[] getOtherElements() {
+        return new String[]{"9", "88", "678", "87", "98", "78", "99"};
     }
 
     @Override
@@ -65,8 +55,26 @@ public class IndexedCollectionTestTest3 extends AbstractCollectionTest<String> {
         return true;
     }
 
-    private static final class IntegerTransformer implements Transformer<String, Integer>, Serializable {
+    //--- Helper methods for creating specific collection types ---
 
+    /**
+     * Decorates a collection with a non-unique IndexedCollection.
+     */
+    protected Collection<String> decorateCollection(final Collection<String> collection) {
+        return IndexedCollection.nonUniqueIndexedCollection(collection, INTEGER_TRANSFORMER);
+    }
+
+    /**
+     * Creates a new IndexedCollection that enforces unique keys for testing.
+     */
+    protected IndexedCollection<Integer, String> makeUniqueKeyCollection() {
+        return IndexedCollection.uniqueIndexedCollection(new ArrayList<>(), INTEGER_TRANSFORMER);
+    }
+
+    /**
+     * A transformer that converts a String to its Integer value.
+     */
+    private static final class IntegerTransformer implements Transformer<String, Integer>, Serializable {
         private static final long serialVersionUID = 809439581555072949L;
 
         @Override
@@ -75,10 +83,23 @@ public class IndexedCollectionTestTest3 extends AbstractCollectionTest<String> {
         }
     }
 
+    //--- Custom Tests for IndexedCollection ---
+
+    /**
+     * Tests that adding an element which maps to an already existing key in a
+     * unique IndexedCollection throws an IllegalArgumentException.
+     */
     @Test
-    void testEnsureDuplicateObjectsCauseException() throws Exception {
-        final Collection<String> coll = makeUniqueTestCollection();
-        coll.add("1");
-        assertThrows(IllegalArgumentException.class, () -> coll.add("1"));
+    @DisplayName("add() should throw exception for duplicate key in unique collection")
+    void addShouldThrowExceptionWhenAddingElementWithExistingKeyToUniqueCollection() {
+        // Arrange: Create a collection that enforces unique keys and add an initial element.
+        // The key for "1" is the Integer 1.
+        final Collection<String> uniqueCollection = makeUniqueKeyCollection();
+        uniqueCollection.add("1");
+
+        // Act & Assert: Verify that adding another element mapping to the same key throws an exception.
+        assertThrows(IllegalArgumentException.class,
+            () -> uniqueCollection.add("1"),
+            "Adding an element with a duplicate key to a unique IndexedCollection should throw an exception.");
     }
 }
