@@ -1,27 +1,37 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class EthiopicChronology_ESTestTest12 extends EthiopicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        EthiopicChronology ethiopicChronology0 = null;
+/**
+ * Unit tests for the EthiopicChronology class.
+ */
+public class EthiopicChronologyTest {
+
+    /**
+     * Tests that the constructor throws an IllegalArgumentException when provided with an
+     * invalid value for the 'minDaysInFirstWeek' parameter.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForInvalidMinDaysInFirstWeek() {
+        // The valid range for minDaysInFirstWeek is from 1 to 7.
+        // We use an out-of-range value to trigger the exception.
+        int invalidMinDays = -159;
+
         try {
-            ethiopicChronology0 = new EthiopicChronology((Chronology) null, (Object) null, (-159));
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Attempt to create an EthiopicChronology instance with the invalid parameter.
+            // The first two 'null' arguments are for the base chronology and a parameter object,
+            // which are not relevant to this specific validation check.
+            new EthiopicChronology((Chronology) null, null, invalidMinDays);
+
+            // Assert: If no exception is thrown, the test should fail.
+            fail("Expected an IllegalArgumentException to be thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid min days in first week: -159
-            //
-            verifyException("org.joda.time.chrono.BasicChronology", e);
+            // Assert: Verify that the thrown exception has the expected message.
+            assertEquals("Invalid min days in first week: " + invalidMinDays, e.getMessage());
         }
     }
 }
