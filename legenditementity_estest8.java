@@ -1,27 +1,29 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class LegendItemEntity_ESTestTest8 extends LegendItemEntity_ESTest_scaffolding {
+/**
+ * Tests for the {@link LegendItemEntity} class, focusing on its properties.
+ */
+public class LegendItemEntityTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        LegendItemEntity<HijrahEra> legendItemEntity0 = new LegendItemEntity<HijrahEra>(rectangle2D_Double0);
-        legendItemEntity0.getSeriesKey();
+    /**
+     * Verifies that the series key is null by default after a LegendItemEntity is created.
+     */
+    @Test
+    public void getSeriesKeyShouldReturnNullWhenNotSet() {
+        // Arrange: Create a LegendItemEntity with a default shape.
+        // The series key is not set during construction.
+        Shape area = new Rectangle2D.Double();
+        LegendItemEntity<String> entity = new LegendItemEntity<>(area);
+
+        // Act: Retrieve the series key.
+        String seriesKey = entity.getSeriesKey();
+
+        // Assert: The retrieved series key should be null.
+        assertNull("The series key should be null by default", seriesKey);
     }
 }
