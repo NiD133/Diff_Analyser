@@ -1,17 +1,23 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest30 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        double double0 = IEEE754rUtils.min(0.0, 1460.933541);
-        assertEquals(0.0, double0, 0.01);
+    @Test
+    public void minShouldReturnFirstArgumentWhenItIsSmaller() {
+        // Arrange: Define two double values where the first is smaller than the second.
+        final double smallerValue = 0.0;
+        final double largerValue = 1460.933541;
+
+        // Act: Call the min method with the defined values.
+        final double result = IEEE754rUtils.min(smallerValue, largerValue);
+
+        // Assert: Verify that the result is the smaller of the two values.
+        assertEquals(smallerValue, result, 0.0);
     }
 }
