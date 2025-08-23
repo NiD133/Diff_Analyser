@@ -1,29 +1,30 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTreeReader_ESTestTest93 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Test for {@link JsonTreeReader}.
+ * This class contains an improved version of an auto-generated test case.
+ */
+public class JsonTreeReaderUnderstandabilityTest {
 
-    @Test(timeout = 4000)
-    public void test092() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        boolean boolean0 = jsonTreeReader0.hasNext();
-        assertFalse(boolean0);
+    /**
+     * Verifies that hasNext() returns false when called on an empty JSON object
+     * after beginObject() has been invoked.
+     */
+    @Test
+    public void hasNext_shouldReturnFalseForEmptyObject() throws IOException {
+        // Arrange: Create a reader for an empty JSON object.
+        JsonObject emptyObject = new JsonObject(); // Represents {}
+        JsonTreeReader reader = new JsonTreeReader(emptyObject);
+
+        // Position the reader inside the object, as if consuming the opening '{'.
+        reader.beginObject();
+
+        // Act & Assert: Verify that the reader correctly reports no further elements.
+        assertFalse("An empty JSON object should not have a next element.", reader.hasNext());
     }
 }
