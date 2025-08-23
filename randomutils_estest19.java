@@ -1,28 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RandomUtils_ESTestTest19 extends RandomUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        RandomUtils randomUtils0 = new RandomUtils();
-        // Undeclared exception!
+/**
+ * Unit tests for {@link org.apache.commons.lang3.RandomUtils}.
+ */
+public class RandomUtilsTest {
+
+    /**
+     * Tests that {@code randomFloat()} throws an IllegalArgumentException when called with
+     * negative range boundaries, as the method requires non-negative inputs.
+     */
+    @Test
+    public void randomFloat_withNegativeBounds_throwsIllegalArgumentException() {
+        // Arrange
+        final RandomUtils randomUtils = new RandomUtils();
+        final float negativeBound = -1.0F; // Any negative value will trigger the validation.
+
+        // Act & Assert
         try {
-            randomUtils0.randomFloat((-3238.355F), (-3238.355F));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Both range values must be non-negative.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
+            randomUtils.randomFloat(negativeBound, negativeBound);
+            fail("Expected an IllegalArgumentException because range values cannot be negative.");
+        } catch (final IllegalArgumentException e) {
+            // Then: Verify the exception message is correct.
+            final String expectedMessage = "Both range values must be non-negative.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
