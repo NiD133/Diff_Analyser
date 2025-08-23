@@ -1,29 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This test class focuses on the behavior of the Attribute class.
+ * The original test was auto-generated; this version has been refactored for clarity.
+ */
 public class Attribute_ESTestTest14 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Attribute attribute0 = new Attribute("``qmo2/5=ohpy:6", (String) null);
-        Attribute attribute1 = attribute0.clone();
-        assertEquals("", attribute1.getValue());
+    /**
+     * Tests that cloning an Attribute created with a null value results in a new Attribute
+     * whose value is an empty string. This aligns with the contract of Attribute#getValue(),
+     * which returns an empty string for an internally null value.
+     */
+    @Test
+    public void cloneOfAttributeWithNullValueShouldHaveEmptyStringValue() {
+        // Arrange: Create an attribute with a key and a null value.
+        // This is a valid state, often used for boolean attributes like 'disabled'.
+        Attribute originalAttribute = new Attribute("disabled", null);
+
+        // Act: Clone the attribute.
+        Attribute clonedAttribute = originalAttribute.clone();
+
+        // Assert: The cloned attribute's value should be an empty string, not null.
+        assertEquals("", clonedAttribute.getValue());
     }
 }
