@@ -1,26 +1,31 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest9 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        ArrayList<String> arrayList0 = new ArrayList<String>();
-        customCategoryURLGenerator0.addURLSeries(arrayList0);
-        int int0 = customCategoryURLGenerator0.getListCount();
-        assertEquals(1, int0);
+    /**
+     * Verifies that getListCount() correctly reports the number of URL series
+     * that have been added.
+     */
+    @Test
+    public void getListCount_shouldReturnOne_whenOneURLSeriesIsAdded() {
+        // Arrange: Create a new URL generator and a list for URLs.
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        List<String> urlSeries = new ArrayList<>();
+
+        // Act: Add the (empty) list of URLs to the generator.
+        generator.addURLSeries(urlSeries);
+        int listCount = generator.getListCount();
+
+        // Assert: The generator should now report that it contains one list.
+        assertEquals("The list count should be 1 after adding one URL series.", 1, listCount);
     }
 }
