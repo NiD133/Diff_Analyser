@@ -1,22 +1,33 @@
 package org.jfree.chart.axis;
 
-import java.util.TimeZone;
-import org.jfree.chart.TestUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.TimeZone;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class QuarterDateFormatTestTest2 {
+/**
+ * Unit tests for the {@link QuarterDateFormat} class.
+ */
+class QuarterDateFormatTest {
 
     /**
-     * Two objects that are equal are required to return the same hashCode.
+     * Verifies that two equal QuarterDateFormat instances have the same hash code,
+     * fulfilling the Object.hashCode() contract.
      */
     @Test
-    public void testHashCode() {
-        QuarterDateFormat qf1 = new QuarterDateFormat(TimeZone.getTimeZone("GMT"), new String[] { "1", "2", "3", "4" });
-        QuarterDateFormat qf2 = new QuarterDateFormat(TimeZone.getTimeZone("GMT"), new String[] { "1", "2", "3", "4" });
-        assertEquals(qf1, qf2);
-        int h1 = qf1.hashCode();
-        int h2 = qf2.hashCode();
-        assertEquals(h1, h2);
+    @DisplayName("Equal objects should have equal hash codes")
+    void equalObjectsShouldHaveEqualHashCodes() {
+        // Arrange: Create two identical formatters using the same timezone and quarter symbols.
+        TimeZone gmt = TimeZone.getTimeZone("GMT");
+        String[] quarterSymbols = QuarterDateFormat.REGULAR_QUARTERS;
+        
+        QuarterDateFormat formatter1 = new QuarterDateFormat(gmt, quarterSymbols);
+        QuarterDateFormat formatter2 = new QuarterDateFormat(gmt, quarterSymbols);
+
+        // Assert: First, confirm the objects are equal. This is a precondition for the hashCode contract.
+        assertEquals(formatter1, formatter2, "Precondition failed: The two formatters should be equal.");
+
+        // Assert: According to the hashCode contract, equal objects must have equal hash codes.
+        assertEquals(formatter1.hashCode(), formatter2.hashCode(), "Equal objects must produce the same hash code.");
     }
 }
