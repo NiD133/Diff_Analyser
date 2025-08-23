@@ -1,74 +1,90 @@
 package org.apache.commons.jxpath.ri.compiler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import java.util.ArrayList;
-import java.util.Collection;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.List;
 import java.util.Locale;
-import org.apache.commons.jxpath.AbstractJXPathTest;
-import org.apache.commons.jxpath.ClassFunctions;
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.FunctionLibrary;
 import org.apache.commons.jxpath.Functions;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.NodeSet;
-import org.apache.commons.jxpath.PackageFunctions;
 import org.apache.commons.jxpath.Pointer;
-import org.apache.commons.jxpath.TestBean;
-import org.apache.commons.jxpath.Variables;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.util.JXPath11CompatibleTypeConverter;
 import org.apache.commons.jxpath.util.TypeConverter;
 import org.apache.commons.jxpath.util.TypeUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ExtensionFunctionTestTest16 extends AbstractJXPathTest {
+/**
+ * Tests the method discovery mechanism of the {@link org.apache.commons.jxpath.ClassFunctions} class.
+ */
+@DisplayName("ClassFunctions Method Lookup")
+class ClassFunctionsGetFunctionTest {
 
-    private Functions functions;
+    private TypeConverter originalTypeConverter;
 
-    private JXPathContext context;
-
-    private TestBean testBean;
-
-    private TypeConverter typeConverter;
-
-    @Override
-    @BeforeEach
-    public void setUp() {
-        if (context == null) {
-            testBean = new TestBean();
-            context = JXPathContext.newContext(testBean);
-            final Variables vars = context.getVariables();
-            vars.declareVariable("test", new TestFunctions(4, "test"));
-            final FunctionLibrary lib = new FunctionLibrary();
-            lib.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
-            lib.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
-            lib.addFunctions(new PackageFunctions("", "call"));
-            lib.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
-            lib.addFunctions(new PackageFunctions("", null));
-            context.setFunctions(lib);
-            context.getVariables().declareVariable("List.class", List.class);
-            context.getVariables().declareVariable("NodeSet.class", NodeSet.class);
+    /**
+     * A helper class containing a static method to be discovered by the test.
+     * The test verifies that JXPath can find this method even when an argument
+     * (Integer) needs to be converted to a primitive (int).
+     */
+    public static class StaticFunctionProvider {
+        public static String build(final String foo, final int bar) {
+            return "foo=" + foo + "; bar=" + bar;
         }
-        functions = new ClassFunctions(TestFunctions.class, "test");
-        typeConverter = TypeUtils.getTypeConverter();
+    }
+
+    @BeforeEach
+    void setUp() {
+        // JXPath's type conversion relies on a global static TypeConverter.
+        // We save the original converter to ensure our test doesn't have side effects.
+        originalTypeConverter = TypeUtils.getTypeConverter();
     }
 
     @AfterEach
-    public void tearDown() {
-        TypeUtils.setTypeConverter(typeConverter);
+    void tearDown() {
+        // Restore the original TypeConverter to avoid side effects on other tests.
+        TypeUtils.setTypeConverter(originalTypeConverter);
     }
 
-    private static final class Context implements ExpressionContext {
+    @Test
+    @DisplayName("getFunction() should find a static method when arguments require type conversion")
+    void getFunction_withConvertibleArguments_findsMatchingStaticMethod() {
+        // Arrange
+        final Functions classFunctions = new ClassFunctions(StaticFunctionProvider.class, "test");
+        final String namespace = "test";
+        final String methodName = "build";
 
-        private final Object object;
+        // Arguments: A String and an Integer. The target method expects a String and an int.
+        // The test verifies that the type conversion from Integer to int is handled correctly.
+        final Object[] arguments = {"7", 1};
+        final String expectedResult = "foo=7; bar=1";
 
-        public Context(final Object object) {
-            this.object = object;
+        // Act
+        final Function foundFunction = classFunctions.getFunction(namespace, methodName, arguments);
+
+        // Assert
+        assertNotNull(foundFunction, "A function should have been found for the given name and arguments.");
+
+        final Object result = foundFunction.invoke(new MockExpressionContext(), arguments);
+        assertEquals(expectedResult, result.toString(), "The invoked function should produce the correct string output.");
+    }
+
+    /**
+     * A minimal mock implementation of ExpressionContext required by the Function.invoke() signature.
+     * It is not used by the actual method invocation for static functions.
+     */
+    private static class MockExpressionContext implements ExpressionContext {
+        @Override
+        public JXPathContext getJXPathContext() {
+            return null;
+        }
+
+        @Override
+        public Pointer getContextNodePointer() {
+            return NodePointer.newNodePointer(null, this, Locale.getDefault());
         }
 
         @Override
@@ -77,25 +93,8 @@ public class ExtensionFunctionTestTest16 extends AbstractJXPathTest {
         }
 
         @Override
-        public Pointer getContextNodePointer() {
-            return NodePointer.newNodePointer(null, object, Locale.getDefault());
-        }
-
-        @Override
-        public JXPathContext getJXPathContext() {
-            return null;
-        }
-
-        @Override
         public int getPosition() {
             return 0;
         }
-    }
-
-    @Test
-    void testStaticMethodLookupWithConversion() {
-        final Object[] args = { "7", Integer.valueOf(1) };
-        final Function func = functions.getFunction("test", "build", args);
-        assertEquals("foo=7; bar=1", func.invoke(new Context(null), args).toString(), "test:build('7', 1)");
     }
 }
