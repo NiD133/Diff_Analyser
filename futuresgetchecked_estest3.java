@@ -1,32 +1,38 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertSame;
+
 import java.sql.SQLException;
-import java.sql.SQLInvalidAuthorizationSpecException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockThread;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FuturesGetChecked_ESTestTest3 extends FuturesGetChecked_ESTest_scaffolding {
+/**
+ * Tests for {@link FuturesGetChecked}.
+ */
+public class FuturesGetCheckedTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        SQLException sQLException0 = new SQLException("8Ov");
-        CompletableFuture<Exception> completableFuture0 = CompletableFuture.completedFuture((Exception) sQLException0);
-        Class<Exception> class0 = Exception.class;
-        FuturesGetChecked.getChecked((Future<Exception>) completableFuture0, class0);
+    @Test
+    public void getChecked_whenFutureCompletesSuccessfully_returnsFuturesResult() throws Exception {
+        // Arrange
+        // Create a result object. In this case, the successful result of the Future is an
+        // instance of SQLException. This tests that getChecked correctly handles the success path,
+        // even when the result type is a Throwable.
+        SQLException expectedResult = new SQLException("This is a successful result, not a failure cause.");
+        Future<SQLException> successfulFuture = CompletableFuture.completedFuture(expectedResult);
+
+        // The exception class parameter is not used when the future succeeds, but is required by the
+        // method signature. We can use any valid exception type.
+        Class<Exception> exceptionClass = Exception.class;
+
+        // Act
+        SQLException actualResult = FuturesGetChecked.getChecked(successfulFuture, exceptionClass);
+
+        // Assert
+        // The method should return the future's result without throwing an exception.
+        assertSame(
+            "getChecked should return the successful result of the future",
+            expectedResult,
+            actualResult);
     }
 }
