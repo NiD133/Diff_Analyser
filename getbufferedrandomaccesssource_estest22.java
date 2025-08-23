@@ -1,24 +1,36 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest22 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Test suite for the {@link GetBufferedRandomAccessSource} class.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        byte[] byteArray0 = new byte[15];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        getBufferedRandomAccessSource0.get((long) (byte) 0);
-        int int0 = getBufferedRandomAccessSource0.get((long) (byte) 0);
-        assertEquals(0, int0);
+    /**
+     * Verifies that the get(long) method returns the correct byte value,
+     * especially when the data is read from the internal buffer after an initial read.
+     */
+    @Test
+    public void get_whenPositionIsAlreadyBuffered_returnsCorrectByte() throws IOException {
+        // Arrange: Create a source with known data (an array of zeros) and wrap it
+        // with the GetBufferedRandomAccessSource.
+        byte[] sourceData = new byte[15]; // Default value for each element is 0.
+        RandomAccessSource underlyingSource = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
+
+        // Act:
+        // 1. The first 'get' call populates the internal buffer from the underlying source.
+        bufferedSource.get(0L);
+
+        // 2. The second 'get' call should read directly from the now-populated buffer.
+        int actualByte = bufferedSource.get(0L);
+
+        // Assert: The byte read from the buffer should match the data in the source array.
+        int expectedByte = 0;
+        assertEquals("The byte read from the buffered source should be 0.", expectedByte, actualByte);
     }
 }
