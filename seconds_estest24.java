@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest24 extends Seconds_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Seconds} class, focusing on understandability.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Seconds seconds0 = Seconds.seconds(352831696);
-        Seconds seconds1 = seconds0.MAX_VALUE.minus(352831696);
-        assertEquals(1794651951, seconds1.getSeconds());
+    /**
+     * Verifies that the minus() method correctly subtracts a value from Seconds.MAX_VALUE.
+     *
+     * This test is structured using the Arrange-Act-Assert pattern for clarity.
+     * It uses descriptive variable names and calculates the expected result dynamically
+     * to avoid "magic numbers," making the test's logic self-evident.
+     */
+    @Test
+    public void minus_whenSubtractingFromMaxValue_returnsCorrectResult() {
+        // Arrange
+        final int valueToSubtract = 352831696;
+        final int expectedSeconds = Integer.MAX_VALUE - valueToSubtract;
+
+        // Act
+        final Seconds result = Seconds.MAX_VALUE.minus(valueToSubtract);
+
+        // Assert
+        assertEquals(expectedSeconds, result.getSeconds());
     }
 }
