@@ -1,46 +1,38 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest40 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for the {@link W3CDom} class.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parseBodyFragment("javax.xml.xpath.XPathFactory:jsoup", "xmlns:");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup(document0);
-        document0.attr("xmlns:", "xmlns:");
-        W3CDom.W3CBuilder w3CDom_W3CBuilder0 = new W3CDom.W3CBuilder(document1);
-        // Undeclared exception!
-        try {
-            w3CDom_W3CBuilder0.traverse(document0);
-            fail("Expecting exception: DOMException");
-        } catch (DOMException e) {
-        }
+    /**
+     * Verifies that converting a Jsoup document to a W3C DOM fails with a DOMException
+     * when an element contains an attribute with an invalid XML Qualified Name (QName).
+     * <p>
+     * The attribute name "xmlns:" is used for this test. It is invalid because it declares
+     * a namespace prefix but is missing the required local name part (e.g., "xmlns:prefix").
+     * The W3C DOM standard strictly enforces valid QNames for attributes.
+     * </p>
+     */
+    @Test(expected = DOMException.class)
+    public void convertJsoupDocumentWithInvalidAttributeNameThrowsDOMException() {
+        // Arrange: Create a Jsoup document and add an attribute with an invalid name.
+        W3CDom w3cDom = new W3CDom();
+        Document jsoupDoc = Parser.parseBodyFragment("<div>Hello</div>", "");
+
+        // The "xmlns:" attribute name is not a valid QName.
+        jsoupDoc.attr("xmlns:", "https://jsoup.org/");
+
+        // Act: Attempt to convert the Jsoup document to a W3C DOM.
+        // This action is expected to throw a DOMException when it encounters the invalid attribute.
+        w3cDom.fromJsoup(jsoupDoc);
+
+        // Assert: The test implicitly asserts that a DOMException is thrown.
+        // If no exception is thrown, the test will fail.
     }
 }
