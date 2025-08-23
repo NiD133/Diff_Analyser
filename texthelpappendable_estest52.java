@@ -1,53 +1,38 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.apache.commons.cli.help.TextStyle.Builder;
+import org.junit.Test;
+
+/**
+ * Test suite for {@link TextHelpAppendable}.
+ * The original test class name 'TextHelpAppendable_ESTestTest52' is kept for context,
+ * but a more conventional name would be 'TextHelpAppendableTest'.
+ */
 public class TextHelpAppendable_ESTestTest52 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textHelpAppendable0.resize(textStyle_Builder0, (-1555.93743));
-        // Undeclared exception!
+    /**
+     * Tests that methods relying on the configured text width, such as appendTitle,
+     * throw an IllegalArgumentException if the width has been set to an invalid negative value.
+     */
+    @Test
+    public void appendTitleShouldThrowExceptionWhenWidthIsNegative() throws Exception {
+        // Arrange: Create a TextHelpAppendable and set its width to a negative value.
+        // The resize() method modifies the width of the provided style builder.
+        // Using a negative fraction results in a negative width.
+        final TextHelpAppendable helpAppendable = TextHelpAppendable.systemOut();
+        final Builder styleBuilder = helpAppendable.getTextStyleBuilder();
+        helpAppendable.resize(styleBuilder, -1.0);
+
+        // Act & Assert: Verify that attempting to append a title throws an exception
+        // with the expected message.
         try {
-            textHelpAppendable0.appendTitle("|iq2*P~/");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Width must be greater than 0
-            //
-            verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
+            helpAppendable.appendTitle("Example Title");
+            fail("Expected an IllegalArgumentException because the width is negative.");
+        } catch (final IllegalArgumentException e) {
+            assertEquals("Width must be greater than 0", e.getMessage());
         }
     }
 }
