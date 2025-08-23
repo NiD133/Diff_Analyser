@@ -1,29 +1,40 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest20 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Unit tests for BBoxCalculator.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that expanding a BBoxCalculator with the world bounds in a geographic context
+     * correctly results in a bounding box that wraps the world and has the correct
+     * min/max latitude and longitude.
+     */
     @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        Rectangle rectangle0 = spatialContext0.getWorldBounds();
-        bBoxCalculator0.expandRange(rectangle0);
-        bBoxCalculator0.getMaxX();
-        boolean boolean0 = bBoxCalculator0.doesXWorldWrap();
-        assertEquals((-90.0), bBoxCalculator0.getMinY(), 0.01);
-        assertTrue(boolean0);
+    public void expandWithWorldBoundsShouldResultInWorldWrap() {
+        // Arrange: Set up a geographic context, a BBoxCalculator, and the world bounds rectangle.
+        final SpatialContext geoContext = SpatialContext.GEO;
+        final BBoxCalculator bboxCalculator = new BBoxCalculator(geoContext);
+        final Rectangle worldBounds = geoContext.getWorldBounds();
+
+        // Act: Expand the calculator's range using the world bounds.
+        bboxCalculator.expandRange(worldBounds);
+
+        // Assert: Verify the calculator's state reflects the full world bounds.
+        assertTrue("Calculator should report that it wraps the world on the X-axis.",
+                bboxCalculator.doesXWorldWrap());
+
+        // Verify all boundary coordinates are correct.
+        assertEquals("Min Y should be the south pole.", -90.0, bboxCalculator.getMinY(), 0.0);
+        assertEquals("Max Y should be the north pole.", 90.0, bboxCalculator.getMaxY(), 0.0);
+        assertEquals("Min X should be the prime meridian.", -180.0, bboxCalculator.getMinX(), 0.0);
+        assertEquals("Max X should be the prime meridian.", 180.0, bboxCalculator.getMaxX(), 0.0);
     }
 }
