@@ -1,27 +1,42 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
+import org.junit.Test;
 
-public class EnumOrdinalTypeHandler_ESTestTest14 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link EnumOrdinalTypeHandler}.
+ */
+public class EnumOrdinalTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
-        doReturn(0).when(resultSet0).getInt(anyString());
-        doReturn(false).when(resultSet0).wasNull();
-        JdbcType jdbcType0 = enumOrdinalTypeHandler0.getNullableResult(resultSet0, "+%+\"nk/Mp#S]");
-        assertEquals(JdbcType.ARRAY, jdbcType0);
+    /**
+     * This test verifies that the handler can correctly retrieve an enum constant
+     * from a ResultSet based on its ordinal value (an integer).
+     */
+    @Test
+    public void shouldReturnEnumConstantForGivenOrdinalFromResultSet() throws SQLException {
+        // Arrange
+        // JdbcType.ARRAY is the first constant in the enum, so its ordinal is 0.
+        int arrayOrdinal = 0;
+        JdbcType expectedEnum = JdbcType.ARRAY;
+        String columnName = "enum_column";
+
+        // Mock the ResultSet to simulate database behavior
+        ResultSet mockResultSet = mock(ResultSet.class);
+        when(mockResultSet.getInt(columnName)).thenReturn(arrayOrdinal);
+        when(mockResultSet.wasNull()).thenReturn(false);
+
+        // Create the handler for the JdbcType enum
+        EnumOrdinalTypeHandler<JdbcType> typeHandler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+
+        // Act
+        JdbcType actualEnum = typeHandler.getNullableResult(mockResultSet, columnName);
+
+        // Assert
+        assertEquals(expectedEnum, actualEnum);
     }
 }
