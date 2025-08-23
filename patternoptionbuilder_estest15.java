@@ -1,18 +1,30 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest15 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('@');
-        assertEquals("class java.lang.Object", class0.toString());
-        assertNotNull(class0);
+    /**
+     * Tests that the '@' character, which represents an object type in an option
+     * pattern, correctly maps to the {@code Object.class}.
+     */
+    @Test
+    public void getValueType_shouldReturnObjectClass_forAtSymbol() {
+        // Arrange
+        // The '@' character signifies that the option argument is a class name
+        // from which an object should be instantiated.
+        final char objectTypeIndicator = '@';
+        final Class<?> expectedClass = Object.class;
+
+        // Act
+        final Class<?> actualClass = PatternOptionBuilder.getValueType(objectTypeIndicator);
+
+        // Assert
+        // Verify that the method returns the correct class type.
+        assertEquals(expectedClass, actualClass);
     }
 }
