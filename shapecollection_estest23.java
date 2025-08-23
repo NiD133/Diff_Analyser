@@ -1,38 +1,28 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest23 extends ShapeCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        ShapeCollection<JtsPoint> shapeCollection0 = null;
-        try {
-            shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, (SpatialContext) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.ShapeCollection", e);
-        }
+/**
+ * Test suite for the {@link ShapeCollection} constructor.
+ */
+public class ShapeCollectionConstructorTest {
+
+    /**
+     * Verifies that the constructor throws a NullPointerException when the provided
+     * SpatialContext is null, as a valid context is a required dependency.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructor_shouldThrowNullPointerException_whenContextIsNull() {
+        // Arrange: Create a valid list of shapes and a null context.
+        List<Shape> shapes = new ArrayList<>();
+        SpatialContext nullContext = null;
+
+        // Act & Assert: Attempting to create a ShapeCollection with a null context
+        // is expected to throw a NullPointerException.
+        new ShapeCollection<>(shapes, nullContext);
     }
 }
