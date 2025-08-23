@@ -1,25 +1,30 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest5 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Shape shape0 = Shape.fromNM(64, 64);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        int[] intArray0 = new int[4];
-        IndexExtractor indexExtractor0 = IndexExtractor.fromIndexArray(intArray0);
-        boolean boolean0 = sparseBloomFilter0.contains(indexExtractor0);
-        assertFalse(boolean0);
+    /**
+     * Tests that an empty {@code SparseBloomFilter} does not contain any indices.
+     * The {@code contains} method should return {@code false} when checking against
+     * an {@code IndexExtractor}, as none of the specified indices will be present.
+     */
+    @Test
+    public void containsShouldReturnFalseForAnyIndexWhenFilterIsEmpty() {
+        // Arrange: Create an empty filter and an extractor with some indices to check.
+        Shape shape = Shape.fromNM(64, 64);
+        SparseBloomFilter emptyFilter = new SparseBloomFilter(shape);
+        IndexExtractor indicesToCheck = IndexExtractor.fromIndexArray(new int[]{5, 10, 15});
+
+        // Act: Check if the empty filter contains the specified indices.
+        boolean result = emptyFilter.contains(indicesToCheck);
+
+        // Assert: The result must be false, as an empty filter contains nothing.
+        assertFalse("An empty filter should not report containing any indices", result);
     }
 }
