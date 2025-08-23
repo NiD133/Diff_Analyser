@@ -1,40 +1,37 @@
 package org.jfree.data.general;
 
+import org.jfree.data.UnknownKeyException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class DefaultPieDataset_ESTestTest42 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * This test class contains an improved version of a test for the DefaultPieDataset class.
+ * The original test was auto-generated and lacked clarity.
+ */
+// The original class name 'DefaultPieDataset_ESTestTest42' is kept for context.
+// In a real-world scenario, this would be part of a 'DefaultPieDatasetTest' class.
+public class DefaultPieDataset_ESTestTest42 {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        // Undeclared exception!
+    /**
+     * Verifies that calling getValue() with a key that does not exist in the dataset
+     * throws an UnknownKeyException.
+     */
+    @Test
+    public void getValue_whenKeyDoesNotExist_throwsUnknownKeyException() {
+        // Arrange: Create an empty dataset and define a key that is not present.
+        DefaultPieDataset<Integer> dataset = new DefaultPieDataset<>();
+        final Integer nonExistentKey = 400;
+
+        // Act & Assert: Expect an UnknownKeyException when trying to access the value for the non-existent key.
         try {
-            defaultPieDataset0.getValue(integer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Key not found: 400
-            //
-            verifyException("org.jfree.data.DefaultKeyedValues", e);
+            dataset.getValue(nonExistentKey);
+            fail("Expected an UnknownKeyException because the key '" + nonExistentKey + "' does not exist in the dataset.");
+        } catch (UnknownKeyException e) {
+            // Success: The expected exception was thrown.
+            // Verify the exception message for correctness and clarity.
+            String expectedMessage = "Key not found: " + nonExistentKey;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
