@@ -1,33 +1,29 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
+import org.junit.Test;
 
-public class BaseTypeHandler_ESTestTest11 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayTypeHandler}.
+ * This test suite verifies the behavior of the ArrayTypeHandler, particularly its handling of null inputs.
+ */
+public class ArrayTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ArrayTypeHandler arrayTypeHandler0 = new ArrayTypeHandler();
-        // Undeclared exception!
-        try {
-            arrayTypeHandler0.getNullableResult((CallableStatement) null, 0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.type.ArrayTypeHandler", e);
-        }
-    }
+  /**
+   * Verifies that getNullableResult throws a NullPointerException if the provided CallableStatement is null.
+   * <p>
+   * The underlying implementation is expected to interact with the statement object directly,
+   * thus a null statement should result in an immediate NullPointerException.
+   */
+  @Test(expected = NullPointerException.class)
+  public void getNullableResultFromCallableStatementShouldThrowNpeForNullStatement() throws SQLException {
+    // Arrange
+    ArrayTypeHandler handler = new ArrayTypeHandler();
+    int anyColumnIndex = 1; // The column index is arbitrary for this test.
+
+    // Act & Assert
+    // The following call is expected to throw a NullPointerException.
+    handler.getNullableResult((CallableStatement) null, anyColumnIndex);
+  }
 }
