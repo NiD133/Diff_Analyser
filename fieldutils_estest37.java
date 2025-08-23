@@ -1,23 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest37 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        int int0 = FieldUtils.getWrappedValue(0, (-3236), 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that getWrappedValue returns the value itself when it is already
+     * within the specified range, specifically when it equals the maximum value.
+     */
+    @Test
+    public void getWrappedValue_shouldReturnSameValue_whenValueIsAtMaximumBoundary() {
+        // Arrange
+        final int value = 0;
+        final int minValue = -3236;
+        final int maxValue = 0; // The value is at the maximum boundary of the range [-3236, 0]
+
+        // Act
+        int wrappedValue = FieldUtils.getWrappedValue(value, minValue, maxValue);
+
+        // Assert
+        assertEquals(value, wrappedValue);
     }
 }
