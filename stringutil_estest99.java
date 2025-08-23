@@ -1,35 +1,20 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
 
-public class StringUtil_ESTestTest99 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class, focusing on URL resolution.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test98() throws Throwable {
-        // Undeclared exception!
-        try {
-            StringUtil.resolve((String) null, (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling resolve with a null base URL throws a NullPointerException.
+     * A base URL is required to resolve a relative URL, so a null value is invalid.
+     */
+    @Test(expected = NullPointerException.class)
+    public void resolveShouldThrowNullPointerExceptionWhenBaseUrlIsNull() {
+        // The resolve method cannot create an absolute URL without a valid base URL.
+        // The original test passed null for both arguments; this behavior is preserved.
+        StringUtil.resolve(null, null);
     }
 }
