@@ -1,28 +1,30 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
 public class SegmentConstantPool_ESTestTest51 extends SegmentConstantPool_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
+    /**
+     * Verifies that getConstantPoolEntry() throws an IOException when requested
+     * to retrieve an entry of the currently unsupported SIGNATURE type.
+     */
+    @Test
+    public void getConstantPoolEntryForUnsupportedSignatureTypeThrowsIOException() throws IOException {
+        // Arrange
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        final int unsupportedType = SegmentConstantPool.SIGNATURE;
+        final long arbitraryIndex = 8L;
+        final String expectedMessage = "Type SIGNATURE is not supported yet: " + unsupportedType;
+
+        // Act & Assert
         try {
-            segmentConstantPool0.getConstantPoolEntry(8, 8);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Type SIGNATURE is not supported yet: 8
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
+            segmentConstantPool.getConstantPoolEntry(unsupportedType, arbitraryIndex);
+            fail("Expected an IOException for unsupported constant pool type, but none was thrown.");
+        } catch (final IOException e) {
+            assertEquals("The exception message did not match the expected format.", expectedMessage, e.getMessage());
         }
     }
 }
