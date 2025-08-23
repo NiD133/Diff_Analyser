@@ -1,48 +1,44 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class W3CDom_ESTestTest34 extends W3CDom_ESTest_scaffolding {
 
+    /**
+     * Tests that attempting to convert a jsoup Element into a W3C Document
+     * that was created from a *different* jsoup Document throws an AssertionError.
+     * This is an invalid use case, as the destination document's context does not
+     * match the source element's document.
+     */
     @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = new Document("javax.xml.xpath.XPathFactory:jsoup");
-        Document document1 = Parser.parse("e93?", "&f:_3v-DWZ");
-        org.w3c.dom.Document document2 = W3CDom.convert(document1);
-        // Undeclared exception!
+    public void convertElementIntoMismatchedW3cDocumentShouldThrowAssertionError() {
+        // Arrange: Create two different jsoup documents and convert one to a W3C document.
+        W3CDom w3cDom = new W3CDom();
+
+        // The jsoup document we intend to convert.
+        Document sourceJsoupDoc = new Document("http://example.com/source");
+        sourceJsoupDoc.body().append("<p>Source Content</p>");
+
+        // A *different* jsoup document, used to create the destination W3C document.
+        Document otherJsoupDoc = Parser.parse("<html><body>Other Content</body></html>", "http://example.com/other");
+        
+        // The destination W3C document, which is internally tied to otherJsoupDoc.
+        org.w3c.dom.Document destinationW3cDoc = W3CDom.convert(otherJsoupDoc);
+
+        // Act & Assert: Attempting to convert sourceJsoupDoc into the mismatched destinationW3cDoc
+        // should fail with an AssertionError due to an internal contract violation.
         try {
-            w3CDom0.convert((Element) document0, document2);
-            fail("Expecting exception: AssertionError");
+            w3cDom.convert(sourceJsoupDoc, destinationW3cDoc);
+            fail("Expected an AssertionError to be thrown due to mismatched document contexts.");
         } catch (AssertionError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // The internal assertion that fails is not expected to have a message.
+            // This confirms we are catching the specific error we anticipate.
+            assertNull("The AssertionError should not have a message.", e.getMessage());
         }
     }
 }
