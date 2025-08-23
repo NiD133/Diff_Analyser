@@ -1,29 +1,36 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class FixedOrderComparator_ESTestTest19 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of {@link FixedOrderComparator}.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>();
-        FixedOrderComparator<Object>[] fixedOrderComparatorArray0 = (FixedOrderComparator<Object>[]) Array.newInstance(FixedOrderComparator.class, 1);
-        FixedOrderComparator<FixedOrderComparator<Object>> fixedOrderComparator1 = new FixedOrderComparator<FixedOrderComparator<Object>>(fixedOrderComparatorArray0);
-        boolean boolean0 = fixedOrderComparator1.equals(fixedOrderComparator0);
-        assertFalse(boolean0);
+    /**
+     * Tests that the equals() method returns false when comparing two
+     * FixedOrderComparator instances that have different ordering rules.
+     *
+     * This test compares an empty comparator with one that has a defined order,
+     * ensuring that their different internal states result in them being not equal.
+     */
+    @Test
+    public void equalsShouldReturnFalseForComparatorsWithDifferentOrder() {
+        // Arrange
+        // Create an empty comparator. Its internal map of ordered items is empty.
+        final FixedOrderComparator<String> emptyComparator = new FixedOrderComparator<>();
+
+        // Create a second comparator with a defined order. Its internal map will not be empty.
+        final FixedOrderComparator<String> comparatorWithOrder = new FixedOrderComparator<>("first", "second");
+
+        // Act & Assert
+        // The equals() method should return false because the internal state (the order map)
+        // of the two comparators is different. We test both directions to ensure symmetry.
+        assertFalse("An empty comparator should not be equal to a non-empty one.",
+                    emptyComparator.equals(comparatorWithOrder));
+
+        assertFalse("A non-empty comparator should not be equal to an empty one.",
+                    comparatorWithOrder.equals(emptyComparator));
     }
 }
