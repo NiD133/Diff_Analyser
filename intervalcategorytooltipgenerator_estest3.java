@@ -1,36 +1,40 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+/**
+ * This test class contains tests for the IntervalCategoryToolTipGenerator.
+ * This specific test case focuses on verifying the behavior of the createItemArray method.
+ */
 public class IntervalCategoryToolTipGenerator_ESTestTest3 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        double[][] doubleArray0 = new double[0][1];
-        DefaultIntervalCategoryDataset defaultIntervalCategoryDataset0 = new DefaultIntervalCategoryDataset(doubleArray0, doubleArray0);
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator();
-        // Undeclared exception!
-        try {
-            intervalCategoryToolTipGenerator0.createItemArray(defaultIntervalCategoryDataset0, 1696, 1696);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The 'row' argument is out of bounds.
-            //
-            verifyException("org.jfree.data.category.DefaultIntervalCategoryDataset", e);
-        }
+    /**
+     * Verifies that createItemArray throws an IllegalArgumentException when the
+     * requested row index is out of bounds for the given dataset.
+     */
+    @Test
+    public void createItemArray_withOutOfBoundsRow_throwsIllegalArgumentException() {
+        // Arrange: Create a generator and an empty dataset with no rows or columns.
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator();
+        double[][] emptyData = new double[0][0];
+        DefaultIntervalCategoryDataset emptyDataset = new DefaultIntervalCategoryDataset(emptyData, emptyData);
+
+        // Any non-negative row index is out of bounds for an empty dataset.
+        int outOfBoundsRow = 0;
+        int column = 0;
+
+        // Act & Assert: Expect an exception when accessing the out-of-bounds row.
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> generator.createItemArray(emptyDataset, outOfBoundsRow, column)
+        );
+
+        // Verify that the exception message is correct, confirming the error's cause.
+        String expectedMessage = "The 'row' argument is out of bounds.";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
