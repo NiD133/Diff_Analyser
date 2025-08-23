@@ -1,47 +1,26 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class InternationalFixedChronology_ESTestTest64 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link InternationalFixedChronology#isLeapYear(long)} method.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = InternationalFixedChronology.INSTANCE;
-        boolean boolean0 = internationalFixedChronology0.isLeapYear(4L);
-        assertTrue(boolean0);
+    @Test
+    public void isLeapYear_whenYearIsDivisibleBy4_shouldReturnTrue() {
+        // The International Fixed Chronology shares the same leap year rules as the Gregorian calendar.
+        // A year is a leap year if it is divisible by 4, unless it is a century year not divisible by 400.
+        
+        // Arrange: Get an instance of the chronology and define a simple leap year to test.
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        long year = 4L;
+
+        // Act: Check if the year is a leap year.
+        boolean isLeap = chronology.isLeapYear(year);
+
+        // Assert: The result should be true, as year 4 is a leap year.
+        assertTrue("Year 4 should be correctly identified as a leap year.", isLeap);
     }
 }
