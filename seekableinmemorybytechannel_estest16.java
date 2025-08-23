@@ -1,30 +1,30 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SeekableByteChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SeekableInMemoryByteChannel_ESTestTest16 extends SeekableInMemoryByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SeekableInMemoryByteChannel} class.
+ */
+public class SeekableInMemoryByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        SeekableInMemoryByteChannel seekableInMemoryByteChannel0 = new SeekableInMemoryByteChannel();
-        seekableInMemoryByteChannel0.close();
-        try {
-            seekableInMemoryByteChannel0.position((long) 1073741828);
-            fail("Expecting exception: ClosedChannelException");
-        } catch (ClosedChannelException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.SeekableInMemoryByteChannel", e);
-        }
+    /**
+     * Verifies that attempting to set the position on a closed channel
+     * throws a ClosedChannelException, as expected by the SeekableByteChannel contract.
+     */
+    @Test(expected = ClosedChannelException.class)
+    public void positionShouldThrowExceptionWhenChannelIsClosed() throws IOException {
+        // Arrange: Create a channel and immediately close it.
+        SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
+        channel.close();
+
+        // Act: Attempt to change the position of the closed channel.
+        // This action is expected to throw the exception.
+        channel.position(100L);
+
+        // Assert: The test passes if a ClosedChannelException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
