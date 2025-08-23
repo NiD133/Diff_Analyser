@@ -1,29 +1,44 @@
 package com.google.common.collect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ForwardingQueue_ESTestTest8 extends ForwardingQueue_ESTest_scaffolding {
+import java.util.ArrayDeque;
+import java.util.Queue;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(2014);
-        // Undeclared exception!
-        try {
-            evictingQueue0.standardOffer((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
+/**
+ * Tests for the helper methods in {@link ForwardingQueue}.
+ */
+class ForwardingQueueTest {
+
+    /**
+     * A minimal concrete implementation of ForwardingQueue for testing its protected methods.
+     * This class makes the protected {@code standardOffer} method publicly accessible for the test.
+     */
+    private static class TestForwardingQueue<E> extends ForwardingQueue<E> {
+        private final Queue<E> delegate = new ArrayDeque<>();
+
+        @Override
+        protected Queue<E> delegate() {
+            return delegate;
         }
+
+        // Expose the protected method for testing by overriding it as public
+        @Override
+        public boolean standardOffer(E e) {
+            return super.standardOffer(e);
+        }
+    }
+
+    @Test
+    @DisplayName("standardOffer() should throw NullPointerException when the element is null")
+    void standardOffer_whenElementIsNull_throwsNullPointerException() {
+        // Arrange
+        ForwardingQueue<Object> queue = new TestForwardingQueue<>();
+
+        // Act & Assert
+        // The standardOffer method is expected to delegate to add(), which should reject nulls.
+        assertThrows(NullPointerException.class, () -> queue.standardOffer(null));
     }
 }
