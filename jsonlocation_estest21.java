@@ -1,26 +1,54 @@
 package com.fasterxml.jackson.core;
 
+import com.fasterxml.jackson.core.io.ContentReference;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonLocation_ESTestTest21 extends JsonLocation_ESTest_scaffolding {
+/**
+ * This test suite focuses on the JsonLocation class.
+ * The original test was improved for clarity and maintainability.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        ContentReference contentReference0 = ContentReference.redacted();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        ContentReference contentReference1 = ContentReference.construct(true, (Object) contentReference0, 0, 1929, errorReportConfiguration0);
-        JsonLocation jsonLocation0 = new JsonLocation((Object) contentReference1, (-578L), 500, 500);
-        ContentReference contentReference2 = jsonLocation0.contentReference();
-        assertEquals(500, jsonLocation0.getLineNr());
-        assertEquals(500, jsonLocation0.getColumnNr());
-        assertEquals((-1L), jsonLocation0.getByteOffset());
-        assertTrue(contentReference2.hasTextualContent());
-        assertEquals((-578L), jsonLocation0.getCharOffset());
+    /**
+     * Tests the deprecated constructor that accepts a generic Object as a source reference.
+     * This ensures that when a JsonLocation is created with specific character offset,
+     * line, and column numbers, all properties are correctly initialized.
+     */
+    @Test
+    @SuppressWarnings("deprecation") // Intentionally testing deprecated constructor for backward compatibility.
+    public void constructorWithObjectRefShouldCorrectlySetLocationFields() {
+        // ARRANGE
+        // Define location parameters with descriptive names for clarity.
+        final long charOffset = -578L;
+        final int lineNumber = 500;
+        final int columnNumber = 500;
+        // This specific constructor does not handle byte offset, so it defaults to -1.
+        final long expectedByteOffset = -1L;
+
+        // Create a source reference to be passed to the JsonLocation constructor.
+        // The constructor under test accepts a generic Object, which it then wraps internally.
+        Object sourceObject = ContentReference.construct(true, "test content");
+
+        // ACT
+        // Instantiate JsonLocation using the deprecated constructor.
+        JsonLocation location = new JsonLocation(sourceObject, charOffset, lineNumber, columnNumber);
+
+        // ASSERT
+        // Verify that all location properties are stored and retrieved correctly.
+        assertEquals("Line number should match the constructor argument",
+                lineNumber, location.getLineNr());
+        assertEquals("Column number should match the constructor argument",
+                columnNumber, location.getColumnNr());
+        assertEquals("Character offset should match the constructor argument",
+                charOffset, location.getCharOffset());
+        assertEquals("Byte offset should default to -1 for this constructor",
+                expectedByteOffset, location.getByteOffset());
+
+        // Verify that the underlying content reference was correctly processed.
+        ContentReference retrievedContentRef = location.contentReference();
+        assertNotNull("The content reference should not be null", retrievedContentRef);
+        assertTrue("The content reference should correctly indicate it has textual content",
+                retrievedContentRef.hasTextualContent());
     }
 }
