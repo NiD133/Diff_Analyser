@@ -1,21 +1,18 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest31 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the static method {@link TokenQueue#escapeCssIdentifier(String)}.
+ */
+public class TokenQueueEscapeCssIdentifierTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        // Undeclared exception!
-        try {
-            TokenQueue.escapeCssIdentifier((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-        }
+    /**
+     * Verifies that calling escapeCssIdentifier with a null input string
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void escapeCssIdentifierWithNullInputShouldThrowException() {
+        TokenQueue.escapeCssIdentifier(null);
     }
 }
