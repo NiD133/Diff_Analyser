@@ -1,33 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest60 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        // Undeclared exception!
-        try {
-            jsonTreeWriter0.value((Boolean) null);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    @Test
+    public void writeValueInsideObjectWithoutName_throwsIllegalStateException() throws IOException {
+        // Arrange
+        JsonTreeWriter jsonTreeWriter = new JsonTreeWriter();
+        jsonTreeWriter.beginObject();
+
+        // Act & Assert
+        // An IllegalStateException is expected because a value cannot be written
+        // to a JSON object without a preceding name.
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            // The specific value type (e.g., null Boolean) is not the focus;
+            // any value call would fail here.
+            jsonTreeWriter.value((Boolean) null);
+        });
+
+        // Verify that the exception has no message, matching the original behavior.
+        assertNull(exception.getMessage());
     }
 }
