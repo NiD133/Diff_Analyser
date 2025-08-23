@@ -1,28 +1,30 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StandardXYBarPainter_ESTestTest20 extends StandardXYBarPainter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardXYBarPainter} class.
+ */
+public class StandardXYBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        standardXYBarPainter0.hashCode();
+    /**
+     * Verifies that the hashCode() method adheres to its contract.
+     *
+     * The Java contract for hashCode() states that if two objects are equal
+     * (according to their equals() method), they must have the same hash code.
+     * For the StandardXYBarPainter class, all instances are considered equal.
+     * This test confirms that two different instances produce the same hash code.
+     */
+    @Test
+    public void testHashCodeContract() {
+        // Arrange: Create two separate instances of the painter.
+        StandardXYBarPainter painter1 = new StandardXYBarPainter();
+        StandardXYBarPainter painter2 = new StandardXYBarPainter();
+
+        // Assert: Verify that the two objects are considered equal, and then
+        // confirm that their hash codes are also equal, fulfilling the contract.
+        assertEquals("All instances of StandardXYBarPainter should be equal.", painter1, painter2);
+        assertEquals("Equal objects must have equal hash codes.", painter1.hashCode(), painter2.hashCode());
     }
 }
