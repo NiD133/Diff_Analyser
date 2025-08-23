@@ -1,18 +1,28 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.net.URL;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest22 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link PatternOptionBuilder} class.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('/');
-        assertNotNull(class0);
-        assertEquals("class java.net.URL", class0.toString());
+    /**
+     * Tests that the pattern character '/' correctly maps to the URL class.
+     * According to the PatternOptionBuilder documentation, the '/' character
+     * is used to specify that an option's argument is a URL.
+     */
+    @Test
+    public void getValueType_shouldReturnURLClass_forSlashCharacter() {
+        // Given the pattern character for a URL type
+        final char urlPatternChar = '/';
+
+        // When retrieving the value type associated with that character
+        final Class<?> valueType = PatternOptionBuilder.getValueType(urlPatternChar);
+
+        // Then the returned type should be the URL class
+        assertEquals(URL.class, valueType);
     }
 }
