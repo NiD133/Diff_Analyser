@@ -1,26 +1,31 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest12 extends RFC1522Codec_ESTest_scaffolding {
+/**
+ * Tests for the RFC1522Codec class, focusing on decoding with invalid inputs.
+ */
+public class RFC1522CodecTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        try {
-            bCodec0.decodeText("=?TF-?B??=?=");
-            fail("Expecting exception: UnsupportedEncodingException");
-        } catch (UnsupportedEncodingException e) {
-        }
+    /**
+     * Tests that decodeText() throws an UnsupportedEncodingException when the
+     * charset specified in the encoded string is invalid or unsupported.
+     */
+    @Test(expected = UnsupportedEncodingException.class)
+    public void decodeTextWithInvalidCharsetShouldThrowUnsupportedEncodingException()
+            throws DecoderException, UnsupportedEncodingException {
+        // Arrange
+        // The RFC 1522 encoded string format is: "=?charset?encoding?encoded-text?="
+        // The test input provides "TF-", which is not a valid charset name.
+        final String encodedTextWithInvalidCharset = "=?TF-?B??=?=";
+        final BCodec bCodec = new BCodec();
+
+        // Act & Assert
+        // The decodeText method is expected to fail by throwing an UnsupportedEncodingException.
+        // The assertion is handled declaratively by the @Test(expected=...) annotation.
+        bCodec.decodeText(encodedTextWithInvalidCharset);
     }
 }
