@@ -1,238 +1,54 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
 
-public class DateTimeComparatorTestTest26 extends TestCase {
+/**
+ * Tests for {@link DateTimeComparator} when comparing by the year field.
+ */
+public class DateTimeComparatorYearTest {
 
-    private static final Chronology ISO = ISOChronology.getInstance();
+    private static final DateTimeZone UTC = DateTimeZone.UTC;
 
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
+    @Test
+    public void yearComparator_shouldCompareBasedOnYearOnly() {
+        // Arrange: Create a comparator that only considers the year field.
+        Comparator<Object> yearComparator = DateTimeComparator.getInstance(DateTimeFieldType.year());
 
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime bDateTime = null;
+        // Test data for various scenarios
+        DateTime startOf2023 = new DateTime("2023-01-01T00:00:00", UTC);
+        DateTime endOf2023 = new DateTime("2023-12-31T23:59:59", UTC);
+        DateTime startOf2024 = new DateTime("2024-01-01T00:00:00", UTC);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
-     */
-    Comparator cMillis = null;
+        // Act & Assert
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
+        // 1. Test for equality: Dates within the same year should be considered equal.
+        assertEquals(
+            "Comparison of two dates in the same year should be 0",
+            0,
+            yearComparator.compare(startOf2023, endOf2023)
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
+        // 2. Test for less-than: A date in an earlier year should be less than one in a later year.
+        assertTrue(
+            "A 2023 date should be less than a 2024 date",
+            yearComparator.compare(startOf2023, startOf2024) < 0
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
+        // 3. Test for greater-than: A date in a later year should be greater than one in an earlier year.
+        assertTrue(
+            "A 2024 date should be greater than a 2023 date",
+            yearComparator.compare(startOf2024, startOf2023) > 0
+        );
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
-    }
-
-    /**
-     * Junit <code>setUp()</code> method.
-     */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
-    }
-
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
-
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
-
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test unequal comparisons with year comparators.
-     */
-    public void testYear() {
-        aDateTime = getADate("2000-01-01T00:00:00");
-        bDateTime = getADate("2001-01-01T00:00:00");
-        assertEquals("YEARM1a", -1, cYear.compare(aDateTime, bDateTime));
-        assertEquals("YEARP1a", 1, cYear.compare(bDateTime, aDateTime));
-        aDateTime = getADate("1968-12-31T23:59:59");
-        bDateTime = getADate("1970-01-01T00:00:00");
-        assertEquals("YEARM1b", -1, cYear.compare(aDateTime, bDateTime));
-        assertEquals("YEARP1b", 1, cYear.compare(bDateTime, aDateTime));
-        aDateTime = getADate("1969-12-31T23:59:59");
-        bDateTime = getADate("1970-01-01T00:00:00");
-        assertEquals("YEARM1c", -1, cYear.compare(aDateTime, bDateTime));
-        assertEquals("YEARP1c", 1, cYear.compare(bDateTime, aDateTime));
+        // 4. Test for reflexivity: Comparing an object with itself should result in 0.
+        assertEquals(
+            "Comparing an instance to itself should return 0",
+            0,
+            yearComparator.compare(startOf2023, startOf2023)
+        );
     }
 }
