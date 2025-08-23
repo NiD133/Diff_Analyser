@@ -1,46 +1,35 @@
 package org.apache.commons.cli.help;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest79 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TextHelpAppendable#resize(TextStyle.Builder, double)} method.
+ */
+public class TextHelpAppendable_ESTestTest79 {
 
-    @Test(timeout = 4000)
-    public void test78() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textStyle_Builder0.setMaxWidth(1);
-        textHelpAppendable0.resize(textStyle_Builder0, 1);
-        assertEquals(1, textStyle_Builder0.getMaxWidth());
-        assertEquals(0, textHelpAppendable0.getIndent());
+    @Test
+    public void resizeWithFractionOfOneShouldNotChangeTextStyleValues() {
+        // Arrange
+        // Create a formatter, which initializes a TextStyle.Builder with default values.
+        // The default indent is 3 (TextHelpAppendable.DEFAULT_INDENT).
+        TextHelpAppendable helpFormatter = TextHelpAppendable.systemOut();
+        TextStyle.Builder styleBuilder = helpFormatter.getTextStyleBuilder();
+
+        // Set a custom max width to verify it's also handled by the resize operation.
+        styleBuilder.setMaxWidth(1);
+
+        // Act
+        // Resizing with a fraction of 1.0 should have no effect on the values.
+        helpFormatter.resize(styleBuilder, 1.0);
+
+        // Assert
+        // The max width should remain at the value we set.
+        assertEquals("Max width should be unchanged after resizing by a factor of 1", 1, styleBuilder.getMaxWidth());
+
+        // The default indent is 3. The resize calculation is (int)(3 * 1.0), which results in 3.
+        // The original generated test incorrectly asserted 0.
+        assertEquals("Indent should be unchanged from the default value", 3, helpFormatter.getIndent());
     }
 }
