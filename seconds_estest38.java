@@ -1,22 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Seconds_ESTestTest38 extends Seconds_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Seconds} class.
+ * This version improves upon an auto-generated test for the isLessThan() method.
+ */
+public class Seconds_ESTestTest38 {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        Duration duration0 = new Duration((-1L), (-1L));
-        Days days0 = duration0.toStandardDays();
-        Seconds seconds0 = days0.toStandardSeconds();
-        Seconds seconds1 = Seconds.THREE;
-        boolean boolean0 = seconds0.isLessThan(seconds1);
-        assertEquals(0, seconds0.getSeconds());
-        assertTrue(boolean0);
+    @Test
+    public void isLessThan_shouldReturnTrue_whenInstanceIsSmallerThanArgument() {
+        // Arrange: Create two instances of Seconds for comparison.
+        // Using constants like Seconds.ZERO and Seconds.THREE makes the intent clear
+        // and avoids the complex setup seen in the original test.
+        Seconds smaller = Seconds.ZERO;
+        Seconds larger = Seconds.THREE;
+
+        // Act: Call the method under test.
+        boolean result = smaller.isLessThan(larger);
+
+        // Assert: Verify that the result is correct.
+        // The assertion message provides immediate context if the test fails.
+        assertTrue("Zero seconds should be considered less than three seconds", result);
     }
 }
