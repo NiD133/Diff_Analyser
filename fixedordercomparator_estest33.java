@@ -1,31 +1,39 @@
 package org.apache.commons.collections4.comparators;
 
+import org.apache.commons.collections4.comparators.FixedOrderComparator.UnknownObjectBehavior;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class FixedOrderComparator_ESTestTest33 extends FixedOrderComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link FixedOrderComparator}.
+ * This specific test focuses on the behavior when comparing an unknown object
+ * with a known one.
+ */
+public class FixedOrderComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 14);
-        FixedOrderComparator<Object> fixedOrderComparator0 = new FixedOrderComparator<Object>(predicateArray0);
-        FixedOrderComparator.UnknownObjectBehavior fixedOrderComparator_UnknownObjectBehavior0 = FixedOrderComparator.UnknownObjectBehavior.AFTER;
-        fixedOrderComparator0.setUnknownObjectBehavior(fixedOrderComparator_UnknownObjectBehavior0);
-        int int0 = fixedOrderComparator0.compare(fixedOrderComparator0, (Object) null);
-        assertTrue(fixedOrderComparator0.isLocked());
-        assertEquals(1, int0);
+    @Test
+    public void compare_ShouldTreatUnknownObjectAsGreater_WhenBehaviorIsAfter() {
+        // Arrange
+        // Create a comparator where only 'null' is a known object.
+        final Object[] knownOrder = { null };
+        final FixedOrderComparator<Object> comparator = new FixedOrderComparator<>(knownOrder);
+
+        // Set the comparator to place unknown objects AFTER known ones.
+        comparator.setUnknownObjectBehavior(UnknownObjectBehavior.AFTER);
+
+        final Object unknownObject = "unknown object";
+        final Object knownObject = null;
+
+        // Act
+        // Compare an unknown object to a known one.
+        final int result = comparator.compare(unknownObject, knownObject);
+
+        // Assert
+        // The unknown object should be considered "greater than" the known one, returning 1.
+        assertEquals(1, result);
+
+        // The comparator should also become locked after the first comparison.
+        assertTrue("Comparator should be locked after the first compare() call", comparator.isLocked());
     }
 }
