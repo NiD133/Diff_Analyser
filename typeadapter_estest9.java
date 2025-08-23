@@ -1,27 +1,31 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest9 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TypeAdapter} class, focusing on specific edge cases.
+ */
+public class TypeAdapter_ESTestTest9 { // Note: In a real project, this class would be named TypeAdapterTest
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        gson_FutureTypeAdapter0.setDelegate(gson_FutureTypeAdapter0);
-        // Undeclared exception!
-        gson_FutureTypeAdapter0.toJson((Object) gson_FutureTypeAdapter0);
+    /**
+     * Tests that calling toJson on a FutureTypeAdapter that delegates to itself
+     * results in a StackOverflowError due to infinite recursion. This is a valid
+     * test for recursive data structures.
+     *
+     * Note: Gson.FutureTypeAdapter is a package-private inner class used by Gson
+     * to handle circular dependencies. This test has access to it because it resides
+     * in the same 'com.google.gson' package.
+     */
+    @Test(expected = StackOverflowError.class)
+    public void toJsonWithRecursiveDelegateShouldCauseStackOverflow() {
+        // Arrange: Create a FutureTypeAdapter and set its delegate to itself,
+        // creating a recursive dependency.
+        Gson.FutureTypeAdapter<Object> futureAdapter = new Gson.FutureTypeAdapter<>();
+        futureAdapter.setDelegate(futureAdapter);
+
+        // Act & Assert: Calling toJson on the adapter with itself as the value
+        // should cause infinite recursion. The @Test(expected=...) annotation
+        // asserts that a StackOverflowError is thrown.
+        futureAdapter.toJson(futureAdapter);
     }
 }
