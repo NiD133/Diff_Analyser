@@ -1,26 +1,24 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LZMAUtils_ESTestTest2 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        // Undeclared exception!
-        try {
-            LZMAUtils.matches(byteArray0, 3);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("org.apache.commons.compress.compressors.lzma.LZMAUtils", e);
-        }
+    /**
+     * Tests that the matches() method throws an ArrayIndexOutOfBoundsException
+     * when the provided byte array is shorter than the length to be checked.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void matchesShouldThrowExceptionWhenLengthIsGreaterThanArraySize() {
+        // The LZMA header signature is 3 bytes long.
+        final int requiredLength = 3;
+        byte[] signatureWithInsufficientData = new byte[0];
+
+        // This call is expected to throw an exception because we are asking
+        // the method to read 3 bytes from an empty array.
+        LZMAUtils.matches(signatureWithInsufficientData, requiredLength);
     }
 }
