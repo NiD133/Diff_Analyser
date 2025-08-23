@@ -1,32 +1,36 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest39 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        BufferedLine bufferedLine1 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        boolean boolean0 = bufferedLine0.equals(bufferedLine1);
-        assertTrue(boolean0);
-        assertEquals(0.0, bufferedLine1.getBuf(), 0.01);
+/**
+ * Tests the equality contract (equals and hashCode) of the {@link BufferedLine} class.
+ */
+public class BufferedLineEqualsTest {
+
+    // A simple Cartesian spatial context is used because BufferedLine operates in Euclidean space.
+    private final SpatialContext spatialContext = new SpatialContext(false);
+
+    @Test
+    public void equals_shouldReturnTrue_forTwoIdenticalBufferedLines() {
+        // Arrange
+        // According to the source code, two BufferedLine objects are equal if they have the
+        // same start point, end point, and buffer distance.
+        // We will create two identical lines to verify this behavior.
+        Point startAndEndPoint = spatialContext.makePoint(0.0, 0.0);
+        double buffer = 0.0;
+
+        BufferedLine lineA = new BufferedLine(startAndEndPoint, startAndEndPoint, buffer, spatialContext);
+        BufferedLine lineB = new BufferedLine(startAndEndPoint, startAndEndPoint, buffer, spatialContext);
+
+        // Act & Assert
+        // 1. Verify that the two identical line objects are considered equal.
+        assertEquals(lineA, lineB);
+
+        // 2. As per the Java contract, if two objects are equal, their hash codes must also be equal.
+        assertEquals("Equal objects must have equal hash codes.", lineA.hashCode(), lineB.hashCode());
     }
 }
