@@ -1,26 +1,25 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Vector_ESTestTest17 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class, focusing on exception handling.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Vector vector0 = new Vector(0.0F, 0.0F, 0.0F);
-        // Undeclared exception!
-        try {
-            vector0.get(360);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 360
-            //
-            verifyException("com.itextpdf.text.pdf.parser.Vector", e);
-        }
+    /**
+     * Verifies that the get() method throws an ArrayIndexOutOfBoundsException
+     * when an index outside the valid range [0, 2] is provided.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void get_withInvalidIndex_shouldThrowArrayIndexOutOfBoundsException() {
+        // Arrange: Create a vector. Its coordinate values are not relevant for this test.
+        Vector vector = new Vector(10.0f, 20.0f, 30.0f);
+        int invalidIndex = 3; // Any index > 2 or < 0 is invalid.
+
+        // Act: Attempt to access a component with an out-of-bounds index.
+        // Assert: The @Test(expected=...) annotation handles the assertion,
+        // ensuring an ArrayIndexOutOfBoundsException is thrown.
+        vector.get(invalidIndex);
     }
 }
