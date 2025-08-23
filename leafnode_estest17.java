@@ -1,21 +1,24 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LeafNode_ESTestTest17 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the abstract {@link LeafNode} class, using {@link TextNode} as a concrete implementation for testing.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        TextNode textNode0 = new TextNode("gMz?D>{rCwB%:");
-        String string0 = textNode0.coreValue();
-        assertEquals("gMz?D>{rCwB%:", string0);
+    @Test
+    public void coreValueReturnsValueProvidedInConstructor() {
+        // Arrange
+        String expectedText = "Hello, Jsoup!";
+        // We use TextNode as a concrete instance of the abstract LeafNode to test shared functionality.
+        TextNode textNode = new TextNode(expectedText);
+
+        // Act
+        String actualText = textNode.coreValue();
+
+        // Assert
+        assertEquals(expectedText, actualText);
     }
 }
