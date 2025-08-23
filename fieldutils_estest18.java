@@ -1,23 +1,23 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest18 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        int int0 = FieldUtils.safeNegate((-70));
-        assertEquals(70, int0);
+    @Test
+    public void safeNegate_shouldReturnPositiveValue_whenInputIsNegative() {
+        // Arrange: Define the input and the expected outcome.
+        final int negativeValue = -70;
+        final int expectedResult = 70;
+
+        // Act: Call the method under test.
+        final int actualResult = FieldUtils.safeNegate(negativeValue);
+
+        // Assert: Verify that the actual result matches the expected result.
+        assertEquals(expectedResult, actualResult);
     }
 }
