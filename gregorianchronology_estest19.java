@@ -1,23 +1,37 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GregorianChronology_ESTestTest19 extends GregorianChronology_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GregorianChronology} class.
+ */
+public class GregorianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-        long long0 = gregorianChronology0.calculateFirstDayOfYearMillis(0);
-        assertEquals((-62167219200000L), long0);
+    /**
+     * Tests that calculateFirstDayOfYearMillis() returns the correct millisecond
+     * instant for the beginning of year 0.
+     */
+    @Test
+    public void calculateFirstDayOfYearMillis_forYearZero_returnsCorrectInstant() {
+        // Arrange
+        GregorianChronology chronology = GregorianChronology.getInstanceUTC();
+        final int year = 0;
+
+        // The expected result is the millisecond instant for midnight on January 1st of year 0, UTC.
+        // We create a DateTime object for this moment to derive the expected value.
+        // This approach is self-documenting and avoids using an unexplained "magic number".
+        DateTime startOfYearZero = new DateTime(year, 1, 1, 0, 0, 0, 0, chronology);
+        long expectedMillis = startOfYearZero.getMillis();
+
+        // Act
+        long actualMillis = chronology.calculateFirstDayOfYearMillis(year);
+
+        // Assert
+        assertEquals("Millis for the start of year 0 should be calculated correctly.",
+                expectedMillis, actualMillis);
     }
 }
