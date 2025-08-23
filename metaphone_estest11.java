@@ -1,19 +1,43 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest11 extends Metaphone_ESTest_scaffolding {
+/**
+ * Tests for {@link Metaphone}.
+ * This class replaces an auto-generated test suite to improve clarity and maintainability.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("ghZg-7V=6hV Uh");
-        //  // Unstable assertion: assertEquals("SFF", string0);
-        //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests that the metaphone() method correctly handles a string containing
+     * non-alphabetic characters (spaces, punctuation, numbers) by ignoring them
+     * during the encoding process.
+     *
+     * This test also confirms that a new Metaphone instance has the expected
+     * default maximum code length.
+     */
+    @Test
+    public void metaphoneShouldIgnoreNonAlphabeticCharacters() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        // The Metaphone algorithm is expected to strip non-alphabetic characters
+        // before encoding. "ghZ g-7V=6hV Uh" becomes "GHZGVHVUH".
+        final String inputWithMixedChars = "ghZ g-7V=6hV Uh";
+        final String expectedCode = "SFF";
+        final int expectedDefaultMaxCodeLen = 4;
+
+        // Act
+        final String actualCode = metaphone.metaphone(inputWithMixedChars);
+        final int actualMaxCodeLen = metaphone.getMaxCodeLen();
+
+        // Assert
+        // 1. Verify that the encoded string is correct.
+        assertEquals("Metaphone encoding should ignore non-alphabetic characters",
+                     expectedCode, actualCode);
+
+        // 2. Verify that the default max code length is as expected.
+        assertEquals("Default max code length should be 4",
+                     expectedDefaultMaxCodeLen, actualMaxCodeLen);
     }
 }
