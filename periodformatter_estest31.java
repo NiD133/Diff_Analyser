@@ -1,45 +1,42 @@
 package org.joda.time.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PeriodFormatter_ESTestTest31 extends PeriodFormatter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = new PeriodFormatterBuilder.Literal("PeriodFormat.months.list");
-        Locale locale0 = Locale.KOREA;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0, locale0, (PeriodType) null);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Test suite for {@link PeriodFormatter}.
+ * This class focuses on parsing behavior with literal-based formatters.
+ */
+public class PeriodFormatterTest {
+
+    /**
+     * Tests that parseMutablePeriod throws an IllegalArgumentException when the input string
+     * does not match the expected literal format.
+     */
+    @Test
+    public void parseMutablePeriod_shouldThrowIllegalArgumentException_whenInputDoesNotMatchLiteral() {
+        // Arrange: Create a formatter that only accepts a specific literal string.
+        final String literalFormat = "PeriodFormat.months.list";
+        PeriodFormatterBuilder.Literal literalComponent = new PeriodFormatterBuilder.Literal(literalFormat);
+
+        // The formatter is configured to use the literal component for both printing and parsing.
+        PeriodFormatter formatter = new PeriodFormatter(literalComponent, literalComponent, Locale.KOREA, (PeriodType) null);
+
+        final String invalidInput = "v:";
+        final String expectedErrorMessage = "Invalid format: \"" + invalidInput + "\"";
+
+        // Act & Assert
         try {
-            periodFormatter0.parseMutablePeriod("v:");
-            fail("Expecting exception: IllegalArgumentException");
+            formatter.parseMutablePeriod(invalidInput);
+            fail("Expected an IllegalArgumentException because the input string does not match the format.");
         } catch (IllegalArgumentException e) {
-            //
-            // Invalid format: \"v:\"
-            //
-            verifyException("org.joda.time.format.PeriodFormatter", e);
+            // Verify that the exception message correctly identifies the invalid input.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
