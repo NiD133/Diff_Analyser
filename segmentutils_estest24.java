@@ -1,18 +1,28 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SegmentUtils_ESTestTest24 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentUtils} class.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        long[] longArray0 = new long[5];
-        int int0 = SegmentUtils.countBit16(longArray0);
-        assertEquals(0, int0);
+    /**
+     * Tests that countBit16 returns 0 when given an array of longs where
+     * no element has the 16th bit set. An array of all zeros is a perfect
+     * example of this scenario.
+     */
+    @Test
+    public void countBit16ShouldReturnZeroForArrayOfZeros() {
+        // Arrange: Create an array of long values, which defaults to all elements being 0.
+        long[] flagsWithNoBitsSet = new long[5];
+
+        // Act: Call the method under test to count the occurrences of the 16th bit.
+        int actualCount = SegmentUtils.countBit16(flagsWithNoBitsSet);
+
+        // Assert: Verify that the count is 0, as expected.
+        int expectedCount = 0;
+        assertEquals("The count should be zero when no flags have the 16th bit set.", expectedCount, actualCount);
     }
 }
