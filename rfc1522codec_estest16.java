@@ -1,30 +1,38 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class RFC1522Codec_ESTestTest16 extends RFC1522Codec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        BCodec bCodec0 = new BCodec();
+/**
+ * Contains tests for the RFC1522Codec class, focusing on decoding malformed inputs.
+ */
+public class RFC1522CodecTest {
+
+    /**
+     * Tests that decodeText() throws a DecoderException when presented with an
+     * encoded word that is missing the required charset definition.
+     *
+     * According to RFC 1522, an encoded word must have the format:
+     * "=?charset?encoding?encoded-text?="
+     */
+    @Test
+    public void decodeTextShouldThrowExceptionForMissingCharset() {
+        // Arrange
+        BCodec codec = new BCodec();
+        // This input is a malformed encoded-word, as it lacks a charset.
+        final String encodedWordWithMissingCharset = "=??-?=";
+        final String expectedErrorMessage = "RFC 1522 violation: charset not specified";
+
+        // Act & Assert
         try {
-            bCodec0.decodeText("=??-?=");
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // RFC 1522 violation: charset not specified
-            //
-            verifyException("org.apache.commons.codec.net.RFC1522Codec", e);
+            codec.decodeText(encodedWordWithMissingCharset);
+            fail("Expected a DecoderException to be thrown for a missing charset.");
+        } catch (final DecoderException e) {
+            // Verify that the exception message correctly identifies the problem.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
