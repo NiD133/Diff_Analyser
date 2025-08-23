@@ -2,26 +2,63 @@ package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Separators_ESTestTest3 extends Separators_ESTest_scaffolding {
+/**
+ * Contains tests for the Separators class, focusing on its immutability
+ * and 'with' methods.
+ *
+ * Note: The original class name "Separators_ESTestTest3" is kept to match the
+ * provided context. In a real-world scenario, it would be renamed to "SeparatorsTest".
+ */
+public class Separators_ESTestTest3 {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.AFTER;
-        Separators.Spacing separators_Spacing1 = Separators.Spacing.BEFORE;
-        Separators separators0 = new Separators("", ')', separators_Spacing0, ')', separators_Spacing1, "", 'M', separators_Spacing0, "");
-        Separators separators1 = separators0.withObjectEntrySpacing(separators_Spacing0);
-        assertEquals("", separators1.getObjectEmptySeparator());
-        assertEquals(')', separators0.getObjectEntrySeparator());
-        assertEquals(Separators.Spacing.AFTER, separators0.getObjectFieldValueSpacing());
-        assertEquals("", separators1.getRootSeparator());
-        assertEquals(Separators.Spacing.AFTER, separators0.getArrayValueSpacing());
-        assertEquals(')', separators0.getObjectFieldValueSeparator());
-        assertEquals("", separators1.getArrayEmptySeparator());
-        assertEquals('M', separators0.getArrayValueSeparator());
-        assertNotSame(separators1, separators0);
+    /**
+     * Verifies that the withObjectEntrySpacing() method correctly returns a new
+     * Separators instance with the updated spacing, while leaving the original
+     * instance unmodified.
+     */
+    @Test
+    public void withObjectEntrySpacing_shouldReturnNewInstanceWithUpdatedSpacing() {
+        // Arrange: Create a Separators instance with custom, non-default values.
+        Separators.Spacing initialEntrySpacing = Separators.Spacing.BEFORE;
+        Separators originalSeparators = new Separators(
+            /* rootSeparator */ "",
+            /* objectFieldValueSeparator */ ':',
+            /* objectFieldValueSpacing */ Separators.Spacing.AFTER,
+            /* objectEntrySeparator */ ',',
+            /* objectEntrySpacing */ initialEntrySpacing,
+            /* objectEmptySeparator */ "",
+            /* arrayValueSeparator */ ',',
+            /* arrayValueSpacing */ Separators.Spacing.AFTER,
+            /* arrayEmptySeparator */ ""
+        );
+
+        Separators.Spacing newEntrySpacing = Separators.Spacing.AFTER;
+
+        // Act: Call the method under test to create a new instance.
+        Separators updatedSeparators = originalSeparators.withObjectEntrySpacing(newEntrySpacing);
+
+        // Assert: Verify the behavior of the 'with' method.
+
+        // 1. A new, distinct instance should be returned.
+        assertNotSame("The 'with' method must return a new instance.", originalSeparators, updatedSeparators);
+
+        // 2. The specific property should be updated on the new instance.
+        assertEquals("The object entry spacing should be updated on the new instance.",
+                newEntrySpacing, updatedSeparators.getObjectEntrySpacing());
+
+        // 3. The original instance should remain unchanged (confirming immutability).
+        assertEquals("The original instance must not be modified.",
+                initialEntrySpacing, originalSeparators.getObjectEntrySpacing());
+
+        // 4. All other properties of the new instance should be copied from the original.
+        assertEquals(originalSeparators.getRootSeparator(), updatedSeparators.getRootSeparator());
+        assertEquals(originalSeparators.getObjectFieldValueSeparator(), updatedSeparators.getObjectFieldValueSeparator());
+        assertEquals(originalSeparators.getObjectFieldValueSpacing(), updatedSeparators.getObjectFieldValueSpacing());
+        assertEquals(originalSeparators.getObjectEntrySeparator(), updatedSeparators.getObjectEntrySeparator());
+        assertEquals(originalSeparators.getObjectEmptySeparator(), updatedSeparators.getObjectEmptySeparator());
+        assertEquals(originalSeparators.getArrayValueSeparator(), updatedSeparators.getArrayValueSeparator());
+        assertEquals(originalSeparators.getArrayValueSpacing(), updatedSeparators.getArrayValueSpacing());
+        assertEquals(originalSeparators.getArrayEmptySeparator(), updatedSeparators.getArrayEmptySeparator());
     }
 }
