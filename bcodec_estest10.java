@@ -1,23 +1,37 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest10 extends BCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        BCodec bCodec0 = new BCodec(charset0);
-        String string0 = bCodec0.decode("=?UTF-8?B??=");
-        assertEquals("", string0);
+/**
+ * Unit tests for the BCodec class.
+ */
+public class BCodecTest {
+
+    /**
+     * Tests that an RFC 1522 "B" encoded-word representing an empty string
+     * is correctly decoded back into an empty string.
+     *
+     * <p>The input "=?UTF-8?B??=" follows the RFC 1522 format:</p>
+     * <ul>
+     *   <li>"=?UTF-8": The character set.</li>
+     *   <li>"?B?": The 'B' (Base64) encoding scheme.</li>
+     *   <li>"": The Base64 encoded content, which is empty.</li>
+     *   <li>"?=": The closing delimiter.</li>
+     * </ul>
+     */
+    @Test
+    public void shouldDecodeEmptyEncodedWordToEmptyString() throws DecoderException {
+        // Arrange
+        BCodec codec = new BCodec(); // Uses UTF-8 by default, which is a sensible default.
+        String encodedEmptyString = "=?UTF-8?B??=";
+
+        // Act
+        String decodedString = codec.decode(encodedEmptyString);
+
+        // Assert
+        assertEquals("Decoding an empty encoded word should result in an empty string.", "", decodedString);
     }
 }
