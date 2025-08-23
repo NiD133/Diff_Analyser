@@ -1,17 +1,28 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest3 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PatternOptionBuilder} class.
+ * This class focuses on verifying the behavior of its static utility methods.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        boolean boolean0 = PatternOptionBuilder.isValueCode('%');
-        assertTrue(boolean0);
+    /**
+     * Verifies that the isValueCode() method correctly identifies the '%' character
+     * as a valid value code. According to the PatternOptionBuilder documentation,
+     * '%' signifies that an option expects a numeric argument.
+     */
+    @Test
+    public void isValueCode_shouldReturnTrue_forNumberTypeCharacter() {
+        // Arrange: The '%' character is the designated code for a Number type.
+        final char numberValueCode = '%';
+
+        // Act: Check if the character is recognized as a value code.
+        final boolean isValue = PatternOptionBuilder.isValueCode(numberValueCode);
+
+        // Assert: The method should return true for this valid code.
+        assertTrue("The '%' character should be recognized as a value code for a Number type.", isValue);
     }
 }
