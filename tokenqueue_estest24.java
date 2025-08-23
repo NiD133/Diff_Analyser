@@ -1,26 +1,27 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest24 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for {@link TokenQueue}.
+ * This improved version focuses on clarity and standard testing practices.
+ */
+// The original class name `TokenQueue_ESTestTest24` was likely auto-generated.
+// A more conventional name like `TokenQueueTest` is used here for better readability.
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("q\u0000!>");
-        tokenQueue0.close();
-        // Undeclared exception!
-        try {
-            tokenQueue0.matchesWord();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to call a method like matchesWord() on a closed TokenQueue
+     * results in a NullPointerException. Once a queue is closed, it should not be usable.
+     */
+    @Test(expected = NullPointerException.class)
+    public void callingMatchesWordOnClosedQueueThrowsException() {
+        // Arrange: Create a TokenQueue and then immediately close it.
+        TokenQueue queue = new TokenQueue("some data");
+        queue.close();
+
+        // Act & Assert: Attempting to use the queue after it's closed should throw.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        queue.matchesWord();
     }
 }
