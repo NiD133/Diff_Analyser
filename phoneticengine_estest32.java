@@ -1,24 +1,33 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class PhoneticEngine_ESTestTest32 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        NameType nameType0 = NameType.ASHKENAZI;
-        RuleType ruleType0 = RuleType.EXACT;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false, 0);
-        int int0 = phoneticEngine0.getMaxPhonemes();
-        assertFalse(phoneticEngine0.isConcat());
-        assertEquals(0, int0);
+    /**
+     * Verifies that the PhoneticEngine constructor correctly initializes the
+     * 'maxPhonemes' and 'concat' properties based on the provided arguments.
+     */
+    @Test
+    public void constructorShouldCorrectlySetMaxPhonemesAndConcatFlag() {
+        // Arrange: Define the parameters for the PhoneticEngine constructor.
+        final NameType nameType = NameType.ASHKENAZI;
+        final RuleType ruleType = RuleType.EXACT;
+        final boolean expectedConcat = false;
+        final int expectedMaxPhonemes = 0;
+
+        // Act: Create a new instance of the PhoneticEngine.
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, expectedConcat, expectedMaxPhonemes);
+
+        // Assert: Check if the properties of the new instance were set correctly.
+        assertFalse("The 'concat' flag should be set to false as passed to the constructor.",
+                    engine.isConcat());
+        assertEquals("The 'maxPhonemes' value should be set to 0 as passed to the constructor.",
+                     expectedMaxPhonemes, engine.getMaxPhonemes());
     }
 }
