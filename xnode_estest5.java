@@ -1,30 +1,33 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest5 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test004() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        String string0 = xNode0.getStringBody("");
-        assertEquals("", string0);
+    /**
+     * Verifies that getStringBody(defaultValue) returns the provided default value
+     * when the underlying XML node has no text content (i.e., a null body).
+     */
+    @Test
+    public void getStringBodyWithDefaultShouldReturnDefaultWhenBodyIsNull() {
+        // Arrange: Create an XNode from an empty DOM Node, which will have a null body.
+        // We use IIOMetadataNode as a convenient, standard JDK implementation of org.w3c.dom.Node.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        String expectedDefault = "default-body-text";
+
+        // Act: Call the method under test.
+        String actualBody = xNode.getStringBody(expectedDefault);
+
+        // Assert: The returned value should be the default string.
+        assertEquals("Should return the default value for a node with no body content", expectedDefault, actualBody);
     }
 }
