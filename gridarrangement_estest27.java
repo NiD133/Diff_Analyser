@@ -1,81 +1,54 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
+import org.jfree.chart.api.Size2D;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest27 extends GridArrangement_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(4, 3136);
-        assertNotNull(gridArrangement0);
-        BlockContainer blockContainer0 = new BlockContainer(gridArrangement0);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertNotNull(blockContainer0);
-        Range range0 = new Range((-1833.62112), (-59.797977));
-        assertEquals((-59.797977), range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[-1833.62112,-59.797977]", range0.toString());
-        assertEquals(1773.823143, range0.getLength(), 0.01);
-        assertEquals((-946.7095485), range0.getCentralValue(), 0.01);
-        assertEquals((-1833.62112), range0.getLowerBound(), 0.01);
-        assertNotNull(range0);
-        LengthConstraintType lengthConstraintType0 = LengthConstraintType.FIXED;
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(3136, range0, lengthConstraintType0, 3136, range0, lengthConstraintType0);
-        assertEquals((-59.797977), range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[-1833.62112,-59.797977]", range0.toString());
-        assertEquals(1773.823143, range0.getLength(), 0.01);
-        assertEquals((-946.7095485), range0.getCentralValue(), 0.01);
-        assertEquals((-1833.62112), range0.getLowerBound(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(3136.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(3136.0, rectangleConstraint0.getHeight(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        Size2D size2D0 = gridArrangement0.arrangeFR(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals((-59.797977), range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[-1833.62112,-59.797977]", range0.toString());
-        assertEquals(1773.823143, range0.getLength(), 0.01);
-        assertEquals((-946.7095485), range0.getCentralValue(), 0.01);
-        assertEquals((-1833.62112), range0.getLowerBound(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(3136.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(LengthConstraintType.FIXED, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(3136.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals((-59.797977), size2D0.getHeight(), 0.01);
-        assertEquals("Size2D[width=3136.0, height=-59.797977]", size2D0.toString());
-        assertEquals(3136.0, size2D0.getWidth(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals((-59.797977), size2D0.height, 0.01);
-        assertEquals(3136.0, size2D0.width, 0.01);
+/**
+ * A test suite for the GridArrangement class, focusing on specific arrangement scenarios.
+ */
+public class GridArrangementTest {
+
+    /**
+     * This test verifies the behavior of the protected method {@code arrangeFR} when
+     * handling an empty container. Specifically, it checks that even when the
+     * provided height constraint's *type* is {@code FIXED}, the method still uses
+     * the upper bound of the constraint's height *range* to determine the resulting size.
+     */
+    @Test
+    public void arrangeFR_withEmptyContainerAndInconsistentConstraint_usesHeightRangeUpperBound() {
+        // Arrange
+        final int rows = 4;
+        final int columns = 3136;
+        final double fixedWidth = 3136.0;
+        final double expectedHeight = -59.797977; // The upper bound of the height range
+
+        GridArrangement arrangement = new GridArrangement(rows, columns);
+        BlockContainer emptyContainer = new BlockContainer(arrangement);
+
+        Range heightRange = new Range(-1833.62112, expectedHeight);
+
+        // Create a constraint where the height constraint *type* is FIXED,
+        // but a height *range* is also supplied. This inconsistent state is used
+        // to test the specific implementation of arrangeFR.
+        RectangleConstraint inconsistentConstraint = new RectangleConstraint(
+                fixedWidth, null, LengthConstraintType.FIXED,
+                0.0, heightRange, LengthConstraintType.FIXED // Note: Type is FIXED
+        );
+
+        // Act
+        // Directly call the protected method arrangeFR, which is designed for
+        // Fixed-width, Ranged-height constraints.
+        Size2D resultSize = arrangement.arrangeFR(emptyContainer, null, inconsistentConstraint);
+
+        // Assert
+        // Verify that the method returned the fixed width and the upper bound of the
+        // height *range*, ignoring the FIXED height constraint type.
+        assertEquals("Width should match the fixed width from the constraint",
+                fixedWidth, resultSize.getWidth(), 0.01);
+        assertEquals("Height should match the upper bound of the range, despite the constraint type being FIXED",
+                expectedHeight, resultSize.getHeight(), 0.01);
     }
 }
