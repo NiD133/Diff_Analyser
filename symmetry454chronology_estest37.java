@@ -1,52 +1,32 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
 import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest37 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * This test class contains an improved version of a generated test case
+ * for the {@link Symmetry454Chronology} class.
+ */
+public class Symmetry454ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        HijrahEra hijrahEra0 = HijrahEra.AH;
-        // Undeclared exception!
-        try {
-            symmetry454Chronology0.date((Era) hijrahEra0, (-2164), (-2164), (-2164));
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // Invalid era: AH
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry454Chronology", e);
-        }
+    /**
+     * Verifies that creating a date with an unsupported era type throws a ClassCastException.
+     *
+     * The Symmetry454 calendar system is aligned with the ISO calendar and uses IsoEra (CE/BCE).
+     * Providing an era from a different system, like the Hijrah calendar's 'AH' era,
+     * is invalid and should be rejected with a type-cast exception.
+     */
+    @Test(expected = ClassCastException.class)
+    public void date_whenEraIsFromUnsupportedChronology_throwsClassCastException() {
+        // Arrange: Get the singleton instance of the chronology and an era from an
+        // incompatible calendar system (Hijrah).
+        Symmetry454Chronology symmetry454Chronology = Symmetry454Chronology.INSTANCE;
+        Era unsupportedEra = HijrahEra.AH;
+
+        // Act & Assert: Attempt to create a date using the unsupported era.
+        // The @Test(expected) annotation asserts that a ClassCastException will be thrown.
+        // The year, month, and day values are arbitrary, as the type check on the era happens first.
+        symmetry454Chronology.date(unsupportedEra, 2024, 1, 1);
     }
 }
