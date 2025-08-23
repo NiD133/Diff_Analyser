@@ -2,6 +2,7 @@ package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,56 +14,96 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Token queue tests.
+ * Tests for TokenQueue focused on:
+ * - Balanced text chomping
+ * - Escaping/unescaping
+ * - CSS identifier parsing and escaping
+ * - Selector parsing with nested quotes and escaped characters
  */
 public class TokenQueueTest {
-    @Test public void chompBalanced() {
+
+    // ------------------------------------------------------------------------------------------------
+    // Balanced chomp
+    // ------------------------------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("chompBalanced: basic balanced parentheses")
+    public void chompBalanced_basic() {
         TokenQueue tq = new TokenQueue(":contains(one (two) three) four");
-        String pre = tq.consumeTo("(");
-        String guts = tq.chompBalanced('(', ')');
-        String remainder = tq.remainder();
 
-        assertEquals(":contains", pre);
-        assertEquals("one (two) three", guts);
-        assertEquals(" four", remainder);
+        String before Open = tq.consumeTo("(");
+        String inside = tq.chompBalanced('(', ')');
+        String after = tq.remainder();
+
+        assertEquals(":contains", before Open);
+        assertEquals("one (two) three", inside);
+        assertEquals(" four", after);
     }
 
-    @Test public void chompEscapedBalanced() {
+    @Test
+    @DisplayName("chompBalanced: escaped open/close are preserved and unescaped correctly")
+    public void chompBalanced_escapedContentPreserved() {
         TokenQueue tq = new TokenQueue(":contains(one (two) \\( \\) \\) three) four");
-        String pre = tq.consumeTo("(");
-        String guts = tq.chompBalanced('(', ')');
-        String remainder = tq.remainder();
 
-        assertEquals(":contains", pre);
-        assertEquals("one (two) \\( \\) \\) three", guts);
-        assertEquals("one (two) ( ) ) three", TokenQueue.unescape(guts));
-        assertEquals(" four", remainder);
+        String before Open = tq.consumeTo("(");
+        String inside = tq.chompBalanced('(', ')');
+        String after = tq.remainder();
+
+        assertEquals(":contains", before Open);
+        assertEquals("one (two) \\( \\) \\) three", inside);
+        assertEquals("one (two) ( ) ) three", TokenQueue.unescape(inside));
+        assertEquals(" four", after);
     }
 
-    @Test public void chompBalancedMatchesAsMuchAsPossible() {
+    @Test
+    @DisplayName("chompBalanced: matches as much as possible within the first balanced pair")
+    public void chompBalanced_matchesAsMuchAsPossible() {
         TokenQueue tq = new TokenQueue("unbalanced(something(or another)) else");
         tq.consumeTo("(");
         String match = tq.chompBalanced('(', ')');
+
         assertEquals("something(or another)", match);
     }
 
-    @Test public void unescape() {
+    @Test
+    @DisplayName("chompBalanced: throws when close marker doesn't match open marker")
+    public void chompBalanced_throwsIfMarkersMismatch() {
+        TokenQueue tq = new TokenQueue("unbalanced(something(or another)) else");
+        tq.consumeTo("(");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> tq.chompBalanced('(', '+'));
+        assertEquals("Did not find balanced marker at 'something(or another)) else'", ex.getMessage());
+    }
+
+    // ------------------------------------------------------------------------------------------------
+    // Unescape
+    // ------------------------------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("unescape: basic escaping for parentheses and backslash")
+    public void unescape_basic() {
         assertEquals("one ( ) \\", TokenQueue.unescape("one \\( \\) \\\\"));
     }
 
-    @Test public void unescape_2() {
+    @Test
+    @DisplayName("unescape: keeps a single literal backslash for escaped literal ampersand")
+    public void unescape_multipleBackslashes() {
         assertEquals("\\&", TokenQueue.unescape("\\\\\\&"));
     }
 
-    @ParameterizedTest
-    @MethodSource("escapeCssIdentifier_WebPlatformTestParameters")
+    // ------------------------------------------------------------------------------------------------
+    // CSS identifier escaping (serialization)
+    // ------------------------------------------------------------------------------------------------
+
+    @ParameterizedTest(name = "escapeCssIdentifier: ''{1}'' -> ''{0}''")
+    @MethodSource("escapeCssIdentifier_wptParameters")
     @MethodSource("escapeCssIdentifier_additionalParameters")
     public void escapeCssIdentifier(String expected, String input) {
         assertEquals(expected, TokenQueue.escapeCssIdentifier(input));
     }
 
     // https://github.com/web-platform-tests/wpt/blob/328fa1c67bf5dfa6f24571d4c41dd10224b6d247/css/cssom/escape.html
-    private static Stream<Arguments> escapeCssIdentifier_WebPlatformTestParameters() {
+    private static Stream<Arguments> escapeCssIdentifier_wptParameters() {
         return Stream.of(
             Arguments.of("", ""),
 
@@ -127,15 +168,15 @@ public class TokenQueueTest {
             Arguments.of("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
 
             Arguments.of("hello\\\\world", "hello\\world"), // Backslashes get backslash-escaped
-            Arguments.of("hello\u1234world", "hello\u1234world"), // Code points greater than U+0080 are preserved
+            Arguments.of("hello\u1234world", "hello\u1234world"), // Code points > U+0080 are preserved
             Arguments.of("\\-", "-"), // CSS.escape: Single dash escaped
 
             Arguments.of("\\ \\!xy", "\u0020\u0021\u0078\u0079"),
 
-            // astral symbol (U+1D306 TETRAGRAM FOR CENTRE)
+            // Astral symbol (U+1D306 TETRAGRAM FOR CENTRE)
             Arguments.of("\uD834\uDF06", "\uD834\uDF06"),
 
-            // lone surrogates
+            // Lone surrogates
             Arguments.of("\uDF06", "\uDF06"),
             Arguments.of("\uD834", "\uD834")
         );
@@ -149,38 +190,44 @@ public class TokenQueueTest {
         );
     }
 
-    @Test public void testNestedQuotes() {
-        validateNestedQuotes("<html><body><a id=\"identifier\" onclick=\"func('arg')\" /></body></html>", "a[onclick*=\"('arg\"]");
-        validateNestedQuotes("<html><body><a id=\"identifier\" onclick=func('arg') /></body></html>", "a[onclick*=\"('arg\"]");
-        validateNestedQuotes("<html><body><a id=\"identifier\" onclick='func(\"arg\")' /></body></html>", "a[onclick*='(\"arg']");
-        validateNestedQuotes("<html><body><a id=\"identifier\" onclick=func(\"arg\") /></body></html>", "a[onclick*='(\"arg']");
+    // ------------------------------------------------------------------------------------------------
+    // CSS selector parsing (nested quotes, quoted patterns)
+    // ------------------------------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("Selectors with nested quotes in attribute match correctly")
+    public void selector_allowsNestedQuotes() {
+        assertSelectsByCss("<html><body><a id=\"identifier\" onclick=\"func('arg')\" /></body></html>", "a[onclick*=\"('arg\"]");
+        assertSelectsByCss("<html><body><a id=\"identifier\" onclick=func('arg') /></body></html>", "a[onclick*=\"('arg\"]");
+        assertSelectsByCss("<html><body><a id=\"identifier\" onclick='func(\"arg\")' /></body></html>", "a[onclick*='(\"arg']");
+        assertSelectsByCss("<html><body><a id=\"identifier\" onclick=func(\"arg\") /></body></html>", "a[onclick*='(\"arg']");
     }
 
-    private static void validateNestedQuotes(String html, String selector) {
+    @Test
+    @DisplayName("Quoted regex metacharacters in :matches selector are handled correctly")
+    public void selector_matchesWithQuotedPattern() {
+        final Document doc = Jsoup.parse("<div>\\) foo1</div><div>( foo2</div><div>1) foo3</div>");
+
+        assertEquals("\\) foo1", firstText(doc, "div:matches(" + Pattern.quote("\\)") + ")"));
+        assertEquals("( foo2", firstText(doc, "div:matches(" + Pattern.quote("(") + ")"));
+        assertEquals("1) foo3", firstText(doc, "div:matches(" + Pattern.quote("1)") + ")"));
+    }
+
+    private static void assertSelectsByCss(String html, String selector) {
         assertEquals("#identifier", Jsoup.parse(html).select(selector).first().cssSelector());
     }
 
-    @Test
-    public void chompBalancedThrowIllegalArgumentException() {
-        try {
-            TokenQueue tq = new TokenQueue("unbalanced(something(or another)) else");
-            tq.consumeTo("(");
-            tq.chompBalanced('(', '+');
-            fail("should have thrown IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Did not find balanced marker at 'something(or another)) else'", expected.getMessage());
-        }
+    private static String firstText(Document doc, String cssQuery) {
+        return doc.select(cssQuery).get(0).childNode(0).toString();
     }
 
-    @Test
-    public void testQuotedPattern() {
-        final Document doc = Jsoup.parse("<div>\\) foo1</div><div>( foo2</div><div>1) foo3</div>");
-        assertEquals("\\) foo1",doc.select("div:matches(" + Pattern.quote("\\)") + ")").get(0).childNode(0).toString());
-        assertEquals("( foo2",doc.select("div:matches(" + Pattern.quote("(") + ")").get(0).childNode(0).toString());
-        assertEquals("1) foo3",doc.select("div:matches(" + Pattern.quote("1)") + ")").get(0).childNode(0).toString());
-    }
+    // ------------------------------------------------------------------------------------------------
+    // Consuming escaped selectors and identifiers
+    // ------------------------------------------------------------------------------------------------
 
-    @Test public void consumeEscapedTag() {
+    @Test
+    @DisplayName("consumeElementSelector: supports escaped special chars (\\ . : !)")
+    public void elementSelector_consumesEscaped() {
         TokenQueue q = new TokenQueue("p\\\\p p\\.p p\\:p p\\!p");
 
         assertEquals("p\\p", q.consumeElementSelector());
@@ -196,7 +243,9 @@ public class TokenQueueTest {
         assertTrue(q.isEmpty());
     }
 
-    @Test public void consumeEscapedId() {
+    @Test
+    @DisplayName("consumeCssIdentifier: supports escaped dot and backslash")
+    public void cssIdentifier_consumesEscaped() {
         TokenQueue q = new TokenQueue("i\\.d i\\\\d");
 
         assertEquals("i.d", q.consumeCssIdentifier());
@@ -206,20 +255,28 @@ public class TokenQueueTest {
         assertTrue(q.isEmpty());
     }
 
-    @Test void escapeAtEof() {
+    @Test
+    @DisplayName("consumeElementSelector: trailing backslash at EOF is not an escape")
+    void elementSelector_escapeAtEofIsLiteral() {
         TokenQueue q = new TokenQueue("Foo\\");
         String s = q.consumeElementSelector();
-        assertEquals("Foo", s); // no escape, no eof. Just straight up Foo.
+
+        // No escape and no EOF effect for consumeElementSelector: just "Foo".
+        assertEquals("Foo", s);
     }
 
-    @ParameterizedTest
-    @MethodSource("cssIdentifiers")
-    @MethodSource("cssAdditionalIdentifiers")
-    void consumeCssIdentifier_WebPlatformTests(String expected, String cssIdentifier) {
+    // ------------------------------------------------------------------------------------------------
+    // CSS identifier parsing (consumption)
+    // ------------------------------------------------------------------------------------------------
+
+    @ParameterizedTest(name = "consumeCssIdentifier: ''{1}'' -> ''{0}''")
+    @MethodSource("cssIdentifiers_wpt")
+    @MethodSource("cssIdentifiers_additional")
+    void consumeCssIdentifier_webPlatformTests(String expected, String cssIdentifier) {
         assertParsedCssIdentifierEquals(expected, cssIdentifier);
     }
 
-    private static Stream<Arguments> cssIdentifiers() {
+    private static Stream<Arguments> cssIdentifiers_wpt() {
         return Stream.of(
             // https://github.com/web-platform-tests/wpt/blob/36036fb5212a3fc15fc5750cecb1923ba4071668/dom/nodes/ParentNode-querySelector-escapes.html
             // - escape hex digit
@@ -298,7 +355,7 @@ public class TokenQueueTest {
         );
     }
 
-    private static Stream<Arguments> cssAdditionalIdentifiers() {
+    private static Stream<Arguments> cssIdentifiers_additional() {
         return Stream.of(
             Arguments.of("1st", "\\31\r\nst"),
             Arguments.of("1", "\\31\r"),
@@ -312,18 +369,26 @@ public class TokenQueueTest {
         );
     }
 
-    @Test void consumeCssIdentifierWithEmptyInput() {
+    @Test
+    @DisplayName("consumeCssIdentifier: empty input throws with helpful message")
+    void consumeCssIdentifier_withEmptyInput_throws() {
         TokenQueue emptyQueue = new TokenQueue("");
         Exception exception = assertThrows(IllegalArgumentException.class, emptyQueue::consumeCssIdentifier);
         assertEquals("CSS identifier expected, but end of input found", exception.getMessage());
     }
 
-    // Some of jsoup's tests depend on this behavior
-    @Test public void consumeCssIdentifier_invalidButSupportedForBackwardsCompatibility() {
+    // Some of jsoup's tests depend on this behavior.
+    @Test
+    @DisplayName("consumeCssIdentifier: invalid but supported inputs for backwards compatibility")
+    public void consumeCssIdentifier_invalidButSupportedForBackwardsCompatibility() {
         assertParsedCssIdentifierEquals("1", "1");
         assertParsedCssIdentifierEquals("-", "-");
         assertParsedCssIdentifierEquals("-1", "-1");
     }
+
+    // ------------------------------------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------------------------------------
 
     private static String parseCssIdentifier(String text) {
         TokenQueue q = new TokenQueue(text);
