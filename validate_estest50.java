@@ -2,31 +2,31 @@ package org.jsoup.helper;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest50 extends Validate_ESTest_scaffolding {
+/**
+ * Tests for the {@link Validate} helper class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that the wtf() method always throws an IllegalStateException
+     * with the message provided to it.
+     */
+    @Test
+    public void wtfShouldAlwaysThrowIllegalStateException() {
+        // Arrange
+        String expectedMessage = "This is an unexpected state.";
+
         try {
-            Validate.wtf("org.jsoup.helper.ValidationException");
-            fail("Expecting exception: IllegalStateException");
+            // Act
+            Validate.wtf(expectedMessage);
+            
+            // Assert: The test should fail if no exception is thrown.
+            fail("Expected an IllegalStateException to be thrown.");
+            
         } catch (IllegalStateException e) {
-            //
-            // org.jsoup.helper.ValidationException
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: The exception was thrown and has the correct message.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
