@@ -2,29 +2,48 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest30 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonIgnoreProperties.Value} class, focusing on the merge logic.
+ */
+public class JsonIgnoreProperties_ESTestTest30 {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        String[] stringArray0 = new String[0];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withAllowSetters();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = JsonIgnoreProperties.Value.merge(jsonIgnoreProperties_Value0, jsonIgnoreProperties_Value1);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value3 = JsonIgnoreProperties.Value.merge(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertFalse(jsonIgnoreProperties_Value3.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value1));
-        assertSame(jsonIgnoreProperties_Value3, jsonIgnoreProperties_Value2);
-        assertTrue(jsonIgnoreProperties_Value3.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value3.getMerge());
-        assertFalse(jsonIgnoreProperties_Value3.getAllowGetters());
+    /**
+     * This test verifies two key behaviors of the `JsonIgnoreProperties.Value.merge()` method:
+     * 1. When merging two `Value` instances, boolean properties are combined such that `true` takes precedence.
+     * 2. A redundant merge (i.e., merging a value with an identical override) returns the original instance
+     *    due to an internal optimization, rather than creating a new, identical object.
+     */
+    @Test
+    public void mergeShouldCombinePropertiesAndReturnSameInstanceOnRedundantMerge() {
+        // Arrange
+        // Create a base value with default settings (all flags false except 'merge').
+        JsonIgnoreProperties.Value baseValue = JsonIgnoreProperties.Value.forIgnoredProperties();
+
+        // Create an override by enabling 'allowSetters' on the base value.
+        JsonIgnoreProperties.Value valueWithSettersAllowed = baseValue.withAllowSetters();
+
+        // Act
+        // 1. First merge: The 'allowSetters' flag from the override should be applied.
+        JsonIgnoreProperties.Value firstMergeResult = JsonIgnoreProperties.Value.merge(baseValue, valueWithSettersAllowed);
+
+        // 2. Second merge: Merging the result with the same override again should be a no-op.
+        JsonIgnoreProperties.Value secondMergeResult = JsonIgnoreProperties.Value.merge(firstMergeResult, valueWithSettersAllowed);
+
+        // Assert
+        // Verify that the first merge produced a value equal to the override.
+        assertEquals("First merge should result in a value equal to the override",
+                valueWithSettersAllowed, firstMergeResult);
+
+        // Verify that the second, redundant merge returned the exact same object instance,
+        // confirming the optimization.
+        assertSame("A redundant merge should return the same instance without creating a new object",
+                firstMergeResult, secondMergeResult);
+
+        // Explicitly verify the properties of the final merged value.
+        assertTrue("allowSetters should be true after merge", secondMergeResult.getAllowSetters());
+        assertFalse("ignoreUnknown should remain false", secondMergeResult.getIgnoreUnknown());
+        assertFalse("allowGetters should remain false", secondMergeResult.getAllowGetters());
+        assertTrue("merge flag should be true by default", secondMergeResult.getMerge());
     }
 }
