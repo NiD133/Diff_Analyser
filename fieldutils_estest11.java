@@ -1,31 +1,33 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest11 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that safeAdd(long, long) throws an ArithmeticException when the
+     * addition results in a value less than Long.MIN_VALUE (underflow).
+     */
+    @Test
+    public void safeAdd_shouldThrowArithmeticException_onLongUnderflow() {
+        // Arrange: Define values that will cause an underflow when added.
+        // Adding any negative number to Long.MIN_VALUE will result in an underflow.
+        final long negativeValue = -610L;
+        final long minLong = Long.MIN_VALUE;
+
+        // Act & Assert: Verify that the operation throws the expected exception.
         try {
-            FieldUtils.safeAdd((long) (-610), (-9223372036854775808L));
-            fail("Expecting exception: ArithmeticException");
+            FieldUtils.safeAdd(negativeValue, minLong);
+            fail("Expected an ArithmeticException to be thrown due to long underflow.");
         } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: -610 + -9223372036854775808
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify the exception message to ensure the failure is for the correct reason.
+            String expectedMessage = "The calculation caused an overflow: " + negativeValue + " + " + minLong;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
