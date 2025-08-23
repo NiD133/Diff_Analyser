@@ -1,32 +1,33 @@
 package org.jsoup.helper;
 
+import org.jsoup.helper.HttpConnection.Response;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
 
-public class CookieUtil_ESTestTest9 extends CookieUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        HttpConnection.Response httpConnection_Response0 = new HttpConnection.Response();
-        CookieUtil.parseCookie("", httpConnection_Response0);
-        assertEquals(400, httpConnection_Response0.statusCode());
+/**
+ * Test suite for the {@link CookieUtil} class.
+ */
+public class CookieUtilTest {
+
+    /**
+     * Verifies that calling {@link CookieUtil#parseCookie(String, Response)} with an empty
+     * cookie string is handled gracefully, without throwing an exception or causing
+     * unintended side effects on the Response object.
+     */
+    @Test
+    public void parseCookieWithEmptyStringShouldBeIgnored() {
+        // Arrange: Create a response object. We will track its status code to ensure
+        // the method under test does not modify it.
+        Response response = new Response();
+        final int originalStatusCode = response.statusCode();
+
+        // Act: Attempt to parse an empty cookie string. This is expected to be a no-op.
+        CookieUtil.parseCookie("", response);
+
+        // Assert: The status code of the response object should remain unchanged,
+        // confirming that the method had no side effects.
+        assertEquals("Parsing an empty cookie string should not alter the response status code.",
+            originalStatusCode, response.statusCode());
     }
 }
