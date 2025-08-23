@@ -1,25 +1,33 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertEquals;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest3 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        FileTime fileTime0 = FileTimes.now();
-        long long0 = FileTimes.toUnixTime(fileTime0);
-        assertEquals(1392409281L, long0);
+    /**
+     * Tests that {@link FileTimes#toUnixTime(FileTime)} correctly converts a
+     * {@link FileTime} object to its equivalent Unix timestamp in seconds.
+     */
+    @Test
+    public void testToUnixTimeConvertsFileTimeFromKnownInstant() {
+        // Arrange: Create a FileTime from a known Instant.
+        // The original test relied on a mocked clock returning this specific time.
+        // Using a constant makes the test deterministic and its logic clear.
+        final long expectedSecondsSinceEpoch = 1392409281L; // Represents 2014-02-14T20:21:21Z
+        final Instant instant = Instant.ofEpochSecond(expectedSecondsSinceEpoch);
+        final FileTime fileTime = FileTime.from(instant);
+
+        // Act: Convert the FileTime back to a Unix timestamp.
+        final long actualSecondsSinceEpoch = FileTimes.toUnixTime(fileTime);
+
+        // Assert: The converted timestamp should match the original value.
+        assertEquals(expectedSecondsSinceEpoch, actualSecondsSinceEpoch);
     }
 }
