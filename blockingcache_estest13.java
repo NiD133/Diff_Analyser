@@ -1,29 +1,25 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest13 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Test suite for the BlockingCache decorator.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BlockingCache blockingCache0 = new BlockingCache((Cache) null);
-        // Undeclared exception!
-        try {
-            blockingCache0.getSize();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.BlockingCache", e);
-        }
+    /**
+     * Verifies that methods delegating to the underlying cache will throw a
+     * NullPointerException if the delegate cache is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenDelegateCacheIsNull() {
+        // Arrange: Create a BlockingCache with a null delegate cache.
+        // This is an invalid state, as BlockingCache requires a real cache to function.
+        BlockingCache blockingCache = new BlockingCache(null);
+
+        // Act: Attempt to call a method that delegates to the underlying cache.
+        // The @Test(expected=...) annotation will assert that an NPE is thrown.
+        blockingCache.getSize();
     }
 }
