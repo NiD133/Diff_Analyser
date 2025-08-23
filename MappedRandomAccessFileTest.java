@@ -1,50 +1,4 @@
-/*
-    This file is part of the iText (R) project.
-    Copyright (c) 1998-2022 iText Group NV
-    Authors: iText Software.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License version 3
-    as published by the Free Software Foundation with the addition of the
-    following permission added to Section 15 as permitted in Section 7(a):
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    ITEXT GROUP. ITEXT GROUP DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS
-    
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Affero General Public License for more details.
-    You should have received a copy of the GNU Affero General Public License
-    along with this program; if not, see http://www.gnu.org/licenses or write to
-    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-    Boston, MA, 02110-1301 USA, or download the license from the following URL:
-    http://itextpdf.com/terms-of-use/
-    
-    The interactive user interfaces in modified source and object code versions
-    of this program must display Appropriate Legal Notices, as required under
-    Section 5 of the GNU Affero General Public License.
-    
-    In accordance with Section 7(b) of the GNU Affero General Public License,
-    a covered work must retain the producer line in every PDF that is created
-    or manipulated using iText.
-    
-    You can be released from the requirements of the license by purchasing
-    a commercial license. Buying such a license is mandatory as soon as you
-    develop commercial activities involving the iText software without
-    disclosing the source code of your own applications.
-    These activities include: offering paid services to customers as an ASP,
-    serving PDFs on the fly in a web application, shipping iText with a closed
-    source product.
-    
-    For more information, please contact iText Software Corp. at this
-    address: sales@itextpdf.com
- */
-/*
- * Created on Feb 10, 2012
- * (c) 2012 Trumpet, Inc.
- *
- */
+// Improved for clarity and maintainability
 package com.itextpdf.text.pdf;
 
 import java.io.File;
@@ -56,11 +10,22 @@ import org.junit.Test;
 
 import com.itextpdf.testutils.TestResourceUtils;
 
+/**
+ * Documents expected behavior of MappedRandomAccessFile when the underlying file is empty.
+ * The class should mirror java.io.RandomAccessFile semantics:
+ * - length() returns 0
+ * - initial file pointer is 0
+ * - read() and read(byte[], off, len) return -1 to indicate EOF
+ */
 public class MappedRandomAccessFileTest {
+
+    private File zeroSizedPdf;
 
     @Before
     public void setUp() throws Exception {
         TestResourceUtils.purgeTempFiles();
+        // Arrange: copy the zero-length test resource to a temp file
+        zeroSizedPdf = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
     }
 
     @After
@@ -69,11 +34,27 @@ public class MappedRandomAccessFileTest {
     }
 
     @Test
-    public void testZeroSize() throws Exception {
-        File pdf = TestResourceUtils.getResourceAsTempFile(getClass(), "zerosizedfile.pdf");
-        MappedRandomAccessFile f = new MappedRandomAccessFile(pdf.getCanonicalPath(), "rw");
-        Assert.assertEquals(-1, f.read());
-        f.close();
-    }
+    public void readReturnsMinusOneForZeroLengthFile() throws Exception {
+        // Open in read-write to exercise the same path used by most callers
+        final MappedRandomAccessFile raf =
+                new MappedRandomAccessFile(zeroSizedPdf.getCanonicalPath(), "rw");
+        try {
+            // Then: basic invariants for an empty file
+            Assert.assertEquals("A zero-length file must report length 0.", 0L, raf.length());
+            Assert.assertEquals("Initial file pointer must be at position 0.", 0L, raf.getFilePointer());
 
+            // When/Then: reading from an empty file yields EOF (-1)
+            Assert.assertEquals("read() must return -1 (EOF) for zero-length files.", -1, raf.read());
+
+            // Subsequent reads after EOF should continue to return -1
+            Assert.assertEquals("Subsequent read() calls after EOF must also return -1.", -1, raf.read());
+
+            // read(byte[], off, len) should also return -1 for zero-length files
+            byte[] buffer = new byte[8];
+            Assert.assertEquals("read(byte[],off,len) must return -1 (EOF) for zero-length files.",
+                    -1, raf.read(buffer, 0, buffer.length));
+        } finally {
+            raf.close();
+        }
+    }
 }
