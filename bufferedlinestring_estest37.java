@@ -1,33 +1,46 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.ShapeCollection;
 import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLineString_ESTestTest37 extends BufferedLineString_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        LinkedList<Point> linkedList0 = new LinkedList<Point>();
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(16.128532143886176, 16.128532143886176, spatialContext0);
-        linkedList0.add((Point) pointImpl0);
-        BufferedLineString bufferedLineString0 = new BufferedLineString(linkedList0, 16.128532143886176, spatialContext0);
-        SpatialRelation spatialRelation0 = bufferedLineString0.relate(bufferedLineString0);
-        assertEquals(1, linkedList0.size());
-        assertEquals(SpatialRelation.WITHIN, spatialRelation0);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for {@link BufferedLineString}.
+ * This class focuses on improving a single, auto-generated test case.
+ */
+public class BufferedLineStringTest {
+
+    private static final SpatialContext GEO_CONTEXT = SpatialContext.GEO;
+
+    /**
+     * Tests that a BufferedLineString created from a single point correctly
+     * reports its spatial relation as WITHIN when compared to itself.
+     *
+     * According to the constructor's logic, a line string with one point is
+     * treated as a zero-length line segment (i.e., a point) with a buffer,
+     * effectively creating a circle. A shape should always be within itself.
+     */
+    @Test
+    public void relate_withSelfForSinglePointLine_shouldReturnWithin() {
+        // Arrange
+        final double coordinate = 16.1285;
+        final double bufferDistance = 16.1285;
+
+        Point singlePoint = GEO_CONTEXT.makePoint(coordinate, coordinate);
+        List<Point> points = Collections.singletonList(singlePoint);
+
+        BufferedLineString lineString = new BufferedLineString(points, bufferDistance, GEO_CONTEXT);
+
+        // Act
+        SpatialRelation relation = lineString.relate(lineString);
+
+        // Assert
+        assertEquals("A shape's relation to itself should be WITHIN", SpatialRelation.WITHIN, relation);
     }
 }
