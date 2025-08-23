@@ -1,26 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PdfDictionary_ESTestTest56 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary(3);
-        assertEquals(6, pdfDictionary0.type());
+    /**
+     * Verifies that the constructor that accepts an initial capacity
+     * correctly sets the object's type to DICTIONARY.
+     */
+    @Test
+    public void constructorWithCapacity_shouldSetObjectTypeToDictionary() {
+        // Arrange: Create a PdfDictionary with a specific initial capacity.
+        // The capacity value itself is not important for this test.
+        int initialCapacity = 3;
+        PdfDictionary dictionary = new PdfDictionary(initialCapacity);
+
+        // Act: Get the type of the created object.
+        int objectType = dictionary.type();
+
+        // Assert: The type should match the constant for a dictionary object.
+        assertEquals("A PdfDictionary object should have the type DICTIONARY.",
+                     PdfObject.DICTIONARY, objectType);
     }
 }
