@@ -1,18 +1,29 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class ByteArrayBuilder_ESTestTest49 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on its core functionality.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder();
-        byte[] byteArray0 = byteArrayBuilder0.toByteArray();
-        assertArrayEquals(new byte[] {}, byteArray0);
+    /**
+     * Verifies that calling {@code toByteArray()} on a newly instantiated,
+     * empty builder returns an empty byte array.
+     */
+    @Test
+    public void toByteArray_onNewBuilder_returnsEmptyArray() {
+        // Arrange: Create a new, empty ByteArrayBuilder.
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+
+        // Act: Retrieve the contents as a byte array.
+        byte[] result = builder.toByteArray();
+
+        // Assert: The result should be a non-null, empty byte array.
+        assertNotNull("The result of toByteArray() should never be null.", result);
+        assertArrayEquals("A new builder should produce an empty byte array.",
+                          new byte[]{}, result);
     }
 }
