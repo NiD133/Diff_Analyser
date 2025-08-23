@@ -1,40 +1,39 @@
 package org.jfree.chart.plot.dial;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.plot.FastScatterPlot;
-import org.jfree.chart.plot.pie.PiePlot;
 import org.jfree.chart.util.GradientPaintTransformType;
-import org.jfree.chart.util.GradientPaintTransformer;
 import org.jfree.chart.util.StandardGradientPaintTransformer;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+/**
+ * Contains tests for the equals() method of the {@link DialBackground} class.
+ */
+// The original test class name is kept to match the user's request context.
 public class DialBackground_ESTestTest5 extends DialBackground_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        DialBackground dialBackground0 = new DialBackground();
-        DialBackground dialBackground1 = new DialBackground();
-        assertTrue(dialBackground1.equals((Object) dialBackground0));
-        GradientPaintTransformType gradientPaintTransformType0 = GradientPaintTransformType.CENTER_VERTICAL;
-        StandardGradientPaintTransformer standardGradientPaintTransformer0 = new StandardGradientPaintTransformer(gradientPaintTransformType0);
-        dialBackground1.setGradientPaintTransformer(standardGradientPaintTransformer0);
-        boolean boolean0 = dialBackground0.equals(dialBackground1);
-        assertFalse(dialBackground1.equals((Object) dialBackground0));
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false if two DialBackground
+     * objects have different GradientPaintTransformer properties.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenGradientPaintTransformersDiffer() {
+        // Arrange: Create two identical DialBackground objects.
+        DialBackground background1 = new DialBackground();
+        DialBackground background2 = new DialBackground();
+
+        // Sanity check: Ensure the two objects are equal initially.
+        assertEquals("Initially, two default DialBackground objects should be equal.", background1, background2);
+
+        // Create a non-default transformer to introduce a difference.
+        StandardGradientPaintTransformer differentTransformer =
+                new StandardGradientPaintTransformer(GradientPaintTransformType.CENTER_VERTICAL);
+
+        // Act: Modify the gradient paint transformer of the second object.
+        background2.setGradientPaintTransformer(differentTransformer);
+
+        // Assert: The two objects should no longer be considered equal.
+        assertNotEquals("After modifying the transformer, the objects should not be equal.", background1, background2);
     }
 }
