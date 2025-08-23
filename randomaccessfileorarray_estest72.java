@@ -1,41 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
+/**
+ * Tests the behavior of {@link RandomAccessFileOrArray} after its resources have been closed.
+ */
 public class RandomAccessFileOrArray_ESTestTest72 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test071() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.close();
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readShortLE();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray instance after
+     * it has been closed results in a NullPointerException. This ensures that the
+     * object correctly invalidates its internal state upon closure.
+     */
+    @Test
+    public void readShortLE_onClosedInstance_throwsNullPointerException() throws IOException {
+        // Arrange: Create an instance backed by a byte array and immediately close it
+        // to set up the "closed" state for the test.
+        byte[] dummyData = new byte[4]; // Content and size are not relevant for this test.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(dummyData);
+        fileOrArray.close();
+
+        // Act & Assert: Verify that calling readShortLE() on the closed instance
+        // throws a NullPointerException.
+        assertThrows(NullPointerException.class, fileOrArray::readShortLE);
     }
 }
