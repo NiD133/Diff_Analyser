@@ -1,40 +1,48 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonWriteContext;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest41 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * This test verifies the instance reuse optimization within JsonWriteContext.
+ * When a child context is requested from a parent, a new child is created.
+ * If another child context is requested from the same parent, the previously
+ * created child instance is reused and reset with the new type and state.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext();
-        assertNotNull(jsonWriteContext1);
-        assertTrue(jsonWriteContext1.inObject());
-        JsonFactory jsonFactory0 = new JsonFactory();
-        StringWriter stringWriter0 = new StringWriter();
-        JsonGenerator jsonGenerator0 = jsonFactory0.createGenerator((Writer) stringWriter0);
-        TokenFilter tokenFilter0 = TokenFilter.INCLUDE_ALL;
-        TokenFilter.Inclusion tokenFilter_Inclusion0 = TokenFilter.Inclusion.INCLUDE_NON_NULL;
-        FilteringGeneratorDelegate filteringGeneratorDelegate0 = new FilteringGeneratorDelegate(jsonGenerator0, tokenFilter0, tokenFilter_Inclusion0, false);
-        JsonWriteContext jsonWriteContext2 = jsonWriteContext0.createChildArrayContext((Object) filteringGeneratorDelegate0);
-        assertEquals(1, jsonWriteContext2.getNestingDepth());
-        assertFalse(jsonWriteContext2.inObject());
-        assertSame(jsonWriteContext2, jsonWriteContext1);
+    @Test
+    public void createChildContext_shouldReuseAndResetExistingChildInstance() {
+        // Arrange: Create a root context.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+
+        // Act 1: Create the first child context, which should be an object context.
+        JsonWriteContext childObjectContext = rootContext.createChildObjectContext();
+
+        // Assert 1: Verify the initial state of the newly created child context.
+        assertNotNull("The first child context should not be null.", childObjectContext);
+        assertTrue("The child context should initially be an object context.", childObjectContext.inObject());
+        assertEquals("Nesting depth for a direct child should be 1.", 1, childObjectContext.getNestingDepth());
+
+        // Arrange 2: Prepare a value for the next context creation.
+        Object newContextValue = "a-new-value";
+
+        // Act 2: Create a second child from the same root. This should reuse the previous instance
+        // and reset it to be an array context.
+        JsonWriteContext reusedChildAsArrayContext = rootContext.createChildArrayContext(newContextValue);
+
+        // Assert 2: Verify that the same instance was reused and its state was correctly updated.
+        assertSame("The same child context instance should be reused.",
+                childObjectContext, reusedChildAsArrayContext);
+
+        assertFalse("The reused context should no longer be an object context.",
+                reusedChildAsArrayContext.inObject());
+        assertTrue("The reused context should now be an array context.",
+                reusedChildAsArrayContext.inArray());
+        assertEquals("The nesting depth should remain 1.", 1, reusedChildAsArrayContext.getNestingDepth());
+        assertEquals("The current value should have been updated.",
+                newContextValue, reusedChildAsArrayContext.getCurrentValue());
     }
 }
