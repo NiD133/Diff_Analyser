@@ -1,27 +1,27 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest23 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("0\u0002?B");
-        tokenQueue0.close();
-        // Undeclared exception!
-        try {
-            tokenQueue0.remainder();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.CharacterReader", e);
-        }
+    /**
+     * Verifies that attempting to access the remainder of a TokenQueue after it has been closed
+     * results in a NullPointerException. This is the expected behavior, as closing the queue
+     * releases its underlying resources.
+     */
+    @Test(expected = NullPointerException.class)
+    public void remainderOnClosedQueueThrowsNullPointerException() {
+        // Arrange: Create a TokenQueue with some data.
+        TokenQueue tokenQueue = new TokenQueue("some data");
+
+        // Act: Close the queue, which should release its internal reader.
+        tokenQueue.close();
+
+        // Assert: Attempting to get the remainder now should throw a NullPointerException.
+        // The @Test(expected=...) annotation handles this assertion automatically.
+        tokenQueue.remainder();
     }
 }
