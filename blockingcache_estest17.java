@@ -1,33 +1,36 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest17 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Test suite for {@link BlockingCache}.
+ */
+public class BlockingCacheTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        SynchronizedCache synchronizedCache0 = new SynchronizedCache((Cache) null);
-        FifoCache fifoCache0 = new FifoCache(synchronizedCache0);
-        TransactionalCache transactionalCache0 = new TransactionalCache(fifoCache0);
-        BlockingCache blockingCache0 = new BlockingCache(transactionalCache0);
-        CountDownLatch countDownLatch0 = new CountDownLatch(600);
-        // Undeclared exception!
-        try {
-            blockingCache0.getObject(countDownLatch0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SynchronizedCache", e);
-        }
+    /**
+     * Verifies that BlockingCache propagates a NullPointerException when an underlying
+     * cache in the decorator chain is misconfigured with a null delegate.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getObjectShouldPropagateNpeFromMisconfiguredDelegate() {
+        // Arrange: Create a chain of cache decorators where an inner cache
+        // is improperly initialized with a null delegate. This simulates a
+        // configuration error.
+        // The chain is: BlockingCache -> TransactionalCache -> FifoCache -> SynchronizedCache -> null
+        Cache misconfiguredDelegate = new SynchronizedCache(null);
+        Cache cacheWithFifo = new FifoCache(misconfiguredDelegate);
+        Cache cacheWithTransactions = new TransactionalCache(cacheWithFifo);
+        Cache blockingCache = new BlockingCache(cacheWithTransactions);
+
+        Object anyKey = new Object();
+
+        // Act: Attempt to get an object. The call will propagate down the decorator
+        // chain until SynchronizedCache throws a NullPointerException upon accessing
+        // its null delegate.
+        blockingCache.getObject(anyKey);
+
+        // Assert: The @Test(expected) annotation verifies that the NullPointerException
+        // is thrown and not swallowed by any of the decorators.
     }
 }
