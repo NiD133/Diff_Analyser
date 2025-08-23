@@ -1,34 +1,41 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest21 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on its read and pushback functionality.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test020() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.pushBack((byte) 0);
-        randomAccessFileOrArray0.readFully(byteArray0);
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
+    /**
+     * Verifies that reading data after a byte has been pushed back will first consume
+     * the pushed-back byte without advancing the underlying file pointer.
+     */
+    @Test
+    public void readFully_afterPushBack_readsPushedBackByteWithoutAdvancingFilePointer() throws IOException {
+        // Arrange: Create an accessor with initial data and push a different byte back.
+        byte[] sourceData = {(byte) 42}; // The original data in the source.
+        RandomAccessFileOrArray accessor = new RandomAccessFileOrArray(sourceData);
+
+        byte pushedBackByte = (byte) 99;
+        accessor.pushBack(pushedBackByte);
+
+        // Pre-condition check: Ensure the pointer is at the beginning.
+        assertEquals("Pre-condition: File pointer should be at the start.", 0L, accessor.getFilePointer());
+
+        // Act: Read one byte into a buffer.
+        byte[] readBuffer = new byte[1];
+        accessor.readFully(readBuffer);
+
+        // Assert: The pushed-back byte should be read, and the file pointer should remain unchanged.
+        assertEquals("Should have read the pushed-back byte.", pushedBackByte, readBuffer[0]);
+        assertEquals("File pointer should not advance when reading a pushed-back byte.", 0L, accessor.getFilePointer());
+
+        // Further verification: A subsequent read should consume from the original source and advance the pointer.
+        int nextByteRead = accessor.read();
+        assertEquals("Subsequent read should consume from the original source.", sourceData[0], (byte) nextByteRead);
+        assertEquals("File pointer should advance after reading from the source.", 1L, accessor.getFilePointer());
     }
 }
