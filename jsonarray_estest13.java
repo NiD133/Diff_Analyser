@@ -1,24 +1,27 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest13 extends JsonArray_ESTest_scaffolding {
+// Note: In a real-world scenario, this class would be named `JsonArrayTest`.
+public class JsonArray_ESTestTest13 {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Float float0 = new Float(0.0);
-        jsonArray0.add((Number) float0);
-        float float1 = jsonArray0.getAsFloat();
-        assertEquals(0.0F, float1, 0.01F);
+    /**
+     * Verifies that getAsFloat() returns the correct float value when the JsonArray
+     * contains a single element that can be represented as a float.
+     */
+    @Test
+    public void getAsFloat_shouldReturnFloatValue_whenArrayContainsSingleFloatElement() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        float expectedFloat = 0.0f;
+        jsonArray.add(expectedFloat);
+
+        // Act
+        float actualFloat = jsonArray.getAsFloat();
+
+        // Assert
+        // A delta of 0.0f is used for an exact match in a float comparison.
+        assertEquals(expectedFloat, actualFloat, 0.0f);
     }
 }
