@@ -1,26 +1,26 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Vector_ESTestTest16 extends Vector_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Vector} class.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Vector vector0 = new Vector((-2350.2F), (-2350.2F), (-2350.2F));
-        // Undeclared exception!
-        try {
-            vector0.subtract((Vector) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.Vector", e);
-        }
+    /**
+     * Verifies that the subtract method throws a NullPointerException
+     * when the argument is null. This is the expected behavior for
+     * methods that do not explicitly handle null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void subtract_shouldThrowNullPointerException_whenArgumentIsNull() {
+        // Arrange: Create an instance of the Vector. The specific coordinates
+        // are not relevant for this test case.
+        Vector vector = new Vector(1.0f, 2.0f, 3.0f);
+
+        // Act & Assert: Attempt to subtract a null vector.
+        // The @Test(expected) annotation handles the assertion,
+        // ensuring a NullPointerException is thrown.
+        vector.subtract(null);
     }
 }
