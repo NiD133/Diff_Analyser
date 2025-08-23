@@ -1,21 +1,30 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class ArrayFill_ESTestTest10 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Test suite for the {@link ArrayFill} class.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        byte[] byteArray1 = ArrayFill.fill(byteArray0, (byte) 76);
-        assertArrayEquals(new byte[] { (byte) 76 }, byteArray1);
+    @Test
+    public void testFillByteArray() {
+        // Arrange
+        final byte[] array = new byte[1];
+        final byte fillValue = 76;
+        final byte[] expectedArray = {76};
+
+        // Act
+        final byte[] resultArray = ArrayFill.fill(array, fillValue);
+
+        // Assert
+        // 1. Verify the array is filled with the correct value.
+        assertArrayEquals("The array content should be filled with the specified value.", expectedArray, resultArray);
+
+        // 2. Verify the method returns the same array instance, as per the contract.
+        assertSame("The method should return the same array instance that was passed in.", array, resultArray);
     }
 }
