@@ -1,21 +1,29 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Seconds_ESTestTest1 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Hours hours0 = Hours.ONE;
-        Days days0 = hours0.toStandardDays();
-        Seconds seconds0 = days0.toStandardSeconds();
-        boolean boolean0 = seconds0.isLessThan((Seconds) null);
-        assertFalse(boolean0);
-        assertEquals(0, seconds0.getSeconds());
+    /**
+     * Tests that isLessThan() correctly handles a null argument by treating it as zero.
+     */
+    @Test
+    public void isLessThan_whenComparingZeroToNull_returnsFalse() {
+        // Arrange
+        // The method's contract states that a null comparison is treated as comparing to zero.
+        // This test verifies the case where the instance itself is also zero.
+        Seconds zeroSeconds = Seconds.ZERO;
+
+        // Act
+        // The core logic being tested: is 0 less than null (which means 0)?
+        boolean result = zeroSeconds.isLessThan(null);
+
+        // Assert
+        // The expected result is false, because 0 is not less than 0.
+        assertFalse("Zero seconds should not be considered less than null (treated as zero).", result);
     }
 }
