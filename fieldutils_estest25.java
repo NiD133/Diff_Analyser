@@ -1,23 +1,29 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest25 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        long long0 = FieldUtils.safeDivide((-9223372036854775808L), 33L);
-        assertEquals((-279496122328932600L), long0);
+    @Test
+    public void safeDivide_withMinValueDividend_returnsCorrectQuotient() {
+        // The safeDivide method is designed to prevent overflow, which is a risk
+        // when dealing with Long.MIN_VALUE (e.g., Long.MIN_VALUE / -1).
+        // This test verifies that for a non-overflowing case involving Long.MIN_VALUE,
+        // the division result is calculated correctly.
+
+        // Arrange
+        final long dividend = Long.MIN_VALUE; // -9223372036854775808L
+        final long divisor = 33L;
+        final long expectedQuotient = -279496122328932600L; // Pre-calculated result of Long.MIN_VALUE / 33L
+
+        // Act
+        long actualQuotient = FieldUtils.safeDivide(dividend, divisor);
+
+        // Assert
+        assertEquals(expectedQuotient, actualQuotient);
     }
 }
