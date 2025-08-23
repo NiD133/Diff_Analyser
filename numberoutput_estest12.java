@@ -1,26 +1,29 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest12 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Test suite for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(2147483647L, byteArray0, 0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 1
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that {@link NumberOutput#outputLong(long, byte[], int)} throws an
+     * {@link ArrayIndexOutOfBoundsException} when the provided buffer is too small
+     * to accommodate the string representation of the number.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLongShouldThrowExceptionWhenBufferIsTooSmall() {
+        // Arrange: A value that requires more space than the buffer provides.
+        // The number Integer.MAX_VALUE (2147483647) requires 10 bytes.
+        long valueToWrite = Integer.MAX_VALUE;
+        byte[] insufficientBuffer = new byte[1];
+        int offset = 0;
+
+        // Act & Assert:
+        // Attempting to write the long into the small buffer should throw an
+        // ArrayIndexOutOfBoundsException. The @Test(expected=...) annotation
+        // handles the assertion.
+        NumberOutput.outputLong(valueToWrite, insufficientBuffer, offset);
     }
 }
