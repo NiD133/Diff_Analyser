@@ -1,37 +1,35 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest11 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test010() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.close();
-        // Undeclared exception!
+/**
+ * Tests for {@link JsonTreeReader}, focusing on its behavior after being closed.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling skipValue() on a closed reader throws an IllegalStateException.
+     */
+    @Test
+    public void skipValueOnClosedReaderThrowsIllegalStateException() throws IOException {
+        // Arrange: Create a reader for an empty JSON array and then close it.
+        JsonArray emptyJsonArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyJsonArray);
+        reader.close();
+
+        // Act & Assert: Attempting to skip a value should fail.
         try {
-            jsonTreeReader0.skipValue();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // JsonReader is closed
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
+            reader.skipValue();
+            fail("Expected an IllegalStateException because the reader is closed, but no exception was thrown.");
+        } catch (IllegalStateException expected) {
+            // Verify that the exception has the expected message.
+            assertEquals("JsonReader is closed", expected.getMessage());
         }
     }
 }
