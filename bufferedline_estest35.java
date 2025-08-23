@@ -1,31 +1,39 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest35 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(2115.863165, 2115.863165, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 2115.863165, spatialContext0);
-        BufferedLine bufferedLine1 = new BufferedLine(pointImpl0, pointImpl0, 2117.6127380359226, spatialContext0);
-        boolean boolean0 = bufferedLine0.equals(bufferedLine1);
-        assertFalse(boolean0);
-        assertFalse(bufferedLine1.equals((Object) bufferedLine0));
-        assertTrue(bufferedLine1.hasArea());
+/**
+ * Test suite for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
+
+    private final SpatialContext ctx = SpatialContext.GEO;
+
+    /**
+     * Tests that two BufferedLine objects are not equal if their buffer sizes differ,
+     * even when their underlying line segments are identical.
+     */
+    @Test
+    public void testEqualsReturnsFalseForDifferentBufferSizes() {
+        // ARRANGE: Create two BufferedLine objects that are identical except for their buffer size.
+        // Using the same start and end point effectively creates a buffered point (a circle).
+        Point commonPoint = ctx.makePoint(10, 20);
+        double bufferA = 5.0;
+        double bufferB = 10.0;
+
+        BufferedLine lineA = new BufferedLine(commonPoint, commonPoint, bufferA, ctx);
+        BufferedLine lineB = new BufferedLine(commonPoint, commonPoint, bufferB, ctx);
+
+        // ACT & ASSERT: The two lines should not be equal because their buffers differ.
+        assertNotEquals(lineA, lineB);
+
+        // Sanity check: Both lines should report having an area due to the non-zero buffer.
+        assertTrue("A line with a positive buffer should have an area.", lineA.hasArea());
+        assertTrue("A line with a positive buffer should have an area.", lineB.hasArea());
     }
 }
