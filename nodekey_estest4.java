@@ -1,25 +1,31 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class NodeKey_ESTestTest4 extends NodeKey_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NodeKey} class.
+ */
+public class NodeKeyTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        NodeKey<Integer> nodeKey0 = null;
-        try {
-            nodeKey0 = new NodeKey<Integer>(617, (Integer) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'node' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException when the
+     * 'node' argument is null, as null nodes are not permitted.
+     */
+    @Test
+    public void constructor_withNullNode_throwsIllegalArgumentException() {
+        // Arrange: Define the input arguments for the constructor call.
+        int stage = 1;
+        Integer nullNode = null;
+
+        // Act & Assert: Call the constructor and verify that the expected exception is thrown.
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> new NodeKey<>(stage, nullNode)
+        );
+
+        // Assert on the exception message to ensure the correct validation failed.
+        assertEquals("Null 'node' argument.", exception.getMessage());
     }
 }
