@@ -1,43 +1,52 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+// The original test class name and its base class are preserved.
 public class UTF8Writer_ESTestTest22 extends UTF8Writer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        // Undeclared exception!
-        try {
-            uTF8Writer0.write("REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled)", 3, 500);
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the {@code write(String, int, int)} method throws a
+     * {@link StringIndexOutOfBoundsException} when the specified length
+     * extends beyond the bounds of the source string.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class, timeout = 4000)
+    public void writeStringWithOutOfBoundsLengthShouldThrowException() throws IOException {
+        // Arrange: Set up the writer and define invalid input parameters.
+
+        // 1. The IOContext is required by the UTF8Writer constructor.
+        //    Default values are sufficient as its configuration is not relevant to this test.
+        IOContext context = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                null, // ContentReference is not used for this exception path.
+                true);
+
+        // 2. Use a simple ByteArrayOutputStream. The actual output is irrelevant
+        //    because the exception should be thrown before any writing occurs.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer writer = new UTF8Writer(context, outputStream);
+
+        // 3. Define a string and an offset/length combination that is invalid.
+        String text = "test string";
+        int offset = 3;
+        // A length that, when added to the offset, clearly exceeds the string's length.
+        int outOfBoundsLength = 500;
+
+        // Act: Attempt to write using the out-of-bounds parameters.
+        // This call is expected to throw the StringIndexOutOfBoundsException.
+        writer.write(text, offset, outOfBoundsLength);
+
+        // Assert: The test will fail automatically if the expected exception is not thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
