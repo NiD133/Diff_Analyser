@@ -1,19 +1,26 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest16 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        int int0 = jsonLocation0.getColumnNr();
-        assertEquals((-1), int0);
+    /**
+     * Verifies that the special 'Not Available' (NA) instance of JsonLocation
+     * returns -1 for the column number, as per its definition.
+     */
+    @Test
+    public void getColumnNr_forNotAvailableLocation_shouldReturnNegativeOne() {
+        // Arrange: The JsonLocation.NA constant represents an unavailable location.
+        JsonLocation notAvailableLocation = JsonLocation.NA;
+
+        // Act: Retrieve the column number from the NA location.
+        int columnNumber = notAvailableLocation.getColumnNr();
+
+        // Assert: The column number should be -1, indicating it is not available.
+        assertEquals(-1, columnNumber);
     }
 }
