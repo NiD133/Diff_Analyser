@@ -1,50 +1,80 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+/*
+ * Note: The class name "LocationTextExtractionStrategy_ESTestTest21" is an artifact of
+ * a test generation tool. In a real-world scenario, it would be renamed to something
+ * more descriptive, like "LocationTextExtractionStrategyTest".
+ */
 public class LocationTextExtractionStrategy_ESTestTest21 extends LocationTextExtractionStrategy_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        Matrix matrix0 = new Matrix(8, 2);
-        PdfOCProperties pdfOCProperties0 = new PdfOCProperties();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfOCProperties0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        LinkedList<MarkedContentInfo> linkedList0 = new LinkedList<MarkedContentInfo>();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedList0);
-        LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-        doReturn((LocationTextExtractionStrategy.TextChunkLocation) null, (LocationTextExtractionStrategy.TextChunkLocation) null).when(locationTextExtractionStrategy_TextChunkLocationStrategy0).createLocation(any(com.itextpdf.text.pdf.parser.TextRenderInfo.class), any(com.itextpdf.text.pdf.parser.LineSegment.class));
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        // Undeclared exception!
+    /**
+     * Verifies that getResultantText() throws a NullPointerException if the TextChunkLocationStrategy
+     * returns a null location.
+     *
+     * The getResultantText() method sorts the collected text chunks. This sorting relies on the
+     * TextChunk's location object. If that location is null, the comparison logic inside
+     * TextChunk.compareTo() will fail with an NPE. This test ensures that this failure mode is
+     * handled as expected.
+     */
+    @Test
+    public void getResultantText_whenLocationStrategyReturnsNull_throwsNullPointerException() {
+        // ARRANGE
+        // 1. Create a mock location strategy that always returns null. This simulates a scenario
+        // where a location cannot be determined for a piece of text.
+        LocationTextExtractionStrategy.TextChunkLocationStrategy mockLocationStrategy =
+                mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class);
+        doReturn(null).when(mockLocationStrategy).createLocation(
+                any(TextRenderInfo.class),
+                any(LineSegment.class)
+        );
+
+        // 2. Instantiate the strategy under test with our misbehaving mock.
+        LocationTextExtractionStrategy extractionStrategy = new LocationTextExtractionStrategy(mockLocationStrategy);
+
+        // 3. Create dummy render info. The specific content is not important, but a font object
+        // must be present to avoid an earlier NPE.
+        GraphicsState dummyGraphicsState = new GraphicsState();
+        dummyGraphicsState.font = new CMapAwareDocumentFont(new PdfDictionary());
+        TextRenderInfo dummyRenderInfo = new TextRenderInfo(
+                new PdfString("dummy text"),
+                dummyGraphicsState,
+                new Matrix(),
+                Collections.emptyList()
+        );
+
+        // ACT
+        // Process text twice. This adds two TextChunk objects to the strategy's internal list.
+        // Because of our mock, both chunks will have a null 'location' field.
+        extractionStrategy.renderText(dummyRenderInfo);
+        extractionStrategy.renderText(dummyRenderInfo);
+
+        // ASSERT
+        // Attempting to get the result will trigger a sort, causing the NPE.
         try {
-            locationTextExtractionStrategy0.getResultantText();
-            fail("Expecting exception: NullPointerException");
+            extractionStrategy.getResultantText();
+            fail("Expected a NullPointerException because the TextChunk's location was null.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.LocationTextExtractionStrategy$TextChunk", e);
+            // Verify the exception originates from the expected place. The TextChunk class
+            // attempts to delegate the comparison to its null location object.
+            StackTraceElement topOfStack = e.getStackTrace()[0];
+            assertEquals(
+                "The NullPointerException should originate from the TextChunk class during comparison.",
+                "com.itextpdf.text.pdf.parser.LocationTextExtractionStrategy$TextChunk",
+                topOfStack.getClassName()
+            );
         }
     }
 }
