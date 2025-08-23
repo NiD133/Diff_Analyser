@@ -1,32 +1,36 @@
 package com.google.common.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Parameter_ESTestTest4 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter}.
+ */
+public class ParameterTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Class<Object> class0 = Object.class;
-        TypeToken<Object> typeToken0 = TypeToken.of(class0);
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 2844, typeToken0, annotationArray0, (Object) null);
-        // Undeclared exception!
-        try {
-            parameter0.getDeclaredAnnotation((Class<Annotation>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that getDeclaredAnnotation() throws a NullPointerException
+     * when the annotation type argument is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getDeclaredAnnotation_whenAnnotationTypeIsNull_throwsNullPointerException() {
+        // Arrange: Create a Parameter instance. Its specific state is not relevant
+        // for this test, as we are only checking a null-check precondition.
+        TypeToken<?> dummyType = TypeToken.of(String.class);
+        Annotation[] noAnnotations = new Annotation[0];
+        int dummyPosition = 0;
+
+        // The constructor is package-private. We pass null for dependencies
+        // not used by the method's precondition check.
+        Parameter parameter = new Parameter(
+                /* declaration */ null,
+                dummyPosition,
+                dummyType,
+                noAnnotations,
+                /* annotatedType */ null);
+
+        // Act & Assert: Calling the method with a null argument should throw.
+        // The @Test(expected=...) annotation handles the assertion.
+        parameter.getDeclaredAnnotation(null);
     }
 }
