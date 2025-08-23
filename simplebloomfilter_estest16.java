@@ -1,31 +1,34 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest16 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Shape shape0 = Shape.fromNM(38, 38);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
+    /**
+     * Tests that passing a null consumer to {@code processIndices} results in a
+     * NullPointerException. This verifies the method's input validation.
+     */
+    @Test
+    public void testProcessIndicesShouldThrowExceptionForNullConsumer() {
+        // Arrange: Create a bloom filter instance. The specific shape is not
+        // relevant for this null-check test.
+        final Shape shape = Shape.fromNM(10, 1);
+        final SimpleBloomFilter bloomFilter = new SimpleBloomFilter(shape);
+
+        // Act & Assert: Call the method with null and verify the exception.
         try {
-            simpleBloomFilter0.processIndices((IntPredicate) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // consumer
-            //
-            verifyException("java.util.Objects", e);
+            bloomFilter.processIndices(null);
+            fail("A NullPointerException was expected but not thrown.");
+        } catch (final NullPointerException e) {
+            // The implementation is expected to use Objects.requireNonNull("consumer", ...),
+            // so we verify the message to confirm the check is for the correct parameter.
+            assertEquals("consumer", e.getMessage());
         }
     }
 }
