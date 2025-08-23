@@ -1,25 +1,39 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest18 extends AtomicDoubleArray_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        double[] doubleArray0 = new double[9];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        DoubleBinaryOperator doubleBinaryOperator0 = mock(DoubleBinaryOperator.class, new ViolatedAssumptionAnswer());
-        doReturn(1.0).when(doubleBinaryOperator0).applyAsDouble(anyDouble(), anyDouble());
-        double double0 = atomicDoubleArray0.accumulateAndGet(0, 0.0, doubleBinaryOperator0);
-        assertEquals(1.0, double0, 0.01);
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
+
+    @Test
+    public void accumulateAndGet_shouldApplyFunctionAndReturnUpdatedValue() {
+        // Arrange
+        // Create an array with a single element, initially 0.0.
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(1);
+        double updateValue = 5.0; // The 'x' parameter for the accumulator function.
+        double expectedResult = 42.0; // A distinct value the mock function will return.
+
+        // Create a mock accumulator function. We don't care about the inputs in this test,
+        // only that the function's result is correctly returned by accumulateAndGet.
+        DoubleBinaryOperator mockAccumulator = mock(DoubleBinaryOperator.class);
+        when(mockAccumulator.applyAsDouble(anyDouble(), anyDouble())).thenReturn(expectedResult);
+
+        // Act
+        // Call the method under test. It should apply the mockAccumulator and return its result.
+        double actualResult = atomicArray.accumulateAndGet(0, updateValue, mockAccumulator);
+
+        // Assert
+        // Verify that the method returned the value produced by our mock function.
+        // A delta of 0.0 asserts for bit-wise equality.
+        assertEquals(expectedResult, actualResult, 0.0);
     }
 }
