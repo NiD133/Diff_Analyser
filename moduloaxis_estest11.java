@@ -1,46 +1,57 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest11 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        moduloAxis0.resizeRange((double) 2.0F);
-        moduloAxis0.setInverted(true);
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double(0.0F, 500, 2.0F, 0.05);
-        RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
-        double double0 = moduloAxis0.valueToJava2D((-4.0), rectangle2D_Double0, rectangleEdge0);
-        assertFalse(moduloAxis0.isAutoRange());
-        assertEquals(500.05, double0, 0.01);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+public class ModuloAxis_ESTestTest11 { // Retaining original class name for context
+
+    /**
+     * Verifies that valueToJava2D correctly maps a data value to the bottom edge
+     * of the plotting area when the axis has been resized and inverted.
+     */
+    @Test
+    public void valueToJava2D_whenAxisIsInvertedAndResized_mapsValueToBottomEdge() {
+        // ARRANGE
+        // 1. Setup a ModuloAxis with a fixed data range of [0.0, 1.0].
+        // The axis initially has a visible range that matches the fixed range.
+        Range fixedRange = new Range(0.0, 1.0);
+        ModuloAxis axis = new ModuloAxis("Test Modulo Axis", fixedRange);
+
+        // 2. Double the visible range. The range is expanded around its center (0.5),
+        // resulting in a new visible range of [-0.5, 1.5].
+        axis.resizeRange(2.0);
+        assertFalse("Resizing the range should disable auto-ranging", axis.isAutoRange());
+
+        // 3. Invert the axis. For a vertical axis, this means the minimum value
+        // is at the top of the screen and the maximum value is at the bottom.
+        axis.setInverted(true);
+
+        // 4. Define the plotting area on the screen. For a vertical axis on the LEFT edge,
+        // the relevant coordinates are Y=500 (top) to Y=500.05 (bottom).
+        Rectangle2D dataArea = new Rectangle2D.Double(0.0, 500.0, 2.0, 0.05);
+        RectangleEdge edge = RectangleEdge.LEFT;
+
+        // 5. Define the input value and the expected coordinate.
+        // The value -4.0 is outside the axis range. The ModuloAxis should map it
+        // to a value within its range before converting to a screen coordinate.
+        double valueToMap = -4.0;
+
+        // For an inverted vertical axis, the maximum value of the axis range (1.5)
+        // maps to the bottom of the data area (y + height). This test asserts
+        // that the input value maps to this bottom edge coordinate.
+        double expectedCoordinate = dataArea.getMaxY(); // 500.05
+
+        // ACT
+        double actualCoordinate = axis.valueToJava2D(valueToMap, dataArea, edge);
+
+        // ASSERT
+        assertEquals("The data value should map to the bottom edge of the data area",
+                expectedCoordinate, actualCoordinate, 0.01);
     }
 }
