@@ -1,66 +1,107 @@
+/* ======================================================
+ * JFreeChart : a chart library for the Java(tm) platform
+ * ======================================================
+ *
+ * (C) Copyright 2000-present, by David Gilbert and Contributors.
+ *
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
+ *
+ * -------------------------------------
+ * SymbolicXYItemLabelGeneratorTest.java
+ * -------------------------------------
+ * (C) Copyright 2003-present, by David Gilbert and Contributors.
+ *
+ * Original Author:  David Gilbert;
+ * Contributor(s):   -;
+ *
+ */
+
 package org.jfree.chart.labels;
 
 import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link SymbolicXYItemLabelGenerator} class.
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class.
  */
 public class SymbolicXYItemLabelGeneratorTest {
 
     /**
-     * Verifies that two default instances of SymbolicXYItemLabelGenerator are equal.
+     * Tests the equals method.
      */
     @Test
     public void testEquals() {
-        SymbolicXYItemLabelGenerator generator1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator generator2 = new SymbolicXYItemLabelGenerator();
-        assertEquals(generator1, generator2, "Two default instances should be equal.");
-        assertEquals(generator2, generator1, "Equality should be symmetric.");
+        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
+        SymbolicXYItemLabelGenerator g2 = new SymbolicXYItemLabelGenerator();
+        assertEquals(g1, g2);
+        assertEquals(g2, g1);
     }
 
     /**
-     * Ensures that the hashCode method is consistent with equals.
+     * Simple check that hashCode is implemented.
      */
     @Test
     public void testHashCode() {
-        SymbolicXYItemLabelGenerator generator1 = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator generator2 = new SymbolicXYItemLabelGenerator();
-        assertEquals(generator1, generator2, "Two default instances should be equal.");
-        assertEquals(generator1.hashCode(), generator2.hashCode(), "Equal instances should have the same hash code.");
+        SymbolicXYItemLabelGenerator g1
+                = new SymbolicXYItemLabelGenerator();
+        SymbolicXYItemLabelGenerator g2
+                = new SymbolicXYItemLabelGenerator();
+        assertEquals(g1, g2);
+        assertEquals(g1.hashCode(), g2.hashCode());
     }
 
     /**
-     * Confirms that cloning a SymbolicXYItemLabelGenerator creates a distinct but equal object.
+     * Confirm that cloning works.
      */
     @Test
     public void testCloning() throws CloneNotSupportedException {
-        SymbolicXYItemLabelGenerator original = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator clone = CloneUtils.clone(original);
-        assertNotSame(original, clone, "Cloned instance should be a different object.");
-        assertSame(original.getClass(), clone.getClass(), "Cloned instance should be of the same class.");
-        assertEquals(original, clone, "Cloned instance should be equal to the original.");
+        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
+        SymbolicXYItemLabelGenerator g2 = CloneUtils.clone(g1);
+        assertNotSame(g1, g2);
+        assertSame(g1.getClass(), g2.getClass());
+        assertEquals(g1, g2);
     }
 
     /**
-     * Verifies that SymbolicXYItemLabelGenerator implements the PublicCloneable interface.
+     * Check to ensure that this class implements PublicCloneable.
      */
     @Test
     public void testPublicCloneable() {
-        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
-        assertTrue(generator instanceof PublicCloneable, "Instance should implement PublicCloneable.");
+        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
+        assertTrue(g1 instanceof PublicCloneable);
     }
 
     /**
-     * Tests serialization and deserialization of a SymbolicXYItemLabelGenerator instance.
+     * Serialize an instance, restore it, and check for equality.
      */
     @Test
     public void testSerialization() {
-        SymbolicXYItemLabelGenerator original = new SymbolicXYItemLabelGenerator();
-        SymbolicXYItemLabelGenerator deserialized = TestUtils.serialised(original);
-        assertEquals(original, deserialized, "Deserialized instance should be equal to the original.");
+        SymbolicXYItemLabelGenerator g1 = new SymbolicXYItemLabelGenerator();
+        SymbolicXYItemLabelGenerator g2 = TestUtils.serialised(g1);
+        assertEquals(g1, g2);
     }
+
 }
