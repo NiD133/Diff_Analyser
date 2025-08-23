@@ -1,31 +1,32 @@
 package org.mockito.internal.exceptions.stacktrace;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class StackTraceFilter_ESTestTest3 extends StackTraceFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link StackTraceFilter}.
+ */
+public class StackTraceFilterTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
-        MockThrowable mockThrowable0 = new MockThrowable();
-        StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[8];
-        StackTraceElement stackTraceElement0 = new StackTraceElement("A", "$cbz1,wrBLR'*'t`%<", "$cbz1,wrBLR'*'t`%<", 6);
-        stackTraceElementArray0[0] = stackTraceElement0;
-        stackTraceElementArray0[1] = stackTraceElementArray0[0];
-        stackTraceElementArray0[2] = stackTraceElementArray0[0];
-        stackTraceElementArray0[3] = stackTraceElementArray0[0];
-        stackTraceElementArray0[4] = stackTraceElementArray0[3];
-        stackTraceElementArray0[5] = stackTraceElementArray0[1];
-        stackTraceElementArray0[6] = stackTraceElementArray0[4];
-        stackTraceElementArray0[7] = stackTraceElementArray0[4];
-        mockThrowable0.setStackTrace(stackTraceElementArray0);
-        StackTraceElement stackTraceElement1 = stackTraceFilter0.filterFirst(mockThrowable0, true);
-        assertFalse(stackTraceElement1.isNativeMethod());
+    private final StackTraceFilter stackTraceFilter = new StackTraceFilter();
+
+    @Test
+    public void filterFirstShouldReturnFirstElementWhenStackTraceIsClean() {
+        // Arrange: Create a stack trace that does not contain any Mockito-internal frames.
+        // This represents a "clean" stack trace from the perspective of the filter.
+        StackTraceElement userCodeElement = new StackTraceElement(
+            "com.example.myapp.MyService", "businessLogic", "MyService.java", 42
+        );
+        StackTraceElement[] cleanStackTrace = { userCodeElement };
+
+        Throwable throwable = new Throwable();
+        throwable.setStackTrace(cleanStackTrace);
+
+        // Act: Call the method under test.
+        StackTraceElement firstFilteredElement = stackTraceFilter.filterFirst(throwable, true);
+
+        // Assert: The filter should return the first element because it's not internal Mockito code.
+        assertSame("Expected the first element of the clean stack trace to be returned",
+                     userCodeElement, firstFilteredElement);
     }
 }
