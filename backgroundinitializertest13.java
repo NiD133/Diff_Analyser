@@ -1,25 +1,22 @@
 package org.apache.commons.lang3.concurrent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.lang3.AbstractLangTest;
 import org.apache.commons.lang3.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
-public class BackgroundInitializerTestTest13 extends AbstractLangTest {
+// The class was renamed for clarity, as the original name 'BackgroundInitializerTestTest13'
+// appeared to be an artifact of test extraction.
+public class BackgroundInitializerTest extends AbstractLangTest {
 
     /**
      * Helper method for checking whether the initialize() method was correctly
@@ -48,26 +45,18 @@ public class BackgroundInitializerTestTest13 extends AbstractLangTest {
      */
     protected static class AbstractBackgroundInitializerTestImpl extends BackgroundInitializer<CloseableCounter> {
 
-        /**
-         * An exception to be thrown by initialize().
-         */
+        /** An exception to be thrown by initialize(). */
         Exception ex;
 
-        /**
-         * A flag whether the background task should sleep a while.
-         */
+        /** A flag whether the background task should sleep a while. */
         boolean shouldSleep;
 
-        /**
-         * A latch tests can use to control when initialize completes.
-         */
+        /** A latch tests can use to control when initialize completes. */
         final CountDownLatch latch = new CountDownLatch(1);
 
         boolean waitForLatch;
 
-        /**
-         * An object containing the state we are testing
-         */
+        /** An object containing the state we are testing. */
         CloseableCounter counter = new CloseableCounter();
 
         AbstractBackgroundInitializerTestImpl() {
@@ -111,15 +100,11 @@ public class BackgroundInitializerTestTest13 extends AbstractLangTest {
 
     protected static class CloseableCounter {
 
-        /**
-         * The number of invocations of initialize().
-         */
-        AtomicInteger initializeCalls = new AtomicInteger();
+        /** The number of invocations of initialize(). */
+        final AtomicInteger initializeCalls = new AtomicInteger();
 
-        /**
-         * Has the close consumer successfully reached this object.
-         */
-        AtomicBoolean closed = new AtomicBoolean();
+        /** Has the close consumer successfully reached this object. */
+        final AtomicBoolean closed = new AtomicBoolean();
 
         public void close() {
             closed.set(true);
@@ -155,13 +140,23 @@ public class BackgroundInitializerTestTest13 extends AbstractLangTest {
     }
 
     /**
-     * Tests isStarted() after the background task has finished.
+     * Tests that isStarted() returns true even after the background task has completed.
      */
     @Test
-    void testIsStartedAfterGet() throws ConcurrentException {
-        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
-        init.start();
-        checkInitialize(init);
-        assertTrue(init.isStarted(), "Not started");
+    void isStarted_shouldReturnTrue_afterInitializationIsComplete() throws ConcurrentException {
+        // Arrange: Create a test implementation of BackgroundInitializer.
+        final AbstractBackgroundInitializerTestImpl initializer = getBackgroundInitializerTestImpl();
+
+        // Act: Start the initializer and wait for it to complete by calling get().
+        initializer.start();
+        final CloseableCounter result = initializer.get(); // This call blocks until initialization is done.
+
+        // Assert: Verify the state after completion.
+        // First, confirm that initialization ran successfully as a precondition.
+        assertNotNull(result, "The result of initialization should not be null.");
+        assertEquals(1, result.getInitializeCalls(), "The initialize() method should have been called exactly once.");
+
+        // Then, assert the main point of the test: isStarted() should still be true.
+        assertTrue(initializer.isStarted(), "isStarted() should return true after the background task has finished.");
     }
 }
