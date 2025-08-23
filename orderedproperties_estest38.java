@@ -1,61 +1,44 @@
 package org.apache.commons.collections4.properties;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
 import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OrderedProperties_ESTestTest38 extends OrderedProperties_ESTest_scaffolding {
+import java.util.Enumeration;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Enumeration<Object> enumeration0 = orderedProperties0.keys();
-        Transformer<Object, Object> transformer0 = CloneTransformer.cloneTransformer();
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Tests for {@link OrderedProperties}.
+ */
+public class OrderedPropertiesTest {
+
+    /**
+     * Tests that computeIfAbsent propagates exceptions from the mapping function.
+     * Specifically, it verifies that using a CloneTransformer with a non-cloneable key
+     * results in an IllegalArgumentException.
+     */
+    @Test
+    public void computeIfAbsentWithCloneTransformerShouldThrowExceptionForNonCloneableKey() {
+        // Arrange: Create properties, a non-cloneable key, and a transformer that requires a cloneable input.
+        final OrderedProperties properties = new OrderedProperties();
+        
+        // The key must not be present in the map for the mapping function (transformer) to be called.
+        // An Enumeration is a good example of a non-cloneable object.
+        final Enumeration<Object> nonCloneableKey = properties.keys();
+        
+        // The CloneTransformer will attempt to clone its input when invoked.
+        final Transformer<Object, Object> cloneTransformer = CloneTransformer.cloneTransformer();
+
+        // Act & Assert: Expect an IllegalArgumentException because the key cannot be cloned.
         try {
-            orderedProperties0.computeIfAbsent(enumeration0, transformer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The prototype must be cloneable via a public clone method
-            //
-            verifyException("org.apache.commons.collections4.functors.PrototypeFactory", e);
+            properties.computeIfAbsent(nonCloneableKey, cloneTransformer);
+            fail("Expected an IllegalArgumentException to be thrown.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception is the one thrown by the cloning logic.
+            final String expectedMessage = "The prototype must be cloneable via a public clone method";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
