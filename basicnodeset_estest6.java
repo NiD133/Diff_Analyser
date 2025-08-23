@@ -1,30 +1,24 @@
 package org.apache.commons.jxpath;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BasicNodeSet_ESTestTest6 extends BasicNodeSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BasicNodeSet} class.
+ */
+public class BasicNodeSetTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        basicNodeSet0.add((Pointer) null);
-        // Undeclared exception!
-        try {
-            basicNodeSet0.getNodes();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.stream.ReferencePipeline$3$1", e);
-        }
+    @Test(expected = NullPointerException.class)
+    public void getNodesShouldThrowNullPointerExceptionWhenSetContainsNullPointer() {
+        // Arrange: Create a BasicNodeSet and add a null pointer to it.
+        // The getNodes() method is not designed to handle null pointers in its internal list.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+        nodeSet.add((Pointer) null);
+
+        // Act: Attempt to retrieve the nodes.
+        // This action is expected to throw a NullPointerException.
+        nodeSet.getNodes();
+
+        // Assert: The test framework implicitly asserts that a NullPointerException was thrown.
+        // If no exception or a different one is thrown, the test will fail.
     }
 }
