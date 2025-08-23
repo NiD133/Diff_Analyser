@@ -1,27 +1,32 @@
 package org.jfree.chart.labels;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.time.chrono.ChronoLocalDate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IntervalCategoryToolTipGenerator_ESTestTest11 extends IntervalCategoryToolTipGenerator_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the {@link IntervalCategoryToolTipGenerator} class.
+ */
+public class IntervalCategoryToolTipGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        NumberFormat numberFormat0 = NumberFormat.getPercentInstance();
-        IntervalCategoryToolTipGenerator intervalCategoryToolTipGenerator0 = new IntervalCategoryToolTipGenerator("Te{[wtf@3LG|<`-", numberFormat0);
-        boolean boolean0 = intervalCategoryToolTipGenerator0.equals("Te{[wtf@3LG|<`-");
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when the generator is
+     * compared with an object of an incompatible type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange: Create an instance of the tooltip generator.
+        String labelFormat = "({0}, {1}) = {3} - {4}";
+        NumberFormat formatter = NumberFormat.getPercentInstance();
+        IntervalCategoryToolTipGenerator generator = new IntervalCategoryToolTipGenerator(labelFormat, formatter);
+
+        // An object of a different type to compare against.
+        Object otherObject = "Not a IntervalCategoryToolTipGenerator";
+
+        // Act: Compare the generator with the other object.
+        boolean isEqual = generator.equals(otherObject);
+
+        // Assert: The result should be false.
+        assertFalse(isEqual);
     }
 }
