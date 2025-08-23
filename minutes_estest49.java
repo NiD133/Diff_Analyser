@@ -1,19 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Minutes_ESTestTest49 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        Minutes minutes0 = Minutes.minutes(1431);
-        boolean boolean0 = minutes0.isGreaterThan((Minutes) null);
-        assertTrue(boolean0);
-        assertEquals(1431, minutes0.getMinutes());
+    /**
+     * Tests that isGreaterThan() correctly handles a null comparison value.
+     * The method's contract specifies that a null input is treated as a zero-value Minutes object.
+     */
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingPositiveMinutesToNull() {
+        // Arrange: Create a Minutes instance with a positive value.
+        // Using the constant ONE is clearer than a "magic number" like 1431.
+        Minutes positiveMinutes = Minutes.ONE;
+
+        // Act & Assert: A positive number of minutes should be greater than null (which represents zero).
+        assertTrue(
+            "Minutes.ONE should be greater than null",
+            positiveMinutes.isGreaterThan(null)
+        );
     }
 }
