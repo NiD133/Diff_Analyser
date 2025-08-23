@@ -1,18 +1,29 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest1 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for {@link TokenQueue}.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("%>-8wJ/e4'{T9H");
-        String string0 = tokenQueue0.consumeCssIdentifier();
-        assertEquals("", string0);
+    @Test
+    public void consumeCssIdentifierShouldReturnEmptyStringWhenQueueStartsWithInvalidCharacter() {
+        // Arrange
+        // A valid CSS identifier cannot start with '%'. The rest of the string is irrelevant
+        // for this test case, as the method should stop immediately.
+        String input = "%-not-a-valid-identifier";
+        TokenQueue queue = new TokenQueue(input);
+
+        // Act
+        String consumedIdentifier = queue.consumeCssIdentifier();
+
+        // Assert
+        // The method should not consume any characters and return an empty string.
+        assertEquals("Expected an empty string for an invalid identifier start", "", consumedIdentifier);
+        
+        // The queue's internal state should remain unchanged.
+        assertEquals("Queue should not be advanced on a failed consumption", input, queue.remainder());
     }
 }
