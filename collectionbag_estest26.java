@@ -1,53 +1,51 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
 import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest26 extends CollectionBag_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        TreeBag<Object> treeBag0 = new TreeBag<Object>();
-        Class<Object>[] classArray0 = (Class<Object>[]) Array.newInstance(Class.class, 0);
-        InvokerTransformer<Object, Object> invokerTransformer0 = new InvokerTransformer<Object, Object>("R5.G^N;x-<AR<<c", classArray0, classArray0);
-        TransformedSortedBag<Object> transformedSortedBag0 = TransformedSortedBag.transformingSortedBag((SortedBag<Object>) treeBag0, (Transformer<? super Object, ?>) invokerTransformer0);
-        CollectionBag<Object> collectionBag0 = new CollectionBag<Object>(transformedSortedBag0);
-        Object object0 = new Object();
-        // Undeclared exception!
+/**
+ * This test class contains an improved version of a test for {@link CollectionBag}.
+ * The original test was auto-generated and lacked clarity.
+ */
+public class CollectionBag_ESTestTest26 { // Note: Class name kept for consistency.
+
+    /**
+     * Tests that if the underlying decorated bag throws a RuntimeException during an add operation,
+     * the CollectionBag correctly propagates that exception.
+     */
+    @Test
+    public void addShouldPropagateExceptionFromDecoratedBag() {
+        // Arrange: Create a decorated bag that is designed to throw a RuntimeException
+        // when an element is added. This is achieved by using a TransformedSortedBag
+        // with an InvokerTransformer that attempts to call a method that does not exist.
+
+        final String nonExistentMethodName = "aMethodThatDoesNotExist";
+        final Transformer<Object, Object> failingTransformer =
+                new InvokerTransformer<>(nonExistentMethodName, null, null);
+
+        final SortedBag<Object> underlyingBag = new TreeBag<>();
+        final Bag<Object> decoratedBagThatThrows =
+                TransformedSortedBag.transformingSortedBag(underlyingBag, failingTransformer);
+
+        // The CollectionBag is the class under test. It wraps the faulty decorated bag.
+        final Bag<Object> collectionBag = new CollectionBag<>(decoratedBagThatThrows);
+        final Object elementToAdd = new Object();
+
+        // Act & Assert: Verify that calling add() on the CollectionBag propagates the expected exception.
         try {
-            collectionBag0.add(object0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // InvokerTransformer: The method 'R5.G^N;x-<AR<<c' on 'class java.lang.Object' does not exist
-            //
-            verifyException("org.apache.commons.collections4.functors.InvokerTransformer", e);
+            collectionBag.add(elementToAdd);
+            fail("Expected a RuntimeException to be thrown because the underlying transformer should fail.");
+        } catch (final RuntimeException e) {
+            // Verify that the exception is the one thrown by InvokerTransformer.
+            final String expectedMessage = "InvokerTransformer: The method '" + nonExistentMethodName +
+                                           "' on 'class java.lang.Object' does not exist";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
