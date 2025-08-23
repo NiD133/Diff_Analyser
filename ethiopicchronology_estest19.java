@@ -1,21 +1,24 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeConstants;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class EthiopicChronology_ESTestTest19 extends EthiopicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the EthiopicChronology class.
+ */
+public class EthiopicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        EthiopicChronology ethiopicChronology1 = (EthiopicChronology) ethiopicChronology0.withZone(dateTimeZone0);
-        assertEquals(1, EthiopicChronology.EE);
+    /**
+     * Tests that the Ethiopic Era (EE) constant has the correct value,
+     * which should be equivalent to the Christian Era (CE).
+     */
+    @Test
+    public void testEEConstant_isEquivalentToCE() {
+        // The source code for EthiopicChronology defines its era constant 'EE'
+        // as being equivalent to the standard Christian Era 'CE'.
+        // This test verifies that this relationship holds.
+        assertEquals("The Ethiopic Era (EE) should be equal to the Christian Era (CE)",
+                DateTimeConstants.CE, EthiopicChronology.EE);
     }
 }
