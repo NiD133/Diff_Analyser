@@ -1,23 +1,27 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class ForwardingQueue_ESTestTest7 extends ForwardingQueue_ESTest_scaffolding {
+/**
+ * Tests for {@link ForwardingQueue}.
+ */
+public class ForwardingQueueTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(1937);
-        Object object0 = new Object();
-        evictingQueue0.standardOffer(object0);
-        Object object1 = evictingQueue0.element();
-        assertTrue(evictingQueue0.contains(object1));
+    @Test
+    public void element_retrievesHeadWithoutRemovingIt() {
+        // Arrange: Create a queue with one element.
+        // We use EvictingQueue as a concrete implementation of ForwardingQueue for this test.
+        EvictingQueue<String> queue = EvictingQueue.create(10);
+        String headElement = "first-in-queue";
+        queue.add(headElement);
+
+        // Act: Retrieve the head of the queue using element().
+        String retrievedElement = queue.element();
+
+        // Assert: Verify the correct element was returned and the queue remains unchanged.
+        assertSame("element() should return the head of the queue.", headElement, retrievedElement);
+        assertEquals("The queue size should not change after calling element().", 1, queue.size());
     }
 }
