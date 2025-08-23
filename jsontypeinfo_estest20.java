@@ -1,26 +1,40 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class JsonTypeInfo_ESTestTest20 extends JsonTypeInfo_ESTest_scaffolding {
+/**
+ * This test class evaluates the behavior of the {@link JsonTypeInfo.Value} class.
+ * Note: The original test was auto-generated and has been rewritten for clarity.
+ */
+public class JsonTypeInfo_ESTestTest20 {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JsonTypeInfo.Id jsonTypeInfo_Id0 = JsonTypeInfo.Id.MINIMAL_CLASS;
-        JsonTypeInfo.As jsonTypeInfo_As0 = JsonTypeInfo.As.WRAPPER_OBJECT;
-        Class<Object> class0 = Object.class;
-        Boolean boolean0 = Boolean.valueOf("@2LLQRbW9{J2*\"1GY");
-        JsonTypeInfo.Value jsonTypeInfo_Value0 = JsonTypeInfo.Value.construct(jsonTypeInfo_Id0, jsonTypeInfo_As0, "@2LLQRbW9{J2*\"1GY", class0, false, boolean0);
-        JsonTypeInfo.Value jsonTypeInfo_Value1 = jsonTypeInfo_Value0.withIdType(jsonTypeInfo_Id0);
-        assertFalse(jsonTypeInfo_Value1.getIdVisible());
-        assertEquals("@2LLQRbW9{J2*\"1GY", jsonTypeInfo_Value1.getPropertyName());
-        assertSame(jsonTypeInfo_Value1, jsonTypeInfo_Value0);
+    /**
+     * Verifies that calling {@code withIdType()} with the same {@code Id} value
+     * returns the original {@code JsonTypeInfo.Value} instance.
+     * This confirms an identity-based optimization where a new object is not
+     * created if the state does not change.
+     */
+    @Test
+    public void withIdType_shouldReturnSameInstance_whenIdTypeIsUnchanged() {
+        // Arrange
+        JsonTypeInfo.Id currentIdType = JsonTypeInfo.Id.MINIMAL_CLASS;
+        JsonTypeInfo.Value initialValue = JsonTypeInfo.Value.construct(
+                currentIdType,
+                JsonTypeInfo.As.WRAPPER_OBJECT,
+                "testProperty",
+                Object.class, // defaultImpl
+                false,        // idVisible
+                false         // requireTypeIdForSubtypes
+        );
+
+        // Act
+        // Call the 'wither' method with the same Id type it already has.
+        JsonTypeInfo.Value resultValue = initialValue.withIdType(currentIdType);
+
+        // Assert
+        // The method should return the exact same instance, not a new one.
+        assertSame("Expected withIdType to return the same instance for an unchanged value.",
+                initialValue, resultValue);
     }
 }
