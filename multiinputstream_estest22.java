@@ -1,28 +1,26 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest22 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        int int0 = multiInputStream0.available();
-        assertEquals(0, int0);
+    @Test
+    public void available_withNoSources_returnsZero() throws IOException {
+        // Arrange: Create an iterator that contains no ByteSource elements.
+        Iterator<ByteSource> emptyIterator = Collections.emptyIterator();
+
+        // Act: Create a MultiInputStream from the empty iterator.
+        MultiInputStream stream = new MultiInputStream(emptyIterator);
+
+        // Assert: The number of available bytes should be 0, as there are no underlying streams.
+        assertEquals(0, stream.available());
     }
 }
