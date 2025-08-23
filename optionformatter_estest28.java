@@ -1,23 +1,28 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest28 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Option option0 = new Option("NO_ARGS_ALLOWED", "iRi[{-|Um");
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getDescription();
-        assertEquals("iRi[{-|Um", string0);
+    @Test
+    public void testGetDescriptionShouldReturnTheConfiguredDescription() {
+        // Arrange: Create an option with a clear, human-readable description.
+        final String expectedDescription = "The file to process.";
+        final Option option = new Option("f", expectedDescription);
+        
+        // Create a formatter for the option using default settings.
+        final OptionFormatter formatter = OptionFormatter.from(option);
+
+        // Act: Retrieve the description from the formatter.
+        final String actualDescription = formatter.getDescription();
+
+        // Assert: The returned description should match the one provided to the Option.
+        assertEquals(expectedDescription, actualDescription);
     }
 }
