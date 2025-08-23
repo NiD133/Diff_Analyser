@@ -1,42 +1,40 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class MinutesTestTest2 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
+/**
+ * Test cases for the factory methods of the {@link Minutes} class.
+ */
+public class MinutesTest {
 
     //-----------------------------------------------------------------------
-    public void testFactory_minutes_int() {
-        assertSame(Minutes.ZERO, Minutes.minutes(0));
-        assertSame(Minutes.ONE, Minutes.minutes(1));
-        assertSame(Minutes.TWO, Minutes.minutes(2));
-        assertSame(Minutes.THREE, Minutes.minutes(3));
-        assertSame(Minutes.MAX_VALUE, Minutes.minutes(Integer.MAX_VALUE));
-        assertSame(Minutes.MIN_VALUE, Minutes.minutes(Integer.MIN_VALUE));
-        assertEquals(-1, Minutes.minutes(-1).getMinutes());
-        assertEquals(4, Minutes.minutes(4).getMinutes());
+    // Test factory method: minutes(int)
+    //-----------------------------------------------------------------------
+
+    /**
+     * Tests that the minutes(int) factory method returns cached, singleton
+     * instances for commonly used constant values.
+     */
+    @Test
+    public void minutes_whenCalledWithConstantValue_returnsCachedInstance() {
+        assertSame("Should return ZERO singleton for 0", Minutes.ZERO, Minutes.minutes(0));
+        assertSame("Should return ONE singleton for 1", Minutes.ONE, Minutes.minutes(1));
+        assertSame("Should return TWO singleton for 2", Minutes.TWO, Minutes.minutes(2));
+        assertSame("Should return THREE singleton for 3", Minutes.THREE, Minutes.minutes(3));
+        assertSame("Should return MAX_VALUE singleton", Minutes.MAX_VALUE, Minutes.minutes(Integer.MAX_VALUE));
+        assertSame("Should return MIN_VALUE singleton", Minutes.MIN_VALUE, Minutes.minutes(Integer.MIN_VALUE));
+    }
+
+    /**
+     * Tests that the minutes(int) factory method creates a new instance with the
+     * correct value for inputs that do not have a cached constant.
+     */
+    @Test
+    public void minutes_whenCalledWithNonConstantValue_returnsCorrectInstance() {
+        assertEquals("Should create a new instance for -1", -1, Minutes.minutes(-1).getMinutes());
+        assertEquals("Should create a new instance for 4", 4, Minutes.minutes(4).getMinutes());
     }
 }
