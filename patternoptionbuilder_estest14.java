@@ -1,18 +1,22 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest14 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('+');
-        assertNotNull(class0);
-        assertEquals("class java.lang.Class", class0.toString());
+    @Test
+    public void getValueTypeShouldReturnClassTypeForPlusCharacter() {
+        // The '+' character in a pattern string signifies that the option's argument
+        // should be treated as a class name.
+
+        // Act: Call the method under test with the '+' character.
+        Class<?> valueType = PatternOptionBuilder.getValueType('+');
+
+        // Assert: Verify that the returned type is indeed java.lang.Class.
+        assertEquals(Class.class, valueType);
     }
 }
