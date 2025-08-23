@@ -1,24 +1,33 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
+import static org.junit.Assert.assertFalse;
+
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest45 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        boolean boolean0 = FileTimes.isUnixTime(9223372036854775790L);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link FileTimes#isUnixTime(long)} returns false for a number of seconds
+     * that exceeds the maximum value representable by {@link Instant}.
+     * <p>
+     * A {@code FileTime} is internally based on {@code Instant}, so its range of supported
+     * seconds is limited by {@code Instant.MIN.getEpochSecond()} and {@code Instant.MAX.getEpochSecond()}.
+     * This test verifies the behavior for a value just outside this upper boundary.
+     * </p>
+     */
+    @Test
+    public void isUnixTime_shouldReturnFalse_whenSecondsExceedMaxSupportedValue() {
+        // Arrange: Define a value that is one second greater than the maximum supported by Instant.
+        final long secondsBeyondMax = Instant.MAX.getEpochSecond() + 1L;
+
+        // Act: Check if this out-of-range value is considered a valid Unix time.
+        final boolean isWithinRange = FileTimes.isUnixTime(secondsBeyondMax);
+
+        // Assert: The method should correctly identify the value as out of range.
+        assertFalse("A seconds value greater than Instant.MAX.getEpochSecond() should be considered invalid.", isWithinRange);
     }
 }
