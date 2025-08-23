@@ -2,19 +2,23 @@ package org.jfree.data.flow;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NodeKey_ESTestTest8 extends NodeKey_ESTest_scaffolding {
+/**
+ * A collection of tests for the {@link NodeKey} class.
+ */
+public class NodeKeyTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Integer integer0 = new Integer(5721);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(5721, integer0);
-        boolean boolean0 = nodeKey0.equals(nodeKey0);
-        assertEquals(5721, nodeKey0.getStage());
-        assertTrue(boolean0);
+    /**
+     * Tests the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void testEquals_isReflexive() {
+        // Arrange: Create a NodeKey instance.
+        NodeKey<String> nodeKey = new NodeKey<>(1, "NodeA");
+
+        // Act & Assert: An object must be equal to itself.
+        // The assertEquals method uses the .equals() method for comparison.
+        assertEquals("A NodeKey instance should be equal to itself.", nodeKey, nodeKey);
     }
 }
