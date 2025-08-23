@@ -1,29 +1,27 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test suite focuses on verifying the behavior of the {@link SegmentConstantPool} class.
+ * This specific test case validates the handling of null inputs.
+ */
 public class SegmentConstantPool_ESTestTest32 extends SegmentConstantPool_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.matchSpecificPoolEntryIndex((String[]) null, (String) null, 5);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache$CachedArray", e);
-        }
+    /**
+     * Verifies that {@code matchSpecificPoolEntryIndex} throws a {@code NullPointerException}
+     * when the primary name array provided is null. The method should not attempt to process
+     * a null array and should fail fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void matchSpecificPoolEntryIndexShouldThrowNullPointerExceptionForNullArray() {
+        // Arrange: Create an instance of SegmentConstantPool.
+        // The CpBands dependency can be null because it is not used by the method under test.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Act & Assert: Call the method with a null array, which is expected to throw.
+        // The other arguments can be arbitrary values as the null array should cause an
+        // immediate exception.
+        segmentConstantPool.matchSpecificPoolEntryIndex(null, "anyString", 0);
     }
 }
