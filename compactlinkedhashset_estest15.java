@@ -1,34 +1,43 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class CompactLinkedHashSet_ESTestTest15 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * This test class contains a specific test case for {@link CompactLinkedHashSet},
+ * focusing on its behavior under inconsistent internal state.
+ */
+public class CompactLinkedHashSetRefactoredTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        ImmutableSet<Locale.Category> immutableSet0 = ImmutableSet.of(locale_Category0);
-        CompactLinkedHashSet<Locale.Category> compactLinkedHashSet0 = CompactLinkedHashSet.create((Collection<? extends Locale.Category>) immutableSet0);
-        Object[] objectArray0 = new Object[0];
-        compactLinkedHashSet0.elements = objectArray0;
-        // Undeclared exception!
+    /**
+     * Verifies that toArray() throws an ArrayIndexOutOfBoundsException if the internal
+     * 'elements' array is smaller than the set's reported size.
+     *
+     * <p>This is a white-box test that intentionally creates a corrupted state to ensure
+     * the method fails predictably rather than causing undefined behavior. Such a state
+     * should not occur in normal operation.
+     */
+    @Test
+    public void toArray_whenInternalElementsArrayIsSmallerThanSize_throwsArrayIndexOutOfBounds() {
+        // Arrange: Create a set that reports having one element.
+        CompactLinkedHashSet<String> set = CompactLinkedHashSet.create(Collections.singleton("one"));
+        assertEquals("Pre-condition: set size should be 1", 1, set.size());
+
+        // Act: Manually corrupt the internal state by replacing the backing array
+        // with an empty one. This creates an inconsistency: size() is 1, but the
+        // elements array has a length of 0.
+        set.elements = new Object[0];
+
+        // Assert: toArray() should now fail when it tries to access elements[0].
         try {
-            compactLinkedHashSet0.toArray();
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("com.google.common.collect.CompactHashSet", e);
+            set.toArray();
+            fail("Expected an ArrayIndexOutOfBoundsException due to the inconsistent internal state.");
+        } catch (ArrayIndexOutOfBoundsException expected) {
+            // The exception is expected because toArray() iterates up to size(),
+            // and accessing index 0 of an empty array is out of bounds.
+            assertEquals("The exception message should indicate the failing index.", "0", expected.getMessage());
         }
     }
 }
