@@ -1,47 +1,63 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class WeeksTestTest6 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Test cases for the {@link Weeks} class, focusing on the
+ * {@link Weeks#standardWeeksIn(ReadablePeriod)} factory method.
+ */
+public class WeeksTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void standardWeeksIn_givenNullPeriod_returnsZeroWeeks() {
+        assertEquals("A null period should result in zero weeks.",
+                     0, Weeks.standardWeeksIn(null).getWeeks());
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
+    @Test
+    public void standardWeeksIn_givenPeriodOfWeeks_returnsSameNumberOfWeeks() {
+        // Test with a zero-length period
+        assertEquals("A zero period should result in zero weeks.",
+                     0, Weeks.standardWeeksIn(Period.ZERO).getWeeks());
+
+        // Test with a period of exactly one week
+        assertEquals("A one-week period should result in one week.",
+                     1, Weeks.standardWeeksIn(Period.weeks(1)).getWeeks());
+
+        // Test with a positive number of weeks
+        assertEquals("A 123-week period should result in 123 weeks.",
+                     123, Weeks.standardWeeksIn(Period.weeks(123)).getWeeks());
+
+        // Test with a negative number of weeks
+        assertEquals("A negative 987-week period should result in -987 weeks.",
+                     -987, Weeks.standardWeeksIn(Period.weeks(-987)).getWeeks());
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void standardWeeksIn_givenPeriodOfDays_truncatesToWholeWeeks() {
+        // The method calculates the number of *complete* standard weeks.
+        // Any remainder of days is truncated.
+
+        // 13 days = 1 week and 6 days. Should truncate to 1 week.
+        assertEquals("A 13-day period should truncate to 1 week.",
+                     1, Weeks.standardWeeksIn(Period.days(13)).getWeeks());
+
+        // 14 days = exactly 2 weeks.
+        assertEquals("A 14-day period is exactly 2 weeks.",
+                     2, Weeks.standardWeeksIn(Period.days(14)).getWeeks());
+
+        // 15 days = 2 weeks and 1 day. Should truncate to 2 weeks.
+        assertEquals("A 15-day period should truncate to 2 weeks.",
+                     2, Weeks.standardWeeksIn(Period.days(15)).getWeeks());
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_standardWeeksIn_RPeriod() {
-        assertEquals(0, Weeks.standardWeeksIn((ReadablePeriod) null).getWeeks());
-        assertEquals(0, Weeks.standardWeeksIn(Period.ZERO).getWeeks());
-        assertEquals(1, Weeks.standardWeeksIn(new Period(0, 0, 1, 0, 0, 0, 0, 0)).getWeeks());
-        assertEquals(123, Weeks.standardWeeksIn(Period.weeks(123)).getWeeks());
-        assertEquals(-987, Weeks.standardWeeksIn(Period.weeks(-987)).getWeeks());
-        assertEquals(1, Weeks.standardWeeksIn(Period.days(13)).getWeeks());
-        assertEquals(2, Weeks.standardWeeksIn(Period.days(14)).getWeeks());
-        assertEquals(2, Weeks.standardWeeksIn(Period.days(15)).getWeeks());
-        try {
-            Weeks.standardWeeksIn(Period.months(1));
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void standardWeeksIn_givenPeriodWithImpreciseField_throwsIllegalArgumentException() {
+        // The standardWeeksIn() method only accepts periods with precise durations
+        // (weeks, days, hours, etc.). Months have a variable length.
+        // Therefore, passing a period containing months should fail.
+        Weeks.standardWeeksIn(Period.months(1));
     }
 }
