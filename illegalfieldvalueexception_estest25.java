@@ -2,17 +2,36 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IllegalFieldValueException_ESTestTest25 extends IllegalFieldValueException_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IllegalFieldValueException} class.
+ */
+public class IllegalFieldValueExceptionTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        IllegalFieldValueException illegalFieldValueException0 = new IllegalFieldValueException("", (Number) null, (Number) null, (Number) null);
-        illegalFieldValueException0.getDurationFieldType();
-        assertEquals("Value null for  is not supported", illegalFieldValueException0.getMessage());
+    /**
+     * Tests that the constructor using a String field name correctly initializes the exception's state,
+     * particularly when the numeric value and bounds are null.
+     */
+    @Test
+    public void testConstructorWithStringFieldNameAndNullValues() {
+        // Arrange
+        String fieldName = "";
+        String expectedMessage = "Value null for  is not supported";
+
+        // Act
+        IllegalFieldValueException exception = new IllegalFieldValueException(fieldName, null, null, null);
+
+        // Assert
+        // Verify the state of the created exception object
+        assertEquals("The exception message should be correctly formatted.", expectedMessage, exception.getMessage());
+        assertEquals("The field name should be stored correctly.", fieldName, exception.getFieldName());
+
+        // Verify that fields not set by this constructor are null
+        assertNull("The illegal number value should be null.", exception.getIllegalNumberValue());
+        assertNull("The illegal string value should be null.", exception.getIllegalStringValue());
+        assertNull("The lower bound should be null.", exception.getLowerBound());
+        assertNull("The upper bound should be null.", exception.getUpperBound());
+        assertNull("The DateTimeFieldType should be null when constructed with a string field name.", exception.getDateTimeFieldType());
+        assertNull("The DurationFieldType should be null when constructed with a string field name.", exception.getDurationFieldType());
     }
 }
