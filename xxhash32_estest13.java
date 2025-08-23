@@ -1,18 +1,36 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XXHash32_ESTestTest13 extends XXHash32_ESTest_scaffolding {
+/**
+ * Tests for the {@link XXHash32} class.
+ */
+public class XXHash32Test {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        XXHash32 xXHash32_0 = new XXHash32();
-        xXHash32_0.reset();
-        assertEquals(46947589L, xXHash32_0.getValue());
+    /**
+     * The expected hash value for an empty input using the default seed (0).
+     * This is a known-answer value for verifying the algorithm's initial state.
+     */
+    private static final long HASH_OF_EMPTY_INPUT = 46947589L;
+
+    /**
+     * Verifies that the reset() method correctly reverts the hasher's internal state
+     * to its original condition after it has been updated with data.
+     */
+    @Test
+    public void resetShouldRevertToInitialStateAfterUpdate() {
+        // Arrange: Create a hasher and update it with some data to alter its state.
+        final XXHash32 hasher = new XXHash32();
+        hasher.update(new byte[]{'a', 'b', 'c', 'd'}, 0, 4);
+
+        // Act: Reset the hasher.
+        hasher.reset();
+
+        // Assert: The hash value should now be identical to the hash of an empty input,
+        // confirming the state has been successfully reset.
+        final long hashAfterReset = hasher.getValue();
+        assertEquals("After reset, the hash value should match the initial state for an empty input.",
+                HASH_OF_EMPTY_INPUT, hashAfterReset);
     }
 }
