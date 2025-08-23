@@ -155,21 +155,26 @@ public class BackgroundInitializerTestTest17 extends AbstractLangTest {
     }
 
     /**
-     * Tests that setting an executor after start() causes an exception.
-     *
-     * @throws org.apache.commons.lang3.concurrent.ConcurrentException because the test implementation may throw it
+     * Tests that an IllegalStateException is thrown when setExternalExecutor()
+     * is called after the initializer has already been started.
      */
     @Test
-    void testSetExternalExecutorAfterStart() throws ConcurrentException, InterruptedException {
-        final AbstractBackgroundInitializerTestImpl init = getBackgroundInitializerTestImpl();
-        init.start();
-        final ExecutorService exec = Executors.newSingleThreadExecutor();
+    void setExternalExecutorShouldThrowExceptionWhenCalledAfterStart() throws ConcurrentException, InterruptedException {
+        // Arrange: Create an initializer and start it.
+        final AbstractBackgroundInitializerTestImpl initializer = getBackgroundInitializerTestImpl();
+        initializer.start();
+
+        final ExecutorService newExecutor = Executors.newSingleThreadExecutor();
         try {
-            assertThrows(IllegalStateException.class, () -> init.setExternalExecutor(exec));
-            init.get();
+            // Act & Assert: Attempting to set an executor on an active initializer should fail.
+            assertThrows(IllegalStateException.class, () -> initializer.setExternalExecutor(newExecutor));
+
+            // Allow the background task to complete to ensure a clean state for subsequent tests.
+            initializer.get();
         } finally {
-            exec.shutdown();
-            exec.awaitTermination(1, TimeUnit.SECONDS);
+            // Cleanup: Ensure the executor created for this test is shut down.
+            newExecutor.shutdown();
+            newExecutor.awaitTermination(1, TimeUnit.SECONDS);
         }
     }
 }
