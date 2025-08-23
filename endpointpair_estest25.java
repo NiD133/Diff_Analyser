@@ -1,30 +1,31 @@
 package com.google.common.graph;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class EndpointPair_ESTestTest25 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.unordered(locale_Category0, locale_Category0);
-        Locale.Category locale_Category1 = Locale.Category.FORMAT;
-        // Undeclared exception!
-        try {
-            endpointPair0.adjacentNode(locale_Category1);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // EndpointPair [DISPLAY, DISPLAY] does not contain node FORMAT
-            //
-            verifyException("com.google.common.graph.EndpointPair", e);
-        }
+    // A JUnit 4 rule for declaratively testing that code throws a specific exception.
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void adjacentNode_whenNodeNotInPair_throwsIllegalArgumentException() {
+        // Arrange: Create an endpoint pair and a node that is not part of it.
+        String node = "A";
+        EndpointPair<String> endpointPair = EndpointPair.unordered(node, node);
+        String nodeNotInPair = "C";
+
+        // Assert: Configure the expected exception type and message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("EndpointPair [A, A] does not contain node C");
+
+        // Act: Call the method under test with the node that is not in the pair.
+        // This call is expected to throw the exception configured above.
+        endpointPair.adjacentNode(nodeNotInPair);
     }
 }
