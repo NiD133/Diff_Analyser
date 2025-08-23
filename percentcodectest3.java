@@ -1,27 +1,49 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class PercentCodecTestTest3 {
+/**
+ * Tests for {@link PercentCodec} with custom configurations.
+ */
+class PercentCodecTest {
 
     @Test
-    void testConfigurablePercentEncoder() throws Exception {
-        final String input = "abc123_-.*\u03B1\u03B2";
-        final PercentCodec percentCodec = new PercentCodec("abcdef".getBytes(StandardCharsets.UTF_8), false);
-        final byte[] encoded = percentCodec.encode(input.getBytes(StandardCharsets.UTF_8));
-        final String encodedS = new String(encoded, StandardCharsets.UTF_8);
-        assertEquals("%61%62%63123_-.*%CE%B1%CE%B2", encodedS, "Configurable PercentCodec encoding test");
-        final byte[] decoded = percentCodec.decode(encoded);
-        assertEquals(new String(decoded, StandardCharsets.UTF_8), input, "Configurable PercentCodec decoding test");
+    void shouldCorrectlyEncodeAndDecodeWithCustomSafeChars() throws EncoderException, DecoderException {
+        // --- ARRANGE ---
+
+        // The input contains a mix of characters to test different encoding rules:
+        // - 'abc': Specified in the constructor to be ALWAYS encoded.
+        // - '123_-.*': URI-safe characters that should NOT be encoded.
+        // - 'αβ': Non-ASCII characters that should ALWAYS be encoded.
+        final String originalString = "abc123_-.*\u03B1\u03B2";
+
+        // The PercentCodec is configured to always encode 'a' through 'f', even though
+        // they are normally considered safe. The 'plusForSpace' flag is false.
+        final byte[] alwaysEncodeChars = "abcdef".getBytes(StandardCharsets.UTF_8);
+        final PercentCodec percentCodec = new PercentCodec(alwaysEncodeChars, false);
+
+        // Expected result after encoding:
+        // - 'a' -> %61, 'b' -> %62, 'c' -> %63
+        // - '123_-.*' -> remains unchanged
+        // - 'α' (U+03B1) -> %CE%B1 (in UTF-8)
+        // - 'β' (U+03B2) -> %CE%B2 (in UTF-8)
+        final String expectedEncodedString = "%61%62%63123_-.*%CE%B1%CE%B2";
+
+        // --- ACT & ASSERT: ENCODING ---
+        final byte[] encodedBytes = percentCodec.encode(originalString.getBytes(StandardCharsets.UTF_8));
+        final String actualEncodedString = new String(encodedBytes, StandardCharsets.UTF_8);
+
+        assertEquals(expectedEncodedString, actualEncodedString, "Encoding should handle custom safe characters and non-ASCII correctly.");
+
+        // --- ACT & ASSERT: DECODING (Round-trip check) ---
+        final byte[] decodedBytes = percentCodec.decode(encodedBytes);
+        final String roundTripString = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        assertEquals(originalString, roundTripString, "Decoding should perfectly reverse the encoding to restore the original string.");
     }
 }
