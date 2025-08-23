@@ -1,48 +1,37 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import java.time.LocalDate;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for {@link InternationalFixedChronology}.
+ * This class contains the improved test case.
+ */
 public class InternationalFixedChronology_ESTestTest11 extends InternationalFixedChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        InternationalFixedDate internationalFixedDate0 = internationalFixedChronology0.INSTANCE.dateYearDay(4314, 7);
-        assertEquals(856134L, internationalFixedDate0.toEpochDay());
-        assertEquals(365, internationalFixedDate0.lengthOfYear());
+    /**
+     * Tests that {@link InternationalFixedChronology#dateYearDay(int, int)}
+     * correctly creates a date for a given day of a non-leap year.
+     */
+    @Test
+    public void dateYearDay_forNonLeapYear_createsCorrectDate() {
+        // Arrange
+        final InternationalFixedChronology ifcChronology = InternationalFixedChronology.INSTANCE;
+        final int year = 4314; // A non-leap year (not divisible by 4)
+        final int dayOfYear = 7;
+
+        // According to its documentation, the International Fixed Calendar is aligned with the
+        // ISO calendar. The 7th day of year 4314 in IFC should correspond to Jan 7, 4314 in ISO.
+        // We use LocalDate to calculate the expected epoch day to make the test self-documenting.
+        final long expectedEpochDay = LocalDate.of(year, 1, dayOfYear).toEpochDay();
+        final int expectedLengthOfYear = 365;
+
+        // Act
+        InternationalFixedDate ifcDate = ifcChronology.dateYearDay(year, dayOfYear);
+
+        // Assert
+        assertEquals("Epoch day should match the equivalent ISO date", expectedEpochDay, ifcDate.toEpochDay());
+        assertEquals("Year 4314 should be a non-leap year with 365 days", expectedLengthOfYear, ifcDate.lengthOfYear());
     }
 }
