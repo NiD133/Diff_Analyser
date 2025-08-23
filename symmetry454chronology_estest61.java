@@ -1,51 +1,39 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Symmetry454Chronology_ESTestTest61 extends Symmetry454Chronology_ESTest_scaffolding {
+/**
+ * Tests for {@link Symmetry454Chronology}.
+ * This focuses on validating the creation of dates with invalid parameters.
+ */
+public class Symmetry454Chronology_ImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        // Undeclared exception!
+    /**
+     * Tests that creating a date with a day-of-month value that is invalid for
+     * the given month throws a DateTimeException.
+     *
+     * <p>In the Symmetry454 calendar, January is a "short" month with 28 days.
+     * This test attempts to create a date for January 35th, which should fail.
+     */
+    @Test
+    public void date_throwsException_whenDayOfMonthIsInvalidForShortMonth() {
+        // Arrange: Set up the chronology and invalid date components.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        int year = 1;
+        int month = 1; // January, a short month with 28 days
+        int invalidDayOfMonth = 35;
+
+        // Act & Assert: Attempt to create the date and verify the correct exception.
         try {
-            symmetry454Chronology0.date(1, 1, 35);
-            fail("Expecting exception: DateTimeException");
+            chronology.date(year, month, invalidDayOfMonth);
+            fail("Expected a DateTimeException to be thrown for an invalid day of month.");
         } catch (DateTimeException e) {
-            //
-            // Invalid date: 1/1/35
-            //
-            verifyException("org.threeten.extra.chrono.Symmetry454Date", e);
+            // Verify that the exception message is as expected, confirming
+            // that the correct validation was triggered.
+            assertEquals("Invalid date: 1/1/35", e.getMessage());
         }
     }
 }
