@@ -1,29 +1,30 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PdfDictionary_ESTestTest40 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Test suite for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        PdfName pdfName0 = PdfName.DR;
-        PdfResources pdfResources0 = new PdfResources();
-        pdfResources0.putEx(pdfName0, pdfName0);
-        PdfDictionary pdfDictionary0 = pdfResources0.getAsDict(pdfName0);
-        assertNull(pdfDictionary0);
+    /**
+     * Verifies that getAsDict() returns null when the value associated with a key
+     * is not a PdfDictionary.
+     */
+    @Test
+    public void getAsDict_whenValueIsNotADictionary_shouldReturnNull() {
+        // Arrange: Create a dictionary and add a key-value pair where the value is a PdfName,
+        // not a PdfDictionary.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName key = PdfName.DR;
+        PdfObject nonDictionaryValue = new PdfName("SomeValue");
+        dictionary.put(key, nonDictionaryValue);
+
+        // Act: Attempt to retrieve the value as a PdfDictionary.
+        PdfDictionary result = dictionary.getAsDict(key);
+
+        // Assert: The result should be null, as the stored value is not of the requested type.
+        assertNull("Expected getAsDict() to return null for a non-dictionary value.", result);
     }
 }
