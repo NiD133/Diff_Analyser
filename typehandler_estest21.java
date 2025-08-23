@@ -1,21 +1,32 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class TypeHandler_ESTestTest21 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeHandler} class.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Object object0 = TypeHandler.createObject("org.apache.commons.cli.TypeHandler");
-        assertNotNull(object0);
+    /**
+     * Tests that the createObject method successfully instantiates a class
+     * that has a public default constructor, given its fully qualified name.
+     *
+     * @throws ParseException if the class cannot be found or instantiated.
+     */
+    @Test
+    public void createObjectShouldReturnNewInstanceForExistingClass() throws ParseException {
+        // Arrange: Define the fully qualified name of a class with a default constructor.
+        final String className = "org.apache.commons.cli.TypeHandler";
+
+        // Act: Call the static method to create an instance of the class.
+        final Object createdObject = TypeHandler.createObject(className);
+
+        // Assert: Verify that the returned object is not null and is of the correct type.
+        assertNotNull("The created object should not be null.", createdObject);
+        assertTrue("The created object should be an instance of TypeHandler.",
+                   createdObject instanceof TypeHandler);
     }
 }
