@@ -1,39 +1,29 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class RandomAccessFileOrArray_ESTestTest87 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test086() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readFloat();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling readFloat() on an instance created with a null
+     * RandomAccessSource throws a NullPointerException.
+     *
+     * This test ensures that the class correctly handles the invalid state of having
+     * no underlying data source when a read operation is attempted.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readFloat_whenSourceIsNull_throwsNullPointerException() {
+        // Arrange: Create an instance of RandomAccessFileOrArray with a null data source.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Act: Attempt to read a float. This action is expected to throw the exception.
+        fileOrArray.readFloat();
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // in the @Test annotation. No further assertion is needed.
     }
 }
