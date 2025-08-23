@@ -1,25 +1,32 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.PriorityBlockingQueue;
-import org.apache.commons.io.output.QueueOutputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class QueueInputStream_ESTestTest6 extends QueueInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link QueueInputStream}.
+ */
+public class QueueInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        PriorityBlockingQueue<Integer> priorityBlockingQueue0 = new PriorityBlockingQueue<Integer>();
-        QueueInputStream queueInputStream0 = new QueueInputStream(priorityBlockingQueue0);
-        int int0 = queueInputStream0.read();
-        assertEquals((-1), int0);
+    /**
+     * Tests that reading from a stream backed by an empty queue immediately
+     * returns -1 (end-of-file), as the default timeout is zero.
+     */
+    @Test
+    public void testReadOnEmptyQueueReturnsEof() {
+        // Arrange: Create an input stream with an empty queue.
+        // By default, the timeout is zero, so the read() operation should not block.
+        final BlockingQueue<Integer> emptyQueue = new PriorityBlockingQueue<>();
+        final QueueInputStream inputStream = new QueueInputStream(emptyQueue);
+
+        // Act: Attempt to read a byte from the empty stream.
+        final int byteRead = inputStream.read();
+
+        // Assert: The read should return EOF (-1) because the queue is empty.
+        assertEquals("Reading from an empty stream should return EOF.", EOF, byteRead);
     }
 }
