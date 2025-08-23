@@ -1,37 +1,49 @@
 package org.jfree.chart.entity;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import javax.swing.JLayeredPane;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryItemEntity_ESTestTest12 extends CategoryItemEntity_ESTest_scaffolding {
+import java.awt.Rectangle;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DefaultCaret defaultCaret0 = new DefaultCaret();
-        DefaultMultiValueCategoryDataset<Integer, Integer> defaultMultiValueCategoryDataset0 = new DefaultMultiValueCategoryDataset<Integer, Integer>();
-        CategoryItemEntity<Integer, Integer> categoryItemEntity0 = new CategoryItemEntity<Integer, Integer>(defaultCaret0, (String) null, (String) null, defaultMultiValueCategoryDataset0, (Integer) 0, (Integer) 0);
-        CategoryItemEntity<Integer, Integer> categoryItemEntity1 = new CategoryItemEntity<Integer, Integer>(defaultCaret0, (String) null, (String) null, defaultMultiValueCategoryDataset0, (Integer) defaultCaret0.height, (Integer) 0);
-        boolean boolean0 = categoryItemEntity0.equals(categoryItemEntity1);
-        assertTrue(boolean0);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link CategoryItemEntity} class, focusing on the equals() method.
+ */
+public class CategoryItemEntityTest {
+
+    /**
+     * Verifies that two CategoryItemEntity instances with identical properties are considered equal.
+     * <p>
+     * The original test created two entities with the same row key (the integer 0),
+     * but one was created directly while the other was derived from a component's height,
+     * making the test's intent obscure. This version clarifies the purpose by creating
+     * two identical objects in a straightforward manner.
+     */
+    @Test
+    public void testEquals_withIdenticalEntities_shouldReturnTrue() {
+        // Arrange: Create two CategoryItemEntity objects with the exact same state.
+        Rectangle area = new Rectangle(10, 20, 30, 40);
+        String toolTipText = "Test ToolTip";
+        String urlText = "http://www.jfree.org/jfreechart/";
+        CategoryDataset<String, String> dataset = new DefaultMultiValueCategoryDataset<>();
+        String rowKey = "Row 1";
+        String columnKey = "Column 1";
+
+        CategoryItemEntity<String, String> entity1 = new CategoryItemEntity<>(
+                area, toolTipText, urlText, dataset, rowKey, columnKey
+        );
+
+        CategoryItemEntity<String, String> entity2 = new CategoryItemEntity<>(
+                area, toolTipText, urlText, dataset, rowKey, columnKey
+        );
+
+        // Act & Assert: The two entities should be equal.
+        // Using assertEquals provides a more informative message on failure than assertTrue.
+        assertEquals(entity1, entity2);
+
+        // For completeness, also check the symmetric property of equals().
+        assertEquals(entity2, entity1);
     }
 }
