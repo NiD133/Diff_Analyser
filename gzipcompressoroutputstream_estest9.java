@@ -1,40 +1,29 @@
 package org.apache.commons.compress.compressors.gzip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class GzipCompressorOutputStream_ESTestTest9 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GzipCompressorOutputStream} class.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        gzipCompressorOutputStream0.close();
-        // Undeclared exception!
-        try {
-            gzipCompressorOutputStream0.finish();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // Deflater has been closed
-            //
-            verifyException("java.util.zip.Deflater", e);
-        }
+    /**
+     * Verifies that calling finish() on a stream that has already been closed
+     * throws a NullPointerException. This is the expected behavior because the
+     * underlying Deflater object is set to null upon closing the stream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void callingFinishOnClosedStreamThrowsNullPointerException() throws IOException {
+        // Arrange: Create a GzipCompressorOutputStream and close it.
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(baos);
+        gzipOut.close();
+
+        // Act: Attempt to finish the already-closed stream.
+        // This call is expected to throw the NullPointerException.
+        gzipOut.finish();
     }
 }
