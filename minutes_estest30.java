@@ -1,18 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest30 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Minutes minutes0 = Minutes.THREE;
-        Minutes minutes1 = minutes0.dividedBy(2);
-        assertEquals(1, minutes1.getMinutes());
+    @Test
+    public void dividedBy_shouldPerformIntegerDivisionAndTruncateResult() {
+        // Arrange
+        final Minutes threeMinutes = Minutes.THREE;
+        final int divisor = 2;
+        final int expectedResult = 1; // 3 / 2 = 1 with integer division
+
+        // Act
+        Minutes result = threeMinutes.dividedBy(divisor);
+
+        // Assert
+        assertEquals(expectedResult, result.getMinutes());
     }
 }
