@@ -1,57 +1,38 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class MetaphoneTestTest29 extends AbstractStringEncoderTest<Metaphone> {
-
-    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
-        // match source to all matches
-        for (final String matche : matches) {
-            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
-        }
-        // match to each other
-        for (final String matche : matches) {
-            for (final String matche2 : matches) {
-                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
-            }
-        }
-    }
-
-    public void assertMetaphoneEqual(final String[][] pairs) {
-        validateFixture(pairs);
-        for (final String[] pair : pairs) {
-            final String name0 = pair[0];
-            final String name1 = pair[1];
-            final String failMsg = "Expected match between " + name0 + " and " + name1;
-            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
-            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
-        }
-    }
+/**
+ * Tests the specific encoding rules of the {@link Metaphone} class.
+ */
+// The class name is now clear, concise, and follows standard Java conventions.
+// The unused helper methods have been removed to reduce clutter.
+public class MetaphoneTest extends AbstractStringEncoderTest<Metaphone> {
 
     @Override
     protected Metaphone createStringEncoder() {
         return new Metaphone();
     }
 
-    public void validateFixture(final String[][] pairs) {
-        if (pairs.length == 0) {
-            fail("Test fixture is empty");
-        }
-        for (int i = 0; i < pairs.length; i++) {
-            if (pairs[i].length != 2) {
-                fail("Error in test fixture in the data array at index " + i);
-            }
-        }
-    }
-
-    @Test
-    void testWordEndingInMB() {
-        assertEquals("KM", getStringEncoder().metaphone("COMB"));
-        assertEquals("TM", getStringEncoder().metaphone("TOMB"));
-        assertEquals("WM", getStringEncoder().metaphone("WOMB"));
+    /**
+     * The Metaphone algorithm specifies that a 'B' is dropped if it appears after an 'M'
+     * at the end of a word. This test verifies that rule with several examples.
+     */
+    @DisplayName("Metaphone should drop the trailing 'B' for words ending in 'MB'")
+    @ParameterizedTest(name = "Encoding of \"{0}\" should be \"{1}\"")
+    @CsvSource({
+        "COMB, KM",
+        "TOMB, TM",
+        "WOMB, WM"
+    })
+    void testWordsEndingInMB(final String input, final String expectedEncoding) {
+        // This single assertion now covers all test cases for this rule.
+        // The test data is clearly separated from the test logic, improving readability.
+        assertEquals(expectedEncoding, getStringEncoder().metaphone(input));
     }
 }
