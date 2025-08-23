@@ -1,19 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Minutes_ESTestTest1 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Minutes minutes0 = Minutes.TWO;
-        Minutes minutes1 = Minutes.MAX_VALUE;
-        boolean boolean0 = minutes1.isLessThan(minutes0);
-        assertFalse(boolean0);
+    @Test
+    public void isLessThan_returnsFalse_whenComparingLargerToSmaller() {
+        // Arrange
+        Minutes largerMinutes = Minutes.MAX_VALUE;
+        Minutes smallerMinutes = Minutes.TWO;
+
+        // Act
+        boolean result = largerMinutes.isLessThan(smallerMinutes);
+
+        // Assert
+        assertFalse("MAX_VALUE should not be less than TWO.", result);
     }
 }
