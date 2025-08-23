@@ -1,27 +1,27 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class StringUtil_ESTestTest98 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil utility class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test97() throws Throwable {
-        StringUtil stringUtil0 = new StringUtil();
+    /**
+     * Verifies that the StringUtil class can be instantiated.
+     * <p>
+     * StringUtil is a utility class containing only static methods and is not intended
+     * for instantiation. However, it has a default public constructor. This test calls
+     * that constructor to ensure it does not throw an exception and to achieve full
+     * code coverage for the class.
+     */
+    @Test
+    public void canBeInstantiatedForCoverage() {
+        // WHEN a new instance of StringUtil is created
+        StringUtil stringUtil = new StringUtil();
+
+        // THEN the instance should not be null
+        assertNotNull("The StringUtil instance should be successfully created.", stringUtil);
     }
 }
