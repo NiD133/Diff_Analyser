@@ -1,18 +1,34 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest23 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        boolean boolean0 = iOCase0.checkStartsWith((String) null, (String) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that IOCase.checkStartsWith() returns false when both the string
+     * to check and the prefix are null.
+     * <p>
+     * The Javadoc for checkStartsWith states it should return false for any
+     * null input, so this behavior should be consistent across all case-sensitivity
+     * settings (SYSTEM, SENSITIVE, INSENSITIVE).
+     * </p>
+     */
+    @Test
+    public void testCheckStartsWithReturnsFalseForNullInputs() {
+        // Arrange
+        // The specific IOCase instance does not affect the outcome with null inputs.
+        final IOCase ioCase = IOCase.SYSTEM;
+        final String nullString = null;
+        final String nullPrefix = null;
+
+        // Act
+        final boolean result = ioCase.checkStartsWith(nullString, nullPrefix);
+
+        // Assert
+        assertFalse("checkStartsWith(null, null) should return false", result);
     }
 }
