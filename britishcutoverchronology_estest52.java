@@ -1,48 +1,41 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
+
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
 import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest52 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        ZonedDateTime zonedDateTime0 = MockZonedDateTime.now();
-        ChronoZonedDateTime<BritishCutoverDate> chronoZonedDateTime0 = britishCutoverChronology0.zonedDateTime((TemporalAccessor) zonedDateTime0);
-        assertNotNull(chronoZonedDateTime0);
+/**
+ * Tests for {@link BritishCutoverChronology#zonedDateTime(TemporalAccessor)}.
+ */
+public class BritishCutoverChronologyZonedDateTimeTest {
+
+    /**
+     * Tests the conversion of a modern ISO ZonedDateTime to a BritishCutoverChronology ZonedDateTime.
+     * For dates after the 1752 cutover, the date and time values should be identical.
+     */
+    @Test
+    public void zonedDateTime_withModernDate_convertsFromIsoZonedDateTimeCorrectly() {
+        // Arrange
+        BritishCutoverChronology britishChronology = BritishCutoverChronology.INSTANCE;
+        ZonedDateTime isoZonedDateTime = ZonedDateTime.of(2024, 8, 15, 10, 30, 0, 0, ZoneId.of("Europe/London"));
+
+        // Act
+        ChronoZonedDateTime<BritishCutoverDate> britishZonedDateTime = britishChronology.zonedDateTime(isoZonedDateTime);
+
+        // Assert
+        assertNotNull("The converted ZonedDateTime should not be null.", britishZonedDateTime);
+        assertEquals("The chronology of the result should be BritishCutoverChronology.",
+                britishChronology, britishZonedDateTime.getChronology());
+        assertEquals("For modern dates, the local date-time should be identical to the ISO source.",
+                isoZonedDateTime.toLocalDateTime(), britishZonedDateTime.toLocalDateTime());
+        assertEquals("The time zone should be preserved during conversion.",
+                isoZonedDateTime.getZone(), britishZonedDateTime.getZone());
+        assertEquals("The zone offset should be preserved during conversion.",
+                isoZonedDateTime.getOffset(), britishZonedDateTime.getOffset());
     }
 }
