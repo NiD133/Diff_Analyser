@@ -1,38 +1,29 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.evosuite.runtime.mock.java.io.MockFile;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmlStreamWriter_ESTestTest15 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link XmlStreamWriter}.
+ * This class focuses on scenarios related to file-based constructor behavior.
+ */
+public class XmlStreamWriterTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        MockFile mockFile0 = new MockFile("", "");
-        XmlStreamWriter xmlStreamWriter0 = null;
-        try {
-            xmlStreamWriter0 = new XmlStreamWriter(mockFile0, "");
-            fail("Expecting exception: FileNotFoundException");
-        } catch (Throwable e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockFileOutputStream", e);
-        }
+    /**
+     * Tests that the constructor throws a FileNotFoundException when the provided
+     * File object represents a directory, as it's impossible to write to a directory
+     * as if it were a file.
+     */
+    @Test(expected = FileNotFoundException.class)
+    public void constructorWithFile_shouldThrowFileNotFoundException_whenFileIsDirectory() throws FileNotFoundException {
+        // A MockFile with an empty path represents the current directory.
+        final File directory = new MockFile("");
+
+        // Attempting to construct an XmlStreamWriter with a directory should fail
+        // because it internally tries to create a FileOutputStream.
+        new XmlStreamWriter(directory, "UTF-8");
     }
 }
