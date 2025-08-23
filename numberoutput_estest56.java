@@ -1,17 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class NumberOutput_ESTestTest56 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        boolean boolean0 = NumberOutput.notFinite(2650.0F);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link NumberOutput#notFinite(float)} correctly identifies a
+     * standard finite float value and returns false.
+     */
+    @Test
+    public void notFinite_shouldReturnFalse_forFiniteFloat() {
+        // Arrange: A standard, finite float value.
+        float finiteFloat = 2650.0F;
+
+        // Act: Call the method under test.
+        boolean result = NumberOutput.notFinite(finiteFloat);
+
+        // Assert: The method should return false, indicating the number is finite.
+        assertFalse("A regular float value should be considered finite.", result);
     }
 }
