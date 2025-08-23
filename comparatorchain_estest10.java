@@ -1,41 +1,36 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ComparatorChain_ESTestTest10 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Tests for {@link ComparatorChain#setComparator(int, Comparator, boolean)}.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>();
-        // Undeclared exception!
+    /**
+     * Tests that calling setComparator() on an empty chain throws an IndexOutOfBoundsException.
+     * The method should fail because index 0 is out of bounds for a chain of size 0.
+     */
+    @Test
+    public void setComparatorOnEmptyChainShouldThrowIndexOutOfBoundsException() {
+        // Arrange: Create an empty ComparatorChain.
+        final ComparatorChain<Object> emptyChain = new ComparatorChain<>();
+        
+        // A dummy comparator to pass to the method. Its behavior is irrelevant for this test.
+        final Comparator<Object> dummyComparator = (o1, o2) -> 0;
+
+        // Act & Assert: Attempt to set a comparator at an invalid index.
         try {
-            comparatorChain0.setComparator(0, (Comparator<Object>) comparatorChain0, false);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 0, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
+            emptyChain.setComparator(0, dummyComparator, false);
+            fail("Expected an IndexOutOfBoundsException to be thrown, but it was not.");
+        } catch (final IndexOutOfBoundsException e) {
+            // Verify that the exception was thrown with the expected, informative message.
+            final String expectedMessage = "Index: 0, Size: 0";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
