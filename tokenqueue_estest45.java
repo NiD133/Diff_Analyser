@@ -1,18 +1,29 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest45 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Tests for the {@link TokenQueue} class, focusing on element selector consumption.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("WC**~WF-]9Y$]");
-        String string0 = tokenQueue0.consumeElementSelector();
-        assertEquals("WC**", string0);
+    /**
+     * Verifies that consumeElementSelector() correctly extracts a selector
+     * containing letters and wildcards, and properly stops at the first
+     * invalid selector character (in this case, the '~' combinator).
+     */
+    @Test
+    public void consumeElementSelectorStopsAtInvalidCharacter() {
+        // Arrange: Create a queue with a valid selector followed by a combinator and other characters.
+        String input = "WC**~WF-]9Y$]";
+        TokenQueue queue = new TokenQueue(input);
+        String expectedSelector = "WC**";
+
+        // Act: Consume the element selector from the queue.
+        String actualSelector = queue.consumeElementSelector();
+
+        // Assert: The consumed part should match the expected selector.
+        assertEquals(expectedSelector, actualSelector);
     }
 }
