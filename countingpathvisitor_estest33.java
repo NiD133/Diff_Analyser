@@ -1,46 +1,28 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains an improved version of an auto-generated test for {@link CountingPathVisitor}.
+ * The original test class structure is preserved for context.
+ */
 public class CountingPathVisitor_ESTestTest33 extends CountingPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withBigIntegerCounters();
-        // Undeclared exception!
-        try {
-            countingPathVisitor0.updateFileCounters((Path) null, (BasicFileAttributes) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.file.CountingPathVisitor", e);
-        }
+    /**
+     * Tests that {@link CountingPathVisitor#updateFileCounters(Path, BasicFileAttributes)}
+     * throws a NullPointerException when the path argument is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void updateFileCountersShouldThrowNullPointerExceptionForNullPath() {
+        // Arrange: Create a visitor instance.
+        final CountingPathVisitor visitor = CountingPathVisitor.withBigIntegerCounters();
+
+        // Act: Call the method under test with a null path. This is expected to throw.
+        visitor.updateFileCounters(null, (BasicFileAttributes) null);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // by the @Test(expected = ...) annotation.
     }
 }
