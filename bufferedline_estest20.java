@@ -1,37 +1,38 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
 import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest20 extends BufferedLine_ESTest_scaffolding {
+/**
+ * Test suite for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        SpatialContextFactory spatialContextFactory0 = new SpatialContextFactory();
-        SpatialContext spatialContext0 = spatialContextFactory0.newSpatialContext();
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        // Undeclared exception!
-        try {
-            bufferedLine0.relate((Rectangle) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.locationtech.spatial4j.shape.impl.RectangleImpl", e);
-        }
+    // A non-geodetic (i.e., Cartesian) spatial context is sufficient for this test.
+    private final SpatialContext context = new SpatialContextFactory().newSpatialContext();
+
+    /**
+     * Verifies that the relate(Rectangle) method correctly throws a NullPointerException
+     * when passed a null argument. This is a standard contract for methods that
+     * do not explicitly support null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void relateWithNullRectangleThrowsNPE() {
+        // Arrange: Create a minimal BufferedLine instance. Its specific geometry
+        // is not relevant for this null-check test.
+        Point point = new PointImpl(0.0, 0.0, context);
+        BufferedLine line = new BufferedLine(point, point, 0.0, context);
+        Rectangle nullRectangle = null;
+
+        // Act: Call the method under test with the null input.
+        // The `relate` method is overloaded, so passing a typed null is necessary
+        // to resolve the correct method signature.
+        line.relate(nullRectangle);
+
+        // Assert: The test framework will automatically pass if the expected
+        // NullPointerException is thrown, and fail otherwise.
     }
 }
