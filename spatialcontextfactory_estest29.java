@@ -1,32 +1,49 @@
 package org.locationtech.spatial4j.context;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.locationtech.spatial4j.io.LegacyShapeWriter;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.io.PolyshapeReader;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
-public class SpatialContextFactory_ESTestTest29 extends SpatialContextFactory_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("shapeFactoryClass", "org.locationtech.spatial4j.io.LegacyShapeWriter");
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        // Undeclared exception!
+/**
+ * Tests for {@link SpatialContextFactory}.
+ */
+public class SpatialContextFactoryTest {
+
+    /**
+     * Tests that makeSpatialContext throws a RuntimeException when the provided
+     * 'shapeFactoryClass' does not have a constructor that accepts a SpatialContext
+     * and a SpatialContextFactory.
+     */
+    @Test
+    public void makeSpatialContext_throwsException_forShapeFactoryWithInvalidConstructor() {
+        // Arrange: Configure a ShapeFactory class that is known to lack the required constructor.
+        // LegacyShapeWriter is a ShapeWriter, not a ShapeFactory, and serves as a good example
+        // of a class that will fail the reflective constructor lookup.
+        Map<String, String> config = new HashMap<>();
+        config.put("shapeFactoryClass", LegacyShapeWriter.class.getName());
+
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+        // Act & Assert
         try {
-            SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-            fail("Expecting exception: RuntimeException");
+            SpatialContextFactory.makeSpatialContext(config, classLoader);
+            fail("Expected a RuntimeException because the specified shape factory class has an invalid constructor.");
         } catch (RuntimeException e) {
-            //
-            // class org.locationtech.spatial4j.io.LegacyShapeWriter needs a constructor that takes: [SpatialContext{geo=true, calculator=null, worldBounds=null}, org.locationtech.spatial4j.context.SpatialContextFactory@1]
-            //
-            verifyException("org.locationtech.spatial4j.context.SpatialContextFactory", e);
+            // Verify that the exception message clearly explains the problem.
+            String actualMessage = e.getMessage();
+            assertTrue(
+                "Exception message should mention the problematic class name.",
+                actualMessage.contains(LegacyShapeWriter.class.getName())
+            );
+            assertTrue(
+                "Exception message should indicate a missing constructor.",
+                actualMessage.contains("needs a constructor that takes")
+            );
         }
     }
 }
