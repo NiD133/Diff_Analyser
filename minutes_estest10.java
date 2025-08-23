@@ -1,18 +1,32 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest10 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Minutes minutes0 = Minutes.MAX_VALUE;
-        Duration duration0 = minutes0.toStandardDuration();
-        assertEquals(1491308L, duration0.getStandardDays());
+    /**
+     * Tests that converting the maximum possible Minutes value to a standard duration
+     * correctly calculates the equivalent number of standard days.
+     */
+    @Test
+    public void toStandardDuration_fromMaxValue_convertsToCorrectNumberOfDays() {
+        // Arrange
+        Minutes maxMinutes = Minutes.MAX_VALUE;
+        
+        // A standard day has 24 hours * 60 minutes/hour = 1440 minutes.
+        // The expected number of days is the total minutes (Integer.MAX_VALUE)
+        // divided by the number of minutes in a day.
+        long expectedDays = (long) Integer.MAX_VALUE / (24 * 60);
+
+        // Act
+        Duration duration = maxMinutes.toStandardDuration();
+        long actualDays = duration.getStandardDays();
+
+        // Assert
+        assertEquals(expectedDays, actualDays);
     }
 }
