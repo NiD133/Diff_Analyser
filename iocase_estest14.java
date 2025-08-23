@@ -1,26 +1,27 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link IOCase}.
+ * This test focuses on the handling of null inputs for the checkCompareTo method.
+ */
 public class IOCase_ESTestTest14 extends IOCase_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        IOCase iOCase0 = IOCase.SENSITIVE;
-        // Undeclared exception!
-        try {
-            iOCase0.checkCompareTo((String) null, (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // str1
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Verifies that checkCompareTo throws a NullPointerException when given a null argument,
+     * as per its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void checkCompareTo_withNullArgument_shouldThrowNullPointerException() {
+        // Arrange: Get any IOCase instance. The behavior with nulls is not case-dependent.
+        final IOCase ioCase = IOCase.SENSITIVE;
+
+        // Act: Call the method with null arguments.
+        // The method contract states it throws NullPointerException if either string is null.
+        ioCase.checkCompareTo(null, null);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // as specified by the 'expected' attribute of the @Test annotation.
     }
 }
