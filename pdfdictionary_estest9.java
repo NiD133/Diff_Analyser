@@ -1,30 +1,32 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertSame;
 
-public class PdfDictionary_ESTestTest9 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * This test suite focuses on verifying the behavior of the PdfDictionary class.
+ */
+public class PdfDictionary_ESTestTest9 {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        PdfName pdfName0 = PdfName.TYPE3;
-        PdfResources pdfResources0 = new PdfResources();
-        PdfCollectionField pdfCollectionField0 = new PdfCollectionField("UnicodeBig", 8);
-        pdfResources0.add(pdfName0, pdfCollectionField0);
-        PdfCollectionField pdfCollectionField1 = (PdfCollectionField) pdfResources0.get(pdfName0);
-        assertEquals(6, PdfCollectionField.CREATIONDATE);
+    /**
+     * Verifies that the get() method returns the exact same object instance
+     * that was previously added using the put() method.
+     */
+    @Test
+    public void get_shouldReturnSameObjectThatWasPut() {
+        // Arrange: Create a dictionary and the key-value pair to be stored.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName testKey = new PdfName("TestKey");
+        // PdfCollectionField is a valid PdfObject, suitable for use as a value.
+        PdfObject expectedValue = new PdfCollectionField("TestValue", 0);
+
+        // Act: Put the value into the dictionary and then retrieve it.
+        dictionary.put(testKey, expectedValue);
+        PdfObject actualValue = dictionary.get(testKey);
+
+        // Assert: Verify that the retrieved object is the same instance as the original.
+        assertSame("The dictionary should return the exact same object instance that was put into it.",
+                expectedValue, actualValue);
     }
 }
