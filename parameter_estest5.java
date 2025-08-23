@@ -1,30 +1,27 @@
 package com.google.common.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Parameter_ESTestTest5 extends Parameter_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, (-2148), (TypeToken<?>) null, annotationArray0, (Object) null);
-        // Undeclared exception!
-        try {
-            parameter0.getAnnotationsByType((Class<Annotation>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+/**
+ * Tests for {@link Parameter}.
+ */
+public class ParameterTest {
+
+    @Test
+    public void getAnnotationsByType_whenTypeIsNull_throwsNullPointerException() {
+        // Arrange: Create a Parameter instance. The constructor arguments are mostly
+        // irrelevant for this test, as we are only checking the null-handling of the method.
+        Annotation[] noAnnotations = {};
+        Parameter parameter = new Parameter(null, 0, null, noAnnotations, null);
+
+        // Act & Assert: Verify that passing a null class throws a NullPointerException.
+        // This is the expected behavior, as the contract is enforced by Preconditions.checkNotNull.
+        assertThrows(NullPointerException.class, () -> {
+            parameter.getAnnotationsByType(null);
+        });
     }
 }
