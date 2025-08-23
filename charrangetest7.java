@@ -1,25 +1,31 @@
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.LangAssertions.assertNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Tests for the factory method {@link CharRange#isNotIn(char, char)}.
+ */
 public class CharRangeTestTest7 extends AbstractLangTest {
 
     @Test
-    void testConstructorAccessors_isNotIn_Normal() {
-        final CharRange rangea = CharRange.isNotIn('a', 'e');
-        assertEquals('a', rangea.getStart());
-        assertEquals('e', rangea.getEnd());
-        assertTrue(rangea.isNegated());
-        assertEquals("^a-e", rangea.toString());
+    @DisplayName("CharRange.isNotIn() should create a negated range with correct properties")
+    void isNotInShouldCreateCorrectNegatedRange() {
+        // Arrange
+        final char startChar = 'a';
+        final char endChar = 'e';
+        final String expectedToString = "^a-e";
+
+        // Act
+        final CharRange range = CharRange.isNotIn(startChar, endChar);
+
+        // Assert
+        assertTrue(range.isNegated(), "The range should be marked as negated.");
+        assertEquals(startChar, range.getStart(), "The start character should match the input.");
+        assertEquals(endChar, range.getEnd(), "The end character should match the input.");
+        assertEquals(expectedToString, range.toString(), "The string representation should indicate a negated range.");
     }
 }
