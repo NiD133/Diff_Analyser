@@ -1,55 +1,45 @@
 package com.itextpdf.text.xml.xmp;
 
+import com.itextpdf.xmp.XMPException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest37 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "Producer", (-1));
-        JTree jTree0 = new JTree((TreeModel) null);
-        DropMode dropMode0 = jTree0.getDropMode();
-        try {
-            xmpWriter0.setProperty((String) null, (String) null, dropMode0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Empty schema namespace URI
-            //
-            verifyException("com.itextpdf.xmp.impl.ParameterAsserts", e);
-        }
+/**
+ * Test suite for the {@link XmpWriter} class, focusing on property validation.
+ */
+public class XmpWriterPropertyTest {
+
+    /**
+     * Verifies that calling setProperty() with a null schema namespace URI
+     * throws an XMPException.
+     *
+     * The schema namespace is a mandatory parameter for identifying a property,
+     * and providing a null value should be rejected.
+     */
+    @Test
+    public void setPropertyWithNullSchemaNamespaceShouldThrowException() throws IOException {
+        // Arrange: Create an XmpWriter instance. A ByteArrayOutputStream is a
+        // suitable dummy stream for this test's purpose.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XmpWriter xmpWriter = new XmpWriter(outputStream);
+
+        String nullSchemaNamespace = null;
+        String propertyName = "dc:title";
+        String propertyValue = "My Document Title";
+
+        // Act & Assert: Call setProperty with a null namespace and verify that
+        // an XMPException is thrown. The modern assertThrows is used for clarity.
+        XMPException thrownException = assertThrows(
+                XMPException.class,
+                () -> xmpWriter.setProperty(nullSchemaNamespace, propertyName, propertyValue)
+        );
+
+        // Further assert on the exception message to ensure it's the expected error.
+        assertEquals("Empty schema namespace URI", thrownException.getMessage());
     }
 }
