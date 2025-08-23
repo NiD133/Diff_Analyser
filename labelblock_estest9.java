@@ -1,45 +1,29 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import org.junit.jupiter.api.Test;
 import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LabelBlock_ESTestTest9 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class, focusing on exception handling.
+ */
+class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("font");
-        // Undeclared exception!
-        try {
-            labelBlock0.setPaint((Paint) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'paint' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    @Test
+    void setPaint_shouldThrowIllegalArgumentException_whenPaintIsNull() {
+        // Arrange: Create a LabelBlock instance.
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+        String expectedErrorMessage = "Null 'paint' argument.";
+
+        // Act & Assert: Verify that calling setPaint(null) throws the expected exception.
+        IllegalArgumentException thrownException = assertThrows(
+            IllegalArgumentException.class,
+            () -> labelBlock.setPaint((Paint) null),
+            "Expected setPaint(null) to throw IllegalArgumentException, but it didn't."
+        );
+
+        // Assert: Verify that the exception message is correct.
+        assertEquals(expectedErrorMessage, thrownException.getMessage());
     }
 }
