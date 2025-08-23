@@ -1,25 +1,37 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
+/**
+ * This test suite focuses on the {@link JsonIgnoreProperties.Value} class,
+ * specifically its static merging capabilities.
+ */
+// Note: The original test class name and inheritance are kept to match the context.
 public class JsonIgnoreProperties_ESTestTest59 extends JsonIgnoreProperties_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.EMPTY;
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[8];
-        jsonIgnoreProperties_ValueArray0[0] = jsonIgnoreProperties_Value0;
-        jsonIgnoreProperties_ValueArray0[1] = jsonIgnoreProperties_Value0;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.mergeAll(jsonIgnoreProperties_ValueArray0);
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
+    /**
+     * Tests that merging an array of {@link JsonIgnoreProperties.Value} instances,
+     * which includes the default EMPTY instance and nulls, results in a new
+     * Value instance where 'ignoreUnknown' remains false (its default state).
+     */
+    @Test
+    public void mergeAllWithEmptyAndNullValuesShouldRetainDefaultIgnoreUnknown() {
+        // Arrange: Create an array containing the default EMPTY value and nulls.
+        // The EMPTY value has 'ignoreUnknown' set to false by default.
+        JsonIgnoreProperties.Value[] valuesToMerge = {
+            JsonIgnoreProperties.Value.EMPTY,
+            null,
+            JsonIgnoreProperties.Value.EMPTY
+        };
+
+        // Act: Merge all the values in the array. The mergeAll method should skip nulls
+        // and combine the non-null values.
+        JsonIgnoreProperties.Value mergedValue = JsonIgnoreProperties.Value.mergeAll(valuesToMerge);
+
+        // Assert: The resulting merged value should retain the default 'ignoreUnknown'
+        // setting from the EMPTY instances, which is false.
+        assertFalse("Merging EMPTY and null values should result in ignoreUnknown=false",
+                mergedValue.getIgnoreUnknown());
     }
 }
