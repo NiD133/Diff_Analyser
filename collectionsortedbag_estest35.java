@@ -1,53 +1,59 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest35 extends CollectionSortedBag_ESTest_scaffolding {
+import java.util.Comparator;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn((-1959)).when(comparator0).compare(any(), any());
-        TreeBag<Object> treeBag0 = new TreeBag<Object>(comparator0);
-        IfClosure<Object> ifClosure0 = new IfClosure<Object>((Predicate<? super Object>) null, (Closure<? super Object>) null);
-        treeBag0.add((Object) ifClosure0);
-        CollectionSortedBag<Object> collectionSortedBag0 = new CollectionSortedBag<Object>(treeBag0);
-        boolean boolean0 = collectionSortedBag0.retainAll(collectionSortedBag0);
-        //  // Unstable assertion: assertFalse(treeBag0.isEmpty());
-        //  // Unstable assertion: assertFalse(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Contains an improved test case for the CollectionSortedBag class.
+ */
+public class CollectionSortedBagTest {
+
+    /**
+     * Tests that calling retainAll() with the collection itself as an argument
+     * does not modify the collection and correctly returns false.
+     *
+     * The contract of Collection.retainAll(c) states it should return true
+     * if the collection was modified. When a collection retains all of its own
+     * elements, no modification occurs, and the method should return false.
+     */
+    @Test
+    public void retainAllWithSelfShouldNotModifyBagAndReturnFalse() {
+        // Arrange
+        // A mock comparator allows any object to be added to the underlying TreeBag
+        // without requiring it to be Comparable.
+        @SuppressWarnings("unchecked") // Safe mock creation with generics
+        final Comparator<Object> mockComparator = mock(Comparator.class);
+        // Stub the compare method to always return a consistent non-zero value.
+        doReturn(-1).when(mockComparator).compare(any(), any());
+
+        // The CollectionSortedBag decorates an underlying SortedBag (a TreeBag in this case).
+        final SortedBag<Object> underlyingBag = new TreeBag<>(mockComparator);
+        final CollectionSortedBag<Object> bag = new CollectionSortedBag<>(underlyingBag);
+
+        final String testElement = "an element";
+        bag.add(testElement);
+
+        // Pre-condition check to ensure the bag is set up correctly.
+        assertEquals("Bag should contain one element before the test", 1, bag.size());
+
+        // Act
+        // Perform the retainAll operation with the bag itself as the argument.
+        final boolean wasModified = bag.retainAll(bag);
+
+        // Assert
+        // The operation should not modify the bag, so it must return false.
+        assertFalse("retainAll(self) should return false as no elements were removed", wasModified);
+
+        // The bag's state should remain unchanged.
+        assertEquals("Bag size should remain 1 after retainAll(self)", 1, bag.size());
+        assertEquals("The element's count should still be 1", 1, bag.getCount(testElement));
     }
 }
