@@ -1,20 +1,37 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class PercentCodec_ESTestTest17 extends PercentCodec_ESTest_scaffolding {
+import java.nio.charset.StandardCharsets;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        PercentCodec percentCodec0 = new PercentCodec((byte[]) null, true);
-        byte[] byteArray1 = percentCodec0.encode(byteArray0);
-        assertSame(byteArray1, byteArray0);
-        assertNotNull(byteArray1);
+/**
+ * Tests for the PercentCodec class.
+ */
+public class PercentCodecTest {
+
+    /**
+     * Tests that the encode() method returns the original byte array instance
+     * when the input contains no characters that require encoding. This verifies
+     * an important optimization that avoids unnecessary object allocation.
+     */
+    @Test
+    public void encodeShouldReturnSameArrayInstanceForSafeBytes() throws Exception {
+        // Arrange
+        // Input contains only "safe" ASCII characters that do not need percent-encoding.
+        final byte[] safeBytes = "abcdef12345".getBytes(StandardCharsets.US_ASCII);
+
+        // A codec configured with no special characters to encode (null).
+        // The '%' character is always considered unsafe internally.
+        final PercentCodec percentCodec = new PercentCodec(null, true);
+
+        // Act
+        final byte[] encodedBytes = percentCodec.encode(safeBytes);
+
+        // Assert
+        // The returned array should be the exact same instance as the input,
+        // not just an equal one, to confirm the optimization is active.
+        assertSame("Expected the original array instance to be returned when no encoding is needed",
+                   safeBytes, encodedBytes);
     }
 }
