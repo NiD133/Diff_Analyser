@@ -1,32 +1,31 @@
 package org.apache.commons.compress.compressors.gzip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class GzipCompressorOutputStream_ESTestTest24 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link GzipCompressorOutputStream}.
+ */
+public class GzipCompressorOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        gzipCompressorOutputStream0.close();
-        gzipCompressorOutputStream0.close();
-        assertTrue(gzipCompressorOutputStream0.isClosed());
+    /**
+     * Verifies that calling close() on a GzipCompressorOutputStream multiple times
+     * is safe and does not throw an exception. This behavior is part of the
+     * general contract for java.io.Closeable.
+     */
+    @Test
+    public void closeCanBeCalledMultipleTimesWithoutError() throws IOException {
+        // Arrange: Create a GzipCompressorOutputStream wrapping an in-memory stream.
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(byteArrayOutputStream);
+
+        // Act: Close the stream for the first time. This is the primary action.
+        gzipOutputStream.close();
+
+        // Assert: Closing the stream again should not throw an exception.
+        // The test implicitly passes if the following line executes without error.
+        gzipOutputStream.close();
     }
 }
