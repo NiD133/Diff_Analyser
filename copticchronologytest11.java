@@ -1,82 +1,35 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTime.Property;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
+import org.junit.Test;
 
-public class CopticChronologyTestTest11 extends TestCase {
-
-    private static final int MILLIS_PER_DAY = DateTimeConstants.MILLIS_PER_DAY;
-
-    private static long SKIP = 1 * MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * Tests the epoch of the CopticChronology.
+ * The Coptic epoch is the first day of the first year in its calendar.
+ */
+public class CopticChronologyEpochTest {
 
     private static final Chronology COPTIC_UTC = CopticChronology.getInstanceUTC();
-
     private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+    @Test
+    public void copticEpoch_shouldCorrespondToCorrectJulianDate() {
+        // The Coptic calendar epoch is defined as 1/1/1 AM (Anno Martyrum).
+        // This test verifies that this date corresponds to August 29, 284 in the
+        // proleptic Julian calendar, as per historical definitions.
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+        // Arrange: Define the Coptic epoch and the expected equivalent Julian date.
+        DateTime copticEpoch = new DateTime(1, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
+        DateTime expectedJulianDate = new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC);
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * MILLIS_PER_DAY;
+        // Act: Convert the Coptic epoch to the Julian chronology.
+        DateTime actualJulianDate = copticEpoch.withChronology(JULIAN_UTC);
 
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * MILLIS_PER_DAY;
-        return new TestSuite(TestCopticChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testEpoch() {
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, COPTIC_UTC);
-        assertEquals(new DateTime(284, 8, 29, 0, 0, 0, 0, JULIAN_UTC), epoch.withChronology(JULIAN_UTC));
+        // Assert: The converted date should match the expected Julian date.
+        assertEquals(expectedJulianDate, actualJulianDate);
     }
 }
