@@ -1,22 +1,26 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest22 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        long long0 = charSequenceReader0.skip(0);
-        assertEquals(0L, long0);
+    @Test
+    public void skip_withZeroArgument_returnsZeroAndDoesNotAdvanceReader() throws IOException {
+        // Arrange
+        // Using a non-empty sequence to confirm the reader's position is unaffected.
+        CharSequenceReader reader = new CharSequenceReader("abc");
+
+        // Act
+        long skippedChars = reader.skip(0);
+
+        // Assert
+        assertEquals("Calling skip(0) should always return 0.", 0L, skippedChars);
+        assertEquals("The reader's position should not change.", 'a', reader.read());
     }
 }
