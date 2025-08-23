@@ -2,30 +2,44 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest27 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This test class contains improved versions of tests for {@link LinkedTreeMap}.
+ * The original test was auto-generated and has been rewritten for clarity and maintainability.
+ */
+public class LinkedTreeMap_ESTestTest27 {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = new Integer((-1109));
-        linkedTreeMap0.putIfAbsent(integer0, integer0);
-        Integer integer1 = new Integer((-968));
-        linkedTreeMap0.find(integer1, true);
-        Integer integer2 = new Integer((-1));
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap0.find(integer2, true);
-        linkedTreeMap0.removeInternal(linkedTreeMap_Node0, true);
-        assertEquals(2, linkedTreeMap0.size());
+    /**
+     * Tests that the internal removal method, `removeInternal`, correctly removes a specified node
+     * from the map and updates the map's size accordingly.
+     */
+    @Test
+    public void removeInternal_removesNodeAndDecrementsSize() {
+        // Arrange
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+
+        // Add three elements to the map to create a known state.
+        // The first is added via `putIfAbsent`.
+        map.putIfAbsent(-1109, -1109);
+        // The next two are added using the internal `find(key, create=true)` method,
+        // which creates a new node with a null value if the key is not found.
+        // This mimics the setup of the original auto-generated test.
+        map.find(-968, true);
+        LinkedTreeMap.Node<Integer, Integer> nodeToRemove = map.find(-1, true);
+
+        // Verify the initial state before acting.
+        assertEquals("Map should contain 3 elements before removal", 3, map.size());
+        assertTrue("Key to be removed should exist before removal", map.containsKey(-1));
+
+        // Act
+        // Remove the node for key -1 directly using the internal method.
+        map.removeInternal(nodeToRemove, true);
+
+        // Assert
+        // Check that the size has been updated and the correct element is gone.
+        assertEquals("Map size should be 2 after removing one element", 2, map.size());
+        assertFalse("The removed key should no longer be in the map", map.containsKey(-1));
+        assertTrue("A non-removed key should still be in the map", map.containsKey(-1109));
+        assertTrue("Another non-removed key should still be in the map", map.containsKey(-968));
     }
 }
