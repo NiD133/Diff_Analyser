@@ -1,36 +1,54 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest20 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Contains tests for the ArArchiveOutputStream class.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        MockPrintStream mockPrintStream0 = new MockPrintStream("HU)HAv");
-        byte[] byteArray0 = new byte[7];
-        File file0 = MockFile.createTempFile("HU)HAv", "HU)HAv", (File) null);
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(mockPrintStream0);
-        ArArchiveEntry arArchiveEntry0 = arArchiveOutputStream0.createArchiveEntry(file0, "XN}!P");
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-        arArchiveOutputStream0.write(byteArray0, 12, 1215);
-        arArchiveOutputStream0.closeArchiveEntry();
-        assertEquals(1283L, arArchiveOutputStream0.getBytesWritten());
+    /**
+     * Tests that getBytesWritten() accurately reflects the number of bytes
+     * written for an archive entry, including the global header, entry header,
+     * and entry data. It also verifies the count is correctly updated after
+     * padding is added upon closing the entry.
+     */
+    @Test
+    public void getBytesWrittenIsAccurateAfterWritingEntry() throws IOException {
+        // Arrange
+        final String entryName = "test_entry.txt";
+        // Use an odd size to ensure padding is tested
+        final int entrySize = 1215;
+        final byte[] entryData = new byte[entrySize];
+
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        // Use try-with-resources to ensure the stream is closed automatically
+        try (ArArchiveOutputStream arOut = new ArArchiveOutputStream(byteArrayOutputStream)) {
+            final ArArchiveEntry entry = new ArArchiveEntry(entryName, entrySize);
+
+            // Act
+            arOut.putArchiveEntry(entry);
+            arOut.write(entryData);
+
+            // Assert: Check byte count before the entry is closed and padded.
+            // The total should be the sum of the global AR header (8 bytes),
+            // the entry header (60 bytes), and the data written so far.
+            final long expectedBytesBeforePadding = 8L + 60L + entrySize;
+            assertEquals("Byte count should be correct before closing the entry",
+                expectedBytesBeforePadding, arOut.getBytesWritten());
+
+            // Act: Close the entry, which will trigger padding
+            arOut.closeArchiveEntry();
+
+            // Assert: Check byte count after the entry is closed.
+            // Since the entry size (1215) is odd, one padding byte is added.
+            final long expectedBytesAfterPadding = expectedBytesBeforePadding + 1;
+            assertEquals("Byte count should include padding byte after closing the entry",
+                expectedBytesAfterPadding, arOut.getBytesWritten());
+        }
     }
 }
