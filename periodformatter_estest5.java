@@ -1,36 +1,36 @@
 package org.joda.time.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
 import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class PeriodFormatter_ESTestTest5 extends PeriodFormatter_ESTest_scaffolding {
+/**
+ * This test class focuses on the parsing capabilities of PeriodFormatter.
+ * The original test was auto-generated and has been improved for clarity.
+ */
+public class PeriodFormatter_ESTestTest5 {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = new PeriodFormatterBuilder.Literal("}=pKmkg&.wlkU)`)%`");
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        Period period0 = periodFormatter0.parsePeriod("}=pKmkg&.wlkU)`)%`");
-        assertNotNull(period0);
+    @Test
+    public void parsePeriod_withLiteralOnlyFormatter_shouldReturnZeroPeriodWhenTextMatches() {
+        // Arrange
+        final String literalText = "TEXT";
+
+        // A formatter component that only matches a specific literal string.
+        // It can be used as both a printer and a parser.
+        PeriodFormatterBuilder.Literal literalComponent = new PeriodFormatterBuilder.Literal(literalText);
+
+        // Create a formatter that is configured to only print and parse the literal text.
+        PeriodFormatter formatter = new PeriodFormatter(literalComponent, literalComponent);
+
+        // Act
+        Period result = formatter.parsePeriod(literalText);
+
+        // Assert
+        assertNotNull("The parsed period should not be null.", result);
+        
+        // Parsing a string that consists only of a literal, with no actual period fields
+        // (like years, days, hours), should result in a zero-length period.
+        assertEquals("A literal-only format should parse to a zero period.", Period.ZERO, result);
     }
 }
