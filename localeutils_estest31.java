@@ -1,21 +1,23 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class LocaleUtils_ESTestTest31 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Locale locale0 = Locale.GERMANY;
-        boolean boolean0 = LocaleUtils.isLanguageUndetermined(locale0);
-        assertFalse(boolean0);
+    @Test
+    public void isLanguageUndetermined_shouldReturnFalse_forLocaleWithDeterminedLanguage() {
+        // Arrange: Create a locale with a well-defined language ("de").
+        final Locale germanLocale = Locale.GERMANY;
+
+        // Act: Check if the locale's language is undetermined.
+        final boolean isUndetermined = LocaleUtils.isLanguageUndetermined(germanLocale);
+
+        // Assert: The result should be false, as the language is clearly defined.
+        assertFalse("Locale.GERMANY has a defined language ('de') and should not be considered undetermined.", isUndetermined);
     }
 }
