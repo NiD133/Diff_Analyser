@@ -1,34 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Tests for {@link JsonTreeReader}.
+ */
+// The test class name and inheritance are preserved from the original.
 public class JsonTreeReader_ESTestTest24 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test023() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextJsonElement();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling nextJsonElement() on a reader initialized with a null
+     * JsonElement throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void nextJsonElement_withNullRootElement_throwsNullPointerException() {
+        // 1. Arrange: Create a JsonTreeReader with a null root element.
+        JsonTreeReader reader = new JsonTreeReader((JsonElement) null);
+
+        // 2. Act: Attempt to read the next JSON element, which should trigger the exception.
+        reader.nextJsonElement();
+
+        // 3. Assert: The @Test(expected) annotation handles the exception assertion.
+        // The test will pass only if a NullPointerException is thrown.
     }
 }
