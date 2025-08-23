@@ -1,31 +1,41 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CodecEncoding_ESTestTest12 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link CodecEncoding} class.
+ * This specific test focuses on the {@code getCodec} method.
+ */
+public class CodecEncodingTest { // Renamed from CodecEncoding_ESTestTest12 for clarity
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        BHSDCodec bHSDCodec0 = Codec.SIGNED5;
-        Codec codec0 = CodecEncoding.getCodec(152, pipedInputStream0, bHSDCodec0);
-        assertEquals(0, codec0.lastBandLength);
+    /**
+     * Tests that getCodec, when given an encoding value of 152, correctly reads a
+     * byte from the input stream to construct a new BHSDCodec.
+     * According to the Pack200 specification, value 152 should result in a
+     * BHSDCodec(2, b+1), where 'b' is the byte read from the stream.
+     */
+    @Test
+    public void getCodecForValue152ShouldCreateBHSDCodecFromStreamByte() throws Exception {
+        // Arrange
+        final int encodingValue = 152;
+        final byte streamByte = 99;
+        final InputStream inputStream = new ByteArrayInputStream(new byte[]{streamByte});
+
+        // The default codec is a required parameter but is not used for this specific encoding value.
+        final Codec defaultCodec = Codec.SIGNED5;
+
+        // The expected codec is a BHSDCodec with b=2 and h=(streamByte + 1).
+        final Codec expectedCodec = new BHSDCodec(2, streamByte + 1);
+
+        // Act
+        final Codec resultCodec = CodecEncoding.getCodec(encodingValue, inputStream, defaultCodec);
+
+        // Assert
+        assertEquals("The returned codec should match the expected BHSDCodec configuration.",
+                expectedCodec, resultCodec);
     }
 }
