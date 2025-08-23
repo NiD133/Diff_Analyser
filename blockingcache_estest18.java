@@ -1,32 +1,45 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest18 extends BlockingCache_ESTest_scaffolding {
+/**
+ * Tests the behavior of BlockingCache when interacting with other cache decorators.
+ */
+public class BlockingCacheInteractionTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("Detected an attempt at releasing unacquired lock. This should never happen.");
-        SoftCache softCache0 = new SoftCache(perpetualCache0);
-        BlockingCache blockingCache0 = new BlockingCache(softCache0);
-        perpetualCache0.putObject("Detected an attempt at releasing unacquired lock. This should never happen.", "Detected an attempt at releasing unacquired lock. This should never happen.");
-        // Undeclared exception!
-        try {
-            blockingCache0.getObject("Detected an attempt at releasing unacquired lock. This should never happen.");
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // class java.lang.String cannot be cast to class java.lang.ref.SoftReference (java.lang.String and java.lang.ref.SoftReference are in module java.base of loader 'bootstrap')
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SoftCache", e);
-        }
+    /**
+     * Verifies that getObject throws a ClassCastException if the underlying cache
+     * contains an object of an unexpected type.
+     *
+     * This test simulates a specific edge case:
+     * 1. A cache stack is created: BlockingCache -> SoftCache -> PerpetualCache.
+     * 2. An entry is put directly into the innermost PerpetualCache, bypassing the
+     *    SoftCache wrapper. The SoftCache is designed to wrap all values in a
+     *    SoftReference.
+     * 3. When getObject() is called on the top-level BlockingCache, it delegates
+     *    down the chain.
+     * 4. The SoftCache retrieves the raw value (a String) and tries to cast it to a
+     *    SoftReference, which fails and correctly throws a ClassCastException.
+     */
+    @Test(expected = ClassCastException.class)
+    public void getObjectShouldThrowClassCastExceptionWhenDelegateCacheContainsWrongType() {
+        // Arrange: Create a decorated cache stack.
+        Cache perpetualCache = new PerpetualCache("test-delegate-cache");
+        Cache softCache = new SoftCache(perpetualCache);
+        Cache blockingCache = new BlockingCache(softCache);
+
+        String key = "test-key";
+        String value = "test-value";
+
+        // Directly manipulate the innermost cache, bypassing the SoftCache decorator.
+        // This puts a raw String into the cache, whereas SoftCache expects a SoftReference.
+        perpetualCache.putObject(key, value);
+
+        // Act & Assert: Attempting to get the object through the full cache stack.
+        // This is expected to fail inside SoftCache when it tries to cast the String
+        // to a SoftReference.
+        blockingCache.getObject(key);
     }
 }
