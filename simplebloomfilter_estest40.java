@@ -1,32 +1,41 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest40 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Shape shape0 = Shape.fromKM(655, 1);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(655, 655);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
+    /**
+     * Tests that merging a Hasher into a SimpleBloomFilter throws an
+     * IllegalArgumentException if the Hasher produces an index that is outside the
+     * valid range defined by the filter's Shape.
+     */
+    @Test
+    public void mergeHasherWithIndexOutOfBoundsShouldThrowException() {
+        // Arrange: Create a Bloom filter with a shape that has only one bit (m=1).
+        // This means the only valid index is 0.
+        final int numberOfBits = 1;
+        final int numberOfHashFunctions = 655; // An arbitrary high number for k
+        final Shape shape = Shape.fromKM(numberOfHashFunctions, numberOfBits);
+        final SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Arrange: Create a hasher that is known to produce indices greater than 0.
+        // The merge operation should fail as any index >= 1 is out of the valid range [0, 1).
+        final Hasher hasher = new EnhancedDoubleHasher(655, 655);
+
+        // Act & Assert
         try {
-            simpleBloomFilter0.merge((Hasher) enhancedDoubleHasher0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // IndexExtractor should only send values in the range[0,1)
-            //
-            verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
+            filter.merge(hasher);
+            fail("Expected an IllegalArgumentException to be thrown because the hasher produces out-of-bounds indices.");
+        } catch (final IllegalArgumentException e) {
+            // Assert: Verify that the correct exception was thrown with the expected message.
+            final String expectedMessage = "IndexExtractor should only send values in the range[0,1)";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
