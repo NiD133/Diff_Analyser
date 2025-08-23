@@ -1,30 +1,35 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest19 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test018() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Integer integer0 = xNode0.getIntBody((Integer) null);
-        assertNull(integer0);
+    /**
+     * Verifies that getIntBody(Integer def) returns the provided default value (null)
+     * when the XML node has no body content.
+     */
+    @Test
+    public void getIntBodyShouldReturnNullDefaultWhenNodeBodyIsEmpty() {
+        // Arrange
+        // An empty DOM node will result in an XNode with a null body.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        Integer defaultValue = null;
+
+        // Act
+        // Call the method under test with a null default value.
+        Integer result = xNode.getIntBody(defaultValue);
+
+        // Assert
+        // The result should be the provided default value.
+        assertNull("Expected getIntBody to return the null default value for an empty node body.", result);
     }
 }
