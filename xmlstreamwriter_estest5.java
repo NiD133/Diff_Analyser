@@ -1,39 +1,40 @@
 package org.apache.commons.io.output;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.fail;
 
-public class XmlStreamWriter_ESTestTest5 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XmlStreamWriter} class.
+ * This class focuses on improving a specific auto-generated test case.
+ */
+public class XmlStreamWriter_ESTestTest5 {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter((OutputStream) null);
-        char[] charArray0 = new char[0];
-        // Undeclared exception!
+    /**
+     * Tests that the write(char[], int, int) method throws an IndexOutOfBoundsException
+     * when the offset and length arguments are outside the bounds of the source character array.
+     */
+    @Test
+    public void writeWithOutOfBoundsParametersShouldThrowException() throws IOException {
+        // Arrange: Create a writer and a buffer with invalid write parameters.
+        // Using a real OutputStream implementation like ByteArrayOutputStream is more robust
+        // than using null, as it prevents potential NullPointerExceptions if the
+        // constructor's behavior changes.
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        final XmlStreamWriter writer = new XmlStreamWriter(outputStream);
+
+        final char[] emptyBuffer = new char[0];
+        final int outOfBoundsOffset = 1; // Any offset > 0 is invalid for an empty buffer
+        final int length = 1;
+
+        // Act & Assert: Attempt the write operation and verify that the correct exception is thrown.
         try {
-            xmlStreamWriter0.write(charArray0, 6343, 6343);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.StringWriter", e);
+            writer.write(emptyBuffer, outOfBoundsOffset, length);
+            fail("Expected an IndexOutOfBoundsException to be thrown due to out-of-bounds parameters.");
+        } catch (final IndexOutOfBoundsException e) {
+            // Success: The expected exception was caught. The test passes.
         }
     }
 }
