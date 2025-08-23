@@ -1,23 +1,29 @@
 package org.joda.time.chrono;
 
+import org.joda.time.DateTimeConstants;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.junit.runner.RunWith;
 
-public class GregorianChronology_ESTestTest5 extends GregorianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        GregorianChronology gregorianChronology0 = GregorianChronology.getInstance();
-        long long0 = gregorianChronology0.getAverageMillisPerYearDividedByTwo();
-        assertEquals(15778476000L, long0);
+/**
+ * Unit tests for {@link GregorianChronology}.
+ */
+public class GregorianChronologyTest {
+
+    @Test
+    public void testGetAverageMillisPerYearDividedByTwo_returnsCorrectConstantValue() {
+        // Arrange
+        GregorianChronology gregorianChronology = GregorianChronology.getInstance();
+
+        // The Gregorian calendar has an average of 365.2425 days per year.
+        // This test verifies the pre-calculated constant for half the average milliseconds in a year.
+        final long averageMillisPerYear = (long) (365.2425 * DateTimeConstants.MILLIS_PER_DAY);
+        final long expectedHalfAverageMillisPerYear = averageMillisPerYear / 2;
+
+        // Act
+        long actualHalfAverageMillisPerYear = gregorianChronology.getAverageMillisPerYearDividedByTwo();
+
+        // Assert
+        assertEquals(expectedHalfAverageMillisPerYear, actualHalfAverageMillisPerYear);
     }
 }
