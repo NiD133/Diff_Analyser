@@ -1,21 +1,28 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DeprecatedAttributes_ESTestTest3 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for the {@link DeprecatedAttributes} class, focusing on its builder.
+ */
+public class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test2() throws Throwable {
-        DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-        deprecatedAttributes_Builder0.setDescription("RSb&;Wj}.&C.b S?5");
-        DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder0.get();
-        String string0 = deprecatedAttributes0.getDescription();
-        assertEquals("", deprecatedAttributes0.getSince());
-        assertFalse(deprecatedAttributes0.isForRemoval());
-        assertEquals("RSb&;Wj}.&C.b S?5", string0);
+    @Test
+    public void shouldBuildWithDescriptionAndDefaultValuesForOthers() {
+        // Arrange
+        final String expectedDescription = "This option is deprecated; use --new-option instead.";
+        final DeprecatedAttributes.Builder builder = DeprecatedAttributes.builder();
+
+        // Act
+        builder.setDescription(expectedDescription);
+        final DeprecatedAttributes attributes = builder.get();
+
+        // Assert
+        assertEquals("The description should be set as provided.", expectedDescription, attributes.getDescription());
+        assertFalse("forRemoval should default to false when not set.", attributes.isForRemoval());
+        assertEquals("since should default to an empty string when not set.", "", attributes.getSince());
     }
 }
