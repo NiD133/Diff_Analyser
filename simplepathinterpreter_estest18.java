@@ -48,7 +48,7 @@ public class SimplePathInterpreter_ESTestTest18 extends SimplePathInterpreter_ES
     @Test(timeout = 4000)
     public void test17() throws Throwable {
         Expression[] expressionArray0 = new Expression[2];
-        Constant constant0 = new Constant("j~");
+        Constant constant0 = new Constant("j ~");
         CoreOperationNotEqual coreOperationNotEqual0 = new CoreOperationNotEqual(constant0, constant0);
         CoreOperationMod coreOperationMod0 = new CoreOperationMod(coreOperationNotEqual0, constant0);
         expressionArray0[0] = (Expression) coreOperationMod0;
