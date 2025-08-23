@@ -1,37 +1,22 @@
 package org.apache.commons.compress.harmony.pack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class CodecEncoding_ESTestTest34 extends CodecEncoding_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CodecEncoding} class.
+ */
+public class CodecEncodingTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        // Undeclared exception!
-        try {
-            CodecEncoding.getCanonicalCodec(260);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 260
-            //
-            verifyException("org.apache.commons.compress.harmony.pack200.CodecEncoding", e);
-        }
+    /**
+     * Verifies that calling getCanonicalCodec() with an index greater than the
+     * number of defined canonical codecs throws an ArrayIndexOutOfBoundsException.
+     * The source class defines 116 canonical codecs, so valid indices are 0-115.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void getCanonicalCodecShouldThrowExceptionForIndexOutOfBounds() {
+        // The canonicalCodec array has a fixed size of 116.
+        // Any index >= 116 is invalid and should cause an exception.
+        final int invalidIndex = 260;
+        CodecEncoding.getCanonicalCodec(invalidIndex);
     }
 }
