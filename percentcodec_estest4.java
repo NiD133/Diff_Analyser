@@ -1,21 +1,36 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertSame;
 
-public class PercentCodec_ESTestTest4 extends PercentCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link PercentCodec} class.
+ */
+public class PercentCodecTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        byteArray0[3] = (byte) 70;
-        byte[] byteArray1 = new byte[0];
-        PercentCodec percentCodec0 = new PercentCodec(byteArray1, true);
-        byte[] byteArray2 = percentCodec0.encode(byteArray0);
-        assertSame(byteArray2, byteArray0);
+    /**
+     * Tests that the encode method returns the same byte array instance
+     * when the input contains no characters that require encoding.
+     * This verifies an important optimization where the input array is returned
+     * directly if no modifications are necessary.
+     */
+    @Test
+    public void encodeShouldReturnSameArrayInstanceWhenNoCharactersNeedEncoding() {
+        // Arrange
+        // Create a codec with an empty list of characters to always encode.
+        // This means only non-US-ASCII characters and '%' should be encoded.
+        final PercentCodec percentCodec = new PercentCodec(new byte[0], true);
+
+        // Create an input byte array with "safe" US-ASCII characters that do not need encoding.
+        final byte[] unencodedBytes = "abcdef-12345".getBytes(StandardCharsets.US_ASCII);
+
+        // Act
+        final byte[] encodedBytes = percentCodec.encode(unencodedBytes);
+
+        // Assert
+        // The codec should recognize that no encoding is needed and return the original array instance,
+        // not a copy.
+        assertSame("Expected the same array instance when no encoding is performed", unencodedBytes, encodedBytes);
     }
 }
