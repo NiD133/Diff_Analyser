@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest15 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the Weeks class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        Weeks weeks1 = weeks0.MAX_VALUE.plus(weeks0);
-        assertEquals((-1), weeks1.getWeeks());
+    /**
+     * Tests that adding the maximum possible Weeks value to the minimum value
+     * correctly results in -1, demonstrating proper integer arithmetic without overflow.
+     * This is equivalent to Integer.MAX_VALUE + Integer.MIN_VALUE.
+     */
+    @Test
+    public void plus_whenAddingMaxAndMinValues_returnsNegativeOne() {
+        // Arrange
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        int expectedWeeks = -1;
+
+        // Act
+        Weeks result = maxWeeks.plus(minWeeks);
+
+        // Assert
+        assertEquals("Adding MAX_VALUE and MIN_VALUE should result in -1",
+                     expectedWeeks, result.getWeeks());
     }
 }
