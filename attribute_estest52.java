@@ -1,30 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest52 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.html;
-        String string0 = Attribute.getValidKey("\r\n\r\n", document_OutputSettings_Syntax0);
-        assertEquals("_", string0);
-        assertNotNull(string0);
+    /**
+     * Tests that {@link Attribute#getValidKey(String, Document.OutputSettings.Syntax)} correctly sanitizes an
+     * invalid key containing only control characters (carriage returns, newlines) when in HTML mode.
+     * The expected behavior is to replace the entire invalid string with a single underscore.
+     */
+    @Test
+    public void getValidKeyReplacesControlCharactersInHtmlMode() {
+        // Arrange
+        String invalidKey = "\r\n\r\n";
+        Document.OutputSettings.Syntax syntax = Document.OutputSettings.Syntax.html;
+        String expectedKey = "_";
+
+        // Act
+        String actualKey = Attribute.getValidKey(invalidKey, syntax);
+
+        // Assert
+        assertEquals(expectedKey, actualKey);
     }
 }
