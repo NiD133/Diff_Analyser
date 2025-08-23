@@ -1,26 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest54 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on boundary conditions.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        byte[] byteArray0 = new byte[4];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong(1000000000000000L, byteArray0, (int) (byte) 121);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 121
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with an offset that is outside
+     * the bounds of the destination byte array throws an
+     * {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputLong_shouldThrowException_whenOffsetIsOutOfBounds() {
+        // Arrange
+        byte[] buffer = new byte[10]; // A buffer of any size smaller than the offset.
+        long value = 12345L;          // The specific value is irrelevant for this boundary check.
+        int invalidOffset = 100;      // An offset clearly outside the buffer's bounds.
+
+        // Act
+        // This call is expected to throw ArrayIndexOutOfBoundsException.
+        NumberOutput.outputLong(value, buffer, invalidOffset);
+
+        // Assert is handled by the @Test(expected=...) annotation.
     }
 }
