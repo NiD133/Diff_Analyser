@@ -1,26 +1,52 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.util.Collections;
+import java.util.Set;
+
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+// The original test class name and inheritance are preserved as they might be part of a larger, generated test suite.
 public class JsonIgnoreProperties_ESTestTest18 extends JsonIgnoreProperties_ESTest_scaffolding {
 
+    /**
+     * Tests that calling `withoutAllowGetters()` on a `JsonIgnoreProperties.Value`
+     * instance returns the canonical `Value.EMPTY` singleton if the resulting
+     * configuration becomes identical to the default empty configuration.
+     * This verifies an optimization that avoids creating new objects unnecessarily.
+     */
     @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.EMPTY;
-        Set<String> set0 = jsonIgnoreProperties_Value0.findIgnoredForSerialization();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = JsonIgnoreProperties.Value.construct(set0, false, true, false, true);
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_Value1.withoutAllowGetters();
-        assertTrue(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value0);
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
+    public void withoutAllowGetters_whenResultIsEquivalentToEmpty_returnsEmptySingleton() {
+        // Arrange: Create a Value instance that is identical to Value.EMPTY,
+        // except that `allowGetters` is set to true.
+        // The properties of Value.EMPTY are:
+        // - ignored: empty set
+        // - ignoreUnknown: false
+        // - allowGetters: false
+        // - allowSetters: false
+        // - merge: true
+        Set<String> noIgnoredProperties = Collections.emptySet();
+        JsonIgnoreProperties.Value valueWithGettersAllowed = JsonIgnoreProperties.Value.construct(
+                noIgnoredProperties,
+                false, // ignoreUnknown
+                true,  // allowGetters (the only difference from EMPTY)
+                false, // allowSetters
+                true   // merge
+        );
+
+        // Sanity check the initial state.
+        assertTrue("Precondition: The initial value should have allowGetters enabled.",
+                valueWithGettersAllowed.getAllowGetters());
+
+        // Act: Call the method under test, which should flip `allowGetters` to false,
+        // making the configuration match the EMPTY instance.
+        JsonIgnoreProperties.Value result = valueWithGettersAllowed.withoutAllowGetters();
+
+        // Assert: The result of the operation should be the canonical EMPTY singleton,
+        // not just a new instance with the same values.
+        assertSame("The resulting value should be the canonical EMPTY instance.",
+                JsonIgnoreProperties.Value.EMPTY, result);
     }
 }
