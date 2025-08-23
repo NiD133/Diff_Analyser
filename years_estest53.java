@@ -1,18 +1,31 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest53 extends Years_ESTest_scaffolding {
+/**
+ * This test suite contains tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        Years years0 = Years.years(0);
-        years0.getPeriodType();
-        assertEquals(0, years0.getYears());
+    /**
+     * Verifies that a `Years` object, created using the `years()` factory method,
+     * is initialized with the correct state. It checks both the number of years
+     * and the period type.
+     */
+    @Test
+    public void yearsFactory_shouldCreateObjectWithCorrectState() {
+        // Arrange: Define the expected number of years.
+        final int expectedYears = 0;
+
+        // Act: Create a Years instance using the factory method.
+        Years years = Years.years(expectedYears);
+
+        // Assert: Verify that the object's state is correct.
+        // 1. The number of years should match the value provided to the factory.
+        assertEquals(expectedYears, years.getYears());
+        
+        // 2. The period type should be correctly set to PeriodType.years().
+        assertEquals(PeriodType.years(), years.getPeriodType());
     }
 }
