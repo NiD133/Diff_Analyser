@@ -1,18 +1,28 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LazilyParsedNumber_ESTestTest10 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("0");
-        double double0 = lazilyParsedNumber0.doubleValue();
-        assertEquals(0.0, double0, 0.01);
+    /**
+     * Verifies that calling {@code doubleValue()} on an instance created
+     * with the string "0" correctly returns the double value 0.0.
+     */
+    @Test
+    public void doubleValue_whenNumberIsZero_returnsZero() {
+        // Arrange
+        LazilyParsedNumber number = new LazilyParsedNumber("0");
+        double expectedValue = 0.0;
+
+        // Act
+        double actualValue = number.doubleValue();
+
+        // Assert
+        // A delta of 0.0 is used because we expect an exact conversion for "0".
+        assertEquals(expectedValue, actualValue, 0.0);
     }
 }
