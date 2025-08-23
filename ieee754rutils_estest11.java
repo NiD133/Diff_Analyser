@@ -1,17 +1,26 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest11 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        double double0 = IEEE754rUtils.min(2855.35762973, 2855.35762973);
-        assertEquals(2855.35762973, double0, 0.01);
+    /**
+     * Tests that IEEE754rUtils.min() returns the input value when both double arguments are identical.
+     */
+    @Test
+    public void minWithEqualDoublesShouldReturnTheValue() {
+        // Arrange
+        final double value = 2855.35762973;
+        final double expected = 2855.35762973;
+
+        // Act
+        final double actual = IEEE754rUtils.min(value, value);
+
+        // Assert
+        assertEquals("The minimum of two equal doubles should be the value itself.", expected, actual, 0.0);
     }
 }
