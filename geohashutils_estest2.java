@@ -1,21 +1,31 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
+import static org.junit.Assert.assertEquals;
 
-public class GeohashUtils_ESTestTest2 extends GeohashUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link GeohashUtils}.
+ */
+public class GeohashUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        GeohashUtils.encodeLatLon((double) 13, (double) 13, 0);
+    /**
+     * Tests that encoding a location with a precision of 0 results in an empty string.
+     * A geohash's precision corresponds to its string length, so zero precision
+     * should logically yield a zero-length string.
+     */
+    @Test
+    public void encodeLatLon_withZeroPrecision_shouldReturnEmptyString() {
+        // Arrange
+        final double latitude = 13.0;
+        final double longitude = 13.0;
+        final int precision = 0;
+        final String expectedGeohash = "";
+
+        // Act
+        String actualGeohash = GeohashUtils.encodeLatLon(latitude, longitude, precision);
+
+        // Assert
+        assertEquals("Encoding with zero precision should produce an empty geohash.",
+                expectedGeohash, actualGeohash);
     }
 }
