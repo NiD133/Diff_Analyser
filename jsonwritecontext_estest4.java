@@ -1,34 +1,33 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class JsonWriteContext_ESTestTest4 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonWriteContext} class, focusing on its state management.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonGenerator) null);
-        JsonWriteContext jsonWriteContext0 = new JsonWriteContext((byte) (-16), (JsonWriteContext) null, dupDetector0);
-        Object object0 = new Object();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext(object0);
-        assertNotNull(jsonWriteContext1);
-        jsonWriteContext1.writeFieldName("I=b]y/#@HKfkg#;");
-        jsonWriteContext1.withDupDetector(dupDetector0);
-        assertTrue(jsonWriteContext1.hasCurrentName());
+    /**
+     * Verifies that hasCurrentName() correctly returns true after a field name has been written
+     * to an object context.
+     */
+    @Test
+    public void hasCurrentNameShouldReturnTrueAfterWritingFieldName() throws Exception {
+        // Arrange: Create a root context and a child object context.
+        DupDetector dupDetector = DupDetector.rootDetector((JsonGenerator) null);
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext(dupDetector);
+        JsonWriteContext objectContext = rootContext.createChildObjectContext();
+
+        // Sanity check: Initially, the context should not have a current name.
+        assertFalse("A new object context should not have a current name", objectContext.hasCurrentName());
+
+        // Act: Write a field name to the object context.
+        objectContext.writeFieldName("testProperty");
+
+        // Assert: The context should now report that it has a current name.
+        assertTrue("hasCurrentName() should return true after a field name is written", objectContext.hasCurrentName());
     }
 }
