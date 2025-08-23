@@ -1,31 +1,37 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JsonArray_ESTestTest35 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Number) null);
-        // Undeclared exception!
+    /**
+     * Tests that calling getAsFloat() on a JsonArray containing a single JsonNull element
+     * throws an UnsupportedOperationException.
+     *
+     * The getAs...() methods on JsonArray are convenience wrappers that operate on the
+     * array's single element. The test verifies that the exception from the underlying
+     * JsonNull element is correctly propagated.
+     */
+    @Test
+    public void getAsFloat_shouldThrowUnsupportedOperationException_whenArrayContainsSingleJsonNull() {
+        // Arrange: Create a JsonArray and add a null value.
+        // Per JsonArray's contract, adding a null reference results in a JsonNull element.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((Number) null);
+
+        // Act & Assert: Verify that calling getAsFloat() throws the expected exception.
         try {
-            jsonArray0.getAsFloat();
-            fail("Expecting exception: UnsupportedOperationException");
+            jsonArray.getAsFloat();
+            fail("Expected an UnsupportedOperationException to be thrown, but it was not.");
         } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
+            // The exception is thrown by JsonElement.getAsFloat(), and its message
+            // is the simple name of the subclass, which is "JsonNull" in this case.
+            assertEquals("JsonNull", e.getMessage());
         }
     }
 }
