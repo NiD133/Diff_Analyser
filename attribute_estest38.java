@@ -2,31 +2,31 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest38 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("open", "w'8l4N");
-        Attribute attribute1 = attribute0.clone();
-        attribute0.setValue("compact");
-        boolean boolean0 = attribute0.equals(attribute1);
-        assertEquals("compact", attribute0.getValue());
-        assertFalse(boolean0);
+    @Test
+    public void equalsReturnsFalseForClonedAttributeWithModifiedValue() {
+        // Arrange: Create an attribute and a clone of it.
+        Attribute originalAttribute = new Attribute("key", "value");
+        Attribute clonedAttribute = originalAttribute.clone();
+
+        // Sanity check: ensure the clone is equal to the original initially.
+        assertEquals(originalAttribute, clonedAttribute);
+        
+        // Act: Modify the value of the original attribute.
+        originalAttribute.setValue("newValue");
+
+        // Assert: The original and the clone should no longer be equal.
+        assertNotEquals("The modified original attribute should not be equal to its unmodified clone.",
+            originalAttribute, clonedAttribute);
+
+        // Also, verify the value was indeed changed on the original attribute.
+        assertEquals("newValue", originalAttribute.getValue());
+        // And that the clone's value remained unchanged.
+        assertEquals("value", clonedAttribute.getValue());
     }
 }
