@@ -1,26 +1,38 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IslamicChronology_ESTestTest11 extends IslamicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.getDefault();
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstance(dateTimeZone0);
-        Object object0 = new Object();
-        IslamicChronology islamicChronology1 = new IslamicChronology(islamicChronology0, object0, islamicChronology0.LEAP_YEAR_15_BASED);
-        boolean boolean0 = islamicChronology0.equals(islamicChronology1);
-        assertFalse(islamicChronology1.equals((Object) islamicChronology0));
-        assertFalse(boolean0);
+/**
+ * Test suite for the equals() and hashCode() methods of IslamicChronology.
+ */
+public class IslamicChronologyEqualsTest {
+
+    @Test
+    public void chronologiesWithDifferentLeapYearPatternsShouldNotBeEqual() {
+        // Arrange: Create two IslamicChronology instances for the same time zone
+        // but with different leap year calculation patterns.
+        DateTimeZone defaultZone = DateTimeZone.getDefault();
+        
+        IslamicChronology chrono16Based = IslamicChronology.getInstance(
+            defaultZone, IslamicChronology.LEAP_YEAR_16_BASED);
+            
+        IslamicChronology chrono15Based = IslamicChronology.getInstance(
+            defaultZone, IslamicChronology.LEAP_YEAR_15_BASED);
+
+        // Assert: The two chronologies should not be considered equal because their
+        // underlying leap year patterns are different.
+        // The equals() method should be symmetric.
+        assertFalse("Chronologies with different leap year patterns should not be equal", 
+                    chrono16Based.equals(chrono15Based));
+        assertFalse("The equals() method should be symmetric", 
+                    chrono15Based.equals(chrono16Based));
+
+        // As per the equals/hashCode contract, their hash codes should also be different.
+        assertNotEquals("Hash codes should differ for unequal objects", 
+                        chrono16Based.hashCode(), chrono15Based.hashCode());
     }
 }
