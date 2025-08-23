@@ -1,27 +1,54 @@
 package com.fasterxml.jackson.annotation;
 
-import java.util.*;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonIncludePropertiesTestTest5 {
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-    private final JsonIncludeProperties.Value ALL = JsonIncludeProperties.Value.all();
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private Set<String> _set(String... args) {
-        return new LinkedHashSet<String>(Arrays.asList(args));
-    }
+/**
+ * Tests for {@link JsonIncludeProperties.Value}.
+ * This focuses on the merging and overriding logic.
+ */
+class JsonIncludePropertiesTestTest5 {
 
-    @JsonIncludeProperties(value = { "foo", "bar" })
-    private final static class Bogus {
+    /**
+     * Helper class annotated to provide a base {@link JsonIncludeProperties.Value}
+     * for testing purposes.
+     */
+    @JsonIncludeProperties(value = {"foo", "bar"})
+    private static class BasePropertiesConfig {
     }
 
     @Test
-    public void testWithOverridesMerge() {
-        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
-        v = v.withOverrides(new JsonIncludeProperties.Value(_set("foo")));
-        Set<String> included = v.getIncluded();
-        assertEquals(1, included.size());
-        assertEquals(_set("foo"), included);
+    void withOverrides_shouldIntersectIncludedProperties() {
+        // Arrange: Define the base and override configurations.
+        // The withOverrides() method is expected to compute the intersection of properties
+        // when both the base and override values have properties defined.
+
+        // 1. Base value is created from an annotation with properties {"foo", "bar"}
+        JsonIncludeProperties.Value baseValue = JsonIncludeProperties.Value.from(
+                BasePropertiesConfig.class.getAnnotation(JsonIncludeProperties.class));
+
+        // 2. Override value is created with a single property, {"foo"}
+        JsonIncludeProperties.Value overrideValue = new JsonIncludeProperties.Value(asSet("foo"));
+
+        // Act: Apply the override.
+        JsonIncludeProperties.Value resultValue = baseValue.withOverrides(overrideValue);
+        Set<String> actualIncludedProperties = resultValue.getIncluded();
+
+        // Assert: Verify that the result contains only the properties present in BOTH sets.
+        // The intersection of {"foo", "bar"} and {"foo"} should be {"foo"}.
+        Set<String> expectedIncludedProperties = asSet("foo");
+        assertEquals(expectedIncludedProperties, actualIncludedProperties);
+    }
+
+    /**
+     * Creates a Set of strings for easy definition of expected values.
+     */
+    private Set<String> asSet(String... args) {
+        return new LinkedHashSet<>(Arrays.asList(args));
     }
 }
