@@ -1,36 +1,36 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest105 extends Elements_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test104() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("", "");
-        Elements elements0 = document0.getElementsContainingText("");
-        List<FormElement> list0 = elements0.forms();
-        assertTrue(list0.isEmpty());
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This test class focuses on the behavior of the Elements.forms() method.
+ */
+public class Elements_ESTestTest105_Refactored { // Renamed for clarity
+
+    /**
+     * Verifies that the forms() method returns an empty list when called on a collection
+     * of elements that do not contain any <form> tags.
+     */
+    @Test
+    public void formsShouldReturnEmptyListWhenNoFormElementsArePresent() {
+        // Arrange: Create a document with a basic structure but no <form> elements.
+        // Parsing an empty body fragment results in <html><head></head><body></body></html>.
+        Document doc = Parser.parseBodyFragment("", "");
+
+        // Select all elements in the document. None of these are or contain a <form>.
+        Elements elements = doc.getAllElements();
+
+        // Act: Attempt to retrieve form elements from the collection.
+        List<FormElement> forms = elements.forms();
+
+        // Assert: The resulting list of forms should be empty.
+        assertTrue("The forms list should be empty as no <form> elements exist in the source.", forms.isEmpty());
     }
 }
