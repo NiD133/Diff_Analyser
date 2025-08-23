@@ -1,25 +1,20 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest28 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        // Undeclared exception!
-        try {
-            IEEE754rUtils.max((double[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // array
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the max(double...) method throws a NullPointerException when the input array is null,
+     * as specified by its contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void max_withNullDoubleArray_shouldThrowNullPointerException() {
+        // The method under test requires a non-null array.
+        // This call is expected to fail with a NullPointerException.
+        IEEE754rUtils.max((double[]) null);
     }
 }
