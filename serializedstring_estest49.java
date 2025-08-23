@@ -1,29 +1,35 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest49 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("n5($,aeq=SuL");
-        char[] charArray0 = serializedString0.asQuotedChars();
-        assertNotNull(charArray0);
-        int int0 = serializedString0.appendQuoted(charArray0, 188);
-        assertEquals((-1), int0);
+    /**
+     * Verifies that {@code appendQuoted(char[], int)} correctly handles an offset
+     * that is outside the bounds of the destination buffer.
+     * <p>
+     * The method is expected to perform a bounds check and return -1 to indicate
+     * that the append operation failed, rather than throwing an
+     * {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test
+    public void appendQuotedShouldReturnFailureCodeWhenOffsetIsOutOfBounds() {
+        // Arrange
+        final SerializedString contentToAppend = new SerializedString("value");
+        final char[] destinationBuffer = new char[10];
+        
+        // Use an offset that is clearly larger than the buffer's length.
+        final int outOfBoundsOffset = 20;
+
+        // Act
+        final int charsWritten = contentToAppend.appendQuoted(destinationBuffer, outOfBoundsOffset);
+
+        // Assert
+        // A return value of -1 signifies that the append operation failed due to lack of space.
+        assertEquals("Should return -1 for an out-of-bounds offset", -1, charsWritten);
     }
 }
