@@ -1,35 +1,64 @@
 package org.apache.commons.lang3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CharSetUtilsTestTest9 extends AbstractLangTest {
+/**
+ * Tests for {@link CharSetUtils#keep(String, String...)}.
+ */
+@DisplayName("Tests for CharSetUtils.keep(String, String...)")
+class CharSetUtilsKeepTest extends AbstractLangTest {
 
     @Test
-    void testKeep_StringStringarray() {
-        assertNull(CharSetUtils.keep(null, (String[]) null));
-        assertNull(CharSetUtils.keep(null));
-        assertNull(CharSetUtils.keep(null, (String) null));
-        assertNull(CharSetUtils.keep(null, "a-e"));
-        assertEquals("", CharSetUtils.keep("", (String[]) null));
-        assertEquals("", CharSetUtils.keep(""));
-        assertEquals("", CharSetUtils.keep("", (String) null));
-        assertEquals("", CharSetUtils.keep("", "a-e"));
-        assertEquals("", CharSetUtils.keep("hello", (String[]) null));
-        assertEquals("", CharSetUtils.keep("hello"));
-        assertEquals("", CharSetUtils.keep("hello", (String) null));
+    @DisplayName("should return null when the input string is null")
+    void testKeepWithNullString() {
+        assertNull(CharSetUtils.keep(null, "a-e"), "Set with a range");
+        assertNull(CharSetUtils.keep(null, (String[]) null), "Null set");
+        assertNull(CharSetUtils.keep(null), "Empty set");
+    }
+
+    @Test
+    @DisplayName("should return an empty string when the input string is empty")
+    void testKeepWithEmptyString() {
+        assertEquals("", CharSetUtils.keep("", "a-e"), "Set with a range");
+        assertEquals("", CharSetUtils.keep("", (String[]) null), "Null set");
+        assertEquals("", CharSetUtils.keep(""), "Empty set");
+    }
+
+    @Test
+    @DisplayName("should return an empty string when the character set is null or empty")
+    void testKeepWithNullOrEmptySet() {
+        assertEquals("", CharSetUtils.keep("hello", (String[]) null), "For a null set");
+        assertEquals("", CharSetUtils.keep("hello"), "For an empty set");
+        assertEquals("", CharSetUtils.keep("hello", (String) null), "For a set containing null");
+    }
+
+    @Test
+    @DisplayName("should keep characters that match a character range")
+    void testKeepWithCharacterRange() {
         assertEquals("e", CharSetUtils.keep("hello", "a-e"));
-        assertEquals("e", CharSetUtils.keep("hello", "a-e"));
+    }
+
+    @Test
+    @DisplayName("should keep characters specified in a simple set")
+    void testKeepWithSimpleSet() {
         assertEquals("ell", CharSetUtils.keep("hello", "el"));
-        assertEquals("hello", CharSetUtils.keep("hello", "elho"));
-        assertEquals("hello", CharSetUtils.keep("hello", "a-z"));
-        assertEquals("----", CharSetUtils.keep("----", "-"));
         assertEquals("ll", CharSetUtils.keep("hello", "l"));
+    }
+
+    @Test
+    @DisplayName("should return the original string if all its characters are in the set")
+    void testKeepWhenAllCharactersMatch() {
+        assertEquals("hello", CharSetUtils.keep("hello", "elho"), "Set contains all characters");
+        assertEquals("hello", CharSetUtils.keep("hello", "a-z"), "Set is a superset range");
+    }
+
+    @Test
+    @DisplayName("should correctly handle special characters like hyphen in the set")
+    void testKeepWithSpecialCharacters() {
+        assertEquals("----", CharSetUtils.keep("----", "-"));
     }
 }
