@@ -2,68 +2,54 @@ package org.apache.commons.codec.binary;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.lang3.ArrayUtils;
+
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest12 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+/**
+ * Tests the {@link Base16} class, focusing on its streaming decoding capabilities.
+ */
+public class Base16Test {
 
     /**
-     * @return the random.
+     * Tests that the decoder correctly processes a Base16 string one character at a time,
+     * maintaining the decoding state between calls. This is crucial for streaming applications
+     * where data may arrive in small, incomplete chunks.
      */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
-
     @Test
-    void testDecodeSingleBytesOptimization() {
+    void testStreamingDecodeWithPartialData() {
+        // This test simulates a streaming decode of the Base16 string "EF",
+        // where each character is processed in a separate call to decode().
+        // The hexadecimal string "EF" should decode to the single byte 0xEF.
+
+        // Arrange: Create a Base16 codec and a context object for the streaming operation.
+        final Base16 base16 = new Base16();
         final BaseNCodec.Context context = new BaseNCodec.Context();
-        assertEquals(0, context.ibitWorkArea);
-        assertNull(context.buffer);
-        final byte[] data = new byte[1];
-        final Base16 b16 = new Base16();
-        data[0] = (byte) 'E';
-        b16.decode(data, 0, 1, context);
-        assertEquals(15, context.ibitWorkArea);
-        assertNull(context.buffer);
-        data[0] = (byte) 'F';
-        b16.decode(data, 0, 1, context);
-        assertEquals(0, context.ibitWorkArea);
-        assertEquals((byte) 0xEF, context.buffer[0]);
+
+        // Assert: The initial state of the context should be empty.
+        assertEquals(0, context.ibitWorkArea, "Initial work area should be 0");
+        assertNull(context.buffer, "Initial buffer should be null");
+
+        // Act: Decode the first character 'E' of the pair "EF".
+        // 'E' in hex corresponds to the 4-bit value 14 (0b1110).
+        final byte[] firstHexChar = {(byte) 'E'};
+        base16.decode(firstHexChar, 0, 1, context);
+
+        // Assert: The context should now hold the value of the first hex character.
+        // The 4-bit value 14 is stored in the work area, waiting for the next hex char.
+        assertEquals(14, context.ibitWorkArea, "Work area should hold the value of the first hex char");
+        assertNull(context.buffer, "Buffer should still be null as a full byte has not been formed");
+
+        // Act: Decode the second character 'F' of the pair "EF".
+        // 'F' in hex corresponds to the 4-bit value 15 (0b1111).
+        final byte[] secondHexChar = {(byte) 'F'};
+        base16.decode(secondHexChar, 0, 1, context);
+
+        // Assert: The two 4-bit values should be combined into a single byte 0xEF.
+        // The context's work area should be reset, and the result written to the buffer.
+        // Calculation: (14 << 4) | 15  =>  224 | 15  =>  239  =>  0xEF
+        assertEquals(0, context.ibitWorkArea, "Work area should be reset after a full byte is decoded");
+        final byte[] expectedDecodedBytes = {(byte) 0xEF};
+        assertArrayEquals(expectedDecodedBytes, context.buffer, "Buffer should contain the fully decoded byte");
     }
 }
