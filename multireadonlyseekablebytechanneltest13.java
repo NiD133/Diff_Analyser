@@ -1,173 +1,221 @@
 package org.apache.commons.compress.utils;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.File;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class MultiReadOnlySeekableByteChannelTestTest13 {
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ *
+ * <p>The tests follow a comprehensive strategy by verifying the channel's behavior
+ * against various data chunking schemes and read buffer sizes.</p>
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    private void check(final byte[] expected) throws IOException {
-        for (int channelSize = 1; channelSize <= expected.length; channelSize++) {
-            // Sanity check that all operations work for SeekableInMemoryByteChannel
-            try (SeekableByteChannel single = makeSingle(expected)) {
-                check(expected, single);
-            }
-            // Checks against our MultiReadOnlySeekableByteChannel instance
-            try (SeekableByteChannel multi = makeMulti(grouped(expected, channelSize))) {
-                check(expected, multi);
-            }
-        }
-    }
+    private static final byte[] TEST_DATA = "0123456789".getBytes(StandardCharsets.US_ASCII);
 
-    private void check(final byte[] expected, final SeekableByteChannel channel) throws IOException {
-        for (int readBufferSize = 1; readBufferSize <= expected.length + 5; readBufferSize++) {
-            check(expected, channel, readBufferSize);
-        }
-    }
+    //<editor-fold desc="Tests for MultiReadOnlySeekableByteChannel">
 
-    private void check(final byte[] expected, final SeekableByteChannel channel, final int readBufferSize) throws IOException {
-        assertTrue(channel.isOpen(), "readBufferSize " + readBufferSize);
-        assertEquals(expected.length, channel.size(), "readBufferSize " + readBufferSize);
-        channel.position(0);
-        assertEquals(0, channel.position(), "readBufferSize " + readBufferSize);
-        assertEquals(0, channel.read(ByteBuffer.allocate(0)), "readBufferSize " + readBufferSize);
-        // Will hold the entire result that we read
-        final ByteBuffer resultBuffer = ByteBuffer.allocate(expected.length + 100);
-        // Used for each read() method call
-        final ByteBuffer buf = ByteBuffer.allocate(readBufferSize);
-        int bytesRead = channel.read(buf);
-        while (bytesRead != -1) {
-            final int remaining = buf.remaining();
-            buf.flip();
-            resultBuffer.put(buf);
-            buf.clear();
-            bytesRead = channel.read(buf);
-            // If this isn't the last read() then we expect the buf
-            // ByteBuffer to be full (i.e. have no remaining)
-            if (resultBuffer.position() < expected.length) {
-                assertEquals(0, remaining, "readBufferSize " + readBufferSize);
-            }
-            if (bytesRead == -1) {
-                assertEquals(0, buf.position(), "readBufferSize " + readBufferSize);
-            } else {
-                assertEquals(bytesRead, buf.position(), "readBufferSize " + readBufferSize);
-            }
-        }
-        resultBuffer.flip();
-        final byte[] arr = new byte[resultBuffer.remaining()];
-        resultBuffer.get(arr);
-        assertArrayEquals(expected, arr, "readBufferSize " + readBufferSize);
-    }
-
-    private void checkEmpty(final SeekableByteChannel channel) throws IOException {
-        final ByteBuffer buf = ByteBuffer.allocate(10);
-        assertTrue(channel.isOpen());
-        assertEquals(0, channel.size());
-        assertEquals(0, channel.position());
-        assertEquals(-1, channel.read(buf));
-        channel.position(5);
-        assertEquals(-1, channel.read(buf));
-        channel.close();
-        assertFalse(channel.isOpen());
-        assertThrows(ClosedChannelException.class, () -> channel.read(buf), "expected a ClosedChannelException");
-        assertThrows(ClosedChannelException.class, () -> channel.position(100), "expected a ClosedChannelException");
-    }
-
-    private byte[][] grouped(final byte[] input, final int chunkSize) {
-        final List<byte[]> groups = new ArrayList<>();
-        int idx = 0;
-        for (; idx + chunkSize <= input.length; idx += chunkSize) {
-            groups.add(Arrays.copyOfRange(input, idx, idx + chunkSize));
-        }
-        if (idx < input.length) {
-            groups.add(Arrays.copyOfRange(input, idx, input.length));
-        }
-        return groups.toArray(new byte[0][]);
-    }
-
-    private SeekableByteChannel makeEmpty() {
-        return makeSingle(ByteUtils.EMPTY_BYTE_ARRAY);
-    }
-
-    private SeekableByteChannel makeMulti(final byte[][] arr) {
-        final SeekableByteChannel[] s = new SeekableByteChannel[arr.length];
-        for (int i = 0; i < s.length; i++) {
-            s[i] = makeSingle(arr[i]);
-        }
-        return MultiReadOnlySeekableByteChannel.forSeekableByteChannels(s);
-    }
-
-    private SeekableByteChannel makeSingle(final byte[] arr) {
-        return new SeekableInMemoryByteChannel(arr);
-    }
-
-    private SeekableByteChannel testChannel() {
-        return MultiReadOnlySeekableByteChannel.forSeekableByteChannels(makeEmpty(), makeEmpty());
-    }
-
-    private static final class ThrowingSeekableByteChannel implements SeekableByteChannel {
-
-        private boolean closed;
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-            throw new IOException("foo");
-        }
-
-        @Override
-        public boolean isOpen() {
-            return !closed;
-        }
-
-        @Override
-        public long position() {
-            return 0;
-        }
-
-        @Override
-        public SeekableByteChannel position(final long newPosition) {
-            return this;
-        }
-
-        @Override
-        public int read(final ByteBuffer dst) throws IOException {
-            return -1;
-        }
-
-        @Override
-        public long size() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public SeekableByteChannel truncate(final long size) {
-            return this;
-        }
-
-        @Override
-        public int write(final ByteBuffer src) throws IOException {
-            return 0;
+    @Test
+    void multiChannelFromNoChannelsShouldBeEmpty() throws IOException {
+        try (SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forSeekableByteChannels()) {
+            assertEmptyChannelBehavior(channel);
         }
     }
 
     @Test
-    void testReferenceBehaviorForEmptyChannel() throws IOException {
-        checkEmpty(makeEmpty());
+    void multiChannelFromMultipleEmptyChannelsShouldBeEmpty() throws IOException {
+        try (SeekableByteChannel channel = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(
+            createInMemoryChannel(ByteUtils.EMPTY_BYTE_ARRAY),
+            createInMemoryChannel(ByteUtils.EMPTY_BYTE_ARRAY))) {
+            assertEmptyChannelBehavior(channel);
+        }
     }
+
+    @Test
+    void multiChannelWithContentIsReadCorrectly() throws IOException {
+        // This test uses a comprehensive helper to check various data chunking
+        // and read buffer size strategies.
+        assertMultiChannelBehavesCorrectly(TEST_DATA);
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Sanity checks for the test's utility channel (SeekableInMemoryByteChannel)">
+
+    @Test
+    void inMemoryChannelBehavesAsExpectedWhenEmpty() throws IOException {
+        try (SeekableByteChannel channel = createInMemoryChannel(ByteUtils.EMPTY_BYTE_ARRAY)) {
+            assertEmptyChannelBehavior(channel);
+        }
+    }
+
+    @Test
+    void inMemoryChannelWithContentIsReadCorrectly() throws IOException {
+        try (SeekableByteChannel channel = createInMemoryChannel(TEST_DATA)) {
+            // Verifies the baseline behavior of the utility channel with various buffer sizes.
+            assertChannelContentAndBehavior(TEST_DATA, channel);
+        }
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Assertion Helper Methods">
+
+    /**
+     * A comprehensive check that tests a MultiReadOnlySeekableByteChannel created from the given data.
+     * <p>
+     * It splits the data into various chunk sizes, creates a multi-channel for each,
+     * and then verifies its behavior against the expected full data set.
+     *
+     * @param expectedData The complete data set the channel should represent.
+     */
+    private void assertMultiChannelBehavesCorrectly(final byte[] expectedData) throws IOException {
+        // Test splitting the data into chunks of different sizes (from 1 to full length).
+        for (int chunkSize = 1; chunkSize <= expectedData.length; chunkSize++) {
+            final byte[][] chunks = groupDataIntoChunks(expectedData, chunkSize);
+            try (SeekableByteChannel multiChannel = createMultiChannelFromChunks(chunks)) {
+                // For each chunking strategy, test with various read buffer sizes.
+                assertChannelContentAndBehavior(expectedData, multiChannel);
+            }
+        }
+    }
+
+    /**
+     * Verifies that a given channel's content and behavior match the expected data.
+     * <p>
+     * This check is run with multiple different read buffer sizes to ensure correctness
+     * under various reading conditions.
+     *
+     * @param expectedData The data the channel is expected to contain.
+     * @param channel      The channel to test.
+     */
+    private void assertChannelContentAndBehavior(final byte[] expectedData, final SeekableByteChannel channel) throws IOException {
+        // Test with various read buffer sizes, including smaller, equal, and larger than the content.
+        for (int readBufferSize = 1; readBufferSize <= expectedData.length + 5; readBufferSize++) {
+            verifyChannelRead(expectedData, channel, readBufferSize);
+        }
+    }
+
+    /**
+     * The core verification logic for a given channel and a specific read buffer size.
+     * <p>
+     * Asserts channel properties (size, position) and reads the entire channel to verify
+     * its content byte-by-byte. It also checks that the channel is read efficiently.
+     *
+     * @param expectedData   The data the channel is expected to contain.
+     * @param channel        The channel to test.
+     * @param readBufferSize The size of the buffer to use for each read() call.
+     */
+    private void verifyChannelRead(final byte[] expectedData, final SeekableByteChannel channel, final int readBufferSize) throws IOException {
+        final String context = "readBufferSize " + readBufferSize;
+        assertTrue(channel.isOpen(), context);
+        assertEquals(expectedData.length, channel.size(), context);
+
+        // Reset position and read from the start.
+        channel.position(0);
+        assertEquals(0, channel.position(), context);
+        assertEquals(0, channel.read(ByteBuffer.allocate(0)), "Reading into a zero-sized buffer should return 0: " + context);
+
+        final ByteBuffer resultBuffer = ByteBuffer.allocate(expectedData.length + 100); // A buffer large enough for all content and padding.
+        final ByteBuffer readBuffer = ByteBuffer.allocate(readBufferSize);
+
+        int bytesRead;
+        while ((bytesRead = channel.read(readBuffer)) != -1) {
+            final int remainingBeforeFlip = readBuffer.remaining();
+            readBuffer.flip();
+            resultBuffer.put(readBuffer);
+            readBuffer.clear();
+
+            // If this isn't the final read, the buffer should have been completely filled.
+            if (resultBuffer.position() < expectedData.length) {
+                assertEquals(0, remainingBeforeFlip, "Buffer should be full on intermediate reads: " + context);
+            }
+
+            // The buffer's position should reflect the number of bytes read.
+            if (bytesRead == -1) {
+                assertEquals(0, readBuffer.position(), "Buffer position should be 0 after EOF: " + context);
+            } else {
+                assertEquals(bytesRead, readBuffer.position(), "Buffer position should match bytes read: " + context);
+            }
+        }
+
+        resultBuffer.flip();
+        final byte[] actualData = new byte[resultBuffer.remaining()];
+        resultBuffer.get(actualData);
+        assertArrayEquals(expectedData, actualData, context);
+    }
+
+    /**
+     * Verifies the behavior of a channel that is expected to be empty.
+     *
+     * @param channel The empty channel to test.
+     */
+    private void assertEmptyChannelBehavior(final SeekableByteChannel channel) throws IOException {
+        final ByteBuffer buf = ByteBuffer.allocate(10);
+        assertTrue(channel.isOpen());
+        assertEquals(0, channel.size());
+        assertEquals(0, channel.position());
+
+        // Reading an empty channel should immediately return -1 (EOF).
+        assertEquals(-1, channel.read(buf));
+
+        // Positioning past the end of an empty channel is allowed, but reading should still be EOF.
+        channel.position(5);
+        assertEquals(-1, channel.read(buf));
+
+        channel.close();
+        assertFalse(channel.isOpen());
+
+        // Operations on a closed channel should fail.
+        assertThrows(ClosedChannelException.class, () -> channel.read(buf), "read() on a closed channel");
+        assertThrows(ClosedChannelException.class, () -> channel.position(100), "position() on a closed channel");
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Factory and Utility Methods">
+
+    /**
+     * Creates a {@link MultiReadOnlySeekableByteChannel} from an array of data chunks.
+     * Each chunk is first placed into its own {@link SeekableInMemoryByteChannel}.
+     */
+    private SeekableByteChannel createMultiChannelFromChunks(final byte[][] dataChunks) {
+        final SeekableByteChannel[] channels = new SeekableByteChannel[dataChunks.length];
+        for (int i = 0; i < channels.length; i++) {
+            channels[i] = createInMemoryChannel(dataChunks[i]);
+        }
+        return MultiReadOnlySeekableByteChannel.forSeekableByteChannels(channels);
+    }
+
+    /** Creates a {@link SeekableInMemoryByteChannel} with the given data. */
+    private SeekableByteChannel createInMemoryChannel(final byte[] data) {
+        return new SeekableInMemoryByteChannel(data);
+    }
+
+    /** Splits a byte array into a list of smaller byte arrays of a given size. */
+    private byte[][] groupDataIntoChunks(final byte[] input, final int chunkSize) {
+        final List<byte[]> groups = new ArrayList<>();
+        int idx = 0;
+        while (idx < input.length) {
+            final int nextIdx = Math.min(idx + chunkSize, input.length);
+            groups.add(Arrays.copyOfRange(input, idx, nextIdx));
+            idx = nextIdx;
+        }
+        return groups.toArray(new byte[0][]);
+    }
+
+    //</editor-fold>
 }
