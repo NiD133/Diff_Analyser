@@ -1,18 +1,30 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class BinaryCodec_ESTestTest5 extends BinaryCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BinaryCodec} class.
+ */
+public class BinaryCodecTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        BinaryCodec binaryCodec0 = new BinaryCodec();
-        byte[] byteArray0 = binaryCodec0.encode((byte[]) null);
-        assertArrayEquals(new byte[] {}, byteArray0);
+    /**
+     * Tests that encoding a null byte array returns an empty byte array
+     * rather than throwing a NullPointerException.
+     */
+    @Test
+    public void encode_givenNullInput_returnsEmptyByteArray() {
+        // Arrange
+        BinaryCodec codec = new BinaryCodec();
+        byte[] nullInput = null;
+        byte[] expectedOutput = new byte[0];
+
+        // Act
+        byte[] actualOutput = codec.encode(nullInput);
+
+        // Assert
+        assertNotNull("The encoded result should not be null.", actualOutput);
+        assertArrayEquals("Encoding a null array should produce an empty byte array.", expectedOutput, actualOutput);
     }
 }
