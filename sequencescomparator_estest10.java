@@ -1,40 +1,34 @@
 package org.apache.commons.collections4.sequence;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequencesComparator_ESTestTest10 extends SequencesComparator_ESTest_scaffolding {
+/**
+ * Contains tests for {@link SequencesComparator} focusing on its interaction with list modifications.
+ */
+public class SequencesComparator_ESTestTest10 { // Original class name retained
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        List<Object> list0 = linkedList0.subList(0, 0);
-        Predicate<Object> predicate0 = NotNullPredicate.notNullPredicate();
-        PredicateTransformer<Object> predicateTransformer0 = new PredicateTransformer<Object>(predicate0);
-        Integer integer0 = new Integer(0);
-        Boolean boolean0 = predicateTransformer0.transform(integer0);
-        linkedList0.add((Object) boolean0);
-        SequencesComparator<Object> sequencesComparator0 = null;
-        try {
-            sequencesComparator0 = new SequencesComparator<Object>(linkedList0, list0);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.SubList", e);
-        }
+    /**
+     * Tests that the SequencesComparator constructor throws a ConcurrentModificationException
+     * if one of the provided lists is a sublist view, and its backing list is
+     * structurally modified after the sublist is created. This is the expected
+     * behavior of Java's sublist implementation, which the comparator must handle.
+     */
+    @Test(expected = ConcurrentModificationException.class, timeout = 4000)
+    public void constructorShouldThrowCMEWhenBackingListOfSublistIsModified() {
+        // Arrange: Create a list and a sublist view of it.
+        final List<String> originalList = new LinkedList<>();
+        final List<String> sublistView = originalList.subList(0, 0);
+
+        // Act: Structurally modify the original list. This invalidates the sublist view,
+        // making it "stale".
+        originalList.add("a new element");
+
+        // Assert: Instantiating the comparator will cause it to access the stale
+        // sublist view, which is expected to throw a ConcurrentModificationException.
+        new SequencesComparator<>(originalList, sublistView);
     }
 }
