@@ -1,36 +1,30 @@
 package org.jsoup.select;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class Elements_ESTestTest23 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#prev(String)} method.
+ */
+public class ElementsPrevWithSelectorTest {
 
-    @Test(timeout = 4000)
-    public void test022() throws Throwable {
-        Document document0 = new Document("b*LY=0yr*g]q30");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.prev("Bb,76");
-        assertEquals(0, elements1.size());
+    @Test
+    public void prevWithSelectorReturnsEmptyWhenNoPreviousSiblingsMatch() {
+        // Arrange
+        // Create a document with a standard structure. The <body> tag's previous sibling is <head>.
+        // The <html> and <head> tags have no previous siblings.
+        Document doc = Jsoup.parse("<html><head></head><body></body></html>");
+        Elements allElements = doc.getAllElements(); // Contains [html, head, body]
+
+        // Act
+        // Attempt to find the previous sibling of each element that matches a non-existent CSS class.
+        Elements foundElements = allElements.prev(".non-existent-class");
+
+        // Assert
+        // The <head> element (the only previous sibling found) does not match the selector.
+        // Therefore, the resulting collection should be empty.
+        assertTrue("The result should be empty as no element has a previous sibling matching the selector.", foundElements.isEmpty());
     }
 }
