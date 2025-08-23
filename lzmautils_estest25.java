@@ -1,17 +1,28 @@
 package org.apache.commons.compress.compressors.lzma;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LZMAUtils_ESTestTest25 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the LZMAUtils class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        String string0 = LZMAUtils.getCompressedFileName("Kj-M[Oi{g@l@");
-        assertEquals("Kj-M[Oi{g@l@.lzma", string0);
+    /**
+     * Tests that getCompressedFileName() correctly appends the ".lzma" suffix
+     * to a given filename.
+     */
+    @Test
+    public void getCompressedFileNameShouldAppendLzmaSuffix() {
+        // Arrange: Define a sample input filename and the expected output.
+        final String inputFileName = "archive.tar";
+        final String expectedFileName = "archive.tar.lzma";
+
+        // Act: Call the method under test.
+        final String actualFileName = LZMAUtils.getCompressedFileName(inputFileName);
+
+        // Assert: Verify that the actual output matches the expected output.
+        assertEquals("The '.lzma' suffix should be appended to the filename.",
+                expectedFileName, actualFileName);
     }
 }
