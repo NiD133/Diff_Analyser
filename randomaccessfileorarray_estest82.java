@@ -1,37 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains improved tests for the RandomAccessFileOrArray class.
+ * The original tests were auto-generated and have been refactored for clarity.
+ */
 public class RandomAccessFileOrArray_ESTestTest82 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test081() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readFully(byteArray0, 695, 695);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that the {@link RandomAccessFileOrArray#readFully(byte[], int, int)} method
+     * throws an {@link ArrayIndexOutOfBoundsException} when the specified write offset is
+     * outside the bounds of the destination buffer.
+     *
+     * @throws IOException This is part of the method signature but is not expected to be thrown,
+     *                     as the exception should occur before any I/O operation.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void readFully_withOffsetOutsideDestinationBounds_shouldThrowException() throws IOException {
+        // Arrange: Create a source with some data. The content is not critical for this test,
+        // as the error occurs due to invalid arguments before any data is read.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+
+        // Arrange: Create a destination buffer and define an offset that is clearly
+        // outside the buffer's valid index range.
+        byte[] destinationBuffer = new byte[5];
+        int invalidOffset = 10; // An offset well beyond the buffer's capacity.
+        int bytesToRead = 1;    // The number of bytes to read is irrelevant, as the offset check fails first.
+
+        // Act & Assert: Attempt to read into the destination buffer at the invalid offset.
+        // The @Test(expected=...) annotation asserts that an ArrayIndexOutOfBoundsException is thrown.
+        fileOrArray.readFully(destinationBuffer, invalidOffset, bytesToRead);
     }
 }
