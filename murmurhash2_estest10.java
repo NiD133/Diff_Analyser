@@ -1,17 +1,32 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest10 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        int int0 = MurmurHash2.hash32((byte[]) null, 0);
-        assertEquals(275646681, int0);
+    /**
+     * Tests that hashing a null byte array with a length of 0 using the
+     * hash32 method with its default seed produces a consistent, known hash value.
+     * This is an important edge case to ensure predictable behavior for empty or
+     * null inputs.
+     */
+    @Test
+    public void testHash32WithNullDataAndZeroLength() {
+        // Arrange: Define the input data and the expected result.
+        final byte[] data = null;
+        final int length = 0;
+        // This is the known hash value for null/empty data with the default seed.
+        final int expectedHash = 275646681;
+
+        // Act: Call the method under test.
+        final int actualHash = MurmurHash2.hash32(data, length);
+
+        // Assert: Verify the result.
+        assertEquals("Hashing null data with zero length should produce the expected default hash.",
+                expectedHash, actualHash);
     }
 }
