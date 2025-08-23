@@ -1,31 +1,37 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class MultiInputStream_ESTestTest17 extends MultiInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiInputStream}, primarily through the {@link ByteSource#concat(Iterator)} factory method.
+ */
+public class MultiInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        byte[] byteArray0 = new byte[3];
-        ByteSource byteSource0 = ByteSource.wrap(byteArray0);
-        arrayDeque0.add(byteSource0);
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        ByteSource byteSource1 = ByteSource.concat(iterator0);
-        boolean boolean0 = byteSource1.contentEquals(byteSource1);
-        assertTrue(boolean0);
+    /**
+     * Verifies that concatenating a single ByteSource results in a new ByteSource
+     * that has the same content as the original.
+     */
+    @Test
+    public void concat_withSingleSource_shouldHaveSameContentAsOriginalSource() throws IOException {
+        // Arrange: Use descriptive names and explicit, non-default test data.
+        byte[] originalContent = new byte[] {10, 20, 30};
+        ByteSource originalSource = ByteSource.wrap(originalContent);
+        Iterator<ByteSource> sources = Collections.singletonList(originalSource).iterator();
+
+        // Act: The action being tested is the concatenation.
+        // This indirectly creates and uses a MultiInputStream.
+        ByteSource concatenatedSource = ByteSource.concat(sources);
+
+        // Assert: The assertion is now meaningful. It verifies that the concatenated
+        // source has the expected content by comparing it to the original source,
+        // not just itself. A descriptive message is added for clarity on failure.
+        assertTrue(
+            "A source concatenated from a single element should have the same content as the original.",
+            concatenatedSource.contentEquals(originalSource));
     }
 }
