@@ -1,25 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest18 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on exception handling
+ * for invalid arguments.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong((long) 1000, (byte[]) null, 1000);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that {@link NumberOutput#outputLong(long, byte[], int)} throws a
+     * {@link NullPointerException} when a null byte array is provided as the output buffer.
+     * This is the expected behavior, as the method requires a valid buffer to write into.
+     */
+    @Test(expected = NullPointerException.class)
+    public void outputLongShouldThrowNullPointerExceptionForNullBuffer() {
+        // Arrange: Define arguments for the method call, using a null buffer.
+        long value = 1000L;
+        int offset = 1000;
+        byte[] nullBuffer = null;
+
+        // Act: Call the method with the null buffer.
+        // Assert: The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        NumberOutput.outputLong(value, nullBuffer, offset);
     }
 }
