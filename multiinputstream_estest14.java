@@ -2,36 +2,45 @@ package com.google.common.io;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MultiInputStream_ESTestTest14 extends MultiInputStream_ESTest_scaffolding {
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * This test class contains refactored tests for {@link MultiInputStream}.
+ * The original test class name {@code MultiInputStream_ESTestTest14} suggests it was
+ * auto-generated. This version is functionally equivalent but prioritizes human
+ * readability and standard testing practices.
+ */
+public class MultiInputStream_ESTestTest14 { // Retaining original class name as requested
 
     @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        ArrayDeque<ByteSource> arrayDeque0 = new ArrayDeque<ByteSource>();
-        ByteSource[] byteSourceArray0 = new ByteSource[3];
-        ByteSource byteSource0 = ByteSource.empty();
-        byteSourceArray0[0] = byteSource0;
-        byte[] byteArray0 = new byte[6];
-        ByteSource byteSource1 = ByteSource.wrap(byteArray0);
-        byteSourceArray0[1] = byteSource1;
-        byteSourceArray0[2] = byteSource0;
-        ByteSource byteSource2 = ByteSource.concat(byteSourceArray0);
-        arrayDeque0.add(byteSource2);
-        Iterator<ByteSource> iterator0 = arrayDeque0.iterator();
-        MultiInputStream multiInputStream0 = new MultiInputStream(iterator0);
-        long long0 = multiInputStream0.skip((byte) 60);
-        assertEquals(6L, long0);
+    public void skip_whenRequestedBytesExceedStreamLength_skipsAllRemainingBytes() throws IOException {
+        // Arrange: Create a MultiInputStream from several sources with a total of 6 bytes.
+        // The sources are structured as [empty, 6 bytes, empty] to test that the
+        // MultiInputStream correctly transitions between underlying streams.
+        final int dataSize = 6;
+        byte[] data = new byte[dataSize];
+
+        List<ByteSource> sources = Arrays.asList(
+            ByteSource.empty(),
+            ByteSource.wrap(data),
+            ByteSource.empty()
+        );
+
+        Iterator<ByteSource> sourcesIterator = sources.iterator();
+        InputStream multiInputStream = new MultiInputStream(sourcesIterator);
+
+        // Act: Attempt to skip more bytes than are available in the entire stream.
+        long bytesToSkip = 100L;
+        long actualBytesSkipped = multiInputStream.skip(bytesToSkip);
+
+        // Assert: The number of skipped bytes should be exactly the total number of bytes
+        // available in the stream, and the stream should be at its end.
+        assertEquals("Should skip all available bytes", dataSize, actualBytesSkipped);
+        assertEquals("Stream should be at the end", -1, multiInputStream.read());
     }
 }
