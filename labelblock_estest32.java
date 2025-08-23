@@ -1,38 +1,29 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LabelBlock_ESTestTest32 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        labelBlock0.setToolTipText("");
-        String string0 = labelBlock0.getToolTipText();
-        assertEquals("", string0);
+    /**
+     * Verifies that the tooltip text can be set via setToolTipText()
+     * and correctly retrieved using getToolTipText().
+     */
+    @Test
+    public void shouldSetAndGetToolTipText() {
+        // Arrange: Create a LabelBlock and define the expected tooltip text.
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+        String expectedToolTipText = "This is a sample tooltip.";
+
+        // Act: Set the tooltip text and then retrieve it.
+        labelBlock.setToolTipText(expectedToolTipText);
+        String actualToolTipText = labelBlock.getToolTipText();
+
+        // Assert: Verify that the retrieved text matches the expected text.
+        assertEquals("The retrieved tooltip text should match the value that was set.",
+                expectedToolTipText, actualToolTipText);
     }
 }
