@@ -1,20 +1,26 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class ArrayFill_ESTestTest24 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        float[] floatArray0 = ArrayFill.fill((float[]) null, (-4645.361F));
-        assertNull(floatArray0);
+    @Test
+    public void fillFloatArrayShouldReturnNullWhenArrayIsNull() {
+        // The fill method is expected to be null-safe.
+        // When a null array is passed, it should return null.
+        
+        // Arrange
+        final float[] inputArray = null;
+        
+        // Act
+        final float[] resultArray = ArrayFill.fill(inputArray, 1.0f);
+        
+        // Assert
+        assertNull("The result should be null for a null input array.", resultArray);
     }
 }
