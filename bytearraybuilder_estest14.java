@@ -1,21 +1,31 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest14 extends ByteArrayBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        JsonRecyclerPools.NonRecyclingPool jsonRecyclerPools_NonRecyclingPool0 = JsonRecyclerPools.NonRecyclingPool.GLOBAL;
-        BufferRecycler bufferRecycler0 = jsonRecyclerPools_NonRecyclingPool0.acquirePooled();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0, (-1));
-        byteArrayBuilder0.release();
-        byte[] byteArray0 = byteArrayBuilder0.getCurrentSegment();
-        assertNull(byteArray0);
+/**
+ * This test suite focuses on the behavior of the ByteArrayBuilder class.
+ */
+public class ByteArrayBuilderTest {
+
+    /**
+     * Verifies that calling getCurrentSegment() after release() returns null.
+     * The release() method is expected to clear all internal buffers, making
+     * the current segment inaccessible.
+     */
+    @Test
+    public void getCurrentSegmentShouldReturnNullAfterRelease() {
+        // Arrange: Create a ByteArrayBuilder.
+        // A BufferRecycler is needed for instantiation, but its specific behavior is not under test.
+        // The initial size of -1 is an edge case from the original test, kept for robustness.
+        ByteArrayBuilder builder = new ByteArrayBuilder(new BufferRecycler(), -1);
+
+        // Act: Release the builder's internal resources.
+        builder.release();
+
+        // Assert: The current segment should now be null.
+        byte[] currentSegment = builder.getCurrentSegment();
+        assertNull("The current segment should be null after the builder is released.", currentSegment);
     }
 }
