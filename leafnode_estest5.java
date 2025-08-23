@@ -2,21 +2,30 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest5 extends LeafNode_ESTest_scaffolding {
+/**
+ * Test suite for the LeafNode class, focusing on attribute handling.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        DataNode dataNode0 = new DataNode("gMz?D>{rCwB%:");
-        dataNode0.setSiblingIndex((-1447));
-        Node node0 = dataNode0.removeAttr("gMz?D>{rCwB%:");
-        assertFalse(node0.hasParent());
+    /**
+     * Verifies that calling removeAttr on a LeafNode that has no attributes
+     * does not cause an error and leaves the node unchanged.
+     */
+    @Test
+    public void removeAttrOnNodeWithNoAttributesDoesNothing() {
+        // Arrange: Create a LeafNode (a DataNode instance) with no attributes.
+        DataNode dataNode = new DataNode("Sample data content");
+        String keyToRemove = "class";
+
+        // Pre-condition: Verify the node has no attributes initially.
+        assertFalse("Node should not have attributes before the test", dataNode.hasAttributes());
+
+        // Act: Attempt to remove an attribute that does not exist.
+        Node resultNode = dataNode.removeAttr(keyToRemove);
+
+        // Assert: The node's state should remain unchanged.
+        assertFalse("Node should still have no attributes after the operation", dataNode.hasAttributes());
+        assertSame("removeAttr should return the same node instance for chaining", dataNode, resultNode);
     }
 }
