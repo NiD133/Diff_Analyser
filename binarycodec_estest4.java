@@ -1,18 +1,60 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class BinaryCodec_ESTestTest4 extends BinaryCodec_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in the {@link BinaryCodec} class.
+ *
+ * Note: This test focuses on the org.apache.commons.codec.binary.BinaryCodec class,
+ * not the org.locationtech.spatial4j.io.BinaryCodec class provided in the prompt's
+ * source code section, as the original test targets the former.
+ */
+public class BinaryCodecTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        boolean boolean0 = BinaryCodec.isEmpty(byteArray0);
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link BinaryCodec#isEmpty(byte[])} returns false for a non-empty byte array.
+     */
+    @Test
+    public void isEmpty_shouldReturnFalse_forNonEmptyArray() {
+        // Arrange: Create a byte array that is not null and has a length greater than zero.
+        byte[] nonEmptyArray = new byte[8];
+
+        // Act: Call the method under test.
+        boolean result = BinaryCodec.isEmpty(nonEmptyArray);
+
+        // Assert: Verify that the method returns false.
+        assertFalse("isEmpty() should return false for a non-empty array", result);
+    }
+
+    /**
+     * Tests that {@link BinaryCodec#isEmpty(byte[])} returns true for an empty byte array.
+     */
+    @Test
+    public void isEmpty_shouldReturnTrue_forEmptyArray() {
+        // Arrange
+        byte[] emptyArray = new byte[0];
+
+        // Act
+        boolean result = BinaryCodec.isEmpty(emptyArray);
+
+        // Assert
+        assertTrue("isEmpty() should return true for an empty (zero-length) array", result);
+    }
+
+    /**
+     * Tests that {@link BinaryCodec#isEmpty(byte[])} returns true for a null byte array.
+     */
+    @Test
+    public void isEmpty_shouldReturnTrue_forNullArray() {
+        // Arrange
+        byte[] nullArray = null;
+
+        // Act
+        boolean result = BinaryCodec.isEmpty(nullArray);
+
+        // Assert
+        assertTrue("isEmpty() should return true for a null array", result);
     }
 }
