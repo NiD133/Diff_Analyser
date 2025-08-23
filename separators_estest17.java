@@ -1,23 +1,64 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Separators_ESTestTest17 extends Separators_ESTest_scaffolding {
+/**
+ * Tests for the {@link Separators} class, focusing on its constructor and getters.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Separators.Spacing separators_Spacing0 = Separators.Spacing.AFTER;
-        Separators separators0 = new Separators("oRb)u^~$[*+b+7&Gu", 'D', separators_Spacing0, 'y', separators_Spacing0, "oRb)u^~$[*+b+7&Gu", '1', separators_Spacing0, "com.fasterxml.jackson.core.util.Separators$Spacing");
-        String string0 = separators0.getArrayEmptySeparator();
-        assertEquals('1', separators0.getArrayValueSeparator());
-        assertEquals('y', separators0.getObjectEntrySeparator());
-        assertEquals("oRb)u^~$[*+b+7&Gu", separators0.getObjectEmptySeparator());
-        assertEquals('D', separators0.getObjectFieldValueSeparator());
-        assertEquals("com.fasterxml.jackson.core.util.Separators$Spacing", string0);
-        assertEquals("oRb)u^~$[*+b+7&Gu", separators0.getRootSeparator());
+    /**
+     * Verifies that the canonical constructor correctly initializes all properties
+     * of a Separators instance, and that the corresponding getter methods
+     * return the values provided to the constructor.
+     */
+    @Test
+    public void constructorShouldCorrectlyInitializeAllProperties() {
+        // Arrange: Define the custom separator values for the test.
+        // Using named constants makes the constructor call and assertions much clearer.
+        final String expectedRootSeparator = "oRb)u^~$[*+b+7&Gu";
+        final char expectedObjectFieldSeparator = 'D';
+        final Separators.Spacing expectedSpacing = Separators.Spacing.AFTER;
+        final char expectedObjectEntrySeparator = 'y';
+        final String expectedObjectEmptySeparator = "oRb)u^~$[*+b+7&Gu";
+        final char expectedArrayValueSeparator = '1';
+        final String expectedArrayEmptySeparator = "com.fasterxml.jackson.core.util.Separators$Spacing";
+
+        // Act: Create a Separators instance using the canonical constructor.
+        Separators separators = new Separators(
+                expectedRootSeparator,
+                expectedObjectFieldSeparator,
+                expectedSpacing, // for object field-value
+                expectedObjectEntrySeparator,
+                expectedSpacing, // for object entry
+                expectedObjectEmptySeparator,
+                expectedArrayValueSeparator,
+                expectedSpacing, // for array value
+                expectedArrayEmptySeparator
+        );
+
+        // Assert: Verify that each getter returns the value set in the constructor.
+        // Assertions are grouped by concern (root, object, array) for readability.
+        assertEquals("Root separator should match the constructor argument",
+                expectedRootSeparator, separators.getRootSeparator());
+
+        assertEquals("Object field-value separator should match the constructor argument",
+                expectedObjectFieldSeparator, separators.getObjectFieldValueSeparator());
+        assertEquals("Object field-value spacing should match the constructor argument",
+                expectedSpacing, separators.getObjectFieldValueSpacing());
+        assertEquals("Object entry separator should match the constructor argument",
+                expectedObjectEntrySeparator, separators.getObjectEntrySeparator());
+        assertEquals("Object entry spacing should match the constructor argument",
+                expectedSpacing, separators.getObjectEntrySpacing());
+        assertEquals("Object empty separator should match the constructor argument",
+                expectedObjectEmptySeparator, separators.getObjectEmptySeparator());
+
+        assertEquals("Array value separator should match the constructor argument",
+                expectedArrayValueSeparator, separators.getArrayValueSeparator());
+        assertEquals("Array value spacing should match the constructor argument",
+                expectedSpacing, separators.getArrayValueSpacing());
+        assertEquals("Array empty separator should match the constructor argument",
+                expectedArrayEmptySeparator, separators.getArrayEmptySeparator());
     }
 }
