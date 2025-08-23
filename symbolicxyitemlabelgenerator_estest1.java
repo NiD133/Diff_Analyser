@@ -1,38 +1,63 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
 import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest1 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        DynamicTimeSeriesCollection dynamicTimeSeriesCollection0 = new DynamicTimeSeriesCollection(6, 6);
-        float[] floatArray0 = new float[5];
-        dynamicTimeSeriesCollection0.appendData(floatArray0, 2, 0);
-        // Undeclared exception!
+/**
+ * This test class evaluates the SymbolicXYItemLabelGenerator, particularly its
+ * behavior when interacting with datasets that are in an unusual or invalid state.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
+
+    /**
+     * This test verifies that if the underlying dataset throws a NullPointerException
+     * during data access, the generator correctly propagates this exception.
+     *
+     * The test case reproduces a specific scenario where a DynamicTimeSeriesCollection
+     * is initialized for a certain number of series, but data is only provided for a
+     * subset of them. This inconsistent state is known to cause an NPE within the
+     * dataset class itself, which the label generator is expected to not suppress.
+     */
+    @Test
+    public void generateToolTip_whenDatasetThrowsNPE_shouldPropagateException() {
+        // ARRANGE: Create a generator and a dataset in an inconsistent state.
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+
+        // 1. Configure a dataset to hold 6 series.
+        final int totalSeriesCount = 6;
+        final int maxItemCount = 6;
+        DynamicTimeSeriesCollection dataset = new DynamicTimeSeriesCollection(
+                totalSeriesCount, maxItemCount);
+
+        // 2. Provide data for only 5 of the 6 series. This mismatch is the key
+        //    to triggering the internal NullPointerException in the dataset.
+        final int populatedSeriesCount = 5;
+        float[] incompleteDataForSeries = new float[populatedSeriesCount];
+        int itemIndex = 2;
+        int seriesIndex = 0; // The 'series' parameter for this specific appendData method.
+        dataset.appendData(incompleteDataForSeries, itemIndex, seriesIndex);
+
+        // 3. Define the coordinates to query, which fall within the populated data range.
+        int seriesToQuery = 1;
+        int itemToQuery = 2;
+
+        // ACT & ASSERT: Expect an NPE originating from the dataset.
         try {
-            symbolicXYItemLabelGenerator0.generateToolTip(dynamicTimeSeriesCollection0, 1, 2);
-            fail("Expecting exception: NullPointerException");
+            generator.generateToolTip(dataset, seriesToQuery, itemToQuery);
+            fail("A NullPointerException was expected but was not thrown.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.data.time.DynamicTimeSeriesCollection", e);
+            // Verify that the exception originates from the dataset class, not the generator.
+            // This confirms the generator is simply propagating an issue from its data source.
+            String originatingClassName = e.getStackTrace()[0].getClassName();
+            assertEquals("Exception should originate from DynamicTimeSeriesCollection",
+                    "org.jfree.data.time.DynamicTimeSeriesCollection",
+                    originatingClassName);
+
+            // The original test also confirmed the exception has no message.
+            assertNull("The exception message was expected to be null", e.getMessage());
         }
     }
 }
