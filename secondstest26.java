@@ -1,42 +1,39 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SecondsTestTest26 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds#negated()} method.
+ */
+class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    void negated_returnsCorrectValueAndIsImmutable() {
+        // Arrange
+        final Seconds originalSeconds = Seconds.seconds(12);
+        final int expectedOriginalValue = 12;
+        final int expectedNegatedValue = -12;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        final Seconds negatedSeconds = originalSeconds.negated();
+
+        // Assert
+        assertEquals(expectedNegatedValue, negatedSeconds.getSeconds(),
+                "The new instance should have the negated value.");
+        assertEquals(expectedOriginalValue, originalSeconds.getSeconds(),
+                "The original instance should remain unchanged, proving immutability.");
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
+    @Test
+    void negated_onMinValue_throwsArithmeticException() {
+        // Arrange
+        final Seconds minValueSeconds = Seconds.MIN_VALUE;
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testNegated() {
-        Seconds test = Seconds.seconds(12);
-        assertEquals(-12, test.negated().getSeconds());
-        assertEquals(12, test.getSeconds());
-        try {
-            Seconds.MIN_VALUE.negated();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+        // Act & Assert
+        // Negating Integer.MIN_VALUE causes an overflow, which should throw an exception.
+        assertThrows(ArithmeticException.class, minValueSeconds::negated,
+                "Negating MIN_VALUE should cause an overflow and throw an ArithmeticException.");
     }
 }
