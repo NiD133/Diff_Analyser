@@ -1,32 +1,22 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
+import java.nio.file.attribute.FileTime;
+import org.junit.Test;
+
+// Note: The class name and inheritance are kept from the original EvoSuite-generated code.
+// In a real-world scenario, the entire test suite would be refactored for better naming and structure.
 public class FileTimes_ESTestTest33 extends FileTimes_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        // Undeclared exception!
-        try {
-            FileTimes.minusSeconds((FileTime) null, 0L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.file.attribute.FileTimes", e);
-        }
+    /**
+     * Tests that {@link FileTimes#minusSeconds(FileTime, long)} throws a NullPointerException
+     * when the fileTime parameter is null.
+     */
+    @Test
+    public void minusSeconds_shouldThrowNullPointerException_whenFileTimeIsNull() {
+        // The value for secondsToSubtract does not matter since the null check on fileTime occurs first.
+        // We use 0L as a neutral value.
+        assertThrows(NullPointerException.class, () -> FileTimes.minusSeconds(null, 0L));
     }
 }
