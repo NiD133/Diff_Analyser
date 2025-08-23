@@ -18,6 +18,6 @@ public class Validate_ESTestTest20 extends Validate_ESTest_scaffolding {
 
     @Test(timeout = 4000)
     public void test19() throws Throwable {
-        Validate.notEmpty("M8@p1\"uw8t)UhU)4", "");
+        Validate.notEmpty("M8@p1\"uw8t)UhU )4", "");
     }
 }
