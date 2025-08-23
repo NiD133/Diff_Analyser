@@ -1,36 +1,31 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest131 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test130() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.children();
-        boolean boolean0 = elements0.hasText();
-        assertFalse(boolean0);
+/**
+ * Test suite for the {@link Elements#hasText()} method.
+ */
+public class ElementsHasTextTest {
+
+    /**
+     * Verifies that hasText() returns false when an Elements collection contains
+     * elements that have no text content, even if they have child elements.
+     */
+    @Test
+    public void hasTextShouldReturnFalseWhenElementsContainNoText() {
+        // Arrange: Create a document with elements that are empty or contain only other empty elements.
+        String htmlWithEmptyElements = "<body><p></p><span></span></body>";
+        Document doc = Jsoup.parse(htmlWithEmptyElements);
+        Elements elements = doc.select("body"); // Select the <body>, which contains empty children.
+
+        // Act: Check if the collection of elements has any text content.
+        boolean hasText = elements.hasText();
+
+        // Assert: The result should be false, as neither the <body> nor its children contain text.
+        assertFalse("Expected hasText() to be false for elements without text", hasText);
     }
 }
