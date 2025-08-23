@@ -1,36 +1,37 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest61 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test060() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextBoolean();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Expected BOOLEAN but was BEGIN_OBJECT at path $
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeReader", e);
-        }
+/**
+ * Unit tests for the {@link JsonTreeReader} class, focusing on its behavior
+ * when encountering unexpected token types.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling nextBoolean() when the current token is the beginning of an object
+     * throws an IllegalStateException.
+     */
+    @Test
+    public void nextBoolean_whenTokenIsBeginObject_throwsIllegalStateException() {
+        // Arrange: Create a JsonTreeReader for an empty JSON object.
+        // The reader's initial state will be at the BEGIN_OBJECT token.
+        JsonObject emptyJsonObject = new JsonObject();
+        JsonTreeReader reader = new JsonTreeReader(emptyJsonObject);
+
+        // Act & Assert: Attempt to read a boolean value and verify the exception.
+        IllegalStateException exception = assertThrows(
+            "Expected an IllegalStateException when trying to read a boolean from an object token.",
+            IllegalStateException.class,
+            () -> reader.nextBoolean()
+        );
+
+        // Assert that the exception message is descriptive and correct.
+        String expectedMessage = "Expected BOOLEAN but was BEGIN_OBJECT at path $";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
