@@ -1,26 +1,38 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class Years_ESTestTest48 extends Years_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        Years years0 = Years.MAX_VALUE;
-        // Undeclared exception!
+    /**
+     * Verifies that subtracting a negative number of years from {@code Years.MAX_VALUE}
+     * correctly throws an {@code ArithmeticException} due to an integer overflow.
+     * <p>
+     * Subtracting a negative value is equivalent to adding a positive one.
+     * Therefore, {@code Integer.MAX_VALUE - (-n)} becomes {@code Integer.MAX_VALUE + n},
+     * which is an operation expected to overflow.
+     */
+    @Test
+    public void minus_fromMaxValueWithNegativeYears_throwsArithmeticExceptionOnOverflow() {
+        // Arrange: Set up the scenario for an integer overflow.
+        Years maxYears = Years.MAX_VALUE;
+        int negativeYearsToSubtract = -2133;
+
+        // Act & Assert: Attempt the operation and verify the expected exception.
         try {
-            years0.minus((-2133));
-            fail("Expecting exception: ArithmeticException");
+            maxYears.minus(negativeYearsToSubtract);
+            fail("Expected an ArithmeticException to be thrown due to overflow, but it was not.");
         } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 2147483647 + 2133
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Assert that the exception message is correct. The message "2147483647 + 2133"
+            // indicates that the internal implementation correctly identified the overflow
+            // when effectively performing an addition.
+            final String expectedMessage = "The calculation caused an overflow: 2147483647 + 2133";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
