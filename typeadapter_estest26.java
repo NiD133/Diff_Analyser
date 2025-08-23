@@ -1,36 +1,36 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest26 extends TypeAdapter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        StringReader stringReader0 = new StringReader("");
-        stringReader0.close();
+/**
+ * Tests for the {@link TypeAdapter#fromJson(Reader)} method.
+ */
+public class TypeAdapterFromJsonTest {
+
+    /**
+     * Verifies that fromJson(Reader) throws an IOException if the provided Reader is already closed.
+     */
+    @Test
+    public void fromJson_whenReaderIsClosed_throwsIOException() throws Exception {
+        // Arrange: Create a TypeAdapter and a reader that is immediately closed.
+        TypeAdapter<Object> typeAdapter = new Gson.FutureTypeAdapter<>().nullSafe();
+        Reader reader = new StringReader("any string");
+        reader.close();
+
+        // Act & Assert: Attempting to read from the closed reader should throw an IOException.
         try {
-            typeAdapter0.fromJson((Reader) stringReader0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("java.io.StringReader", e);
+            typeAdapter.fromJson(reader);
+            fail("Expected an IOException to be thrown when reading from a closed stream.");
+        } catch (IOException expected) {
+            // The underlying StringReader is expected to throw an exception with this message.
+            assertEquals("Stream closed", expected.getMessage());
         }
     }
 }
