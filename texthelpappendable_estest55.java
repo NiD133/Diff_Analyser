@@ -1,56 +1,43 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
 import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link TextHelpAppendable} focusing on buffer handling.
+ */
 public class TextHelpAppendable_ESTestTest55 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(1);
-        ArrayList<String> arrayList0 = new ArrayList<String>();
-        LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-        ArrayDeque<List<String>> arrayDeque0 = new ArrayDeque<List<String>>(13);
-        TableDefinition tableDefinition0 = TableDefinition.from("!#+qbKUXZg%1>e", linkedList0, arrayList0, arrayDeque0);
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendTable(tableDefinition0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that appending a table to a TextHelpAppendable backed by a buffer
+     * that is too small results in a BufferOverflowException.
+     */
+    @Test(timeout = 4000, expected = BufferOverflowException.class)
+    public void appendTableShouldThrowBufferOverflowWhenBufferIsTooSmall() throws IOException {
+        // Arrange: Create an Appendable with a buffer that is too small to hold the table's title.
+        final int bufferCapacity = 1;
+        CharBuffer tinyBuffer = CharBuffer.allocate(bufferCapacity);
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(tinyBuffer);
+
+        // Arrange: Create a table definition with a title that is larger than the buffer's capacity.
+        // The table's content (styles, headers, rows) can be empty for this specific test.
+        TableDefinition tableDefinition = TableDefinition.from(
+                "Table Title", // This title is longer than the buffer's capacity of 1.
+                new LinkedList<>(),
+                new ArrayList<>(),
+                new ArrayDeque<>());
+
+        // Act: Attempt to append the table. This should immediately try to write the title
+        // and cause the underlying small buffer to overflow.
+        helpAppendable.appendTable(tableDefinition);
+
+        // Assert: The test expects a BufferOverflowException, which is handled by the
+        // @Test(expected=...) annotation.
     }
 }
