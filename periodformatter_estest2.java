@@ -1,47 +1,40 @@
 package org.joda.time.format;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PeriodFormatter_ESTestTest2 extends PeriodFormatter_ESTest_scaffolding {
+import java.util.Locale;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        String[] stringArray0 = new String[6];
-        stringArray0[0] = "E";
-        stringArray0[1] = "E";
-        stringArray0[2] = "E";
-        stringArray0[3] = "E";
-        stringArray0[4] = "E";
-        stringArray0[5] = "E";
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        PeriodFormatterBuilder.Composite periodFormatterBuilder_Composite0 = new PeriodFormatterBuilder.Composite(linkedList0);
-        PeriodFormatterBuilder.Separator periodFormatterBuilder_Separator0 = new PeriodFormatterBuilder.Separator("E", "E", stringArray0, periodFormatterBuilder_Composite0, periodFormatterBuilder_Composite0, false, true);
-        Locale locale0 = Locale.KOREA;
-        PeriodType periodType0 = PeriodType.millis();
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Separator0, (PeriodParser) null, locale0, periodType0);
-        PeriodFormatter periodFormatter1 = periodFormatter0.withParseType(periodType0);
-        assertSame(periodFormatter1, periodFormatter0);
+import static org.junit.Assert.assertSame;
+
+/**
+ * Tests for {@link PeriodFormatter}.
+ * This class focuses on improving the understandability of an auto-generated test.
+ */
+public class PeriodFormatter_ESTestTest2 {
+
+    /**
+     * Tests that calling {@link PeriodFormatter#withParseType(PeriodType)} with the
+     * same PeriodType returns the original formatter instance.
+     * <p>
+     * This is an optimization for immutable objects, where creating a new instance
+     * is unnecessary if no properties are changed.
+     */
+    @Test
+    public void withParseType_shouldReturnSameInstance_whenTypeIsUnchanged() {
+        // Arrange
+        // Create a formatter with a specific parse type. The printer and parser
+        // are not relevant to this test and can be null.
+        PeriodType initialParseType = PeriodType.millis();
+        PeriodFormatter originalFormatter = new PeriodFormatter(null, null, Locale.KOREA, initialParseType);
+
+        // Act
+        // Call the method under test with the exact same PeriodType.
+        PeriodFormatter newFormatter = originalFormatter.withParseType(initialParseType);
+
+        // Assert
+        // The formatter should return itself because it is immutable and no change was requested.
+        assertSame("Expected the same formatter instance when the parse type is not changed",
+                originalFormatter, newFormatter);
     }
 }
