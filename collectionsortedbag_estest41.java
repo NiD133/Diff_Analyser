@@ -1,49 +1,39 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest41 extends CollectionSortedBag_ESTest_scaffolding {
+import java.util.Comparator;
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        TreeBag<Object> treeBag0 = new TreeBag<Object>(comparator0);
-        CollectionSortedBag<Object> collectionSortedBag0 = new CollectionSortedBag<Object>(treeBag0);
-        boolean boolean0 = collectionSortedBag0.addAll(collectionSortedBag0);
-        assertFalse(boolean0);
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Unit tests for {@link CollectionSortedBag}.
+ */
+public class CollectionSortedBagTest {
+
+    /**
+     * Tests that calling addAll() with the bag itself as an argument returns false,
+     * as the collection is not modified. This adheres to the java.util.Collection contract.
+     */
+    @Test
+    public void addAll_withSelfAsArgument_shouldReturnFalse() {
+        // Arrange
+        // A mock comparator is required by the TreeBag constructor, but it will not be
+        // invoked because the bag is empty and no elements are compared.
+        @SuppressWarnings("unchecked")
+        final Comparator<Object> mockComparator = mock(Comparator.class);
+        
+        final SortedBag<Object> decoratedBag = new TreeBag<>(mockComparator);
+        final SortedBag<Object> bag = new CollectionSortedBag<>(decoratedBag);
+
+        // Act
+        // Attempt to add all elements from the bag into itself.
+        final boolean wasModified = bag.addAll(bag);
+
+        // Assert
+        // The collection should not change, so the method must return false.
+        assertFalse("addAll(self) should return false, indicating the collection was not modified.", wasModified);
     }
 }
