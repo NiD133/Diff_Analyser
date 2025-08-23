@@ -1,60 +1,40 @@
 package org.apache.commons.codec.language;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import org.apache.commons.codec.AbstractStringEncoderTest;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MetaphoneTestTest7 extends AbstractStringEncoderTest<Metaphone> {
+/**
+ * Tests the isMetaphoneEqual method of the Metaphone class.
+ */
+class MetaphoneTest {
 
-    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
-        // match source to all matches
-        for (final String matche : matches) {
-            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
-        }
-        // match to each other
-        for (final String matche : matches) {
-            for (final String matche2 : matches) {
-                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
-            }
-        }
-    }
+    private Metaphone metaphone;
 
-    public void assertMetaphoneEqual(final String[][] pairs) {
-        validateFixture(pairs);
-        for (final String[] pair : pairs) {
-            final String name0 = pair[0];
-            final String name1 = pair[1];
-            final String failMsg = "Expected match between " + name0 + " and " + name1;
-            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
-            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
-        }
-    }
-
-    @Override
-    protected Metaphone createStringEncoder() {
-        return new Metaphone();
-    }
-
-    public void validateFixture(final String[][] pairs) {
-        if (pairs.length == 0) {
-            fail("Test fixture is empty");
-        }
-        for (int i = 0; i < pairs.length; i++) {
-            if (pairs[i].length != 2) {
-                fail("Error in test fixture in the data array at index " + i);
-            }
-        }
+    @BeforeEach
+    void setUp() {
+        this.metaphone = new Metaphone();
     }
 
     /**
-     * Initial AE case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
+     * Tests the initial AE case from the original algorithm documentation.
+     * Match data was originally computed from http://www.lanw.com/java/phonetic/default.htm
      */
     @Test
-    void testIsMetaphoneEqualAero() {
-        assertIsMetaphoneEqual("Aero", new String[] { "Eure" });
+    @DisplayName("isMetaphoneEqual should return true for 'Aero' and 'Eure'")
+    void isMetaphoneEqual_shouldReturnTrue_forSimilarSoundingWords() {
+        // Given
+        final String word1 = "Aero";
+        final String word2 = "Eure";
+
+        // When & Then
+        // The isMetaphoneEqual method should be symmetric.
+        assertTrue(metaphone.isMetaphoneEqual(word1, word2),
+            () -> "Expected '" + word1 + "' and '" + word2 + "' to be metaphonically equal.");
+
+        assertTrue(metaphone.isMetaphoneEqual(word2, word1),
+            () -> "Expected '" + word2 + "' and '" + word1 + "' to be metaphonically equal (testing for symmetry).");
     }
 }
