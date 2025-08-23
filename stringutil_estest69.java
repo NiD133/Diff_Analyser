@@ -1,28 +1,28 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest69 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ * This test case focuses on the {@code isActuallyWhitespace} method.
+ *
+ * Note: The original test extended a scaffolding class, which is preserved here.
+ * In a full refactoring, the purpose of this scaffolding would be reviewed.
+ */
+public class StringUtilTest extends StringUtil_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test68() throws Throwable {
-        boolean boolean0 = StringUtil.isActuallyWhitespace(13);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the carriage return character ('\r') is correctly identified
+     * as "actual whitespace". The integer code point for '\r' is 13.
+     */
+    @Test
+    public void carriageReturnIsConsideredActualWhitespace() {
+        // The isActuallyWhitespace method should return true for the carriage return character.
+        // Using the character literal '\r' is more readable than its integer value 13.
+        assertTrue(
+            "The carriage return character ('\\r') should be classified as whitespace.",
+            StringUtil.isActuallyWhitespace('\r')
+        );
     }
 }
