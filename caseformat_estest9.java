@@ -1,26 +1,20 @@
 package com.google.common.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CaseFormat_ESTestTest9 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_UNDERSCORE;
-        // Undeclared exception!
-        try {
-            caseFormat0.to(caseFormat0, (String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that the {@code to} method throws a NullPointerException when the input string
+     * is null, as mandated by its use of {@code Preconditions.checkNotNull}.
+     */
+    @Test(expected = NullPointerException.class)
+    public void to_whenGivenNullString_shouldThrowNullPointerException() {
+        // The specific source and target formats do not matter for this test,
+        // as the null check on the input string occurs before any conversion logic.
+        CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, null);
     }
 }
