@@ -1,84 +1,67 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Locale;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 
-public class StringConverterTestTest39 extends TestCase {
+/**
+ * Unit tests for {@link StringConverter} focusing on exception scenarios when setting an interval.
+ * This test ensures the converter correctly handles invalid or incomplete string formats.
+ */
+public class StringConverterSetIntoIntervalExceptionTest extends TestCase {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
-
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
+    private DateTimeZone originalDefaultZone = null;
+    private Locale originalDefaultLocale = null;
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
 
     public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
+        // The suite should run the tests contained within this class.
+        return new TestSuite(StringConverterSetIntoIntervalExceptionTest.class);
     }
 
     @Override
     protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
+        // Save the original default timezone and locale to restore them after the test.
+        // This ensures test isolation and predictable behavior.
+        originalDefaultZone = DateTimeZone.getDefault();
+        originalDefaultLocale = Locale.getDefault();
+
+        // Set a specific default timezone and locale for consistent test results.
+        DateTimeZone.setDefault(DateTimeZone.forID("Europe/London"));
         Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
+        // Restore the original default timezone and locale.
+        DateTimeZone.setDefault(originalDefaultZone);
+        Locale.setDefault(originalDefaultLocale);
     }
 
-    public void testSetIntoIntervalEx_Object_Chronology3() throws Exception {
-        MutableInterval m = new MutableInterval(-1000L, 1000L);
+    /**
+     * Tests that setInto() throws IllegalArgumentException for an incomplete interval string.
+     *
+     * An ISO8601 interval can be represented as <start>/<end>, <start>/<period>, or <period>/<end>.
+     * The string "P1Y/" represents an interval defined by a period ending at a specific time.
+     * However, the end instant is missing, making the string invalid for parsing.
+     */
+    public void testSetInto_whenIntervalStringIsMissingEndDate_throwsIllegalArgumentException() {
+        // Arrange
+        final String incompleteIntervalString = "P1Y/";
+        final MutableInterval interval = new MutableInterval(0L, 1000L);
+        final StringConverter converter = StringConverter.INSTANCE;
+
+        // Act & Assert
         try {
-            StringConverter.INSTANCE.setInto(m, "P1Y/", null);
-            fail();
-        } catch (IllegalArgumentException ex) {
+            converter.setInto(interval, incompleteIntervalString, null);
+            fail("Expected an IllegalArgumentException for an incomplete interval string.");
+        } catch (IllegalArgumentException expected) {
+            // This is the expected behavior; the test passes.
         }
     }
 }
