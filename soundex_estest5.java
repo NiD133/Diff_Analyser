@@ -1,26 +1,39 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Soundex_ESTestTest5 extends Soundex_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Soundex soundex0 = new Soundex("IW=es%O[9p.u.:", true);
-        // Undeclared exception!
+/**
+ * Tests for {@link Soundex} focusing on exception handling with custom mappings.
+ */
+public class SoundexCustomMappingTest {
+
+    /**
+     * Tests that the soundex method throws an IllegalArgumentException when it encounters a character
+     * that is not covered by a custom, short mapping.
+     */
+    @Test
+    public void soundexShouldThrowExceptionForCharacterOutsideShortMapping() {
+        // Arrange
+        // A custom mapping that is shorter than the 26 characters required for the English alphabet.
+        // This mapping only covers characters 'A' through 'N' (14 characters).
+        final String shortMapping = "ABCDEFGHIJKLMN";
+        final Soundex soundex = new Soundex(shortMapping, false);
+
+        // The input string contains 'Z'. The Soundex algorithm calculates the mapping index
+        // for 'Z' as 25 ('Z' - 'A'), which is out of bounds for our 14-character mapping.
+        final String inputWithUnmappedChar = "ZULU";
+
+        // Act & Assert
         try {
-            soundex0.soundex("?9+dzZ o|D}!;?at7Q@");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The character is not mapped: Z (index=25)
-            //
-            verifyException("org.apache.commons.codec.language.Soundex", e);
+            soundex.soundex(inputWithUnmappedChar);
+            fail("Expected an IllegalArgumentException because the character 'Z' is not in the custom mapping.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception was thrown for the correct reason.
+            final String expectedMessage = "The character is not mapped: Z (index=25)";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
