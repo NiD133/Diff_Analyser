@@ -1,56 +1,29 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest31 extends DayOfYear_ESTest_scaffolding {
+/**
+ * This test class contains tests for the {@link DayOfYear} class.
+ */
+public class DayOfYear_ESTestTest31 {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        ZoneOffset zoneOffset0 = ZoneOffset.ofHoursMinutes(8, 8);
-        ThaiBuddhistDate thaiBuddhistDate0 = MockThaiBuddhistDate.now((ZoneId) zoneOffset0);
-        DayOfYear dayOfYear0 = DayOfYear.from(thaiBuddhistDate0);
-        // Undeclared exception!
-        try {
-            dayOfYear0.query((TemporalQuery<ChronoField>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.time.temporal.TemporalAccessor", e);
-        }
+    /**
+     * Tests that calling the query() method with a null argument
+     * correctly throws a NullPointerException.
+     *
+     * The {@link java.time.temporal.TemporalAccessor#query(java.time.temporal.TemporalQuery)}
+     * contract implies that a null query object is not permitted.
+     */
+    @Test(expected = NullPointerException.class)
+    public void query_withNullArgument_throwsNullPointerException() {
+        // Arrange: Create an arbitrary DayOfYear instance. The specific day (e.g., 150)
+        // does not affect the outcome of this test.
+        DayOfYear dayOfYear = DayOfYear.of(150);
+
+        // Act: Call the query() method with a null argument.
+        dayOfYear.query(null);
+
+        // Assert: The test is expected to throw a NullPointerException.
+        // This is handled by the `expected` attribute of the @Test annotation.
     }
 }
