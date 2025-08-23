@@ -1,47 +1,38 @@
 package com.google.common.util.concurrent;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import com.google.common.testing.NullPointerTester;
+
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
 import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
 
-public class ExecutionListTestTest4 extends TestCase {
+/** Tests for {@link ExecutionList}. */
+public class ExecutionListTest extends TestCase {
 
-    private final ExecutionList list = new ExecutionList();
+  /**
+   * This test verifies that a runnable added to an {@code ExecutionList} *after* {@code execute()}
+   * has been called is executed immediately.
+   */
+  public void testAdd_afterExecute_executesRunnableImmediately() throws InterruptedException {
+    // Arrange: Create an ExecutionList and put it into the "executed" state.
+    ExecutionList executionList = new ExecutionList();
+    executionList.execute();
 
-    private static final Runnable THROWING_RUNNABLE = new Runnable() {
+    CountDownLatch runnableWasExecuted = new CountDownLatch(1);
+    ExecutorService executor = newCachedThreadPool();
 
-        @Override
-        public void run() {
-            throw new RuntimeException();
-        }
-    };
+    try {
+      // Act: Add a new runnable to the already-executed list.
+      executionList.add(runnableWasExecuted::countDown, executor);
 
-    private class MockRunnable implements Runnable {
-
-        final CountDownLatch countDownLatch;
-
-        MockRunnable(CountDownLatch countDownLatch) {
-            this.countDownLatch = countDownLatch;
-        }
-
-        @Override
-        public void run() {
-            countDownLatch.countDown();
-        }
+      // Assert: The runnable should be executed promptly, as the list has already been fired.
+      assertTrue(
+          "A runnable added after execute() should be executed immediately.",
+          runnableWasExecuted.await(5, SECONDS));
+    } finally {
+      // Clean up the executor to release its resources.
+      executor.shutdown();
     }
-
-    public void testAddAfterRun() throws Exception {
-        // Run the previous test
-        testRunOnPopulatedList();
-        // If it passed, then verify an Add will be executed without calling run
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        list.add(new MockRunnable(countDownLatch), newCachedThreadPool());
-        assertTrue(countDownLatch.await(1L, SECONDS));
-    }
+  }
 }
