@@ -1,47 +1,47 @@
 package com.itextpdf.text.xml.xmp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.xmp.XMPMeta;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest6 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "kZE9PB", (-1915564823));
-        xmpWriter0.xmpMeta = null;
-        XMPMeta xMPMeta0 = xmpWriter0.getXmpMeta();
-        assertNull(xMPMeta0);
+/**
+ * Test suite for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that the getXmpMeta() method returns null if the internal
+     * xmpMeta field has been explicitly set to null.
+     *
+     * <p><b>Note:</b> This is a white-box test that directly manipulates the
+     * internal state of the object. In normal usage, the {@code xmpMeta} field is
+     * initialized by the constructor and is not expected to be null. This test
+     * simply ensures the getter method behaves as a simple accessor even in this
+     * unusual state.</p>
+     *
+     * @throws IOException if an I/O error occurs during XmpWriter construction.
+     */
+    @Test
+    public void getXmpMeta_shouldReturnNull_whenInternalMetaFieldIsManuallyNulled() throws IOException {
+        // Arrange
+        // An XmpWriter is created. Its internal xmpMeta object is initialized by the constructor.
+        // We use a simple constructor and a dummy output stream, as they are not relevant to this test.
+        XmpWriter xmpWriter = new XmpWriter(new ByteArrayOutputStream());
+
+        // To test the getter's behavior in an edge case, we manually set the internal
+        // (protected) field to null. This is not a standard use case.
+        xmpWriter.xmpMeta = null;
+
+        // Act
+        // Call the getter method to retrieve the (now null) internal object.
+        XMPMeta retrievedMeta = xmpWriter.getXmpMeta();
+
+        // Assert
+        // Verify that the getter returned the null value we assigned.
+        assertNull("getXmpMeta() should return the value of the internal xmpMeta field, which was set to null.", retrievedMeta);
     }
 }
