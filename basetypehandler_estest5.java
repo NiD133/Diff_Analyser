@@ -1,34 +1,29 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
+
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class BaseTypeHandler_ESTestTest5 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Tests for the {@link BaseTypeHandler} class.
+ * This test suite focuses on the base functionality provided by BaseTypeHandler,
+ * using a concrete implementation (ClobTypeHandler) to test non-abstract methods.
+ */
+public class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ClobTypeHandler clobTypeHandler0 = ClobTypeHandler.INSTANCE;
-        JdbcType jdbcType0 = JdbcType.TIME_WITH_TIMEZONE;
-        // Undeclared exception!
-        try {
-            clobTypeHandler0.setParameter((PreparedStatement) null, (-3018), (String) null, jdbcType0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.type.BaseTypeHandler", e);
-        }
+    private static final ClobTypeHandler clobTypeHandler = ClobTypeHandler.INSTANCE;
+
+    /**
+     * Verifies that setParameter throws a NullPointerException if the PreparedStatement is null.
+     * The underlying JDBC driver requires a non-null PreparedStatement to set a parameter,
+     * so the TypeHandler must enforce this contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void setParameterShouldThrowNullPointerExceptionWhenPreparedStatementIsNull() throws SQLException {
+        // The call to setParameter should throw a NullPointerException because the PreparedStatement is null.
+        // The other arguments are dummy values required by the method signature.
+        // A null parameter is used to ensure the code path that calls ps.setNull() is taken.
+        clobTypeHandler.setParameter(null, 1, null, JdbcType.CLOB);
     }
 }
