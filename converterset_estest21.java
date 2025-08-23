@@ -1,33 +1,30 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest21 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ConverterSet} class.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        Converter[] converterArray0 = new Converter[1];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        // Undeclared exception!
-        try {
-            converterSet0.remove(1968, converterArray0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.convert.ConverterSet", e);
-        }
+    /**
+     * Verifies that attempting to remove a converter by an index that is out of the set's bounds
+     * correctly throws an IndexOutOfBoundsException.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void removeByIndex_shouldThrowException_whenIndexIsOutOfBounds() {
+        // Arrange: Create a ConverterSet with a single element.
+        // The only valid index for removal is 0.
+        Converter[] initialConverters = new Converter[1];
+        ConverterSet converterSet = new ConverterSet(initialConverters);
+
+        int outOfBoundsIndex = 1; // Any index >= 1 is out of bounds.
+
+        // Act: Attempt to remove the element at the invalid index.
+        // The second argument (for returning the removed converter) is not relevant to this test.
+        converterSet.remove(outOfBoundsIndex, null);
+
+        // Assert: The test expects an IndexOutOfBoundsException, which is handled by the
+        // @Test(expected=...) annotation. If no exception is thrown, the test will fail.
     }
 }
