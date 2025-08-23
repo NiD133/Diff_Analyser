@@ -1,49 +1,39 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest1 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable} to verify list formatting.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        CharBuffer charBuffer0 = CharBuffer.allocate(3);
-        ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-        arrayDeque0.add(charBuffer0);
-        arrayDeque0.add(charBuffer0);
-        textHelpAppendable0.appendList(true, arrayDeque0);
-        assertEquals(1, textHelpAppendable0.getLeftPad());
-        assertEquals(3, textHelpAppendable0.getIndent());
-        assertEquals(74, textHelpAppendable0.getMaxWidth());
+    /**
+     * Verifies that an ordered list is formatted with numbered items and the correct indentation.
+     * This test ensures that appendList correctly processes a collection of strings,
+     * prefixes each with a number, and applies the default indentation for lists.
+     */
+    @Test
+    public void appendOrderedListShouldFormatItemsWithNumbersAndIndentation() throws IOException {
+        // Arrange: Create a StringWriter to capture the output and a TextHelpAppendable instance.
+        StringWriter stringWriter = new StringWriter();
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(stringWriter);
+        Collection<CharSequence> listItems = Arrays.asList("First item", "Second item");
+
+        // Act: Call the method under test to append the items as an ordered list.
+        helpAppendable.appendList(true, listItems);
+
+        // Assert: Verify that the captured output matches the expected formatted string.
+        // The expected format is based on the default list indentation (DEFAULT_LIST_INDENT = 7).
+        final String EOL = System.lineSeparator();
+        final String expectedOutput = "       1. First item" + EOL +
+                                      "       2. Second item" + EOL;
+
+        assertEquals(expectedOutput, stringWriter.toString());
     }
 }
