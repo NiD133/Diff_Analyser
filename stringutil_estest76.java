@@ -1,28 +1,24 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest76 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test75() throws Throwable {
-        boolean boolean0 = StringUtil.isWhitespace(10);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the isWhitespace() method correctly identifies the
+     * Line Feed character (code point 10) as whitespace, per the HTML specification.
+     */
+    @Test
+    public void isWhitespaceShouldReturnTrueForLineFeed() {
+        // The original test used the integer literal 10. Using the character literal '\n'
+        // is functionally equivalent but makes the test's intent immediately clear.
+        // The char is implicitly converted to its integer code point (10) when passed to the method.
+        
+        assertTrue("The Line Feed character '\\n' should be classified as whitespace.",
+            StringUtil.isWhitespace('\n'));
     }
 }
