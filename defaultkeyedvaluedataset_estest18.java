@@ -2,28 +2,26 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
 
-public class DefaultKeyedValueDataset_ESTestTest18 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+/**
+ * Tests for the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        MockDate mockDate0 = new MockDate(0, 1, 0);
-        OHLCDataItem oHLCDataItem0 = new OHLCDataItem(mockDate0, (-1.0), (-1.0), 0.0, 0.0, 0.0);
-        byte[] byteArray0 = new byte[5];
-        BigInteger bigInteger0 = new BigInteger(byteArray0);
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset(oHLCDataItem0, bigInteger0);
-        Number number0 = defaultKeyedValueDataset0.getValue();
-        assertEquals((short) 0, number0.shortValue());
+    /**
+     * Verifies that the getValue() method returns the value provided in the constructor.
+     */
+    @Test
+    public void getValue_shouldReturnValueFromConstructor() {
+        // Arrange: Create a dataset with a well-defined key and value.
+        Comparable<String> key = "Population";
+        Number expectedValue = 1500;
+        DefaultKeyedValueDataset dataset = new DefaultKeyedValueDataset(key, expectedValue);
+
+        // Act: Retrieve the value from the dataset.
+        Number actualValue = dataset.getValue();
+
+        // Assert: The retrieved value should be the same as the one used for construction.
+        assertEquals(expectedValue, actualValue);
     }
 }
