@@ -1,41 +1,51 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import java.util.zip.ZipEntry;
 
-public class StreamCompressor_ESTestTest7 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Contains tests for the {@link StreamCompressor} class.
+ * The original test class was auto-generated and has been refactored for clarity.
+ */
+public class StreamCompressorTest {
+
+    /**
+     * Tests that writing a single byte using the STORED method correctly updates
+     * the total number of bytes written and the CRC32 checksum.
+     */
     @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        byte[] byteArray0 = new byte[2];
-        streamCompressor0.write(byteArray0, 1, (byte) 1, 1871);
-        long long0 = streamCompressor0.getTotalBytesWritten();
-        assertEquals(3523407757L, streamCompressor0.getCrc32());
-        assertEquals(1L, long0);
+    public void writeSingleByteAsStoredUpdatesBytesWrittenAndCrc() throws IOException {
+        // Arrange
+        // The data to be written is a single byte with value 0.
+        // We write one byte from the sourceData array, starting at offset 1.
+        byte[] sourceData = {0x00, 0x00};
+        int offset = 1;
+        int length = 1;
+
+        // The expected CRC32 for a single null byte (0x00).
+        final long expectedCrc = 3523407757L;
+        final long expectedBytesWritten = 1L;
+
+        OutputStream outputStream = new PipedOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(outputStream);
+
+        // Act
+        // The original test used a magic number (1871) for the compression method.
+        // Its behavior indicates it was treated as STORED, so we use the explicit constant.
+        streamCompressor.write(sourceData, offset, length, ZipEntry.STORED);
+        long actualTotalBytesWritten = streamCompressor.getTotalBytesWritten();
+        long actualCrc = streamCompressor.getCrc32();
+
+        // Assert
+        assertEquals("The total bytes written count should be 1.",
+            expectedBytesWritten, actualTotalBytesWritten);
+        assertEquals("The CRC32 checksum should be calculated for the single written byte.",
+            expectedCrc, actualCrc);
     }
 }
