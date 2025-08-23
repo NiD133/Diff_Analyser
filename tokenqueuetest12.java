@@ -1,86 +1,280 @@
 package org.jsoup.parser;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import java.util.regex.Pattern;
+
 import java.util.stream.Stream;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class TokenQueueTestTest12 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @ParameterizedTest
-    @MethodSource("escapeCssIdentifier_WebPlatformTestParameters")
-    @MethodSource("escapeCssIdentifier_additionalParameters")
-    public void escapeCssIdentifier(String expected, String input) {
+/**
+ * Tests for CSS identifier parsing and escaping in {@link TokenQueue}.
+ * Includes tests ported from the W3C web-platform-tests repository and Chromium source.
+ *
+ * @see TokenQueue#escapeCssIdentifier(String)
+ * @see TokenQueue#consumeCssIdentifier()
+ */
+@DisplayName("TokenQueue CSS Identifier Handling")
+public class TokenQueueCssIdentifierTest {
+
+    //<editor-fold desc="Tests for TokenQueue.escapeCssIdentifier()">
+
+    @ParameterizedTest(name = "[{index}] Input: \"{1}\", Expected: \"{0}\"")
+    @MethodSource({
+        "w3cCssEscape_nullAndReplacementChars",
+        "w3cCssEscape_numericAndDashPrefixes",
+        "w3cCssEscape_controlAndSpecialChars",
+        "w3cCssEscape_uncommonAndSurrogateChars",
+        "customCssEscape_specialChars"
+    })
+    void escapeCssIdentifier(String expected, String input) {
         assertEquals(expected, TokenQueue.escapeCssIdentifier(input));
     }
 
-    // https://github.com/web-platform-tests/wpt/blob/328fa1c67bf5dfa6f24571d4c41dd10224b6d247/css/cssom/escape.html
-    private static Stream<Arguments> escapeCssIdentifier_WebPlatformTestParameters() {
-        return Stream.of(Arguments.of("", ""), // Null bytes
-        Arguments.of("\uFFFD", "\0"), Arguments.of("a\uFFFD", "a\0"), Arguments.of("\uFFFDb", "\0b"), Arguments.of("a\uFFFDb", "a\0b"), // Replacement character
-        Arguments.of("\uFFFD", "\uFFFD"), Arguments.of("a\uFFFD", "a\uFFFD"), Arguments.of("\uFFFDb", "\uFFFDb"), Arguments.of("a\uFFFDb", "a\uFFFDb"), // Number prefix
-        Arguments.of("\\30 a", "0a"), Arguments.of("\\31 a", "1a"), Arguments.of("\\32 a", "2a"), Arguments.of("\\33 a", "3a"), Arguments.of("\\34 a", "4a"), Arguments.of("\\35 a", "5a"), Arguments.of("\\36 a", "6a"), Arguments.of("\\37 a", "7a"), Arguments.of("\\38 a", "8a"), Arguments.of("\\39 a", "9a"), // Letter number prefix
-        Arguments.of("a0b", "a0b"), Arguments.of("a1b", "a1b"), Arguments.of("a2b", "a2b"), Arguments.of("a3b", "a3b"), Arguments.of("a4b", "a4b"), Arguments.of("a5b", "a5b"), Arguments.of("a6b", "a6b"), Arguments.of("a7b", "a7b"), Arguments.of("a8b", "a8b"), Arguments.of("a9b", "a9b"), // Dash number prefix
-        Arguments.of("-\\30 a", "-0a"), Arguments.of("-\\31 a", "-1a"), Arguments.of("-\\32 a", "-2a"), Arguments.of("-\\33 a", "-3a"), Arguments.of("-\\34 a", "-4a"), Arguments.of("-\\35 a", "-5a"), Arguments.of("-\\36 a", "-6a"), Arguments.of("-\\37 a", "-7a"), Arguments.of("-\\38 a", "-8a"), Arguments.of("-\\39 a", "-9a"), // Double dash prefix
-        Arguments.of("--a", "--a"), // Various tests
-        Arguments.of("\\1 \\2 \\1e \\1f ", "\u0001\u0002\u001E\u001F"), Arguments.of("\u0080\u002D\u005F\u00A9", "\u0080\u002D\u005F\u00A9"), Arguments.of("\\7f \u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F", "\u007F\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F"), Arguments.of("\u00A0\u00A1\u00A2", "\u00A0\u00A1\u00A2"), Arguments.of("a0123456789b", "a0123456789b"), Arguments.of("abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz"), Arguments.of("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Backslashes get backslash-escaped
-        Arguments.of("hello\\\\world", "hello\\world"), // Code points greater than U+0080 are preserved
-        Arguments.of("hello\u1234world", "hello\u1234world"), // CSS.escape: Single dash escaped
-        Arguments.of("\\-", "-"), Arguments.of("\\ \\!xy", "\u0020\u0021\u0078\u0079"), // astral symbol (U+1D306 TETRAGRAM FOR CENTRE)
-        Arguments.of("\uD834\uDF06", "\uD834\uDF06"), // lone surrogates
-        Arguments.of("\uDF06", "\uDF06"), Arguments.of("\uD834", "\uD834"));
+    /**
+     * Provides test cases for escaping null bytes and replacement characters.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/css/cssom/escape.html">W3C CSSOM Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssEscape_nullAndReplacementChars() {
+        return Stream.of(
+            // Empty string
+            Arguments.of("", ""),
+            // Null bytes are replaced with the replacement character
+            Arguments.of("\uFFFD", "\0"),
+            Arguments.of("a\uFFFD", "a\0"),
+            Arguments.of("\uFFFDb", "\0b"),
+            Arguments.of("a\uFFFDb", "a\0b"),
+            // Replacement characters are passed through
+            Arguments.of("\uFFFD", "\uFFFD"),
+            Arguments.of("a\uFFFD", "a\uFFFD"),
+            Arguments.of("\uFFFDb", "\uFFFDb"),
+            Arguments.of("a\uFFFDb", "a\uFFFDb")
+        );
     }
 
-    private static Stream<Arguments> escapeCssIdentifier_additionalParameters() {
-        return Stream.of(Arguments.of("one\\#two\\.three\\/four\\\\five", "one#two.three/four\\five"), Arguments.of("-a", "-a"), Arguments.of("--", "--"));
+    /**
+     * Provides test cases for escaping identifiers starting with numbers or dashes.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/css/cssom/escape.html">W3C CSSOM Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssEscape_numericAndDashPrefixes() {
+        return Stream.of(
+            // A digit at the start of an identifier is escaped
+            Arguments.of("\\30 a", "0a"), Arguments.of("\\31 a", "1a"), Arguments.of("\\32 a", "2a"),
+            Arguments.of("\\33 a", "3a"), Arguments.of("\\34 a", "4a"), Arguments.of("\\35 a", "5a"),
+            Arguments.of("\\36 a", "6a"), Arguments.of("\\37 a", "7a"), Arguments.of("\\38 a", "8a"),
+            Arguments.of("\\39 a", "9a"),
+            // Digits after a letter are not escaped
+            Arguments.of("a0b", "a0b"), Arguments.of("a1b", "a1b"), Arguments.of("a9b", "a9b"),
+            // A dash followed by a digit is escaped
+            Arguments.of("-\\30 a", "-0a"), Arguments.of("-\\31 a", "-1a"), Arguments.of("-\\39 a", "-9a"),
+            // Double-dash prefix is allowed for custom properties
+            Arguments.of("--a", "--a")
+        );
     }
 
-    private static void validateNestedQuotes(String html, String selector) {
-        assertEquals("#identifier", Jsoup.parse(html).select(selector).first().cssSelector());
+    /**
+     * Provides test cases for escaping control characters and other special ASCII characters.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/css/cssom/escape.html">W3C CSSOM Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssEscape_controlAndSpecialChars() {
+        return Stream.of(
+            // Control characters (U+0001 to U+001F) are escaped
+            Arguments.of("\\1 \\2 \\1e \\1f ", "\u0001\u0002\u001E\u001F"),
+            // A single leading dash is escaped
+            Arguments.of("\\-", "-"),
+            // Space and exclamation mark are escaped
+            Arguments.of("\\ \\!xy", "\u0020\u0021\u0078\u0079"),
+            // Backslashes are themselves escaped
+            Arguments.of("hello\\\\world", "hello\\world")
+        );
     }
 
-    @ParameterizedTest
-    @MethodSource("cssIdentifiers")
-    @MethodSource("cssAdditionalIdentifiers")
-    void consumeCssIdentifier_WebPlatformTests(String expected, String cssIdentifier) {
+    /**
+     * Provides test cases for escaping high code points and surrogate pairs.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/css/cssom/escape.html">W3C CSSOM Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssEscape_uncommonAndSurrogateChars() {
+        return Stream.of(
+            // Code points from U+0080 upwards are preserved
+            Arguments.of("\u0080\u002D\u005F\u00A9", "\u0080\u002D\u005F\u00A9"),
+            Arguments.of("hello\u1234world", "hello\u1234world"),
+            // Astral symbols (surrogate pairs) are preserved
+            Arguments.of("\uD834\uDF06", "\uD834\uDF06"), // U+1D306
+            // Lone surrogates are preserved
+            Arguments.of("\uDF06", "\uDF06"),
+            Arguments.of("\uD834", "\uD834")
+        );
+    }
+
+    /**
+     * Provides additional custom test cases for escaping.
+     */
+    private static Stream<Arguments> customCssEscape_specialChars() {
+        return Stream.of(
+            Arguments.of("one\\#two\\.three\\/four\\\\five", "one#two.three/four\\five"),
+            Arguments.of("-a", "-a"),
+            Arguments.of("--", "--")
+        );
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Tests for TokenQueue.consumeCssIdentifier()">
+
+    @ParameterizedTest(name = "[{index}] Input: \"{1}\", Expected: \"{0}\"")
+    @MethodSource({
+        "w3cCssConsume_hexEscapes",
+        "w3cCssConsume_specialHexReplacements",
+        "w3cCssConsume_generalEscapes",
+        "w3cCssConsume_nonEdgeCases",
+        "chromiumCssConsume_various",
+        "chromiumCssConsume_simpleAndEdgeCases",
+        "customCssConsume_various"
+    })
+    void consumeCssIdentifier(String expected, String cssIdentifier) {
         assertParsedCssIdentifierEquals(expected, cssIdentifier);
     }
 
-    private static Stream<Arguments> cssIdentifiers() {
-        return Stream.of(// https://github.com/web-platform-tests/wpt/blob/36036fb5212a3fc15fc5750cecb1923ba4071668/dom/nodes/ParentNode-querySelector-escapes.html
-        // - escape hex digit
-        Arguments.of("0nextIsWhiteSpace", "\\30 nextIsWhiteSpace"), Arguments.of("0nextIsNotHexLetters", "\\30nextIsNotHexLetters"), Arguments.of("0connectHexMoreThan6Hex", "\\000030connectHexMoreThan6Hex"), Arguments.of("0spaceMoreThan6Hex", "\\000030 spaceMoreThan6Hex"), // - hex digit special replacement
-        // 1. zero points
-        Arguments.of("zero\uFFFD", "zero\\0"), Arguments.of("zero\uFFFD", "zero\\000000"), // 2. surrogate points
-        Arguments.of("\uFFFDsurrogateFirst", "\\d83d surrogateFirst"), Arguments.of("surrogateSecond\uFFFd", "surrogateSecond\\dd11"), Arguments.of("surrogatePair\uFFFD\uFFFD", "surrogatePair\\d83d\\dd11"), // 3. out of range points
-        Arguments.of("outOfRange\uFFFD", "outOfRange\\110000"), Arguments.of("outOfRange\uFFFD", "outOfRange\\110030"), Arguments.of("outOfRange\uFFFD", "outOfRange\\555555"), Arguments.of("outOfRange\uFFFD", "outOfRange\\ffffff"), // - escape anything else
-        Arguments.of(".comma", "\\.comma"), Arguments.of("-minus", "\\-minus"), Arguments.of("g", "\\g"), // non edge cases
-        Arguments.of("aBMPRegular", "\\61 BMPRegular"), Arguments.of("\uD83D\uDD11nonBMP", "\\1f511 nonBMP"), Arguments.of("00continueEscapes", "\\30\\30 continueEscapes"), Arguments.of("00continueEscapes", "\\30 \\30 continueEscapes"), Arguments.of("continueEscapes00", "continueEscapes\\30 \\30 "), Arguments.of("continueEscapes00", "continueEscapes\\30 \\30"), Arguments.of("continueEscapes00", "continueEscapes\\30\\30 "), Arguments.of("continueEscapes00", "continueEscapes\\30\\30"), // ident tests case from CSS tests of chromium source: https://goo.gl/3Cxdov
-        Arguments.of("hello", "hel\\6Co"), Arguments.of("&B", "\\26 B"), Arguments.of("hello", "hel\\6C o"), Arguments.of("spaces", "spac\\65\r\ns"), Arguments.of("spaces", "sp\\61\tc\\65\fs"), Arguments.of("test\uD799", "test\\D799"), Arguments.of("\uE000", "\\E000"), Arguments.of("test", "te\\s\\t"), Arguments.of("spaces in\tident", "spaces\\ in\\\tident"), Arguments.of(".,:!", "\\.\\,\\:\\!"), Arguments.of("null\uFFFD", "null\\0"), Arguments.of("null\uFFFD", "null\\0000"), Arguments.of("large\uFFFD", "large\\110000"), Arguments.of("large\uFFFD", "large\\23456a"), Arguments.of("surrogate\uFFFD", "surrogate\\D800"), Arguments.of("surrogate\uFFFD", "surrogate\\0DBAC"), Arguments.of("\uFFFDsurrogate", "\\00DFFFsurrogate"), Arguments.of("\uDBFF\uDFFF", "\\10fFfF"), Arguments.of("\uDBFF\uDFFF0", "\\10fFfF0"), Arguments.of("\uDBC0\uDC0000", "\\10000000"), Arguments.of("eof\uFFFD", "eof\\"), Arguments.of("simple-ident", "simple-ident"), Arguments.of("testing123", "testing123"), Arguments.of("_underscore", "_underscore"), Arguments.of("-text", "-text"), Arguments.of("-m", "-\\6d"), Arguments.of("--abc", "--abc"), Arguments.of("--", "--"), Arguments.of("--11", "--11"), Arguments.of("---", "---"), Arguments.of("\u2003", "\u2003"), Arguments.of("\u00A0", "\u00A0"), Arguments.of("\u1234", "\u1234"), Arguments.of("\uD808\uDF45", "\uD808\uDF45"), Arguments.of("\uFFFD", "\u0000"), Arguments.of("ab\uFFFDc", "ab\u0000c"));
-    }
-
-    private static Stream<Arguments> cssAdditionalIdentifiers() {
-        return Stream.of(Arguments.of("1st", "\\31\r\nst"), Arguments.of("1", "\\31\r"), Arguments.of("1a", "\\31\ra"), Arguments.of("1", "\\031"), Arguments.of("1", "\\0031"), Arguments.of("1", "\\00031"), Arguments.of("1", "\\000031"), Arguments.of("1", "\\000031"), Arguments.of("a", "a\\\nb"));
-    }
-
-    private static String parseCssIdentifier(String text) {
-        TokenQueue q = new TokenQueue(text);
-        return q.consumeCssIdentifier();
-    }
-
-    private void assertParsedCssIdentifierEquals(String expected, String cssIdentifier) {
-        assertEquals(expected, parseCssIdentifier(cssIdentifier));
-    }
-
     @Test
-    void consumeCssIdentifierWithEmptyInput() {
+    void consumeCssIdentifier_whenEmpty_throwsException() {
         TokenQueue emptyQueue = new TokenQueue("");
         Exception exception = assertThrows(IllegalArgumentException.class, emptyQueue::consumeCssIdentifier);
         assertEquals("CSS identifier expected, but end of input found", exception.getMessage());
     }
+
+    /**
+     * Provides test cases for consuming hexadecimal escape sequences.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/dom/nodes/ParentNode-querySelector-escapes.html">W3C DOM Query Selector Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssConsume_hexEscapes() {
+        return Stream.of(
+            Arguments.of("0nextIsWhiteSpace", "\\30 nextIsWhiteSpace"),
+            Arguments.of("0nextIsNotHexLetters", "\\30nextIsNotHexLetters"),
+            Arguments.of("0connectHexMoreThan6Hex", "\\000030connectHexMoreThan6Hex"),
+            Arguments.of("0spaceMoreThan6Hex", "\\000030 spaceMoreThan6Hex")
+        );
+    }
+
+    /**
+     * Provides test cases for consuming special hex escape replacements (null, surrogate, out-of-range).
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/dom/nodes/ParentNode-querySelector-escapes.html">W3C DOM Query Selector Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssConsume_specialHexReplacements() {
+        return Stream.of(
+            // 1. Zero points are replaced with U+FFFD
+            Arguments.of("zero\uFFFD", "zero\\0"),
+            Arguments.of("zero\uFFFD", "zero\\000000"),
+            // 2. Surrogate code points are replaced with U+FFFD
+            Arguments.of("\uFFFDsurrogateFirst", "\\d83d surrogateFirst"),
+            Arguments.of("surrogateSecond\uFFFd", "surrogateSecond\\dd11"),
+            Arguments.of("surrogatePair\uFFFD\uFFFD", "surrogatePair\\d83d\\dd11"),
+            // 3. Out-of-range code points are replaced with U+FFFD
+            Arguments.of("outOfRange\uFFFD", "outOfRange\\110000"),
+            Arguments.of("outOfRange\uFFFD", "outOfRange\\ffffff")
+        );
+    }
+
+    /**
+     * Provides test cases for consuming general character escapes.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/dom/nodes/ParentNode-querySelector-escapes.html">W3C DOM Query Selector Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssConsume_generalEscapes() {
+        return Stream.of(
+            Arguments.of(".comma", "\\.comma"),
+            Arguments.of("-minus", "\\-minus"),
+            Arguments.of("g", "\\g")
+        );
+    }
+
+    /**
+     * Provides test cases for consuming non-edge-case escape sequences.
+     * @see <a href="https://github.com/web-platform-tests/wpt/blob/master/dom/nodes/ParentNode-querySelector-escapes.html">W3C DOM Query Selector Escape Tests</a>
+     */
+    private static Stream<Arguments> w3cCssConsume_nonEdgeCases() {
+        return Stream.of(
+            Arguments.of("aBMPRegular", "\\61 BMPRegular"),
+            Arguments.of("\uD83D\uDD11nonBMP", "\\1f511 nonBMP"),
+            Arguments.of("00continueEscapes", "\\30\\30 continueEscapes"),
+            Arguments.of("00continueEscapes", "\\30 \\30 continueEscapes"),
+            Arguments.of("continueEscapes00", "continueEscapes\\30 \\30 "),
+            Arguments.of("continueEscapes00", "continueEscapes\\30\\30")
+        );
+    }
+
+    /**
+     * Provides test cases from Chromium's CSS tests.
+     * @see <a href="https://goo.gl/3Cxdov">Chromium CSS Tests</a>
+     */
+    private static Stream<Arguments> chromiumCssConsume_various() {
+        return Stream.of(
+            Arguments.of("hello", "hel\\6Co"),
+            Arguments.of("&B", "\\26 B"),
+            Arguments.of("hello", "hel\\6C o"),
+            Arguments.of("spaces", "spac\\65\r\ns"),
+            Arguments.of("spaces", "sp\\61\tc\\65\fs"),
+            Arguments.of("test\uD799", "test\\D799"),
+            Arguments.of("\uE000", "\\E000"),
+            Arguments.of("test", "te\\s\\t"),
+            Arguments.of("spaces in\tident", "spaces\\ in\\\tident"),
+            Arguments.of(".,:!", "\\.\\,\\:\\!")
+        );
+    }
+
+    /**
+     * Provides test cases for simple identifiers and edge cases from Chromium's CSS tests.
+     * @see <a href="https://goo.gl/3Cxdov">Chromium CSS Tests</a>
+     */
+    private static Stream<Arguments> chromiumCssConsume_simpleAndEdgeCases() {
+        return Stream.of(
+            // Simple identifiers
+            Arguments.of("simple-ident", "simple-ident"),
+            Arguments.of("testing123", "testing123"),
+            Arguments.of("_underscore", "_underscore"),
+            Arguments.of("-text", "-text"),
+            Arguments.of("-m", "-\\6d"),
+            Arguments.of("--abc", "--abc"),
+            Arguments.of("--", "--"),
+            Arguments.of("--11", "--11"),
+            Arguments.of("---", "---"),
+            // Unescaped characters
+            Arguments.of("\u2003", "\u2003"),
+            Arguments.of("\u00A0", "\u00A0"),
+            Arguments.of("\u1234", "\u1234"),
+            Arguments.of("\uD808\uDF45", "\uD808\uDF45"),
+            // Edge cases with null, surrogates, and EOF
+            Arguments.of("null\uFFFD", "null\\0"),
+            Arguments.of("surrogate\uFFFD", "surrogate\\D800"),
+            Arguments.of("\uDBFF\uDFFF", "\\10fFfF"),
+            Arguments.of("eof\uFFFD", "eof\\"),
+            Arguments.of("\uFFFD", "\u0000"),
+            Arguments.of("ab\uFFFDc", "ab\u0000c")
+        );
+    }
+
+    /**
+     * Provides additional custom test cases for consuming identifiers.
+     */
+    private static Stream<Arguments> customCssConsume_various() {
+        return Stream.of(
+            Arguments.of("1st", "\\31\r\nst"),
+            Arguments.of("1", "\\31\r"),
+            Arguments.of("1a", "\\31\ra"),
+            Arguments.of("1", "\\031"),
+            Arguments.of("1", "\\00031"),
+            Arguments.of("1", "\\0000031"),
+            Arguments.of("a", "a\\\nb") // escaped newline is ignored
+        );
+    }
+
+    private void assertParsedCssIdentifierEquals(String expected, String cssIdentifier) {
+        TokenQueue tq = new TokenQueue(cssIdentifier);
+        String consumed = tq.consumeCssIdentifier();
+        assertEquals(expected, consumed);
+    }
+
+    //</editor-fold>
 }
