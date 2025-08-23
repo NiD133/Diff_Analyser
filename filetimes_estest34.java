@@ -1,32 +1,21 @@
 package org.apache.commons.io.file.attribute;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest34 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        // Undeclared exception!
-        try {
-            FileTimes.minusNanos((FileTime) null, 0L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.file.attribute.FileTimes", e);
-        }
+    /**
+     * Tests that {@code minusNanos()} throws a NullPointerException when the
+     * input FileTime is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void minusNanos_shouldThrowNullPointerException_whenFileTimeIsNull() {
+        // The value of the second argument (nanosToSubtract) is irrelevant,
+        // as the null check on the first argument should cause the exception.
+        FileTimes.minusNanos(null, 0L);
     }
 }
