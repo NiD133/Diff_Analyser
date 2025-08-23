@@ -1,43 +1,29 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest63 extends Elements_ESTest_scaffolding {
+/**
+ * Verifies the behavior of the {@link Elements#set(int, Element)} method,
+ * specifically for handling invalid index arguments.
+ */
+public class ElementsSetInvalidIndexTest {
 
-    @Test(timeout = 4000)
-    public void test062() throws Throwable {
-        Elements elements0 = new Elements();
-        Element element0 = new Element("4[]rS^,A(7");
-        // Undeclared exception!
-        try {
-            elements0.set((-1588), element0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling set() with a negative index on an Elements object
+     * throws an ArrayIndexOutOfBoundsException. The underlying implementation
+     * delegates to ArrayList, which has this behavior.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void setWithNegativeIndexThrowsException() {
+        // Arrange: Create an empty list of elements and a new element to add.
+        Elements elements = new Elements();
+        Element elementToSet = new Element("p");
+        int negativeIndex = -1;
+
+        // Act: Attempt to set an element at the negative index.
+        // This call is expected to throw the exception, which is handled by the
+        // 'expected' parameter in the @Test annotation.
+        elements.set(negativeIndex, elementToSet);
     }
 }
