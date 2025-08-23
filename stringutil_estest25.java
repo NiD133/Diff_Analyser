@@ -1,29 +1,41 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest25 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the StringUtil class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        StringUtil.padding(8170, 8170);
-        // Undeclared exception!
-        StringUtil.padding(8170, 8170);
+    /**
+     * Verifies that StringUtil.padding() correctly generates a string of spaces
+     * for a width that is larger than its internal cache, which has a size of 20.
+     */
+    @Test
+    public void paddingWithWidthGreaterThanCacheReturnsCorrectString() {
+        // Arrange: Define a width larger than the internal cache size.
+        int largeWidth = 100;
+        
+        // Create the expected string of 100 spaces for comparison.
+        char[] expectedChars = new char[largeWidth];
+        Arrays.fill(expectedChars, ' ');
+        String expectedPadding = new String(expectedChars);
+
+        // Act: Call the padding method with a large width and an unlimited max size.
+        String actualPadding = StringUtil.padding(largeWidth, -1);
+
+        // Assert: Verify that the generated string has the correct length and content.
+        assertEquals(
+            "The generated padding string should have the correct length.",
+            largeWidth, 
+            actualPadding.length()
+        );
+        assertEquals(
+            "The generated string should consist entirely of spaces.",
+            expectedPadding, 
+            actualPadding
+        );
     }
 }
