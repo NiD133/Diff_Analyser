@@ -1,53 +1,39 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
 import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest70 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        char[] charArray0 = new char[6];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendHeader(7, charBuffer0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+    /**
+     * Verifies that appendHeader throws a BufferOverflowException when the underlying
+     * Appendable has insufficient capacity to hold the formatted header text.
+     * The formatting added by appendHeader (like indentation or newlines) requires
+     * more space than the buffer provides.
+     */
+    @Test(expected = BufferOverflowException.class)
+    public void appendHeaderShouldThrowBufferOverflowExceptionWhenAppendableIsFull() throws IOException {
+        // Arrange: Create a TextHelpAppendable with a small, fixed-size buffer
+        // that is too small to accommodate the header text plus any formatting.
+        final int bufferCapacity = 6;
+        CharBuffer limitedCapacityBuffer = CharBuffer.allocate(bufferCapacity);
+        TextHelpAppendable textHelpAppendable = new TextHelpAppendable(limitedCapacityBuffer);
+
+        // The text to append is exactly the size of the buffer.
+        final String headerText = "Header";
+        assertEquals("Precondition: Header text length should match buffer capacity.",
+                bufferCapacity, headerText.length());
+
+        // Act & Assert: Attempting to append the header will cause an overflow
+        // because the method adds formatting characters (e.g., newlines, spaces)
+        // that exceed the buffer's remaining capacity. The expected exception
+        // is declared in the @Test annotation.
+        textHelpAppendable.appendHeader(1, headerText);
     }
 }
