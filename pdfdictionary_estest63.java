@@ -1,27 +1,27 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class PdfDictionary_ESTestTest63 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        boolean boolean0 = pdfDictionary0.isFont();
-        assertFalse(boolean0);
+    /**
+     * Verifies that the isFont() method returns false for a newly created, empty dictionary.
+     * An empty dictionary does not have its /Type key set to /Font, so it should not be
+     * identified as a font dictionary.
+     */
+    @Test
+    public void isFont_shouldReturnFalse_forEmptyDictionary() {
+        // Arrange: Create a new, empty PdfDictionary.
+        PdfDictionary dictionary = new PdfDictionary();
+
+        // Act: Check if the dictionary is of type Font.
+        boolean isFont = dictionary.isFont();
+
+        // Assert: The result should be false.
+        assertFalse("An empty dictionary should not be identified as a font dictionary", isFont);
     }
 }
