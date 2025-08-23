@@ -1,39 +1,31 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
-import java.io.IOException;
+import static org.junit.Assert.assertFalse;
+
 import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest31 extends MergedStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MergedStream} class.
+ */
+public class MergedStreamTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[20];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, (byte) 98, (byte) 98);
-        boolean boolean0 = mergedStream0.markSupported();
-        assertFalse(boolean0);
+    /**
+     * Verifies that the {@code markSupported()} method correctly returns {@code false},
+     * as {@link MergedStream} is not designed to support mark/reset operations.
+     */
+    @Test
+    public void markSupportedShouldReturnFalse() {
+        // Arrange: Create a MergedStream instance.
+        // The specific underlying stream and buffer content are not relevant for this test,
+        // as markSupported() is expected to always return false.
+        InputStream underlyingInputStream = new PipedInputStream();
+        byte[] buffer = new byte[16];
+        MergedStream mergedStream = new MergedStream(null, underlyingInputStream, buffer, 0, 0);
+
+        // Act & Assert: Call markSupported() and verify it returns false.
+        assertFalse("MergedStream is not expected to support mark/reset operations.",
+                mergedStream.markSupported());
     }
 }
