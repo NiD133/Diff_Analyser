@@ -1,20 +1,29 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This class contains an improved version of an auto-generated test case
+ * for the {@link RandomUtils} class.
+ */
 public class RandomUtils_ESTestTest29 extends RandomUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.insecure();
-        boolean boolean0 = randomUtils0.randomBoolean();
-        //  // Unstable assertion: assertTrue(boolean0);
+    /**
+     * Tests that calling {@link RandomUtils#randomBoolean()} on an insecure instance
+     * executes without throwing an exception.
+     * <p>
+     * Since the method's output is random by nature, this test cannot assert a
+     * specific boolean value (true or false). The test's primary purpose is to
+     * act as a smoke test, verifying that the method call completes successfully.
+     * Success is determined by the absence of any thrown exceptions.
+     */
+    @Test
+    public void testInsecureRandomBooleanCompletesSuccessfully() {
+        // Arrange: Obtain an insecure RandomUtils instance.
+        final RandomUtils randomUtils = RandomUtils.insecure();
+
+        // Act & Assert: The test passes if this method call executes without
+        // throwing an exception. No specific return value can be asserted.
+        randomUtils.randomBoolean();
     }
 }
