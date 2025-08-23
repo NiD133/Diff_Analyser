@@ -1,23 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class FieldUtils_ESTestTest27 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        long long0 = FieldUtils.safeAdd((-1185L), (-1185L));
-        assertEquals((-2370L), long0);
+    /**
+     * Tests that safeAdd correctly adds two negative long values
+     * without causing an overflow.
+     */
+    @Test
+    public void safeAdd_shouldCorrectlyAddTwoNegativeLongs() {
+        // Arrange
+        long value1 = -1185L;
+        long value2 = -1185L;
+        long expectedSum = -2370L;
+
+        // Act
+        long actualSum = FieldUtils.safeAdd(value1, value2);
+
+        // Assert
+        assertEquals(expectedSum, actualSum);
     }
 }
