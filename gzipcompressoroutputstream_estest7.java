@@ -1,40 +1,35 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest7 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link GzipCompressorOutputStream} class.
+ */
+public class GzipCompressorOutputStreamTest {
 
+    /**
+     * Verifies that attempting to write to a stream after it has been closed
+     * results in an IOException.
+     */
     @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = new GzipCompressorOutputStream(byteArrayOutputStream0);
-        gzipCompressorOutputStream0.close();
-        byte[] byteArray0 = new byte[0];
+    public void writeToClosedStreamShouldThrowIOException() throws IOException {
+        // Arrange: Create a GzipCompressorOutputStream and immediately close it.
+        ByteArrayOutputStream underlyingStream = new ByteArrayOutputStream();
+        GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(underlyingStream);
+        gzipOutputStream.close();
+
+        // Act & Assert: Attempting to write to the closed stream should throw an IOException.
         try {
-            gzipCompressorOutputStream0.write(byteArray0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream closed
-            //
-            verifyException("org.apache.commons.compress.CompressFilterOutputStream", e);
+            gzipOutputStream.write(new byte[0]);
+            fail("Expected an IOException to be thrown when writing to a closed stream.");
+        } catch (final IOException e) {
+            // Verify the exception has the expected message.
+            assertEquals("Stream closed", e.getMessage());
         }
     }
 }
