@@ -1,21 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class ByteArrayBuilder_ESTestTest53 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        JsonRecyclerPools.NonRecyclingPool jsonRecyclerPools_NonRecyclingPool0 = JsonRecyclerPools.NonRecyclingPool.GLOBAL;
-        BufferRecycler bufferRecycler0 = jsonRecyclerPools_NonRecyclingPool0.acquirePooled();
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(bufferRecycler0, 1);
-        byteArrayBuilder0.release();
-        byteArrayBuilder0.release();
-        assertEquals(0, byteArrayBuilder0.getCurrentSegmentLength());
+    /**
+     * Verifies that the release() method can be called multiple times without
+     * causing errors or side effects. This ensures the method is idempotent.
+     */
+    @Test
+    public void releaseShouldBeSafeToCallMultipleTimes() {
+        // Arrange: Create a ByteArrayBuilder with a buffer recycler.
+        // The recycler is needed to test the full logic of the release() method.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        ByteArrayBuilder builder = new ByteArrayBuilder(bufferRecycler);
+
+        // Act: Call release() twice. The second call should be a safe no-op.
+        builder.release();
+        builder.release();
+
+        // Assert: The builder should be in a clean state after being released.
+        // The current segment length is expected to be 0.
+        // This test also implicitly verifies that the second call to release()
+        // does not throw an exception.
+        assertEquals(0, builder.getCurrentSegmentLength());
     }
 }
