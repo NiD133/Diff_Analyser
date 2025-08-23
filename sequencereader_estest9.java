@@ -1,38 +1,45 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.Reader;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.io.StringReader;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SequenceReader_ESTestTest9 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        ArrayList<StringReader> arrayList0 = new ArrayList<StringReader>();
-        List<StringReader> list0 = arrayList0.subList(0, 0);
-        StringReader stringReader0 = new StringReader("Array Size=");
-        arrayList0.add(stringReader0);
-        SequenceReader sequenceReader0 = null;
+    /**
+     * Tests that the SequenceReader constructor throws a ConcurrentModificationException
+     * if it is initialized with a sublist whose backing list has been modified.
+     *
+     * This is expected behavior because the constructor iterates over the provided
+     * collection, and the sublist's iterator is fail-fast.
+     */
+    @Test
+    public void constructorShouldThrowExceptionWhenBackingListOfSubListIsModified() {
+        // Arrange: Create a list and a sublist view of it.
+        final ArrayList<StringReader> backingList = new ArrayList<>();
+        final List<StringReader> subList = backingList.subList(0, 0);
+
+        // Act: Structurally modify the backing list *after* the sublist has been created.
+        // This action invalidates the sublist and its iterator.
+        backingList.add(new StringReader("some data"));
+
+        // Assert: Attempting to create a SequenceReader with the invalidated sublist
+        // should trigger a ConcurrentModificationException.
         try {
-            sequenceReader0 = new SequenceReader(list0);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayList$SubList", e);
+            new SequenceReader(subList);
+            fail("Expected a ConcurrentModificationException to be thrown.");
+        } catch (final ConcurrentModificationException e) {
+            // This is the expected outcome.
+            // For this specific case in ArrayList$SubList, the exception message is null.
+            assertNull("The exception message should be null.", e.getMessage());
         }
     }
 }
