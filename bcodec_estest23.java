@@ -1,24 +1,50 @@
 package org.apache.commons.codec.net;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BCodec_ESTestTest23 extends BCodec_ESTest_scaffolding {
+import java.nio.charset.Charset;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        CodecPolicy codecPolicy0 = CodecPolicy.STRICT;
-        BCodec bCodec0 = new BCodec(charset0, codecPolicy0);
-        boolean boolean0 = bCodec0.isStrictDecoding();
-        assertTrue(boolean0);
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Tests for {@link BCodec}.
+ */
+public class BCodecTest {
+
+    /**
+     * Tests that a BCodec instance created with the STRICT policy
+     * correctly reports that it is in strict decoding mode.
+     */
+    @Test
+    public void testIsStrictDecodingReturnsTrueWhenConstructedWithStrictPolicy() {
+        // Arrange
+        final CodecPolicy policy = CodecPolicy.STRICT;
+        final BCodec bCodec = new BCodec(Charset.defaultCharset(), policy);
+
+        // Act
+        final boolean isStrict = bCodec.isStrictDecoding();
+
+        // Assert
+        assertTrue("isStrictDecoding() should return true for a codec constructed with STRICT policy.", isStrict);
+    }
+
+    /**
+     * Tests that a BCodec instance created with the LENIENT policy
+     * correctly reports that it is not in strict decoding mode.
+     * This is the default behavior.
+     */
+    @Test
+    public void testIsStrictDecodingReturnsFalseWhenConstructedWithLenientPolicy() {
+        // Arrange
+        final CodecPolicy policy = CodecPolicy.LENIENT;
+        final BCodec bCodec = new BCodec(Charset.defaultCharset(), policy);
+
+        // Act
+        final boolean isStrict = bCodec.isStrictDecoding();
+
+        // Assert
+        assertFalse("isStrictDecoding() should return false for a codec constructed with LENIENT policy.", isStrict);
     }
 }
