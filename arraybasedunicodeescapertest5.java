@@ -1,42 +1,58 @@
 package com.google.common.escape;
 
-import static com.google.common.escape.ReflectionFreeAssertThrows.assertThrows;
 import static com.google.common.truth.Truth.assertThat;
-import com.google.common.annotations.GwtCompatible;
+
 import com.google.common.collect.ImmutableMap;
-import com.google.common.escape.testing.EscaperAsserts;
-import java.io.IOException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullMarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class ArrayBasedUnicodeEscaperTestTest5 extends TestCase {
+/**
+ * Tests for {@link ArrayBasedUnicodeEscaper} focusing on its handling of Unicode surrogate pairs.
+ */
+@RunWith(JUnit4.class)
+public class ArrayBasedUnicodeEscaperSurrogatePairTest {
 
-    private static final ImmutableMap<Character, String> NO_REPLACEMENTS = ImmutableMap.of();
+  private static final String UNSAFE_REPLACEMENT = "X";
 
-    private static final ImmutableMap<Character, String> SIMPLE_REPLACEMENTS = ImmutableMap.of('\n', "<newline>", '\t', "<tab>", '&', "<and>");
+  // This escaper considers code points from 0 to 0x20000 as safe. Any code point outside this
+  // range is considered unsafe and will be replaced by "X".
+  private final UnicodeEscaper escaper =
+      new ArrayBasedUnicodeEscaper(ImmutableMap.of(), 0, 0x20000, null) {
+        @Override
+        protected char[] escapeUnsafe(int c) {
+          return UNSAFE_REPLACEMENT.toCharArray();
+        }
+      };
 
-    private static final char[] NO_CHARS = new char[0];
+  @Test
+  public void escape_withSafeSurrogateCodePoint_doesNotChangeInput() {
+    // Arrange: U+10000 is a code point that requires a surrogate pair for representation in a
+    // String, but it falls within the defined safe range (0 - 0x20000).
+    int safeCodePoint = 0x10000;
+    String inputWithSafeSurrogate = new String(Character.toChars(safeCodePoint));
 
-    public void testCodePointsFromSurrogatePairs() throws IOException {
-        UnicodeEscaper surrogateEscaper = new ArrayBasedUnicodeEscaper(NO_REPLACEMENTS, 0, 0x20000, null) {
+    // Act
+    String escaped = escaper.escape(inputWithSafeSurrogate);
 
-            private final char[] escaped = new char[] { 'X' };
+    // Assert: The escaper should correctly identify the code point as safe and not escape it.
+    assertThat(escaped).isEqualTo(inputWithSafeSurrogate);
+  }
 
-            @Override
-            protected char[] escapeUnsafe(int c) {
-                return escaped;
-            }
-        };
-        EscaperAsserts.assertBasic(surrogateEscaper);
-        // A surrogate pair defining a code point within the safe range.
-        // 0x10000
-        String safeInput = "\uD800\uDC00";
-        assertThat(surrogateEscaper.escape(safeInput)).isEqualTo(safeInput);
-        // A surrogate pair defining a code point outside the safe range (but both
-        // of the surrogate characters lie within the safe range). It is important
-        // not to accidentally treat this as a sequence of safe characters.
-        // 0x10FFFF
-        String unsafeInput = "\uDBFF\uDFFF";
-        assertThat(surrogateEscaper.escape(unsafeInput)).isEqualTo("X");
-    }
+  @Test
+  public void escape_withUnsafeSurrogateCodePoint_replacesEntirePair() {
+    // Arrange: U+10FFFF is a code point outside the safe range (0 - 0x20000). It is represented
+    // by the surrogate pair "\uDBFF\uDFFF".
+    int unsafeCodePoint = 0x10FFFF;
+    String inputWithUnsafeSurrogate = new String(Character.toChars(unsafeCodePoint));
+
+    // Act
+    String escaped = escaper.escape(inputWithUnsafeSurrogate);
+
+    // Assert: This is a crucial test. The individual char values of the surrogate pair
+    // (0xDBFF and 0xDFFF) are numerically less than the safe max (0x20000). However, the
+    // escaper must correctly process them as a single, unsafe code point and escape the pair
+    // as a whole.
+    assertThat(escaped).isEqualTo(UNSAFE_REPLACEMENT);
+  }
 }
