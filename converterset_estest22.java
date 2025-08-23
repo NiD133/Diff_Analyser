@@ -2,24 +2,24 @@ package org.joda.time.convert;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest22 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Converter[] converterArray0 = new Converter[0];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        ConverterSet converterSet1 = converterSet0.remove((Converter) null, (Converter[]) null);
-        assertSame(converterSet1, converterSet0);
+    @Test
+    public void remove_withNullConverter_shouldReturnSameInstance() {
+        // Arrange: Create an empty ConverterSet.
+        Converter[] emptyConverters = new Converter[0];
+        ConverterSet initialSet = new ConverterSet(emptyConverters);
+
+        // Act: Attempt to remove a null converter. Since a null converter cannot be
+        // in the set, this operation should result in no change.
+        ConverterSet resultSet = initialSet.remove(null, null);
+
+        // Assert: The original set instance should be returned, confirming the
+        // set was not modified.
+        assertSame("Removing a null converter from a set should not change it", initialSet, resultSet);
     }
 }
