@@ -1,34 +1,38 @@
 package org.apache.commons.collections4.iterators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.util.Iterator;
+import org.junit.Test;
+
+/**
+ * Tests for {@link BoundedIterator}.
+ * This test case focuses on constructor validation.
+ */
+// Note: The original class name "BoundedIterator_ESTestTest12" was kept,
+// but a more descriptive name like "BoundedIteratorTest" is recommended.
 public class BoundedIterator_ESTestTest12 extends BoundedIterator_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        BoundedIterator<Boolean> boundedIterator0 = null;
+    /**
+     * Tests that the BoundedIterator constructor throws an IllegalArgumentException
+     * when the 'max' parameter is negative.
+     */
+    @Test
+    public void constructorShouldThrowIllegalArgumentExceptionForNegativeMax() {
+        // Arrange: Define parameters for the constructor.
+        // The iterator can be null because the validation for 'max' occurs before the iterator is used.
+        final Iterator<Object> nullIterator = null;
+        final long offset = 0L;
+        final long negativeMax = -1L;
+
+        // Act & Assert: Attempt to create the iterator and verify the resulting exception.
         try {
-            boundedIterator0 = new BoundedIterator<Boolean>((Iterator<? extends Boolean>) null, 0L, (-1022L));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Max parameter must not be negative.
-            //
-            verifyException("org.apache.commons.collections4.iterators.BoundedIterator", e);
+            new BoundedIterator<>(nullIterator, offset, negativeMax);
+            fail("Expected an IllegalArgumentException to be thrown due to the negative 'max' parameter.");
+        } catch (final IllegalArgumentException e) {
+            // Assert: Verify that the exception message is correct.
+            assertEquals("Max parameter must not be negative.", e.getMessage());
         }
     }
 }
