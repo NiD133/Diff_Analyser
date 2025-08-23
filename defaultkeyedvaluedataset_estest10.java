@@ -1,25 +1,35 @@
 package org.jfree.data.general;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigInteger;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.chart.date.SpreadsheetDate;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.xy.OHLCDataItem;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DefaultKeyedValueDataset_ESTestTest10 extends DefaultKeyedValueDataset_ESTest_scaffolding {
+import java.util.Objects;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        DefaultKeyedValueDataset defaultKeyedValueDataset0 = new DefaultKeyedValueDataset();
-        DefaultKeyedValueDataset defaultKeyedValueDataset1 = new DefaultKeyedValueDataset(defaultKeyedValueDataset0);
-        defaultKeyedValueDataset1.hashCode();
+/**
+ * A test suite for the hashCode() method of the {@link DefaultKeyedValueDataset} class.
+ */
+public class DefaultKeyedValueDatasetTest {
+
+    /**
+     * Verifies that the hashCode method correctly computes a hash code when the
+     * dataset's internal data is another DefaultKeyedValueDataset instance.
+     *
+     * This test ensures that nesting datasets does not cause exceptions and that
+     * the hash code is calculated as expected based on the nested object.
+     */
+    @Test
+    public void hashCode_whenDataIsAnotherDataset_isCalculatedCorrectly() {
+        // Arrange: Create an inner dataset and an outer dataset that contains it.
+        // The inner dataset is empty (its internal data is null).
+        DefaultKeyedValueDataset innerDataset = new DefaultKeyedValueDataset();
+        DefaultKeyedValueDataset outerDataset = new DefaultKeyedValueDataset(innerDataset);
+
+        // Act: Calculate the hash code of the outer dataset.
+        int actualHashCode = outerDataset.hashCode();
+
+        // Assert: The hash code should be based on the contained innerDataset object.
+        // The source class uses Objects.hash(this.data) for its implementation.
+        int expectedHashCode = Objects.hash(innerDataset);
+        assertEquals(expectedHashCode, actualHashCode);
     }
 }
