@@ -2,27 +2,41 @@ package org.jfree.data.flow;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
+
 import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultFlowDataset_ESTestTest29 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        Integer integer0 = JLayeredPane.DEFAULT_LAYER;
-        defaultFlowDataset0.setFlow(0, integer0, integer0, 0);
-        NodeKey<Integer> nodeKey0 = new NodeKey<Integer>(0, integer0);
-        List<FlowKey> list0 = (List<FlowKey>) defaultFlowDataset0.getOutFlows(nodeKey0);
-        assertEquals(1, defaultFlowDataset0.getStageCount());
-        assertFalse(list0.isEmpty());
+    /**
+     * Verifies that getOutFlows() correctly returns the list of flows
+     * originating from a specified source node.
+     */
+    @Test
+    public void getOutFlows_shouldReturnFlowsOriginatingFromNode() {
+        // Arrange: Create a dataset and add a single, well-defined flow.
+        DefaultFlowDataset<String> dataset = new DefaultFlowDataset<>();
+        final int stage = 0;
+        final String sourceNode = "Source A";
+        final String destinationNode = "Destination B";
+        final double flowValue = 100.0;
+
+        dataset.setFlow(stage, sourceNode, destinationNode, flowValue);
+
+        // Act: Retrieve the outgoing flows for the source node.
+        NodeKey<String> sourceNodeKey = new NodeKey<>(stage, sourceNode);
+        List<FlowKey> outgoingFlows = dataset.getOutFlows(sourceNodeKey);
+
+        // Assert: The list should contain exactly one flow, matching the one we added.
+        assertNotNull("The list of outgoing flows should not be null.", outgoingFlows);
+        assertEquals("There should be exactly one outgoing flow from the source node.", 1, outgoingFlows.size());
+
+        FlowKey<String> expectedFlowKey = new FlowKey<>(stage, sourceNode, destinationNode);
+        assertEquals("The flow key in the list should match the one that was added.", expectedFlowKey, outgoingFlows.get(0));
+        
+        // Also, verify that adding a flow to stage 0 correctly sets the stage count.
+        assertEquals("The stage count should be 1.", 1, dataset.getStageCount());
     }
 }
