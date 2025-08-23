@@ -1,29 +1,29 @@
 package org.jfree.chart.urls;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CustomCategoryURLGenerator_ESTestTest11 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        DefaultKeyedValues2DDataset<String, String> defaultKeyedValues2DDataset0 = new DefaultKeyedValues2DDataset<String, String>();
-        // Undeclared exception!
-        try {
-            customCategoryURLGenerator0.generateURL(defaultKeyedValues2DDataset0, (-3864), (-3864));
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that generateURL() throws an IndexOutOfBoundsException when the
+     * series index is negative. The generator has no URLs configured, so any
+     * attempt to access an index will be out of bounds.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void generateURLShouldThrowExceptionForNegativeSeriesIndex() {
+        // Arrange: Create a URL generator and a dataset.
+        CustomCategoryURLGenerator urlGenerator = new CustomCategoryURLGenerator();
+        CategoryDataset dataset = new DefaultCategoryDataset();
+        int negativeSeriesIndex = -1;
+        int categoryIndex = 0; // This value is arbitrary for this test case.
+
+        // Act: Call generateURL with an invalid negative index.
+        // The assertion is that this line throws the expected exception.
+        urlGenerator.generateURL(dataset, negativeSeriesIndex, categoryIndex);
     }
 }
