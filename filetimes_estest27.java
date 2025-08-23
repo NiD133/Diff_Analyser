@@ -1,32 +1,20 @@
 package org.apache.commons.io.file.attribute;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest27 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        // Undeclared exception!
-        try {
-            FileTimes.plusMillis((FileTime) null, 24L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.file.attribute.FileTimes", e);
-        }
+    /**
+     * Tests that {@link FileTimes#plusMillis(java.nio.file.attribute.FileTime, long)}
+     * throws a NullPointerException when the fileTime parameter is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void plusMillisShouldThrowNullPointerExceptionForNullFileTime() {
+        // The 'expected' attribute of the @Test annotation asserts that this method call
+        // must throw a NullPointerException for the test to pass.
+        FileTimes.plusMillis(null, 24L);
     }
 }
