@@ -2,23 +2,28 @@ package com.google.gson;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest19 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test for {@link JsonArray#getAsCharacter()}.
+ */
+public class JsonArray_ESTestTest19 {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Float float0 = new Float(0.0);
-        jsonArray0.add((Number) float0);
-        char char0 = jsonArray0.getAsCharacter();
-        assertEquals('j', char0);
+    /**
+     * Tests that getAsCharacter() on an array with a single number element
+     * returns the first character of that number's string representation.
+     */
+    @Test
+    public void getAsCharacter_whenArrayContainsSingleNumber_returnsFirstCharOfStringRepresentation() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(123.45); // Using a number whose first digit is not 0
+
+        // Act
+        char result = jsonArray.getAsCharacter();
+
+        // Assert
+        // The method should convert the number 123.45 to its string form "123.45"
+        // and return the first character.
+        assertEquals('1', result);
     }
 }
