@@ -1,18 +1,28 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class OptionBuilder_ESTestTest23 extends OptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for the deprecated {@link OptionBuilder} class.
+ */
+public class OptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Class<Object> class0 = Object.class;
-        OptionBuilder optionBuilder0 = OptionBuilder.withType(class0);
-        assertNotNull(optionBuilder0);
+    /**
+     * Verifies that the withType() method returns an OptionBuilder instance,
+     * which is essential for enabling the fluent, chained-method API style.
+     */
+    @Test
+    public void withTypeShouldReturnBuilderInstanceForChaining() {
+        // Arrange: The OptionBuilder uses a static, fluent-style API.
+        // We are simply verifying that a call to one of its methods returns
+        // the builder instance as expected.
+
+        // Act: Call the method under test.
+        OptionBuilder builder = OptionBuilder.withType(Object.class);
+
+        // Assert: The returned instance must not be null to allow for
+        // subsequent method calls in a chain (e.g., .withLongOpt(...).create()).
+        assertNotNull("The builder instance should not be null.", builder);
     }
 }
