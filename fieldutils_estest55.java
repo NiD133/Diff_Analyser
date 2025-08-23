@@ -1,31 +1,43 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class FieldUtils_ESTestTest55 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class, focusing on safe conversion methods.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeToInt(9223372036854775785L);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Value cannot fit in an int: 9223372036854775785
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    @Test
+    public void safeToInt_shouldThrowException_whenValueIsTooLargeToFitInInt() {
+        // Arrange: Define a test value that is explicitly one greater than the maximum integer value.
+        // This makes the boundary condition being tested obvious.
+        final long valueGreaterThanIntMax = (long) Integer.MAX_VALUE + 1;
+
+        // Act: Call the method and capture the expected exception.
+        ArithmeticException exception = assertThrows(
+            ArithmeticException.class,
+            () -> FieldUtils.safeToInt(valueGreaterThanIntMax)
+        );
+
+        // Assert: Verify that the exception message is informative and correct.
+        assertEquals("Value cannot fit in an int: " + valueGreaterThanIntMax, exception.getMessage());
+    }
+
+    @Test
+    public void safeToInt_shouldThrowException_whenValueIsTooSmallToFitInInt() {
+        // Arrange: Define a test value that is one less than the minimum integer value
+        // to test the lower boundary condition.
+        final long valueLessThanIntMin = (long) Integer.MIN_VALUE - 1;
+
+        // Act: Call the method and capture the expected exception.
+        ArithmeticException exception = assertThrows(
+            ArithmeticException.class,
+            () -> FieldUtils.safeToInt(valueLessThanIntMin)
+        );
+
+        // Assert: Verify the exception message.
+        assertEquals("Value cannot fit in an int: " + valueLessThanIntMin, exception.getMessage());
     }
 }
