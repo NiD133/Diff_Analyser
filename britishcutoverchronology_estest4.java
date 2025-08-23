@@ -1,48 +1,37 @@
 package org.threeten.extra.chrono;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest4 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link BritishCutoverChronology#prolepticYear(Era, int)} method.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        JulianEra julianEra0 = JulianEra.AD;
-        int int0 = britishCutoverChronology0.prolepticYear(julianEra0, 13);
-        assertEquals(13, int0);
+    /**
+     * Tests that for the 'Anno Domini' (AD) era, the proleptic year is identical
+     * to the year-of-era.
+     *
+     * <p>The {@code prolepticYear} method should return the {@code yearOfEra} value
+     * directly when the era is {@code JulianEra.AD}. This test confirms that behavior.
+     */
+    @Test
+    public void prolepticYear_forAdEra_returnsSameAsYearOfEra() {
+        // Arrange
+        // Use the singleton instance as recommended by the class documentation.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        int yearOfEra = 13;
+        int expectedProlepticYear = 13;
+
+        // Act
+        int actualProlepticYear = chronology.prolepticYear(JulianEra.AD, yearOfEra);
+
+        // Assert
+        assertEquals(
+            "For the AD era, the proleptic year should be the same as the year-of-era.",
+            expectedProlepticYear,
+            actualProlepticYear
+        );
     }
 }
