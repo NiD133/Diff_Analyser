@@ -1,17 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumberOutput_ESTestTest72 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test71() throws Throwable {
-        String string0 = NumberOutput.toString((-1.0));
-        assertEquals("-1.0", string0);
+    /**
+     * Verifies that the {@code toString(double)} method correctly converts a
+     * simple negative double value to its string representation.
+     */
+    @Test
+    public void toString_shouldConvertNegativeDoubleToString() {
+        // Arrange
+        double negativeDouble = -1.0;
+        String expected = "-1.0";
+
+        // Act
+        String actual = NumberOutput.toString(negativeDouble);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
