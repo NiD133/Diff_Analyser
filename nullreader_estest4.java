@@ -1,22 +1,38 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NullReader_ESTestTest4 extends NullReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link NullReader} class.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        NullReader nullReader0 = new NullReader((-995L));
-        nullReader0.skip((-5663L));
-        int int0 = nullReader0.read((char[]) null, 0, 0);
-        assertEquals((-5663L), nullReader0.getPosition());
-        assertEquals(0, int0);
+    /**
+     * Tests that reading zero characters from a NullReader returns 0 and does not
+     * advance the reader's position, even when the position is negative.
+     */
+    @Test
+    public void readWithZeroLengthShouldReturnZeroAndNotChangePosition() throws IOException {
+        // Arrange: Create a NullReader and set its internal position to a negative value
+        // by skipping backwards. This tests an edge case.
+        final long initialSize = -1L; // The size is not relevant for this test.
+        final NullReader reader = new NullReader(initialSize);
+
+        final long negativePosition = -5663L;
+        reader.skip(negativePosition);
+        assertEquals("Precondition failed: Position should be negative after skip.",
+                negativePosition, reader.getPosition());
+
+        // Act: Attempt to read zero characters. According to the Reader contract,
+        // this should do nothing and return 0.
+        final int charsRead = reader.read(null, 0, 0);
+
+        // Assert: Verify that the read operation returned 0 and the position is unchanged.
+        assertEquals("A zero-length read should return 0.", 0, charsRead);
+        assertEquals("Position should not change after a zero-length read.",
+                negativePosition, reader.getPosition());
     }
 }
