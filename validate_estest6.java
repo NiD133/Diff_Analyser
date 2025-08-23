@@ -1,33 +1,32 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
 import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class Validate_ESTestTest6 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} utility class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Object[] objectArray0 = new Object[5];
-        // Undeclared exception!
-        try {
-            Validate.fail("wz%c^4e%9no&N8", objectArray0);
-            fail("Expecting exception: IllegalFormatWidthException");
-        } catch (IllegalFormatWidthException e) {
-            //
-            // 9
-            //
-            verifyException("java.util.Formatter$FormatSpecifier", e);
-        }
+    /**
+     * Verifies that the Validate.fail() method propagates exceptions from the underlying
+     * String.format() call when provided with an invalid format string.
+     */
+    @Test
+    public void failWithInvalidFormatWidthThrowsException() {
+        // GIVEN a format string with an invalid width specifier.
+        // The %n specifier (for a platform-specific newline) does not support a width argument.
+        // Therefore, the "%9n" part of this string is invalid.
+        String invalidFormatString = "wz%c^4e%9no&N8";
+        Object[] formatArgs = new Object[5]; // Arguments are irrelevant as formatting fails before they are used.
+
+        // WHEN Validate.fail is called with the invalid format string
+        // THEN it should throw an IllegalFormatWidthException, as thrown by String.format.
+        assertThrows(
+            "Validate.fail should propagate the underlying formatting exception",
+            IllegalFormatWidthException.class,
+            () -> Validate.fail(invalidFormatString, formatArgs)
+        );
     }
 }
