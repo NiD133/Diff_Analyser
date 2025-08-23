@@ -1,49 +1,48 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.nio.charset.IllegalCharsetNameException;
+import java.util.Collections;
+
+// The original class signature is maintained to preserve the test suite structure,
+// but the test case itself has been rewritten for clarity.
 public class TextRenderInfo_ESTestTest48 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        LinkedHashSet<MarkedContentInfo> linkedHashSet0 = new LinkedHashSet<MarkedContentInfo>();
-        Matrix matrix0 = new Matrix();
-        PdfString pdfString0 = new PdfString("Courier", ".notdef");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedHashSet0);
-        // Undeclared exception!
-        try {
-            textRenderInfo0.getBaseline();
-            fail("Expecting exception: IllegalCharsetNameException");
-        } catch (IllegalCharsetNameException e) {
-            //
-            // .notdef
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Verifies that getBaseline() throws IllegalCharsetNameException when the
+     * TextRenderInfo is constructed with a PdfString that has an invalid encoding name.
+     * <p>
+     * The getBaseline() method's execution path involves decoding the PdfString,
+     * which relies on Java's Charset.forName(). Providing an unrecognized encoding
+     * name should result in the expected exception.
+     */
+    @Test(timeout = 4000, expected = IllegalCharsetNameException.class)
+    public void getBaseline_whenPdfStringHasInvalidEncoding_throwsIllegalCharsetNameException() {
+        // Arrange: Create a TextRenderInfo instance with a PdfString that has an invalid encoding.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        // The encoding ".notdef" is not a valid Java charset name and is used to trigger the exception.
+        String invalidEncoding = ".notdef";
+        PdfString pdfStringWithInvalidEncoding = new PdfString("any-text", invalidEncoding);
+
+        Matrix textMatrix = new Matrix();
+        
+        TextRenderInfo textRenderInfo = new TextRenderInfo(
+                pdfStringWithInvalidEncoding,
+                graphicsState,
+                textMatrix,
+                Collections.emptySet()
+        );
+
+        // Act: Call the method under test. This action triggers the internal decoding of the PdfString.
+        textRenderInfo.getBaseline();
+
+        // Assert: The test is expected to throw an IllegalCharsetNameException.
+        // This is handled declaratively by the @Test(expected = ...) annotation.
     }
 }
