@@ -1,26 +1,24 @@
 package com.itextpdf.text.pdf.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Vector_ESTestTest19 extends Vector_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Vector} class, focusing on its core functionalities.
+ */
+public class VectorTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Vector vector0 = new Vector((-557.00323F), (-557.00323F), (-557.00323F));
-        // Undeclared exception!
-        try {
-            vector0.cross((Vector) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.parser.Vector", e);
-        }
+    /**
+     * Verifies that the cross() method correctly throws a NullPointerException
+     * when it is called with a null argument. This ensures the method handles
+     * invalid input gracefully by failing fast.
+     */
+    @Test(expected = NullPointerException.class)
+    public void cross_shouldThrowNullPointerException_when_argumentIsNull() {
+        // Arrange: Create an arbitrary vector instance. The specific values are not important for this test.
+        Vector vector = new Vector(1.0f, 2.0f, 3.0f);
+
+        // Act: Attempt to compute the cross product with a null vector.
+        // The test will pass only if a NullPointerException is thrown.
+        vector.cross(null);
     }
 }
