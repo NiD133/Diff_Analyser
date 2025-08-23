@@ -1,30 +1,33 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest86 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Unit tests for the JsonTreeReader class.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test085() throws Throwable {
-        JsonObject jsonObject0 = new JsonObject();
-        jsonObject0.addProperty("s>;R", "s>;R");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonObject0);
-        jsonTreeReader0.beginObject();
-        String string0 = jsonTreeReader0.nextName();
-        assertEquals("s>;R", string0);
+    /**
+     * Verifies that nextName() correctly returns the name of a property
+     * after beginning to read a JSON object.
+     */
+    @Test
+    public void nextName_afterBeginObject_returnsCorrectPropertyName() throws IOException {
+        // Arrange: Create a JSON object with a single property and a reader for it.
+        String expectedPropertyName = "user_name";
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(expectedPropertyName, "JohnDoe");
+
+        JsonTreeReader reader = new JsonTreeReader(jsonObject);
+
+        // Act: Start reading the object and get the first property name.
+        reader.beginObject();
+        String actualPropertyName = reader.nextName();
+
+        // Assert: The returned name should match the one we added.
+        assertEquals(expectedPropertyName, actualPropertyName);
     }
 }
