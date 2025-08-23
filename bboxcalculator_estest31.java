@@ -1,27 +1,42 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest31 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandXRange(0.0, Double.POSITIVE_INFINITY);
-        bBoxCalculator0.expandXRange(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+/**
+ * Tests for {@link BBoxCalculator}.
+ * This test suite focuses on verifying the behavior of the bounding box calculation logic.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Verifies that expanding only the X-axis of the BBoxCalculator does not alter the
+     * Y-axis boundaries. The Y-axis should remain in its initial, un-set state.
+     * This behavior is crucial as it confirms the independence of the axis calculations.
+     */
+    @Test
+    public void expandXRangeShouldNotAffectYBounds() {
+        // Arrange: Create a BBoxCalculator in a geographic context.
+        // The Y-bounds are initialized to positive/negative infinity, representing an empty state.
+        BBoxCalculator bboxCalculator = new BBoxCalculator(SpatialContext.GEO);
+
+        // Pre-condition check: Verify the initial state of the Y-bounds.
+        assertEquals("Initial minY should be positive infinity",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinY(), 0.0);
+        assertEquals("Initial maxY should be negative infinity",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxY(), 0.0);
+
+        // Act: Expand the X-range. The original test used unusual infinite values,
+        // but any valid range demonstrates the same principle more clearly.
+        bboxCalculator.expandXRange(0.0, 10.0);
+        bboxCalculator.expandXRange(20.0, 30.0);
+
+        // Assert: The Y-bounds should remain unchanged from their initial state.
+        assertEquals("minY should be unaffected by expandXRange",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinY(), 0.0);
+        assertEquals("maxY should be unaffected by expandXRange",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxY(), 0.0);
     }
 }
