@@ -1,54 +1,31 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This test class focuses on the exception-handling behavior of the
+ * {@link ClusteredXYBarRenderer} class.
+ */
 public class ClusteredXYBarRenderer_ESTestTest13 extends ClusteredXYBarRenderer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        DefaultBoxAndWhiskerXYDataset<Short> defaultBoxAndWhiskerXYDataset0 = new DefaultBoxAndWhiskerXYDataset<Short>((Short) null);
-        // Undeclared exception!
-        try {
-            clusteredXYBarRenderer0.findDomainBounds(defaultBoxAndWhiskerXYDataset0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.data.general.AbstractSeriesDataset", e);
-        }
+    /**
+     * Verifies that {@code findDomainBounds()} throws a {@code NullPointerException}
+     * when the provided dataset contains a null series key.
+     * <p>
+     * This exception is expected because the underlying dataset implementation
+     * (in this case, from {@code AbstractSeriesDataset}) does not permit null keys
+     * for its series. The renderer's method triggers this by interacting with the dataset.
+     */
+    @Test(expected = NullPointerException.class)
+    public void findDomainBoundsShouldThrowExceptionForDatasetWithNullKey() {
+        // Arrange: Create a renderer and a dataset with an invalid null series key.
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        DefaultBoxAndWhiskerXYDataset<Short> datasetWithNullKey =
+                new DefaultBoxAndWhiskerXYDataset<>((Short) null);
+
+        // Act & Assert: Calling the method with the invalid dataset should throw an NPE.
+        // The test will pass only if a NullPointerException is thrown.
+        renderer.findDomainBounds(datasetWithNullKey);
     }
 }
