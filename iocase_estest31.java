@@ -1,18 +1,26 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class IOCase_ESTestTest31 extends IOCase_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = iOCase0.checkEquals("System", "SYSTEM");
-        assertTrue(boolean0);
+    /**
+     * Tests that IOCase.INSENSITIVE correctly identifies two strings
+     * as equal, regardless of their case.
+     */
+    @Test
+    public void checkEqualsWithInsensitiveReturnsTrueForMixedCaseStrings() {
+        // Arrange
+        final String string1 = "System";
+        final String string2 = "SYSTEM";
+
+        // Act & Assert
+        // The checkEquals method should return true because the comparison is case-insensitive.
+        assertTrue("Strings that differ only in case should be considered equal",
+                   IOCase.INSENSITIVE.checkEquals(string1, string2));
     }
 }
