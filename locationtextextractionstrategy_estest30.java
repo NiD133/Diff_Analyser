@@ -1,47 +1,67 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
-import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 
 public class LocationTextExtractionStrategy_ESTestTest30 extends LocationTextExtractionStrategy_ESTest_scaffolding {
 
+    /**
+     * Tests that the renderText method correctly adjusts the text baseline
+     * when the GraphicsState has a non-zero "rise" value. A positive rise
+     * should result in a downward vertical translation of the baseline.
+     */
     @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Vector vector0 = new Vector(898.6386F, 898.6386F, 898.6386F);
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        graphicsState0.rise = (float) 3;
-        Matrix matrix0 = graphicsState0.getCtm();
-        PdfOCProperties pdfOCProperties0 = new PdfOCProperties();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfOCProperties0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        LinkedList<MarkedContentInfo> linkedList0 = new LinkedList<MarkedContentInfo>();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, linkedList0);
-        LocationTextExtractionStrategy.TextChunkLocationDefaultImp locationTextExtractionStrategy_TextChunkLocationDefaultImp0 = new LocationTextExtractionStrategy.TextChunkLocationDefaultImp(vector0, vector0, 12);
-        LocationTextExtractionStrategy.TextChunkLocationStrategy locationTextExtractionStrategy_TextChunkLocationStrategy0 = mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class, new ViolatedAssumptionAnswer());
-        doReturn(locationTextExtractionStrategy_TextChunkLocationDefaultImp0).when(locationTextExtractionStrategy_TextChunkLocationStrategy0).createLocation(any(com.itextpdf.text.pdf.parser.TextRenderInfo.class), any(com.itextpdf.text.pdf.parser.LineSegment.class));
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy(locationTextExtractionStrategy_TextChunkLocationStrategy0);
-        locationTextExtractionStrategy0.renderText(textRenderInfo0);
-        assertEquals(12.0F, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.getCharSpaceWidth(), 0.01F);
-        assertEquals((-898), locationTextExtractionStrategy_TextChunkLocationDefaultImp0.distPerpendicular());
-        assertEquals(0, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.orientationMagnitude());
-        assertEquals(898.6386F, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.distParallelEnd(), 0.01F);
-        assertEquals(898.6386F, locationTextExtractionStrategy_TextChunkLocationDefaultImp0.distParallelStart(), 0.01F);
+    public void renderText_whenTextHasRise_usesTransformedBaselineForLocation() {
+        // Arrange
+        final float TEXT_RISE = 3.0f;
+
+        // 1. Define the original baseline of the text.
+        Vector startPoint = new Vector(10, 20, 1);
+        Vector endPoint = new Vector(50, 20, 1);
+        LineSegment originalBaseline = new LineSegment(startPoint, endPoint);
+
+        // 2. Mock TextRenderInfo to simulate text with a non-zero "rise".
+        // This isolates the test from the complexity of building a full GraphicsState.
+        TextRenderInfo mockRenderInfo = mock(TextRenderInfo.class);
+        when(mockRenderInfo.getRise()).thenReturn(TEXT_RISE);
+        when(mockRenderInfo.getBaseline()).thenReturn(originalBaseline);
+        // The getText() method is called internally, so we must stub it.
+        when(mockRenderInfo.getText()).thenReturn("any text");
+        // The getFont() method is also called internally.
+        when(mockRenderInfo.getFont()).thenReturn(mock(CMapAwareDocumentFont.class));
+
+
+        // 3. Mock the strategy used for creating text chunk locations.
+        LocationTextExtractionStrategy.TextChunkLocationStrategy mockLocationStrategy =
+                mock(LocationTextExtractionStrategy.TextChunkLocationStrategy.class);
+
+        // 4. Create the strategy instance to be tested, injecting our mock dependency.
+        LocationTextExtractionStrategy extractionStrategy = new LocationTextExtractionStrategy(mockLocationStrategy);
+        ArgumentCaptor<LineSegment> baselineCaptor = ArgumentCaptor.forClass(LineSegment.class);
+
+        // Act
+        // Call the method under test.
+        extractionStrategy.renderText(mockRenderInfo);
+
+        // Assert
+        // Verify that our location strategy was called with a correctly transformed baseline.
+        // The transformation for "rise" is a vertical translation by its negative value.
+        verify(mockLocationStrategy).createLocation(eq(mockRenderInfo), baselineCaptor.capture());
+
+        LineSegment capturedBaseline = baselineCaptor.getValue();
+        Vector expectedStartPoint = new Vector(startPoint.get(Vector.I1), startPoint.get(Vector.I2) - TEXT_RISE, 1);
+        Vector expectedEndPoint = new Vector(endPoint.get(Vector.I1), endPoint.get(Vector.I2) - TEXT_RISE, 1);
+
+        assertEquals("The baseline's start point should be translated vertically by the negative rise.",
+                expectedStartPoint, capturedBaseline.getStartPoint());
+        assertEquals("The baseline's end point should be translated vertically by the negative rise.",
+                expectedEndPoint, capturedBaseline.getEndPoint());
     }
 }
