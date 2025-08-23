@@ -1,61 +1,44 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
+
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest37 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link OrderedProperties} class, focusing on edge cases.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        Set<Object> set0 = orderedProperties0.keySet();
-        orderedProperties0.put(set0, set0);
-        BiFunction<Object, Object, Object> biFunction0 = (BiFunction<Object, Object, Object>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        // Undeclared exception!
-        try {
-            orderedProperties0.compute(orderedProperties0, biFunction0);
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that a compute operation causes a StackOverflowError if the map contains
+     * a self-referencing key.
+     *
+     * <p>This scenario is created by adding a map's own key set as a key to itself.
+     * When {@code compute} is called with the map as the key, it triggers a hashCode
+     * calculation on the map. This, in turn, requires calculating the hashCode of its
+     * keys. When it encounters the self-referencing key set, the hashCode calculation
+     * enters an infinite recursion, leading to a {@link StackOverflowError}.</p>
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void computeWithSelfReferencingKeyShouldCauseStackOverflow() {
+        // Arrange: Create a properties map where its own key set is also a key.
+        // This creates a circular reference.
+        OrderedProperties properties = new OrderedProperties();
+        Set<Object> keySet = properties.keySet();
+
+        // By adding the keySet as a key, the keySet now contains itself.
+        properties.put(keySet, "some-value");
+
+        // A remapping function is required by the compute method's signature.
+        // It will not be invoked because the error occurs during the key lookup.
+        BiFunction<Object, Object, Object> remappingFunction = (key, value) -> "new-value";
+
+        // Act & Assert:
+        // Calling compute with the properties object itself as the key triggers a
+        // recursive hashCode() calculation on the self-referencing keySet, which
+        // results in a StackOverflowError. The @Test(expected=...) annotation
+        // asserts that this specific error is thrown.
+        properties.compute(properties, remappingFunction);
     }
 }
