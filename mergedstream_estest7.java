@@ -1,43 +1,42 @@
 package com.fasterxml.jackson.core.io;
 
+import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.core.io.MergedStream;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import java.io.IOException;
 
-public class MergedStream_ESTestTest7 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Enumeration<FilterInputStream> enumeration0 = (Enumeration<FilterInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        byte[] byteArray0 = new byte[7];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, sequenceInputStream0, byteArray0, 0, (byte) 0);
-        int int0 = mergedStream0.read();
-        assertEquals(0, int0);
-        int int1 = mergedStream0.read();
-        assertEquals((-1), int1);
+/**
+ * Contains tests for the {@link MergedStream} class, focusing on its core
+ * functionality of reading from a prefix buffer before the underlying stream.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Verifies that MergedStream first reads all bytes from its internal prefix buffer
+     * and then, once the buffer is exhausted, returns -1 (End-Of-File) if the
+     * underlying stream is also empty.
+     */
+    @Test
+    public void testRead_whenBufferHasDataAndStreamIsEmpty_readsFromBufferThenReturnsEOF() throws IOException {
+        // Arrange
+        byte[] prefixBuffer = new byte[] { 42 };
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]); // An empty stream
+
+        // Create a MergedStream with a 1-byte buffer and an empty underlying stream.
+        // The IOContext is not used in the read() path, so null is acceptable for this test.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, prefixBuffer, 0, 1);
+
+        // Act
+        int byteReadFromBuffer = mergedStream.read();
+        int endOfStreamMarker = mergedStream.read();
+
+        // Assert
+        assertEquals("Should first read the byte from the prefix buffer.", 42, byteReadFromBuffer);
+        assertEquals("Should return -1 (EOF) after the buffer is exhausted.", -1, endOfStreamMarker);
     }
 }
