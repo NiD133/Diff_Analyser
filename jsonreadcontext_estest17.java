@@ -1,29 +1,31 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.json.JsonReadContext;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonReadContext_ESTestTest17 extends JsonReadContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its initial state.
+ */
+public class JsonReadContextTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext((DupDetector) null);
-        JsonReadContext jsonReadContext1 = jsonReadContext0.getParent();
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals(0, jsonReadContext0.getEntryCount());
-        assertNull(jsonReadContext1);
-        assertEquals("ROOT", jsonReadContext0.getTypeDesc());
+    /**
+     * Verifies that a newly created root context has the correct initial properties,
+     * most importantly that its parent is null.
+     */
+    @Test
+    public void rootContextShouldHaveNullParentAndCorrectInitialState() {
+        // Arrange: Create a root-level context.
+        // The DupDetector is not relevant for this test, so it's set to null.
+        JsonReadContext rootContext = JsonReadContext.createRootContext(null);
+
+        // Act: Attempt to retrieve the parent of the root context.
+        JsonReadContext parentContext = rootContext.getParent();
+
+        // Assert: Verify the state of the root context.
+        assertNull("The parent of a root context must be null.", parentContext);
+        assertEquals("A root context should have a nesting depth of 0.", 0, rootContext.getNestingDepth());
+        assertEquals("A new root context should have an entry count of 0.", 0, rootContext.getEntryCount());
+        assertEquals("The type description for a root context should be 'ROOT'.", "ROOT", rootContext.getTypeDesc());
     }
 }
