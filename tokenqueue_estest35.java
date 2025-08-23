@@ -1,22 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest35 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("");
-        // Undeclared exception!
-        try {
-            tokenQueue0.consumeTo("");
-            fail("Expecting exception: StringIndexOutOfBoundsException");
-        } catch (StringIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling {@link TokenQueue#consumeTo(String)} with an empty string
+     * argument is an invalid operation and results in a StringIndexOutOfBoundsException.
+     * This test covers the edge case where the delimiter is empty.
+     */
+    @Test(expected = StringIndexOutOfBoundsException.class)
+    public void consumeToWithEmptyStringDelimiterShouldThrowException() {
+        // Arrange: Create an empty TokenQueue.
+        TokenQueue queue = new TokenQueue("");
+
+        // Act: Attempt to consume up to an empty string delimiter.
+        // Assert: The test expects a StringIndexOutOfBoundsException to be thrown.
+        queue.consumeTo("");
     }
 }
