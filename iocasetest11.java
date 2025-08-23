@@ -2,51 +2,76 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class IOCaseTestTest11 {
+/**
+ * Tests for the {@link IOCase#checkStartsWith(String, String)} method.
+ */
+@DisplayName("IOCase.checkStartsWith()")
+class IOCaseTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    private static final boolean IS_WINDOWS = File.separatorChar == '\\';
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
+    @Nested
+    @DisplayName("when using SENSITIVE")
+    class Sensitive {
+
+        @Test
+        @DisplayName("should return true for an exact case prefix match")
+        void returnsTrueForExactMatch() {
+            assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"),
+                "SENSITIVE should find a prefix with an exact case match.");
+        }
+
+        @Test
+        @DisplayName("should return false for a different case prefix match")
+        void returnsFalseForDifferentCase() {
+            assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "Ab"),
+                "SENSITIVE should not find a prefix with a different case.");
         }
     }
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
+    @Nested
+    @DisplayName("when using INSENSITIVE")
+    class Insensitive {
+
+        @Test
+        @DisplayName("should return true for an exact case prefix match")
+        void returnsTrueForExactMatch() {
+            assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "AB"),
+                "INSENSITIVE should find a prefix with an exact case match.");
+        }
+
+        @Test
+        @DisplayName("should return true for a different case prefix match")
+        void returnsTrueForDifferentCase() {
+            assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "Ab"),
+                "INSENSITIVE should find a prefix even with a different case.");
         }
     }
 
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
+    @Nested
+    @DisplayName("when using SYSTEM")
+    class System {
 
-    @Test
-    void test_checkStartsWith_case() {
-        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
-        assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "Ab"));
-        assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "AB"));
-        assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "Ab"));
-        assertTrue(IOCase.SYSTEM.checkStartsWith("ABC", "AB"));
-        assertEquals(WINDOWS, IOCase.SYSTEM.checkStartsWith("ABC", "Ab"));
+        @Test
+        @DisplayName("should return true for an exact case prefix match")
+        void returnsTrueForExactMatch() {
+            assertTrue(IOCase.SYSTEM.checkStartsWith("ABC", "AB"),
+                "SYSTEM should always find a prefix with an exact case match.");
+        }
+
+        @Test
+        @DisplayName("should behave case-insensitively on Windows and sensitively otherwise")
+        void behavesAccordingToOS() {
+            final String osBehavior = IS_WINDOWS ? "case-insensitive" : "case-sensitive";
+            assertEquals(IS_WINDOWS, IOCase.SYSTEM.checkStartsWith("ABC", "Ab"),
+                "SYSTEM should be " + osBehavior + " on the current OS.");
+        }
     }
 }
