@@ -2,24 +2,24 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
 public class Seconds_ESTestTest30 extends Seconds_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that secondsBetween() throws an IllegalArgumentException
+     * when both ReadablePartial arguments are null.
+     */
+    @Test
+    public void secondsBetween_withNullPartials_shouldThrowIllegalArgumentException() {
         try {
+            // Act: Call the method with null arguments
             Seconds.secondsBetween((ReadablePartial) null, (ReadablePartial) null);
-            fail("Expecting exception: IllegalArgumentException");
+            
+            // Assert: Fail the test if no exception is thrown
+            fail("Expected an IllegalArgumentException to be thrown for null partials.");
         } catch (IllegalArgumentException e) {
-            //
-            // ReadablePartial objects must not be null
-            //
-            verifyException("org.joda.time.base.BaseSingleFieldPeriod", e);
+            // Assert: Verify that the exception message is correct
+            assertEquals("ReadablePartial objects must not be null", e.getMessage());
         }
     }
 }
