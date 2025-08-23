@@ -1,34 +1,35 @@
 package org.apache.commons.collections4.bag;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class TreeBag_ESTestTest1 extends TreeBag_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link TreeBag} class.
+ */
+public class TreeBagTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Comparator<Object> comparator0 = (Comparator<Object>) mock(Comparator.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(comparator0).toString();
-        doReturn(0).when(comparator0).compare(any(), any());
-        TreeBag<Predicate<Object>> treeBag0 = new TreeBag<Predicate<Object>>(comparator0);
-        treeBag0.add((Predicate<Object>) null);
-        Predicate<Object> predicate0 = treeBag0.last();
-        assertNull(predicate0);
+    /**
+     * Tests that the last() method correctly returns null when null is the only element
+     * in the bag. A custom comparator that treats all elements as equal is used to
+     * ensure the underlying TreeMap can handle the null key.
+     */
+    @Test
+    public void testLast_returnsNull_whenNullIsTheOnlyElementAdded() {
+        // Arrange: Create a TreeBag with a comparator that treats all elements as equal.
+        // This is necessary for the underlying TreeMap to handle a null key without a
+        // NullPointerException when natural ordering is not used.
+        Comparator<Object> alwaysEqualComparator = (o1, o2) -> 0;
+        SortedBag<Object> bag = new TreeBag<>(alwaysEqualComparator);
+
+        // Act: Add a null element to the bag.
+        bag.add(null);
+        Object lastElement = bag.last();
+
+        // Assert: Verify that the last element is indeed null and the bag's state is correct.
+        assertNull("The last element should be null as it's the only one present.", lastElement);
+        assertEquals("The bag size should be 1.", 1, bag.size());
+        assertEquals("The count of the null element should be 1.", 1, bag.getCount(null));
     }
 }
