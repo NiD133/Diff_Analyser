@@ -1,30 +1,28 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest13 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
-        // Undeclared exception!
-        try {
-            optionFormatter0.getOpt();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.OptionFormatter", e);
-        }
+    /**
+     * Tests that getOpt() throws a NullPointerException if the OptionFormatter
+     * was created with a null Option. This is expected because the formatter
+     * needs a valid Option object to retrieve information from.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getOptShouldThrowNullPointerExceptionWhenCreatedWithNullOption() {
+        // Arrange: Create a formatter from a null Option.
+        // The 'from' method itself does not throw, but creates an invalid state.
+        OptionFormatter formatter = OptionFormatter.from((Option) null);
+
+        // Act: Calling getOpt() on this formatter should trigger the NPE.
+        formatter.getOpt();
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is handled by the @Test(expected) annotation.
     }
 }
