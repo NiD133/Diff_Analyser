@@ -1,25 +1,35 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest23 extends QueryParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        // Undeclared exception!
+/**
+ * Tests for the error-handling capabilities of the {@link QueryParser}.
+ * This focuses on ensuring the parser fails gracefully with informative messages
+ * for invalid CSS query syntax.
+ */
+public class QueryParserErrorHandlingTest {
+
+    /**
+     * Verifies that parsing a query with an unexpected token immediately following a valid attribute selector
+     * throws an {@link IllegalStateException}. According to CSS selector grammar, a combinator (like ' ', '>', '+'),
+     * another selector, or the end of the query is expected after an attribute selector.
+     */
+    @Test
+    public void parseThrowsExceptionForUnexpectedTokenAfterAttributeSelector() {
+        // The query is invalid because the underscore '_' is not a valid token
+        // to follow the attribute selector "[b]".
+        String invalidQuery = "wj[b]_o4~M";
+
         try {
-            QueryParser.parse("wj[b]_o4~M");
-            fail("Expecting exception: IllegalStateException");
+            QueryParser.parse(invalidQuery);
+            fail("Expected an IllegalStateException to be thrown due to invalid query syntax, but no exception was thrown.");
         } catch (IllegalStateException e) {
-            //
-            // Could not parse query 'wj[b]_o4~M': unexpected token at '_o4~M'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // The exception message should be specific, identifying the invalid part of the query.
+            String expectedMessage = "Could not parse query 'wj[b]_o4~M': unexpected token at '_o4~M'";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
