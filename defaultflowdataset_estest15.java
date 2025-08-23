@@ -1,28 +1,30 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultFlowDataset_ESTestTest15 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class, focusing on edge cases and
+ * exception handling.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultFlowDataset0.getSources(71);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling getSources() with an invalid stage index throws an
+     * IndexOutOfBoundsException on an empty dataset.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getSourcesShouldThrowExceptionForInvalidStageIndex() {
+        // Arrange: Create a new, empty dataset.
+        // A new DefaultFlowDataset is initialized with one stage (index 0),
+        // meaning its stage count is 1.
+        DefaultFlowDataset<String> dataset = new DefaultFlowDataset<>();
+        
+        // The only valid stage index is 0. We will test with the first invalid index.
+        int invalidStageIndex = 1;
+
+        // Act & Assert: Attempting to access sources for a non-existent stage
+        // should throw an IndexOutOfBoundsException. The assertion is handled
+        // by the 'expected' attribute of the @Test annotation.
+        dataset.getSources(invalidStageIndex);
     }
 }
