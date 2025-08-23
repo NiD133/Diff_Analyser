@@ -1,36 +1,61 @@
 package org.apache.commons.compress.utils;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import java.nio.file.Files;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest3 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        File[] fileArray0 = new File[2];
-        MockFile mockFile0 = new MockFile("");
-        fileArray0[0] = (File) mockFile0;
-        fileArray0[1] = (File) mockFile0;
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = (MultiReadOnlySeekableByteChannel) MultiReadOnlySeekableByteChannel.forFiles(fileArray0);
-        multiReadOnlySeekableByteChannel0.position(1L, 1L);
-        long long0 = multiReadOnlySeekableByteChannel0.position();
-        assertEquals(705L, long0);
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel}.
+ * This version of the test is self-contained and does not rely on test generation frameworks.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
+
+    @Rule
+    public final TemporaryFolder tempFolder = new TemporaryFolder();
+
+    /**
+     * Tests that positioning the channel using a specific channel index and a relative offset
+     * correctly calculates the overall global position. The global position should be the sum of
+     * the sizes of all preceding channels plus the relative offset in the target channel.
+     */
+    @Test
+    public void shouldCalculateCorrectGlobalPositionWhenPositioningByChannelAndOffset() throws IOException {
+        // Arrange
+        // 1. Define file sizes and the target offset to make the calculation clear.
+        final long firstFileSize = 704L;
+        final long offsetInSecondFile = 1L;
+        final long expectedGlobalPosition = firstFileSize + offsetInSecondFile;
+
+        // 2. Create two temporary files with specific sizes.
+        File firstFile = tempFolder.newFile("first.txt");
+        Files.write(firstFile.toPath(), new byte[(int) firstFileSize]);
+
+        File secondFile = tempFolder.newFile("second.txt");
+        // The second file just needs to be large enough to seek to the desired offset.
+        Files.write(secondFile.toPath(), new byte[(int) offsetInSecondFile + 10]);
+
+        File[] files = {firstFile, secondFile};
+
+        // The try-with-resources statement ensures the channel is closed automatically.
+        // We cast to the concrete class to access the specific `position(long, long)` method.
+        try (MultiReadOnlySeekableByteChannel channel =
+                     (MultiReadOnlySeekableByteChannel) MultiReadOnlySeekableByteChannel.forFiles(files)) {
+
+            // Act
+            // Position the channel at an offset of 1 byte into the second file (index 1).
+            channel.position(1, offsetInSecondFile);
+            long actualGlobalPosition = channel.position();
+
+            // Assert
+            // The global position should equal the size of the first file plus the offset into the second.
+            assertEquals("The global position was not calculated correctly.",
+                expectedGlobalPosition, actualGlobalPosition);
+        }
     }
 }
