@@ -1,19 +1,26 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class OptionGroup_ESTestTest14 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        String string0 = optionGroup0.getSelected();
-        assertNull(string0);
+    /**
+     * Verifies that getSelected() returns null for a newly created OptionGroup
+     * that has no selected option.
+     */
+    @Test
+    public void getSelectedShouldReturnNullForNewGroup() {
+        // Arrange: Create a new, empty OptionGroup.
+        OptionGroup optionGroup = new OptionGroup();
+
+        // Act: Call getSelected() on the new group.
+        String selectedOption = optionGroup.getSelected();
+
+        // Assert: The result should be null, as no option has been set.
+        assertNull("A new OptionGroup should not have a selected option.", selectedOption);
     }
 }
