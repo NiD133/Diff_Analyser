@@ -1,46 +1,35 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Document;
 
-public class W3CDom_ESTestTest55 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link W3CDom} helper class.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that the selectXpath method throws an IllegalArgumentException
+     * when the provided W3C Document context node is null.
+     */
+    @Test
+    public void selectXpathShouldThrowExceptionForNullContextNode() {
+        // Arrange: Create a W3CDom instance and define a null context.
+        W3CDom w3cDom = new W3CDom();
+        String anyXpathQuery = "//div"; // The query itself is not relevant for this test.
+        Document nullDocumentContext = null;
+
+        // Act & Assert: Attempt to call the method and expect an exception.
         try {
-            w3CDom0.selectXpath("z4oSaE[\")", (org.w3c.dom.Document) null);
-            fail("Expecting exception: IllegalArgumentException");
+            w3cDom.selectXpath(anyXpathQuery, nullDocumentContext);
+            fail("Expected an IllegalArgumentException to be thrown, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // The parameter 'contextNode' must not be null.
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is correct.
+            String expectedMessage = "The parameter 'contextNode' must not be null.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
