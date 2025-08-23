@@ -1,23 +1,27 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest13 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Shape shape0 = Shape.fromKM(4, 4);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        int int0 = simpleBloomFilter0.characteristics();
-        assertEquals(0, int0);
+    /**
+     * Tests that a newly created (empty) filter has zero characteristics.
+     * The number of characteristics is the count of enabled bits in the filter.
+     */
+    @Test
+    public void testCharacteristicsOfNewEmptyFilterIsZero() {
+        // Arrange: Create a shape and a new, empty Bloom filter.
+        Shape shape = Shape.fromKM(4, 4);
+        SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Act: Get the number of characteristics from the empty filter.
+        int characteristics = filter.characteristics();
+
+        // Assert: The number of characteristics should be 0.
+        assertEquals("An empty filter should have zero characteristics", 0, characteristics);
     }
 }
