@@ -1,28 +1,29 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Lister_ESTestTest2 extends Lister_ESTest_scaffolding {
+/**
+ * Tests for the {@link Lister} command-line application.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        String[] stringArray0 = new String[1];
-        stringArray0[0] = "ustar\u0000";
-        Lister lister0 = new Lister(true, stringArray0);
-        // Undeclared exception!
-        try {
-            lister0.go();
-            fail("Expecting exception: InvalidPathException");
-        } catch (InvalidPathException e) {
-        }
+    /**
+     * Verifies that the Lister#go() method throws an InvalidPathException
+     * when the input file path argument contains a null character, which is illegal in file paths.
+     */
+    @Test(expected = InvalidPathException.class)
+    public void goShouldThrowInvalidPathExceptionForPathContainingNullCharacter() throws Exception {
+        // Arrange: Create command-line arguments with a file path containing a null character.
+        // This is an invalid path on most operating systems.
+        final String invalidPathWithNullChar = "archive-name\u0000.tar";
+        final String[] args = { invalidPathWithNullChar };
+
+        // The 'quiet' flag is set to true, but it's not relevant to this test's outcome.
+        final Lister lister = new Lister(true, args);
+
+        // Act & Assert: Calling go() should attempt to create a Path object from the invalid
+        // string, which is expected to throw an InvalidPathException.
+        lister.go();
     }
 }
