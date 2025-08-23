@@ -1,34 +1,36 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest110 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test109() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        int int0 = randomAccessFileOrArray0.readInt();
-        assertEquals(4L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(0, int0);
+    /**
+     * Verifies that readInt() correctly reads a 4-byte integer from a byte array
+     * of zeros and advances the internal pointer by four bytes.
+     */
+    @Test
+    public void readInt_fromByteArrayOfZeros_returnsZeroAndAdvancesPointer() throws IOException {
+        // Arrange: Create a source with 5 bytes, all initialized to zero.
+        // An int is 4 bytes, so a 5-byte array ensures there's extra data past the read.
+        // The default value for a new byte array is 0 for all elements.
+        byte[] sourceBytes = new byte[5];
+        RandomAccessFileOrArray randomAccess = new RandomAccessFileOrArray(sourceBytes);
+
+        // Act: Read an integer from the beginning of the source.
+        int result = randomAccess.readInt();
+
+        // Assert: Check the read value and the new pointer position.
+        // The integer represented by four zero bytes {0, 0, 0, 0} is 0.
+        assertEquals("The integer read from four zero-bytes should be 0.", 0, result);
+
+        // The pointer should advance by 4 bytes (the size of an int).
+        long expectedPosition = 4L;
+        long actualPosition = randomAccess.getFilePointer();
+        assertEquals("The file pointer should advance by 4 bytes after reading an int.", expectedPosition, actualPosition);
     }
 }
