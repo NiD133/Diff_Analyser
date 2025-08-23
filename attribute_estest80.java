@@ -1,31 +1,34 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class Attribute_ESTestTest80 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test79() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("XII YZ}5!", "async");
-        boolean boolean0 = attribute0.isDataAttribute();
-        assertFalse(boolean0);
-        assertEquals("async", attribute0.getValue());
-        assertEquals("XII YZ}5!", attribute0.getKey());
+    /**
+     * Verifies that isDataAttribute() returns false for an attribute key
+     * that does not begin with the "data-" prefix.
+     */
+    @Test
+    public void isDataAttributeShouldReturnFalseForNonDataAttributeKey() {
+        // Arrange: Create an attribute with a key that is not a data attribute.
+        // The key "XII YZ}5!" is unusual but valid for this test as it does not start with "data-".
+        String key = "XII YZ}5!";
+        String value = "async";
+        Attribute attribute = Attribute.createFromEncoded(key, value);
+
+        // Act: Check if the attribute is a data attribute.
+        boolean isDataAttribute = attribute.isDataAttribute();
+
+        // Assert: The result should be false, and the attribute's properties should be correct.
+        assertFalse("Attribute key does not start with 'data-', so it should not be a data attribute.", isDataAttribute);
+        
+        // Also verify the attribute was constructed correctly.
+        assertEquals("The key should be preserved.", key, attribute.getKey());
+        assertEquals("The value should be preserved.", value, attribute.getValue());
     }
 }
