@@ -1,80 +1,46 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest11 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(15, 15);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range(527.2633130861806, 1317.5620888757064);
-        assertEquals("Range[527.2633130861806,1317.5620888757064]", range0.toString());
-        assertEquals(527.2633130861806, range0.getLowerBound(), 0.01);
-        assertEquals(922.4127009809436, range0.getCentralValue(), 0.01);
-        assertEquals(1317.5620888757064, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(790.2987757895258, range0.getLength(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals("Range[527.2633130861806,1317.5620888757064]", range0.toString());
-        assertEquals(527.2633130861806, range0.getLowerBound(), 0.01);
-        assertEquals(922.4127009809436, range0.getCentralValue(), 0.01);
-        assertEquals(1317.5620888757064, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(790.2987757895258, range0.getLength(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer(gridArrangement0);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNotNull(blockContainer0);
-        Size2D size2D0 = gridArrangement0.arrangeRR(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals("Range[527.2633130861806,1317.5620888757064]", range0.toString());
-        assertEquals(527.2633130861806, range0.getLowerBound(), 0.01);
-        assertEquals(922.4127009809436, range0.getCentralValue(), 0.01);
-        assertEquals(1317.5620888757064, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(790.2987757895258, range0.getLength(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals("Size2D[width=527.2633130861806, height=527.2633130861806]", size2D0.toString());
-        assertEquals(527.2633130861806, size2D0.getHeight(), 0.01);
-        assertEquals(527.2633130861806, size2D0.getWidth(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(527.2633130861806, size2D0.height, 0.01);
-        assertEquals(527.2633130861806, size2D0.width, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
+
+    private static final double DELTA = 0.01;
+
+    /**
+     * Tests that arranging an empty container with a range-based constraint
+     * results in a size corresponding to the lower bound of the range.
+     *
+     * This tests the specific arrangeRR() protected method, which is called when
+     * both width and height constraints are of type Range.
+     */
+    @Test
+    public void arrangeWithRangeConstraintOnEmptyContainerShouldReturnSizeOfLowerBound() {
+        // Arrange
+        final double lowerBound = 527.2633130861806;
+        final double upperBound = 1317.5620888757064;
+
+        GridArrangement arrangement = new GridArrangement(15, 15);
+        BlockContainer emptyContainer = new BlockContainer(arrangement);
+        
+        Range constraintRange = new Range(lowerBound, upperBound);
+        RectangleConstraint constraint = new RectangleConstraint(constraintRange, constraintRange);
+
+        // Act
+        // The Graphics2D object is not used when arranging an empty container, so null is acceptable.
+        Size2D resultSize = arrangement.arrange(emptyContainer, (Graphics2D) null, constraint);
+
+        // Assert
+        assertEquals("The resulting width should be the lower bound of the constraint range.",
+                lowerBound, resultSize.getWidth(), DELTA);
+        assertEquals("The resulting height should be the lower bound of the constraint range.",
+                lowerBound, resultSize.getHeight(), DELTA);
     }
 }
