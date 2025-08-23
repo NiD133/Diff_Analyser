@@ -1,36 +1,27 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
-public class Elements_ESTestTest136 extends Elements_ESTest_scaffolding {
+/**
+ * Tests for the {@link Elements#hasClass(String)} method.
+ */
+public class Elements_ESTestTest136 {
 
-    @Test(timeout = 4000)
-    public void test135() throws Throwable {
-        Document document0 = new Document("No elements matched the query '%s' in the elements.");
-        Elements elements0 = document0.getAllElements();
-        boolean boolean0 = elements0.hasClass("No elements matched the query '%s' in the elements.");
-        assertFalse(boolean0);
+    @Test
+    public void hasClassShouldReturnFalseWhenNoElementHasTheClass() {
+        // Arrange: Create a document and select a collection of elements,
+        // none of which have the class we're looking for.
+        Document doc = Jsoup.parse("<div></div><p>Some text</p><span></span>");
+        Elements elements = doc.getAllElements(); // Contains <html>, <head>, <body>, <div>, <p>, <span>
+        String classNameToFind = "non-existent-class";
+
+        // Act: Check if any element in the collection has the specified class.
+        boolean result = elements.hasClass(classNameToFind);
+
+        // Assert: The result should be false, as no element has the class.
+        assertFalse("Expected hasClass to be false when no element has the class", result);
     }
 }
