@@ -1,39 +1,42 @@
 package org.apache.commons.compress.archivers.ar;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ArArchiveOutputStream_ESTestTest15 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Tests for the {@link ArArchiveOutputStream} class.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream((OutputStream) null);
-        arArchiveOutputStream0.finish();
-        LinkOption[] linkOptionArray0 = new LinkOption[0];
+    /**
+     * Verifies that attempting to create a new archive entry after the stream
+     * has been finished will result in an IOException.
+     */
+    @Test
+    public void shouldThrowIOExceptionWhenCreatingEntryAfterFinish() throws IOException {
+        // Arrange: Set up an archive stream and finish it.
+        // Using a real, in-memory stream is clearer than using a null stream.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ArArchiveOutputStream archiveOutputStream = new ArArchiveOutputStream(outputStream);
+
+        // Finalize the archive. No more entries should be allowed.
+        archiveOutputStream.finish();
+
+        // Act & Assert: Attempt to add an entry to the finished stream.
         try {
-            arArchiveOutputStream0.createArchiveEntry((Path) null, "", linkOptionArray0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Stream has already been finished.
-            //
-            verifyException("org.apache.commons.compress.archivers.ArchiveOutputStream", e);
+            // The specific parameters for createArchiveEntry do not matter,
+            // as the check for a finished stream happens first.
+            archiveOutputStream.createArchiveEntry((Path) null, "new-entry.txt");
+            fail("Expected an IOException because the stream has already been finished.");
+        } catch (final IOException e) {
+            // Verify that the correct exception and message are thrown.
+            // This behavior is defined in the superclass ArchiveOutputStream.
+            assertEquals("Stream has already been finished.", e.getMessage());
         }
     }
 }
