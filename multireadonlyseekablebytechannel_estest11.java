@@ -1,41 +1,39 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest11 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Tests for {@link MultiReadOnlySeekableByteChannel} focusing on handling of invalid inputs.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LinkedList<SeekableByteChannel> linkedList0 = new LinkedList<SeekableByteChannel>();
-        linkedList0.add((SeekableByteChannel) null);
-        MultiReadOnlySeekableByteChannel multiReadOnlySeekableByteChannel0 = new MultiReadOnlySeekableByteChannel(linkedList0);
-        // Undeclared exception!
-        try {
-            multiReadOnlySeekableByteChannel0.position(1L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.stream.MatchOps$1MatchSink", e);
-        }
+    /**
+     * Verifies that calling position() on a MultiReadOnlySeekableByteChannel throws a
+     * NullPointerException if it was constructed with a list containing a null channel.
+     *
+     * This test ensures the class is not robust against null elements in its input list,
+     * which is an important behavior to document and verify. The position() method is
+     * expected to fail fast when it encounters the null channel while calculating sizes.
+     *
+     * @throws IOException for compliance with the SeekableByteChannel interface, not expected here.
+     */
+    @Test(expected = NullPointerException.class)
+    public void positionShouldThrowNullPointerExceptionWhenChannelListContainsNull() throws IOException {
+        // Arrange: Create a list of channels that includes a null element, representing
+        // an invalid or corrupt set of input channels.
+        List<SeekableByteChannel> channelsWithNull = Arrays.asList((SeekableByteChannel) null);
+        MultiReadOnlySeekableByteChannel multiChannel = new MultiReadOnlySeekableByteChannel(channelsWithNull);
+
+        // Act: Attempt to set the position on the composite channel. This action should
+        // trigger an interaction with the null channel, causing the exception.
+        multiChannel.position(1L);
+
+        // Assert: The test passes if a NullPointerException is thrown, as specified
+        // by the @Test(expected=...) annotation. No further assertions are needed.
     }
 }
