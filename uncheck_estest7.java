@@ -1,31 +1,39 @@
 package org.apache.commons.io.function;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Uncheck_ESTestTest7 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for {@link Uncheck}.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        IOLongSupplier iOLongSupplier0 = mock(IOLongSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((-890L)).when(iOLongSupplier0).getAsLong();
-        long long0 = Uncheck.getAsLong(iOLongSupplier0, (Supplier<String>) null);
-        assertEquals((-890L), long0);
+    /**
+     * Tests that Uncheck.getAsLong() successfully returns the value from the
+     * underlying IOLongSupplier when no IOException is thrown.
+     */
+    @Test
+    public void getAsLongShouldReturnValueFromSupplierWhenNoExceptionIsThrown() throws IOException {
+        // Arrange: Set up the test objects and expectations.
+        final long expectedValue = -890L;
+        final IOLongSupplier mockIoSupplier = mock(IOLongSupplier.class);
+
+        // Configure the mock to return a specific value when its getAsLong() method is called.
+        // The 'throws IOException' is necessary for the mock setup, as IOLongSupplier.getAsLong()
+        // is declared to throw a checked IOException.
+        doReturn(expectedValue).when(mockIoSupplier).getAsLong();
+
+        // Act: Call the method under test.
+        // This test case uses the overload with a message supplier, passing null
+        // to ensure it's handled correctly in the success path.
+        final long actualValue = Uncheck.getAsLong(mockIoSupplier, (Supplier<String>) null);
+
+        // Assert: Verify the result is as expected.
+        assertEquals(expectedValue, actualValue);
     }
 }
