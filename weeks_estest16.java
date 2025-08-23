@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest16 extends Weeks_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        Weeks weeks1 = weeks0.plus(4);
-        assertEquals((-2147483644), weeks1.getWeeks());
+    /**
+     * Tests that adding a small positive integer to Weeks.MIN_VALUE
+     * produces the correct arithmetic result without overflow.
+     */
+    @Test
+    public void plus_addingToMinValue_returnsCorrectSum() {
+        // Arrange
+        Weeks minWeeks = Weeks.MIN_VALUE;
+        int weeksToAdd = 4;
+        int expectedWeeks = Integer.MIN_VALUE + weeksToAdd;
+
+        // Act
+        Weeks result = minWeeks.plus(weeksToAdd);
+
+        // Assert
+        assertEquals(expectedWeeks, result.getWeeks());
     }
 }
