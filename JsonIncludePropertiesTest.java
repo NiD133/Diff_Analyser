@@ -1,77 +1,111 @@
 package com.fasterxml.jackson.annotation;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests to verify that it is possibly to merge {@link JsonIncludeProperties.Value}
- * instances for overrides
+ * Tests for JsonIncludeProperties.Value to ensure:
+ * - "all"/undefined instance is a stable singleton
+ * - Values can be created from annotations
+ * - Overrides merge according to documented semantics (intersection)
  */
-public class JsonIncludePropertiesTest
-{
-    @JsonIncludeProperties(value = {"foo", "bar"})
-    private final static class Bogus
-    {
-    }
+public class JsonIncludePropertiesTest {
 
-    private final JsonIncludeProperties.Value ALL = JsonIncludeProperties.Value.all();
+    // Use an easy-to-read annotated type for building a Value from an annotation
+    @JsonIncludeProperties({"foo", "bar"})
+    private static final class SampleAnnotatedType { }
 
-    @Test
-    public void testAll()
-    {
-        assertSame(ALL, JsonIncludeProperties.Value.from(null));
-        assertNull(ALL.getIncluded());
-        assertEquals(ALL, ALL);
-        assertEquals("JsonIncludeProperties.Value(included=null)", ALL.toString());
-        assertEquals(0, ALL.hashCode());
-    }
+    // In the implementation, "ALL" represents an undefined value (null included set)
+    private static final JsonIncludeProperties.Value UNDEFINED = JsonIncludeProperties.Value.all();
 
     @Test
-    public void testFromAnnotation()
-    {
-        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
-        assertNotNull(v);
-        Set<String> included = v.getIncluded();
-        assertEquals(2, v.getIncluded().size());
-        assertEquals(_set("foo", "bar"), included);
-        String tmp = v.toString();
-        boolean test1 = tmp.equals("JsonIncludeProperties.Value(included=[foo, bar])");
-        boolean test2 = tmp.equals("JsonIncludeProperties.Value(included=[bar, foo])");
-        assertTrue(test1 || test2);
-        assertEquals(v, JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class)));
+    public void allValue_isSingletonUndefined() {
+        // from(null) should return the singleton undefined instance
+        assertSame(UNDEFINED, JsonIncludeProperties.Value.from(null));
+
+        // Undefined means "not defined": included set is null
+        assertNull(UNDEFINED.getIncluded());
+
+        // Basic equals/hashCode/toString contracts for readability and stability
+        assertEquals(UNDEFINED, UNDEFINED);
+        assertEquals("JsonIncludeProperties.Value(included=null)", UNDEFINED.toString());
+        assertEquals(0, UNDEFINED.hashCode());
     }
 
     @Test
-    public void testWithOverridesAll() {
-        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
-        v = v.withOverrides(ALL);
-        Set<String> included = v.getIncluded();
+    public void fromAnnotation_buildsExpectedIncludedSet() {
+        JsonIncludeProperties.Value value = fromSampleAnnotation();
+
+        assertNotNull(value);
+        Set<String> included = value.getIncluded();
+        assertNotNull(included);
         assertEquals(2, included.size());
-        assertEquals(_set("foo", "bar"), included);
+        assertEquals(set("foo", "bar"), included);
+
+        // toString order is not guaranteed; assert content without relying on element order
+        String s = value.toString();
+        assertTrue(s.startsWith("JsonIncludeProperties.Value(included=["));
+        assertTrue(s.contains("foo"));
+        assertTrue(s.contains("bar"));
+        assertTrue(s.endsWith("])"));
+
+        // Re-reading from the same annotation should give an equal Value
+        assertEquals(value, fromSampleAnnotation());
     }
 
     @Test
-    public void testWithOverridesEmpty() {
-        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
-        v = v.withOverrides(new JsonIncludeProperties.Value(Collections.<String>emptySet()));
-        Set<String> included = v.getIncluded();
+    public void withOverrides_whenOverrideIsUndefined_keepsOriginalIncludedSet() {
+        JsonIncludeProperties.Value original = fromSampleAnnotation();
+        JsonIncludeProperties.Value merged = original.withOverrides(UNDEFINED);
+
+        Set<String> included = merged.getIncluded();
+        assertNotNull(included);
+        assertEquals(2, included.size());
+        assertEquals(set("foo", "bar"), included);
+    }
+
+    @Test
+    public void withOverrides_whenOverrideIsEmpty_clearsAllProperties() {
+        JsonIncludeProperties.Value original = fromSampleAnnotation();
+
+        // Empty set means "include none"
+        JsonIncludeProperties.Value override = new JsonIncludeProperties.Value(Collections.<String>emptySet());
+        JsonIncludeProperties.Value merged = original.withOverrides(override);
+
+        Set<String> included = merged.getIncluded();
+        assertNotNull(included);
         assertEquals(0, included.size());
     }
 
     @Test
-    public void testWithOverridesMerge() {
-        JsonIncludeProperties.Value v = JsonIncludeProperties.Value.from(Bogus.class.getAnnotation(JsonIncludeProperties.class));
-        v = v.withOverrides(new JsonIncludeProperties.Value(_set("foo")));
-        Set<String> included = v.getIncluded();
+    public void withOverrides_whenOverrideRestricts_mergesByIntersection() {
+        JsonIncludeProperties.Value original = fromSampleAnnotation();
+
+        // Restrict to just "foo": merge should compute intersection => {"foo"}
+        JsonIncludeProperties.Value override = new JsonIncludeProperties.Value(set("foo"));
+        JsonIncludeProperties.Value merged = original.withOverrides(override);
+
+        Set<String> included = merged.getIncluded();
+        assertNotNull(included);
         assertEquals(1, included.size());
-        assertEquals(_set("foo"), included);
+        assertEquals(set("foo"), included);
     }
 
-    private Set<String> _set(String... args)
-    {
-        return new LinkedHashSet<String>(Arrays.asList(args));
+    // Helper to build a Value from the SampleAnnotatedType's annotation
+    private static JsonIncludeProperties.Value fromSampleAnnotation() {
+        return JsonIncludeProperties.Value.from(
+                SampleAnnotatedType.class.getAnnotation(JsonIncludeProperties.class)
+        );
+    }
+
+    // Helper to create a deterministic Set preserving insertion order for stable comparisons
+    private static Set<String> set(String... values) {
+        return new LinkedHashSet<>(Arrays.asList(values));
     }
 }
