@@ -1,34 +1,41 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTreeBuilderTestTest29 {
-
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}, focusing on how it handles and serializes
+ * malformed XML, particularly concerning invalid attribute names.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    void xmlOutputCorrectsInvalidAttributeNames() {
-        String xml = "<body style=\"color: red\" \" name\"><div =\"\"></div></body>";
-        Document doc = Jsoup.parse(xml, Parser.xmlParser());
-        assertEquals(Syntax.xml, doc.outputSettings().syntax());
-        String out = doc.html();
-        assertEquals("<body style=\"color: red\" _=\"\" name_=\"\"><div _=\"\"></div></body>", out);
+    void xmlParserSanitizesInvalidAttributeNamesOnOutput() {
+        // Arrange: An XML string with several malformed attributes to test the parser's leniency.
+        // Malformations include:
+        // 1. In <body>: An attribute name that is just a quote (`"`), followed by a standalone attribute (`name`).
+        // 2. In <div>: An attribute with an empty name (`=""`).
+        String malformedXml = "<body style=\"color: red\" \" name\"><div =\"\"></div></body>";
+
+        // The expected output shows how the parser sanitizes these invalid names upon serialization.
+        // - The invalid attribute name `"` is replaced with `_`.
+        // - The standalone attribute `name` is serialized as `name_=""`.
+        // - The attribute with an empty name is also replaced with `_`.
+        String expectedSanitizedXml = "<body style=\"color: red\" _=\"\" name_=\"\"><div _=\"\"></div></body>";
+
+        // Act
+        Document doc = Jsoup.parse(malformedXml, Parser.xmlParser());
+        String actualXml = doc.html();
+
+        // Assert
+        // First, confirm the document is correctly configured for XML output.
+        assertEquals(Syntax.xml, doc.outputSettings().syntax(), "Document should have XML syntax settings.");
+
+        // Second, verify that the serialized output matches the expected sanitized string.
+        assertEquals(expectedSanitizedXml, actualXml, "Invalid attribute names should be sanitized on output.");
     }
 }
