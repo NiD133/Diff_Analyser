@@ -2,27 +2,40 @@ package org.joda.time.convert;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest4 extends ConverterSet_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the ConverterSet.remove() method.
+ * The original test was auto-generated; this version has been refactored for
+ * better human readability and maintainability.
+ */
+public class ConverterSet_ESTestTest4 {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Converter[] converterArray0 = new Converter[1];
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        converterArray0[0] = (Converter) stringConverter0;
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        ConverterSet converterSet1 = converterSet0.remove(converterArray0[0], converterArray0);
-        int int0 = converterSet1.size();
-        assertEquals(0, int0);
+    /**
+     * Tests that removing the only converter from a set results in an empty set.
+     * It also verifies that the returned set is a new instance (due to immutability)
+     * and that the removed converter is correctly reported.
+     */
+    @Test
+    public void remove_whenLastConverterIsRemoved_shouldReturnEmptySet() {
+        // Arrange: Create a ConverterSet containing a single StringConverter.
+        Converter converterToRemove = StringConverter.INSTANCE;
+        ConverterSet initialSet = new ConverterSet(new Converter[]{converterToRemove});
+        assertEquals("Precondition: The initial set must contain one converter.", 1, initialSet.size());
+
+        // The 'remove' method can optionally report which converter was removed
+        // by placing it in the first element of a provided array.
+        Converter[] removedConverterHolder = new Converter[1];
+
+        // Act: Remove the single converter from the set.
+        ConverterSet resultSet = initialSet.remove(converterToRemove, removedConverterHolder);
+
+        // Assert: The resulting set should be a new, empty set.
+        assertNotNull("The resulting set should not be null.", resultSet);
+        assertNotSame("Because ConverterSet is immutable, a new instance should be returned.", initialSet, resultSet);
+        assertEquals("The resulting set should be empty.", 0, resultSet.size());
+
+        // Assert: The correct converter was reported as removed.
+        assertSame("The removed converter should be the one we specified.",
+                     converterToRemove, removedConverterHolder[0]);
     }
 }
