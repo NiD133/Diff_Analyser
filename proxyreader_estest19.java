@@ -1,32 +1,37 @@
 package org.apache.commons.io.input;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+
 import java.io.IOException;
 import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ProxyReader_ESTestTest19 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ProxyReader} class.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        TaggedReader taggedReader0 = new TaggedReader(pipedReader0);
+    /**
+     * Tests that an IOException thrown by the underlying reader's {@code ready()}
+     * method is correctly propagated by the {@code ProxyReader}.
+     */
+    @Test
+    public void readyShouldPropagateIOExceptionFromUnderlyingReader() {
+        // Arrange: Create a reader that is guaranteed to throw an IOException when ready() is called.
+        // An unconnected PipedReader serves this purpose well.
+        final PipedReader unconnectedReader = new PipedReader();
+        final ProxyReader proxyReader = new TaggedReader(unconnectedReader);
+
+        // Act & Assert: Verify that calling ready() on the proxy throws the expected exception.
         try {
-            taggedReader0.ready();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("org.apache.commons.io.input.TaggedReader", e);
+            proxyReader.ready();
+            fail("Expected an IOException to be thrown because the underlying reader is not ready.");
+        } catch (final IOException e) {
+            // The test is successful if an IOException is caught.
+            // We also assert the message to ensure it's the correct exception.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
