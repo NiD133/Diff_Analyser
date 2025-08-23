@@ -1,25 +1,34 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ProxyReader_ESTestTest41 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ProxyReader} class, focusing on its core proxying behavior.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        StringReader stringReader0 = new StringReader("$^pT");
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(stringReader0);
-        boolean boolean0 = closeShieldReader0.ready();
-        assertTrue(boolean0);
+    /**
+     * Tests that the ready() method correctly delegates to the underlying reader.
+     * When the underlying reader is ready (i.e., has data to be read), the
+     * ProxyReader should also report that it is ready.
+     */
+    @Test
+    public void testReadyDelegatesToUnderlyingReader() throws IOException {
+        // Arrange: Create an underlying reader that has content and is therefore "ready".
+        final StringReader underlyingReader = new StringReader("test data");
+
+        // Use CloseShieldReader as a concrete implementation of the abstract ProxyReader
+        // to test the inherited proxying behavior.
+        final ProxyReader proxyReader = CloseShieldReader.wrap(underlyingReader);
+
+        // Act: Call the ready() method on the proxy.
+        final boolean isReady = proxyReader.ready();
+
+        // Assert: The result should be true, reflecting the state of the underlying reader.
+        assertTrue("The proxy reader should be ready because the underlying reader is.", isReady);
     }
 }
