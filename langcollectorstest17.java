@@ -1,75 +1,80 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
+
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class LangCollectorsTestTest17 {
+/**
+ * Tests for the joining collectors in {@link LangCollectors}.
+ */
+@DisplayName("Tests for LangCollectors")
+class LangCollectorsJoiningTest {
 
-    private static final Long _1L = Long.valueOf(1);
+    @Nested
+    @DisplayName("joining(delimiter, prefix, suffix, toString)")
+    class JoiningWithFourArguments {
 
-    private static final Long _2L = Long.valueOf(2);
+        private final Collector<Object, ?, String> defaultCollector =
+            LangCollectors.joining("-", "<", ">", Objects::toString);
 
-    private static final Long _3L = Long.valueOf(3);
+        @Test
+        @DisplayName("should return only prefix and suffix for an empty stream")
+        void testEmptyStream() {
+            // When
+            final String result = Stream.of().collect(defaultCollector);
 
-    private static final Function<Object, String> TO_STRING = Objects::toString;
-
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
-    }
-
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
-
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
-
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
-    private static final class Fixture {
-
-        int value;
-
-        private Fixture(final int value) {
-            this.value = value;
+            // Then
+            assertEquals("<>", result);
         }
 
-        @Override
-        public String toString() {
-            return Integer.toString(value);
-        }
-    }
+        @Test
+        @DisplayName("should wrap a single element in prefix and suffix")
+        void testSingleElementStream() {
+            // When
+            final String result = Stream.of("1").collect(defaultCollector);
 
-    @Test
-    void testJoiningStrings4Args() {
-        assertEquals("<>", Stream.of().collect(JOINING_4));
-        assertEquals("<1>", Stream.of("1").collect(JOINING_4));
-        assertEquals("<1-2>", Stream.of("1", "2").collect(JOINING_4));
-        assertEquals("<1-2-3>", Stream.of("1", "2", "3").collect(JOINING_4));
-        assertEquals("<1-null-3>", Stream.of("1", null, "3").collect(JOINING_4));
-        assertEquals("<1-NUL-3>", Stream.of("1", null, "3").collect(JOINING_4_NUL));
+            // Then
+            assertEquals("<1>", result);
+        }
+
+        @Test
+        @DisplayName("should join multiple elements with the delimiter")
+        void testMultipleElementsStream() {
+            // When
+            final String result = Stream.of("1", "2", "3").collect(defaultCollector);
+
+            // Then
+            assertEquals("<1-2-3>", result);
+        }
+
+        @Test
+        @DisplayName("should convert null elements to the string 'null' by default")
+        void testStreamWithNull() {
+            // When
+            final String result = Stream.of("1", null, "3").collect(defaultCollector);
+
+            // Then
+            assertEquals("<1-null-3>", result);
+        }
+
+        @Test
+        @DisplayName("should use a custom mapping function for null elements")
+        void testStreamWithNullAndCustomMapper() {
+            // Given a collector that maps nulls to "NUL"
+            final Collector<Object, ?, String> collectorWithCustomNullHandler =
+                LangCollectors.joining("-", "<", ">", obj -> Objects.toString(obj, "NUL"));
+
+            // When
+            final String result = Stream.of("1", null, "3").collect(collectorWithCustomNullHandler);
+
+            // Then
+            assertEquals("<1-NUL-3>", result);
+        }
     }
 }
