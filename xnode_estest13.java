@@ -1,31 +1,35 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest13 extends XNode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XNode} class, focusing on body parsing.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test012() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Long long0 = new Long(11L);
-        Long long1 = xNode0.getLongBody(long0);
-        assertEquals(11L, (long) long1);
+    /**
+     * Verifies that getLongBody(defaultValue) returns the default value
+     * when the XNode's body is null (e.g., when wrapping an empty XML node).
+     */
+    @Test
+    public void shouldReturnDefaultLongWhenBodyIsNull() {
+        // Arrange
+        // An empty DOM node will result in a null body for the XNode.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        Long defaultValue = 11L;
+
+        // Act
+        // Attempt to get the body as a Long, providing a default value.
+        Long actualValue = xNode.getLongBody(defaultValue);
+
+        // Assert
+        // The method should return the provided default value because the body is null.
+        assertEquals(defaultValue, actualValue);
     }
 }
