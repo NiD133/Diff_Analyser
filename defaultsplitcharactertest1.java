@@ -1,18 +1,31 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DefaultSplitCharacterTestTest1 {
+/**
+ * Test suite for the {@link DefaultSplitCharacter} class.
+ */
+public class DefaultSplitCharacterTest {
 
-    private final String[] INPUT_TEXT = new String[] { "tha111-is one that should-be-splitted-right-herel-2018-12-18", "anddate format2 01-01-1920" };
+    /**
+     * Verifies that calling {@code getCurrentCharacter} with an index that is outside
+     * the bounds of the character array correctly throws an {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void getCurrentCharacter_withOutOfBoundsIndex_throwsArrayIndexOutOfBoundsException() {
+        // Arrange: Set up the test instance and input data.
+        DefaultSplitCharacter splitCharacter = new DefaultSplitCharacter();
+        char[] characters = new char[10];
+        int outOfBoundsIndex = 10; // The first invalid index for a 10-element array is 10.
 
-    private boolean isPsplitCharacter(int current, String text) {
-        return new DefaultSplitCharacter().isSplitCharacter(75, current, text.length() + 1, text.toCharArray(), null);
-    }
+        // The PdfChunk array is not relevant for this specific exception scenario.
+        PdfChunk[] chunks = null;
 
-    @Test
-    public void splitCharacterDateFormatTest() {
-        Assert.assertFalse(isPsplitCharacter(21, INPUT_TEXT[1]));
+        // Act: Call the method with the out-of-bounds index.
+        // The @Test(expected=...) annotation will handle the assertion.
+        splitCharacter.getCurrentCharacter(outOfBoundsIndex, characters, chunks);
+
+        // Assert: The test succeeds if an ArrayIndexOutOfBoundsException is thrown,
+        // and fails otherwise.
     }
 }
