@@ -1,18 +1,24 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TokenQueue_ESTestTest15 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("$dXr'&T^\"0qAav");
-        char char0 = tokenQueue0.current();
-        assertEquals('$', char0);
+    @Test
+    public void currentShouldPeekAtFirstCharacterWithoutConsuming() {
+        // Arrange
+        String input = "$dXr'&T^\"0qAav";
+        TokenQueue queue = new TokenQueue(input);
+
+        // Act
+        char firstCharacter = queue.current();
+
+        // Assert
+        assertEquals("The first character should be '$'", '$', firstCharacter);
+        assertEquals("Calling current() should not advance the queue", input, queue.toString());
     }
 }
