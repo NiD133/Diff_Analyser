@@ -1,35 +1,53 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import java.util.Arrays;
 
-public class ByteUtils_ESTestTest36 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteUtils} class, focusing on the
+ * toLittleEndian(DataOutput, long, int) method.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("zM{+~O5n/O/LjZTOA", true);
-        DataOutputStream dataOutputStream0 = new DataOutputStream(mockFileOutputStream0);
-        ByteUtils.toLittleEndian((DataOutput) dataOutputStream0, (long) (-294), 2026);
+    /**
+     * Tests that toLittleEndian with a DataOutput correctly writes a number of bytes
+     * greater than the standard 8 bytes for a long value. When the value is negative,
+     * it should use sign extension for the additional bytes.
+     *
+     * <p>The original test called this method with a large length (2026) but performed
+     * no assertions, only verifying that no exception was thrown. This improved
+     * test verifies the actual byte output to ensure correctness.</p>
+     */
+    @Test
+    public void toLittleEndianWithDataOutputShouldWriteMoreThanEightBytesForNegativeValue() throws IOException {
+        // Arrange
+        final long valueToWrite = -294L; // 0xFFFFFFFFFFFFFEDA in 64-bit two's complement
+        final int length = 10;           // A length greater than 8 bytes to test the behavior
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final DataOutput dataOut = new DataOutputStream(baos);
+
+        // The expected little-endian representation of -294L is:
+        // DA, FE, FF, FF, FF, FF, FF, FF
+        // For a length of 10, sign extension of the negative number should add two more FF bytes.
+        final byte[] expectedBytes = new byte[length];
+        expectedBytes[0] = (byte) 0xDA;
+        expectedBytes[1] = (byte) 0xFE;
+        Arrays.fill(expectedBytes, 2, length, (byte) 0xFF);
+
+        // Act
+        ByteUtils.toLittleEndian(dataOut, valueToWrite, length);
+
+        // Assert
+        final byte[] actualBytes = baos.toByteArray();
+        assertEquals("The number of bytes written should match the specified length.", length, actualBytes.length);
+        assertArrayEquals("The written bytes should be the correct little-endian representation with sign extension.",
+                expectedBytes, actualBytes);
     }
 }
