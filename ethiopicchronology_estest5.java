@@ -1,28 +1,38 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class EthiopicChronology_ESTestTest5 extends EthiopicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link EthiopicChronology}.
+ * This test focuses on boundary conditions for method inputs.
+ */
+public class EthiopicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstanceUTC();
-        // Undeclared exception!
+    /**
+     * Verifies that isLeapDay() throws an IllegalArgumentException when the provided
+     * instant is below the minimum supported value for the Ethiopic calendar.
+     */
+    @Test
+    public void isLeapDay_whenInstantIsBelowMinimum_throwsIllegalArgumentException() {
+        // Arrange: Create a chronology and define an instant that is known to be
+        // out of the valid range (specifically, Long.MIN_VALUE).
+        EthiopicChronology chronology = EthiopicChronology.getInstanceUTC();
+        final long instantBelowSupportedMinimum = Long.MIN_VALUE;
+
+        // Act & Assert: Attempt to use the invalid instant and verify that the
+        // expected exception is thrown with a descriptive message.
         try {
-            ethiopicChronology0.isLeapDay((-9223372036854775808L));
-            fail("Expecting exception: IllegalArgumentException");
+            chronology.isLeapDay(instantBelowSupportedMinimum);
+            fail("Expected an IllegalArgumentException because the instant is below the supported minimum.");
         } catch (IllegalArgumentException e) {
-            //
-            // The instant is below the supported minimum of 0001-01-01T00:00:00.000Z (EthiopicChronology[UTC])
-            //
-            verifyException("org.joda.time.chrono.LimitChronology", e);
+            // Verify that the exception is thrown for the correct reason by checking its message.
+            String expectedMessageContent = "The instant is below the supported minimum";
+            assertTrue(
+                "The exception message should explain that the instant is too low.",
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
