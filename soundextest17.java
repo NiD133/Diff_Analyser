@@ -1,13 +1,19 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.apache.commons.codec.AbstractStringEncoderTest;
-import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
 
-public class SoundexTestTest17 extends AbstractStringEncoderTest<Soundex> {
+import org.apache.commons.codec.AbstractStringEncoderTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/**
+ * Tests Soundex compatibility with examples from a Microsoft SQL Server article.
+ * This ensures that the Apache Commons Codec implementation of Soundex
+ * produces results consistent with other known implementations.
+ */
+@DisplayName("Soundex MS SQL Server Compatibility Test")
+public class SoundexMssqlCompatibilityTest extends AbstractStringEncoderTest<Soundex> {
 
     @Override
     protected Soundex createStringEncoder() {
@@ -15,18 +21,26 @@ public class SoundexTestTest17 extends AbstractStringEncoderTest<Soundex> {
     }
 
     /**
-     * Examples for MS SQLServer from https://databases.about.com/library/weekly/aa042901a.htm
+     * The test cases are sourced from an article on MS SQL Server's Soundex implementation.
+     * Source: https://databases.about.com/library/weekly/aa042901a.htm
+     *
+     * @param name the input string to be encoded.
+     * @param expectedSoundex the expected Soundex code.
      */
-    @Test
-    void testMsSqlServer3() {
-        assertEquals("A500", getStringEncoder().encode("Ann"));
-        assertEquals("A536", getStringEncoder().encode("Andrew"));
-        assertEquals("J530", getStringEncoder().encode("Janet"));
-        assertEquals("M626", getStringEncoder().encode("Margaret"));
-        assertEquals("S315", getStringEncoder().encode("Steven"));
-        assertEquals("M240", getStringEncoder().encode("Michael"));
-        assertEquals("R163", getStringEncoder().encode("Robert"));
-        assertEquals("L600", getStringEncoder().encode("Laura"));
-        assertEquals("A500", getStringEncoder().encode("Anne"));
+    @DisplayName("Should encode names to their expected Soundex codes from MS SQL Server examples")
+    @ParameterizedTest(name = "encode(''{0}'') => ''{1}''")
+    @CsvSource({
+        "Ann,      A500",
+        "Andrew,   A536",
+        "Janet,    J530",
+        "Margaret, M626",
+        "Steven,   S315",
+        "Michael,  M240",
+        "Robert,   R163",
+        "Laura,    L600",
+        "Anne,     A500"
+    })
+    void testEncodeNamesFromMsSqlServerArticle(final String name, final String expectedSoundex) {
+        assertEquals(expectedSoundex, getStringEncoder().encode(name));
     }
 }
