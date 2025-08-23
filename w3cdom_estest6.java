@@ -1,39 +1,46 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest6 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Attributes attributes0 = new Attributes();
-        Map<String, String> map0 = attributes0.dataset();
-        Properties properties0 = W3CDom.propertiesFromMap(map0);
-        assertEquals(0, properties0.size());
+/**
+ * Tests for the utility method {@link W3CDom#propertiesFromMap(Map)}.
+ */
+public class W3CDomTest {
+
+    @Test
+    public void propertiesFromMapWithEmptyMapReturnsEmptyProperties() {
+        // Arrange: Create an empty map.
+        Map<String, String> emptyMap = new HashMap<>();
+
+        // Act: Convert the empty map to a Properties object.
+        Properties properties = W3CDom.propertiesFromMap(emptyMap);
+
+        // Assert: The resulting Properties object should also be empty.
+        assertTrue("The resulting properties should be empty for an empty map input.", properties.isEmpty());
+    }
+
+    @Test
+    public void propertiesFromMapConvertsAllEntries() {
+        // Arrange: Create a map with some sample data.
+        Map<String, String> sourceMap = new HashMap<>();
+        sourceMap.put("encoding", "UTF-8");
+        sourceMap.put("method", "xml");
+        sourceMap.put("indent", "yes");
+
+        // Act: Convert the map to a Properties object.
+        Properties properties = W3CDom.propertiesFromMap(sourceMap);
+
+        // Assert: The Properties object should contain the same key-value pairs.
+        assertEquals("The number of properties should match the number of map entries.", 3, properties.size());
+        assertEquals("The 'encoding' property should be correctly transferred.", "UTF-8", properties.getProperty("encoding"));
+        assertEquals("The 'method' property should be correctly transferred.", "xml", properties.getProperty("method"));
+        assertEquals("The 'indent' property should be correctly transferred.", "yes", properties.getProperty("indent"));
     }
 }
