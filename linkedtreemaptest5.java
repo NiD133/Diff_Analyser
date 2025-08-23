@@ -1,29 +1,35 @@
 package com.google.gson.internal;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.MoreAsserts;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
+
 import org.junit.Test;
 
-public class LinkedTreeMapTestTest5 {
+/**
+ * Tests for {@link LinkedTreeMap}.
+ *
+ * <p>This test focuses on the behavior of putting entries with null values.
+ */
+public class LinkedTreeMapTest {
 
+    /**
+     * Verifies that putting a null value is allowed by default and that the map's
+     * state is updated correctly. The default constructor of {@link LinkedTreeMap}
+     * is expected to permit null values.
+     */
     @Test
-    public void testPutNullValue() {
+    public void put_withNullValue_isAllowedByDefault() {
+        // Arrange
         LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
-        map.put("a", null);
+        String key = "a";
+
+        // Act
+        map.put(key, null);
+
+        // Assert
+        // Verify the map's state after the operation
         assertThat(map).hasSize(1);
-        assertThat(map.containsKey("a")).isTrue();
+        assertThat(map.containsKey(key)).isTrue();
         assertThat(map.containsValue(null)).isTrue();
-        assertThat(map.get("a")).isNull();
+        assertThat(map.get(key)).isNull();
     }
 }
