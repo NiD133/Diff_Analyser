@@ -1,66 +1,51 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
 import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InstantiateFactory;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedBag_ESTestTest30 extends TransformedBag_ESTest_scaffolding {
+/**
+ * This test class contains a test case for TransformedBag functionality,
+ * specifically focusing on interactions with a sorted underlying bag.
+ */
+public class TransformedBagRefactoredTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Transformer<Integer, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        Vector<Integer> vector0 = new Vector<Integer>(477);
-        TreeBag<Object> treeBag0 = new TreeBag<Object>((Iterable<?>) vector0);
-        SynchronizedSortedBag<Object> synchronizedSortedBag0 = new SynchronizedSortedBag<Object>(treeBag0);
-        Transformer<Object, Boolean>[] transformerArray0 = (Transformer<Object, Boolean>[]) Array.newInstance(Transformer.class, 0);
-        ChainedTransformer<Object> chainedTransformer0 = new ChainedTransformer<Object>(transformerArray0);
-        TransformedSortedBag<Object> transformedSortedBag0 = TransformedSortedBag.transformingSortedBag((SortedBag<Object>) synchronizedSortedBag0, (Transformer<? super Object, ?>) chainedTransformer0);
-        // Undeclared exception!
-        try {
-            transformedSortedBag0.add((Object) transformer0, 477);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that a ClassCastException is thrown when attempting to add a
+     * non-Comparable object to a TransformedBag that decorates a TreeBag.
+     * <p>
+     * The exception originates from the underlying TreeBag, which requires
+     * elements to be comparable for sorting. This test verifies that the `add`
+     * call is correctly delegated to the decorated bag.
+     */
+    @Test(timeout = 4000, expected = ClassCastException.class)
+    public void addNonComparableToTransformedSortedBagShouldThrowClassCastException() {
+        // Arrange
+        // 1. A TreeBag is a SortedBag that requires its elements to be Comparable.
+        final SortedBag<Object> underlyingSortedBag = new TreeBag<>();
+
+        // 2. Use an identity transformer that passes objects through unchanged.
+        //    An empty ChainedTransformer conveniently acts as an identity transformer.
+        final Transformer<Object, Object> identityTransformer =
+                new ChainedTransformer<>(new Transformer[0]);
+
+        // 3. The bag under test, which decorates the TreeBag.
+        final Bag<Object> transformedBag =
+                TransformedSortedBag.transformingSortedBag(underlyingSortedBag, identityTransformer);
+
+        // 4. An instance of Object does not implement Comparable.
+        final Object nonComparableObject = new Object();
+
+        // Act
+        // Attempt to add the non-Comparable object. The identity transformer will
+        // pass it directly to the underlying TreeBag. The TreeBag will then throw
+        // a ClassCastException because it cannot sort the new element.
+        transformedBag.add(nonComparableObject, 477);
+
+        // Assert
+        // The test passes if a ClassCastException is thrown, as specified by the
+        // @Test(expected=...) annotation.
     }
 }
