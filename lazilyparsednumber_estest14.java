@@ -1,26 +1,26 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest14 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber((String) null);
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.intValue();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.NumberLimits", e);
-        }
+    /**
+     * Verifies that attempting to parse a LazilyParsedNumber constructed with a null
+     * string value results in a NullPointerException. The class contract requires a
+     * non-null value.
+     */
+    @Test(expected = NullPointerException.class)
+    public void intValue_whenConstructedWithNull_throwsNullPointerException() {
+        // Arrange: Create a LazilyParsedNumber with a null string, which is invalid input.
+        LazilyParsedNumber number = new LazilyParsedNumber(null);
+
+        // Act: Attempt to get the integer value. This should trigger the exception
+        // because the internal parsing logic cannot handle a null string.
+        number.intValue();
+
+        // Assert: The @Test(expected) annotation verifies that a NullPointerException was thrown.
     }
 }
