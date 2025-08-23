@@ -1,46 +1,29 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
-import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest31 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        MonthDay monthDay0 = new MonthDay();
-        String string0 = monthDay0.toString();
-        assertEquals("--02-14", string0);
+/**
+ * Test class for the AbstractPartial class, focusing on the toString() method
+ * as inherited and implemented by subclasses like MonthDay.
+ */
+public class AbstractPartial_ESTestTest31 {
+
+    @Test
+    public void toString_onMonthDayInstance_returnsISO8601PartialFormat() {
+        // Arrange: Create a MonthDay instance for a fixed date (February 14th).
+        // Using a fixed date makes the test deterministic and independent of when it is run.
+        // The original test used new MonthDay(), which would fail on any day other than Feb 14th.
+        MonthDay monthDay = new MonthDay(2, 14); // Represents --02-14
+        String expectedString = "--02-14";
+
+        // Act: Call the toString() method.
+        String actualString = monthDay.toString();
+
+        // Assert: Verify that the output string matches the standard ISO8601 format for a partial date.
+        assertEquals("The toString() method should return the date in ISO8601 partial format (--MM-dd).",
+                expectedString, actualString);
     }
 }
