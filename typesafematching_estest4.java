@@ -1,26 +1,33 @@
 package org.mockito.internal.invocation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
-import org.mockito.internal.matchers.CapturingMatcher;
-import org.mockito.internal.matchers.CompareEqual;
-import org.mockito.internal.matchers.GreaterOrEqual;
-import org.mockito.internal.matchers.Not;
 import org.mockito.internal.matchers.NotNull;
 
-public class TypeSafeMatching_ESTestTest4 extends TypeSafeMatching_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test3() throws Throwable {
-        ArgumentMatcherAction argumentMatcherAction0 = TypeSafeMatching.matchesTypeSafe();
-        Class<Integer> class0 = Integer.class;
-        NotNull<Integer> notNull0 = new NotNull<Integer>(class0);
-        boolean boolean0 = argumentMatcherAction0.apply(notNull0, (Object) null);
-        assertFalse(boolean0);
+/**
+ * Tests for {@link TypeSafeMatching}.
+ */
+public class TypeSafeMatchingTest {
+
+    /**
+     * This test verifies that the TypeSafeMatching action correctly handles null arguments.
+     * <p>
+     * A null argument is considered type-compatible with any matcher. Therefore, the action
+     * should proceed to call the underlying matcher's 'matches' method. In this case,
+     * the {@link NotNull} matcher should correctly return false for a null input.
+     */
+    @Test
+    public void shouldReturnFalseWhenNotNullMatcherIsAppliedToNullArgument() {
+        // Arrange
+        ArgumentMatcherAction typeSafeMatching = TypeSafeMatching.matchesTypeSafe();
+        ArgumentMatcher<Object> notNullMatcher = new NotNull<>();
+
+        // Act
+        boolean isMatch = typeSafeMatching.apply(notNullMatcher, null);
+
+        // Assert
+        assertFalse("A NotNull matcher should return false for a null argument", isMatch);
     }
 }
