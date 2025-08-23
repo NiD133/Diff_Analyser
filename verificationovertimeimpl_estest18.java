@@ -1,27 +1,42 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
 import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest18 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, 0L, (VerificationMode) null, false);
-        verificationOverTimeImpl0.getTimer();
-        assertFalse(verificationOverTimeImpl0.isReturnOnSuccess());
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    @Test
+    public void shouldCorrectlyInitializeStateFromConstructor() {
+        // Arrange
+        long pollingPeriodMillis = 10L;
+        long durationMillis = 100L;
+        boolean returnOnSuccess = false;
+        VerificationMode delegateMode = null; // Not relevant for this test
+
+        // Act
+        VerificationOverTimeImpl verificationOverTime = new VerificationOverTimeImpl(
+            pollingPeriodMillis,
+            durationMillis,
+            delegateMode,
+            returnOnSuccess
+        );
+
+        // Assert
+        // Verify that the internal Timer is created
+        Timer timer = verificationOverTime.getTimer();
+        assertNotNull("The internal timer should be initialized upon construction.", timer);
+
+        // Verify that the returnOnSuccess flag is set correctly
+        assertFalse(
+            "The returnOnSuccess flag should reflect the value passed to the constructor.",
+            verificationOverTime.isReturnOnSuccess()
+        );
     }
 }
