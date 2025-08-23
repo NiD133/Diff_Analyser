@@ -1,38 +1,32 @@
 package org.apache.commons.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
 import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class RandomAccessFileMode_ESTestTest19 extends RandomAccessFileMode_ESTest_scaffolding {
+import java.io.RandomAccessFile;
+import java.nio.file.Path;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE;
-        // Undeclared exception!
-        try {
-            randomAccessFileMode0.apply((Path) null, (IOFunction<RandomAccessFile, RandomAccessFileMode>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.RandomAccessFileMode", e);
-        }
+/**
+ * Tests for the {@link RandomAccessFileMode} enum, focusing on its method contracts.
+ */
+public class RandomAccessFileModeTest {
+
+    /**
+     * Tests that calling {@code apply(Path, IOFunction)} with null arguments
+     * throws a {@link NullPointerException}.
+     * <p>
+     * This test verifies that the method correctly validates its inputs and does not
+     * permit null values for the path or the function, adhering to a robust programming contract.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void testApplyWithNullArgumentsShouldThrowNullPointerException() {
+        // Arrange: Select any RandomAccessFileMode instance. The specific mode is irrelevant for this test.
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE;
+
+        // Act & Assert: Call the apply method with null for both arguments.
+        // This is expected to throw a NullPointerException immediately.
+        // The casts are required to resolve method signature ambiguity for the null literals.
+        mode.apply((Path) null, (IOFunction<RandomAccessFile, ?>) null);
     }
 }
