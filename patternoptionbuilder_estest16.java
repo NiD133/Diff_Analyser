@@ -1,18 +1,29 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest16 extends PatternOptionBuilder_ESTest_scaffolding {
+import java.io.File;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('*');
-        assertNotNull(class0);
-        assertTrue(class0.isArray());
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
+
+    /**
+     * Tests that the getValueType method correctly identifies the '*' character
+     * as representing an array of files (File[]).
+     */
+    @Test
+    public void getValueType_shouldReturnArrayOfFiles_forStarCharacter() {
+        // Arrange: The '*' character in a pattern string represents an array of files.
+        final char fileArrayCode = '*';
+
+        // Act: Retrieve the class type associated with the character code.
+        final Class<?> valueType = PatternOptionBuilder.getValueType(fileArrayCode);
+
+        // Assert: The returned type should be exactly File[].class.
+        // This is more specific and readable than checking for not-null and isArray().
+        assertEquals("The '*' character should map to the File[] type", File[].class, valueType);
     }
 }
