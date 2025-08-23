@@ -1,26 +1,22 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Weeks_ESTestTest30 extends Weeks_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Weeks} class, focusing on edge cases and exception handling.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        // Undeclared exception!
-        try {
-            weeks0.toStandardSeconds();
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: -2147483648 * 604800
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that converting a Weeks instance to seconds throws an ArithmeticException
+     * when the resulting value would cause an integer overflow.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void toStandardSeconds_whenResultOverflows_throwsArithmeticException() {
+        // The toStandardSeconds() method calculates the total seconds by multiplying
+        // the number of weeks by the number of seconds in one week (7 * 24 * 60 * 60 = 604,800).
+        // Using Weeks.MIN_VALUE (which is Integer.MIN_VALUE) will cause this
+        // multiplication to overflow the valid range for an integer.
+        Weeks.MIN_VALUE.toStandardSeconds();
     }
 }
