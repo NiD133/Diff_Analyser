@@ -1,30 +1,25 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IslamicChronology_ESTestTest34 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link IslamicChronology} class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetHours(12);
-        // Undeclared exception!
-        try {
-            IslamicChronology.getInstance(dateTimeZone0, (IslamicChronology.LeapYearPatternType) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.chrono.IslamicChronology", e);
-        }
+    /**
+     * Tests that the getInstance factory method throws a NullPointerException
+     * when the leap year pattern is null, as this is a required parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getInstance_whenLeapYearPatternIsNull_thenThrowNullPointerException() {
+        // Arrange: The specific time zone is not relevant to this test case.
+        // We use a fixed zone like UTC to ensure the test is deterministic.
+        DateTimeZone anyZone = DateTimeZone.UTC;
+
+        // Act & Assert: The factory method should throw a NullPointerException
+        // because the leap year pattern type must not be null.
+        IslamicChronology.getInstance(anyZone, null);
     }
 }
