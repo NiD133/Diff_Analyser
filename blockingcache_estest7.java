@@ -1,23 +1,35 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest7 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache((String) null);
-        SoftCache softCache0 = new SoftCache(perpetualCache0);
-        BlockingCache blockingCache0 = new BlockingCache(softCache0);
-        String string0 = blockingCache0.getId();
-        assertNull(string0);
+/**
+ * Test suite for the {@link BlockingCache} decorator.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that the getId() method of BlockingCache correctly delegates the call
+     * to the underlying (decorated) cache instance.
+     * <p>
+     * This test specifically checks the case where the decorated cache is initialized
+     * with a null ID.
+     */
+    @Test
+    public void shouldReturnNullIdWhenDecoratedCacheHasNullId() {
+        // Arrange: Create a cache with a null ID and wrap it with a BlockingCache.
+        // The PerpetualCache serves as a simple, concrete implementation for the decorated cache.
+        Cache decoratedCache = new PerpetualCache(null);
+        Cache blockingCache = new BlockingCache(decoratedCache);
+
+        // Act: Retrieve the ID from the BlockingCache.
+        String actualId = blockingCache.getId();
+
+        // Assert: The returned ID should be null, as the call is delegated to the
+        // underlying cache which was initialized with a null ID.
+        assertNull("The ID should be null as it's delegated from the decorated cache.", actualId);
     }
 }
