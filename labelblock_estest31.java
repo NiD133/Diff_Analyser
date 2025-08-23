@@ -1,37 +1,32 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
+import static org.junit.Assert.assertNull;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest31 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("", (Font) null);
-        Font font0 = labelBlock0.getFont();
-        assertNull(font0);
+    /**
+     * Verifies that getFont() returns null if the block was constructed with a
+     * null font.
+     *
+     * Note: The LabelBlock constructor's Javadoc states that the font parameter
+     * should not be null. However, the implementation does not enforce this.
+     * This test confirms the actual behavior of the current implementation.
+     */
+    @Test
+    public void getFontShouldReturnNullWhenConstructedWithNullFont() {
+        // Arrange: Create a LabelBlock instance, intentionally passing a null font
+        // to test how the class handles it.
+        LabelBlock labelBlock = new LabelBlock("Test Label", null);
+
+        // Act: Retrieve the font from the LabelBlock.
+        Font retrievedFont = labelBlock.getFont();
+
+        // Assert: The retrieved font should be null, matching what was passed to the constructor.
+        assertNull("The font should be null as it was set to null in the constructor.", retrievedFont);
     }
 }
