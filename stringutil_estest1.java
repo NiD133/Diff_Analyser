@@ -1,28 +1,37 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest1 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil#isHexDigit(char)} method.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        boolean boolean0 = StringUtil.isHexDigit('F');
-        assertTrue(boolean0);
+    @Test
+    public void isHexDigit_shouldReturnTrue_forUppercaseHexLetters() {
+        assertTrue("Character 'A' should be a valid hex digit", StringUtil.isHexDigit('A'));
+        assertTrue("Character 'F' should be a valid hex digit", StringUtil.isHexDigit('F'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnTrue_forLowercaseHexLetters() {
+        assertTrue("Character 'a' should be a valid hex digit", StringUtil.isHexDigit('a'));
+        assertTrue("Character 'f' should be a valid hex digit", StringUtil.isHexDigit('f'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnTrue_forDigits() {
+        assertTrue("Character '0' should be a valid hex digit", StringUtil.isHexDigit('0'));
+        assertTrue("Character '9' should be a valid hex digit", StringUtil.isHexDigit('9'));
+    }
+
+    @Test
+    public void isHexDigit_shouldReturnFalse_forNonHexCharacters() {
+        assertFalse("Character 'G' is not a hex digit", StringUtil.isHexDigit('G'));
+        assertFalse("Character 'z' is not a hex digit", StringUtil.isHexDigit('z'));
+        assertFalse("Symbol '$' is not a hex digit", StringUtil.isHexDigit('$'));
+        assertFalse("Space character is not a hex digit", StringUtil.isHexDigit(' '));
     }
 }
