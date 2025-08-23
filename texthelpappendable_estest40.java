@@ -1,54 +1,32 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
+
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest40 extends TextHelpAppendable_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        Vector<String> vector0 = new Vector<String>();
-        vector0.add("");
-        LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.makeColumnQueues(vector0, linkedList0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 0, Size: 0
-            //
-            verifyException("java.util.LinkedList", e);
-        }
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
+
+    /**
+     * Tests that makeColumnQueues throws an IndexOutOfBoundsException when the number of
+     * data columns is greater than the number of provided styles.
+     */
+    @Test
+    public void makeColumnQueuesShouldThrowExceptionWhenColumnsExceedStyles() {
+        // Arrange: Create a formatter, one column of data, and an empty list of styles.
+        TextHelpAppendable formatter = new TextHelpAppendable(new StringWriter());
+        List<String> columnData = List.of("some data");
+        List<TextStyle> styles = Collections.emptyList();
+
+        // Act & Assert: Expect an exception because there is no style for the data column.
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            formatter.makeColumnQueues(columnData, styles);
+        });
     }
 }
