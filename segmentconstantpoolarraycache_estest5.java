@@ -1,25 +1,31 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+// The original test class name is kept for context. 
+// In a real-world scenario, it would be renamed to SegmentConstantPoolArrayCacheTest.
 public class SegmentConstantPoolArrayCache_ESTestTest5 extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
 
+    /**
+     * Tests that an array becomes cached after being accessed for the first time
+     * via the {@link SegmentConstantPoolArrayCache#indexesForArrayKey(String[], String)} method.
+     */
     @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
-        String[] stringArray0 = new String[8];
-        List<Integer> list0 = segmentConstantPoolArrayCache0.indexesForArrayKey(stringArray0, "Trying to cache an array that already exists");
-        assertNotNull(list0);
-        SegmentConstantPoolArrayCache.CachedArray segmentConstantPoolArrayCache_CachedArray0 = segmentConstantPoolArrayCache0.new CachedArray(stringArray0);
-        boolean boolean0 = segmentConstantPoolArrayCache0.arrayIsCached(segmentConstantPoolArrayCache_CachedArray0.primaryArray);
-        assertTrue(boolean0);
+    public void testIndexesForArrayKeyCachesTheArrayOnFirstAccess() {
+        // Given: A cache and an uncached string array.
+        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
+        String[] stringArray = {"alpha", "beta", "gamma"};
+
+        // Verify the precondition: the array should not be cached initially.
+        assertFalse("Precondition failed: Array should not be cached before first access.", cache.arrayIsCached(stringArray));
+
+        // When: The array is accessed to find the indexes of a key.
+        // The return value is not needed for this test, as we are only verifying the caching side-effect.
+        cache.indexesForArrayKey(stringArray, "beta");
+
+        // Then: The array should now be cached.
+        assertTrue("Array should be cached after being accessed.", cache.arrayIsCached(stringArray));
     }
 }
