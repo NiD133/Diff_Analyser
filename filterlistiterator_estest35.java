@@ -1,86 +1,31 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class FilterListIterator_ESTestTest35 extends FilterListIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link FilterListIterator}.
+ * This class demonstrates a clear and focused way to test its behavior.
+ */
+public class FilterListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Predicate<Object>[] predicateArray0 = (Predicate<Object>[]) Array.newInstance(Predicate.class, 6);
-        Predicate<Object> predicate0 = TruePredicate.truePredicate();
-        predicateArray0[0] = predicate0;
-        Predicate<Object> predicate1 = NotPredicate.notPredicate((Predicate<? super Object>) predicate0);
-        predicateArray0[1] = predicate1;
-        LinkedList<Predicate<Object>> linkedList0 = new LinkedList<Predicate<Object>>();
-        Predicate<Object> predicate2 = NonePredicate.nonePredicate((Collection<? extends Predicate<? super Object>>) linkedList0);
-        predicateArray0[2] = predicate2;
-        NonePredicate<Object> nonePredicate0 = new NonePredicate<Object>(predicateArray0);
-        predicateArray0[3] = (Predicate<Object>) nonePredicate0;
-        Predicate<Object> predicate3 = UniquePredicate.uniquePredicate();
-        predicateArray0[4] = predicate3;
-        NullIsTruePredicate<Object> nullIsTruePredicate0 = new NullIsTruePredicate<Object>(predicate0);
-        predicateArray0[5] = (Predicate<Object>) nullIsTruePredicate0;
-        nullIsTruePredicate0.test(predicate2);
-        Predicate<Object> predicate4 = NonePredicate.nonePredicate((Predicate<? super Object>[]) predicateArray0);
-        FilterListIterator<Object> filterListIterator0 = new FilterListIterator<Object>(predicate4);
-        filterListIterator0.previousIndex();
-        FilterListIterator<Transformer<Object, Object>> filterListIterator1 = new FilterListIterator<Transformer<Object, Object>>(predicate1);
-        FilterListIterator<Transformer<Object, Object>> filterListIterator2 = new FilterListIterator<Transformer<Object, Object>>(filterListIterator1, predicateArray0[3]);
-        FilterListIterator<Transformer<Object, Object>> filterListIterator3 = new FilterListIterator<Transformer<Object, Object>>(filterListIterator2);
-        // Undeclared exception!
-        try {
-            filterListIterator3.remove();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // FilterListIterator.remove() is not supported.
-            //
-            verifyException("org.apache.commons.collections4.iterators.FilterListIterator", e);
-        }
+    /**
+     * Verifies that the remove() method is not supported and consistently
+     * throws an UnsupportedOperationException.
+     * <p>
+     * The {@link FilterListIterator#remove()} operation is explicitly not
+     * implemented, and this test ensures that contract is met.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void removeShouldThrowUnsupportedOperationException() {
+        // Arrange: Create a simple FilterListIterator instance.
+        // The internal state or wrapped iterator is irrelevant, as remove()
+        // is unconditionally unsupported.
+        final FilterListIterator<Object> iterator = new FilterListIterator<>();
+
+        // Act: Attempt to call the remove() method.
+        iterator.remove();
+
+        // Assert: The test expects an UnsupportedOperationException,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
