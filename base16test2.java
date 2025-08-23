@@ -1,57 +1,74 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest2 {
+/**
+ * Tests the {@link Base16} class, specifically focusing on the encode method
+ * that operates on a subsection of a byte array (using an offset and length).
+ */
+public class Base16Test {
 
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
+    private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     /**
-     * @return the random.
+     * A helper method to test Base16 encoding on a slice of a larger byte array.
+     * It constructs a buffer with optional padding at the beginning and end of the
+     * actual data to be encoded.
+     *
+     * @param prefixPaddingSize The number of zero-bytes to prepend to the data.
+     * @param suffixPaddingSize The number of zero-bytes to append to the data.
      */
-    public Random getRandom() {
-        return this.random;
-    }
+    private void assertEncodeSlice(final int prefixPaddingSize, final int suffixPaddingSize) {
+        // Arrange
+        final String originalString = "Hello World";
+        final byte[] originalBytes = originalString.getBytes(UTF_8);
+        final String expectedEncodedString = "48656C6C6F20576F726C64";
 
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
+        // Create a buffer with the specified padding around the original data.
+        byte[] buffer = ArrayUtils.addAll(new byte[prefixPaddingSize], originalBytes);
+        buffer = ArrayUtils.addAll(buffer, new byte[suffixPaddingSize]);
 
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
+        final Base16 base16 = new Base16();
+
+        // Act: Encode only the slice of the buffer containing the original data.
+        final byte[] encodedBytes = base16.encode(buffer, prefixPaddingSize, originalBytes.length);
+        final String actualEncodedString = new String(encodedBytes, UTF_8);
+
+        // Assert
+        assertEquals(expectedEncodedString, actualEncodedString,
+            "Encoding a slice of a padded buffer should produce the correct Base16 string.");
     }
 
     @Test
-    void testBase16AtBufferEnd() {
-        testBase16InBuffer(100, 0);
+    void testEncodeWithPrefixPadding() {
+        // This test ensures the encoder correctly handles an offset,
+        // ignoring any prefix padding in the buffer.
+        assertEncodeSlice(100, 0);
+    }
+
+    @Test
+    void testEncodeWithSuffixPadding() {
+        // This test ensures the encoder correctly handles the length parameter,
+        // ignoring any suffix padding in the buffer.
+        assertEncodeSlice(0, 100);
+    }
+
+    @Test
+    void testEncodeWithPrefixAndSuffixPadding() {
+        // This test ensures the encoder correctly handles both an offset and a length,
+        // ignoring padding at both ends of the buffer.
+        assertEncodeSlice(50, 50);
+    }
+
+    @Test
+    void testEncodeWithoutPadding() {
+        // This test serves as a baseline, ensuring the helper works correctly
+        // in the simplest case with no padding.
+        assertEncodeSlice(0, 0);
     }
 }
