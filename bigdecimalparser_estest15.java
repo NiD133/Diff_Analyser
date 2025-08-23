@@ -1,18 +1,30 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BigDecimalParser_ESTestTest15 extends BigDecimalParser_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BigDecimalParser} class.
+ */
+public class BigDecimalParserTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BigDecimal bigDecimal0 = BigDecimalParser.parse(".1");
-        assertEquals((byte) 0, bigDecimal0.byteValue());
+    /**
+     * Verifies that {@link BigDecimalParser#parse(String)} correctly handles
+     * a numeric string that starts with a decimal point.
+     */
+    @Test
+    public void parseShouldHandleNumberWithLeadingDecimalPoint() {
+        // Arrange
+        String numberAsString = ".1";
+        BigDecimal expectedValue = new BigDecimal("0.1");
+
+        // Act
+        BigDecimal actualValue = BigDecimalParser.parse(numberAsString);
+
+        // Assert
+        // We use assertEquals directly, which for BigDecimal compares both value and scale.
+        // This is a more precise and clearer assertion than the original test's byteValue comparison.
+        assertEquals(expectedValue, actualValue);
     }
 }
