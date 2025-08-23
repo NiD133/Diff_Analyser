@@ -1,29 +1,43 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Attribute_ESTestTest35 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the {@link Attribute} class, focusing on key prefixing.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        Attribute attribute0 = new Attribute("QSy4iJ5y", "QSy4iJ5y");
-        String string0 = attribute0.prefix();
-        assertEquals("", string0);
+    /**
+     * Verifies that calling {@link Attribute#prefix()} on an attribute without a
+     * namespace prefix in its key returns an empty string.
+     */
+    @Test
+    public void prefixReturnsEmptyStringWhenNoPrefixExists() {
+        // Arrange: Create an attribute with a standard key like "id", which has no prefix.
+        Attribute attribute = new Attribute("id", "main-content");
+
+        // Act: Get the prefix from the attribute.
+        String prefix = attribute.prefix();
+
+        // Assert: The result should be an empty string.
+        assertEquals("", prefix);
+    }
+
+    /**
+     * Verifies that calling {@link Attribute#prefix()} on an attribute with a
+     * namespace prefix (e.g., "og:title") correctly extracts the prefix part.
+     * This test is added for completeness and to provide context for the test above.
+     */
+    @Test
+    public void prefixReturnsCorrectlyWhenPrefixExists() {
+        // Arrange: Create an attribute with a namespaced key.
+        Attribute attribute = new Attribute("og:title", "A Great Title");
+
+        // Act: Get the prefix from the attribute.
+        String prefix = attribute.prefix();
+
+        // Assert: The result should be the namespace prefix, "og".
+        assertEquals("og", prefix);
     }
 }
