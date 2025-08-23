@@ -1,25 +1,33 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class SegmentUtils_ESTestTest12 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * This test suite verifies the behavior of the {@link SegmentUtils} class,
+ * particularly its handling of invalid inputs.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that {@code countArgs} throws an {@code IllegalArgumentException}
+     * when the provided method descriptor string is invalid because it does not
+     * start with an opening parenthesis '('.
+     */
+    @Test
+    public void countArgsShouldThrowExceptionForDescriptorWithoutOpeningParenthesis() {
+        // A valid Java method descriptor for counting arguments must start with '('.
+        // This input is intentionally invalid to trigger the expected exception.
+        final String invalidDescriptor = "tp!Hg y";
+        final String expectedErrorMessage = "No arguments";
+
         try {
-            SegmentUtils.countArgs("tp!Hgy");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // No arguments
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentUtils", e);
+            SegmentUtils.countArgs(invalidDescriptor);
+            fail("Expected an IllegalArgumentException because the descriptor is invalid.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception has the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
