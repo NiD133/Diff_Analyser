@@ -1,21 +1,33 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertSame;
 
-public class ArrayFill_ESTestTest6 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        int[] intArray0 = new int[7];
-        int[] intArray1 = ArrayFill.fill(intArray0, (-1));
-        assertArrayEquals(new int[] { (-1), (-1), (-1), (-1), (-1), (-1), (-1) }, intArray1);
+    /**
+     * Tests that `ArrayFill.fill()` correctly populates an integer array
+     * with a given value and returns the same array instance.
+     */
+    @Test
+    public void fill_withIntArray_fillsArrayAndReturnsSameInstance() {
+        // Arrange
+        final int[] originalArray = new int[7];
+        final int fillValue = -1;
+        final int[] expectedArray = {-1, -1, -1, -1, -1, -1, -1};
+
+        // Act
+        final int[] resultArray = ArrayFill.fill(originalArray, fillValue);
+
+        // Assert
+        // 1. Verify the method returns the same array instance passed as input.
+        assertSame("The method should return the same array instance.", originalArray, resultArray);
+
+        // 2. Verify the array's contents were correctly modified.
+        assertArrayEquals("Each element in the array should be set to the fill value.", expectedArray, resultArray);
     }
 }
