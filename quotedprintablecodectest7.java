@@ -1,35 +1,35 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest7 {
+/**
+ * Tests the QuotedPrintableCodec's handling of null String inputs.
+ */
+@DisplayName("QuotedPrintableCodec Null Handling")
+class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+    @Test
+    @DisplayName("Encoding a null String should return null")
+    void encodeNullStringShouldReturnNull() throws EncoderException {
+        // The cast to (String) is necessary to resolve method ambiguity between
+        // encode(String) and encode(byte[]).
+        final String encodedResult = codec.encode((String) null);
 
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+        assertNull(encodedResult);
     }
 
     @Test
-    void testEncodeDecodeNull() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        assertNull(qpcodec.encode((String) null), "Null string quoted-printable encoding test");
-        assertNull(qpcodec.decode((String) null), "Null string quoted-printable decoding test");
+    @DisplayName("Decoding a null String should return null")
+    void decodeNullStringShouldReturnNull() throws DecoderException {
+        final String decodedResult = codec.decode((String) null);
+
+        assertNull(decodedResult);
     }
 }
