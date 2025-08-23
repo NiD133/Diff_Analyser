@@ -1,19 +1,25 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class OptionGroup_ESTestTest16 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        boolean boolean0 = optionGroup0.isRequired();
-        assertFalse(boolean0);
+    /**
+     * Verifies that a newly instantiated OptionGroup is not required by default.
+     */
+    @Test
+    public void newOptionGroupShouldNotBeRequired() {
+        // Arrange: Create a new OptionGroup instance.
+        OptionGroup optionGroup = new OptionGroup();
+
+        // Act: Check if the group is required.
+        boolean isRequired = optionGroup.isRequired();
+
+        // Assert: The group should not be required.
+        assertFalse("A new OptionGroup should not be required by default.", isRequired);
     }
 }
