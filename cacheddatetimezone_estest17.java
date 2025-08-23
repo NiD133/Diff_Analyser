@@ -1,25 +1,37 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest17 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Instant instant0 = Instant.now();
-        DateTimeZone dateTimeZone0 = instant0.getZone();
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        boolean boolean0 = cachedDateTimeZone0.equals(dateTimeZone0);
-        assertFalse(boolean0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that a CachedDateTimeZone instance is not considered equal to the
+     * original DateTimeZone instance it wraps.
+     *
+     * The equals() implementation in CachedDateTimeZone requires the other object
+     * to also be a CachedDateTimeZone for equality to be possible.
+     */
+    @Test
+    public void equals_returnsFalse_whenComparedWithUncachedZone() {
+        // Arrange: Create a standard, non-fixed time zone and its cached wrapper.
+        // Using a specific ID like "Europe/London" makes the test deterministic
+        // and independent of the system's default time zone.
+        DateTimeZone originalZone = DateTimeZone.forID("Europe/London");
+        DateTimeZone cachedZone = CachedDateTimeZone.forZone(originalZone);
+
+        // Sanity check to ensure we are not comparing the same object instance.
+        assertNotEquals("The cached zone should be a different object than the original",
+                originalZone, cachedZone);
+
+        // Act & Assert: Verify that the cached zone is not equal to the original zone.
+        assertFalse("A CachedDateTimeZone instance should not be equal to the raw DateTimeZone it wraps.",
+                cachedZone.equals(originalZone));
     }
 }
