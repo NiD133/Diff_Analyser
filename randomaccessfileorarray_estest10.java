@@ -1,35 +1,46 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * This class contains tests for the RandomAccessFileOrArray class.
+ * The original test class name is kept for context, but in a real-world scenario,
+ * it would be renamed to something like RandomAccessFileOrArrayTest.
+ */
 public class RandomAccessFileOrArray_ESTestTest10 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test009() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        byteArray0[2] = (byte) (-9);
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        double double0 = randomAccessFileOrArray0.readDouble();
-        assertEquals(8L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(1.34178037854316E-309, double0, 0.01);
+    /**
+     * Tests that readDouble() correctly reads 8 bytes from the source,
+     * interprets them as a big-endian double, and advances the internal pointer accordingly.
+     */
+    @Test
+    public void readDoubleShouldReturnCorrectValueAndAdvancePointer() throws IOException {
+        // Arrange
+        // An 8-byte array representing a double in big-endian format.
+        // The byte representation corresponds to the long value 0x0000F70000000000L.
+        byte[] inputBytes = new byte[8];
+        inputBytes[2] = (byte) 0xF7; // This is equivalent to (byte) -9
+
+        // The expected double value is derived from the IEEE 754 representation
+        // of the long bits. This makes the connection between the input bytes and
+        // the expected result explicit, avoiding a "magic number" in the assertion.
+        long longBits = 0x0000F70000000000L;
+        double expectedDouble = Double.longBitsToDouble(longBits);
+
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(inputBytes);
+
+        // Act
+        double actualDouble = reader.readDouble();
+        long finalFilePointer = reader.getFilePointer();
+
+        // Assert
+        // 1. Verify that the correct double value was read.
+        // A delta of 0.0 is used because the bit-level conversion should be exact.
+        assertEquals("The read double value should match the expected value.", expectedDouble, actualDouble, 0.0);
+
+        // 2. Verify that the file pointer advanced by 8 bytes (the size of a double).
+        assertEquals("The file pointer should advance by 8 after reading a double.", 8L, finalFilePointer);
     }
 }
