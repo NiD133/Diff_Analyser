@@ -1,30 +1,33 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonParser_ESTestTest20 extends JsonParser_ESTest_scaffolding {
+/**
+ * Test for {@link JsonParser}.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        StringReader stringReader0 = new StringReader("}Yz");
-        try {
-            jsonParser0.parse((Reader) stringReader0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // org.evosuite.runtime.mock.java.lang.MockThrowable: Expected value at line 1 column 1 path $
-            // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
-            //
-            verifyException("com.google.gson.internal.Streams", e);
-        }
+    @Test
+    public void parseReader_withMalformedJsonStartingWithClosingBrace_throwsJsonSyntaxException() {
+        // Arrange
+        String malformedJson = "}Yz";
+        Reader reader = new StringReader(malformedJson);
+
+        // Act & Assert
+        JsonSyntaxException thrown = assertThrows(
+            JsonSyntaxException.class,
+            () -> JsonParser.parseReader(reader)
+        );
+
+        // Verify the exception message for more precise feedback
+        assertTrue(
+            "The exception message should indicate the location of the syntax error.",
+            thrown.getMessage().startsWith("Expected value at line 1 column 1")
+        );
     }
 }
