@@ -1,38 +1,38 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest102 extends Elements_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test101() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("<m-2,eXTA:N5y7", "<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        boolean boolean0 = elements0.retainAll(linkedList0);
-        assertEquals(0, elements0.size());
-        assertTrue(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Contains tests for collection-modification methods of the {@link Elements} class.
+ */
+public class ElementsModificationTest {
+
+    /**
+     * Verifies that calling retainAll() with an empty collection correctly removes all
+     * elements from the list and returns true to indicate that the list was modified.
+     */
+    @Test
+    public void retainAllWithEmptyCollectionRemovesAllElements() {
+        // Arrange: Create a document and select a non-empty list of elements.
+        Document doc = Parser.parse("<div><p>One</p><span>Two</span></div>");
+        Elements elements = doc.select("*"); // Selects all elements: <html>, <head>, <body>, <div>, <p>, <span>
+
+        // Pre-condition check to ensure the test setup is valid.
+        assertFalse("The initial list of elements should not be empty.", elements.isEmpty());
+
+        // Act: Attempt to retain only the elements present in an empty collection.
+        boolean wasModified = elements.retainAll(Collections.emptyList());
+
+        // Assert: The list should now be empty, and the method should report a modification.
+        assertTrue("The elements list should be empty after the retainAll operation.", elements.isEmpty());
+        assertTrue("The retainAll method should return true, as the list was modified.", wasModified);
     }
 }
