@@ -1,31 +1,26 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest33 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for the {@link SimpleBloomFilter} class.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        Shape shape0 = Shape.fromKM(668, 668);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            simpleBloomFilter0.contains((IndexExtractor) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bloomfilter.SimpleBloomFilter", e);
-        }
+    /**
+     * Tests that calling the contains() method with a null IndexExtractor
+     * correctly throws a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void contains_withNullIndexExtractor_shouldThrowNullPointerException() {
+        // Arrange: Create a Bloom filter with an arbitrary shape.
+        // The specific dimensions of the shape do not affect this test.
+        Shape shape = Shape.fromKM(10, 100);
+        SimpleBloomFilter bloomFilter = new SimpleBloomFilter(shape);
+
+        // Act: Attempt to check for containment using a null IndexExtractor.
+        // The assertion is handled by the @Test(expected=...) annotation, which
+        // verifies that a NullPointerException is thrown.
+        bloomFilter.contains((IndexExtractor) null);
     }
 }
