@@ -1,23 +1,28 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest49 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Tests for the {@link QuotedPrintableCodec} class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec();
-        String string0 = quotedPrintableCodec0.encode((String) null);
-        assertNull(string0);
+    /**
+     * Tests that encoding a null String returns null, which is a common contract
+     * for encoder implementations.
+     */
+    @Test
+    public void encodeStringShouldReturnNullForNullInput() {
+        // Arrange
+        QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        // Act
+        // The cast to (String) is necessary to resolve ambiguity between the
+        // overloaded encode(String) and encode(Object) methods.
+        String encodedString = codec.encode((String) null);
+
+        // Assert
+        assertNull("Encoding a null String should result in a null value.", encodedString);
     }
 }
