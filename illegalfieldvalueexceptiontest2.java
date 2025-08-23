@@ -1,37 +1,43 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.field.FieldUtils;
 import org.joda.time.field.SkipDateTimeField;
+import org.junit.jupiter.api.Test;
 
-public class IllegalFieldValueExceptionTestTest2 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Tests for {@link IllegalFieldValueException}.
+ */
+class IllegalFieldValueExceptionTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestIllegalFieldValueException.class);
-    }
+    @Test
+    void setOnSkipDateTimeField_withSkippedValue_throwsExceptionWithCorrectDetails() {
+        // Arrange
+        final int skippedYear = 1970;
+        DateTimeField yearField = ISOChronology.getInstanceUTC().year();
+        DateTimeField fieldToTest = new SkipDateTimeField(ISOChronology.getInstanceUTC(), yearField, skippedYear);
 
-    public void testSkipDateTimeField() {
-        DateTimeField field = new SkipDateTimeField(ISOChronology.getInstanceUTC(), ISOChronology.getInstanceUTC().year(), 1970);
-        try {
-            field.set(0, 1970);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.year(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("year", e.getFieldName());
-            assertEquals(new Integer(1970), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("1970", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
+        // Act & Assert
+        // The set() method is expected to throw an exception when trying to set the skipped value.
+        IllegalFieldValueException thrownException = assertThrows(
+            IllegalFieldValueException.class,
+            () -> fieldToTest.set(0L, skippedYear)
+        );
+
+        // Assert that the exception contains the correct details about the failure.
+        assertAll("Exception properties",
+            () -> assertEquals(DateTimeFieldType.year(), thrownException.getDateTimeFieldType(), "DateTime field type should be 'year'"),
+            () -> assertNull(thrownException.getDurationFieldType(), "Duration field type should be null"),
+            () -> assertEquals("year", thrownException.getFieldName(), "Field name should be 'year'"),
+            () -> assertEquals(Integer.valueOf(skippedYear), thrownException.getIllegalNumberValue(), "Illegal number value should be the skipped year"),
+            () -> assertNull(thrownException.getIllegalStringValue(), "Illegal string value should be null"),
+            () -> assertEquals(String.valueOf(skippedYear), thrownException.getIllegalValueAsString(), "Illegal value as string should be the skipped year"),
+            () -> assertNull(thrownException.getLowerBound(), "Lower bound should be null"),
+            () -> assertNull(thrownException.getUpperBound(), "Upper bound should be null")
+        );
     }
 }
