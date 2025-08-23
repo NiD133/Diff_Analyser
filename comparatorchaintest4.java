@@ -1,22 +1,41 @@
 package org.apache.commons.collections4.comparators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ComparatorChainTestTest4 extends AbstractComparatorTest<ComparatorChainTest.PseudoRow> {
+/**
+ * Tests for {@link ComparatorChain}, specifically for version 4 compatibility.
+ * <p>
+ * This class extends {@link AbstractComparatorTest} to leverage a suite of
+ * generic comparator tests.
+ * </p>
+ */
+public class ComparatorChainTest extends AbstractComparatorTest<ComparatorChainTest.PseudoRow> {
 
+    /**
+     * Provides a list of {@link PseudoRow} objects in the exact order expected
+     * from the comparator created by {@link #makeObject()}.
+     */
     @Override
     public List<PseudoRow> getComparableObjectsOrdered() {
-        // this is the correct order assuming a
-        // "0th forward, 1st reverse, 2nd forward" sort
-        return new LinkedList<>(Arrays.asList(new PseudoRow(1, 2, 3), new PseudoRow(2, 3, 5), new PseudoRow(2, 2, 4), new PseudoRow(2, 2, 8), new PseudoRow(3, 1, 0), new PseudoRow(4, 4, 4), new PseudoRow(4, 4, 7)));
+        // The ordering is based on a chain that sorts by:
+        // column 0 in ascending order,
+        // then column 1 in descending order,
+        // then column 2 in ascending order.
+        return Arrays.asList(
+            new PseudoRow(1, 2, 3),
+            new PseudoRow(2, 3, 5),
+            new PseudoRow(2, 2, 4),
+            new PseudoRow(2, 2, 8),
+            new PseudoRow(3, 1, 0),
+            new PseudoRow(4, 4, 4),
+            new PseudoRow(4, 4, 7)
+        );
     }
 
     @Override
@@ -24,22 +43,29 @@ public class ComparatorChainTestTest4 extends AbstractComparatorTest<ComparatorC
         return "4";
     }
 
+    /**
+     * Creates an instance of the {@link ComparatorChain} to be tested.
+     */
     @Override
     public Comparator<PseudoRow> makeObject() {
+        // Create a chain that sorts by:
+        // 1. column 0 (ascending)
+        // 2. column 1 (descending)
+        // 3. column 2 (ascending)
         final ComparatorChain<PseudoRow> chain = new ComparatorChain<>(new ColumnComparator(0));
-        // reverse the second column
-        chain.addComparator(new ColumnComparator(1), true);
-        chain.addComparator(new ColumnComparator(2), false);
+        chain.addComparator(new ColumnComparator(1), true);  // true = descending order
+        chain.addComparator(new ColumnComparator(2), false); // false = ascending order
         return chain;
     }
 
+    /**
+     * A helper comparator that compares two {@link PseudoRow} objects based on a single column.
+     */
     public static class ColumnComparator implements Comparator<PseudoRow>, Serializable {
-
         private static final long serialVersionUID = -2284880866328872105L;
+        protected final int colIndex;
 
-        protected int colIndex;
-
-        ColumnComparator(final int colIndex) {
+        public ColumnComparator(final int colIndex) {
             this.colIndex = colIndex;
         }
 
@@ -59,19 +85,21 @@ public class ComparatorChainTestTest4 extends AbstractComparatorTest<ComparatorC
         }
     }
 
+    /**
+     * A helper class for tests that represents a row of data with three integer columns.
+     */
     public static class PseudoRow implements Serializable {
-
-        /**
-         * Generated serial version ID.
-         */
         private static final long serialVersionUID = 8085570439751032499L;
+        public final int[] cols = new int[3];
 
-        public int[] cols = new int[3];
-
-        PseudoRow(final int col1, final int col2, final int col3) {
+        public PseudoRow(final int col1, final int col2, final int col3) {
             cols[0] = col1;
             cols[1] = col2;
             cols[2] = col3;
+        }
+
+        public int getColumn(final int colIndex) {
+            return cols[colIndex];
         }
 
         @Override
@@ -80,11 +108,7 @@ public class ComparatorChainTestTest4 extends AbstractComparatorTest<ComparatorC
                 return false;
             }
             final PseudoRow row = (PseudoRow) o;
-            return getColumn(0) == row.getColumn(0) && getColumn(1) == row.getColumn(1) && getColumn(2) == row.getColumn(2);
-        }
-
-        public int getColumn(final int colIndex) {
-            return cols[colIndex];
+            return Arrays.equals(cols, row.cols);
         }
 
         @Override
@@ -94,18 +118,27 @@ public class ComparatorChainTestTest4 extends AbstractComparatorTest<ComparatorC
 
         @Override
         public String toString() {
-            return "[" + cols[0] + "," + cols[1] + "," + cols[2] + "]";
+            return Arrays.toString(cols);
         }
     }
 
+    /**
+     * Tests that a ComparatorChain constructed from a list containing a single
+     * comparator behaves identically to that single comparator.
+     */
     @Test
-    void testListComparatorChain() {
-        final List<Comparator<Integer>> list = new LinkedList<>();
-        list.add(new ComparableComparator<>());
-        final ComparatorChain<Integer> chain = new ComparatorChain<>(list);
-        final Integer i1 = 4;
-        final Integer i2 = 6;
-        final int correctValue = i1.compareTo(i2);
-        assertEquals(chain.compare(i1, i2), correctValue, "Comparison returns the right order");
+    void testChainConstructedFromList_withSingleComparator() {
+        // Arrange
+        final Integer value1 = 4;
+        final Integer value2 = 6;
+        final List<Comparator<Integer>> comparators = Arrays.asList(new ComparableComparator<>());
+        final ComparatorChain<Integer> chain = new ComparatorChain<>(comparators);
+
+        // Act
+        final int actualResult = chain.compare(value1, value2);
+
+        // Assert
+        final int expectedResult = value1.compareTo(value2);
+        assertEquals(expectedResult, actualResult, "A chain with one comparator should behave like that comparator.");
     }
 }
