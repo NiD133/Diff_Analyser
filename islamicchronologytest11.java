@@ -1,80 +1,32 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Test;
 
-public class IslamicChronologyTestTest11 extends TestCase {
-
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+/**
+ * Tests the epoch of the IslamicChronology.
+ * The Islamic calendar epoch (Year 1, Month 1, Day 1) corresponds to
+ * July 16, 622 CE in the proleptic Julian calendar.
+ */
+public class IslamicChronologyEpochTest {
 
     private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
-
     private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
 
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
+    @Test
+    public void testEpoch_correspondsToJulianCalendarEpoch() {
+        // The Islamic calendar epoch is defined as the start of Year 1, Month 1, Day 1.
+        final DateTime islamicEpoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ISLAMIC_UTC);
 
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
+        // This date corresponds to July 16, 622 CE in the Julian calendar, which marks the Hijra.
+        final DateTime expectedJulianDate = new DateTime(622, 7, 16, 0, 0, 0, 0, JULIAN_UTC);
 
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testEpoch() {
-        DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0, 0, ISLAMIC_UTC);
-        DateTime expectedEpoch = new DateTime(622, 7, 16, 0, 0, 0, 0, JULIAN_UTC);
-        assertEquals(expectedEpoch.getMillis(), epoch.getMillis());
+        // Verify that the millisecond representation of both dates is identical.
+        assertEquals("The Islamic epoch millis should match the corresponding Julian date millis",
+                expectedJulianDate.getMillis(), islamicEpoch.getMillis());
     }
 }
