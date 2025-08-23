@@ -1,24 +1,28 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
 import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class StandardEntityCollection_ESTestTest13 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        Iterator<ChartEntity> iterator0 = standardEntityCollection0.iterator();
-        assertNotNull(iterator0);
+    /**
+     * Verifies that the iterator() method returns a non-null iterator
+     * when the collection is empty. This ensures that clients can safely
+     * iterate over any collection without a null check.
+     */
+    @Test
+    public void iterator_onEmptyCollection_shouldReturnNonNullIterator() {
+        // Arrange: Create a new, empty entity collection.
+        StandardEntityCollection emptyCollection = new StandardEntityCollection();
+
+        // Act: Request an iterator from the empty collection.
+        Iterator<ChartEntity> iterator = emptyCollection.iterator();
+
+        // Assert: The returned iterator should not be null.
+        assertNotNull("The iterator for an empty collection should never be null.", iterator);
     }
 }
