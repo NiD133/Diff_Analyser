@@ -1,30 +1,26 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest19 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link SimpleBloomFilter}.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Shape shape0 = Shape.fromNMK(15, 15, 15);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        // Undeclared exception!
-        try {
-            simpleBloomFilter0.processBitMapPairs(simpleBloomFilter0, (LongBiPredicate) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that {@code processBitMapPairs} throws a NullPointerException when the
+     * provided LongBiPredicate is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testProcessBitMapPairsWithNullPredicateThrowsNullPointerException() {
+        // Arrange: Create a filter to call the method on.
+        // The shape parameters are arbitrary but valid.
+        final Shape shape = Shape.fromNMK(15, 15, 15);
+        final SimpleBloomFilter filter = new SimpleBloomFilter(shape);
+
+        // Act: Call the method with a null predicate.
+        // The other filter can be any valid BitMapExtractor, including itself.
+        // The @Test(expected) annotation will assert that a NullPointerException is thrown.
+        filter.processBitMapPairs(filter, null);
     }
 }
