@@ -1,45 +1,47 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest14 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        CopticDate copticDate0 = CopticDate.ofEpochDay((-4481L));
-        Symmetry010Date symmetry010Date0 = symmetry010Chronology0.INSTANCE.date((TemporalAccessor) copticDate0);
-        assertEquals(IsoEra.CE, symmetry010Date0.getEra());
+/**
+ * A test suite for the {@link Symmetry010Chronology} class.
+ * This focuses on creating dates from other calendar systems.
+ */
+public class Symmetry010ChronologyTest {
+
+    /**
+     * Tests that a {@link Symmetry010Date} can be correctly created from a date
+     * in a different calendar system, specifically {@link CopticDate}.
+     *
+     * The core contract of {@link Symmetry010Chronology#date(TemporalAccessor)} is that
+     * the resulting date must represent the same point in the timeline (i.e., have the
+     * same epoch day) as the source date.
+     */
+    @Test
+    public void shouldCreateEquivalentDateWhenConvertingFromCopticDate() {
+        // Arrange
+        // The epoch day -4481L corresponds to the ISO date 1957-09-11.
+        // We use a CopticDate as the input TemporalAccessor from a different chronology.
+        long epochDay = -4481L;
+        CopticDate inputCopticDate = CopticDate.ofEpochDay(epochDay);
+        Symmetry010Chronology symmetryChronology = Symmetry010Chronology.INSTANCE;
+
+        // Act
+        // Convert the CopticDate to a Symmetry010Date using the chronology.
+        Symmetry010Date actualSymmetryDate = symmetryChronology.date(inputCopticDate);
+
+        // Assert
+        // 1. The primary assertion: the resulting date must have the same epoch day.
+        // This confirms the conversion correctly preserves the point in time.
+        assertEquals("The epoch day should be preserved after conversion",
+                epochDay, actualSymmetryDate.toEpochDay());
+
+        // 2. A secondary assertion (from the original test): the era should be correct.
+        // A date corresponding to 1957 is in the Common Era (CE).
+        assertEquals("The era should be Common Era (CE)",
+                IsoEra.CE, actualSymmetryDate.getEra());
     }
 }
