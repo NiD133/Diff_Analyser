@@ -1,42 +1,42 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class WeeksTestTest16 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final int DAYS_PER_WEEK = 7;
+    private static final int HOURS_PER_DAY = 24;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Tests that a standard conversion from a number of weeks to hours is calculated correctly.
+     */
+    @Test
+    public void testToStandardHours_convertsCorrectly() {
+        // Arrange
+        final Weeks twoWeeks = Weeks.weeks(2);
+        final Hours expectedHours = Hours.hours(2 * DAYS_PER_WEEK * HOURS_PER_DAY);
+
+        // Act
+        final Hours actualHours = twoWeeks.toStandardHours();
+
+        // Assert
+        assertEquals(expectedHours, actualHours);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardHours() {
-        Weeks test = Weeks.weeks(2);
-        Hours expected = Hours.hours(2 * 7 * 24);
-        assertEquals(expected, test.toStandardHours());
-        try {
-            Weeks.MAX_VALUE.toStandardHours();
-            fail();
-        } catch (ArithmeticException ex) {
-            // expected
-        }
+    /**
+     * Tests that attempting to convert the maximum number of weeks to hours
+     * throws an ArithmeticException, as the result would overflow an integer.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void testToStandardHours_whenResultOverflows_throwsArithmeticException() {
+        // Act
+        // This operation should fail with an overflow.
+        Weeks.MAX_VALUE.toStandardHours();
+        
+        // Assert is handled by the 'expected' parameter of the @Test annotation.
     }
 }
