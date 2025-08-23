@@ -1,29 +1,35 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.EOFException;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NullReader_ESTestTest11 extends NullReader_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        NullReader nullReader0 = new NullReader(1L, false, true);
-        char[] charArray0 = new char[1];
-        nullReader0.read(charArray0);
-        try {
-            nullReader0.read(charArray0, 2146374983, 3917);
-            fail("Expecting exception: EOFException");
-        } catch (EOFException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.NullReader", e);
-        }
+/**
+ * Unit tests for the {@link NullReader} class.
+ */
+public class NullReaderTest {
+
+    /**
+     * Tests that an EOFException is thrown when attempting to read past the end of the stream
+     * if the 'throwEofException' flag is enabled.
+     */
+    @Test
+    public void testReadPastEndWhenThrowEofExceptionIsTrueThrowsEOFException() throws IOException {
+        // Arrange: Create a reader of size 1, configured to throw an exception at EOF.
+        final long size = 1L;
+        final boolean throwEofException = true;
+        final boolean markSupported = false; // This parameter is not relevant for this test case.
+        final NullReader reader = new NullReader(size, markSupported, throwEofException);
+
+        // Act: Read the entire content of the reader to reach its end.
+        // This is the setup for the main assertion.
+        char[] buffer = new char[1];
+        reader.read(buffer);
+
+        // Assert: Verify that a subsequent read attempt throws an EOFException.
+        assertThrows(EOFException.class, () -> reader.read(new char[10], 0, 10));
     }
 }
