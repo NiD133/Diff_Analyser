@@ -1,31 +1,30 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.FileChannel;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MultiReadOnlySeekableByteChannel_ESTestTest35 extends MultiReadOnlySeekableByteChannel_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MultiReadOnlySeekableByteChannel} class.
+ */
+public class MultiReadOnlySeekableByteChannelTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        SeekableByteChannel[] seekableByteChannelArray0 = new SeekableByteChannel[0];
-        SeekableByteChannel seekableByteChannel0 = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(seekableByteChannelArray0);
-        assertEquals(0L, seekableByteChannel0.position());
+    /**
+     * Verifies that creating a composite channel from an empty array of channels
+     * results in a valid, empty channel. An empty channel should have a size
+     * and an initial position of zero.
+     */
+    @Test
+    public void forSeekableByteChannelsWithEmptyArrayReturnsEmptyChannel() throws IOException {
+        // Arrange: Define an empty source of channels.
+        SeekableByteChannel[] emptyChannelArray = new SeekableByteChannel[0];
+
+        // Act: Create a multi-channel from the empty array.
+        SeekableByteChannel resultChannel = MultiReadOnlySeekableByteChannel.forSeekableByteChannels(emptyChannelArray);
+
+        // Assert: The resulting channel should behave as an empty channel.
+        assertEquals("Position of an empty combined channel should be 0", 0L, resultChannel.position());
+        assertEquals("Size of an empty combined channel should be 0", 0L, resultChannel.size());
     }
 }
