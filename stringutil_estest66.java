@@ -1,29 +1,30 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest66 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        StringBuilder stringBuilder0 = StringUtil.borrowBuilder();
-        StringUtil.appendNormalisedWhitespace(stringBuilder0, "width must be >= 0", true);
-        assertEquals("width must be >= 0", stringBuilder0.toString());
+    /**
+     * Verifies that appendNormalisedWhitespace does not alter a string that
+     * already contains normalised whitespace, even when stripLeading is true.
+     */
+    @Test
+    public void appendNormalisedWhitespaceOnAlreadyNormalisedStringIsUnchanged() {
+        // Arrange
+        StringBuilder accumulator = StringUtil.borrowBuilder();
+        String inputString = "width must be >= 0";
+        // The input string has no leading, trailing, or consecutive whitespace.
+        // Therefore, it should remain unchanged.
+        String expected = "width must be >= 0";
+
+        // Act
+        StringUtil.appendNormalisedWhitespace(accumulator, inputString, true);
+
+        // Assert
+        assertEquals(expected, accumulator.toString());
     }
 }
