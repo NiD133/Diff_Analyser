@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Weeks_ESTestTest47 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Weeks weeks0 = Weeks.MAX_VALUE;
-        Weeks weeks1 = weeks0.dividedBy((-1));
-        assertEquals((-2147483647), weeks1.getWeeks());
+    /**
+     * Tests that dividing Weeks.MAX_VALUE by -1 results in a Weeks object
+     * holding the correctly negated value.
+     */
+    @Test
+    public void dividedBy_whenDividingMaxValueByNegativeOne_returnsNegatedValue() {
+        // Arrange: Start with the maximum possible Weeks value.
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        int expectedWeeks = -Integer.MAX_VALUE;
+
+        // Act: Divide by -1.
+        Weeks result = maxWeeks.dividedBy(-1);
+
+        // Assert: The result should hold the negated value of Integer.MAX_VALUE.
+        assertEquals(expectedWeeks, result.getWeeks());
     }
 }
