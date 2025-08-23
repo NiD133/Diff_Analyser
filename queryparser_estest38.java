@@ -1,25 +1,32 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest38 extends QueryParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        // Undeclared exception!
+/**
+ * Test suite for exception handling in the QueryParser.
+ */
+public class QueryParserExceptionTest {
+
+    /**
+     * Verifies that parsing a query with an `:eq()` pseudo-selector that is missing its
+     * required numeric index argument throws an IllegalStateException.
+     */
+    @Test
+    public void parse_onEqPseudoSelectorWithMissingIndex_shouldThrowException() {
+        // The query "I>tD:eq" is invalid because the :eq pseudo-selector requires a
+        // numeric index in parentheses, for example: :eq(0).
+        String invalidQuery = "I>tD:eq";
+
         try {
-            QueryParser.parse("I>tD:eq");
-            fail("Expecting exception: IllegalStateException");
+            QueryParser.parse(invalidQuery);
+            fail("Expected an IllegalStateException for an :eq selector with a missing index, but no exception was thrown.");
         } catch (IllegalStateException e) {
-            //
-            // Index must be numeric
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
+            // Verify that the exception is thrown for the correct reason.
+            String expectedMessage = "Index must be numeric";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
