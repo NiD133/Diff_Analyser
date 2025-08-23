@@ -1,13 +1,19 @@
 package org.apache.commons.codec.language;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.apache.commons.codec.AbstractStringEncoderTest;
 import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class SoundexTestTest16 extends AbstractStringEncoderTest<Soundex> {
+/**
+ * Tests the {@link Soundex} encoder.
+ *
+ * <p>This class includes test cases based on examples from the MS SQL Server T-SQL reference.</p>
+ */
+public class SoundexTest extends AbstractStringEncoderTest<Soundex> {
 
     @Override
     protected Soundex createStringEncoder() {
@@ -15,14 +21,22 @@ public class SoundexTestTest16 extends AbstractStringEncoderTest<Soundex> {
     }
 
     /**
-     * Examples for MS SQLServer from
-     * https://support.microsoft.com/default.aspx?scid=https://support.microsoft.com:80/support
-     * /kb/articles/Q100/3/65.asp&NoWebContent=1
+     * Tests that different phonetic spellings of "Erickson" are all encoded to the same Soundex code.
      *
-     * @throws EncoderException for some failure scenarios
+     * @param nameVariant a spelling variation of the name "Erickson"
+     * @throws EncoderException if encoding fails
      */
-    @Test
-    void testMsSqlServer2() throws EncoderException {
-        checkEncodingVariations("E625", new String[] { "Erickson", "Erickson", "Erikson", "Ericson", "Ericksen", "Ericsen" });
+    @DisplayName("Phonetic variations of 'Erickson' should all encode to E625")
+    @ParameterizedTest(name = "Encoding \"{0}\"")
+    @ValueSource(strings = {
+        "Erickson",
+        "Erikson",
+        "Ericson",
+        "Ericksen",
+        "Ericsen"
+    })
+    void testEricksonVariationsShouldEncodeToE625(final String nameVariant) throws EncoderException {
+        final String expectedSoundex = "E625";
+        assertEquals(expectedSoundex, getStringEncoder().encode(nameVariant));
     }
 }
