@@ -1,57 +1,49 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TextHelpAppendable_ESTestTest73 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for the {@link TextHelpAppendable} class, focusing on table formatting logic.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test72() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        ArrayList<TextStyle> arrayList0 = new ArrayList<TextStyle>();
-        TextStyle textStyle0 = TextStyle.DEFAULT;
-        arrayList0.add(textStyle0);
-        LinkedHashSet<List<String>> linkedHashSet0 = new LinkedHashSet<List<String>>();
-        ArrayList<String> arrayList1 = new ArrayList<String>();
-        TableDefinition tableDefinition0 = TableDefinition.from("", arrayList0, arrayList1, linkedHashSet0);
-        // Undeclared exception!
+    /**
+     * Verifies that {@link TextHelpAppendable#adjustTableFormat(TableDefinition)} throws
+     * an {@link IndexOutOfBoundsException} when the table definition provides more
+     * style columns than header columns. This is an invalid state, as each style
+     * corresponds to a header.
+     */
+    @Test
+    public void adjustTableFormatThrowsExceptionWhenStylesExceedHeaders() {
+        // Arrange: Create a TextHelpAppendable instance.
+        final TextHelpAppendable textHelpAppendable = TextHelpAppendable.systemOut();
+
+        // Arrange: Define a table with one style but zero headers. This mismatch is
+        // expected to cause an IndexOutOfBoundsException when the method tries to
+        // access a header that doesn't exist.
+        final ArrayList<TextStyle> styles = new ArrayList<>();
+        styles.add(TextStyle.DEFAULT);
+
+        final ArrayList<String> emptyHeaders = new ArrayList<>();
+        final LinkedHashSet<List<String>> noRows = new LinkedHashSet<>();
+
+        final TableDefinition tableDefinition = TableDefinition.from("Test Table", styles, emptyHeaders, noRows);
+
+        // Act & Assert
         try {
-            textHelpAppendable0.adjustTableFormat(tableDefinition0);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // Index: 0, Size: 0
-            //
-            verifyException("java.util.ArrayList", e);
+            textHelpAppendable.adjustTableFormat(tableDefinition);
+            fail("Expected an IndexOutOfBoundsException to be thrown due to more styles than headers.");
+        } catch (final IndexOutOfBoundsException e) {
+            // Assert: Verify the exception is thrown because of an attempt to access
+            // index 0 of an empty list (the headers).
+            final String expectedMessage = "Index: 0, Size: 0";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
