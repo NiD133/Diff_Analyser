@@ -1,35 +1,37 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * This class contains the test case from the original file.
+ * The surrounding test suite structure is kept for context.
+ */
 public class LinkedTreeMap_ESTestTest19 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = new Integer((-1916));
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = new LinkedTreeMap.Node<Integer, Integer>(false);
-        linkedTreeMap0.root = linkedTreeMap_Node0;
-        // Undeclared exception!
-        try {
-            linkedTreeMap0.put(integer0, integer0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that calling put() on a map with a manually corrupted root node
+     * (specifically, a root with a null key) throws a NullPointerException.
+     *
+     * This scenario tests the robustness of the put method when faced with an
+     * invalid internal state, which should not occur in normal operation but
+     * could happen due to unforeseen bugs or reflection-based manipulation.
+     */
+    @Test(expected = NullPointerException.class)
+    public void put_whenRootNodeHasNullKey_throwsNullPointerException() {
+        // Arrange: Create a map and simulate a corrupted state by manually setting
+        // its root to a node that has a null key. The internal implementation
+        // of LinkedTreeMap expects the root node to always have a non-null key.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        
+        // This creates a special-purpose node, normally used only for the map's header,
+        // which has a null key.
+        LinkedTreeMap.Node<Integer, String> rootWithNullKey = new LinkedTreeMap.Node<>(false);
+        map.root = rootWithNullKey;
+
+        // Act: Attempt to add an element to the map. The put operation will try to
+        // compare the new key with the root's null key, causing the NPE.
+        map.put(1, "one");
+
+        // Assert: The @Test(expected) annotation verifies that a NullPointerException was thrown.
     }
 }
