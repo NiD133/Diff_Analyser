@@ -1,18 +1,31 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest27 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        int int0 = iOCase0.checkIndexOf("aRG9v=v)b", 2351, "");
-        assertEquals((-1), int0);
+    /**
+     * Tests that checkIndexOf returns -1 when the starting search index is out of bounds.
+     * This holds true even when searching for an empty string, which differs from
+     * String.indexOf() behavior in some JDK versions.
+     */
+    @Test
+    public void checkIndexOfShouldReturnNegativeOneForOutOfBoundsStartIndex() {
+        // Arrange
+        final IOCase ioCase = IOCase.SYSTEM;
+        final String text = "some arbitrary text";
+        final String searchString = "";
+        // An index safely outside the bounds of the 'text' string.
+        final int outOfBoundsIndex = text.length() + 1;
+
+        // Act
+        final int actualIndex = ioCase.checkIndexOf(text, outOfBoundsIndex, searchString);
+
+        // Assert
+        assertEquals("Expected -1 for an out-of-bounds start index", -1, actualIndex);
     }
 }
