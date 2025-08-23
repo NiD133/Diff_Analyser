@@ -1,59 +1,78 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CombinedRangeXYPlot;
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ClusteredXYBarRenderer_ESTestTest16 extends ClusteredXYBarRenderer_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * This test class focuses on the behavior of the ClusteredXYBarRenderer.
+ * The original test class name is preserved to maintain context, but in a
+ * real-world scenario, it would be renamed to ClusteredXYBarRendererTest.
+ */
+public class ClusteredXYBarRenderer_ESTestTest16 {
+
+    /**
+     * Verifies that the drawItem() method throws a ClassCastException when
+     * provided with a dataset that does not implement the IntervalXYDataset
+     * interface. The renderer requires interval data to correctly calculate
+     * bar positions and widths, and this test ensures it fails predictably
+     * with incompatible data types.
+     */
     @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        CombinedRangeXYPlot<Short> combinedRangeXYPlot0 = new CombinedRangeXYPlot<Short>();
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-        CategoryCrosshairState<Short, Short> categoryCrosshairState0 = new CategoryCrosshairState<Short, Short>();
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer(2, false);
-        CyclicNumberAxis cyclicNumberAxis0 = new CyclicNumberAxis(0.0, 0.0);
-        DefaultXYZDataset<Short> defaultXYZDataset0 = new DefaultXYZDataset<Short>();
-        // Undeclared exception!
+    public void drawItem_withNonIntervalDataset_shouldThrowClassCastException() {
+        // Arrange: Create a renderer and a dataset that is NOT an IntervalXYDataset.
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        // DefaultXYZDataset is a valid XYDataset but does not provide interval information.
+        XYDataset nonIntervalDataset = new DefaultXYZDataset();
+
+        // Arrange: Set up dummy objects required by the drawItem() method signature.
+        // These are not central to the test's logic but are necessary for the method call.
+        XYPlot plot = new CombinedRangeXYPlot<>();
+        Rectangle2D dataArea = new Rectangle2D.Double();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(new ChartRenderingInfo());
+        ValueAxis domainAxis = new CyclicNumberAxis(0.0);
+        ValueAxis rangeAxis = new CyclicNumberAxis(0.0);
+        int series = 0;
+        int item = 0;
+        int pass = 0;
+
+        // Act & Assert: Expect a ClassCastException when calling drawItem() with the
+        // incompatible dataset.
         try {
-            clusteredXYBarRenderer0.drawItem((Graphics2D) null, (XYItemRendererState) null, rectangle2D_Double0, plotRenderingInfo0, combinedRangeXYPlot0, cyclicNumberAxis0, cyclicNumberAxis0, defaultXYZDataset0, 2, (-3493), categoryCrosshairState0, 2);
-            fail("Expecting exception: ClassCastException");
+            renderer.drawItem(
+                    null,           // g2 (Graphics2D)
+                    null,           // state (XYItemRendererState)
+                    dataArea,
+                    plotInfo,
+                    plot,
+                    domainAxis,
+                    rangeAxis,
+                    nonIntervalDataset,
+                    series,
+                    item,
+                    null,           // crosshairState
+                    pass
+            );
+            fail("A ClassCastException was expected because the dataset is not an IntervalXYDataset.");
         } catch (ClassCastException e) {
-            //
-            // class org.jfree.data.xy.DefaultXYZDataset cannot be cast to class org.jfree.data.xy.IntervalXYDataset (org.jfree.data.xy.DefaultXYZDataset and org.jfree.data.xy.IntervalXYDataset are in unnamed module of loader org.evosuite.instrumentation.InstrumentingClassLoader @9a99bfa)
-            //
-            verifyException("org.jfree.chart.renderer.xy.ClusteredXYBarRenderer", e);
+            // Success: The expected exception was caught.
+            // Verify the exception message to confirm the cause of the failure.
+            String expectedMessageFragment = "cannot be cast to class org.jfree.data.xy.IntervalXYDataset";
+            assertTrue(
+                "The exception message should clearly indicate the casting error.",
+                e.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
