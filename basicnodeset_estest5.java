@@ -1,31 +1,39 @@
 package org.apache.commons.jxpath;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BasicNodeSet_ESTestTest5 extends BasicNodeSet_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        VariablePointer variablePointer0 = new VariablePointer((QName) null);
-        basicNodeSet0.add((Pointer) variablePointer0);
-        // Undeclared exception!
+/**
+ * Contains tests for the {@link BasicNodeSet} class.
+ * This class focuses on specific behaviors and edge cases.
+ */
+public class BasicNodeSetTest {
+
+    /**
+     * Tests that calling getNodes() on a set containing a pointer to an
+     * undefined variable throws a RuntimeException.
+     *
+     * The VariablePointer is created with a null QName, which cannot be resolved
+     * in any JXPathContext, thus simulating a reference to an undefined variable.
+     */
+    @Test
+    public void getNodesShouldThrowExceptionForUndefinedVariable() {
+        // Arrange: Create a node set and add a pointer to an undefined variable.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+        Pointer undefinedVariablePointer = new VariablePointer((QName) null);
+        nodeSet.add(undefinedVariablePointer);
+
+        // Act & Assert: Attempting to get nodes should fail because the variable is undefined.
         try {
-            basicNodeSet0.getNodes();
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Undefined variable: null
-            //
-            verifyException("org.apache.commons.jxpath.ri.model.VariablePointer$1", e);
+            nodeSet.getNodes();
+            fail("Expected a RuntimeException because the node set contains a pointer to an undefined variable.");
+        } catch (final RuntimeException e) {
+            // Verify that the exception message correctly identifies the issue.
+            assertEquals("Undefined variable: null", e.getMessage());
         }
     }
 }
