@@ -1,27 +1,36 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class LinkedTreeMap_ESTestTest62 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link LinkedTreeMap} class.
+ */
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Set<Map.Entry<Integer, Integer>> set0 = (Set<Map.Entry<Integer, Integer>>) linkedTreeMap0.entrySet();
-        linkedTreeMap0.remove((Object) set0);
-        assertTrue(set0.isEmpty());
-        assertEquals(0, linkedTreeMap0.size());
+    /**
+     * Tests that calling `remove()` with a key of an incompatible type
+     * does not modify the map or throw a ClassCastException.
+     */
+    @Test
+    public void removeWithIncompatibleKeyTypeShouldNotModifyMap() {
+        // Arrange
+        Map<Integer, Integer> map = new LinkedTreeMap<>();
+        assertTrue("Map should be empty initially", map.isEmpty());
+
+        // An object of a type that cannot be a key in this map.
+        // The map's own entrySet is used here as a convenient example.
+        Object incompatibleKey = map.entrySet();
+
+        // Act
+        // This call should be gracefully ignored, returning null without modifying the map.
+        map.remove(incompatibleKey);
+
+        // Assert
+        // The map's state should remain unchanged.
+        assertTrue("Map should remain empty after the remove operation", map.isEmpty());
+        assertEquals("Map size should still be 0", 0, map.size());
     }
 }
