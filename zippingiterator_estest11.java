@@ -1,36 +1,28 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
+
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ZippingIterator_ESTestTest11 extends ZippingIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ZippingIterator} class.
+ */
+public class ZippingIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Iterator<Integer> iterator0 = linkedList0.iterator();
-        ZippingIterator<Integer> zippingIterator0 = new ZippingIterator<Integer>(iterator0, iterator0, iterator0);
-        ZippingIterator<Object> zippingIterator1 = new ZippingIterator<Object>(zippingIterator0, iterator0, iterator0);
-        // Undeclared exception!
-        try {
-            zippingIterator1.remove();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // No value can be removed at present
-            //
-            verifyException("org.apache.commons.collections4.iterators.ZippingIterator", e);
-        }
+    /**
+     * Verifies that calling remove() before a call to next() throws an
+     * IllegalStateException, as specified by the Iterator contract.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void removeBeforeNextShouldThrowIllegalStateException() {
+        // Arrange: Create a ZippingIterator. The content of the underlying
+        // iterators is irrelevant for this test case; what matters is that
+        // next() has not yet been called on the ZippingIterator.
+        final Iterator<Object> emptyIterator = Collections.emptyIterator();
+        final ZippingIterator<Object> zippingIterator = new ZippingIterator<>(emptyIterator);
+
+        // Act & Assert: Calling remove() immediately should throw.
+        zippingIterator.remove();
     }
 }
