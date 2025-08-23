@@ -1,20 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class DateTimeComparator_ESTestTest2 extends DateTimeComparator_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DateTimeComparator}.
+ */
+public class DateTimeComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfEra();
-        DateTimeComparator dateTimeComparator0 = DateTimeComparator.getInstance(dateTimeFieldType0);
-        DateTimeFieldType dateTimeFieldType1 = dateTimeComparator0.getLowerLimit();
-        assertNotNull(dateTimeFieldType1);
-        assertEquals("yearOfEra", dateTimeFieldType1.toString());
+    /**
+     * Tests that getLowerLimit() returns the same DateTimeFieldType that was used
+     * to create the comparator instance.
+     */
+    @Test
+    public void getInstance_withLowerLimit_shouldSetLowerLimitCorrectly() {
+        // Arrange: Define the field type to be used as the lower limit.
+        DateTimeFieldType expectedLowerLimit = DateTimeFieldType.yearOfEra();
+
+        // Act: Create a comparator instance with the specified lower limit.
+        DateTimeComparator comparator = DateTimeComparator.getInstance(expectedLowerLimit);
+        DateTimeFieldType actualLowerLimit = comparator.getLowerLimit();
+
+        // Assert: The getter should return the same field type instance.
+        assertNotNull("The lower limit should not be null", actualLowerLimit);
+        assertEquals("The lower limit should match the one provided during construction",
+                expectedLowerLimit, actualLowerLimit);
     }
 }
