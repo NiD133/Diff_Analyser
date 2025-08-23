@@ -1,23 +1,40 @@
 package org.jfree.chart.entity;
 
-import java.awt.geom.Rectangle2D;
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
 import org.jfree.data.general.DefaultPieDataset;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class StandardEntityCollectionTestTest3 {
+import java.awt.geom.Rectangle2D;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+
+/**
+ * Tests for the serialization of the {@link StandardEntityCollection} class.
+ */
+class StandardEntityCollectionTest {
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a StandardEntityCollection object can be serialized and
+     * then deserialized, resulting in an object that is equal to the original.
      */
     @Test
-    public void testSerialization() {
-        PieSectionEntity<String> e1 = new PieSectionEntity<>(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0), new DefaultPieDataset<String>(), 0, 1, "Key", "ToolTip", "URL");
-        StandardEntityCollection c1 = new StandardEntityCollection();
-        c1.add(e1);
-        StandardEntityCollection c2 = TestUtils.serialised(c1);
-        assertEquals(c1, c2);
+    @DisplayName("A serialized and deserialized collection should be equal to the original")
+    void collectionAfterSerializationShouldBeEqualToOriginal() {
+        // Arrange: Create an entity and add it to a collection.
+        PieSectionEntity<String> testEntity = new PieSectionEntity<>(
+                new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0),
+                new DefaultPieDataset<>(), 0, 1, "Key", "ToolTip", "URL");
+        
+        StandardEntityCollection originalCollection = new StandardEntityCollection();
+        originalCollection.add(testEntity);
+
+        // Act: Serialize and then deserialize the collection.
+        StandardEntityCollection deserializedCollection = TestUtils.serialised(originalCollection);
+
+        // Assert: The deserialized collection should be a different instance but equal to the original.
+        assertNotSame(originalCollection, deserializedCollection, "Serialization should create a new instance.");
+        assertEquals(originalCollection, deserializedCollection, "Deserialized collection should be equal to the original.");
     }
 }
