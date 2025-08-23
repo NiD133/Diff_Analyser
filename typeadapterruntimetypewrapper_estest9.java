@@ -1,57 +1,56 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializer;
-import com.google.gson.ToNumberPolicy;
 import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.internal.Excluder;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.BufferedWriter;
-import java.io.CharArrayWriter;
-import java.io.EOFException;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.PipedReader;
-import java.io.PipedWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.time.temporal.ChronoField;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
 
-public class TypeAdapterRuntimeTypeWrapper_ESTestTest9 extends TypeAdapterRuntimeTypeWrapper_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        JsonSerializer<Integer> jsonSerializer0 = (JsonSerializer<Integer>) mock(JsonSerializer.class, new ViolatedAssumptionAnswer());
-        JsonDeserializer<Integer> jsonDeserializer0 = (JsonDeserializer<Integer>) mock(JsonDeserializer.class, new ViolatedAssumptionAnswer());
-        Class<Integer> class0 = Integer.class;
-        TypeToken<Integer> typeToken0 = TypeToken.get(class0);
-        TypeAdapterFactory typeAdapterFactory0 = DefaultDateTypeAdapter.DEFAULT_STYLE_FACTORY;
-        TreeTypeAdapter<Integer> treeTypeAdapter0 = new TreeTypeAdapter<Integer>(jsonSerializer0, jsonDeserializer0, (Gson) null, typeToken0, typeAdapterFactory0, true);
-        TypeAdapterRuntimeTypeWrapper<Integer> typeAdapterRuntimeTypeWrapper0 = new TypeAdapterRuntimeTypeWrapper<Integer>((Gson) null, treeTypeAdapter0, class0);
-        PipedReader pipedReader0 = new PipedReader();
-        JsonReader jsonReader0 = new JsonReader(pipedReader0);
-        // Undeclared exception!
-        try {
-            typeAdapterRuntimeTypeWrapper0.read(jsonReader0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("com.google.gson.internal.Streams", e);
-        }
+/**
+ * This test focuses on the exception handling of the {@link TypeAdapterRuntimeTypeWrapper#read(JsonReader)} method.
+ */
+public class TypeAdapterRuntimeTypeWrapperTest {
+
+    /**
+     * Verifies that if the delegate TypeAdapter throws an IOException during reading,
+     * the TypeAdapterRuntimeTypeWrapper correctly propagates this exception.
+     *
+     * The read() method's primary responsibility is to delegate the call, and this
+     * test ensures it also delegates the failure condition transparently.
+     */
+    @Test
+    public void read_whenDelegateThrowsIOException_propagatesException() throws IOException {
+        // Arrange
+        // 1. Create a mock for the delegate TypeAdapter. The wrapper's read() method
+        //    is expected to simply delegate to this adapter.
+        @SuppressWarnings("unchecked")
+        TypeAdapter<Integer> mockDelegateAdapter = mock(TypeAdapter.class);
+
+        // 2. Create a dummy JsonReader. Its content is irrelevant because the delegate is mocked.
+        JsonReader dummyJsonReader = new JsonReader(new StringReader(""));
+
+        // 3. Configure the mock delegate to throw a specific IOException when its read() method is called.
+        IOException expectedException = new IOException("Simulated I/O failure from delegate");
+        when(mockDelegateAdapter.read(dummyJsonReader)).thenThrow(expectedException);
+
+        // 4. Instantiate the class under test, providing it with the mock delegate.
+        //    The Gson context is null as it is not used by the read() method.
+        TypeAdapter<Integer> wrapper = new TypeAdapterRuntimeTypeWrapper<>(null, mockDelegateAdapter, Integer.class);
+
+        // Act & Assert
+        // Verify that calling read() on the wrapper throws the expected IOException.
+        IOException actualException = assertThrows(IOException.class, () -> {
+            wrapper.read(dummyJsonReader);
+        });
+
+        // Ensure the propagated exception is the exact same instance thrown by the mock delegate.
+        assertSame("The exception propagated by the wrapper should be the one from the delegate",
+                expectedException, actualException);
     }
 }
