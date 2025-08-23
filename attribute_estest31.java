@@ -1,28 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Attribute_ESTestTest31 extends Attribute_ESTest_scaffolding {
+/**
+ * Tests for the static utility methods in the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        boolean boolean0 = Attribute.isBooleanAttribute("");
-        assertFalse(boolean0);
+    /**
+     * Verifies that {@link Attribute#isBooleanAttribute(String)} returns false for an empty string.
+     * An empty string is not a valid attribute key and thus should not be classified as a boolean attribute.
+     */
+    @Test
+    public void isBooleanAttributeShouldReturnFalseForEmptyKey() {
+        // Arrange: The input is an empty string, which is an invalid attribute key.
+        String emptyKey = "";
+
+        // Act: Call the method under test.
+        boolean result = Attribute.isBooleanAttribute(emptyKey);
+
+        // Assert: The result should be false, as an empty key cannot be a boolean attribute.
+        assertFalse("isBooleanAttribute should return false for an empty key.", result);
     }
 }
