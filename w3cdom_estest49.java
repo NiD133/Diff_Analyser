@@ -1,42 +1,52 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
+import org.junit.Test;
 import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest49 extends W3CDom_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test48() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parseBodyFragment("jsoupSource", "jsoupSource");
-        DocumentImpl documentImpl0 = (DocumentImpl) w3CDom0.fromJsoup(document0);
-        Class<Element> class0 = Element.class;
-        List<Element> list0 = w3CDom0.sourceNodes((NodeList) documentImpl0, class0);
-        assertTrue(w3CDom0.namespaceAware());
-        assertFalse(list0.isEmpty());
+import static org.junit.Assert.*;
+
+public class W3CDomTest {
+
+    /**
+     * Tests that the sourceNodes() method can correctly retrieve the original jsoup Element nodes
+     * from a W3C NodeList that was created from a jsoup Document.
+     */
+    @Test
+    public void sourceNodesRetrievesOriginalJsoupElementsFromW3cNodeList() {
+        // Arrange
+        W3CDom w3cDom = new W3CDom();
+        String html = "<html><body><p>Hello</p> and some text</body></html>";
+        Document jsoupDoc = Jsoup.parse(html);
+        Element originalJsoupParagraph = jsoupDoc.selectFirst("p");
+
+        // Act
+        // 1. Convert the jsoup document to a W3C DOM document.
+        org.w3c.dom.Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+
+        // 2. Get a NodeList of the <body>'s children from the W3C document.
+        // This list will contain the W3C <p> element and a W3C text node.
+        NodeList w3cBodyChildren = w3cDoc.getElementsByTagName("body").item(0).getChildNodes();
+
+        // 3. Retrieve the original jsoup *Elements* from the W3C NodeList.
+        // This should filter out the text node and only return the jsoup Element.
+        List<Element> sourceElements = w3cDom.sourceNodes(w3cBodyChildren, Element.class);
+
+        // Assert
+        // Verify that only the single <p> element was retrieved.
+        assertEquals("Should retrieve only the Element nodes", 1, sourceElements.size());
+
+        // Verify that the retrieved element is the exact same instance as the original jsoup <p> element.
+        Element retrievedElement = sourceElements.get(0);
+        assertSame("Retrieved element should be the original jsoup node instance",
+            originalJsoupParagraph, retrievedElement);
+        assertEquals("p", retrievedElement.tagName());
+
+        // The original test also checked this; it's a good check for the default state.
+        assertTrue("W3CDom should be namespace-aware by default", w3cDom.namespaceAware());
     }
 }
