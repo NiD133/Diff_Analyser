@@ -1,47 +1,27 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class BritishCutoverChronology_ESTestTest10 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
-        BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateEpochDay((-1813L));
-        assertNotNull(britishCutoverDate0);
+    @Test
+    public void dateEpochDay_withDateBeforeEpoch_createsCorrectDate() {
+        // Arrange: Define a date before the standard Java epoch (1970-01-01).
+        // The epoch day -1813 corresponds to the ISO date 1965-01-15.
+        // This date is after the British cutover of 1752, so it follows Gregorian rules.
+        long epochDay = -1813L;
+        LocalDate expectedIsoDate = LocalDate.of(1965, 1, 15);
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+
+        // Act: Create a BritishCutoverDate from the epoch day.
+        BritishCutoverDate actualDate = chronology.dateEpochDay(epochDay);
+
+        // Assert: The created date should be equivalent to the expected ISO date.
+        assertEquals(expectedIsoDate, LocalDate.from(actualDate));
     }
 }
