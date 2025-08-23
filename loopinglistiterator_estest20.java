@@ -1,27 +1,31 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import static org.junit.Assert.assertNull;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest20 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the LoopingListIterator class, focusing on its looping behavior.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        LinkedList<Closure<Integer>> linkedList0 = new LinkedList<Closure<Integer>>();
-        linkedList0.add((Closure<Integer>) null);
-        LoopingListIterator<Closure<Integer>> loopingListIterator0 = new LoopingListIterator<Closure<Integer>>(linkedList0);
-        Closure<Integer> closure0 = loopingListIterator0.previous();
-        assertNull(closure0);
+    /**
+     * Verifies that calling previous() on a newly created iterator
+     * loops around to the end of the list and returns the last element.
+     */
+    @Test
+    public void previousOnNewIteratorShouldLoopAroundToReturnLastElement() {
+        // Arrange: Create a list with a single null element. A new iterator
+        // is positioned before the first element (at index 0).
+        final List<String> listWithSingleItem = Collections.singletonList(null);
+        final LoopingListIterator<String> loopingIterator = new LoopingListIterator<>(listWithSingleItem);
+
+        // Act: Call previous(), which should cause the iterator to wrap around.
+        final String previousElement = loopingIterator.previous();
+
+        // Assert: The returned element should be the last (and only) element from the list.
+        assertNull("previous() should have returned the null element from the list.", previousElement);
     }
 }
