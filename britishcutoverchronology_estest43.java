@@ -1,56 +1,42 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.time.chrono.Era;
+import java.time.chrono.JapaneseEra;
+import org.junit.Test;
+
+/*
+ * Note: The class name "BritishCutoverChronology_ESTestTest43" is auto-generated.
+ * In a real-world scenario, this would be part of a well-named test suite,
+ * for example, "BritishCutoverChronologyTest".
+ */
 public class BritishCutoverChronology_ESTestTest43 extends BritishCutoverChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        JapaneseEra japaneseEra0 = JapaneseEra.SHOWA;
-        // Undeclared exception!
+    /**
+     * Tests that dateYearDay() throws a ClassCastException when an incorrect Era type is provided.
+     *
+     * The BritishCutoverChronology is designed to work specifically with JulianEra. This test
+     * verifies that providing an era from a different calendar system, such as JapaneseEra,
+     * results in the expected exception, ensuring type safety.
+     */
+    @Test
+    public void dateYearDay_withIncorrectEraType_throwsClassCastException() {
+        // Arrange: Create the chronology and an era from an incompatible calendar system.
+        BritishCutoverChronology chronology = new BritishCutoverChronology();
+        Era incorrectEra = JapaneseEra.SHOWA;
+        // The specific year and day values are not relevant for this type-check failure.
+        int yearOfEra = 1;
+        int dayOfYear = 1;
+
+        // Act & Assert: Attempting to create a date with an incompatible era should fail.
         try {
-            britishCutoverChronology0.dateYearDay((Era) japaneseEra0, (-5181), (-5181));
-            fail("Expecting exception: ClassCastException");
+            chronology.dateYearDay(incorrectEra, yearOfEra, dayOfYear);
+            fail("Expected a ClassCastException to be thrown due to incorrect Era type.");
         } catch (ClassCastException e) {
-            //
-            // Era must be JulianEra
-            //
-            verifyException("org.threeten.extra.chrono.BritishCutoverChronology", e);
+            // Verify that the exception message clearly communicates the requirement.
+            assertEquals("Era must be JulianEra", e.getMessage());
         }
     }
 }
