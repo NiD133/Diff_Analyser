@@ -1,59 +1,44 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest21 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        ChronoUnit chronoUnit0 = ChronoUnit.ERAS;
-        Duration duration0 = chronoUnit0.getDuration();
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Tests that dateNow() throws a DateTimeException if the provided clock
+     * returns an instant that is outside the representable range.
+     */
+    @Test
+    public void dateNow_whenClockInstantExceedsMax_throwsException() {
+        // Arrange: Create a BritishCutoverChronology instance.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+
+        // Arrange: Create a clock that produces an Instant beyond the maximum storable value.
+        // We do this by starting at the absolute maximum Instant and adding one second.
+        // The call to dateNow() will fail internally when it tries to create this invalid Instant.
+        Clock clockAtMax = Clock.fixed(Instant.MAX, ZoneOffset.UTC);
+        Clock clockBeyondMax = Clock.offset(clockAtMax, Duration.ofSeconds(1));
+
+        // Act & Assert
         try {
-            britishCutoverChronology0.dateNow(clock1);
-            fail("Expecting exception: DateTimeException");
+            chronology.dateNow(clockBeyondMax);
+            fail("Expected a DateTimeException to be thrown for an out-of-range instant.");
         } catch (DateTimeException e) {
-            //
-            // Instant exceeds minimum or maximum instant
-            //
-            verifyException("java.time.Instant", e);
+            // Assert that the correct exception was thrown with the expected message.
+            // The exception originates from java.time when the overflow is detected.
+            assertEquals("Instant exceeds minimum or maximum instant", e.getMessage());
         }
     }
 }
