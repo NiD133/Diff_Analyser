@@ -1,31 +1,33 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest27 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        Shape shape0 = Shape.fromKM(989, 989);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        // Undeclared exception!
+    /**
+     * Tests that the contains(BitMapExtractor) method throws a NullPointerException
+     * when the provided extractor is null. This is a critical contract for methods
+     * accepting object arguments.
+     */
+    @Test
+    public void testContainsWithNullBitMapExtractorThrowsNullPointerException() {
+        // Arrange: Create a filter instance. The shape details are not important for this test.
+        Shape shape = Shape.fromKM(10, 100);
+        SparseBloomFilter filter = new SparseBloomFilter(shape);
+
+        // Act & Assert: Verify that calling contains() with a null argument throws the expected exception.
         try {
-            sparseBloomFilter0.contains((BitMapExtractor) null);
-            fail("Expecting exception: NullPointerException");
+            filter.contains((BitMapExtractor) null);
+            fail("Expected a NullPointerException to be thrown.");
         } catch (NullPointerException e) {
-            //
-            // bitMapExtractor
-            //
-            verifyException("java.util.Objects", e);
+            // This assertion is more specific and checks that the exception is thrown
+            // for the correct reason, which is a common practice for null checks.
+            assertEquals("bitMapExtractor", e.getMessage());
         }
     }
 }
