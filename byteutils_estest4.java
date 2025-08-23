@@ -1,33 +1,23 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest4 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ByteUtils.toLittleEndian((ByteUtils.ByteConsumer) null, (long) 0, (-2448));
+    /**
+     * Tests that {@link ByteUtils#toLittleEndian(ByteUtils.ByteConsumer, long, int)}
+     * does not perform any action or throw an exception when provided with a negative length.
+     * The method is expected to return immediately without interacting with the consumer.
+     */
+    @Test
+    public void toLittleEndianWithNegativeLengthShouldDoNothing() {
+        // This test verifies that a negative length argument causes the method to exit early.
+        // A null consumer is intentionally passed. If the method attempted to process any bytes,
+        // it would throw a NullPointerException, causing the test to fail.
+        // The test passes if no exception is thrown.
+        ByteUtils.toLittleEndian(null, 0L, -1);
     }
 }
