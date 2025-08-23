@@ -1,35 +1,37 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest22 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test021() throws Throwable {
-        byte[] byteArray0 = new byte[2];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.readLine();
-        int int0 = randomAccessFileOrArray0.skipBytes(769);
-        assertEquals(2L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals((-1), int0);
+    /**
+     * Verifies that calling skipBytes() when the pointer is already at the end of the data source
+     * returns -1 and does not change the pointer's position.
+     *
+     * The return value of -1 signifies that the end-of-file was reached before any bytes could be skipped,
+     * which is a specific behavior of this class.
+     */
+    @Test
+    public void skipBytes_whenAtEndOfFile_returnsMinusOneAndDoesNotAdvancePointer() throws IOException {
+        // Arrange: Create a data source and explicitly move the pointer to its end.
+        byte[] sourceData = new byte[]{ 10, 20 };
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+        
+        // Using seek() is more direct and clearer than the original test's use of readLine()
+        // to advance the pointer to the end of the data.
+        fileOrArray.seek(fileOrArray.length());
+        long positionAtEnd = fileOrArray.getFilePointer();
+        
+        // Act: Attempt to skip bytes when already at the end.
+        int bytesSkipped = fileOrArray.skipBytes(500);
+
+        // Assert: Check for the specific return value and ensure the pointer has not moved.
+        assertEquals("skipBytes should return -1 to indicate the pointer was already at the end of the source.", -1, bytesSkipped);
+        assertEquals("The file pointer should remain at the end of the source.", positionAtEnd, fileOrArray.getFilePointer());
     }
 }
