@@ -1,27 +1,40 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GroupedRandomAccessSource_ESTestTest26 extends GroupedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Test suite for the {@link GroupedRandomAccessSource} class.
+ */
+public class GroupedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[2];
-        byte[] byteArray0 = new byte[0];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        randomAccessSourceArray0[1] = (RandomAccessSource) getBufferedRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        groupedRandomAccessSource0.sourceReleased(arrayRandomAccessSource0);
-        assertEquals(0L, groupedRandomAccessSource0.length());
+    /**
+     * Verifies that calling the sourceReleased method does not alter the
+     * total length of the GroupedRandomAccessSource. The length is calculated
+     * at construction time and should remain immutable.
+     */
+    @Test
+    public void sourceReleased_shouldNotAffectTotalLength() throws IOException {
+        // --- Arrange ---
+        // Create a group of sources, both based on an empty byte array.
+        // The total length of the grouped source will therefore be zero.
+        RandomAccessSource source1 = new ArrayRandomAccessSource(new byte[0]);
+        RandomAccessSource source2 = new GetBufferedRandomAccessSource(new ArrayRandomAccessSource(new byte[0]));
+
+        RandomAccessSource[] sources = {source1, source2};
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(sources);
+
+        // Sanity check: ensure the initial length is correct.
+        assertEquals("Initial length of the grouped source should be zero.", 0L, groupedSource.length());
+
+        // --- Act ---
+        // The sourceReleased() method is a protected hook for resource management in subclasses.
+        // In the base class, it is expected to have no side effects on the object's state.
+        groupedSource.sourceReleased(source1);
+
+        // --- Assert ---
+        // Verify that the length remains unchanged after the call.
+        assertEquals("Length should remain zero after releasing a source.", 0L, groupedSource.length());
     }
 }
