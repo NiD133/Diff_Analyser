@@ -1,44 +1,26 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Symmetry010Chronology_ESTestTest61 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Symmetry010Chronology} class.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        Symmetry010Date symmetry010Date0 = symmetry010Chronology0.dateNow();
-        assertEquals(IsoEra.CE, symmetry010Date0.getEra());
+    @Test
+    public void dateNow_shouldReturnDateInCommonEra() {
+        // Arrange
+        // The Symmetry010Chronology is a singleton, so we use its static INSTANCE.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+
+        // Act
+        // Get the current date in this chronology from the system clock.
+        Symmetry010Date currentDate = chronology.dateNow();
+
+        // Assert
+        // The current date is expected to be in the Common Era (CE).
+        assertEquals("The era of the current date should be Common Era (CE)", IsoEra.CE, currentDate.getEra());
     }
 }
