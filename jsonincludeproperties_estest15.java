@@ -1,21 +1,29 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonIncludeProperties_ESTestTest15 extends JsonIncludeProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIncludeProperties.Value} class.
+ */
+public class JsonIncludePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
-        String string0 = jsonIncludeProperties_Value0.toString();
-        assertEquals("JsonIncludeProperties.Value(included=null)", string0);
+    /**
+     * Tests that the toString() method for the constant {@code Value.ALL}
+     * returns the expected string representation. This constant signifies that
+     * no specific properties are filtered, which is represented internally by a
+     * null set of included properties.
+     */
+    @Test
+    public void toString_forAllValue_shouldReturnExpectedFormat() {
+        // Arrange
+        JsonIncludeProperties.Value allPropertiesValue = JsonIncludeProperties.Value.ALL;
+        String expectedToString = "JsonIncludeProperties.Value(included=null)";
+
+        // Act
+        String actualToString = allPropertiesValue.toString();
+
+        // Assert
+        assertEquals(expectedToString, actualToString);
     }
 }
