@@ -1,31 +1,35 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import static org.junit.Assert.assertEquals;
 
+import java.util.Properties;
+import javax.imageio.metadata.IIOMetadataNode;
+import org.w3c.dom.Node;
+
+// Note: The original test class name and scaffolding are preserved as per the prompt's context.
+// In a real-world scenario, these would likely be renamed (e.g., to XNodeTest) and simplified.
 public class XNode_ESTestTest26 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test025() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Float float0 = new Float((-3170.6738875886467));
-        Float float1 = xNode0.getFloatBody(float0);
-        assertEquals((-3170.6738F), (float) float1, 0.01F);
+    /**
+     * Verifies that getFloatBody() returns the provided default value
+     * when the XML node's body is empty or null.
+     */
+    @Test
+    public void getFloatBodyShouldReturnDefaultValueWhenBodyIsEmpty() {
+        // Arrange
+        // Create an XNode with an empty body. An IIOMetadataNode is used here as a
+        // concrete, empty implementation of a W3C Node, which results in a null body.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        
+        Float defaultValue = -3170.6738F;
+
+        // Act
+        Float actualValue = xNode.getFloatBody(defaultValue);
+
+        // Assert
+        // Since the node's body is empty, the method should return the default value.
+        assertEquals(defaultValue, actualValue);
     }
 }
