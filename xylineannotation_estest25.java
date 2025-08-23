@@ -2,50 +2,36 @@ package org.jfree.chart.annotations;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
 
-public class XYLineAnnotation_ESTestTest25 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Unit tests for the XYLineAnnotation class, focusing on the equals() method.
+ */
+// Note: The original test class name "XYLineAnnotation_ESTestTest25" has been
+// renamed to "XYLineAnnotationTest" to follow standard naming conventions.
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        CombinedRangeXYPlot<ChronoLocalDate> combinedRangeXYPlot0 = new CombinedRangeXYPlot<ChronoLocalDate>();
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation(10, 1.0F, 1.0F, 10, combinedRangeXYPlot0.DEFAULT_OUTLINE_STROKE, combinedRangeXYPlot0.DEFAULT_CROSSHAIR_PAINT);
-        PeriodAxis periodAxis0 = new PeriodAxis("rk<Dtq7=E");
-        JFreeChart jFreeChart0 = new JFreeChart("org.jfree.chart.util.DefaultShadowenerator", periodAxis0.DEFAULT_TICK_LABEL_FONT, combinedRangeXYPlot0, true);
-        BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(10, 2718);
-        boolean boolean0 = xYLineAnnotation0.equals(bufferedImage0);
-        assertEquals(1.0, xYLineAnnotation0.getY1(), 0.01);
-        assertEquals(1.0, xYLineAnnotation0.getX2(), 0.01);
-        assertFalse(boolean0);
-        assertEquals(10.0, xYLineAnnotation0.getX1(), 0.01);
-        assertEquals(10.0, xYLineAnnotation0.getY2(), 0.01);
+    /**
+     * Verifies that the equals() method returns false when the annotation is
+     * compared with an object of a different, unrelated type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentTypeObject() {
+        // Arrange: Create an instance of the annotation and an object of a different type.
+        Stroke stroke = new BasicStroke(1.0f);
+        Paint paint = Color.BLACK;
+        XYLineAnnotation annotation = new XYLineAnnotation(10.0, 20.0, 30.0, 40.0, stroke, paint);
+
+        Object nonAnnotationObject = new Object();
+
+        // Act: Compare the annotation with the other object.
+        boolean isEqual = annotation.equals(nonAnnotationObject);
+
+        // Assert: The result should be false.
+        assertFalse("An XYLineAnnotation should not be equal to an object of a different type.", isEqual);
     }
 }
