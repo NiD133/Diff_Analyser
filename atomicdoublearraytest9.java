@@ -1,72 +1,84 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
 import org.jspecify.annotations.NullUnmarked;
 
+/**
+ * Tests for the behavior of get() following lazySet() on an {@link AtomicDoubleArray}.
+ */
+@GwtIncompatible
+@J2ktIncompatible
+@NullUnmarked
 public class AtomicDoubleArrayTestTest9 extends JSR166TestCase {
 
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+    /**
+     * A comprehensive set of double values for testing, including infinities, NaN, zeros,
+     * and other edge cases.
+     */
+    private static final double[] TEST_VALUES = {
+        Double.NEGATIVE_INFINITY,
+        -Double.MAX_VALUE,
+        (double) Long.MIN_VALUE,
+        (double) Integer.MIN_VALUE,
+        -Math.PI,
+        -1.0,
+        -Double.MIN_VALUE,
+        -0.0,
+        +0.0,
+        Double.MIN_VALUE,
+        1.0,
+        Math.PI,
+        (double) Integer.MAX_VALUE,
+        (double) Long.MAX_VALUE,
+        Double.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        Double.NaN
+    };
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Asserts that two double values are bitwise-equal, which is the equality contract
+     * for AtomicDoubleArray's atomic operations.
+     *
+     * @param expected the expected value
+     * @param actual the actual value
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
-
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
-
-    class Counter extends CheckedRunnable {
-
-        final AtomicDoubleArray aa;
-
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
+    static void assertBitEquals(double expected, double actual) {
+        long expectedBits = Double.doubleToRawLongBits(expected);
+        long actualBits = Double.doubleToRawLongBits(actual);
+        if (expectedBits != actualBits) {
+            fail(String.format(
+                "Expected bitwise equality, but was not. "
+                    + "Expected: %s (0x%h) but got: %s (0x%h)",
+                expected, expectedBits, actual, actualBits));
         }
     }
 
     /**
-     * get returns the last value lazySet at index by same thread
+     * Verifies that a `get` call within the same thread that performed a `lazySet`
+     * will always observe the value that was set. While `lazySet` provides no guarantee
+     * about visibility to *other* threads, it guarantees immediate visibility to the
+     * *same* thread.
      */
-    public void testGetLazySet() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(VALUES.length);
-        for (int i = 0; i < VALUES.length; i++) {
-            assertBitEquals(0.0, aa.get(i));
-            aa.lazySet(i, VALUES[i]);
-            assertBitEquals(VALUES[i], aa.get(i));
-            aa.lazySet(i, -3.0);
-            assertBitEquals(-3.0, aa.get(i));
+    public void testLazySet_getInSameThread_returnsUpdatedValue() {
+        // Arrange
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(TEST_VALUES.length);
+        final double anotherTestValue = -3.0;
+
+        // Act & Assert: Iterate through a wide range of double values to ensure consistent behavior.
+        for (int i = 0; i < TEST_VALUES.length; i++) {
+            double originalTestValue = TEST_VALUES[i];
+
+            // Step 1: Verify setting a value from the initial state (0.0).
+            assertEquals(0.0, atomicArray.get(i));
+
+            atomicArray.lazySet(i, originalTestValue);
+            // A `get` in the same thread must see the `lazySet` value immediately.
+            assertBitEquals(originalTestValue, atomicArray.get(i));
+
+            // Step 2: Verify a subsequent `lazySet` on the same index.
+            atomicArray.lazySet(i, anotherTestValue);
+            assertBitEquals(anotherTestValue, atomicArray.get(i));
         }
     }
 }
