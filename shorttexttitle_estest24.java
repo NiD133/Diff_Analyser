@@ -1,53 +1,42 @@
 package org.jfree.chart.title;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.RectangleConstraint;
-import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.awt.Graphics2D;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * This is a test suite for the ShortTextTitle class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class ShortTextTitle_ESTestTest24 extends ShortTextTitle_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        Range range0 = ValueAxis.DEFAULT_RANGE;
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, 838.5372107469134);
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle("iT/Ila@nrA+L");
-        // Undeclared exception!
+    /**
+     * Verifies that the arrange() method throws a RuntimeException when called with a null Graphics2D context.
+     *
+     * The original test expected a "Not yet implemented." message, which suggests that
+     * in the version of the library under test, this method's implementation was a placeholder.
+     */
+    @Test
+    public void arrange_withNullGraphics2D_shouldThrowRuntimeException() {
+        // Arrange: Create a title and a layout constraint. The specific values are not
+        // critical for this test, as the null Graphics2D object is the trigger for the exception.
+        ShortTextTitle title = new ShortTextTitle("Test Title");
+        Range widthRange = ValueAxis.DEFAULT_RANGE;
+        RectangleConstraint constraint = new RectangleConstraint(widthRange, 100.0);
+
+        // Act & Assert: Call arrange() with a null Graphics2D and verify the expected exception.
         try {
-            shortTextTitle0.arrange((Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
+            title.arrange(null, constraint);
+            fail("Expected a RuntimeException to be thrown due to the null Graphics2D context.");
         } catch (RuntimeException e) {
-            //
-            // Not yet implemented.
-            //
-            verifyException("org.jfree.chart.title.ShortTextTitle", e);
+            // Assert that the exception message matches the expected placeholder text.
+            assertEquals("Not yet implemented.", e.getMessage());
         }
     }
 }
