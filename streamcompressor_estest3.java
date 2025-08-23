@@ -1,38 +1,38 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class StreamCompressor_ESTestTest3 extends StreamCompressor_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("Sq~)ZO");
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) mockFileOutputStream0);
-        byte[] byteArray0 = new byte[4];
-        streamCompressor0.writeCounted(byteArray0, 2, 2);
-        assertEquals(2L, streamCompressor0.getTotalBytesWritten());
+/**
+ * Tests for the {@link StreamCompressor} class.
+ * Note: The original test class name "StreamCompressor_ESTestTest3" was preserved,
+ * but a more descriptive name like "StreamCompressorTest" would be preferable.
+ */
+public class StreamCompressor_ESTestTest3 {
+
+    /**
+     * Verifies that calling writeCounted() correctly updates the total number of bytes written.
+     */
+    @Test
+    public void writeCountedShouldUpdateTotalBytesWritten() throws IOException {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        StreamCompressor streamCompressor = StreamCompressor.create(outputStream);
+
+        byte[] dataToWrite = new byte[]{10, 20, 30, 40};
+        int offset = 2;
+        int length = 2; // We are writing the last two bytes: {30, 40}
+
+        // Act
+        streamCompressor.writeCounted(dataToWrite, offset, length);
+
+        // Assert
+        long expectedBytesWritten = 2L;
+        assertEquals("The total bytes written should match the specified length.",
+                expectedBytesWritten, streamCompressor.getTotalBytesWritten());
     }
 }
