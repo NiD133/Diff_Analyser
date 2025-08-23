@@ -1,34 +1,20 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Entities_ESTestTest11 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities} class, focusing on its exception-handling capabilities.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        // Undeclared exception!
-        try {
-            Entities.getByName((String) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling {@link Entities#getByName(String)} with a null input
+     * correctly throws a {@link NullPointerException}. This test ensures the method
+     * adheres to the common contract of rejecting null arguments when not explicitly
+     * designed to handle them.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getByNameShouldThrowNullPointerExceptionForNullInput() {
+        Entities.getByName(null);
     }
 }
