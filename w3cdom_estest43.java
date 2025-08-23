@@ -1,46 +1,41 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public class W3CDom_ESTestTest43 extends W3CDom_ESTest_scaffolding {
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parseBodyFragment("javax.xml.xpath.XPathFactory:jsoup", "javax.xml.xpath.XPathFactory:jsoup");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup(document0);
-        Element element0 = document0.attr("520&v[}X+}:5ZJj 0", "jsoupSource");
-        W3CDom.W3CBuilder w3CDom_W3CBuilder0 = new W3CDom.W3CBuilder(document1);
-        // Undeclared exception!
-        try {
-            w3CDom_W3CBuilder0.traverse(element0);
-            fail("Expecting exception: DOMException");
-        } catch (DOMException e) {
-        }
+/**
+ * Test suite for the W3CDom helper class, focusing on conversion behavior.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that attempting to convert a Jsoup element with an invalid W3C attribute name
+     * throws a DOMException. Attribute names in XML and W3C DOM have a restricted character set
+     * and cannot contain characters like spaces, ampersands, or brackets.
+     */
+    @Test(expected = DOMException.class)
+    public void conversionFailsForElementWithInvalidAttributeName() throws ParserConfigurationException {
+        // Arrange:
+        // 1. Create a destination W3C document to host the converted nodes.
+        org.w3c.dom.Document w3cDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        W3CDom.W3CBuilder w3cBuilder = new W3CDom.W3CBuilder(w3cDoc);
+
+        // 2. Create a Jsoup element with an attribute name that is invalid for W3C DOM.
+        // The name contains spaces and an ampersand, which are not permitted.
+        Document jsoupDoc = Parser.parse("<p invalid & name='value'>Test</p>");
+        Element elementWithInvalidAttr = jsoupDoc.selectFirst("p");
+
+        // Act:
+        // Attempt to traverse the Jsoup element. The W3CBuilder will try to create a
+        // corresponding W3C element with the invalid attribute, which must fail.
+        w3cBuilder.traverse(elementWithInvalidAttr);
+
+        // Assert: A DOMException is expected, as declared in the @Test annotation.
     }
 }
