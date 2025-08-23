@@ -1,18 +1,26 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest18 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("jL:A; nlq0j6l");
-        assertEquals("JLNL", string0);
+    @Test
+    public void shouldCorrectlyEncodeStringWithMixedCaseAndNonAlphabeticCharacters() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String inputWithMixedChars = "jL:A; nlq0j6l";
+        final String expectedCode = "JLNL";
+
+        // Act
+        final String actualCode = metaphone.metaphone(inputWithMixedChars);
+
+        // Assert
+        assertEquals("Metaphone should ignore non-alphabetic characters and be case-insensitive.",
+                     expectedCode,
+                     actualCode);
     }
 }
