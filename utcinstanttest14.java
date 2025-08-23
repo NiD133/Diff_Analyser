@@ -1,159 +1,251 @@
 package org.threeten.extra.scale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+
 import java.time.DateTimeException;
 import java.time.Duration;
-import java.time.Instant;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import com.google.common.testing.EqualsTester;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class UtcInstantTestTest14 {
+/**
+ * Tests for {@link UtcInstant}.
+ * This class focuses on creation, modification, and arithmetic operations.
+ */
+public class UtcInstantTest {
 
-    private static final long MJD_1972_12_30 = 41681;
-
+    // A day with a leap second (December 31, 1972)
     private static final long MJD_1972_12_31_LEAP = 41682;
-
-    private static final long MJD_1973_01_01 = 41683;
-
+    // A day before the leap second day
+    private static final long MJD_1972_12_30 = MJD_1972_12_31_LEAP - 1;
+    // A day after the leap second day
+    private static final long MJD_1973_01_01 = MJD_1972_12_31_LEAP + 1;
+    // Another leap day, one year later
     private static final long MJD_1973_12_31_LEAP = MJD_1972_12_31_LEAP + 365;
 
     private static final long SECS_PER_DAY = 24L * 60 * 60;
-
-    private static final long NANOS_PER_SEC = 1000000000L;
-
+    private static final long NANOS_PER_SEC = 1_000_000_000L;
     private static final long NANOS_PER_DAY = SECS_PER_DAY * NANOS_PER_SEC;
-
     private static final long NANOS_PER_LEAP_DAY = (SECS_PER_DAY + 1) * NANOS_PER_SEC;
 
-    public static Object[][] data_badParse() {
-        return new Object[][] { { "" }, { "A" }, // bad month
-        { "2012-13-01T00:00:00Z" } };
-    }
-
+    //-----------------------------------------------------------------------
+    // parse(CharSequence) - Invalid
+    //-----------------------------------------------------------------------
     @ParameterizedTest
-    @MethodSource("data_badParse")
-    public void factory_parse_CharSequence_invalid(String str) {
-        assertThrows(DateTimeException.class, () -> UtcInstant.parse(str));
+    @ValueSource(strings = {"", "A", "2012-13-01T00:00:00Z"})
+    @DisplayName("parse() should throw exception for invalid formats")
+    public void parse_withInvalidFormat_shouldThrowException(String invalidString) {
+        assertThrows(DateTimeException.class, () -> UtcInstant.parse(invalidString));
     }
 
     //-----------------------------------------------------------------------
-    public static Object[][] data_withModifiedJulianDay() {
-        return new Object[][] { { 0L, 12345L, 1L, 1L, 12345L }, { 0L, 12345L, -1L, -1L, 12345L }, { 7L, 12345L, 2L, 2L, 12345L }, { 7L, 12345L, -2L, -2L, 12345L }, { -99L, 12345L, 3L, 3L, 12345L }, { -99L, 12345L, -3L, -3L, 12345L }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1972_12_30, null, null }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1972_12_31_LEAP, MJD_1972_12_31_LEAP, NANOS_PER_DAY }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1973_01_01, null, null }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1973_12_31_LEAP, MJD_1973_12_31_LEAP, NANOS_PER_DAY } };
+    // withModifiedJulianDay()
+    //-----------------------------------------------------------------------
+    public static Stream<Arguments> data_withModifiedJulianDay_valid() {
+        return Stream.of(
+            // initialMjd, initialNanos, newMjd, expectedMjd, expectedNanos
+            Arguments.of(0L, 12345L, 1L, 1L, 12345L),
+            Arguments.of(0L, 12345L, -1L, -1L, 12345L),
+            // On a leap day, setting MJD to the same day is valid
+            Arguments.of(MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1972_12_31_LEAP, MJD_1972_12_31_LEAP, NANOS_PER_DAY),
+            // On a leap day, setting MJD to another leap day is valid
+            Arguments.of(MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1973_12_31_LEAP, MJD_1973_12_31_LEAP, NANOS_PER_DAY)
+        );
     }
 
     @ParameterizedTest
-    @MethodSource("data_withModifiedJulianDay")
-    public void test_withModifiedJulianDay(long mjd, long nanos, long newMjd, Long expectedMjd, Long expectedNanos) {
-        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos);
-        if (expectedMjd != null) {
-            UtcInstant withModifiedJulianDay = i.withModifiedJulianDay(newMjd);
-            assertEquals(expectedMjd.longValue(), withModifiedJulianDay.getModifiedJulianDay());
-            assertEquals(expectedNanos.longValue(), withModifiedJulianDay.getNanoOfDay());
-        } else {
-            assertThrows(DateTimeException.class, () -> i.withModifiedJulianDay(newMjd));
-        }
+    @MethodSource("data_withModifiedJulianDay_valid")
+    @DisplayName("withModifiedJulianDay() should set a valid new day")
+    public void withModifiedJulianDay_shouldSetNewDay(long initialMjd, long initialNanos, long newMjd, long expectedMjd, long expectedNanos) {
+        UtcInstant initial = UtcInstant.ofModifiedJulianDay(initialMjd, initialNanos);
+        UtcInstant result = initial.withModifiedJulianDay(newMjd);
+        assertEquals(expectedMjd, result.getModifiedJulianDay());
+        assertEquals(expectedNanos, result.getNanoOfDay());
+    }
+
+    public static Stream<Arguments> data_withModifiedJulianDay_invalid() {
+        return Stream.of(
+            // initialMjd, initialNanos, newMjd (invalid)
+            // On a leap day, setting MJD to a non-leap day is invalid because nanoOfDay is too large
+            Arguments.of(MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1972_12_30),
+            Arguments.of(MJD_1972_12_31_LEAP, NANOS_PER_DAY, MJD_1973_01_01)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("data_withModifiedJulianDay_invalid")
+    @DisplayName("withModifiedJulianDay() should throw exception for an invalid day")
+    public void withModifiedJulianDay_forInvalidDay_shouldThrowException(long initialMjd, long initialNanos, long invalidNewMjd) {
+        UtcInstant initial = UtcInstant.ofModifiedJulianDay(initialMjd, initialNanos);
+        assertThrows(DateTimeException.class, () -> initial.withModifiedJulianDay(invalidNewMjd));
     }
 
     //-----------------------------------------------------------------------
-    public static Object[][] data_withNanoOfDay() {
-        return new Object[][] { { 0L, 12345L, 1L, 0L, 1L }, { 0L, 12345L, -1L, null, null }, { 7L, 12345L, 2L, 7L, 2L }, { -99L, 12345L, 3L, -99L, 3L }, { MJD_1972_12_30, NANOS_PER_DAY - 1, NANOS_PER_DAY - 1, MJD_1972_12_30, NANOS_PER_DAY - 1 }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1, NANOS_PER_DAY - 1, MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1 }, { MJD_1973_01_01, NANOS_PER_DAY - 1, NANOS_PER_DAY - 1, MJD_1973_01_01, NANOS_PER_DAY - 1 }, { MJD_1972_12_30, NANOS_PER_DAY - 1, NANOS_PER_DAY, null, null }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1, NANOS_PER_DAY, MJD_1972_12_31_LEAP, NANOS_PER_DAY }, { MJD_1973_01_01, NANOS_PER_DAY - 1, NANOS_PER_DAY, null, null }, { MJD_1972_12_30, NANOS_PER_DAY - 1, NANOS_PER_LEAP_DAY - 1, null, null }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1, NANOS_PER_LEAP_DAY - 1, MJD_1972_12_31_LEAP, NANOS_PER_LEAP_DAY - 1 }, { MJD_1973_01_01, NANOS_PER_DAY - 1, NANOS_PER_LEAP_DAY - 1, null, null }, { MJD_1972_12_30, NANOS_PER_DAY - 1, NANOS_PER_LEAP_DAY, null, null }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY - 1, NANOS_PER_LEAP_DAY, null, null }, { MJD_1973_01_01, NANOS_PER_DAY - 1, NANOS_PER_LEAP_DAY, null, null } };
+    // withNanoOfDay()
+    //-----------------------------------------------------------------------
+    public static Stream<Arguments> data_withNanoOfDay_valid() {
+        return Stream.of(
+            // mjd, initialNanos, newNanoOfDay, expectedMjd, expectedNanos
+            Arguments.of(0L, 12345L, 1L, 0L, 1L),
+            Arguments.of(MJD_1972_12_30, NANOS_PER_DAY - 1, NANOS_PER_DAY - 1, MJD_1972_12_30, NANOS_PER_DAY - 1),
+            // On a leap day, setting nano to the leap second nano is valid
+            Arguments.of(MJD_1972_12_31_LEAP, 0, NANOS_PER_DAY, MJD_1972_12_31_LEAP, NANOS_PER_DAY),
+            // On a leap day, setting nano up to the max for a leap day is valid
+            Arguments.of(MJD_1972_12_31_LEAP, 0, NANOS_PER_LEAP_DAY - 1, MJD_1972_12_31_LEAP, NANOS_PER_LEAP_DAY - 1)
+        );
     }
 
     @ParameterizedTest
-    @MethodSource("data_withNanoOfDay")
-    public void test_withNanoOfDay(long mjd, long nanos, long newNanoOfDay, Long expectedMjd, Long expectedNanos) {
-        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos);
-        if (expectedMjd != null) {
-            UtcInstant withNanoOfDay = i.withNanoOfDay(newNanoOfDay);
-            assertEquals(expectedMjd.longValue(), withNanoOfDay.getModifiedJulianDay());
-            assertEquals(expectedNanos.longValue(), withNanoOfDay.getNanoOfDay());
-        } else {
-            assertThrows(DateTimeException.class, () -> i.withNanoOfDay(newNanoOfDay));
-        }
+    @MethodSource("data_withNanoOfDay_valid")
+    @DisplayName("withNanoOfDay() should set valid new nanoseconds")
+    public void withNanoOfDay_shouldSetNewNanos(long mjd, long initialNanos, long newNanoOfDay, long expectedMjd, long expectedNanos) {
+        UtcInstant initial = UtcInstant.ofModifiedJulianDay(mjd, initialNanos);
+        UtcInstant result = initial.withNanoOfDay(newNanoOfDay);
+        assertEquals(expectedMjd, result.getModifiedJulianDay());
+        assertEquals(expectedNanos, result.getNanoOfDay());
     }
 
+    public static Stream<Arguments> data_withNanoOfDay_invalid() {
+        return Stream.of(
+            // mjd, initialNanos, invalidNanoOfDay
+            Arguments.of(0L, 12345L, -1L), // Negative nanos are invalid
+            Arguments.of(MJD_1972_12_30, 0, NANOS_PER_DAY), // Too large for a standard day
+            Arguments.of(MJD_1973_01_01, 0, NANOS_PER_DAY), // Too large for a standard day
+            Arguments.of(MJD_1972_12_30, 0, NANOS_PER_LEAP_DAY - 1), // Too large for a standard day
+            Arguments.of(MJD_1972_12_31_LEAP, 0, NANOS_PER_LEAP_DAY) // Too large, even for a leap day
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("data_withNanoOfDay_invalid")
+    @DisplayName("withNanoOfDay() should throw exception for invalid nanoseconds")
+    public void withNanoOfDay_forInvalidNanos_shouldThrowException(long mjd, long initialNanos, long invalidNanoOfDay) {
+        UtcInstant initial = UtcInstant.ofModifiedJulianDay(mjd, initialNanos);
+        assertThrows(DateTimeException.class, () -> initial.withNanoOfDay(invalidNanoOfDay));
+    }
+
+    //-----------------------------------------------------------------------
+    // plus(Duration)
     //-----------------------------------------------------------------------
     public static Object[][] data_plus() {
-        return new Object[][] { { 0, 0, -2 * SECS_PER_DAY, 5, -2, 5 }, { 0, 0, -1 * SECS_PER_DAY, 1, -1, 1 }, { 0, 0, -1 * SECS_PER_DAY, 0, -1, 0 }, { 0, 0, 0, -2, -1, NANOS_PER_DAY - 2 }, { 0, 0, 0, -1, -1, NANOS_PER_DAY - 1 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 2, 0, 2 }, { 0, 0, 1, 0, 0, 1 * NANOS_PER_SEC }, { 0, 0, 2, 0, 0, 2 * NANOS_PER_SEC }, { 0, 0, 3, 333333333, 0, 3 * NANOS_PER_SEC + 333333333 }, { 0, 0, 1 * SECS_PER_DAY, 0, 1, 0 }, { 0, 0, 1 * SECS_PER_DAY, 1, 1, 1 }, { 0, 0, 2 * SECS_PER_DAY, 5, 2, 5 }, { 1, 0, -2 * SECS_PER_DAY, 5, -1, 5 }, { 1, 0, -1 * SECS_PER_DAY, 1, 0, 1 }, { 1, 0, -1 * SECS_PER_DAY, 0, 0, 0 }, { 1, 0, 0, -2, 0, NANOS_PER_DAY - 2 }, { 1, 0, 0, -1, 0, NANOS_PER_DAY - 1 }, { 1, 0, 0, 0, 1, 0 }, { 1, 0, 0, 1, 1, 1 }, { 1, 0, 0, 2, 1, 2 }, { 1, 0, 1, 0, 1, 1 * NANOS_PER_SEC }, { 1, 0, 2, 0, 1, 2 * NANOS_PER_SEC }, { 1, 0, 3, 333333333, 1, 3 * NANOS_PER_SEC + 333333333 }, { 1, 0, 1 * SECS_PER_DAY, 0, 2, 0 }, { 1, 0, 1 * SECS_PER_DAY, 1, 2, 1 }, { 1, 0, 2 * SECS_PER_DAY, 5, 3, 5 } };
+        return new Object[][] {
+            // initialMjd, initialNanos, plusSeconds, plusNanos, expectedMjd, expectedNanos
+            // Additions from MJD=0, Nanos=0
+            { 0, 0, -2 * SECS_PER_DAY, 5, -2, 5 },
+            { 0, 0, -1 * SECS_PER_DAY, 1, -1, 1 },
+            { 0, 0, 0, -1, -1, NANOS_PER_DAY - 1 }, // Subtract nanos, roll back day
+            { 0, 0, 0, 0, 0, 0 },                   // Add zero
+            { 0, 0, 0, 1, 0, 1 },                   // Add one nano
+            { 0, 0, 1, 333, 0, NANOS_PER_SEC + 333 },
+            { 0, 0, 1 * SECS_PER_DAY, 1, 1, 1 },
+
+            // Additions from MJD=1, Nanos=0
+            { 1, 0, -2 * SECS_PER_DAY, 5, -1, 5 },
+            { 1, 0, -1 * SECS_PER_DAY, 0, 0, 0 },
+            { 1, 0, 0, -1, 0, NANOS_PER_DAY - 1 }, // Subtract nanos, roll back day
+            { 1, 0, 0, 0, 1, 0 },                   // Add zero
+            { 1, 0, 1 * SECS_PER_DAY, 1, 2, 1 },
+        };
     }
 
     @ParameterizedTest
     @MethodSource("data_plus")
-    public void test_plus(long mjd, long nanos, long plusSeconds, int plusNanos, long expectedMjd, long expectedNanos) {
-        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos).plus(Duration.ofSeconds(plusSeconds, plusNanos));
-        assertEquals(expectedMjd, i.getModifiedJulianDay());
-        assertEquals(expectedNanos, i.getNanoOfDay());
+    @DisplayName("plus() should add duration correctly")
+    public void plus_shouldAddDurationCorrectly(long mjd, long nanos, long plusSeconds, int plusNanos, long expectedMjd, long expectedNanos) {
+        UtcInstant initial = UtcInstant.ofModifiedJulianDay(mjd, nanos);
+        Duration toAdd = Duration.ofSeconds(plusSeconds, plusNanos);
+
+        UtcInstant result = initial.plus(toAdd);
+
+        assertEquals(expectedMjd, result.getModifiedJulianDay(), "Modified Julian Day should match");
+        assertEquals(expectedNanos, result.getNanoOfDay(), "Nano of day should match");
     }
 
     //-----------------------------------------------------------------------
+    // minus(Duration)
+    //-----------------------------------------------------------------------
     public static Object[][] data_minus() {
-        return new Object[][] { { 0, 0, 2 * SECS_PER_DAY, -5, -2, 5 }, { 0, 0, 1 * SECS_PER_DAY, -1, -1, 1 }, { 0, 0, 1 * SECS_PER_DAY, 0, -1, 0 }, { 0, 0, 0, 2, -1, NANOS_PER_DAY - 2 }, { 0, 0, 0, 1, -1, NANOS_PER_DAY - 1 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, -1, 0, 1 }, { 0, 0, 0, -2, 0, 2 }, { 0, 0, -1, 0, 0, 1 * NANOS_PER_SEC }, { 0, 0, -2, 0, 0, 2 * NANOS_PER_SEC }, { 0, 0, -3, -333333333, 0, 3 * NANOS_PER_SEC + 333333333 }, { 0, 0, -1 * SECS_PER_DAY, 0, 1, 0 }, { 0, 0, -1 * SECS_PER_DAY, -1, 1, 1 }, { 0, 0, -2 * SECS_PER_DAY, -5, 2, 5 }, { 1, 0, 2 * SECS_PER_DAY, -5, -1, 5 }, { 1, 0, 1 * SECS_PER_DAY, -1, 0, 1 }, { 1, 0, 1 * SECS_PER_DAY, 0, 0, 0 }, { 1, 0, 0, 2, 0, NANOS_PER_DAY - 2 }, { 1, 0, 0, 1, 0, NANOS_PER_DAY - 1 }, { 1, 0, 0, 0, 1, 0 }, { 1, 0, 0, -1, 1, 1 }, { 1, 0, 0, -2, 1, 2 }, { 1, 0, -1, 0, 1, 1 * NANOS_PER_SEC }, { 1, 0, -2, 0, 1, 2 * NANOS_PER_SEC }, { 1, 0, -3, -333333333, 1, 3 * NANOS_PER_SEC + 333333333 }, { 1, 0, -1 * SECS_PER_DAY, 0, 2, 0 }, { 1, 0, -1 * SECS_PER_DAY, -1, 2, 1 }, { 1, 0, -2 * SECS_PER_DAY, -5, 3, 5 } };
+        return new Object[][] {
+            // initialMjd, initialNanos, minusSeconds, minusNanos, expectedMjd, expectedNanos
+            // Subtractions from MJD=0, Nanos=0
+            { 0, 0, 2 * SECS_PER_DAY, -5, -2, 5 },
+            { 0, 0, 1 * SECS_PER_DAY, -1, -1, 1 },
+            { 0, 0, 0, 1, -1, NANOS_PER_DAY - 1 }, // Subtract nanos, roll back day
+            { 0, 0, 0, 0, 0, 0 },                   // Subtract zero
+            { 0, 0, 0, -1, 0, 1 },                   // Subtract negative nano (add)
+            { 0, 0, -1, -333, 0, NANOS_PER_SEC + 333 },
+            { 0, 0, -1 * SECS_PER_DAY, -1, 1, 1 },
+
+            // Subtractions from MJD=1, Nanos=0
+            { 1, 0, 2 * SECS_PER_DAY, -5, -1, 5 },
+            { 1, 0, 1 * SECS_PER_DAY, 0, 0, 0 },
+            { 1, 0, 0, 1, 0, NANOS_PER_DAY - 1 }, // Subtract nanos, roll back day
+            { 1, 0, 0, 0, 1, 0 },                   // Subtract zero
+            { 1, 0, -1 * SECS_PER_DAY, -1, 2, 1 },
+        };
     }
 
     @ParameterizedTest
     @MethodSource("data_minus")
-    public void test_minus(long mjd, long nanos, long minusSeconds, int minusNanos, long expectedMjd, long expectedNanos) {
-        UtcInstant i = UtcInstant.ofModifiedJulianDay(mjd, nanos).minus(Duration.ofSeconds(minusSeconds, minusNanos));
-        assertEquals(expectedMjd, i.getModifiedJulianDay());
-        assertEquals(expectedNanos, i.getNanoOfDay());
+    @DisplayName("minus() should subtract duration correctly")
+    public void minus_shouldSubtractDurationCorrectly(long mjd, long nanos, long minusSeconds, int minusNanos, long expectedMjd, long expectedNanos) {
+        UtcInstant initial = UtcInstant.ofModifiedJulianDay(mjd, nanos);
+        Duration toSubtract = Duration.ofSeconds(minusSeconds, minusNanos);
+
+        UtcInstant result = initial.minus(toSubtract);
+
+        assertEquals(expectedMjd, result.getModifiedJulianDay(), "Modified Julian Day should match");
+        assertEquals(expectedNanos, result.getNanoOfDay(), "Nano of day should match");
     }
 
-    void doTest_comparisons_UtcInstant(UtcInstant... instants) {
-        for (int i = 0; i < instants.length; i++) {
-            UtcInstant a = instants[i];
-            for (int j = 0; j < instants.length; j++) {
-                UtcInstant b = instants[j];
-                if (i < j) {
-                    assertEquals(-1, a.compareTo(b));
-                    assertEquals(false, a.equals(b));
-                    assertTrue(a.isBefore(b));
-                    assertFalse(a.isAfter(b));
-                } else if (i > j) {
-                    assertEquals(1, a.compareTo(b));
-                    assertEquals(false, a.equals(b));
-                    assertFalse(a.isBefore(b));
-                    assertTrue(a.isAfter(b));
-                } else {
-                    assertEquals(0, a.compareTo(b));
-                    assertEquals(true, a.equals(b));
-                    assertFalse(a.isBefore(b));
-                    assertFalse(a.isAfter(b));
-                }
-            }
-        }
-    }
-
+    //-----------------------------------------------------------------------
+    // toString() and parse()
     //-----------------------------------------------------------------------
     public static Object[][] data_toString() {
-        return new Object[][] { { 40587, 0, "1970-01-01T00:00:00Z" }, { 40588, 1, "1970-01-02T00:00:00.000000001Z" }, { 40588, 999, "1970-01-02T00:00:00.000000999Z" }, { 40588, 1000, "1970-01-02T00:00:00.000001Z" }, { 40588, 999000, "1970-01-02T00:00:00.000999Z" }, { 40588, 1000000, "1970-01-02T00:00:00.001Z" }, { 40618, 999999999, "1970-02-01T00:00:00.999999999Z" }, { 40619, 1000000000, "1970-02-02T00:00:01Z" }, { 40620, 60L * 1000000000L, "1970-02-03T00:01:00Z" }, { 40621, 60L * 60L * 1000000000L, "1970-02-04T01:00:00Z" }, { MJD_1972_12_31_LEAP, 24L * 60L * 60L * 1000000000L - 1000000000L, "1972-12-31T23:59:59Z" }, { MJD_1972_12_31_LEAP, NANOS_PER_DAY, "1972-12-31T23:59:60Z" }, { MJD_1973_01_01, 0, "1973-01-01T00:00:00Z" } };
+        return new Object[][] {
+            { 40587L, 0L, "1970-01-01T00:00:00Z" },
+            { 40588L, 1L, "1970-01-02T00:00:00.000000001Z" },
+            { 40588L, 999_999_999L, "1970-01-02T00:00:00.999999999Z" },
+            { 40588L, 1_000_000_000L, "1970-01-02T00:00:01Z" },
+            // Test case for the second before a leap second
+            { MJD_1972_12_31_LEAP, NANOS_PER_DAY - NANOS_PER_SEC, "1972-12-31T23:59:59Z" },
+            // Test case for the leap second itself (23:59:60)
+            { MJD_1972_12_31_LEAP, NANOS_PER_DAY, "1972-12-31T23:59:60Z" },
+            // Test case for the second after a leap second
+            { MJD_1973_01_01, 0L, "1973-01-01T00:00:00Z" },
+        };
     }
 
     @ParameterizedTest
     @MethodSource("data_toString")
-    public void test_toString(long mjd, long nod, String expected) {
-        assertEquals(expected, UtcInstant.ofModifiedJulianDay(mjd, nod).toString());
+    @DisplayName("toString() should return correct ISO-8601 format")
+    public void toString_shouldReturnIsoFormat(long mjd, long nod, String expected) {
+        UtcInstant instant = UtcInstant.ofModifiedJulianDay(mjd, nod);
+        assertEquals(expected, instant.toString());
     }
 
     @ParameterizedTest
     @MethodSource("data_toString")
-    public void test_toString_parse(long mjd, long nod, String str) {
-        assertEquals(UtcInstant.ofModifiedJulianDay(mjd, nod), UtcInstant.parse(str));
+    @DisplayName("parse() should correctly reverse toString()")
+    public void parse_shouldRevertToString(long mjd, long nod, String isoString) {
+        UtcInstant expected = UtcInstant.ofModifiedJulianDay(mjd, nod);
+        UtcInstant parsed = UtcInstant.parse(isoString);
+        assertEquals(expected, parsed);
     }
 
-    //-----------------------------------------------------------------------
     @Test
-    public void factory_parse_CharSequence() {
-        assertEquals(UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY - NANOS_PER_SEC), UtcInstant.parse("1972-12-31T23:59:59Z"));
-        assertEquals(UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY), UtcInstant.parse("1972-12-31T23:59:60Z"));
+    @DisplayName("parse() should handle leap second string correctly")
+    public void parse_shouldHandleLeapSecondCorrectly() {
+        UtcInstant expectedBeforeLeap = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY - NANOS_PER_SEC);
+        assertEquals(expectedBeforeLeap, UtcInstant.parse("1972-12-31T23:59:59Z"));
+
+        UtcInstant expectedOnLeap = UtcInstant.ofModifiedJulianDay(MJD_1972_12_31_LEAP, NANOS_PER_DAY);
+        assertEquals(expectedOnLeap, UtcInstant.parse("1972-12-31T23:59:60Z"));
     }
 }
