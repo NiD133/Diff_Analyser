@@ -1,27 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest55 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        String string0 = serializedString0.toString();
-        assertEquals("", string0);
+    /**
+     * Verifies that the toString() method returns the original string value
+     * that the SerializedString was constructed with.
+     */
+    @Test
+    public void toStringShouldReturnOriginalStringValue() {
+        // Arrange
+        String expectedValue = "";
+        SerializedString serializedString = new SerializedString(expectedValue);
+
+        // Act
+        String actualValue = serializedString.toString();
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
