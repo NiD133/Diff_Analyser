@@ -1,55 +1,33 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest18 extends DayOfYear_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.of(366);
-        ZonedDateTime zonedDateTime0 = MockZonedDateTime.now();
-        // Undeclared exception!
-        try {
-            dayOfYear0.adjustInto(zonedDateTime0);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid date 'DayOfYear 366' as '2014' is not a leap year
-            //
-            verifyException("java.time.LocalDate", e);
-        }
+/**
+ * Contains tests for the {@link DayOfYear#adjustInto(Temporal)} method.
+ */
+public class DayOfYearTest {
+
+    @Test
+    public void adjustInto_forDay366OnNonLeapYear_throwsDateTimeException() {
+        // Arrange: Define the 366th day of the year and a date within a non-leap year.
+        // Day 366 is only valid in a leap year.
+        DayOfYear day366 = DayOfYear.of(366);
+        // The year 2014 is explicitly chosen as it is not a leap year.
+        ZonedDateTime dateInNonLeapYear = ZonedDateTime.of(2014, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+
+        // Act & Assert: Verify that adjusting a date in a non-leap year to day 366
+        // throws a DateTimeException with a specific, informative message.
+        DateTimeException thrown = assertThrows(
+            DateTimeException.class,
+            () -> day366.adjustInto(dateInNonLeapYear)
+        );
+
+        assertEquals("Invalid date 'DayOfYear 366' as '2014' is not a leap year", thrown.getMessage());
     }
 }
