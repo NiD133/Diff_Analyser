@@ -1,27 +1,37 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class LinkedTreeMap_ESTestTest10 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * This class contains tests for the LinkedTreeMap.
+ * The original test class name 'LinkedTreeMap_ESTestTest10' is kept for reference.
+ */
+public class LinkedTreeMap_ESTestTest10 {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = Integer.valueOf((-4058));
-        linkedTreeMap0.put(integer0, integer0);
-        linkedTreeMap0.keySet();
-        assertEquals(1, linkedTreeMap0.size());
+    /**
+     * Verifies that keySet() on a map with one entry returns a correct Set
+     * containing that entry's key, without modifying the original map.
+     */
+    @Test
+    public void keySet_onNonEmptyMap_returnsCorrectKeys() {
+        // Arrange: Create a map and add a single key-value pair.
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        Integer key = 1;
+        String value = "one";
+        map.put(key, value);
+
+        // Act: Retrieve the key set from the map.
+        Set<Integer> keySet = map.keySet();
+
+        // Assert: Verify the state of both the map and the returned key set.
+        // 1. The original map's size should remain unchanged.
+        assertEquals("The map size should not change after calling keySet()", 1, map.size());
+
+        // 2. The returned keySet should be valid.
+        assertEquals("The keySet should contain one element", 1, keySet.size());
+        assertTrue("The keySet should contain the added key", keySet.contains(key));
     }
 }
