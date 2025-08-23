@@ -1,18 +1,28 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SimpleObjectIdResolver_ESTestTest4 extends SimpleObjectIdResolver_ESTest_scaffolding {
+/**
+ * This test suite focuses on the {@link SimpleObjectIdResolver} class.
+ */
+public class SimpleObjectIdResolverTest {
 
-    @Test(timeout = 4000)
-    public void test3() throws Throwable {
-        SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-        boolean boolean0 = simpleObjectIdResolver0.canUseFor(simpleObjectIdResolver0);
-        assertTrue(boolean0);
+    /**
+     * Tests that an instance of {@code SimpleObjectIdResolver} is compatible
+     * with another resolver of the exact same type. The {@code canUseFor} method
+     * is expected to return true in this scenario.
+     */
+    @Test
+    public void canUseFor_shouldReturnTrue_whenResolverIsOfSameType() {
+        // Arrange: Create two separate instances of the resolver.
+        SimpleObjectIdResolver resolver1 = new SimpleObjectIdResolver();
+        SimpleObjectIdResolver resolver2 = new SimpleObjectIdResolver();
+
+        // Act: Check if the first resolver can be used as a blueprint for the second.
+        boolean isCompatible = resolver1.canUseFor(resolver2);
+
+        // Assert: The result should be true as they are of the same class.
+        assertTrue("A resolver should be compatible with another resolver of the same type.", isCompatible);
     }
 }
