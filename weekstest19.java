@@ -1,38 +1,37 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class WeeksTestTest19 extends TestCase {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void toStandardDuration_convertsTypicalValueToCorrectDuration() {
+        // Arrange
+        Weeks twentyWeeks = Weeks.weeks(20);
+        Duration expectedDuration = new Duration(20L * DateTimeConstants.MILLIS_PER_WEEK);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Act
+        Duration actualDuration = twentyWeeks.toStandardDuration();
+
+        // Assert
+        assertEquals(expectedDuration, actualDuration);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestWeeks.class);
-    }
+    @Test
+    public void toStandardDuration_convertsMaxValueToCorrectDuration() {
+        // Arrange
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+        long expectedMillis = (long) Integer.MAX_VALUE * DateTimeConstants.MILLIS_PER_WEEK;
+        Duration expectedDuration = new Duration(expectedMillis);
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+        // Act
+        Duration actualDuration = maxWeeks.toStandardDuration();
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardDuration() {
-        Weeks test = Weeks.weeks(20);
-        Duration expected = new Duration(20L * DateTimeConstants.MILLIS_PER_WEEK);
-        assertEquals(expected, test.toStandardDuration());
-        expected = new Duration(((long) Integer.MAX_VALUE) * DateTimeConstants.MILLIS_PER_WEEK);
-        assertEquals(expected, Weeks.MAX_VALUE.toStandardDuration());
+        // Assert
+        assertEquals(expectedDuration, actualDuration);
     }
 }
