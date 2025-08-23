@@ -1,89 +1,64 @@
 package org.joda.time.format;
 
-import java.io.CharArrayWriter;
-import java.util.Locale;
-import java.util.TimeZone;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
 
-public class PeriodFormatterTestTest5 extends TestCase {
+/**
+ * Tests the withParseType() and getParseType() methods of PeriodFormatter.
+ *
+ * <p>The original test class contained extensive setup for timezones, locales, and a fixed "now"
+ * time. This was removed as it is not relevant to testing the withParseType() method, which
+ * operates independently of that context. This refactoring makes the test more focused and easier
+ * to understand.
+ */
+public class PeriodFormatterParseTypeTest extends TestCase {
 
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
+    /**
+     * Verifies that withParseType() returns a new formatter instance with the specified type.
+     */
+    public void testWithParseType_createsNewFormatterWithCorrectType() {
+        // Arrange: Create a standard formatter, which has a null parse type by default.
+        PeriodFormatter initialFormatter = ISOPeriodFormat.standard();
+        assertNull("Initial formatter's parse type should be null", initialFormatter.getParseType());
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Act: Create a new formatter with a specific parse type.
+        PeriodType dayTimeType = PeriodType.dayTime();
+        PeriodFormatter formatterWithDayTime = initialFormatter.withParseType(dayTimeType);
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        // Assert: The new formatter has the correct type and is a new instance.
+        assertEquals("Formatter should have the new parse type", dayTimeType, formatterWithDayTime.getParseType());
+        assertNotSame("A new formatter instance should be returned when the type changes", initialFormatter, formatterWithDayTime);
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
+        // Act: Create another formatter, setting the parse type back to null.
+        PeriodFormatter formatterWithNull = formatterWithDayTime.withParseType(null);
 
-    private static final DateTimeZone NEWYORK = DateTimeZone.forID("America/New_York");
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology BUDDHIST_PARIS = BuddhistChronology.getInstance(PARIS);
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    private PeriodFormatter f = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+        // Assert: The resulting formatter has a null parse type and is another new instance.
+        assertNull("Formatter's parse type should now be null", formatterWithNull.getParseType());
+        assertNotSame("A new formatter instance should be returned when changing to null", formatterWithDayTime, formatterWithNull);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPeriodFormatter.class);
-    }
+    /**
+     * Verifies the immutability optimization: if the parse type is not changed,
+     * the same formatter instance is returned.
+     */
+    public void testWithParseType_whenTypeIsUnchanged_returnsSameInstance() {
+        // Arrange: Create a formatter with a specific, non-null parse type.
+        PeriodType dayTimeType = PeriodType.dayTime();
+        PeriodFormatter formatterWithDayTime = ISOPeriodFormat.standard().withParseType(dayTimeType);
 
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-        f = ISOPeriodFormat.standard();
-    }
+        // Act: Call withParseType with the exact same type.
+        PeriodFormatter sameFormatter = formatterWithDayTime.withParseType(dayTimeType);
 
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-        f = null;
-    }
+        // Assert: The same instance is returned.
+        assertSame("Should return the same instance if the type is unchanged", formatterWithDayTime, sameFormatter);
 
-    public void testWithGetParseTypeMethods() {
-        PeriodFormatter f2 = f.withParseType(PeriodType.dayTime());
-        assertEquals(PeriodType.dayTime(), f2.getParseType());
-        assertSame(f2, f2.withParseType(PeriodType.dayTime()));
-        f2 = f.withParseType(null);
-        assertEquals(null, f2.getParseType());
-        assertSame(f2, f2.withParseType(null));
+        // Arrange: Create a formatter with a null parse type.
+        PeriodFormatter formatterWithNull = ISOPeriodFormat.standard().withParseType(null);
+
+        // Act: Call withParseType with null again.
+        PeriodFormatter sameFormatterWithNull = formatterWithNull.withParseType(null);
+
+        // Assert: The same instance is returned.
+        assertSame("Should return the same instance if the null type is unchanged", formatterWithNull, sameFormatterWithNull);
     }
 }
