@@ -1,42 +1,30 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
+
 import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest22 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link ByteUtils} class, focusing on edge cases and invalid arguments.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        // Undeclared exception!
-        try {
-            ByteUtils.toLittleEndian((DataOutput) null, 0L, 872);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Verifies that toLittleEndian throws a NullPointerException when given a null DataOutput.
+     * This ensures the method correctly handles null inputs as per standard API contracts.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toLittleEndianWithNullDataOutputThrowsNullPointerException() throws IOException {
+        // Arrange: Define the arguments for the method call. The key is the null DataOutput.
+        final DataOutput nullDataOutput = null;
+        final long value = 0L;
+        // The length is arbitrary, as the NPE should occur before it is used.
+        // A realistic value is chosen for clarity.
+        final int length = 4;
+
+        // Act & Assert: Call the method with the null argument.
+        // The @Test(expected=...) annotation handles the assertion that an NPE is thrown.
+        ByteUtils.toLittleEndian(nullDataOutput, value, length);
     }
 }
