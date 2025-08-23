@@ -1,59 +1,52 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest23 extends BritishCutoverChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        ChronoUnit chronoUnit0 = ChronoUnit.FOREVER;
-        Duration duration0 = chronoUnit0.getDuration();
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
-        try {
-            britishCutoverChronology0.dateNow(clock1);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // long overflow
-            //
-            verifyException("java.lang.Math", e);
-        }
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ * This test focuses on edge cases related to time representation limits.
+ */
+public class BritishCutoverChronologyTest {
+
+    /**
+     * Tests that dateNow() throws an ArithmeticException when the provided Clock's
+     * instant is too large to be represented.
+     *
+     * The dateNow(Clock) method internally calculates an epoch-day from the clock's instant.
+     * If the instant represents a time far enough in the future, this calculation
+     * will overflow a long, resulting in an ArithmeticException.
+     */
+    @Test
+    public void dateNow_whenClockInstantOverflows_throwsArithmeticException() {
+        // ARRANGE
+        // The chronology under test.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+
+        // Create a clock that represents a time so far in the future it will cause an overflow.
+        // We use a fixed base clock for determinism and offset it by a near-maximum duration.
+        // The resulting instant's epoch-second value will exceed Long.MAX_VALUE.
+        Clock baseClock = Clock.fixed(Instant.parse("2000-01-01T00:00:00Z"), ZoneOffset.UTC);
+        Duration hugeDuration = Duration.ofSeconds(Long.MAX_VALUE);
+        Clock overflowClock = Clock.offset(baseClock, hugeDuration);
+
+        // ACT & ASSERT
+        // The call to dateNow() should fail when trying to process the overflowing instant.
+        // We use assertThrows for a clear and concise declaration of the expected exception.
+        ArithmeticException exception = assertThrows(
+                ArithmeticException.class,
+                () -> chronology.dateNow(overflowClock)
+        );
+
+        // Verify the exception message to confirm it's the expected overflow.
+        // This message comes from java.lang.Math.addExact, used by Instant.plus().
+        assertEquals("long overflow", exception.getMessage());
     }
 }
