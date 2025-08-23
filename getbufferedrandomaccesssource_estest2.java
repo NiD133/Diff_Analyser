@@ -1,22 +1,31 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class GetBufferedRandomAccessSource_ESTestTest2 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link GetBufferedRandomAccessSource} class.
+ */
+public class GetBufferedRandomAccessSourceTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        WindowRandomAccessSource windowRandomAccessSource0 = new WindowRandomAccessSource((RandomAccessSource) null, 0L, 0L);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(windowRandomAccessSource0);
-        long long0 = getBufferedRandomAccessSource0.length();
-        assertEquals(0L, long0);
+    /**
+     * Verifies that the length() method correctly returns 0 when the underlying source is empty.
+     * This confirms that the length calculation is properly delegated to the wrapped source.
+     */
+    @Test
+    public void length_whenSourceIsEmpty_returnsZero() throws IOException {
+        // Arrange: Create an empty underlying source and wrap it.
+        // Using ByteArrayRandomAccessSource with an empty array is a clear and direct
+        // way to represent a source with a length of zero.
+        RandomAccessSource emptySource = new ByteArrayRandomAccessSource(new byte[0]);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(emptySource);
+
+        // Act: Get the length from the buffered source.
+        long actualLength = bufferedSource.length();
+
+        // Assert: The length should be 0, matching the underlying source.
+        assertEquals(0L, actualLength);
     }
 }
