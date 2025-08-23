@@ -1,29 +1,30 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmlStreamWriter_ESTestTest18 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link XmlStreamWriter.Builder} class.
+ */
+public class XmlStreamWriterBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        XmlStreamWriter.Builder xmlStreamWriter_Builder0 = new XmlStreamWriter.Builder();
-        assertEquals(8192, xmlStreamWriter_Builder0.getBufferSizeDefault());
+    /**
+     * Tests that a new {@link XmlStreamWriter.Builder} instance is configured
+     * with the default buffer size defined in {@link IOUtils}.
+     */
+    @Test
+    public void newBuilderShouldUseDefaultBufferSize() {
+        // Arrange
+        final XmlStreamWriter.Builder builder = new XmlStreamWriter.Builder();
+        final int expectedBufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
+
+        // Act
+        final int actualBufferSize = builder.getBufferSizeDefault();
+
+        // Assert
+        assertEquals("The builder should be initialized with the default buffer size from IOUtils.",
+                expectedBufferSize, actualBufferSize);
     }
 }
