@@ -1,35 +1,28 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest22 extends SerializedString_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SerializedString} class, focusing on its exception-handling behavior.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        // Undeclared exception!
-        try {
-            serializedString0.appendUnquotedUTF8((byte[]) null, (-443));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.SerializedString", e);
-        }
+    /**
+     * Verifies that {@link SerializedString#appendUnquotedUTF8(byte[], int)} throws a
+     * {@link NullPointerException} when the provided buffer is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void appendUnquotedUTF8ShouldThrowNullPointerExceptionForNullBuffer() {
+        // Arrange: Create an instance of SerializedString. Its content is irrelevant for this test.
+        SerializedString serializedString = new SerializedString("any-value");
+        byte[] nullBuffer = null;
+        int anyOffset = -1; // The offset value is not relevant to triggering the NPE.
+
+        // Act: Call the method with a null buffer.
+        // This action is expected to throw a NullPointerException.
+        serializedString.appendUnquotedUTF8(nullBuffer, anyOffset);
+
+        // Assert: The test passes if the expected NullPointerException is thrown.
+        // This is handled declaratively by the @Test(expected=...) annotation.
     }
 }
