@@ -1,48 +1,92 @@
 package org.apache.commons.cli.help;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import org.apache.commons.io.IOUtils;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class TextHelpAppendableTestTest3 {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+class TextHelpAppendableTest {
 
     private StringBuilder sb;
-
     private TextHelpAppendable underTest;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         sb = new StringBuilder();
         underTest = new TextHelpAppendable(sb);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.apache.commons.cli.help.UtilTest#charArgs")
-    void testindexOfWrapPosWithWhitespace(final Character c, final boolean isWhitespace) {
-        final String text = String.format("Hello%cWorld", c);
-        assertEquals(isWhitespace ? 5 : 6, TextHelpAppendable.indexOfWrap(text, 7, 0));
+    @DisplayName("indexOfWrap should return the position of the last whitespace character within the search width")
+    @ParameterizedTest(name = "For whitespace char ''{0}''")
+    @ValueSource(chars = {' ', '\t', '\n'})
+    void indexOfWrap_whenWhitespaceIsPresent_returnsItsPosition(final char whitespaceChar) {
+        // Arrange
+        final String text = "Hello" + whitespaceChar + "World"; // Whitespace is at index 5
+        final int searchWidth = 7;
+        final int startPosition = 0;
+        final int expectedPosition = 5;
+
+        // Act
+        final int actualPosition = TextHelpAppendable.indexOfWrap(text, searchWidth, startPosition);
+
+        // Assert
+        assertEquals(expectedPosition, actualPosition);
     }
 
     @Test
-    void testAppend() throws IOException {
-        final char c = (char) 0x1F44D;
-        underTest.append(c);
-        assertEquals(1, sb.length());
-        assertEquals(String.valueOf(c), sb.toString());
-        sb.setLength(0);
-        underTest.append("Hello");
+    @DisplayName("indexOfWrap should return a position just within the width limit when no whitespace is found")
+    void indexOfWrap_whenNoWhitespaceIsPresent_returnsPositionBeforeWidthLimit() {
+        // Arrange
+        final String text = "HelloWorld";
+        final int searchWidth = 7;
+        final int startPosition = 0;
+        // The expected behavior is non-obvious: for a width of 7, it returns 6.
+        // This suggests it finds the last valid character index before the text would wrap.
+        final int expectedPosition = 6;
+
+        // Act
+        final int actualPosition = TextHelpAppendable.indexOfWrap(text, searchWidth, startPosition);
+
+        // Assert
+        assertEquals(expectedPosition, actualPosition);
+    }
+
+    @Test
+    @DisplayName("append(char) should correctly write a supplementary character to the buffer")
+    void append_withSupplementaryCharacter_writesToBuffer() throws IOException {
+        // Arrange
+        // U+1F44D is the "thumbs up" emoji (👍), a supplementary character.
+        final int thumbsUpCodepoint = 0x1F44D;
+        final String expectedString = new String(Character.toChars(thumbsUpCodepoint));
+
+        // Act
+        underTest.append(thumbsUpCodepoint);
+
+        // Assert
+        // A supplementary character is represented by a surrogate pair in a Java String (UTF-16),
+        // so its length is 2, not 1.
+        assertEquals(2, sb.length());
+        assertEquals(expectedString, sb.toString());
+    }
+
+    @Test
+    @DisplayName("append(CharSequence) should write the full sequence to the buffer")
+    void append_withCharSequence_writesToBuffer() throws IOException {
+        // Arrange
+        final String text = "Hello";
+
+        // Act
+        underTest.append(text);
+
+        // Assert
         assertEquals("Hello", sb.toString());
     }
 }
