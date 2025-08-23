@@ -1,46 +1,59 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.awt.geom.Rectangle2D;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+// Note: The original test class name and inheritance are preserved.
 public class ModuloAxis_ESTestTest12 extends ModuloAxis_ESTest_scaffolding {
 
+    /**
+     * This test verifies the behavior of the {@code valueToJava2D} method after
+     * the axis's display range has been significantly resized.
+     *
+     * <p>The test sets up a ModuloAxis with a wrapped display range (like a compass),
+     * resizes this range by a large, specific factor, and then checks if a given data value
+     * is correctly translated into its corresponding 2D coordinate. It also confirms
+     * that resizing the range correctly disables the auto-range feature.
+     */
     @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        moduloAxis0.resizeRange(1005.89236);
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        Rectangle2D rectangle2D0 = moduloAxis0.DEFAULT_TICK_LABEL_INSETS.createOutsetRectangle((Rectangle2D) rectangle2D_Double0, true, true);
-        RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
-        double double0 = moduloAxis0.valueToJava2D(3676.6, rectangle2D0, rectangleEdge0);
-        assertFalse(moduloAxis0.isAutoRange());
-        assertEquals(5.979967110664955, double0, 0.01);
+    public void valueToJava2DShouldCalculateCorrectCoordinateAfterRangeResize() {
+        // Arrange
+        // A ModuloAxis with a fixed range of [0, 1]. The default display range
+        // is a wrapped range from 270 to 90 (like degrees on a compass).
+        final Range fixedRange = new Range(0.0, 1.0);
+        final ModuloAxis moduloAxis = new ModuloAxis("Test Axis", fixedRange);
+
+        // Define the drawing area and the position of the axis.
+        // The original test used a complex calculation that resulted in this rectangle.
+        final Rectangle2D plotArea = new Rectangle2D.Double(-4.0, -2.0, 8.0, 4.0);
+        final RectangleEdge axisEdge = RectangleEdge.LEFT;
+
+        // Use named constants for the non-intuitive values from the original test
+        // to make their purpose clear.
+        final double resizeFactor = 1005.89236;
+        final double dataValue = 3676.6;
+
+        // Act
+        // Resize the display range. This is a key part of the setup for the value conversion.
+        // This action also has the side effect of disabling auto-ranging.
+        moduloAxis.resizeRange(resizeFactor);
+
+        // Convert the data value to a 2D coordinate.
+        final double actualCoordinate = moduloAxis.valueToJava2D(dataValue, plotArea, axisEdge);
+
+        // Assert
+        final double expectedCoordinate = 5.979967110664955;
+        final double tolerance = 0.01;
+
+        assertEquals("The calculated Java2D coordinate should match the expected value after resizing.",
+                expectedCoordinate, actualCoordinate, tolerance);
+        assertFalse("Resizing the range should disable the auto-range feature.",
+                moduloAxis.isAutoRange());
     }
 }
