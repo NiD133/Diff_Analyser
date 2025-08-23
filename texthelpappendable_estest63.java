@@ -1,55 +1,35 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.CharBuffer;
+
+/**
+ * Tests for {@link TextHelpAppendable} focusing on buffer handling.
+ */
 public class TextHelpAppendable_ESTestTest63 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        char[] charArray0 = new char[5];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharBuffer charBuffer1 = CharBuffer.wrap((CharSequence) charBuffer0);
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-        textHelpAppendable0.append('#');
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendParagraph(charBuffer1);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.Buffer", e);
-        }
+    /**
+     * Verifies that appendParagraph throws a BufferOverflowException when the underlying
+     * Appendable has insufficient space to write the entire paragraph.
+     */
+    @Test(timeout = 4000, expected = BufferOverflowException.class)
+    public void appendParagraphShouldThrowExceptionWhenAppendableHasInsufficientSpace() throws IOException {
+        // Arrange: Create a small, fixed-size buffer as the destination for the help text.
+        final CharBuffer destinationBuffer = CharBuffer.allocate(5);
+        final TextHelpAppendable textHelpAppendable = new TextHelpAppendable(destinationBuffer);
+
+        // Act & Assert
+        // Append one character, leaving only 4 characters of space in the buffer.
+        textHelpAppendable.append('#');
+
+        // Define a paragraph that is too long (5 chars) to fit in the remaining space.
+        final String oversizedParagraph = "12345";
+
+        // Attempting to append this paragraph should cause a BufferOverflowException.
+        // The @Test(expected=...) annotation handles the assertion.
+        textHelpAppendable.appendParagraph(oversizedParagraph);
     }
 }
