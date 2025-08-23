@@ -1,31 +1,27 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JsonArray_ESTestTest62 extends JsonArray_ESTest_scaffolding {
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Character) null);
-        // Undeclared exception!
+    @Test
+    public void getAsString_whenArrayContainsSingleJsonNull_throwsUnsupportedOperationException() {
+        // Arrange: Create a JsonArray and add a null value.
+        // The JsonArray class converts any null input into a JsonNull element.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((Character) null);
+
+        // Act & Assert: Verify that calling getAsString() throws the expected exception.
+        // The getAsString() method on a JsonArray with one element delegates the call
+        // to that single element. For a JsonNull element, this is an unsupported operation.
         try {
-            jsonArray0.getAsString();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
+            jsonArray.getAsString();
+            fail("Expected an UnsupportedOperationException to be thrown, but it was not.");
+        } catch (UnsupportedOperationException expectedException) {
+            // The default exception message from JsonElement.getAsString() is the class's simple name.
+            assertEquals("JsonNull", expectedException.getMessage());
         }
     }
 }
