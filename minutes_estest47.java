@@ -1,19 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Minutes_ESTestTest47 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class, focusing on comparison logic.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Minutes minutes0 = Minutes.TWO;
-        Minutes minutes1 = Minutes.ZERO;
-        boolean boolean0 = minutes0.isGreaterThan(minutes1);
-        assertTrue(boolean0);
+    @Test
+    public void isGreaterThan_shouldReturnTrue_whenComparingLargerToSmaller() {
+        // Arrange: Create two Minutes instances where one is clearly larger than the other.
+        Minutes twoMinutes = Minutes.TWO;
+        Minutes zeroMinutes = Minutes.ZERO;
+
+        // Act: Call the isGreaterThan method to perform the comparison.
+        boolean result = twoMinutes.isGreaterThan(zeroMinutes);
+
+        // Assert: Verify that the result is true, as 2 minutes is greater than 0 minutes.
+        assertTrue("Two minutes should be considered greater than zero minutes.", result);
     }
 }
