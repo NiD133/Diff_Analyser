@@ -1,38 +1,65 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 import static org.jsoup.nodes.Document.OutputSettings.Syntax;
 import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTreeBuilderTestTest40 {
+/**
+ * Test suite for the XmlTreeBuilder, focusing on its interaction with different tag sets and output syntaxes.
+ */
+public class XmlTreeBuilderTest {
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
+    @Test
+    @DisplayName("XML parser with HTML tag set should output in XML syntax by default")
+    void xmlParserWithHtmlTagSet_OutputsInXmlSyntax() {
+        // GIVEN an input string that resembles XML but uses tags defined in the HTML tag set (e.g., <script>, <img>).
+        String xml = "<html xmlns=" + NamespaceHtml + "><div><script>a<b</script><img><p>";
+
+        // WHEN the string is parsed using the XML parser configured with the HTML tag set.
+        Document doc = Jsoup.parse(xml, Parser.xmlParser().tagSet(TagSet.Html()));
+        doc.outputSettings().prettyPrint(true);
+
+        // THEN the output should adhere to XML syntax rules.
+        // Specifically, <script> content is wrapped in <![CDATA[...]]> and empty tags like <img> are self-closing.
+        String expectedXmlOutput = """
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                 <div>
+                  <script>//<![CDATA[
+                a<b
+                //]]></script>
+                  <img />
+                  <p></p>
+                 </div>
+                </html>""";
+        assertEquals(expectedXmlOutput, doc.html(), "The output should be formatted as XML.");
     }
 
     @Test
-    void canSupplyWithHtmlTagSet() {
-        // use the properties of html tag set but without HtmlTreeBuilder rules
+    @DisplayName("XML parser output should switch to HTML syntax when configured")
+    void xmlParserWithHtmlTagSet_CanSwitchOutputToHtmlSyntax() {
+        // GIVEN a document parsed with the XML parser.
         String xml = "<html xmlns=" + NamespaceHtml + "><div><script>a<b</script><img><p>";
         Document doc = Jsoup.parse(xml, Parser.xmlParser().tagSet(TagSet.Html()));
         doc.outputSettings().prettyPrint(true);
-        String expect = "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" + " <div>\n" + "  <script>//<![CDATA[\n" + "a<b\n" + "//]]></script>\n" + "  <img />\n" + "  <p></p>\n" + " </div>\n" + "</html>";
-        assertEquals(expect, doc.html());
+
+        // WHEN the document's output syntax is explicitly set to HTML.
         doc.outputSettings().syntax(Syntax.html);
-        expect = "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" + " <div>\n" + "  <script>a<b</script>\n" + "  <img>\n" + "  <p></p>\n" + " </div>\n" + "</html>";
-        assertEquals(expect, doc.html());
+
+        // THEN the output should adhere to HTML syntax rules.
+        // Specifically, <script> content is not wrapped in <![CDATA[...]]> and empty tags like <img> are not self-closing.
+        String expectedHtmlOutput = """
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                 <div>
+                  <script>a<b</script>
+                  <img>
+                  <p></p>
+                 </div>
+                </html>""";
+        assertEquals(expectedHtmlOutput, doc.html(), "The output should be formatted as HTML.");
     }
 }
