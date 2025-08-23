@@ -1,52 +1,40 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+import org.junit.jupiter.api.Test;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
-public class Symmetry010Chronology_ESTestTest23 extends Symmetry010Chronology_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        // Undeclared exception!
-        try {
-            symmetry010Chronology0.dateYearDay(999, 999);
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid value for DayOfYear (valid values 1 - 364/371): 999
-            //
-            verifyException("java.time.temporal.ValueRange", e);
-        }
+/**
+ * Unit tests for the {@link Symmetry010Chronology} class.
+ */
+public class Symmetry010ChronologyTest {
+
+    /**
+     * Tests that dateYearDay() throws a DateTimeException when the day-of-year
+     * value is outside the valid range.
+     *
+     * According to the Symmetry010 calendar system, a standard year has 364 days
+     * and a leap year has 371. The value 999 is used here as it is clearly
+     * outside this valid range.
+     */
+    @Test
+    void dateYearDay_whenDayOfYearIsOutOfRange_throwsDateTimeException() {
+        // Arrange
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        int year = 999; // A valid year for the test
+        int invalidDayOfYear = 999; // An out-of-range day, as the max is 371
+        String expectedErrorMessage = "Invalid value for DayOfYear (valid values 1 - 364/371): " + invalidDayOfYear;
+
+        // Act & Assert
+        // Verify that calling the method with an invalid dayOfYear throws the expected exception.
+        DateTimeException thrown = assertThrows(
+            DateTimeException.class,
+            () -> chronology.dateYearDay(year, invalidDayOfYear)
+        );
+
+        // Also, verify that the exception message is correct to ensure the right validation failed.
+        assertEquals(expectedErrorMessage, thrown.getMessage());
     }
 }
