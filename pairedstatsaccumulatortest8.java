@@ -2,120 +2,179 @@ package com.google.common.math;
 
 import static com.google.common.math.StatsTesting.ALLOWED_ERROR;
 import static com.google.common.math.StatsTesting.ALL_MANY_VALUES;
-import static com.google.common.math.StatsTesting.EMPTY_STATS_ITERABLE;
 import static com.google.common.math.StatsTesting.MANY_VALUES;
 import static com.google.common.math.StatsTesting.MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.MANY_VALUES_STATS_ITERABLE;
-import static com.google.common.math.StatsTesting.MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
 import static com.google.common.math.StatsTesting.ONE_VALUE;
-import static com.google.common.math.StatsTesting.ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_STATS;
 import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE;
-import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES_STATS;
 import static com.google.common.math.StatsTesting.TWO_VALUES;
-import static com.google.common.math.StatsTesting.TWO_VALUES_STATS;
-import static com.google.common.math.StatsTesting.TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
 import static com.google.common.math.StatsTesting.assertDiagonalLinearTransformation;
 import static com.google.common.math.StatsTesting.assertHorizontalLinearTransformation;
 import static com.google.common.math.StatsTesting.assertLinearTransformationNaN;
-import static com.google.common.math.StatsTesting.assertStatsApproxEqual;
 import static com.google.common.math.StatsTesting.assertVerticalLinearTransformation;
 import static com.google.common.math.StatsTesting.createFilledPairedStatsAccumulator;
 import static com.google.common.math.StatsTesting.createPartitionedFilledPairedStatsAccumulator;
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.Assert.assertThrows;
+
 import com.google.common.math.StatsTesting.ManyValues;
 import java.util.Collections;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class PairedStatsAccumulatorTestTest8 extends TestCase {
+/**
+ * Tests for {@link PairedStatsAccumulator#leastSquaresFit()}.
+ * This class focuses on various data scenarios and edge cases for linear regression.
+ */
+@RunWith(JUnit4.class)
+public class PairedStatsAccumulatorLeastSquaresFitTest {
 
-    private PairedStatsAccumulator emptyAccumulator;
+    @Test
+    public void leastSquaresFit_empty_throwsIllegalStateException() {
+        // An accumulator with no data cannot produce a fit.
+        PairedStatsAccumulator emptyAccumulator = new PairedStatsAccumulator();
+        assertThrows(IllegalStateException.class, emptyAccumulator::leastSquaresFit);
 
-    private PairedStatsAccumulator emptyAccumulatorByAddAllEmptyPairedStats;
-
-    private PairedStatsAccumulator oneValueAccumulator;
-
-    private PairedStatsAccumulator oneValueAccumulatorByAddAllEmptyPairedStats;
-
-    private PairedStatsAccumulator twoValuesAccumulator;
-
-    private PairedStatsAccumulator twoValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator manyValuesAccumulator;
-
-    private PairedStatsAccumulator manyValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator horizontalValuesAccumulator;
-
-    private PairedStatsAccumulator horizontalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator verticalValuesAccumulator;
-
-    private PairedStatsAccumulator verticalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator constantValuesAccumulator;
-
-    private PairedStatsAccumulator constantValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        emptyAccumulator = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        oneValueAccumulator = new PairedStatsAccumulator();
-        oneValueAccumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        oneValueAccumulatorByAddAllEmptyPairedStats.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        twoValuesAccumulator = createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
-        twoValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
-        manyValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
-        manyValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
-        horizontalValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
-        verticalValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES);
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES, 2);
-        constantValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        constantValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
+        // Same for an accumulator where empty stats have been added.
+        PairedStatsAccumulator accumulatorFromEmptyStats = new PairedStatsAccumulator();
+        accumulatorFromEmptyStats.addAll(emptyAccumulator.snapshot());
+        assertThrows(IllegalStateException.class, accumulatorFromEmptyStats::leastSquaresFit);
     }
 
-    public void testLeastSquaresFit() {
-        assertThrows(IllegalStateException.class, () -> emptyAccumulator.leastSquaresFit());
-        assertThrows(IllegalStateException.class, () -> emptyAccumulatorByAddAllEmptyPairedStats.leastSquaresFit());
-        assertThrows(IllegalStateException.class, () -> oneValueAccumulator.leastSquaresFit());
-        assertThrows(IllegalStateException.class, () -> oneValueAccumulatorByAddAllEmptyPairedStats.leastSquaresFit());
-        assertDiagonalLinearTransformation(twoValuesAccumulator.leastSquaresFit(), twoValuesAccumulator.xStats().mean(), twoValuesAccumulator.yStats().mean(), twoValuesAccumulator.xStats().populationVariance(), twoValuesAccumulator.populationCovariance());
-        assertDiagonalLinearTransformation(twoValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit(), twoValuesAccumulatorByAddAllPartitionedPairedStats.xStats().mean(), twoValuesAccumulatorByAddAllPartitionedPairedStats.yStats().mean(), twoValuesAccumulatorByAddAllPartitionedPairedStats.xStats().populationVariance(), twoValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance());
-        assertDiagonalLinearTransformation(manyValuesAccumulator.leastSquaresFit(), manyValuesAccumulator.xStats().mean(), manyValuesAccumulator.yStats().mean(), manyValuesAccumulator.xStats().populationVariance(), manyValuesAccumulator.populationCovariance());
-        assertDiagonalLinearTransformation(manyValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit(), manyValuesAccumulatorByAddAllPartitionedPairedStats.xStats().mean(), manyValuesAccumulatorByAddAllPartitionedPairedStats.yStats().mean(), manyValuesAccumulatorByAddAllPartitionedPairedStats.xStats().populationVariance(), manyValuesAccumulatorByAddAllPartitionedPairedStats.populationCovariance());
-        // For datasets of many double values, we test many combinations of finite and non-finite
-        // x-values:
+    @Test
+    public void leastSquaresFit_onePoint_throwsIllegalStateException() {
+        // An accumulator with a single data point cannot produce a fit.
+        PairedStatsAccumulator oneValueAccumulator = new PairedStatsAccumulator();
+        oneValueAccumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
+        assertThrows(IllegalStateException.class, oneValueAccumulator::leastSquaresFit);
+    }
+
+    @Test
+    public void leastSquaresFit_twoPoints_isCorrect() {
+        PairedStatsAccumulator accumulator =
+                createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
+
+        LinearTransformation fit = accumulator.leastSquaresFit();
+
+        assertDiagonalLinearTransformation(
+                fit,
+                accumulator.xStats().mean(),
+                accumulator.yStats().mean(),
+                accumulator.xStats().populationVariance(),
+                accumulator.populationCovariance());
+    }
+
+    @Test
+    public void leastSquaresFit_twoPoints_viaAddAll_isCorrect() {
+        // Test with an accumulator built by adding partitioned stats.
+        PairedStatsAccumulator accumulator =
+                createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
+
+        LinearTransformation fit = accumulator.leastSquaresFit();
+
+        assertDiagonalLinearTransformation(
+                fit,
+                accumulator.xStats().mean(),
+                accumulator.yStats().mean(),
+                accumulator.xStats().populationVariance(),
+                accumulator.populationCovariance());
+    }
+
+    @Test
+    public void leastSquaresFit_manyPoints_isCorrect() {
+        PairedStatsAccumulator accumulator =
+                createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
+
+        LinearTransformation fit = accumulator.leastSquaresFit();
+
+        assertDiagonalLinearTransformation(
+                fit,
+                accumulator.xStats().mean(),
+                accumulator.yStats().mean(),
+                accumulator.xStats().populationVariance(),
+                accumulator.populationCovariance());
+    }
+
+    @Test
+    public void leastSquaresFit_manyPoints_viaAddAll_isCorrect() {
+        // Test with an accumulator built by adding partitioned stats.
+        PairedStatsAccumulator accumulator =
+                createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
+
+        LinearTransformation fit = accumulator.leastSquaresFit();
+
+        assertDiagonalLinearTransformation(
+                fit,
+                accumulator.xStats().mean(),
+                accumulator.yStats().mean(),
+                accumulator.xStats().populationVariance(),
+                accumulator.populationCovariance());
+    }
+
+    @Test
+    public void leastSquaresFit_withNonFiniteValues_returnsNaNFit() {
+        // The fit should be NaN if any x-value is non-finite.
         for (ManyValues values : ALL_MANY_VALUES) {
-            PairedStatsAccumulator accumulator = createFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES);
-            PairedStatsAccumulator accumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES, 2);
-            LinearTransformation fit = accumulator.leastSquaresFit();
-            LinearTransformation fitByAddAllPartitionedPairedStats = accumulatorByAddAllPartitionedPairedStats.leastSquaresFit();
             if (values.hasAnyNonFinite()) {
-                assertLinearTransformationNaN(fit);
-                assertLinearTransformationNaN(fitByAddAllPartitionedPairedStats);
-            } else {
-                assertDiagonalLinearTransformation(fit, accumulator.xStats().mean(), accumulator.yStats().mean(), accumulator.xStats().populationVariance(), accumulator.populationCovariance());
-                assertDiagonalLinearTransformation(fitByAddAllPartitionedPairedStats, accumulatorByAddAllPartitionedPairedStats.xStats().mean(), accumulatorByAddAllPartitionedPairedStats.yStats().mean(), accumulatorByAddAllPartitionedPairedStats.xStats().populationVariance(), accumulatorByAddAllPartitionedPairedStats.populationCovariance());
+                PairedStatsAccumulator accumulator =
+                        createFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES);
+                PairedStatsAccumulator accumulatorByAddAll =
+                        createPartitionedFilledPairedStatsAccumulator(values.asIterable(), OTHER_MANY_VALUES, 2);
+
+                assertLinearTransformationNaN(accumulator.leastSquaresFit());
+                assertLinearTransformationNaN(accumulatorByAddAll.leastSquaresFit());
             }
         }
-        assertHorizontalLinearTransformation(horizontalValuesAccumulator.leastSquaresFit(), horizontalValuesAccumulator.yStats().mean());
-        assertHorizontalLinearTransformation(horizontalValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit(), horizontalValuesAccumulatorByAddAllPartitionedPairedStats.yStats().mean());
-        assertVerticalLinearTransformation(verticalValuesAccumulator.leastSquaresFit(), verticalValuesAccumulator.xStats().mean());
-        assertVerticalLinearTransformation(verticalValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit(), verticalValuesAccumulatorByAddAllPartitionedPairedStats.xStats().mean());
-        assertThrows(IllegalStateException.class, () -> constantValuesAccumulator.leastSquaresFit());
-        assertThrows(IllegalStateException.class, () -> constantValuesAccumulatorByAddAllPartitionedPairedStats.leastSquaresFit());
+    }
+
+    @Test
+    public void leastSquaresFit_horizontalLineData_isCorrect() {
+        // Data where y is constant (zero y-variance) should result in a horizontal line fit.
+        PairedStatsAccumulator accumulator =
+                createFilledPairedStatsAccumulator(
+                        MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
+        PairedStatsAccumulator accumulatorByAddAll =
+                createPartitionedFilledPairedStatsAccumulator(
+                        MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
+
+        assertHorizontalLinearTransformation(
+                accumulator.leastSquaresFit(), accumulator.yStats().mean());
+        assertHorizontalLinearTransformation(
+                accumulatorByAddAll.leastSquaresFit(), accumulatorByAddAll.yStats().mean());
+    }
+
+    @Test
+    public void leastSquaresFit_verticalLineData_isCorrect() {
+        // Data where x is constant (zero x-variance) should result in a vertical line fit.
+        PairedStatsAccumulator accumulator =
+                createFilledPairedStatsAccumulator(
+                        Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES);
+        PairedStatsAccumulator accumulatorByAddAll =
+                createPartitionedFilledPairedStatsAccumulator(
+                        Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES, 2);
+
+        assertVerticalLinearTransformation(
+                accumulator.leastSquaresFit(), accumulator.xStats().mean());
+        assertVerticalLinearTransformation(
+                accumulatorByAddAll.leastSquaresFit(), accumulatorByAddAll.xStats().mean());
+    }
+
+    @Test
+    public void leastSquaresFit_constantData_throwsIllegalStateException() {
+        // Data where both x and y are constant (zero variance in both) cannot produce a fit.
+        PairedStatsAccumulator accumulator =
+                createFilledPairedStatsAccumulator(
+                        Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE),
+                        Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
+        PairedStatsAccumulator accumulatorByAddAll =
+                createPartitionedFilledPairedStatsAccumulator(
+                        Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE),
+                        Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE),
+                        2);
+
+        assertThrows(IllegalStateException.class, accumulator::leastSquaresFit);
+        assertThrows(IllegalStateException.class, accumulatorByAddAll::leastSquaresFit);
     }
 }
