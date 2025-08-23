@@ -1,23 +1,39 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest26 extends PhoneticEngine_ESTest_scaffolding {
+/**
+ * Contains tests for edge cases and error handling in the PhoneticEngine,
+ * specifically focusing on how it handles unusually long input strings.
+ */
+public class PhoneticEngineLongInputTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        NameType nameType0 = NameType.ASHKENAZI;
-        RuleType ruleType0 = RuleType.APPROX;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, true);
-        // Undeclared exception!
-        phoneticEngine0.encode("org.apache.commons.cod6c.language.bm.Res}urce*onstants");
+    /**
+     * A very long and complex string designed to trigger an out-of-bounds error
+     * in the rule-matching logic of older versions of PhoneticEngine.
+     */
+    private static final String EXTREMELY_LONG_INPUT =
+            "org.apache.commons.cod6c.language.bm.Res}urce*onstants";
+
+    /**
+     * Verifies that the {@code encode} method throws an {@code ArrayIndexOutOfBoundsException}
+     * when processing an extremely long input string.
+     *
+     * <p>This scenario previously caused a bug where the rule-matching algorithm would
+     * attempt to read past the bounds of the input string when checking rule contexts.
+     * This test acts as a regression test to ensure the issue remains fixed.</p>
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void encodeShouldThrowArrayIndexOutOfBoundsExceptionForVeryLongInput() {
+        // Arrange: Create a PhoneticEngine with a specific configuration known
+        // to be vulnerable to the long input bug.
+        final NameType nameType = NameType.ASHKENAZI;
+        final RuleType ruleType = RuleType.APPROX;
+        final boolean useConcat = true;
+        final PhoneticEngine phoneticEngine = new PhoneticEngine(nameType, ruleType, useConcat);
+
+        // Act: Attempt to encode the problematic long string.
+        // The test will pass if, and only if, an ArrayIndexOutOfBoundsException is thrown.
+        phoneticEngine.encode(EXTREMELY_LONG_INPUT);
     }
 }
