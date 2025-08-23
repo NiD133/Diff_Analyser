@@ -1,18 +1,25 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest64 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        Instant instant0 = new Instant();
-        Seconds seconds0 = Seconds.secondsBetween((ReadableInstant) instant0, (ReadableInstant) instant0);
-        assertEquals(0, seconds0.getSeconds());
+    /**
+     * Tests that the duration between two identical instants is zero seconds.
+     */
+    @Test
+    public void secondsBetween_shouldReturnZero_whenInstantsAreTheSame() {
+        // Arrange: Create a single point in time.
+        Instant now = new Instant();
+
+        // Act: Calculate the seconds between the instant and itself.
+        Seconds result = Seconds.secondsBetween(now, now);
+
+        // Assert: The result should be zero seconds.
+        assertEquals(Seconds.ZERO, result);
     }
 }
