@@ -1,29 +1,27 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class TaiInstant_ESTestTest48 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TaiInstant} class.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        TaiInstant taiInstant0 = TaiInstant.ofTaiSeconds(37L, 37L);
-        TaiInstant taiInstant1 = TaiInstant.ofTaiSeconds(37L, 3503L);
-        boolean boolean0 = taiInstant1.isAfter(taiInstant0);
-        assertTrue(boolean0);
-        assertEquals(3503, taiInstant1.getNano());
-        assertEquals(37L, taiInstant1.getTaiSeconds());
+    /**
+     * Tests that isAfter() returns true when comparing an instant to an earlier one
+     * where both have the same TAI seconds but the former has a greater nanosecond value.
+     */
+    @Test
+    public void isAfter_shouldReturnTrue_whenNanosecondsAreGreater() {
+        // Arrange: Create two instants at the same second, but with one having more nanoseconds.
+        TaiInstant earlierInstant = TaiInstant.ofTaiSeconds(37L, 100L);
+        TaiInstant laterInstant = TaiInstant.ofTaiSeconds(37L, 200L);
+
+        // Act: Check if the later instant is correctly identified as being "after" the earlier one.
+        boolean result = laterInstant.isAfter(earlierInstant);
+
+        // Assert: The result must be true.
+        assertTrue("An instant should be considered 'after' another if its nanosecond part is greater", result);
     }
 }
