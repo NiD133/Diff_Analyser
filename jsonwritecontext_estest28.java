@@ -1,33 +1,38 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonStreamContext;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest28 extends JsonWriteContext_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on context state management.
+ */
+public class JsonWriteContextTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        jsonWriteContext0.writeValue();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.createChildObjectContext();
-        jsonWriteContext0.writeValue();
-        jsonWriteContext1.clearAndGetParent();
-        assertEquals(1, jsonWriteContext0.getCurrentIndex());
-        assertEquals(2, jsonWriteContext0.getEntryCount());
+    /**
+     * Tests that creating a child context and then calling {@link JsonWriteContext#clearAndGetParent()}
+     * on it does not alter the state (entry count and current index) of the parent context.
+     */
+    @Test
+    public void clearAndGetParentOnChildShouldNotAffectParentState() {
+        // Arrange: Create a root context and write two values to it, establishing a known state.
+        // A child context is created between the writes to ensure its lifecycle doesn't interfere.
+        JsonWriteContext rootContext = JsonWriteContext.createRootContext();
+        rootContext.writeValue(); // Simulates writing a first value. entryCount=1, currentIndex=0
+
+        JsonWriteContext childContext = rootContext.createChildObjectContext();
+
+        rootContext.writeValue(); // Simulates writing a second value. entryCount=2, currentIndex=1
+
+        // Act: Clear the child context. This is the operation under test.
+        JsonStreamContext returnedParent = childContext.clearAndGetParent();
+
+        // Assert: Verify the parent context's state remains unchanged and the correct parent is returned.
+        final int expectedIndex = 1;
+        final int expectedEntryCount = 2;
+
+        assertSame("clearAndGetParent() should return the direct parent context", rootContext, returnedParent);
+        assertEquals("Parent's current index should be unaffected", expectedIndex, rootContext.getCurrentIndex());
+        assertEquals("Parent's entry count should be unaffected", expectedEntryCount, rootContext.getEntryCount());
     }
 }
