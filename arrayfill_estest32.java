@@ -1,20 +1,27 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link ArrayFill} class.
+ * This test was improved for clarity from an auto-generated version.
+ */
 public class ArrayFill_ESTestTest32 extends ArrayFill_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        boolean[] booleanArray0 = ArrayFill.fill((boolean[]) null, true);
-        assertNull(booleanArray0);
+    /**
+     * Tests that {@link ArrayFill#fill(boolean[], boolean)} correctly handles a null input array
+     * by returning null, as specified in its contract.
+     */
+    @Test
+    public void fillBooleanArray_shouldReturnNull_whenInputArrayIsNull() {
+        // Arrange: Define a null boolean array to pass to the method.
+        final boolean[] inputArray = null;
+
+        // Act: Call the fill method with the null array.
+        final boolean[] resultArray = ArrayFill.fill(inputArray, true);
+
+        // Assert: Verify that the method returns null for a null input.
+        assertNull("The fill method should return null when the input array is null.", resultArray);
     }
 }
