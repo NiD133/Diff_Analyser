@@ -1,23 +1,26 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest8 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.CharRange}.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CharRange charRange0 = CharRange.isNot('}');
-        char char0 = charRange0.getStart();
-        assertTrue(charRange0.isNegated());
-        assertEquals('}', char0);
-        assertEquals('}', charRange0.getEnd());
+    @Test
+    public void isNot_shouldCreateNegatedSingleCharRange() {
+        // Arrange
+        final char testChar = '}';
+
+        // Act: Create a negated range representing all characters EXCEPT testChar.
+        final CharRange negatedRange = CharRange.isNot(testChar);
+
+        // Assert: Verify the range is correctly configured.
+        // A negated single-character range still uses the character for its start and end points.
+        assertTrue("The range should be marked as negated.", negatedRange.isNegated());
+        assertEquals("The start of the range should be the specified character.", testChar, negatedRange.getStart());
+        assertEquals("The end of the range should be the specified character.", testChar, negatedRange.getEnd());
     }
 }
