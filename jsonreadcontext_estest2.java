@@ -1,33 +1,47 @@
 package com.fasterxml.jackson.core.json;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonReadContext_ESTestTest2 extends JsonReadContext_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonReadContext} class.
+ */
+public class JsonReadContextTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(11, 11, (DupDetector) null);
-        JsonReadContext jsonReadContext1 = jsonReadContext0.createChildObjectContext(11, 11);
-        assertEquals("Object", jsonReadContext1.typeDesc());
-        assertEquals(0, jsonReadContext1.getEntryCount());
-        JsonReadContext jsonReadContext2 = jsonReadContext0.createChildObjectContext(1, 0);
-        assertEquals("ROOT", jsonReadContext0.getTypeDesc());
-        assertSame(jsonReadContext2, jsonReadContext1);
-        assertNotNull(jsonReadContext2);
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals(1, jsonReadContext2.getNestingDepth());
+    /**
+     * Verifies that successive calls to {@code createChildObjectContext} on the same parent
+     * reuse the same child context instance. This is an internal optimization to reduce
+     * object allocation, and this test ensures that behavior is preserved.
+     */
+    @Test
+    public void createChildObjectContextShouldReuseExistingChildInstance() {
+        // Arrange: Create a root context.
+        JsonReadContext rootContext = JsonReadContext.createRootContext(11, 11, null);
+
+        // Act: Create the first child context.
+        JsonReadContext firstChildContext = rootContext.createChildObjectContext(11, 11);
+
+        // Assert: Verify the initial state of the root and the new child context.
+        assertEquals("ROOT", rootContext.getTypeDesc());
+        assertEquals(0, rootContext.getNestingDepth());
+
+        assertNotNull(firstChildContext);
+        assertEquals("Object", firstChildContext.typeDesc());
+        assertEquals(0, firstChildContext.getEntryCount());
+        assertEquals(1, firstChildContext.getNestingDepth());
+
+        // Act: Create a second child context from the same root.
+        // The line and column numbers are different to ensure the 'reset' logic is also working.
+        JsonReadContext reusedChildContext = rootContext.createChildObjectContext(1, 0);
+
+        // Assert: The core behavior - the same child instance should be returned.
+        // This confirms the instance reuse optimization is active.
+        assertSame("Expected the same child context instance to be reused for performance.",
+                firstChildContext, reusedChildContext);
+
+        // Assert: The properties of the reused child context are correctly maintained or reset.
+        // The nesting depth should be preserved from the first creation.
+        assertEquals(1, reusedChildContext.getNestingDepth());
     }
 }
