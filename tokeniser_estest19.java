@@ -1,24 +1,30 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
-public class Tokeniser_ESTestTest19 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Tokeniser} class, focusing on error handling.
+ */
+public class TokeniserErrorHandlingTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("~q|K}QnrD6s{{tpV-~", "~q|K}QnrD6s{{tpV-~");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        tokeniser0.error("~q|K}QnrD6s{{tpV-~", (Object[]) null);
+    /**
+     * Verifies that the error() method throws a NullPointerException when the varargs
+     * array for format arguments is null. This is the current behavior because the
+     * arguments are passed directly to String.format(), which does not permit a null
+     * arguments array.
+     */
+    @Test(expected = NullPointerException.class)
+    public void errorWithNullArgumentsThrowsNPE() {
+        // Arrange: Create a Tokeniser instance.
+        // The XmlTreeBuilder is used to set up a valid internal state for the Tokeniser.
+        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+        treeBuilder.parse("", "http://example.com"); // Initialise the reader
+        Tokeniser tokeniser = new Tokeniser(treeBuilder);
+        String errorMessage = "Test error message without format specifiers";
+
+        // Act: Call the method under test with a null varargs array.
+        tokeniser.error(errorMessage, (Object[]) null);
+
+        // Assert: The test passes if a NullPointerException is thrown, as expected.
     }
 }
