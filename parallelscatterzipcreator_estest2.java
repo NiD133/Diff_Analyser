@@ -1,51 +1,42 @@
 package org.apache.commons.compress.archivers.zip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
-import org.apache.commons.compress.parallel.InputStreamSupplier;
 import org.apache.commons.compress.parallel.ScatterGatherBackingStoreSupplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURI;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.util.concurrent.ExecutorService;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
+/**
+ * Test suite for {@link ParallelScatterZipCreator}.
+ * This class focuses on testing constructor argument validation.
+ */
 public class ParallelScatterZipCreator_ESTestTest2 extends ParallelScatterZipCreator_ESTest_scaffolding {
 
+    /**
+     * Tests that the ParallelScatterZipCreator constructor throws an IllegalArgumentException
+     * when provided with a compression level that is outside the valid range (-1 to 9).
+     */
     @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        ThreadPoolExecutor.DiscardOldestPolicy threadPoolExecutor_DiscardOldestPolicy0 = new ThreadPoolExecutor.DiscardOldestPolicy();
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor0 = new ScheduledThreadPoolExecutor(0, threadPoolExecutor_DiscardOldestPolicy0);
-        scheduledThreadPoolExecutor0.prestartAllCoreThreads();
-        File file0 = MockFile.createTempFile("D;U(uA", ";,hSX[abfs+0dlNvz");
-        MockFile mockFile0 = new MockFile(file0, "");
-        Path path0 = mockFile0.toPath();
-        DefaultBackingStoreSupplier defaultBackingStoreSupplier0 = new DefaultBackingStoreSupplier(path0);
-        ParallelScatterZipCreator parallelScatterZipCreator0 = null;
+    public void constructorShouldThrowIllegalArgumentExceptionForInvalidCompressionLevel() {
+        // Arrange: Create mock dependencies, as their internal behavior is not relevant
+        // for testing constructor argument validation.
+        final ExecutorService executorService = mock(ExecutorService.class);
+        final ScatterGatherBackingStoreSupplier backingStoreSupplier = mock(ScatterGatherBackingStoreSupplier.class);
+
+        // An invalid compression level, outside the accepted range of [-1, 9].
+        final int invalidCompressionLevel = -1088;
+        final String expectedErrorMessage = "Compression level is expected between -1~9";
+
+        // Act & Assert: Attempt to create an instance with the invalid level and
+        // verify that the correct exception and message are produced.
         try {
-            parallelScatterZipCreator0 = new ParallelScatterZipCreator(scheduledThreadPoolExecutor0, defaultBackingStoreSupplier0, (-1088));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Compression level is expected between -1~9
-            //
-            verifyException("org.apache.commons.compress.archivers.zip.ParallelScatterZipCreator", e);
+            new ParallelScatterZipCreator(executorService, backingStoreSupplier, invalidCompressionLevel);
+            fail("Expected an IllegalArgumentException to be thrown for an invalid compression level.");
+        } catch (final IllegalArgumentException e) {
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
