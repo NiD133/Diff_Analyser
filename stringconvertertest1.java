@@ -1,90 +1,53 @@
 package org.joda.time.convert;
 
+import junit.framework.TestCase;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 
-public class StringConverterTestTest1 extends TestCase {
+/**
+ * Tests the design of the StringConverter class, ensuring it is correctly
+ * implemented as a package-private singleton.
+ *
+ * This test uses reflection because it needs to verify non-public members
+ * and modifiers, which are not accessible through the public API.
+ */
+public class StringConverterTest extends TestCase {
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+    /**
+     * Verifies that StringConverter is a package-private singleton by checking
+     * the modifiers of the class, its constructor, and its INSTANCE field.
+     */
+    public void testSingletonDesignIsEnforced() throws Exception {
+        Class<?> cls = StringConverter.class;
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+        // 1. Verify the class is package-private.
+        // This prevents instantiation or extension from other packages.
+        assertFalse("Class must not be public", Modifier.isPublic(cls.getModifiers()));
+        assertFalse("Class must not be protected", Modifier.isProtected(cls.getModifiers()));
+        assertFalse("Class must not be private", Modifier.isPrivate(cls.getModifiers()));
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // 2. Verify there is a single, protected, no-arg constructor.
+        // A protected constructor prevents instantiation except by subclasses or
+        // classes within the same package.
+        Constructor<?>[] constructors = cls.getDeclaredConstructors();
+        assertEquals("There must be exactly one constructor", 1, constructors.length);
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
+        Constructor<?> constructor = constructors[0];
+        assertTrue("The constructor must be protected", Modifier.isProtected(constructor.getModifiers()));
+        assertEquals("The constructor must not accept any arguments", 0, constructor.getParameterTypes().length);
 
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
+        // 3. Verify the INSTANCE field is a package-private, static, and final field.
+        Field instanceField = cls.getDeclaredField("INSTANCE");
+        int modifiers = instanceField.getModifiers();
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Check for package-private access to the singleton instance.
+        assertFalse("INSTANCE field must not be public", Modifier.isPublic(modifiers));
+        assertFalse("INSTANCE field must not be protected", Modifier.isProtected(modifiers));
+        assertFalse("INSTANCE field must not be private", Modifier.isPrivate(modifiers));
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSingleton() throws Exception {
-        Class cls = StringConverter.class;
-        assertEquals(false, Modifier.isPublic(cls.getModifiers()));
-        assertEquals(false, Modifier.isProtected(cls.getModifiers()));
-        assertEquals(false, Modifier.isPrivate(cls.getModifiers()));
-        Constructor con = cls.getDeclaredConstructor((Class[]) null);
-        assertEquals(1, cls.getDeclaredConstructors().length);
-        assertEquals(true, Modifier.isProtected(con.getModifiers()));
-        Field fld = cls.getDeclaredField("INSTANCE");
-        assertEquals(false, Modifier.isPublic(fld.getModifiers()));
-        assertEquals(false, Modifier.isProtected(fld.getModifiers()));
-        assertEquals(false, Modifier.isPrivate(fld.getModifiers()));
+        // Check that the instance is static and final, as expected for a singleton.
+        assertTrue("INSTANCE field must be static", Modifier.isStatic(modifiers));
+        assertTrue("INSTANCE field must be final", Modifier.isFinal(modifiers));
     }
 }
