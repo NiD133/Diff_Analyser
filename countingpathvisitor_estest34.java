@@ -1,47 +1,38 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
+import org.apache.commons.io.file.Counters.PathCounters;
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CountingPathVisitor_ESTestTest34 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Contains an improved test case for the {@link CountingPathVisitor} constructor.
+ */
+public class CountingPathVisitor_ESTestTest34 { // Class name kept for context with the original
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
-        FileFileFilter fileFileFilter0 = (FileFileFilter) FileFileFilter.INSTANCE;
-        CountingPathVisitor countingPathVisitor0 = null;
-        try {
-            countingPathVisitor0 = new CountingPathVisitor(counters_PathCounters0, fileFileFilter0, fileFileFilter0, (IOBiFunction<Path, IOException, FileVisitResult>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // visitFileFailedFunction
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that the deprecated constructor throws a NullPointerException
+     * when the 'visitFileFailed' function argument is null.
+     */
+    @Test
+    public void constructorShouldThrowNullPointerExceptionForNullVisitFileFailedFunction() {
+        // Arrange: Set up the necessary non-null arguments for the constructor.
+        final PathCounters counters = CountingPathVisitor.defaultPathCounters();
+        final PathFilter fileFilter = FileFileFilter.INSTANCE;
+        final PathFilter directoryFilter = FileFileFilter.INSTANCE;
+        final IOBiFunction<Path, IOException, FileVisitResult> nullVisitFileFailedFunction = null;
+
+        // Act & Assert: Verify that calling the constructor with a null function
+        // results in a NullPointerException.
+        // This constructor is deprecated, but its contract for non-null arguments
+        // should still be enforced, typically by the superclass constructor.
+        assertThrows(NullPointerException.class, () -> {
+            new CountingPathVisitor(counters, fileFilter, directoryFilter, nullVisitFileFailedFunction);
+        });
     }
 }
