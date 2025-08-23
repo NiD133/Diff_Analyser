@@ -1,49 +1,48 @@
 package com.itextpdf.text.xml.xmp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.xmp.XMPConst;
+import com.itextpdf.xmp.XMPException;
 import com.itextpdf.xmp.XMPMeta;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest28 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        BiFunction<Object, Object, String> biFunction0 = (BiFunction<Object, Object, String>) mock(BiFunction.class, new ViolatedAssumptionAnswer());
-        doReturn((Object) null).when(biFunction0).apply(any(), any());
-        hashMap0.put("subject", "subject");
-        hashMap0.replaceAll(biFunction0);
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, hashMap0);
+/**
+ * Tests for the {@link XmpWriter} constructor that accepts a Map of document information.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that the XmpWriter constructor correctly handles entries with null values
+     * in the provided info map by simply ignoring them.
+     */
+    @Test
+    public void constructorWithInfoMap_shouldIgnoreEntriesWithNullValues() throws IOException, XMPException {
+        // Arrange: Create a document info map containing one valid entry and one entry with a null value.
+        Map<String, String> documentInfo = new HashMap<>();
+        documentInfo.put("Author", "Test Author"); // This property should be added.
+        documentInfo.put("Subject", null);         // This property should be ignored.
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Act: Instantiate the XmpWriter with the map.
+        XmpWriter xmpWriter = new XmpWriter(outputStream, documentInfo);
+
+        // Assert: Verify that the XMP metadata was created correctly.
+        XMPMeta xmpMeta = xmpWriter.getXmpMeta();
+
+        // 1. Check that the valid "Author" property was processed and added as "dc:creator".
+        String creator = xmpMeta.getArrayItem(XMPConst.NS_DC, "creator", 1).getValue();
+        assertEquals("Test Author", creator);
+
+        // 2. Check that the "Subject" property, which had a null value, was ignored and not added as "dc:description".
+        boolean subjectExists = xmpMeta.doesPropertyExist(XMPConst.NS_DC, "description");
+        assertFalse("The 'description' property should not exist for a null 'Subject' value.", subjectExists);
     }
 }
