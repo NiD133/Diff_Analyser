@@ -1,29 +1,34 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TypeAdapter_ESTestTest8 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for specific scenarios in {@link TypeAdapter}, focusing on the behavior of delegated adapters.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter1 = new Gson.FutureTypeAdapter<Object>();
-        gson_FutureTypeAdapter1.setDelegate(gson_FutureTypeAdapter0);
-        gson_FutureTypeAdapter0.setDelegate(gson_FutureTypeAdapter1);
-        // Undeclared exception!
-        gson_FutureTypeAdapter0.toJsonTree(gson_FutureTypeAdapter0);
+    /**
+     * Verifies that a circular dependency between two delegating TypeAdapters
+     * causes a {@link StackOverflowError} when used for serialization.
+     *
+     * <p>This test simulates a scenario that can occur with recursive data structures where a
+     * TypeAdapter for a type might indirectly delegate back to itself.
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void toJsonTree_withCircularDelegation_throwsStackOverflowError() {
+        // Arrange: Create two TypeAdapters that delegate to each other, forming a cycle.
+        // Gson.FutureTypeAdapter is a placeholder that delegates calls to another adapter
+        // once it's set.
+        Gson.FutureTypeAdapter<Object> adapterA = new Gson.FutureTypeAdapter<>();
+        Gson.FutureTypeAdapter<Object> adapterB = new Gson.FutureTypeAdapter<>();
+
+        adapterA.setDelegate(adapterB);
+        adapterB.setDelegate(adapterA); // This creates the circular dependency.
+
+        // Act & Assert: Attempt to serialize an object using one of the adapters.
+        // The call to toJsonTree should trigger an infinite recursion between adapterA and
+        // adapterB, resulting in a StackOverflowError. The test will pass if this
+        // specific error is thrown.
+        adapterA.toJsonTree("any object");
     }
 }
