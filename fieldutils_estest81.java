@@ -1,31 +1,33 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class FieldUtils_ESTestTest81 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the safeAdd(long, long) method in {@link FieldUtils}.
+ */
+public class FieldUtilsSafeAddTest {
 
-    @Test(timeout = 4000)
-    public void test80() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeAdd((-9223372036854775808L), (-9223372036854775808L));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: -9223372036854775808 + -9223372036854775808
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that safeAdd throws an ArithmeticException when adding two long values
+     * results in a negative overflow (underflow).
+     */
+    @Test
+    public void safeAdd_whenLongAdditionCausesNegativeOverflow_throwsArithmeticException() {
+        // Arrange: Define the values that will cause an overflow.
+        // Using Long.MIN_VALUE makes the intent clear without magic numbers.
+        final long value1 = Long.MIN_VALUE;
+        final long value2 = Long.MIN_VALUE;
+        final String expectedMessage = "The calculation caused an overflow: " + value1 + " + " + value2;
+
+        // Act & Assert: Verify that the correct exception is thrown with the expected message.
+        // assertThrows is a modern, clear way to test for exceptions.
+        ArithmeticException exception = assertThrows(
+            ArithmeticException.class,
+            () -> FieldUtils.safeAdd(value1, value2)
+        );
+
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
