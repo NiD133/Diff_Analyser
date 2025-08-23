@@ -1,30 +1,29 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Lister_ESTestTest6 extends Lister_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        String[] stringArray0 = new String[0];
-        Lister lister0 = null;
-        try {
-            lister0 = new Lister(true, stringArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("org.apache.commons.compress.archivers.Lister", e);
-        }
+/**
+ * Tests for the {@link Lister} class.
+ */
+public class ListerTest {
+
+    /**
+     * Verifies that the Lister constructor throws an exception when initialized
+     * with an empty arguments array, as it requires at least one argument for
+     * the archive file path.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForEmptyArguments() {
+        // Arrange: Create an empty arguments array.
+        final String[] emptyArgs = {};
+
+        // Act & Assert: Expect an ArrayIndexOutOfBoundsException when constructing
+        // a Lister instance with no arguments. The constructor attempts to access
+        // the first element (args[0]) for the file path.
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+            new Lister(true, emptyArgs);
+        });
     }
 }
