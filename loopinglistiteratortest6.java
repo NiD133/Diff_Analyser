@@ -1,43 +1,39 @@
 package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
-import java.util.NoSuchElementException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class LoopingListIteratorTestTest6 {
+// Class name improved for clarity and to follow standard conventions.
+// The original "LoopingListIteratorTestTest6" was likely a typo.
+public class LoopingListIteratorTest {
 
     /**
-     * Tests whether a looping list iterator works on a list with only
-     * one element.
+     * Tests that a LoopingListIterator loops correctly both forwards and
+     * backwards when iterating over a single-element list.
      */
     @Test
-    void testLooping1() {
-        final List<String> list = Arrays.asList("a");
-        // <a>
-        final LoopingListIterator<String> loop = new LoopingListIterator<>(list);
-        assertTrue(loop.hasNext());
-        // <a>
-        assertEquals("a", loop.next());
-        assertTrue(loop.hasNext());
-        // <a>
-        assertEquals("a", loop.next());
-        assertTrue(loop.hasNext());
-        // <a>
-        assertEquals("a", loop.next());
-        assertTrue(loop.hasPrevious());
-        // <a>
-        assertEquals("a", loop.previous());
-        assertTrue(loop.hasPrevious());
-        // <a>
-        assertEquals("a", loop.previous());
-        assertTrue(loop.hasPrevious());
-        // <a>
-        assertEquals("a", loop.previous());
+    @DisplayName("A looping iterator on a single-element list should loop indefinitely")
+    void testLoopingOnSingleElementList() {
+        // Arrange: Create a list with a single element and its looping iterator.
+        final List<String> list = List.of("a");
+        final LoopingListIterator<String> iterator = new LoopingListIterator<>(list);
+
+        // Act & Assert: Test forward looping.
+        // The iterator should loop forward multiple times, always returning the single element.
+        for (int i = 0; i < 3; i++) {
+            assertTrue(iterator.hasNext(), "hasNext() should always be true for a non-empty looping iterator");
+            assertEquals("a", iterator.next(), "next() should consistently return the single element on iteration " + (i + 1));
+        }
+
+        // Act & Assert: Test backward looping.
+        // The iterator should also loop backward multiple times, always returning the single element.
+        for (int i = 0; i < 3; i++) {
+            assertTrue(iterator.hasPrevious(), "hasPrevious() should always be true for a non-empty looping iterator");
+            assertEquals("a", iterator.previous(), "previous() should consistently return the single element on iteration " + (i + 1));
+        }
     }
 }
