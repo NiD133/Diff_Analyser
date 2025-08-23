@@ -1,32 +1,36 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+// Note: The original class name and scaffolding are kept for context.
 public class GetBufferedRandomAccessSource_ESTestTest16 extends GetBufferedRandomAccessSource_ESTest_scaffolding {
 
+    /**
+     * Verifies that attempting to read from a source after it has been closed
+     * throws an IllegalStateException.
+     */
     @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        GetBufferedRandomAccessSource getBufferedRandomAccessSource0 = new GetBufferedRandomAccessSource(arrayRandomAccessSource0);
-        getBufferedRandomAccessSource0.close();
-        // Undeclared exception!
+    public void get_onClosedSource_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a source and wrap it with the buffered source.
+        byte[] sourceData = new byte[16];
+        ArrayRandomAccessSource underlyingSource = new ArrayRandomAccessSource(sourceData);
+        GetBufferedRandomAccessSource bufferedSource = new GetBufferedRandomAccessSource(underlyingSource);
+
+        // Close the source before attempting to use it.
+        bufferedSource.close();
+
+        // Act & Assert: Expect an IllegalStateException when trying to read.
         try {
-            getBufferedRandomAccessSource0.get((-155L));
-            fail("Expecting exception: IllegalStateException");
+            bufferedSource.get(0L);
+            fail("Expected an IllegalStateException because the source is closed.");
         } catch (IllegalStateException e) {
-            //
-            // Already closed
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
+            // Verify that the exception has the expected message.
+            assertEquals("Already closed", e.getMessage());
         }
     }
 }
