@@ -1,62 +1,57 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest1 extends IndexedCollection_ESTest_scaffolding {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        Predicate<Integer> predicate0 = NotNullPredicate.notNullPredicate();
-        Integer integer0 = new Integer((-3039));
-        linkedList0.add(integer0);
-        ConstantTransformer<Integer, Predicate<Integer>> constantTransformer0 = new ConstantTransformer<Integer, Predicate<Integer>>(predicate0);
-        LinkedList<Integer> linkedList1 = new LinkedList<Integer>();
-        IndexedCollection<Predicate<Integer>, Integer> indexedCollection0 = IndexedCollection.nonUniqueIndexedCollection((Collection<Integer>) linkedList1, (Transformer<Integer, Predicate<Integer>>) constantTransformer0);
-        linkedList0.add(integer0);
-        boolean boolean0 = indexedCollection0.addAll(linkedList0);
-        assertTrue(boolean0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for {@link IndexedCollection}.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that addAll() successfully adds multiple elements to a non-unique index
+     * and correctly updates both the collection and the index.
+     */
+    @Test
+    public void addAllShouldAddElementsToNonUniqueIndex() {
+        // Arrange
+        // Use a simple String as the key for better readability.
+        final String key = "GROUP_A";
+        // This transformer will assign the same key to every element added.
+        final Transformer<Integer, String> keyTransformer = ConstantTransformer.constantTransformer(key);
+
+        // The collection that will be decorated and indexed. Start with an empty list.
+        final Collection<Integer> decorated = new ArrayList<>();
+        final IndexedCollection<String, Integer> indexedCollection =
+                IndexedCollection.nonUniqueIndexedCollection(decorated, keyTransformer);
+
+        final List<Integer> elementsToAdd = Arrays.asList(100, 200);
+
+        // Act
+        final boolean wasModified = indexedCollection.addAll(elementsToAdd);
+
+        // Assert
+        // 1. Verify addAll returned true, indicating the collection was changed.
+        assertTrue("addAll should return true when new elements are added.", wasModified);
+
+        // 2. Verify the size and contents of the underlying collection.
+        assertEquals("Collection size should be 2 after adding two elements.", 2, indexedCollection.size());
+        assertTrue("Collection should contain the first added element.", indexedCollection.contains(100));
+        assertTrue("Collection should contain the second added element.", indexedCollection.contains(200));
+
+        // 3. Verify that the index was correctly updated.
+        final Collection<Integer> valuesForKey = indexedCollection.values(key);
+        assertEquals("The index should map the key to two values.", 2, valuesForKey.size());
+        assertTrue("The index values for the key should contain the first element.", valuesForKey.contains(100));
+        assertTrue("The index values for the key should contain the second element.", valuesForKey.contains(200));
     }
 }
