@@ -1,27 +1,29 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This class contains tests for the LinkedTreeMap class.
+ * The original test class name 'LinkedTreeMap_ESTestTest47' suggests it was auto-generated.
+ */
 public class LinkedTreeMap_ESTestTest47 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        linkedTreeMap0.keySet();
-        Set<Integer> set0 = linkedTreeMap0.keySet();
-        assertTrue(set0.isEmpty());
-        assertNotNull(set0);
+    /**
+     * Verifies that calling keySet() on an empty map returns a non-null, empty set.
+     */
+    @Test
+    public void keySet_onEmptyMap_returnsEmptySet() {
+        // Arrange: Create an empty LinkedTreeMap.
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+
+        // Act: Retrieve the key set from the map.
+        Set<Integer> keySet = map.keySet();
+
+        // Assert: Verify the key set is not null and is empty.
+        assertNotNull("The key set should never be null.", keySet);
+        assertTrue("The key set of a new map should be empty.", keySet.isEmpty());
     }
 }
