@@ -1,37 +1,44 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
-public class DeviationRenderer_ESTestTest15 extends DeviationRenderer_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link DeviationRenderer} class.
+ */
+public class DeviationRenderer_ESTestTest15 { // Scaffolding dependency removed for clarity
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer(false, false);
-        boolean boolean0 = deviationRenderer0.isItemPass(3);
-        assertEquals(0.5F, deviationRenderer0.getAlpha(), 0.01F);
-        assertFalse(boolean0);
-        assertTrue(deviationRenderer0.getDrawSeriesLineAsPath());
+    /**
+     * Verifies the default state of a DeviationRenderer instance after creation.
+     * A new renderer should have a default alpha of 0.5f and have path drawing enabled.
+     */
+    @Test
+    public void constructor_ShouldSetDefaultProperties() {
+        // Arrange: Create a new renderer instance.
+        DeviationRenderer renderer = new DeviationRenderer(false, false);
+
+        // Assert: Check that the default properties are set as expected.
+        assertEquals("Default alpha value should be 0.5f.", 0.5F, renderer.getAlpha(), 0.01F);
+        assertTrue("Drawing series line as a path should be true by default.", renderer.getDrawSeriesLineAsPath());
+    }
+
+    /**
+     * Verifies that isItemPass() returns false for a pass index that is not
+     * the designated item-drawing pass. According to the implementation, the
+     * item-drawing pass is pass 2.
+     */
+    @Test
+    public void isItemPass_ForNonItemPassIndex_ShouldReturnFalse() {
+        // Arrange
+        DeviationRenderer renderer = new DeviationRenderer(false, false);
+        int nonItemPassIndex = 3; // The item pass is 2, so this should be false.
+
+        // Act
+        boolean isItemPass = renderer.isItemPass(nonItemPassIndex);
+
+        // Assert
+        assertFalse("isItemPass() should return false for a non-item pass index.", isItemPass);
     }
 }
