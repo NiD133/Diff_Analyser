@@ -1,26 +1,41 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IllegalFieldValueException_ESTestTest12 extends IllegalFieldValueException_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Long long0 = new Long(1580L);
-        IllegalFieldValueException illegalFieldValueException0 = null;
-        try {
-            illegalFieldValueException0 = new IllegalFieldValueException((DateTimeFieldType) null, long0, long0, long0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.IllegalFieldValueException", e);
-        }
+/**
+ * This test class focuses on the exception-handling behavior of the
+ * IllegalFieldValueException's constructors.
+ */
+public class IllegalFieldValueExceptionTest {
+
+    /**
+     * Verifies that the constructor throws a NullPointerException when a null
+     * DateTimeFieldType is provided.
+     * <p>
+     * The constructor is expected to fail because it internally attempts to call
+     * {@code .getName()} on the null field type, which results in an NPE.
+     */
+    @Test
+    public void constructor_shouldThrowNullPointerException_whenDateTimeFieldTypeIsNull() {
+        // Arrange
+        final Number dummyValue = 1580L;
+        final Number dummyLowerBound = 1L;
+        final Number dummyUpperBound = 2000L;
+        final DateTimeFieldType nullDateTimeFieldType = null;
+
+        // Act & Assert
+        // We expect a NullPointerException because the constructor tries to access the
+        // name of the null DateTimeFieldType.
+        NullPointerException thrown = assertThrows(
+            NullPointerException.class,
+            () -> new IllegalFieldValueException(nullDateTimeFieldType, dummyValue, dummyLowerBound, dummyUpperBound)
+        );
+
+        // A standard NullPointerException thrown by the JVM in this way has no message.
+        // This assertion confirms that expected behavior.
+        assertNull("The NullPointerException should not have a message.", thrown.getMessage());
     }
 }
