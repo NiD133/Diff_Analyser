@@ -1,29 +1,29 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Document.OutputSettings.Syntax;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest2 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Document.OutputSettings.Syntax document_OutputSettings_Syntax0 = Document.OutputSettings.Syntax.xml;
-        String string0 = Attribute.getValidKey("ZVY", document_OutputSettings_Syntax0);
-        assertEquals("ZVY", string0);
+/**
+ * Unit tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Tests that {@link Attribute#getValidKey(String, Syntax)} returns the original key
+     * when it is already a valid key for the XML syntax.
+     */
+    @Test
+    public void getValidKeyShouldReturnOriginalKeyWhenAlreadyValidForXml() {
+        // Arrange
+        String validXmlKey = "ZVY";
+        Syntax syntax = Syntax.xml;
+
+        // Act
+        String resultKey = Attribute.getValidKey(validXmlKey, syntax);
+
+        // Assert
+        assertEquals("The original valid key should be returned unchanged.", validXmlKey, resultKey);
     }
 }
