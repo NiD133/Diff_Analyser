@@ -1,36 +1,45 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest45 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test044() throws Throwable {
-        Document document0 = Document.createShell("Only http & https protocols supported");
-        Elements elements0 = document0.getAllElements();
-        Element element0 = elements0.deselect(3);
-        assertEquals("body", element0.nodeName());
+/**
+ * Test suite for the {@link Elements#deselect(int)} method.
+ */
+public class ElementsDeselectTest {
+
+    @Test
+    public void deselectRemovesElementFromListButNotFromDomAndReturnsIt() {
+        // Arrange
+        // A shell document's structure is: <html><head><title>...</title></head><body></body></html>
+        // This results in an Elements list of: [html, head, title, body]
+        Document doc = Document.createShell("");
+        Elements elements = doc.getAllElements();
+        
+        int initialSize = elements.size(); // Should be 4
+        int bodyElementIndex = 3; // The <body> element is at index 3
+
+        // Sanity check to ensure our understanding of the structure is correct
+        assertEquals("body", elements.get(bodyElementIndex).tagName());
+
+        // Act
+        Element deselectedElement = elements.deselect(bodyElementIndex);
+
+        // Assert
+        // 1. Verify the correct element was returned
+        assertNotNull(deselectedElement);
+        assertEquals("body", deselectedElement.tagName());
+
+        // 2. Verify the element was removed from the Elements list
+        assertEquals("The list size should decrease by one.", initialSize - 1, elements.size());
+        assertFalse("The list should no longer contain the deselected element.", elements.contains(deselectedElement));
+
+        // 3. Verify the element remains in the original Document (the DOM)
+        assertNotNull("The body element should still exist on the document.", doc.body());
+        assertSame("The returned element should be the same instance as the one in the DOM.",
+                     doc.body(), deselectedElement);
     }
 }
