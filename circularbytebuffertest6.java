@@ -2,28 +2,38 @@ package org.apache.commons.io.input.buffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.StandardCharsets;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CircularByteBufferTestTest6 {
+/**
+ * Tests for the clear() method in {@link CircularByteBuffer}.
+ */
+class CircularByteBufferTest {
+
+    private static final int BUFFER_SIZE = 10;
 
     @Test
-    void testClear() {
-        final byte[] data = { 1, 2, 3 };
-        final CircularByteBuffer buffer = new CircularByteBuffer(10);
-        assertEquals(0, buffer.getCurrentNumberOfBytes());
-        assertFalse(buffer.hasBytes());
-        buffer.add(data, 0, data.length);
-        assertEquals(3, buffer.getCurrentNumberOfBytes());
-        assertEquals(7, buffer.getSpace());
-        assertTrue(buffer.hasBytes());
-        assertTrue(buffer.hasSpace());
+    @DisplayName("clear() should reset the buffer to its initial empty state")
+    void clearShouldResetBufferToEmptyState() {
+        // Arrange: Create a buffer and add some data to it.
+        final byte[] initialData = { 1, 2, 3 };
+        final CircularByteBuffer buffer = new CircularByteBuffer(BUFFER_SIZE);
+        buffer.add(initialData, 0, initialData.length);
+
+        // Sanity check to ensure the buffer is not empty before clearing.
+        assertTrue(buffer.hasBytes(), "Precondition failed: Buffer should contain bytes before clearing.");
+        assertEquals(initialData.length, buffer.getCurrentNumberOfBytes(), "Precondition failed: Incorrect byte count before clearing.");
+
+        // Act: Call the method under test.
         buffer.clear();
-        assertEquals(0, buffer.getCurrentNumberOfBytes());
-        assertEquals(10, buffer.getSpace());
-        assertFalse(buffer.hasBytes());
-        assertTrue(buffer.hasSpace());
+
+        // Assert: Verify the buffer is now empty and has its full capacity available.
+        assertFalse(buffer.hasBytes(), "Buffer should be empty after clear().");
+        assertEquals(0, buffer.getCurrentNumberOfBytes(), "Current number of bytes should be 0 after clear().");
+        
+        assertTrue(buffer.hasSpace(), "Buffer should have space available after clear().");
+        assertEquals(BUFFER_SIZE, buffer.getSpace(), "Available space should be reset to the total buffer size.");
     }
 }
