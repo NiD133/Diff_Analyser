@@ -1,54 +1,39 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
+
 import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest66 extends TextHelpAppendable_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(1);
-        ArrayDeque<CharSequence> arrayDeque0 = new ArrayDeque<CharSequence>();
-        arrayDeque0.add(charBuffer0);
-        TextHelpAppendable textHelpAppendable0 = new TextHelpAppendable(charBuffer0);
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendList(true, arrayDeque0);
-            fail("Expecting exception: BufferOverflowException");
-        } catch (BufferOverflowException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.CharBuffer", e);
-        }
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
+
+    /**
+     * Tests that appendList throws a BufferOverflowException when the underlying
+     * Appendable has insufficient capacity to hold the formatted list output.
+     */
+    @Test
+    public void appendListShouldThrowBufferOverflowWhenAppendableHasInsufficientCapacity() {
+        // Arrange: Create an Appendable with a very small capacity (1 character).
+        // The TextHelpAppendable will attempt to write to this buffer.
+        CharBuffer limitedCapacityBuffer = CharBuffer.allocate(1);
+        TextHelpAppendable textHelpAppendable = new TextHelpAppendable(limitedCapacityBuffer);
+
+        // Arrange: Create a list with some content. The formatted output for this list,
+        // which includes numbering (e.g., "1. ") and indentation, will be larger
+        // than the buffer's 1-character capacity.
+        List<CharSequence> listToAppend = Collections.singletonList("some text");
+
+        // Act & Assert: Verify that calling appendList throws a BufferOverflowException
+        // because the formatted list cannot fit into the underlying buffer.
+        assertThrows(BufferOverflowException.class, () -> {
+            textHelpAppendable.appendList(true, listToAppend);
+        });
     }
 }
