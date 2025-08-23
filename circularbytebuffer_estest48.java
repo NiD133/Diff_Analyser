@@ -1,20 +1,29 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest48 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        circularByteBuffer0.add((byte) 0);
-        boolean boolean0 = circularByteBuffer0.hasBytes();
-        assertEquals(1, circularByteBuffer0.getCurrentNumberOfBytes());
-        assertTrue(boolean0);
+    /**
+     * Tests that hasBytes() correctly returns true when the buffer is not empty.
+     */
+    @Test
+    public void testHasBytesReturnsTrueWhenBufferIsNotEmpty() {
+        // Arrange: Create a buffer and add a single byte to it.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        buffer.add((byte) 42);
+
+        // Act: Check if the buffer has bytes.
+        final boolean result = buffer.hasBytes();
+
+        // Assert: Verify that the buffer reports it has bytes and its size is 1.
+        assertTrue("hasBytes() should return true for a non-empty buffer.", result);
+        assertEquals("The buffer should contain exactly one byte.", 1, buffer.getCurrentNumberOfBytes());
     }
 }
