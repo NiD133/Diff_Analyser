@@ -1,38 +1,22 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.SQLException;
-import java.sql.SQLInvalidAuthorizationSpecException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockThread;
-import org.junit.runner.RunWith;
 
-public class FuturesGetChecked_ESTestTest6 extends FuturesGetChecked_ESTest_scaffolding {
+/**
+ * Contains tests for the FuturesGetChecked utility class.
+ * Note: The original test was auto-generated. This version has been refactored for better
+ * understandability and maintainability.
+ */
+public class FuturesGetChecked_ESTestTest6 {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Class<Exception> class0 = Exception.class;
-        try {
-            FuturesGetChecked.getChecked((Future<Exception>) null, class0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.util.concurrent.FuturesGetChecked", e);
-        }
+    /**
+     * Verifies that getChecked throws a NullPointerException when the provided Future is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getChecked_withNullFuture_throwsNullPointerException() throws Exception {
+        // The method under test is expected to throw a NullPointerException
+        // when its 'future' argument is null, as it will attempt to call .get() on it.
+        FuturesGetChecked.getChecked((Future<Object>) null, Exception.class);
     }
 }
