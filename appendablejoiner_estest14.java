@@ -1,40 +1,24 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AppendableJoiner_ESTestTest14 extends AppendableJoiner_ESTest_scaffolding {
+/**
+ * Unit tests for {@link AppendableJoiner}.
+ */
+public class AppendableJoinerTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        AppendableJoiner.Builder<StringBuilder> appendableJoiner_Builder0 = AppendableJoiner.builder();
-        AppendableJoiner<StringBuilder> appendableJoiner0 = appendableJoiner_Builder0.get();
-        // Undeclared exception!
-        try {
-            appendableJoiner0.join((StringBuilder) null, (StringBuilder[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.lang3.AppendableJoiner", e);
-        }
+    /**
+     * Tests that calling join() with a null Appendable throws a NullPointerException,
+     * as the destination for the joined string is a required parameter.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testJoinWithNullAppendableShouldThrowNullPointerException() {
+        // Arrange: Create a default joiner. The generic type is not relevant for this test.
+        final AppendableJoiner<Object> joiner = AppendableJoiner.builder().get();
+
+        // Act: Call the join method with a null StringBuilder as the appendable.
+        // The exception is expected because the appendable argument cannot be null.
+        // We also pass a null array, mirroring the original test case.
+        joiner.join(null, (Object[]) null);
     }
 }
