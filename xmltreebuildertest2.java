@@ -1,34 +1,34 @@
 package org.jsoup.parser;
 
-import org.jsoup.Jsoup;
 import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Tests for the {@link XmlTreeBuilder}, focusing on its parsing and tree construction logic.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    public void testPopToClose() {
-        // test: </val> closes Two, </bar> ignored
-        String xml = "<doc><val>One<val>Two</val></bar>Three</doc>";
-        XmlTreeBuilder tb = new XmlTreeBuilder();
-        Document doc = tb.parse(xml, "http://foo.com/");
-        assertEquals("<doc><val>One<val>Two</val>Three</val></doc>", TextUtil.stripNewlines(doc.html()));
+    @DisplayName("popStackToClose should ignore a closing tag that has no matching open element")
+    public void popStackToCloseIgnoresMismatchedEndTag() {
+        // Arrange
+        // This XML contains a </bar> closing tag which has no corresponding opening <bar> tag.
+        // The parser is expected to ignore </bar> and correctly close the inner <val> tag.
+        String malformedXml = "<doc><val>One<val>Two</val></bar>Three</doc>";
+        XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+
+        // Act
+        Document parsedDoc = treeBuilder.parse(malformedXml, "http://example.com/");
+        String actualHtml = TextUtil.stripNewlines(parsedDoc.html());
+
+        // Assert
+        String expectedHtml = "<doc><val>One<val>Two</val>Three</val></doc>";
+        String failureMessage = "A mismatched closing tag </bar> should be ignored, and its subsequent text 'Three' should be appended to the parent <val> element.";
+
+        assertEquals(expectedHtml, actualHtml, failureMessage);
     }
 }
