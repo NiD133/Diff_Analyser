@@ -1,24 +1,39 @@
 package org.apache.commons.collections4.bloomfilter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class SimpleBloomFilter_ESTestTest31 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Unit tests for the SimpleBloomFilter class.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Shape shape0 = Shape.fromNM(2147483605, 2147483605);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        EnhancedDoubleHasher enhancedDoubleHasher0 = new EnhancedDoubleHasher(2147483605, 1047039L);
-        SimpleBloomFilter simpleBloomFilter1 = simpleBloomFilter0.copy();
-        assertNotSame(simpleBloomFilter1, simpleBloomFilter0);
+    /**
+     * Tests that the copy() method creates a new SimpleBloomFilter instance
+     * that is a distinct object but has the same state (shape, cardinality, and bit map)
+     * as the original.
+     */
+    @Test
+    public void copyShouldCreateADistinctButEqualFilter() {
+        // Arrange: Create a shape and a bloom filter.
+        // We use simple, clear values for the shape's parameters.
+        Shape shape = Shape.fromNM(10, 100); // 10 items, 100 bits
+        SimpleBloomFilter originalFilter = new SimpleBloomFilter(shape);
+
+        // To make the test more robust, merge a hasher to modify the filter's state.
+        // This ensures we are not just copying an empty filter.
+        Hasher hasher = new SimpleHasher(new byte[]{1, 2, 3});
+        originalFilter.merge(hasher);
+
+        // Act: Create a copy of the filter.
+        SimpleBloomFilter copiedFilter = originalFilter.copy();
+
+        // Assert: The copy should be a different object but have identical contents.
+        assertNotSame("The copied filter should be a new object instance.", originalFilter, copiedFilter);
+        assertEquals("The copied filter should have the same shape.", originalFilter.getShape(), copiedFilter.getShape());
+        assertEquals("The copied filter should have the same cardinality.", originalFilter.cardinality(), copiedFilter.cardinality());
+        assertArrayEquals("The copied filter should have the same bit map.", originalFilter.asBitMapArray(), copiedFilter.asBitMapArray());
     }
 }
