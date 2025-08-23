@@ -1,19 +1,27 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.Version;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class VersionUtil_ESTestTest3 extends VersionUtil_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link VersionUtil} class, focusing on version string parsing logic.
+ */
+public class VersionUtilTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        int int0 = VersionUtil.parseVersionPart("");
-        assertEquals(0, int0);
+    /**
+     * Tests that {@code parseVersionPart} correctly handles an empty string input
+     * by returning 0, which is the expected default value for a missing version component.
+     */
+    @Test
+    public void parseVersionPart_shouldReturnZero_whenGivenEmptyString() {
+        // Arrange
+        String emptyVersionPart = "";
+        int expectedVersionPart = 0;
+
+        // Act
+        int actualVersionPart = VersionUtil.parseVersionPart(emptyVersionPart);
+
+        // Assert
+        assertEquals(expectedVersionPart, actualVersionPart);
     }
 }
