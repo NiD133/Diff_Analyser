@@ -1,32 +1,30 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.time.Duration;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class ListeningExecutorService_ESTestTest9 extends ListeningExecutorService_ESTest_scaffolding {
+/**
+ * Tests for implementations of {@link ListeningExecutorService}.
+ */
+public class ListeningExecutorServiceTest {
 
-    @Test(timeout = 4000)
-    public void test8() throws Throwable {
-        DirectExecutorService directExecutorService0 = new DirectExecutorService();
-        Duration duration0 = Duration.ZERO;
-        boolean boolean0 = directExecutorService0.awaitTermination(duration0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that awaitTermination() returns false immediately when called with a zero timeout
+     * on a service that has not been shut down.
+     */
+    @Test
+    public void awaitTermination_withZeroTimeoutOnRunningService_returnsFalse() throws InterruptedException {
+        // Arrange: Create a running executor service.
+        // DirectExecutorService is a simple implementation that runs tasks in the calling thread.
+        ListeningExecutorService executorService = new DirectExecutorService();
+        Duration zeroTimeout = Duration.ZERO;
+
+        // Act: Call awaitTermination with a zero timeout. The service has not been shut down,
+        // so it should not report as terminated. The zero timeout ensures the call returns instantly.
+        boolean isTerminated = executorService.awaitTermination(zeroTimeout);
+
+        // Assert: The service should not have terminated.
+        assertFalse("Expected awaitTermination to return false for a running service with a zero timeout", isTerminated);
     }
 }
