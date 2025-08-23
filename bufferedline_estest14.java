@@ -1,31 +1,39 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest14 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        pointImpl0.reset(0.0, (-2.3956291180657985));
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        bufferedLine0.getBoundingBox();
-        assertEquals(0.0, bufferedLine0.getBuf(), 0.01);
+/**
+ * Test suite for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    /**
+     * Tests that the getBuf() method correctly returns the buffer size
+     * provided during the construction of a BufferedLine.
+     */
+    @Test
+    public void getBufShouldReturnZeroWhenLineIsCreatedWithZeroBuffer() {
+        // Arrange
+        // Use a standard spatial context for simplicity.
+        SpatialContext spatialContext = SpatialContext.GEO;
+
+        // Create a degenerate line (a point) for the test. The coordinates are arbitrary
+        // as they do not affect the buffer size property.
+        Point startAndEndPoint = new PointImpl(10, 20, spatialContext);
+        double expectedBuffer = 0.0;
+
+        // Act
+        // Create a BufferedLine with a zero buffer.
+        BufferedLine line = new BufferedLine(startAndEndPoint, startAndEndPoint, expectedBuffer, spatialContext);
+        double actualBuffer = line.getBuf();
+
+        // Assert
+        // Verify that the stored buffer is the one we provided.
+        // A delta of 0.0 is used for an exact comparison.
+        assertEquals(expectedBuffer, actualBuffer, 0.0);
     }
 }
