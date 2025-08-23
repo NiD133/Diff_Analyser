@@ -1,51 +1,25 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
 
-public class DayOfMonth_ESTestTest18 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for the get(TemporalField) method of {@link DayOfMonth}.
+ */
+public class DayOfMonthGetTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        DayOfMonth dayOfMonth0 = DayOfMonth.now();
-        // Undeclared exception!
-        try {
-            dayOfMonth0.get((TemporalField) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // field
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that calling get() with a null field throws a NullPointerException,
+     * as per the method's contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void get_whenFieldIsNull_throwsNullPointerException() {
+        // Arrange: Create an arbitrary DayOfMonth instance. 
+        // The specific value (15) is not important for this test.
+        DayOfMonth dayOfMonth = DayOfMonth.of(15);
+
+        // Act: Call the get() method with a null argument.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        dayOfMonth.get((TemporalField) null);
     }
 }
