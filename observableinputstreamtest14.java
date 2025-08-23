@@ -1,130 +1,73 @@
 package org.apache.commons.io.input;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ObservableInputStream.Observer;
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.test.CustomIOException;
 import org.junit.jupiter.api.Test;
 
-public class ObservableInputStreamTestTest14 {
+/**
+ * Tests for {@link ObservableInputStream} focusing on observer notifications.
+ */
+public class ObservableInputStreamNotificationTest {
 
-    private ObservableInputStream brokenObservableInputStream() {
-        return new ObservableInputStream(BrokenInputStream.INSTANCE);
-    }
-
-    private InputStream createInputStream() {
-        final byte[] buffer = MessageDigestInputStreamTest.generateRandomByteStream(IOUtils.DEFAULT_BUFFER_SIZE);
-        return createInputStream(new ByteArrayInputStream(buffer));
-    }
-
-    private ObservableInputStream createInputStream(final InputStream origin) {
-        return new ObservableInputStream(origin);
-    }
-
-    private void testNotificationCallbacks(final int bufferSize) throws IOException {
-        final byte[] buffer = IOUtils.byteArray();
-        final LengthObserver lengthObserver = new LengthObserver();
-        final MethodCountObserver methodCountObserver = new MethodCountObserver();
-        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(buffer), lengthObserver, methodCountObserver)) {
-            assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, IOUtils.copy(ois, NullOutputStream.INSTANCE, bufferSize));
-        }
-        assertEquals(IOUtils.DEFAULT_BUFFER_SIZE, lengthObserver.getTotal());
-        assertEquals(1, methodCountObserver.getClosedCount());
-        assertEquals(1, methodCountObserver.getFinishedCount());
-        assertEquals(0, methodCountObserver.getErrorCount());
-        assertEquals(0, methodCountObserver.getDataCount());
-        assertEquals(buffer.length / bufferSize, methodCountObserver.getDataBufferCount());
-    }
-
-    private static final class DataViewObserver extends MethodCountObserver {
-
-        private byte[] buffer;
-
-        private int lastValue = -1;
-
-        private int length = -1;
-
-        private int offset = -1;
-
-        @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.buffer = buffer;
-            this.offset = offset;
-            this.length = length;
-        }
-
-        @Override
-        public void data(final int value) throws IOException {
-            super.data(value);
-            lastValue = value;
-        }
-    }
-
+    /**
+     * An observer that counts the total number of bytes observed through its callbacks.
+     */
     private static final class LengthObserver extends Observer {
-
-        private long total;
+        private long totalBytes;
 
         @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
-            this.total += length;
+        public void data(final byte[] buffer, final int offset, final int length) {
+            this.totalBytes += length;
         }
 
         @Override
-        public void data(final int value) throws IOException {
-            total++;
+        public void data(final int value) {
+            totalBytes++;
         }
 
-        public long getTotal() {
-            return total;
+        public long getTotalBytes() {
+            return totalBytes;
         }
     }
 
+    /**
+     * An observer that counts the number of times each callback method is invoked.
+     */
     private static class MethodCountObserver extends Observer {
-
         private long closedCount;
-
         private long dataBufferCount;
-
-        private long dataCount;
-
+        private long dataByteCount;
         private long errorCount;
-
         private long finishedCount;
 
         @Override
-        public void closed() throws IOException {
+        public void closed() {
             closedCount++;
         }
 
         @Override
-        public void data(final byte[] buffer, final int offset, final int length) throws IOException {
+        public void data(final byte[] buffer, final int offset, final int length) {
             dataBufferCount++;
         }
 
         @Override
-        public void data(final int value) throws IOException {
-            dataCount++;
+        public void data(final int value) {
+            dataByteCount++;
         }
 
         @Override
-        public void error(final IOException exception) throws IOException {
+        public void error(final IOException exception) {
             errorCount++;
         }
 
         @Override
-        public void finished() throws IOException {
+        public void finished() {
             finishedCount++;
         }
 
@@ -136,8 +79,8 @@ public class ObservableInputStreamTestTest14 {
             return dataBufferCount;
         }
 
-        public long getDataCount() {
-            return dataCount;
+        public long getDataByteCount() {
+            return dataByteCount;
         }
 
         public long getErrorCount() {
@@ -149,8 +92,46 @@ public class ObservableInputStreamTestTest14 {
         }
     }
 
+    /**
+     * Tests that when an ObservableInputStream is read in chunks using a custom-sized
+     * buffer, the observer's data(byte[], int, int) method is called for each chunk.
+     * It also verifies that other lifecycle callbacks (closed, finished) are invoked
+     * correctly.
+     */
     @Test
-    void testNotificationCallbacksBufferSize2() throws Exception {
-        testNotificationCallbacks(2);
+    void whenStreamIsCopiedWithCustomBuffer_thenObserverIsCalledForEveryChunk() throws IOException {
+        // Arrange
+        final int copyBufferSize = 2;
+        final byte[] sourceData = IOUtils.byteArray(); // Creates a 4096-byte array
+        final int streamSize = sourceData.length;
+
+        final LengthObserver lengthObserver = new LengthObserver();
+        final MethodCountObserver methodCountObserver = new MethodCountObserver();
+
+        // Act
+        long bytesCopied;
+        try (ObservableInputStream ois = new ObservableInputStream(new ByteArrayInputStream(sourceData), lengthObserver, methodCountObserver)) {
+            bytesCopied = IOUtils.copy(ois, NullOutputStream.INSTANCE, copyBufferSize);
+        }
+
+        // Assert
+        assertEquals(streamSize, bytesCopied, "The number of bytes copied should match the source stream size.");
+
+        final int expectedDataBufferCallbackCount = streamSize / copyBufferSize;
+
+        assertAll("Observer callbacks should be invoked correctly",
+            () -> assertEquals(streamSize, lengthObserver.getTotalBytes(),
+                "LengthObserver should have counted all bytes."),
+            () -> assertEquals(1, methodCountObserver.getClosedCount(),
+                "closed() should be called once after the stream is closed."),
+            () -> assertEquals(1, methodCountObserver.getFinishedCount(),
+                "finished() should be called once when the end of the stream is reached."),
+            () -> assertEquals(0, methodCountObserver.getErrorCount(),
+                "error() should not be called in a successful read."),
+            () -> assertEquals(0, methodCountObserver.getDataByteCount(),
+                "data(int) for single-byte reads should not be called."),
+            () -> assertEquals(expectedDataBufferCallbackCount, methodCountObserver.getDataBufferCount(),
+                "data(byte[]) for buffer reads should be called for each chunk.")
+        );
     }
 }
