@@ -1,31 +1,30 @@
 package com.fasterxml.jackson.core.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.filter.FilteringGeneratorDelegate;
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonWriteContext_ESTestTest10 extends JsonWriteContext_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        JsonWriteContext jsonWriteContext0 = JsonWriteContext.createRootContext();
-        JsonWriteContext jsonWriteContext1 = jsonWriteContext0.reset(1);
-        jsonWriteContext1._currentName = "{?4P :";
-        boolean boolean0 = jsonWriteContext0.hasCurrentName();
-        assertTrue(boolean0);
+/**
+ * Unit tests for the {@link JsonWriteContext} class, focusing on name-related state.
+ */
+public class JsonWriteContextTest {
+
+    /**
+     * Verifies that hasCurrentName() returns true after a field name has been set
+     * using the public API.
+     */
+    @Test
+    public void hasCurrentName_shouldReturnTrue_whenNameIsSet() throws JsonProcessingException {
+        // Arrange: Create an object context, which is the natural place for a field name.
+        JsonWriteContext context = JsonWriteContext.createRootContext()
+                                                   .createChildObjectContext();
+
+        // Act: Set the current field name using the public writeFieldName() method.
+        context.writeFieldName("testField");
+        boolean hasName = context.hasCurrentName();
+
+        // Assert: The context should now report that it has a current name.
+        assertTrue("hasCurrentName() should return true after a field name is written", hasName);
     }
 }
