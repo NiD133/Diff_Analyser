@@ -154,6 +154,8 @@ public class BackgroundInitializerTestTest16 extends AbstractLangTest {
         }
     }
 
+
+
     /**
      * Tests whether an external executor can be set using the
      * setExternalExecutor() method.
