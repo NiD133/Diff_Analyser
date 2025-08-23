@@ -1,52 +1,36 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+import org.junit.jupiter.api.Test;
+
 import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
 import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest20 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        IsoEra isoEra0 = IsoEra.BCE;
-        // Undeclared exception!
-        try {
-            symmetry454Chronology0.prolepticYear(isoEra0, (-2133538947));
-            fail("Expecting exception: DateTimeException");
-        } catch (DateTimeException e) {
-            //
-            // Invalid value for YearOfEra (valid values -1000000 - 1000000): -2133538947
-            //
-            verifyException("java.time.temporal.ValueRange", e);
-        }
+/**
+ * Tests for {@link Symmetry454Chronology}.
+ */
+class Symmetry454ChronologyTest {
+
+    @Test
+    void prolepticYear_whenYearOfEraIsBelowMinimum_throwsDateTimeException() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        Era bceEra = IsoEra.BCE;
+        // From the source, the valid range for yearOfEra is -1,000,000 to 1,000,000.
+        // We test with a value just outside this boundary for clarity.
+        int yearBelowMinimum = -1_000_001;
+
+        // Act & Assert
+        DateTimeException exception = assertThrows(
+            DateTimeException.class,
+            () -> chronology.prolepticYear(bceEra, yearBelowMinimum)
+        );
+
+        // Verify the exception message is correct and informative
+        String expectedMessage = "Invalid value for YearOfEra (valid values -1000000 - 1000000): " + yearBelowMinimum;
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
