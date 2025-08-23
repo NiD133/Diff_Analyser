@@ -1,31 +1,37 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This class contains tests for {@link JsonTreeReader}.
+ * The original test class name `JsonTreeReader_ESTestTest74` is preserved
+ * to maintain context from the original auto-generated suite.
+ */
 public class JsonTreeReader_ESTestTest74 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test073() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        Byte byte0 = new Byte((byte) 3);
-        jsonArray0.add((Number) byte0);
-        jsonTreeReader0.beginArray();
-        long long0 = jsonTreeReader0.nextLong();
-        assertEquals(3L, long0);
+    /**
+     * Tests that {@link JsonTreeReader#nextLong()} can correctly read a number
+     * that was added to a JsonArray as a Byte, and return it as a long.
+     * This verifies the type coercion from a smaller numeric type.
+     */
+    @Test
+    public void nextLong_whenArrayContainsByte_returnsLongValue() throws IOException {
+        // Arrange: Create a JsonArray containing a single byte value.
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add((byte) 3);
+        JsonTreeReader reader = new JsonTreeReader(jsonArray);
+
+        // Act: Navigate into the array and read the number as a long.
+        reader.beginArray();
+        long actualValue = reader.nextLong();
+
+        // Assert: Verify the value was read correctly.
+        long expectedValue = 3L;
+        assertEquals(expectedValue, actualValue);
     }
 }
