@@ -1,21 +1,26 @@
 package org.apache.commons.lang3.exception;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DefaultExceptionContext_ESTestTest10 extends DefaultExceptionContext_ESTest_scaffolding {
+/**
+ * Unit tests for {@link DefaultExceptionContext}.
+ */
+public class DefaultExceptionContextTest {
 
-    @Test(timeout = 4000)
-    public void test9() throws Throwable {
-        DefaultExceptionContext defaultExceptionContext0 = new DefaultExceptionContext();
-        Object object0 = defaultExceptionContext0.getFirstContextValue("6Yh~Lxgr");
-        assertNull(object0);
+    /**
+     * Tests that getFirstContextValue() returns null when the requested label does not exist in the context.
+     */
+    @Test
+    public void getFirstContextValue_shouldReturnNull_whenLabelDoesNotExist() {
+        // Arrange: Create an empty exception context.
+        final DefaultExceptionContext context = new DefaultExceptionContext();
+        final String nonExistentLabel = "NON_EXISTENT_LABEL";
+
+        // Act: Attempt to retrieve a value for a label that has not been added.
+        final Object result = context.getFirstContextValue(nonExistentLabel);
+
+        // Assert: Verify that the result is null, as expected.
+        assertNull("Expected null when retrieving a value for a non-existent label.", result);
     }
 }
