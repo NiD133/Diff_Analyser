@@ -1,29 +1,21 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
 import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link TypeHandler#createValue(String, Class)}.
+ */
 public class TypeHandler_ESTestTest13 extends TypeHandler_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Class<Date> class0 = Date.class;
-        try {
-            TypeHandler.createValue("", class0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // java.text.ParseException: Unparseable date: \"\"
-            //
-            verifyException("org.apache.commons.cli.ParseException", e);
-        }
+    /**
+     * Verifies that attempting to create a Date from an empty string
+     * correctly throws a ParseException, as an empty string is not a valid date.
+     */
+    @Test(expected = ParseException.class)
+    public void createValue_withEmptyStringForDateType_shouldThrowParseException() throws ParseException {
+        // Act: Attempt to create a Date from an invalid (empty) string.
+        // The @Test(expected) annotation handles the assertion.
+        TypeHandler.createValue("", Date.class);
     }
 }
