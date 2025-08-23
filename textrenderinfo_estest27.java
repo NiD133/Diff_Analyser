@@ -1,49 +1,52 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
+import org.junit.Test;
+
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class TextRenderInfo_ESTestTest27 extends TextRenderInfo_ESTest_scaffolding {
+/**
+ * This test verifies the behavior of the TextRenderInfo class when handling
+ * text with an unsupported character encoding.
+ */
+public class TextRenderInfoRefactoredTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = new Matrix();
-        PdfString pdfString0 = new PdfString("Times-Italic", "Courier-Bold");
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, stack0);
-        // Undeclared exception!
-        try {
-            textRenderInfo0.getUnscaledWidth();
-            fail("Expecting exception: UnsupportedCharsetException");
-        } catch (UnsupportedCharsetException e) {
-            //
-            // Courier-Bold
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    /**
+     * Tests that getUnscaledWidth() throws an UnsupportedCharsetException
+     * when the underlying PdfString was created with an encoding that is not
+     * a valid or supported charset name.
+     *
+     * The method getUnscaledWidth() internally needs to decode the string to
+     * calculate its width, which fails if the encoding is invalid.
+     */
+    @Test(expected = UnsupportedCharsetException.class)
+    public void getUnscaledWidth_whenPdfStringHasUnsupportedEncoding_throwsUnsupportedCharsetException() {
+        // ARRANGE: Set up a TextRenderInfo object containing a PdfString that has an
+        // invalid encoding. "Courier-Bold" is a font name, not a valid Java charset.
+        final String unsupportedEncoding = "Courier-Bold";
+        PdfString textWithUnsupportedEncoding = new PdfString("some text", unsupportedEncoding);
+
+        GraphicsState graphicsState = new GraphicsState();
+        // A font must be set in the graphics state for TextRenderInfo construction.
+        graphicsState.font = new CMapAwareDocumentFont(new PdfGState());
+
+        Matrix textMatrix = new Matrix();
+
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                textWithUnsupportedEncoding,
+                graphicsState,
+                textMatrix,
+                Collections.emptyList() // An empty list of marked content is sufficient for this test.
+        );
+
+        // ACT: Attempt to get the unscaled width. This action is expected to trigger
+        // the decoding of the string, which will fail.
+        renderInfo.getUnscaledWidth();
+
+        // ASSERT: The test passes if an UnsupportedCharsetException is thrown,
+        // which is handled by the @Test(expected = ...) annotation.
     }
 }
