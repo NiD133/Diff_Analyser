@@ -1,25 +1,30 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
+import static org.junit.Assert.assertEquals;
+
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest7 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Instant instant0 = FileTimes.ntfsTimeToInstant(0L);
-        long long0 = FileTimes.toNtfsTime(instant0);
-        assertEquals(0L, long0);
+    /**
+     * Tests that converting the NTFS epoch time (0L) to an Instant and back
+     * results in the original value. This verifies the round-trip conversion is
+     * lossless for this fundamental boundary value.
+     */
+    @Test
+    public void ntfsEpochTimeShouldRoundTripViaInstant() {
+        // Arrange: The NTFS epoch is 1601-01-01T00:00:00Z, represented by the value 0.
+        final long ntfsEpochTime = 0L;
+
+        // Act: Convert the NTFS time to an Instant and then back to a long.
+        final Instant instantRepresentation = FileTimes.ntfsTimeToInstant(ntfsEpochTime);
+        final long roundTripNtfsTime = FileTimes.toNtfsTime(instantRepresentation);
+
+        // Assert: The value after the round-trip conversion should be identical to the original.
+        assertEquals(ntfsEpochTime, roundTripNtfsTime);
     }
 }
