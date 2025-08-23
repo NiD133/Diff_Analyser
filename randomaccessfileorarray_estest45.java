@@ -1,34 +1,41 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest45 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test044() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        double double0 = randomAccessFileOrArray0.readDoubleLE();
-        assertEquals(8L, randomAccessFileOrArray0.getFilePointer());
-        assertEquals(0.0, double0, 0.01);
+    /**
+     * Verifies that readDoubleLE() correctly parses a little-endian double
+     * from a byte source and advances the internal pointer by the correct amount.
+     */
+    @Test
+    public void readDoubleLE_givenLittleEndianBytes_returnsCorrectDoubleAndAdvancesPointer() throws IOException {
+        // Arrange
+        // The double value 1.0 is represented by the 64-bit long 0x3ff0000000000000.
+        // In little-endian byte order, this is {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x3F}.
+        final double expectedValue = 1.0;
+        final byte[] littleEndianBytesForOne = new byte[]{
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xF0, 0x3F
+        };
+        RandomAccessFileOrArray reader = new RandomAccessFileOrArray(littleEndianBytesForOne);
+
+        // Act
+        double actualValue = reader.readDoubleLE();
+
+        // Assert
+        // 1. Verify that the parsed double value is correct.
+        assertEquals("The method should correctly interpret the little-endian byte representation.",
+                expectedValue, actualValue, 0.0);
+
+        // 2. Verify that the file pointer has advanced by the size of a double.
+        long expectedPosition = Double.BYTES;
+        long actualPosition = reader.getFilePointer();
+        assertEquals("The file pointer should advance by the size of a double (8 bytes).",
+                expectedPosition, actualPosition);
     }
 }
