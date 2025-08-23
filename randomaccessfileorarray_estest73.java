@@ -1,41 +1,34 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest73 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomAccessFileOrArray} class, focusing on edge cases
+ * related to file pointer manipulation.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test072() throws Throwable {
-        byte[] byteArray0 = new byte[5];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        randomAccessFileOrArray0.seek((-172L));
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readShortLE();
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that attempting to read from a RandomAccessFileOrArray
+     * after seeking to a negative position results in an ArrayIndexOutOfBoundsException.
+     *
+     * This behavior is expected when the underlying data source is a byte array,
+     * as a negative position translates to an invalid negative array index.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void readShortLE_afterSeekingToNegativeOffset_throwsArrayIndexOutOfBoundsException() throws IOException {
+        // Arrange: Create an instance backed by a simple byte array.
+        byte[] sourceData = new byte[10];
+        RandomAccessFileOrArray randomAccess = new RandomAccessFileOrArray(sourceData);
+
+        // Act: Move the internal pointer to an invalid negative position.
+        // The seek() operation itself might not throw an exception, but it sets up the invalid state.
+        randomAccess.seek(-1L);
+
+        // Assert: Attempting to read from the invalid position should throw.
+        // The @Test(expected=...) annotation handles the assertion, making the test fail
+        // if this line does not throw the specified exception.
+        randomAccess.readShortLE();
     }
 }
