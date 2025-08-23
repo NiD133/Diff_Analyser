@@ -1,29 +1,32 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class has been improved for understandability.
+ * The original test was auto-generated and difficult to read.
+ *
+ * Test for {@link SegmentConstantPool}.
+ */
 public class SegmentConstantPool_ESTestTest52 extends SegmentConstantPool_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.getConstantPoolEntry(6, 2009L);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Verifies that calling {@code getConstantPoolEntry} on a {@code SegmentConstantPool}
+     * instance that was initialized with null {@code CpBands} throws a
+     * {@code NullPointerException}.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void getConstantPoolEntryShouldThrowNPEWhenBandsAreNull() {
+        // Arrange: Create a SegmentConstantPool with null bands, which is an invalid state
+        // for retrieving entries.
+        final SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+        final long arbitraryIndex = 2009L;
+
+        // Act: Attempt to retrieve a constant pool entry. This is expected to fail
+        // by throwing a NullPointerException because the internal 'bands' field is null.
+        segmentConstantPool.getConstantPoolEntry(SegmentConstantPool.CP_STRING, arbitraryIndex);
+
+        // Assert: The test passes if a NullPointerException is thrown, as declared
+        // in the @Test annotation's 'expected' parameter.
     }
 }
