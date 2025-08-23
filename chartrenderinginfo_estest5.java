@@ -1,30 +1,37 @@
 package org.jfree.chart;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class ChartRenderingInfo_ESTestTest5 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ChartRenderingInfo} class, focusing on chart area management.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo((EntityCollection) null);
-        Rectangle rectangle0 = new Rectangle(1, 294, (-343), 7);
-        chartRenderingInfo0.setChartArea(rectangle0);
-        Rectangle2D.Double rectangle2D_Double0 = (Rectangle2D.Double) chartRenderingInfo0.getChartArea();
-        assertEquals(294.0, rectangle2D_Double0.y, 0.01);
+    /**
+     * Verifies that setting the chart area with a Rectangle correctly updates
+     * the internal state, and the getter returns an equivalent area.
+     */
+    @Test
+    public void setChartArea_shouldStoreCorrectDimensions() {
+        // Arrange: Create a ChartRenderingInfo instance and define an area to be set.
+        // Using a null EntityCollection is a valid setup scenario.
+        ChartRenderingInfo info = new ChartRenderingInfo(null);
+        Rectangle areaToSet = new Rectangle(10, 20, 300, 200);
+
+        // Act: Set the chart area using the defined Rectangle.
+        info.setChartArea(areaToSet);
+
+        // Assert: The retrieved area should have the same dimensions as the one that was set.
+        Rectangle2D retrievedArea = info.getChartArea();
+
+        assertNotNull("The retrieved chart area should not be null.", retrievedArea);
+        assertEquals("X-coordinate should be correctly set.", 10.0, retrievedArea.getX(), 0.0);
+        assertEquals("Y-coordinate should be correctly set.", 20.0, retrievedArea.getY(), 0.0);
+        assertEquals("Width should be correctly set.", 300.0, retrievedArea.getWidth(), 0.0);
+        assertEquals("Height should be correctly set.", 200.0, retrievedArea.getHeight(), 0.0);
     }
 }
