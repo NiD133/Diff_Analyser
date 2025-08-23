@@ -1,46 +1,43 @@
 package org.jfree.chart.annotations;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.WaferMapPlot;
-import org.jfree.chart.plot.pie.PiePlot;
-import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
-import org.jfree.data.time.Day;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class XYLineAnnotation_ESTestTest1 extends XYLineAnnotation_ESTest_scaffolding {
+/**
+ * Provides tests for the {@link XYLineAnnotation} class.
+ */
+public class XYLineAnnotationTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        XYLineAnnotation xYLineAnnotation0 = new XYLineAnnotation((-3139.810815486518), (-3139.810815486518), (-3139.810815486518), (-605.8001));
-        xYLineAnnotation0.hashCode();
-        assertEquals((-605.8001), xYLineAnnotation0.getY2(), 0.01);
-        assertEquals((-3139.810815486518), xYLineAnnotation0.getX2(), 0.01);
-        assertEquals((-3139.810815486518), xYLineAnnotation0.getX1(), 0.01);
-        assertEquals((-3139.810815486518), xYLineAnnotation0.getY1(), 0.01);
+    /** 
+     * A small tolerance for comparing double values to handle potential floating-point inaccuracies. 
+     */
+    private static final double DELTA = 1e-9;
+
+    /**
+     * Verifies that calling hashCode() on an XYLineAnnotation instance
+     * does not throw an exception and does not alter the object's state.
+     *
+     * This test's structure is derived from the original auto-generated test,
+     * which called hashCode() for coverage and then verified the object's state.
+     * This refactored version clarifies that intent by ensuring the hashCode()
+     * call is safe and has no side effects on the object's properties.
+     */
+    @Test
+    public void hashCode_shouldNotThrowExceptionOrAlterState() {
+        // Arrange: Define coordinates and create an annotation instance.
+        final double x1 = -3139.810815486518;
+        final double y1 = -3139.810815486518;
+        final double x2 = -3139.810815486518;
+        final double y2 = -605.8001;
+        XYLineAnnotation annotation = new XYLineAnnotation(x1, y1, x2, y2);
+
+        // Act: Call the hashCode() method. The test will fail if this throws an exception.
+        annotation.hashCode();
+
+        // Assert: Verify that the object's state remains unchanged after calling hashCode().
+        assertEquals("The x1 coordinate should remain unchanged after hashCode() call.", x1, annotation.getX1(), DELTA);
+        assertEquals("The y1 coordinate should remain unchanged after hashCode() call.", y1, annotation.getY1(), DELTA);
+        assertEquals("The x2 coordinate should remain unchanged after hashCode() call.", x2, annotation.getX2(), DELTA);
+        assertEquals("The y2 coordinate should remain unchanged after hashCode() call.", y2, annotation.getY2(), DELTA);
     }
 }
