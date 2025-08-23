@@ -1,87 +1,51 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.JulianChronology;
+import org.junit.Test;
 
-public class StringConverterTestTest15 extends TestCase {
+import static org.junit.Assert.assertEquals;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
-
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
-
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
-
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
+/**
+ * Tests for {@link StringConverter} focusing on its integration with the DateTime constructor.
+ * This test verifies the parsing of string representations of datetimes.
+ */
+public class StringConverterTest {
 
     private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+    /**
+     * This test verifies that the DateTime constructor can parse a full ISO 8601 formatted string
+     * and correctly apply a specified Chronology. The string's date and time components
+     * should be interpreted according to the provided Chronology (Julian in this case),
+     * not the default ISOChronology.
+     */
+    @Test
+    public void shouldCreateCorrectDateTimeWhenParsingStringWithExplicitChronology() {
+        // Arrange
+        final String isoDateTimeString = "2004-06-09T12:24:48.501+02:00";
+        final JulianChronology julianChronologyInParis = JulianChronology.getInstance(PARIS);
 
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
+        // Act
+        // The DateTime constructor uses the StringConverter internally to handle the string input.
+        // The provided chronology should be used for parsing.
+        DateTime result = new DateTime(isoDateTimeString, julianChronologyInParis);
 
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
+        // Assert
+        // Verify that the date components are interpreted in the Julian calendar
+        assertEquals("Year should match", 2004, result.getYear());
+        assertEquals("Month should match", 6, result.getMonthOfYear());
+        assertEquals("Day should match", 9, result.getDayOfMonth());
 
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
+        // Verify that the time components are parsed correctly
+        assertEquals("Hour should match", 12, result.getHourOfDay());
+        assertEquals("Minute should match", 24, result.getMinuteOfHour());
+        assertEquals("Second should match", 48, result.getSecondOfMinute());
+        assertEquals("Millis should match", 501, result.getMillisOfSecond());
 
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    public void testGetDateTime5() throws Exception {
-        DateTime test = new DateTime("2004-06-09T12:24:48.501+02:00", JulianChronology.getInstance(PARIS));
-        assertEquals(2004, test.getYear());
-        assertEquals(6, test.getMonthOfYear());
-        assertEquals(9, test.getDayOfMonth());
-        assertEquals(12, test.getHourOfDay());
-        assertEquals(24, test.getMinuteOfHour());
-        assertEquals(48, test.getSecondOfMinute());
-        assertEquals(501, test.getMillisOfSecond());
-        assertEquals(PARIS, test.getZone());
+        // Verify that the specified chronology and its time zone are set on the resulting DateTime
+        assertEquals("Chronology should be Julian", julianChronologyInParis, result.getChronology());
+        assertEquals("Time zone should be Paris", PARIS, result.getZone());
     }
 }
