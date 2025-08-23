@@ -1,42 +1,20 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for the {@link ByteUtils} class, focusing on handling of invalid inputs.
+ */
 public class ByteUtils_ESTestTest23 extends ByteUtils_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        // Undeclared exception!
-        try {
-            ByteUtils.fromLittleEndian((byte[]) null, 8, 8);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Verifies that fromLittleEndian throws a NullPointerException when the input array is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void fromLittleEndianWithNullArrayThrowsNullPointerException() {
+        // The offset and length values (8, 8) are arbitrary for this test,
+        // as the method should throw an exception due to the null array
+        // before these parameters are used.
+        ByteUtils.fromLittleEndian(null, 8, 8);
     }
 }
