@@ -2,31 +2,32 @@ package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.TextUtil;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import static org.jsoup.nodes.Document.OutputSettings.Syntax;
-import static org.jsoup.parser.Parser.NamespaceHtml;
-import static org.jsoup.parser.Parser.NamespaceXml;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlTreeBuilderTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static void assertXmlNamespace(Element el) {
-        assertEquals(NamespaceXml, el.tag().namespace(), String.format("Element %s not in XML namespace", el.tagName()));
-    }
+/**
+ * Test suite for the XmlTreeBuilder.
+ * This class focuses on verifying the XML parsing behavior, particularly how the parser is supplied
+ * to the Jsoup class and handles malformed XML.
+ */
+public class XmlTreeBuilderTest {
 
     @Test
-    public void testSupplyParserToJsoupClass() {
-        String xml = "<doc><val>One<val>Two</val></bar>Three</doc>";
-        Document doc = Jsoup.parse(xml, "http://foo.com/", Parser.xmlParser());
-        assertEquals("<doc><val>One<val>Two</val>Three</val></doc>", TextUtil.stripNewlines(doc.html()));
+    @DisplayName("The XML parser should correctly handle an unmatched closing tag")
+    public void jsoupParseWithXmlParserHandlesUnmatchedClosingTag() {
+        // Arrange: Define an XML string with an unmatched closing tag </bar>.
+        // The expectation is that the parser will ignore it.
+        String malformedXml = "<doc><val>One<val>Two</val></bar>Three</doc>";
+        String expectedOutput = "<doc><val>One<val>Two</val>Three</val></doc>";
+
+        // Act: Parse the malformed XML string using Jsoup, configured with an XML parser.
+        Document doc = Jsoup.parse(malformedXml, "", Parser.xmlParser());
+
+        // Assert: Verify that the parser ignored the unmatched </bar> tag
+        // and correctly structured the document.
+        assertEquals(expectedOutput, TextUtil.stripNewlines(doc.html()));
     }
 }
