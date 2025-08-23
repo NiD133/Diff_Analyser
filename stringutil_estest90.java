@@ -1,36 +1,25 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
 
-public class StringUtil_ESTestTest90 extends StringUtil_ESTest_scaffolding {
+/**
+ * Test suite for {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test89() throws Throwable {
-        // Undeclared exception!
-        try {
-            StringUtil.padding(166, (-37));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Must be true
-            //
-            verifyException("org.jsoup.helper.Validate", e);
-        }
+    /**
+     * Tests that calling {@link StringUtil#padding(int, int)} with a negative
+     * maxPaddingWidth (less than -1) throws an {@link IllegalArgumentException}.
+     * The max padding width must be -1 (for unlimited) or a non-negative number.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void paddingWithInvalidMaxWidthThrowsIllegalArgumentException() {
+        // Arrange: Define a valid width and an invalid maximum padding width.
+        final int width = 166;
+        final int invalidMaxWidth = -37; // Must be >= -1
+
+        // Act & Assert: Call the method with the invalid argument.
+        // The @Test(expected) annotation asserts that an IllegalArgumentException is thrown.
+        StringUtil.padding(width, invalidMaxWidth);
     }
 }
