@@ -1,67 +1,44 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.time.Clock;
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
-public class JulianChronology_ESTestTest23 extends JulianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        Clock clock0 = MockClock.systemDefaultZone();
-        ChronoUnit chronoUnit0 = ChronoUnit.FOREVER;
-        Duration duration0 = chronoUnit0.getDuration();
-        Clock clock1 = MockClock.offset(clock0, duration0);
-        // Undeclared exception!
-        try {
-            julianChronology0.dateNow(clock1);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // long overflow
-            //
-            verifyException("java.lang.Math", e);
-        }
+/**
+ * Tests for {@link JulianChronology}.
+ */
+public class JulianChronologyTest {
+
+    /**
+     * Tests that {@code dateNow(Clock)} propagates an {@code ArithmeticException}
+     * when the provided clock's instant is so large that it causes a long overflow.
+     */
+    @Test
+    public void dateNow_whenClockInstantOverflows_throwsArithmeticException() {
+        // Arrange: Create a clock that represents a time so far in the future
+        // that calculating its instant will cause a numeric overflow.
+        // ChronoUnit.FOREVER provides a duration that is effectively infinite.
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        Clock baseClock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
+        Duration effectivelyInfiniteDuration = ChronoUnit.FOREVER.getDuration();
+        Clock overflowingClock = Clock.offset(baseClock, effectivelyInfiniteDuration);
+
+        // Act & Assert: Verify that dateNow throws the expected ArithmeticException.
+        // The exception originates from java.time.Instant when adding the huge duration.
+        ArithmeticException exception = assertThrows(
+            ArithmeticException.class,
+            () -> julianChronology.dateNow(overflowingClock)
+        );
+
+        // Further assert that the exception message indicates an overflow,
+        // ensuring we've caught the correct error.
+        assertTrue(exception.getMessage().toLowerCase().contains("overflow"));
     }
 }
