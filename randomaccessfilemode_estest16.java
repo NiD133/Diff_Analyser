@@ -1,39 +1,36 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.fail; // This import is no longer needed but kept for context if other tests use it.
+
+// The original test class structure is maintained.
 public class RandomAccessFileMode_ESTestTest16 extends RandomAccessFileMode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.valueOfMode("r");
-        MockFile mockFile0 = new MockFile("r");
-        Path path0 = mockFile0.toPath();
-        try {
-            randomAccessFileMode0.create(path0);
-            fail("Expecting exception: FileNotFoundException");
-        } catch (FileNotFoundException e) {
-            //
-            // File does not exist, and RandomAccessFile is not open in write mode
-            //
-            verifyException("org.evosuite.runtime.mock.java.io.MockRandomAccessFile", e);
-        }
+    /**
+     * Tests that attempting to create a RandomAccessFile in read-only mode ("r")
+     * for a file that does not exist throws a FileNotFoundException. This is the
+     * expected behavior, as read-only mode does not permit file creation.
+     */
+    @Test(expected = FileNotFoundException.class, timeout = 4000)
+    public void createWithReadOnlyModeForNonExistentFileThrowsException() throws IOException {
+        // Arrange: Set up the test conditions.
+        final RandomAccessFileMode readOnlyMode = RandomAccessFileMode.valueOfMode("r");
+        final File nonExistentFile = new File("this_file_should_not_exist.tmp");
+        final Path nonExistentPath = nonExistentFile.toPath();
+
+        // Act: Execute the method under test.
+        // This call is expected to throw a FileNotFoundException because the file
+        // does not exist and the mode is read-only.
+        readOnlyMode.create(nonExistentPath);
+
+        // Assert: The test passes if the expected exception is thrown.
+        // This is handled by the @Test(expected) annotation. If no exception or a
+        // different one is thrown, the test will fail.
     }
 }
