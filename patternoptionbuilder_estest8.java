@@ -1,17 +1,27 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PatternOptionBuilder_ESTestTest8 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        boolean boolean0 = PatternOptionBuilder.isValueCode('/');
-        assertTrue(boolean0);
+    /**
+     * Tests that the character representing a URL is correctly identified as a value code.
+     * According to the PatternOptionBuilder documentation, '/' signifies that an
+     * option's argument should be parsed as a URL.
+     */
+    @Test
+    public void isValueCodeShouldReturnTrueForUrlCharacter() {
+        // Arrange: The character for a URL type.
+        final char urlTypeChar = '/';
+
+        // Act: Check if the character is a value code.
+        boolean isCode = PatternOptionBuilder.isValueCode(urlTypeChar);
+
+        // Assert: The character should be recognized as a valid value code.
+        assertTrue("The URL type character '/' should be a value code.", isCode);
     }
 }
