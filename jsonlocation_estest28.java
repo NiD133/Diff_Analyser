@@ -1,20 +1,44 @@
 package com.fasterxml.jackson.core;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonLocation_ESTestTest28 extends JsonLocation_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        JsonLocation jsonLocation0 = new JsonLocation((Object) null, 0L, 1840L, (-201), 93);
-        StringBuilder stringBuilder0 = new StringBuilder("_K|FUenM:'d");
-        jsonLocation0.appendOffsetDescription(stringBuilder0);
-        assertEquals("_K|FUenM:'dbyte offset: #0", stringBuilder0.toString());
+    /**
+     * Tests that appendOffsetDescription() correctly appends the byte offset
+     * to a StringBuilder when line and column information is not available.
+     * The byte offset should be preferred over the character offset in this case.
+     */
+    @Test
+    public void appendOffsetDescriptionShouldAppendByteOffsetWhenLineNumberIsUnavailable() {
+        // Arrange: Create a location with a valid byte offset and char offset,
+        // but an invalid line number (-1).
+        final long byteOffset = 123L;
+        final long charOffset = 456L; // This should be ignored in favor of the byte offset.
+        final int unavailableLineNumber = -1;
+        final int unavailableColumnNumber = -1;
+
+        JsonLocation location = new JsonLocation(
+            /* sourceRef */ null,
+            byteOffset,
+            charOffset,
+            unavailableLineNumber,
+            unavailableColumnNumber
+        );
+
+        String initialContent = "Source: [UNKNOWN]; ";
+        StringBuilder stringBuilder = new StringBuilder(initialContent);
+
+        // Act: Call the method under test.
+        location.appendOffsetDescription(stringBuilder);
+
+        // Assert: Verify that the byte offset description was appended correctly.
+        String expectedDescription = "byte offset: #" + byteOffset;
+        String expectedFullString = initialContent + expectedDescription;
+        assertEquals(expectedFullString, stringBuilder.toString());
     }
 }
