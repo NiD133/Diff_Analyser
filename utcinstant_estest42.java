@@ -1,32 +1,25 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class UtcInstant_ESTestTest42 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the UtcInstant class, focusing on its comparison methods.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(2775000000000L, 2775000000000L);
-        // Undeclared exception!
-        try {
-            utcInstant0.isAfter((UtcInstant) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.scale.UtcInstant", e);
-        }
+    /**
+     * Tests that isAfter() correctly throws a NullPointerException when its argument is null,
+     * as this is a violation of the method's contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void isAfter_whenArgumentIsNull_throwsNullPointerException() {
+        // Arrange: Create any valid UtcInstant instance. The specific value is irrelevant
+        // for this test, as we are only verifying the null-handling behavior.
+        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0, 0);
+
+        // Act & Assert: Call isAfter() with a null argument.
+        // The @Test(expected) annotation handles the assertion, failing the test
+        // if a NullPointerException is not thrown.
+        instant.isAfter(null);
     }
 }
