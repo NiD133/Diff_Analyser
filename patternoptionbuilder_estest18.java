@@ -1,18 +1,29 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class PatternOptionBuilder_ESTestTest18 extends PatternOptionBuilder_ESTest_scaffolding {
+import java.io.FileInputStream;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType('<');
-        assertNotNull(class0);
-        assertEquals("class java.io.FileInputStream", class0.toString());
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
+
+    /**
+     * Tests that the special character for an existing file ('<') correctly maps to the
+     * FileInputStream class, which is used for reading from a file that must exist.
+     */
+    @Test
+    public void getValueTypeShouldReturnFileInputStreamForExistingFileCharacter() {
+        // Arrange
+        final char existingFileCode = '<';
+        final Class<?> expectedType = FileInputStream.class;
+
+        // Act
+        final Class<?> actualType = PatternOptionBuilder.getValueType(existingFileCode);
+
+        // Assert
+        assertEquals("The '<' character should represent the FileInputStream class.", expectedType, actualType);
     }
 }
