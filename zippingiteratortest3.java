@@ -3,59 +3,86 @@ package org.apache.commons.collections4.iterators;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.collections4.IteratorUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ZippingIteratorTestTest3 extends AbstractIteratorTest<Integer> {
+/**
+ * Tests for ZippingIterator.
+ * <p>
+ * This class includes tests for specific zipping scenarios and provides
+ * iterator instances for the generic tests in {@link AbstractIteratorTest}.
+ * </p>
+ */
+public class ZippingIteratorTest extends AbstractIteratorTest<Integer> {
 
-    private ArrayList<Integer> evens;
+    // Constants to define the size of test collections
+    private static final int DATA_SIZE = 10;
 
-    private ArrayList<Integer> odds;
+    // Test data collections
+    private List<Integer> evenNumbers;
+    private List<Integer> oddNumbers;
+    private List<Integer> fibonacciNumbers;
 
-    private ArrayList<Integer> fib;
+    @BeforeEach
+    public void setUp() {
+        // Initialize lists with predictable data
+        evenNumbers = new ArrayList<>();
+        oddNumbers = new ArrayList<>();
+        // Total elements will be DATA_SIZE * 2
+        for (int i = 0; i < DATA_SIZE * 2; i++) {
+            if (i % 2 == 0) {
+                evenNumbers.add(i);
+            } else {
+                oddNumbers.add(i);
+            }
+        }
 
+        fibonacciNumbers = Arrays.asList(1, 1, 2, 3, 5, 8, 13, 21);
+    }
+
+    /**
+     * Provides a ZippingIterator instance for the abstract test suite.
+     * This iterator interleaves three distinct sequences.
+     */
+    @Override
+    public ZippingIterator<Integer> makeObject() {
+        return new ZippingIterator<>(evenNumbers.iterator(), oddNumbers.iterator(), fibonacciNumbers.iterator());
+    }
+
+    /**
+     * Provides an empty ZippingIterator for the abstract test suite.
+     */
     @Override
     @SuppressWarnings("unchecked")
     public ZippingIterator<Integer> makeEmptyIterator() {
         return new ZippingIterator<>(IteratorUtils.<Integer>emptyIterator());
     }
 
-    @Override
-    public ZippingIterator<Integer> makeObject() {
-        return new ZippingIterator<>(evens.iterator(), odds.iterator(), fib.iterator());
-    }
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        evens = new ArrayList<>();
-        odds = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            if (0 == i % 2) {
-                evens.add(i);
-            } else {
-                odds.add(i);
-            }
-        }
-        fib = new ArrayList<>();
-        fib.add(1);
-        fib.add(1);
-        fib.add(2);
-        fib.add(3);
-        fib.add(5);
-        fib.add(8);
-        fib.add(13);
-        fib.add(21);
-    }
-
+    /**
+     * Tests that zipping an iterator of even numbers and an iterator of odd numbers
+     * results in a single, sequential iterator of all numbers.
+     */
     @Test
-    void testIterateEvenOdd() {
-        final ZippingIterator<Integer> iter = new ZippingIterator<>(evens.iterator(), odds.iterator());
-        for (int i = 0; i < 20; i++) {
-            assertTrue(iter.hasNext());
-            assertEquals(Integer.valueOf(i), iter.next());
+    void testZippingEvensAndOddsProducesSequentialNumbers() {
+        // Arrange: Create an iterator by zipping two iterators of equal length.
+        final ZippingIterator<Integer> zippingIterator =
+                new ZippingIterator<>(evenNumbers.iterator(), oddNumbers.iterator());
+        final int totalElements = evenNumbers.size() + oddNumbers.size();
+
+        // Act & Assert: Verify that the iterator produces a complete sequence.
+        for (int i = 0; i < totalElements; i++) {
+            assertTrue(zippingIterator.hasNext(), "Iterator should have a next element at index " + i);
+            final Integer expected = i;
+            final Integer actual = zippingIterator.next();
+            assertEquals(expected, actual, "Element at index " + i + " should match the expected sequence");
         }
-        assertFalse(iter.hasNext());
+
+        // Assert: Verify the iterator is exhausted after the loop.
+        assertFalse(zippingIterator.hasNext(), "Iterator should be exhausted after iterating through all elements");
     }
 }
