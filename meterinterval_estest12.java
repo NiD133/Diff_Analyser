@@ -2,33 +2,69 @@ package org.jfree.chart.plot;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.SystemColor;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.HistogramType;
-import org.junit.runner.RunWith;
 
-public class MeterInterval_ESTestTest12 extends MeterInterval_ESTest_scaffolding {
+/**
+ * Tests for the equals() method of the {@link MeterInterval} class.
+ *
+ * This class contains focused, understandable test cases that replace a
+ * previously unclear, auto-generated test.
+ */
+public class MeterIntervalEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        Range range0 = new Range((-229.41607020985958), (-229.41607020985958));
-        BasicStroke basicStroke0 = new BasicStroke();
-        MeterInterval meterInterval0 = new MeterInterval("d|V&g", range0);
-        MeterInterval meterInterval1 = new MeterInterval("U`/UA", range0);
-        Paint paint0 = meterInterval0.getOutlinePaint();
-        assertNotNull(paint0);
-        MeterInterval meterInterval2 = new MeterInterval("U`/UA", range0, paint0, basicStroke0, paint0);
-        boolean boolean0 = meterInterval1.equals(meterInterval2);
-        assertFalse(meterInterval1.equals((Object) meterInterval0));
-        assertFalse(boolean0);
+    /**
+     * Verifies that two MeterInterval instances are not equal if their labels
+     * are different, even when all other properties are identical.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenLabelsAreDifferent() {
+        // Arrange: Create two intervals with the same range but different labels.
+        Range commonRange = new Range(0.0, 100.0);
+        MeterInterval interval1 = new MeterInterval("Normal", commonRange);
+        MeterInterval interval2 = new MeterInterval("Warning", commonRange);
+
+        // Act & Assert: The intervals should not be considered equal.
+        assertNotEquals("Intervals with different labels should not be equal", interval1, interval2);
+    }
+
+    /**
+     * Verifies that two MeterInterval instances are not equal if their
+     * background paints differ. This specifically tests the case where one
+     * interval has the default null background paint and the other has a
+     * non-null background paint.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenBackgroundPaintsDiffer() {
+        // Arrange: Define common properties for two intervals.
+        String commonLabel = "Normal";
+        Range commonRange = new Range(0.0, 100.0);
+
+        // Arrange: Create an interval using the simple constructor, which results
+        // in a default outline, a default stroke, and a null background paint.
+        MeterInterval intervalWithDefaultBackground = new MeterInterval(commonLabel, commonRange);
+
+        // Arrange: To isolate the change, retrieve the default paint and stroke
+        // to create a second interval that is identical except for its background paint.
+        Paint defaultOutlinePaint = intervalWithDefaultBackground.getOutlinePaint();
+        Stroke defaultOutlineStroke = intervalWithDefaultBackground.getOutlineStroke();
+        Paint customBackgroundPaint = Color.GREEN;
+
+        MeterInterval intervalWithCustomBackground = new MeterInterval(
+                commonLabel,
+                commonRange,
+                defaultOutlinePaint,
+                defaultOutlineStroke,
+                customBackgroundPaint
+        );
+
+        // Act & Assert: The intervals should not be equal due to the difference
+        // in their background paint property.
+        assertNotEquals("Intervals should not be equal if one has a null background paint and the other does not",
+                intervalWithDefaultBackground, intervalWithCustomBackground);
     }
 }
