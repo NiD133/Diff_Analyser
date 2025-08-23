@@ -1,35 +1,30 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertNull;
 
-public class ExtensionFunction_ESTestTest1 extends ExtensionFunction_ESTest_scaffolding {
+/**
+ * Tests for the {@link ExtensionFunction} class, focusing on its constructor and basic getters.
+ */
+public class ExtensionFunction_ESTestTest1 {
 
+    /**
+     * Verifies that getFunctionName() returns null if the ExtensionFunction
+     * was constructed with a null function name.
+     */
     @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Expression[] expressionArray0 = new Expression[3];
-        ExtensionFunction extensionFunction0 = new ExtensionFunction((QName) null, expressionArray0);
-        QName qName0 = extensionFunction0.getFunctionName();
-        assertNull(qName0);
+    public void getFunctionNameShouldReturnNullWhenConstructedWithNull() {
+        // Arrange: Create an ExtensionFunction with a null QName.
+        // The arguments are not relevant for this test.
+        QName functionName = null;
+        Expression[] dummyArguments = new Expression[3];
+        ExtensionFunction extensionFunction = new ExtensionFunction(functionName, dummyArguments);
+
+        // Act: Call the method under test.
+        QName retrievedFunctionName = extensionFunction.getFunctionName();
+
+        // Assert: Verify that the returned name is null, as expected.
+        assertNull("getFunctionName() should return the null value passed to the constructor.", retrievedFunctionName);
     }
 }
