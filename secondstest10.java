@@ -1,35 +1,26 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class SecondsTestTest10 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
+    /**
+     * Tests that the getPeriodType() method returns the correct, seconds-only period type.
+     */
+    @Test
     public void testGetPeriodType() {
-        Seconds test = Seconds.seconds(20);
-        assertEquals(PeriodType.seconds(), test.getPeriodType());
+        // Arrange
+        Seconds secondsInstance = Seconds.seconds(20);
+        PeriodType expectedType = PeriodType.seconds();
+
+        // Act
+        PeriodType actualType = secondsInstance.getPeriodType();
+
+        // Assert
+        assertEquals("A Seconds object must have a PeriodType of 'seconds'", expectedType, actualType);
     }
 }
