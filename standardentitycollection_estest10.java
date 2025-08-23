@@ -1,24 +1,24 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StandardEntityCollection_ESTestTest10 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        boolean boolean0 = standardEntityCollection0.equals(standardEntityCollection0);
-        assertTrue(boolean0);
+    /**
+     * Verifies the reflexive property of the equals() method.
+     * An object must always be equal to itself.
+     */
+    @Test
+    public void equals_shouldReturnTrue_whenComparingAnInstanceToItself() {
+        // Arrange: Create an instance of the class under test.
+        StandardEntityCollection collection = new StandardEntityCollection();
+
+        // Act & Assert: An object should always be equal to itself.
+        assertTrue("A collection instance should always be equal to itself.",
+                collection.equals(collection));
     }
 }
