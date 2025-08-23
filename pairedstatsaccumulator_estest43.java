@@ -1,20 +1,24 @@
 package com.google.common.math;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest43 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        Stats stats0 = pairedStatsAccumulator0.yStats();
-        assertEquals(0.0, stats0.sum(), 0.01);
+    @Test
+    public void yStats_onNewAccumulator_returnsEmptyStats() {
+        // Arrange: Create a new, empty accumulator.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+
+        // Act: Get the statistics for the y-values.
+        Stats yStats = accumulator.yStats();
+
+        // Assert: Verify the statistics are empty (count is 0, sum is 0.0).
+        assertEquals(0, yStats.count());
+        assertEquals(0.0, yStats.sum(), 0.0);
     }
 }
