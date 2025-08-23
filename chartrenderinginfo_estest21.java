@@ -2,27 +2,30 @@ package org.jfree.chart;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
-public class ChartRenderingInfo_ESTestTest21 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        Rectangle2D.Double rectangle2D_Double0 = (Rectangle2D.Double) chartRenderingInfo0.getChartArea();
-        assertEquals(0.0, rectangle2D_Double0.height, 0.01);
+    /**
+     * Verifies that a newly created ChartRenderingInfo instance has an empty
+     * chart area by default.
+     */
+    @Test
+    public void newChartRenderingInfoShouldHaveEmptyChartArea() {
+        // Arrange: Create a new ChartRenderingInfo instance using the default constructor.
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo();
+
+        // Act: Retrieve the chart area from the new instance.
+        Rectangle2D chartArea = renderingInfo.getChartArea();
+
+        // Assert: The retrieved chart area should be an empty rectangle at origin (0,0).
+        assertNotNull("The chart area should not be null.", chartArea);
+        assertEquals("Default chart area x-coordinate should be 0.0.", 0.0, chartArea.getX(), 0.0);
+        assertEquals("Default chart area y-coordinate should be 0.0.", 0.0, chartArea.getY(), 0.0);
+        assertEquals("Default chart area width should be 0.0.", 0.0, chartArea.getWidth(), 0.0);
+        assertEquals("Default chart area height should be 0.0.", 0.0, chartArea.getHeight(), 0.0);
     }
 }
