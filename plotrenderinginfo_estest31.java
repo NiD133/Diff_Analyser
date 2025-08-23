@@ -1,32 +1,28 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PlotRenderingInfo_ESTestTest31 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-        // Undeclared exception!
-        try {
-            plotRenderingInfo0.getSubplotInfo(1);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that getSubplotInfo() throws an IndexOutOfBoundsException
+     * when attempting to access a subplot index that does not exist.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void getSubplotInfo_withInvalidIndex_throwsIndexOutOfBoundsException() {
+        // Arrange: Create a PlotRenderingInfo instance which, by default, has no subplots.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
+
+        // Act: Attempt to retrieve a subplot using an index that is out of bounds
+        // for an empty list.
+        plotInfo.getSubplotInfo(1);
+
+        // Assert: The test passes if an IndexOutOfBoundsException is thrown,
+        // which is handled by the @Test(expected=...) annotation.
     }
 }
