@@ -1,114 +1,79 @@
 package org.apache.commons.compress.archivers.zip;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+import java.io.ByteArrayOutputStream;
 import java.util.zip.ZipException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ExtraFieldUtilsTestTest2 implements UnixStat {
+/**
+ * Tests for {@link ExtraFieldUtils} merging logic.
+ */
+public class ExtraFieldUtilsTest {
 
     /**
      * Header-ID of a ZipExtraField not supported by Commons Compress.
-     *
-     * <p>
-     * Used to be ZipShort(1) but this is the ID of the Zip64 extra field.
-     * </p>
      */
-    static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
-
-    /**
-     * Header-ID of a ZipExtraField not supported by Commons Compress used for the ArrayIndexOutOfBoundsTest.
-     */
-    static final ZipShort AIOB_HEADER = new ZipShort(0x1000);
-
-    private AsiExtraField a;
-
-    private UnrecognizedExtraField dummy;
-
-    private byte[] data;
-
-    private byte[] aLocal;
-
-    @BeforeEach
-    public void setUp() {
-        a = new AsiExtraField();
-        a.setMode(0755);
-        a.setDirectory(true);
-        dummy = new UnrecognizedExtraField();
-        dummy.setHeaderId(UNRECOGNIZED_HEADER);
-        dummy.setLocalFileDataData(new byte[] { 0 });
-        dummy.setCentralDirectoryData(new byte[] { 0 });
-        aLocal = a.getLocalFileDataData();
-        final byte[] dummyLocal = dummy.getLocalFileDataData();
-        data = new byte[4 + aLocal.length + 4 + dummyLocal.length];
-        System.arraycopy(a.getHeaderId().getBytes(), 0, data, 0, 2);
-        System.arraycopy(a.getLocalFileDataLength().getBytes(), 0, data, 2, 2);
-        System.arraycopy(aLocal, 0, data, 4, aLocal.length);
-        System.arraycopy(dummy.getHeaderId().getBytes(), 0, data, 4 + aLocal.length, 2);
-        System.arraycopy(dummy.getLocalFileDataLength().getBytes(), 0, data, 4 + aLocal.length + 2, 2);
-        System.arraycopy(dummyLocal, 0, data, 4 + aLocal.length + 4, dummyLocal.length);
-    }
-
-    public static class AiobThrowingExtraField implements ZipExtraField {
-
-        static final int LENGTH = 4;
-
-        @Override
-        public byte[] getCentralDirectoryData() {
-            return getLocalFileDataData();
-        }
-
-        @Override
-        public ZipShort getCentralDirectoryLength() {
-            return getLocalFileDataLength();
-        }
-
-        @Override
-        public ZipShort getHeaderId() {
-            return AIOB_HEADER;
-        }
-
-        @Override
-        public byte[] getLocalFileDataData() {
-            return new byte[LENGTH];
-        }
-
-        @Override
-        public ZipShort getLocalFileDataLength() {
-            return new ZipShort(LENGTH);
-        }
-
-        @Override
-        public void parseFromCentralDirectoryData(final byte[] buffer, final int offset, final int length) {
-            parseFromLocalFileData(buffer, offset, length);
-        }
-
-        @Override
-        public void parseFromLocalFileData(final byte[] buffer, final int offset, final int length) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
-    }
+    private static final ZipShort UNRECOGNIZED_HEADER = new ZipShort(0x5555);
 
     @Test
-    void testMergeWithUnparseableData() throws Exception {
-        final ZipExtraField d = new UnparseableExtraFieldData();
-        final byte[] b = UNRECOGNIZED_HEADER.getBytes();
-        d.parseFromLocalFileData(new byte[] { b[0], b[1], 1, 0 }, 0, 4);
-        final byte[] local = ExtraFieldUtils.mergeLocalFileDataData(new ZipExtraField[] { a, d });
-        assertEquals(data.length - 1, local.length, "local length");
-        for (int i = 0; i < local.length; i++) {
-            assertEquals(data[i], local[i], "local byte " + i);
-        }
-        final byte[] dCentral = d.getCentralDirectoryData();
-        final byte[] data2 = new byte[4 + aLocal.length + dCentral.length];
-        System.arraycopy(data, 0, data2, 0, 4 + aLocal.length + 2);
-        System.arraycopy(dCentral, 0, data2, 4 + aLocal.length, dCentral.length);
-        final byte[] central = ExtraFieldUtils.mergeCentralDirectoryData(new ZipExtraField[] { a, d });
-        assertEquals(data2.length, central.length, "central length");
-        for (int i = 0; i < central.length; i++) {
-            assertEquals(data2[i], central[i], "central byte " + i);
+    void mergeMethodsShouldConcatenateFieldBytes() throws Exception {
+        // Arrange
+        // 1. A standard, recognized extra field (AsiExtraField for Unix metadata).
+        final AsiExtraField asiField = new AsiExtraField();
+        asiField.setMode(0755); // rwxr-xr-x
+        asiField.setDirectory(true);
+
+        // 2. An UnparseableExtraFieldData instance, which holds raw, unparsed data.
+        // This simulates what happens when a parser encounters an unknown field type.
+        final UnparseableExtraFieldData unparseableField = new UnparseableExtraFieldData();
+        final byte[] rawUnparseableBytes = {
+            (byte) 0x55, (byte) 0x55, // Header ID: UNRECOGNIZED_HEADER
+            (byte) 0x01, (byte) 0x00  // Length of data payload (1 byte)
+        };
+        // Initialize the field with raw data that has a declared length but no corresponding payload.
+        // The merge methods should still correctly read the header and length.
+        unparseableField.parseFromLocalFileData(rawUnparseableBytes, 0, rawUnparseableBytes.length);
+
+        final ZipExtraField[] fieldsToMerge = {asiField, unparseableField};
+
+        // Act
+        final byte[] mergedLocalData = ExtraFieldUtils.mergeLocalFileDataData(fieldsToMerge);
+        final byte[] mergedCentralData = ExtraFieldUtils.mergeCentralDirectoryData(fieldsToMerge);
+
+        // Assert
+        // The merged data should be a concatenation of the full block for each field.
+        // A full block consists of: Header ID (2 bytes) + Data Length (2 bytes) + Data Payload.
+
+        // --- Verify Local File Data ---
+        final byte[] expectedLocalData = buildExpectedByteArray(
+            asiField.getHeaderId(), asiField.getLocalFileDataLength(), asiField.getLocalFileDataData(),
+            unparseableField.getHeaderId(), unparseableField.getLocalFileDataLength(), unparseableField.getLocalFileDataData()
+        );
+        assertArrayEquals(expectedLocalData, mergedLocalData, "Merged local file data should be correct");
+
+        // --- Verify Central Directory Data ---
+        final byte[] expectedCentralData = buildExpectedByteArray(
+            asiField.getHeaderId(), asiField.getCentralDirectoryLength(), asiField.getCentralDirectoryData(),
+            unparseableField.getHeaderId(), unparseableField.getCentralDirectoryLength(), unparseableField.getCentralDirectoryData()
+        );
+        assertArrayEquals(expectedCentralData, mergedCentralData, "Merged central directory data should be correct");
+    }
+
+    /**
+     * Helper method to build the expected byte array from extra field components.
+     * This improves readability in the test's assertion phase.
+     */
+    private byte[] buildExpectedByteArray(final ZipShort header1, final ZipShort length1, final byte[] data1,
+                                          final ZipShort header2, final ZipShort length2, final byte[] data2) throws Exception {
+        try (final ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+            stream.write(header1.getBytes());
+            stream.write(length1.getBytes());
+            stream.write(data1);
+            stream.write(header2.getBytes());
+            stream.write(length2.getBytes());
+            stream.write(data2);
+            return stream.toByteArray();
         }
     }
 }
