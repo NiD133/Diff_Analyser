@@ -1,30 +1,40 @@
 package org.joda.time.convert;
 
+import org.joda.time.Chronology;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
 
-public class CalendarConverter_ESTestTest3 extends CalendarConverter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        MockGregorianCalendar mockGregorianCalendar0 = new MockGregorianCalendar();
-        CalendarConverter calendarConverter0 = CalendarConverter.INSTANCE;
-        long long0 = calendarConverter0.getInstantMillis(mockGregorianCalendar0, (Chronology) null);
-        assertEquals(1392409281320L, long0);
+/**
+ * Unit tests for {@link CalendarConverter}.
+ */
+public class CalendarConverterTest {
+
+    /**
+     * Tests that getInstantMillis() correctly extracts the millisecond instant
+     * from a java.util.Calendar object, ignoring the provided Chronology.
+     */
+    @Test
+    public void getInstantMillis_shouldReturnMillisecondsFromCalendar() {
+        // Arrange: Create a Calendar instance set to a specific, well-known moment.
+        // This makes the test deterministic and its inputs explicit.
+        GregorianCalendar calendar = new GregorianCalendar(2004, Calendar.JULY, 9, 12, 30, 0);
+        calendar.set(Calendar.MILLISECOND, 500);
+        // Set a specific timezone to avoid test failures due to system default settings.
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        long expectedMillis = calendar.getTimeInMillis();
+        CalendarConverter converter = CalendarConverter.INSTANCE;
+
+        // Act: Convert the Calendar to milliseconds.
+        // The Chronology parameter is ignored by this method, so we pass null to confirm.
+        long actualMillis = converter.getInstantMillis(calendar, (Chronology) null);
+
+        // Assert: The converted value should match the original calendar's milliseconds.
+        assertEquals(expectedMillis, actualMillis);
     }
 }
