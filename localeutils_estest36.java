@@ -1,21 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class LocaleUtils_ESTestTest36 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LocaleUtils} class.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        Locale locale0 = Locale.ITALY;
-        boolean boolean0 = LocaleUtils.isAvailableLocale(locale0);
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link LocaleUtils#isAvailableLocale(Locale)} returns true
+     * for a locale that is part of the standard set of available locales.
+     */
+    @Test
+    public void isAvailableLocale_shouldReturnTrue_forStandardLocale() {
+        // Arrange: Define a locale that is expected to be available in any standard Java environment.
+        // Locale.ITALY is a constant and a reliable choice for this test.
+        final Locale standardLocale = Locale.ITALY;
+
+        // Act: Call the method under test.
+        final boolean isAvailable = LocaleUtils.isAvailableLocale(standardLocale);
+
+        // Assert: Verify that the method correctly identifies the locale as available.
+        assertTrue("Locale.ITALY should be recognized as an available locale.", isAvailable);
     }
 }
