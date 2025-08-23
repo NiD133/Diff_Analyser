@@ -1,31 +1,25 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class AtomicDoubleArray_ESTestTest32 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        double[] doubleArray0 = new double[0];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        // Undeclared exception!
-        try {
-            atomicDoubleArray0.compareAndSet(44, 44, 44);
-            fail("Expecting exception: IndexOutOfBoundsException");
-        } catch (IndexOutOfBoundsException e) {
-            //
-            // index 44
-            //
-            verifyException("java.util.concurrent.atomic.AtomicLongArray", e);
-        }
+    /**
+     * Verifies that compareAndSet throws an IndexOutOfBoundsException when the index
+     * is outside the bounds of the array.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void compareAndSet_withOutOfBoundsIndex_throwsIndexOutOfBoundsException() {
+        // Arrange: Create an empty array, which has a size of 0.
+        AtomicDoubleArray array = new AtomicDoubleArray(0);
+        int outOfBoundsIndex = 44;
+        double anyValue = 1.0;
+
+        // Act: Attempt to access an index that does not exist.
+        // The test succeeds if this call throws the expected IndexOutOfBoundsException.
+        array.compareAndSet(outOfBoundsIndex, anyValue, anyValue);
     }
 }
