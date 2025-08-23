@@ -1,27 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This test class contains tests for the {@link SerializedString} class.
+ * This specific test focuses on the behavior of the equals() method.
+ */
 public class SerializedString_ESTestTest29 extends SerializedString_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("");
-        boolean boolean0 = serializedString0.equals(serializedString0);
-        assertTrue(boolean0);
+    /**
+     * Tests that the equals() method is reflexive.
+     * An object instance must always be equal to itself.
+     */
+    @Test
+    public void testEquals_withSameInstance_returnsTrue() {
+        // Arrange: Create an instance of SerializedString.
+        SerializedString serializedString = new SerializedString("any string");
+
+        // Act & Assert: Verify that the instance is equal to itself.
+        // This confirms the reflexive property of the equals() method as per the Object contract.
+        assertTrue("An instance of SerializedString should be equal to itself.",
+                   serializedString.equals(serializedString));
     }
 }
