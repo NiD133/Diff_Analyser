@@ -1,29 +1,25 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPoolArrayCache_ESTestTest6 extends SegmentConstantPoolArrayCache_ESTest_scaffolding {
+/**
+ * Tests for {@link SegmentConstantPoolArrayCache}.
+ */
+public class SegmentConstantPoolArrayCacheTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        SegmentConstantPoolArrayCache segmentConstantPoolArrayCache0 = new SegmentConstantPoolArrayCache();
-        // Undeclared exception!
-        try {
-            segmentConstantPoolArrayCache0.indexesForArrayKey((String[]) null, "");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPoolArrayCache$CachedArray", e);
-        }
+    /**
+     * Verifies that calling indexesForArrayKey() with a null array argument
+     * correctly throws a NullPointerException. The cache mechanism cannot
+     * operate on a null array.
+     */
+    @Test(expected = NullPointerException.class)
+    public void indexesForArrayKeyShouldThrowNPEForNullArray() {
+        // Arrange
+        SegmentConstantPoolArrayCache cache = new SegmentConstantPoolArrayCache();
+        String anyKey = "anyValue"; // The key's value is irrelevant for this test
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException because the input array is null.
+        cache.indexesForArrayKey(null, anyKey);
     }
 }
