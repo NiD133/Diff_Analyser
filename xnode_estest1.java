@@ -1,31 +1,46 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import java.util.Properties;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest1 extends XNode_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test000() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode("`<k}k`_uR'");
-        iIOMetadataNode0.removeChild(iIOMetadataNode0);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        String string0 = xNode0.toString();
-        assertEquals("<`<k}k`_uR'>\n</`<k}k`_uR'>\n", string0);
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that the toString() method correctly formats an XNode representing
+     * an empty XML element.
+     */
+    @Test
+    public void toStringShouldCorrectlyFormatAnEmptyNode() {
+        // Arrange
+        // 1. Define a simple name for our XML node.
+        String nodeName = "root";
+
+        // 2. Create a standard DOM Node. IIOMetadataNode is a concrete implementation.
+        // This node is created without any children.
+        Node domNode = new IIOMetadataNode(nodeName);
+
+        // 3. The XNode constructor requires a Properties object for variables.
+        // An empty one is sufficient for this test.
+        Properties variables = new Properties();
+
+        // 4. Instantiate the XNode. The XPathParser is not used by the toString()
+        // method, so it can be null.
+        XNode xNode = new XNode(null, domNode, variables);
+
+        // Act
+        // Call the method under test to get its string representation.
+        String actualXmlString = xNode.toString();
+
+        // Assert
+        // The expected format for an empty node is <name>\n</name>\n
+        String expectedXmlString = "<root>\n</root>\n";
+        assertEquals(expectedXmlString, actualXmlString);
     }
 }
