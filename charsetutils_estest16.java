@@ -1,17 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSetUtils_ESTestTest16 extends CharSetUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSetUtils#delete(String, String...)}.
+ */
+public class CharSetUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        String[] stringArray0 = new String[8];
-        String string0 = CharSetUtils.delete("A-Z", stringArray0);
-        assertEquals("A-Z", string0);
+    /**
+     * Tests that CharSetUtils.delete() returns the original string when the set of
+     * characters to delete is an array containing only null elements.
+     * An array of nulls is treated as an empty set, so no characters should be deleted.
+     */
+    @Test
+    public void deleteWithSetContainingOnlyNullsShouldReturnOriginalString() {
+        // Arrange
+        final String input = "A-Z";
+        final String[] setToDelete = new String[8]; // Creates an array of 8 nulls
+
+        // Act
+        final String result = CharSetUtils.delete(input, setToDelete);
+
+        // Assert
+        assertEquals("The string should remain unchanged", input, result);
     }
 }
