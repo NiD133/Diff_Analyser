@@ -1,22 +1,34 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BoundedReader_ESTestTest7 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        StringReader stringReader0 = new StringReader("v4]>?/Q;dj|.O1#4");
-        BoundedReader boundedReader0 = new BoundedReader(stringReader0, 1);
-        int int0 = boundedReader0.read();
-        assertEquals(118, int0);
+    /**
+     * Tests that read() returns the first character from the underlying reader
+     * when the bound is set to one.
+     */
+    @Test
+    public void testReadSingleCharWhenBoundIsOne() throws IOException {
+        // Arrange
+        final String testData = "v-rest-of-string";
+        final StringReader underlyingReader = new StringReader(testData);
+        
+        // Create a BoundedReader limited to reading just one character.
+        final BoundedReader boundedReader = new BoundedReader(underlyingReader, 1);
+
+        // Act
+        final int firstChar = boundedReader.read();
+
+        // Assert
+        // Verify that the character read is 'v', not its obscure integer value 118.
+        assertEquals('v', firstChar);
     }
 }
