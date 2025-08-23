@@ -1,26 +1,24 @@
 package com.google.gson.internal;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LazilyParsedNumber_ESTestTest24 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Tests for {@link LazilyParsedNumber}.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber((String) null);
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.longValue();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.NumberLimits", e);
-        }
+    @Test
+    public void longValue_whenConstructedWithNull_throwsNullPointerException() {
+        // Arrange: Create a LazilyParsedNumber with a null string value.
+        // While the constructor's contract states the value must not be null,
+        // this test verifies the defensive behavior of the class.
+        LazilyParsedNumber number = new LazilyParsedNumber(null);
+
+        // Act & Assert: Verify that attempting to parse the null value as a long
+        // results in a NullPointerException.
+        assertThrows(NullPointerException.class, () -> {
+            number.longValue();
+        });
     }
 }
