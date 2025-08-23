@@ -1,39 +1,42 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest34 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[1];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, 1, 1);
-        int int0 = mergedStream0.available();
-        assertEquals(0, int0);
+// Note: The original test class name 'MergedStream_ESTestTest34' is preserved for context.
+// In a real-world scenario, this would likely be part of a 'MergedStreamTest' class.
+public class MergedStream_ESTestTest34 {
+
+    /**
+     * Tests that {@link MergedStream#available()} returns 0 when both its sources of data are empty:
+     * 1. The internal, prepended buffer.
+     * 2. The underlying input stream.
+     */
+    @Test
+    public void available_shouldReturnZero_whenPrependedBufferAndStreamAreEmpty() throws IOException {
+        // Arrange
+        // 1. An underlying stream that has no available bytes.
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]);
+
+        // 2. A buffer to be prepended to the stream.
+        byte[] prependedBuffer = new byte[1];
+
+        // 3. A MergedStream where the "view" into the prepended buffer is empty.
+        //    This is achieved by setting the start and end pointers to the same position,
+        //    simulating a scenario where all prepended data has been read.
+        int start = 1;
+        int end = 1; // When start == end, the buffer part is considered empty.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, prependedBuffer, start, end);
+
+        // Act
+        int availableBytes = mergedStream.available();
+
+        // Assert
+        assertEquals("Expected 0 available bytes when both the buffer and stream are empty.", 0, availableBytes);
     }
 }
