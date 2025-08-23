@@ -2,28 +2,30 @@ package org.jsoup.nodes;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
 
-public class LeafNode_ESTestTest31 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the {@link LeafNode} class, focusing on its exception-handling behavior.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        CDataNode cDataNode0 = new CDataNode("iX.>E!");
-        // Undeclared exception!
+    /**
+     * Verifies that calling absUrl() with an empty string for the attribute key
+     * throws an IllegalArgumentException, as the key must not be empty.
+     */
+    @Test
+    public void absUrlWithEmptyKeyThrowsIllegalArgumentException() {
+        // Arrange: Create a concrete instance of a LeafNode. The node's content is irrelevant.
+        LeafNode node = new CDataNode("some data");
+
         try {
-            cDataNode0.absUrl("");
-            fail("Expecting exception: IllegalArgumentException");
+            // Act: Call the method under test with an invalid (empty) key.
+            node.absUrl("");
+            
+            // Assert: If the method does not throw an exception, this test should fail.
+            fail("Expected an IllegalArgumentException to be thrown for an empty key.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Assert: Verify that the exception has the expected message.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
