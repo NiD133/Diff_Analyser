@@ -1,44 +1,37 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest47 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        ChronoField chronoField0 = ChronoField.ALIGNED_WEEK_OF_MONTH;
-        ValueRange valueRange0 = symmetry454Chronology0.range(chronoField0);
-        assertNotNull(valueRange0);
+/**
+ * Unit tests for the range of fields in {@link Symmetry454Chronology}.
+ */
+public class Symmetry454ChronologyRangeTest {
+
+    /**
+     * Verifies the valid range for the ALIGNED_WEEK_OF_MONTH field.
+     * <p>
+     * The Symmetry454 calendar has months of either 4 weeks (28 days) or 5 weeks (35 days).
+     * This test ensures that the chronology correctly reports this specific range.
+     */
+    @Test
+    public void rangeForAlignedWeekOfMonth_isCorrect() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        // The expected range for weeks in a month is 1 to 5, with the shortest
+        // "long" month having 4 weeks.
+        ValueRange expectedRange = ValueRange.of(1, 4, 5);
+
+        // Act
+        ValueRange actualRange = chronology.range(ChronoField.ALIGNED_WEEK_OF_MONTH);
+
+        // Assert
+        assertEquals(
+                "The range for ALIGNED_WEEK_OF_MONTH should be 1-4/5 weeks.",
+                expectedRange,
+                actualRange);
     }
 }
