@@ -1,37 +1,29 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class LabelBlock_ESTestTest35 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        RectangleAnchor rectangleAnchor0 = labelBlock0.getTextAnchor();
-        assertEquals(RectangleAnchor.CENTER, rectangleAnchor0);
+    /**
+     * Verifies that a newly created LabelBlock has a default text anchor of CENTER.
+     * This test checks the default state set by the constructor.
+     */
+    @Test
+    public void newLabelBlockShouldHaveCenterTextAnchorByDefault() {
+        // Arrange: Create a new LabelBlock instance.
+        // The constructor should set a default text anchor.
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+        RectangleAnchor expectedAnchor = RectangleAnchor.CENTER;
+
+        // Act: Retrieve the text anchor from the new instance.
+        RectangleAnchor actualAnchor = labelBlock.getTextAnchor();
+
+        // Assert: Verify that the actual anchor matches the expected default value.
+        assertEquals("The default text anchor should be CENTER.", expectedAnchor, actualAnchor);
     }
 }
