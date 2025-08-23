@@ -1,55 +1,46 @@
 package com.google.common.graph;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.testing.EqualsTester;
-import java.util.Collection;
-import java.util.Set;
-import org.jspecify.annotations.NullUnmarked;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import static org.junit.Assert.*;
 
-public class EndpointPairTestTest3 {
+/**
+ * Unit tests for the {@link EndpointPair} class.
+ */
+public class EndpointPairTest {
 
-    private static final Integer N0 = 0;
+    /**
+     * Verifies that the target() method of an ordered EndpointPair
+     * correctly returns the node specified as the target during creation.
+     */
+    @Test
+    public void orderedPair_target_returnsCorrectNode() {
+        // Arrange: Define source and target nodes for a directed edge.
+        String sourceNode = "A";
+        String targetNode = "B";
+        EndpointPair<String> endpointPair = EndpointPair.ordered(sourceNode, targetNode);
 
-    private static final Integer N1 = 1;
+        // Act: Retrieve the target node from the endpoint pair.
+        String actualTarget = endpointPair.target();
 
-    private static final Integer N2 = 2;
-
-    private static final Integer N3 = 3;
-
-    private static final Integer N4 = 4;
-
-    private static final String E12 = "1-2";
-
-    private static final String E12_A = "1-2a";
-
-    private static final String E21 = "2-1";
-
-    private static final String E13 = "1-3";
-
-    private static final String E44 = "4-4";
-
-    private static void containsExactlySanityCheck(Collection<?> collection, Object... varargs) {
-        assertThat(collection).hasSize(varargs.length);
-        for (Object obj : varargs) {
-            assertThat(collection).contains(obj);
-        }
-        assertThat(collection).containsExactly(varargs);
+        // Assert: The retrieved target node should be the same as the one provided.
+        assertSame("The target() method should return the node provided as the target.",
+                targetNode, actualTarget);
     }
 
+    /**
+     * Verifies that the target() method of an ordered EndpointPair
+     * returns the correct node when the edge is a self-loop.
+     */
     @Test
-    public void testSelfLoop() {
-        EndpointPair<String> unordered = EndpointPair.unordered("node", "node");
-        assertThat(unordered.isOrdered()).isFalse();
-        assertThat(unordered).containsExactly("node", "node");
-        assertThat(unordered.nodeU()).isEqualTo("node");
-        assertThat(unordered.nodeV()).isEqualTo("node");
-        assertThat(unordered.adjacentNode("node")).isEqualTo("node");
-        assertThat(unordered.toString()).isEqualTo("[node, node]");
+    public void orderedPair_target_returnsCorrectNodeOnSelfLoop() {
+        // Arrange: Create a single node for a self-looping edge.
+        String node = "LOOP";
+        EndpointPair<String> selfLoopPair = EndpointPair.ordered(node, node);
+
+        // Act: Retrieve the target node from the self-looping pair.
+        String actualTarget = selfLoopPair.target();
+
+        // Assert: The target of a self-loop should be the node itself.
+        assertSame("The target of a self-loop should be the node itself.", node, actualTarget);
     }
 }
