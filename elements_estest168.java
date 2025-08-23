@@ -1,36 +1,33 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest168 extends Elements_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test167() throws Throwable {
-        Document document0 = new Document("Bb,Y6");
-        Elements elements0 = document0.getAllElements();
-        List<DataNode> list0 = elements0.dataNodes();
-        assertTrue(list0.isEmpty());
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that calling dataNodes() on a collection of elements
+     * that do not contain any DataNode children returns an empty list.
+     */
+    @Test
+    public void dataNodesReturnsEmptyListWhenNoDataNodesArePresent() {
+        // Arrange: Create a document with standard elements but no DataNodes (like <script> or <style>).
+        // A default new Document contains <html>, <head>, and <body>.
+        Document doc = new Document("");
+        Elements elements = doc.getAllElements();
+
+        // Act: Retrieve the DataNode children from the elements.
+        List<DataNode> dataNodes = elements.dataNodes();
+
+        // Assert: The resulting list should be empty.
+        assertTrue("Expected an empty list as no DataNode elements were present", dataNodes.isEmpty());
     }
 }
