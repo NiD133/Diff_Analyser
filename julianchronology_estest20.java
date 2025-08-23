@@ -1,63 +1,37 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
-public class JulianChronology_ESTestTest20 extends JulianChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        // Undeclared exception!
+/**
+ * Tests for {@link JulianChronology}.
+ * This class focuses on the date creation methods.
+ */
+public class JulianChronologyTest {
+
+    /**
+     * Tests that creating a date with day-of-year 366 in a non-leap year throws an exception.
+     * In the Julian calendar, a year is a leap year if it is divisible by 4.
+     * The year 366 is not divisible by 4, so it has only 365 days.
+     */
+    @Test
+    public void dateYearDay_throwsExceptionForDay366InNonLeapYear() {
+        // Arrange
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        int nonLeapYear = 366; // 366 % 4 != 0, so it's not a Julian leap year.
+        int invalidDayOfYear = 366;
+        String expectedMessage = "Invalid date 'DayOfYear 366' as '366' is not a leap year";
+
+        // Act & Assert
         try {
-            julianChronology0.dateYearDay(366, 366);
-            fail("Expecting exception: DateTimeException");
+            julianChronology.dateYearDay(nonLeapYear, invalidDayOfYear);
+            fail("Expected a DateTimeException to be thrown for day 366 in a non-leap year.");
         } catch (DateTimeException e) {
-            //
-            // Invalid date 'DayOfYear 366' as '366' is not a leap year
-            //
-            verifyException("org.threeten.extra.chrono.JulianDate", e);
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
