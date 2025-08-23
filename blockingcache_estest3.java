@@ -1,24 +1,34 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest3 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("");
-        SoftCache softCache0 = new SoftCache(perpetualCache0);
-        BlockingCache blockingCache0 = new BlockingCache(softCache0);
-        blockingCache0.getObject(softCache0);
-        blockingCache0.putObject(softCache0, (Object) null);
-        assertEquals("", blockingCache0.getId());
+/**
+ * Test suite for BlockingCache.
+ *
+ * Note: The original test 'test02' was likely auto-generated.
+ * It has been rewritten to clearly test a specific behavior in an understandable way.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that BlockingCache correctly delegates the getId() call
+     * to the underlying cache instance it decorates.
+     */
+    @Test
+    public void shouldDelegateGetIdToDecoratedCache() {
+        // Arrange
+        String expectedId = "user-cache";
+        Cache delegateCache = new PerpetualCache(expectedId);
+        Cache blockingCache = new BlockingCache(delegateCache);
+
+        // Act
+        String actualId = blockingCache.getId();
+
+        // Assert
+        assertEquals(expectedId, actualId);
     }
 }
