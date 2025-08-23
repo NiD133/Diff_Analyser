@@ -1,32 +1,39 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldUtils_ESTestTest50 extends FieldUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.minuteOfHour();
-        // Undeclared exception!
+/**
+ * Contains tests for the utility methods in {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
+
+    /**
+     * Tests that verifyValueBounds throws an IllegalArgumentException when the provided
+     * value is greater than the specified upper bound.
+     */
+    @Test
+    public void verifyValueBounds_whenValueIsAboveUpperBound_throwsIllegalArgumentException() {
+        // Arrange: Define the field type, the bounds, and a value outside those bounds.
+        final DateTimeFieldType fieldType = DateTimeFieldType.minuteOfHour();
+        final int lowerBound = -1584;
+        final int upperBound = -473;
+        final int valueAboveRange = 1428;
+
+        // Define the expected exception message for clarity and maintainability.
+        final String expectedMessage = "Value 1428 for minuteOfHour must be in the range [-1584,-473]";
+
+        // Act & Assert: Call the method and verify that it throws the correct exception
+        // with the expected message.
         try {
-            FieldUtils.verifyValueBounds(dateTimeFieldType0, 1428, (-1584), (-473));
-            fail("Expecting exception: IllegalArgumentException");
+            FieldUtils.verifyValueBounds(fieldType, valueAboveRange, lowerBound, upperBound);
+            fail("Expected an IllegalArgumentException to be thrown, but no exception was thrown.");
         } catch (IllegalArgumentException e) {
-            //
-            // Value 1428 for minuteOfHour must be in the range [-1584,-473]
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception message is exactly as expected.
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
