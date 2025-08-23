@@ -1,21 +1,28 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest5 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ThresholdingOutputStream}.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream((-2596));
-        thresholdingOutputStream0.getStream();
-        assertEquals(0, thresholdingOutputStream0.getThreshold());
+    /**
+     * Tests that the constructor treats a negative threshold value as zero,
+     * which is the specified behavior for invalid inputs.
+     */
+    @Test
+    public void constructorShouldSetNegativeThresholdToZero() {
+        // Arrange
+        final int negativeThreshold = -2596;
+        final int expectedThreshold = 0;
+
+        // Act
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(negativeThreshold);
+
+        // Assert
+        assertEquals("A negative threshold should be corrected to 0.",
+                     expectedThreshold, stream.getThreshold());
     }
 }
