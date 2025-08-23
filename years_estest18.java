@@ -1,18 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class Years_ESTestTest18 extends Years_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Years years0 = Years.ZERO;
-        Years years1 = years0.dividedBy(1);
-        assertSame(years0, years1);
+    /**
+     * Tests that dividing a Years instance by 1 returns the same instance,
+     * which is an important optimization for immutable objects.
+     */
+    @Test
+    public void dividedByOne_shouldReturnSameInstance() {
+        // Arrange
+        final Years zeroYears = Years.ZERO;
+
+        // Act
+        final Years result = zeroYears.dividedBy(1);
+
+        // Assert
+        // For immutable objects, dividing by 1 should be a no-op and return
+        // the original instance, not just an equal one.
+        assertSame("Dividing by 1 should return the same instance", zeroYears, result);
     }
 }
