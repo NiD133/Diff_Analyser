@@ -24,9 +24,9 @@ public class CleaningPathVisitor_ESTestTest15 extends CleaningPathVisitor_ESTest
     public void test14() throws Throwable {
         Counters.PathCounters counters_PathCounters0 = CountingPathVisitor.defaultPathCounters();
         String[] stringArray0 = new String[1];
-        stringArray0[0] = ",(-_DTfh #j%MqF^";
+        stringArray0[0] = ",(-_DTfh #j%Mq F^";
         CleaningPathVisitor cleaningPathVisitor0 = new CleaningPathVisitor(counters_PathCounters0, stringArray0);
-        MockFile mockFile0 = new MockFile(",(-_DTfh #j%MqF^");
+        MockFile mockFile0 = new MockFile(",(-_DTfh #j%Mq F^");
         Path path0 = mockFile0.toPath();
         // Undeclared exception!
         try {
