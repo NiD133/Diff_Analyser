@@ -1,58 +1,47 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest23 extends CollectionSortedBag_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        TreeBag<Object> treeBag0 = new TreeBag<Object>();
-        Transformer<Object, Object> transformer0 = ConstantTransformer.nullTransformer();
-        TransformedSortedBag<Object> transformedSortedBag0 = TransformedSortedBag.transformingSortedBag((SortedBag<Object>) treeBag0, (Transformer<? super Object, ?>) transformer0);
-        CollectionSortedBag<Object> collectionSortedBag0 = new CollectionSortedBag<Object>(transformedSortedBag0);
-        // Undeclared exception!
+/**
+ * Tests for {@link CollectionSortedBag}.
+ */
+public class CollectionSortedBagTest {
+
+    @Test
+    public void addWithCount_whenDecoratedBagThrowsException_propagatesException() {
+        // Arrange
+        // 1. Create an underlying TreeBag. A TreeBag is a SortedBag that does not
+        //    permit null elements and will throw a NullPointerException if one is added.
+        final SortedBag<Object> underlyingBag = new TreeBag<>();
+
+        // 2. Create a transformer that will convert any element into null.
+        final Transformer<Object, Object> nullTransformer = ConstantTransformer.nullTransformer();
+
+        // 3. Decorate the TreeBag with a TransformedSortedBag. When an element is added
+        //    to this bag, it will be transformed to null before being passed to the underlying TreeBag.
+        final SortedBag<Object> transformedBag =
+                TransformedSortedBag.transformingSortedBag(underlyingBag, nullTransformer);
+
+        // 4. The CollectionSortedBag under test, which decorates the transformed bag.
+        final SortedBag<Object> collectionSortedBag = new CollectionSortedBag<>(transformedBag);
+
+        final Object elementToAdd = "any non-null object";
+        final int count = 5;
+
+        // Act & Assert
+        // The add operation should fail because the nullTransformer will produce a null element,
+        // which the underlying TreeBag rejects. We expect a NullPointerException to be propagated.
         try {
-            collectionSortedBag0.add((Object) transformer0, 32);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
+            collectionSortedBag.add(elementToAdd, count);
+            fail("Expected a NullPointerException to be thrown.");
+        } catch (final NullPointerException e) {
+            // Success: The expected exception was caught.
+            // The exception originates from the underlying TreeBag's inability to handle nulls.
         }
     }
 }
