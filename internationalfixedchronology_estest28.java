@@ -1,56 +1,37 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class InternationalFixedChronology_ESTestTest28 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link InternationalFixedChronology} class, focusing on invalid date creation.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        InternationalFixedEra internationalFixedEra0 = InternationalFixedEra.CE;
-        // Undeclared exception!
+    /**
+     * Tests that dateYearDay() throws a DateTimeException when the year-of-era
+     * is outside the valid range. The valid range for year-of-era is 1 to 1,000,000.
+     */
+    @Test
+    public void dateYearDay_whenYearOfEraIsTooLarge_throwsDateTimeException() {
+        // Arrange
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        Era era = InternationalFixedEra.CE;
+        int invalidYear = 1_000_001; // Exceeds the maximum valid year of 1,000,000
+        int validDayOfYear = 150;
+
+        // Act & Assert
         try {
-            internationalFixedChronology0.dateYearDay((Era) internationalFixedEra0, 2103657451, 2103657451);
-            fail("Expecting exception: DateTimeException");
+            chronology.dateYearDay(era, invalidYear, validDayOfYear);
+            fail("Expected DateTimeException was not thrown for an out-of-range year.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for YearOfEra (valid values 1 - 1000000): 2103657451
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception message is informative and correct
+            String expectedMessage = "Invalid value for YearOfEra (valid values 1 - 1000000): " + invalidYear;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
