@@ -1,22 +1,39 @@
 package org.apache.commons.lang3.stream;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
+
 import java.util.function.Function;
 import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LangCollectors_ESTestTest2 extends LangCollectors_ESTest_scaffolding {
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        Collector<Object, ?, String> collector0 = LangCollectors.joining((CharSequence) charBuffer0, (CharSequence) charBuffer0, (CharSequence) charBuffer0, (Function<Object, String>) null);
-        assertNotNull(collector0);
+/**
+ * Tests for {@link LangCollectors}.
+ */
+// The original test class name "LangCollectors_ESTestTest2" and its inheritance
+// have been removed for clarity and to eliminate dependence on generated scaffolding.
+public class LangCollectorsTest {
+
+    /**
+     * Tests that creating a joining Collector with a null 'toString' mapping function
+     * does not throw an exception upon creation. The factory method should successfully
+     * return a Collector instance.
+     */
+    @Test
+    public void joiningWithNullMapperShouldCreateCollector() {
+        // Arrange: Define clear, simple inputs for the collector.
+        // The key part of this test is providing a null mapping function.
+        final CharSequence delimiter = ",";
+        final CharSequence prefix = "[";
+        final CharSequence suffix = "]";
+        final Function<Object, String> nullToStringMapper = null;
+
+        // Act: Call the factory method under test.
+        final Collector<Object, ?, String> collector = LangCollectors.joining(
+                delimiter, prefix, suffix, nullToStringMapper);
+
+        // Assert: Verify that the factory method returned a non-null collector.
+        // This confirms that the collector can be instantiated even with a null mapper.
+        assertNotNull("The collector should be successfully created even with a null mapping function.", collector);
     }
 }
