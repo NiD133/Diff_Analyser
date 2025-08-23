@@ -1,33 +1,21 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class TaiInstant_ESTestTest34 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link TaiInstant} class.
+ */
+public class TaiInstantTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        // Undeclared exception!
-        try {
-            TaiInstant.of((Instant) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.mock.java.time.MockInstant", e);
-        }
+    /**
+     * Tests that the {@code of(Instant)} factory method throws a NullPointerException
+     * when given a null input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void of_withNullInstant_shouldThrowNullPointerException() {
+        // The explicit cast to Instant is necessary to resolve method overload ambiguity
+        // between of(Instant) and of(UtcInstant).
+        TaiInstant.of((Instant) null);
     }
 }
