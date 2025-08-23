@@ -1,39 +1,40 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest3 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream(2914);
-        byte[] byteArray0 = new byte[8];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, (byte) 0, (byte) 0);
-        long long0 = mergedStream0.skip((byte) 0);
-        assertEquals(0L, long0);
+/**
+ * Contains tests for the {@link MergedStream} class.
+ * This is a refactored version of an auto-generated test.
+ */
+public class MergedStream_ESTestTest3 { // Note: Original class name is kept for consistency.
+
+    /**
+     * Verifies that calling skip(0) on a MergedStream correctly returns 0,
+     * adhering to the general contract of InputStream.skip().
+     * This test specifically covers the case where the stream's internal buffer is empty.
+     */
+    @Test
+    public void skipZeroBytesShouldReturnZero() throws IOException {
+        // Arrange: Create a MergedStream with an empty internal buffer.
+        // The underlying stream has content, but it should not be accessed when skipping zero bytes.
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[]{10, 20, 30});
+        byte[] emptyBuffer = new byte[8];
+        int bufferStart = 0;
+        int bufferEnd = 0; // An empty buffer segment is defined by start == end.
+
+        // The IOContext is not used by the skip() method, so null is acceptable for this specific test.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, emptyBuffer, bufferStart, bufferEnd);
+
+        // Act: Attempt to skip zero bytes from the stream.
+        long bytesSkipped = mergedStream.skip(0);
+
+        // Assert: The number of bytes skipped should be 0.
+        assertEquals(0L, bytesSkipped);
     }
 }
