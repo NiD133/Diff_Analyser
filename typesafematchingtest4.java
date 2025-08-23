@@ -2,35 +2,35 @@ package org.mockito.internal.invocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.internal.invocation.TypeSafeMatching.matchesTypeSafe;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.internal.matchers.LessOrEqual;
 import org.mockito.internal.matchers.Null;
-import org.mockito.internal.matchers.StartsWith;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mockitousage.IMethods;
 
-public class TypeSafeMatchingTestTest4 {
-
-    private static final Object NOT_A_COMPARABLE = new Object();
+public class TypeSafeMatchingTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    public IMethods mock;
-
-    /**
-     * Should not throw an {@link ClassCastException}
-     */
     @Test
-    public void compareToNull2() {
-        boolean match = matchesTypeSafe().apply(Null.NULL, null);
-        assertThat(match).isTrue();
+    public void shouldReturnTrue_whenNullMatcherIsAppliedToNullArgument() {
+        // The main purpose of TypeSafeMatching is to prevent ClassCastExceptions.
+        // This test verifies that applying a null-checking matcher to a null argument
+        // is handled safely and correctly returns true.
+
+        // Arrange
+        ArgumentMatcher<?> nullMatcher = Null.NULL;
+        Object nullArgument = null;
+
+        // Act
+        boolean isMatch = matchesTypeSafe().apply(nullMatcher, nullArgument);
+
+        // Assert
+        assertThat(isMatch)
+            .as("Applying a null-checking matcher to a null argument should result in a match")
+            .isTrue();
     }
 }
