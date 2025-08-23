@@ -1,27 +1,31 @@
 package org.apache.commons.compress.archivers;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.file.FileSystemException;
-import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Lister_ESTestTest12 extends Lister_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Lister} class.
+ */
+public class ListerTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        String[] stringArray0 = new String[1];
-        stringArray0[0] = "A(";
-        Lister lister0 = new Lister(true, stringArray0);
-        try {
-            lister0.go();
-            fail("Expecting exception: NoSuchFileException");
-        } catch (NoSuchFileException e) {
-        }
+    /**
+     * Verifies that the go() method throws a NoSuchFileException
+     * when the specified archive file does not exist.
+     */
+    @Test(expected = NoSuchFileException.class)
+    public void goShouldThrowExceptionWhenFileDoesNotExist() throws ArchiveException, IOException {
+        // Arrange: Define arguments for a non-existent file.
+        String[] args = {"non-existent-archive.zip"};
+        // The 'quiet' flag is set to true to prevent console output during the test run.
+        Lister lister = new Lister(true, args);
+
+        // Act: Attempt to list the contents of the non-existent file.
+        // This call is expected to throw a NoSuchFileException.
+        lister.go();
+
+        // Assert: The test passes if the expected NoSuchFileException is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
