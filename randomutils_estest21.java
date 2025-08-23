@@ -1,20 +1,37 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtils_ESTestTest21 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link RandomUtils} class.
+ * This class demonstrates an improved version of an auto-generated test.
+ */
+public class RandomUtilsImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.secure();
-        double double0 = randomUtils0.randomDouble(117.68, 2958.43561);
-        //  // Unstable assertion: assertEquals(1506.2807688613188, double0, 0.01);
+    /**
+     * Verifies that randomDouble() from a secure RandomUtils instance
+     * generates a value within the specified inclusive start and exclusive end bounds.
+     */
+    @Test
+    public void testSecureRandomDoubleReturnsValueWithinSpecifiedRange() {
+        // Arrange
+        final double startInclusive = 117.68;
+        final double endExclusive = 2958.43561;
+        final RandomUtils randomUtils = RandomUtils.secure();
+
+        // Act
+        final double result = randomUtils.randomDouble(startInclusive, endExclusive);
+
+        // Assert
+        // The result must be within the defined range [startInclusive, endExclusive).
+        assertTrue(
+            "The generated double (" + result + ") should be greater than or equal to the start value (" + startInclusive + ").",
+            result >= startInclusive
+        );
+        assertTrue(
+            "The generated double (" + result + ") should be less than the end value (" + endExclusive + ").",
+            result < endExclusive
+        );
     }
 }
