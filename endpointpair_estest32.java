@@ -1,31 +1,31 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest32 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.FORMAT;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.ordered(locale_Category0, locale_Category0);
-        Object object0 = endpointPair0.source();
-        EndpointPair<Object> endpointPair1 = EndpointPair.unordered((Object) object0, (Object) endpointPair0);
-        // Undeclared exception!
+    @Test
+    public void source_onUnorderedPair_throwsUnsupportedOperationException() {
+        // Arrange: Create an unordered pair, which represents an edge in an undirected graph.
+        // Source and target are undefined for unordered pairs.
+        EndpointPair<String> unorderedPair = EndpointPair.unordered("nodeU", "nodeV");
+
+        // Act & Assert: Verify that calling source() throws an exception with a helpful message.
         try {
-            endpointPair1.source();
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // Cannot call source()/target() on a EndpointPair from an undirected graph. Consider calling adjacentNode(node) if you already have a node, or nodeU()/nodeV() if you don't.
-            //
-            verifyException("com.google.common.graph.EndpointPair$Unordered", e);
+            unorderedPair.source();
+            fail("Expected UnsupportedOperationException was not thrown.");
+        } catch (UnsupportedOperationException expected) {
+            assertEquals(
+                "Cannot call source()/target() on a EndpointPair from an undirected graph. "
+                    + "Consider calling adjacentNode(node) if you already have a node, "
+                    + "or nodeU()/nodeV() if you don't.",
+                expected.getMessage());
         }
     }
 }
