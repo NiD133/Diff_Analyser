@@ -1,34 +1,49 @@
 package org.jfree.chart.block;
 
-import org.jfree.chart.TestUtils;
 import org.jfree.data.Range;
+import org.jfree.ui.Size2D;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class GridArrangementTestTest13 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    private static final double EPSILON = 0.000000001;
+/**
+ * Tests for the {@link GridArrangement} class.
+ */
+class GridArrangementTest {
 
-    private BlockContainer createTestContainer1() {
-        Block b1 = new EmptyBlock(10, 11);
-        Block b2 = new EmptyBlock(20, 22);
-        Block b3 = new EmptyBlock(30, 33);
-        BlockContainer result = new BlockContainer(new GridArrangement(1, 3));
-        result.add(b1);
-        result.add(b2);
-        result.add(b3);
-        return result;
-    }
+    private static final double DELTA = 1e-9;
 
     /**
-     * The arrangement should be able to handle null blocks in the layout.
+     * Verifies that the arrangement logic correctly handles a null block.
+     * When a container with a null block is arranged with a fixed-width and
+     * ranged-height constraint, the resulting size should respect the constraint.
+     * Specifically, the height should be the lower bound of the range, as there
+     * is no content to expand it.
      */
     @Test
-    public void testNullBlock_FR() {
-        BlockContainer c = new BlockContainer(new GridArrangement(1, 1));
-        c.add(null);
-        Size2D s = c.arrange(null, new RectangleConstraint(30.0, new Range(5.0, 10.0)));
-        assertEquals(30.0, s.getWidth(), EPSILON);
-        assertEquals(5.0, s.getHeight(), EPSILON);
+    @DisplayName("Arrange should handle a null block with a fixed-width, ranged-height constraint")
+    void arrangeWithNullBlockShouldReturnSizeBasedOnConstraint() {
+        // Arrange: Create a 1x1 grid arrangement and a container with one null block.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer container = new BlockContainer(arrangement);
+        container.add(null);
+
+        // Define a constraint with a fixed width and a ranged height.
+        double fixedWidth = 30.0;
+        Range heightRange = new Range(5.0, 10.0);
+        RectangleConstraint constraint = new RectangleConstraint(fixedWidth, heightRange);
+
+        // Act: Arrange the container. The Graphics2D context is not needed for this calculation.
+        Size2D actualSize = container.arrange(null, constraint);
+
+        // Assert: The resulting size should match the fixed width and the minimum height from the range.
+        double expectedWidth = fixedWidth;
+        double expectedHeight = heightRange.getLowerBound();
+
+        assertEquals(expectedWidth, actualSize.getWidth(), DELTA,
+                "Width should match the fixed width from the constraint.");
+        assertEquals(expectedHeight, actualSize.getHeight(), DELTA,
+                "Height should be the lower bound of the range when the block is null.");
     }
 }
