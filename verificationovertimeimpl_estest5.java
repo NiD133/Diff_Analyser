@@ -1,30 +1,41 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
 import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
 import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest5 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        AtMost atMost0 = new AtMost(3199);
-        Timeout timeout0 = new Timeout(0L, atMost0);
-        Timer timer0 = new Timer(3199);
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(0L, timeout0, false, timer0);
-        VerificationMode verificationMode0 = verificationOverTimeImpl0.getDelegate();
-        assertSame(verificationMode0, timeout0);
+/**
+ * Test for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    @Test
+    public void getDelegate_shouldReturnTheVerificationModePassedToConstructor() {
+        // Arrange
+        // Create a delegate VerificationMode. Its specific type and configuration
+        // are not important for this test, as we only check if the getter returns it.
+        VerificationMode expectedDelegate = new Timeout(100L, new AtMost(5));
+        Timer timer = new Timer(100L);
+
+        // Create the object under test, passing the delegate to its constructor.
+        VerificationOverTimeImpl verificationOverTime = new VerificationOverTimeImpl(
+                0L,    // pollingPeriod (not relevant for this test)
+                expectedDelegate,
+                false, // returnOnSuccess (not relevant for this test)
+                timer
+        );
+
+        // Act
+        VerificationMode actualDelegate = verificationOverTime.getDelegate();
+
+        // Assert
+        assertSame(
+                "getDelegate() should return the exact same VerificationMode instance that was passed to the constructor.",
+                expectedDelegate,
+                actualDelegate
+        );
     }
 }
