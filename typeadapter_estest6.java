@@ -1,28 +1,35 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TypeAdapter_ESTestTest6 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests for the {@link TypeAdapter} class, focusing on its utility methods.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        StringReader stringReader0 = new StringReader("null");
-        Object object0 = typeAdapter0.fromJson((Reader) stringReader0);
-        assertNull(object0);
+    /**
+     * Verifies that a TypeAdapter wrapped by {@link TypeAdapter#nullSafe()}
+     * correctly deserializes a JSON 'null' literal into a Java null object
+     * when reading from a {@link Reader}.
+     */
+    @Test
+    public void nullSafeAdapter_whenReadingJsonNullFromReader_shouldReturnNull() throws IOException {
+        // Arrange: Create a base TypeAdapter and wrap it with nullSafe().
+        // The specific implementation of the delegate adapter (FutureTypeAdapter) is not
+        // important, as we are testing the behavior of the nullSafe wrapper.
+        TypeAdapter<Object> delegateAdapter = new Gson.FutureTypeAdapter<>();
+        TypeAdapter<Object> nullSafeAdapter = delegateAdapter.nullSafe();
+        Reader jsonReader = new StringReader("null");
+
+        // Act: Deserialize the JSON input using the null-safe adapter.
+        Object result = nullSafeAdapter.fromJson(jsonReader);
+
+        // Assert: The deserialized object should be null.
+        assertNull("The result of deserializing 'null' should be a null object.", result);
     }
 }
