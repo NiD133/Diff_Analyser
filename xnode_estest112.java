@@ -1,30 +1,33 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import org.w3c.dom.Node;
+
+import javax.imageio.metadata.IIOMetadataNode;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest112 extends XNode_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test111() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Class<Locale.IsoCountryCode> class0 = Locale.IsoCountryCode.class;
-        xNode0.getEnumAttribute(class0, "");
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
+
+    /**
+     * Verifies that getEnumAttribute() returns null when the requested attribute does not exist on the XML node.
+     */
+    @Test
+    public void getEnumAttributeShouldReturnNullWhenAttributeIsMissing() {
+        // Arrange: Create an XNode from a DOM node that has no attributes.
+        Node domNode = new IIOMetadataNode("test-node");
+        XNode xNode = new XNode(null, domNode, new Properties());
+        String attributeName = "countryCode"; // An attribute that does not exist on the node.
+
+        // Act: Attempt to get an enum value from the non-existent attribute.
+        Locale.IsoCountryCode result = xNode.getEnumAttribute(Locale.IsoCountryCode.class, attributeName);
+
+        // Assert: The method should return null, indicating the attribute was not found.
+        assertNull("Expected null for a missing enum attribute", result);
     }
 }
