@@ -1,53 +1,45 @@
 package org.apache.commons.collections4.map;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
 import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
 import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PredicatedMap_ESTestTest17 extends PredicatedMap_ESTest_scaffolding {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Predicate<Object> predicate0 = ExceptionPredicate.exceptionPredicate();
-        HashMap<Predicate<Object>, Predicate<Object>> hashMap0 = new HashMap<Predicate<Object>, Predicate<Object>>();
-        PredicatedMap<Predicate<Object>, Predicate<Object>> predicatedMap0 = PredicatedMap.predicatedMap((Map<Predicate<Object>, Predicate<Object>>) hashMap0, (Predicate<? super Predicate<Object>>) predicate0, (Predicate<? super Predicate<Object>>) predicate0);
-        // Undeclared exception!
-        try {
-            predicatedMap0.checkSetValue(predicate0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // ExceptionPredicate invoked
-            //
-            verifyException("org.apache.commons.collections4.functors.ExceptionPredicate", e);
-        }
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+public class PredicatedMap_ESTestTest17 {
+
+    /**
+     * Tests that checkSetValue() propagates exceptions thrown by the value predicate.
+     * The checkSetValue() method is used to validate a value before it's updated
+     * in a map entry.
+     */
+    @Test
+    public void checkSetValueShouldThrowExceptionWhenValuePredicateFails() {
+        // Arrange
+        // Use a predicate that always throws a RuntimeException to test the failure case.
+        final Predicate<Object> failingValuePredicate = ExceptionPredicate.exceptionPredicate();
+        final Map<String, Object> emptyMap = new HashMap<>();
+
+        // Create a PredicatedMap where the value predicate is the one that throws an exception.
+        // The key predicate is set to always return true as it's not relevant to this test.
+        final PredicatedMap<String, Object> predicatedMap =
+            PredicatedMap.predicatedMap(emptyMap, TruePredicate.truePredicate(), failingValuePredicate);
+
+        final Object valueToTest = "any value";
+
+        // Act & Assert
+        // The checkSetValue method should invoke the value predicate. Since our predicate
+        // always throws a RuntimeException, we expect that exception to be propagated.
+        final RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
+            predicatedMap.checkSetValue(valueToTest);
+        });
+
+        // Verify that the exception message is the one from ExceptionPredicate.
+        assertEquals("ExceptionPredicate invoked", thrown.getMessage());
     }
 }
