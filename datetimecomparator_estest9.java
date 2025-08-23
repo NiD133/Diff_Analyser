@@ -1,19 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class DateTimeComparator_ESTestTest9 extends DateTimeComparator_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() method of the {@link DateTimeComparator} class.
+ */
+public class DateTimeComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-        DateTimeComparator dateTimeComparator1 = DateTimeComparator.getInstance();
-        boolean boolean0 = dateTimeComparator1.equals(dateTimeComparator0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that a standard DateTimeComparator, which compares all date and time fields,
+     * is not considered equal to a time-only comparator, which only compares time fields.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparingFullAndTmeOnlyComparators() {
+        // Arrange: Create two comparators with different comparison rules.
+        // The 'full' comparator considers the entire instant (date and time).
+        DateTimeComparator fullComparator = DateTimeComparator.getInstance();
+        
+        // The 'time-only' comparator ignores the date part and only considers the time of day.
+        DateTimeComparator timeOnlyComparator = DateTimeComparator.getTimeOnlyInstance();
+
+        // Act & Assert: The two comparators are fundamentally different, so they should not be equal.
+        assertFalse("A full comparator should not be equal to a time-only comparator",
+                fullComparator.equals(timeOnlyComparator));
     }
 }
