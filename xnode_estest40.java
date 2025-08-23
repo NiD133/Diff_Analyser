@@ -1,30 +1,36 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
+import org.junit.Test;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest40 extends XNode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test039() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Boolean boolean0 = xNode0.getBooleanAttribute("null", (Boolean) null);
-        assertNull(boolean0);
+    /**
+     * Verifies that getBooleanAttribute() returns the provided default value (null)
+     * when the requested attribute does not exist on the underlying XML node.
+     */
+    @Test
+    public void getBooleanAttributeShouldReturnNullDefaultWhenAttributeIsMissing() {
+        // Arrange: Create an XNode from a DOM Node that has no attributes.
+        // IIOMetadataNode is a convenient, standalone implementation of org.w3c.dom.Node.
+        Node nodeWithoutAttributes = new IIOMetadataNode();
+        // The XPathParser is not used by the getBooleanAttribute method, so it can be null.
+        XNode xNode = new XNode(null, nodeWithoutAttributes, new Properties());
+
+        String nonExistentAttributeName = "someFlag";
+        Boolean defaultValue = null;
+
+        // Act: Attempt to retrieve the boolean attribute, providing a null default.
+        Boolean actualValue = xNode.getBooleanAttribute(nonExistentAttributeName, defaultValue);
+
+        // Assert: The method should return the default value since the attribute is not present.
+        assertNull("Expected the default value (null) to be returned for a missing attribute.", actualValue);
     }
 }
