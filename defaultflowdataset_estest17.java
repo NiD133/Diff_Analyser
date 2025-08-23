@@ -1,32 +1,29 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class DefaultFlowDataset_ESTestTest17 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class, focusing on argument validation.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultFlowDataset0.getInFlows((NodeKey) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'nodeKey' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that the getInFlows() method throws an IllegalArgumentException
+     * when a null nodeKey is provided. This ensures robust handling of invalid input.
+     */
+    @Test
+    public void getInFlowsShouldThrowExceptionForNullNodeKey() {
+        // Arrange: Create an instance of the dataset.
+        DefaultFlowDataset<String> dataset = new DefaultFlowDataset<>();
+
+        // Act & Assert: Expect an IllegalArgumentException when calling the method with a null argument.
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            dataset.getInFlows(null);
+        });
+
+        // Assert: Verify that the exception message is correct, confirming the reason for the failure.
+        assertEquals("Null 'nodeKey' argument.", exception.getMessage());
     }
 }
