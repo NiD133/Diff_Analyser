@@ -1,158 +1,57 @@
 package org.threeten.extra;
 
-import static java.time.Month.APRIL;
-import static java.time.Month.AUGUST;
-import static java.time.Month.DECEMBER;
-import static java.time.Month.FEBRUARY;
-import static java.time.Month.JANUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.JUNE;
-import static java.time.Month.MARCH;
-import static java.time.Month.MAY;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
-import static java.time.Month.SEPTEMBER;
-import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_MONTH;
-import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR;
-import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_MONTH;
-import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_YEAR;
-import static java.time.temporal.ChronoField.AMPM_OF_DAY;
-import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_AMPM;
-import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.DAY_OF_WEEK;
-import static java.time.temporal.ChronoField.DAY_OF_YEAR;
-import static java.time.temporal.ChronoField.EPOCH_DAY;
-import static java.time.temporal.ChronoField.ERA;
-import static java.time.temporal.ChronoField.HOUR_OF_AMPM;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.INSTANT_SECONDS;
-import static java.time.temporal.ChronoField.MICRO_OF_DAY;
-import static java.time.temporal.ChronoField.MICRO_OF_SECOND;
-import static java.time.temporal.ChronoField.MILLI_OF_DAY;
-import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
-import static java.time.temporal.ChronoField.MINUTE_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.NANO_OF_DAY;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.OFFSET_SECONDS;
-import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
-import static java.time.temporal.ChronoField.SECOND_OF_DAY;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-import static java.time.temporal.ChronoField.YEAR;
-import static java.time.temporal.ChronoField.YEAR_OF_ERA;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
+
 import java.time.Month;
-import java.time.MonthDay;
 import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.chrono.IsoChronology;
-import java.time.chrono.JapaneseDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.IsoFields;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQueries;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.RetryingTest;
-import com.google.common.testing.EqualsTester;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-public class DayOfMonthTestTest29 {
+@DisplayName("DayOfMonth")
+class DayOfMonthTest {
 
-    private static final int MAX_LENGTH = 31;
+    @Nested
+    @DisplayName("isValidYearMonth for day 29")
+    class IsValidForDay29 {
 
-    private static final DayOfMonth TEST = DayOfMonth.of(12);
+        private static final DayOfMonth DAY_29 = DayOfMonth.of(29);
+        private static final int LEAP_YEAR = 2012;
+        private static final int COMMON_YEAR = 2011;
 
-    private static final ZoneId PARIS = ZoneId.of("Europe/Paris");
+        @DisplayName("should be valid for all months in a leap year")
+        @ParameterizedTest(name = "for {0}, {1}")
+        @EnumSource(Month.class)
+        void isAlwaysValidInLeapYear(Month month) {
+            // Arrange: A YearMonth in a leap year (e.g., 2012)
+            YearMonth leapYearMonth = YearMonth.of(LEAP_YEAR, month);
 
-    private static class TestingField implements TemporalField {
-
-        public static final TestingField INSTANCE = new TestingField();
-
-        @Override
-        public TemporalUnit getBaseUnit() {
-            return ChronoUnit.DAYS;
+            // Act & Assert: Day 29 is valid for any month in a leap year.
+            assertTrue(DAY_29.isValidYearMonth(leapYearMonth));
         }
 
-        @Override
-        public TemporalUnit getRangeUnit() {
-            return ChronoUnit.MONTHS;
+        @Test
+        @DisplayName("should be invalid for February in a common year")
+        void isInvalidForFebruaryInCommonYear() {
+            // Arrange: February in a common year (e.g., 2011)
+            YearMonth commonYearFebruary = YearMonth.of(COMMON_YEAR, Month.FEBRUARY);
+
+            // Act & Assert: Day 29 is not a valid day in February of a common year.
+            assertFalse(DAY_29.isValidYearMonth(commonYearFebruary));
         }
 
-        @Override
-        public ValueRange range() {
-            return ValueRange.of(1, 28, 31);
-        }
+        @Test
+        @DisplayName("should be valid for March in a common year")
+        void isValidForMarchInCommonYear() {
+            // Arrange: March in a common year (e.g., 2011)
+            YearMonth commonYearMarch = YearMonth.of(COMMON_YEAR, Month.MARCH);
 
-        @Override
-        public boolean isDateBased() {
-            return true;
+            // Act & Assert: Day 29 is a valid day for months other than February.
+            assertTrue(DAY_29.isValidYearMonth(commonYearMarch));
         }
-
-        @Override
-        public boolean isTimeBased() {
-            return false;
-        }
-
-        @Override
-        public boolean isSupportedBy(TemporalAccessor temporal) {
-            return temporal.isSupported(DAY_OF_MONTH);
-        }
-
-        @Override
-        public ValueRange rangeRefinedBy(TemporalAccessor temporal) {
-            return range();
-        }
-
-        @Override
-        public long getFrom(TemporalAccessor temporal) {
-            return temporal.getLong(DAY_OF_MONTH);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <R extends Temporal> R adjustInto(R temporal, long newValue) {
-            return (R) temporal.with(DAY_OF_MONTH, newValue);
-        }
-    }
-
-    @Test
-    public void test_isValidYearMonth_29() {
-        DayOfMonth test = DayOfMonth.of(29);
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 1)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 2)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 3)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 4)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 5)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 6)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 7)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 8)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 9)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 10)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 11)));
-        assertEquals(true, test.isValidYearMonth(YearMonth.of(2012, 12)));
-        assertEquals(false, test.isValidYearMonth(YearMonth.of(2011, 2)));
     }
 }
