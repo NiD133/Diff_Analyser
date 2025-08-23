@@ -1,29 +1,34 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class LinkedTreeMap_ESTestTest3 extends LinkedTreeMap_ESTest_scaffolding {
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = new Integer((-22));
-        linkedTreeMap0.putIfAbsent(integer0, (Integer) null);
-        Object object0 = new Object();
-        boolean boolean0 = linkedTreeMap0.containsKey(object0);
-        assertEquals(1, linkedTreeMap0.size());
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link LinkedTreeMap#containsKey(Object)} returns {@code false}
+     * when called with an object of an incompatible type.
+     * <p>
+     * The implementation of {@code containsKey} for a tree-based map often involves
+     * casting the key to a {@code Comparable} to perform a search. This test ensures
+     * that if a key of an incompatible type is passed (which would cause a
+     * {@code ClassCastException}), the method handles it gracefully and returns {@code false}.
+     */
+    @Test
+    public void containsKeyShouldReturnFalseForIncompatibleType() {
+        // Arrange
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        map.put(1, "one");
+
+        // An object of a type that cannot be cast to the map's key type (Integer).
+        Object incompatibleKey = new Object();
+
+        // Act
+        boolean found = map.containsKey(incompatibleKey);
+
+        // Assert
+        assertFalse("containsKey should return false for an incompatible key type.", found);
+        assertEquals("The map's size should remain unchanged after the check.", 1, map.size());
     }
 }
