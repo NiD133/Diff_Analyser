@@ -2,160 +2,64 @@ package org.apache.commons.collections4.iterators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.collections4.Transformer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ObjectGraphIteratorTestTest15 extends AbstractIteratorTest<Object> {
+/**
+ * Tests for ObjectGraphIterator focusing on its ability to handle nested iterators.
+ *
+ * Note: The original test file contained many helper classes (Forest, Tree, etc.)
+ * for other test cases. They have been omitted here for clarity as they are not
+ * relevant to the test case being improved.
+ */
+public class ObjectGraphIteratorTest {
 
-    protected String[] testArray = { "One", "Two", "Three", "Four", "Five", "Six" };
-
-    protected List<String> list1;
-
-    protected List<String> list2;
-
-    protected List<String> list3;
-
-    protected List<Iterator<String>> iteratorList;
-
-    @Override
-    public ObjectGraphIterator<Object> makeEmptyIterator() {
-        final ArrayList<Object> list = new ArrayList<>();
-        return new ObjectGraphIterator<>(list.iterator());
-    }
-
-    @Override
-    public ObjectGraphIterator<Object> makeObject() {
-        setUp();
-        return new ObjectGraphIterator<>(iteratorList.iterator());
-    }
+    private List<String> list1;
+    private List<String> list2;
+    private List<String> list3;
+    private List<Iterator<String>> nestedIterators;
 
     @BeforeEach
-    public void setUp() {
-        list1 = new ArrayList<>();
-        list1.add("One");
-        list1.add("Two");
-        list1.add("Three");
-        list2 = new ArrayList<>();
-        list2.add("Four");
-        list3 = new ArrayList<>();
-        list3.add("Five");
-        list3.add("Six");
-        iteratorList = new ArrayList<>();
-        iteratorList.add(list1.iterator());
-        iteratorList.add(list2.iterator());
-        iteratorList.add(list3.iterator());
-    }
+    void setUp() {
+        // The test will call remove() on the iterators, so we need mutable lists.
+        list1 = new ArrayList<>(List.of("One", "Two", "Three"));
+        list2 = new ArrayList<>(List.of("Four"));
+        list3 = new ArrayList<>(List.of("Five", "Six"));
 
-    static class Branch {
-
-        List<Leaf> leaves = new ArrayList<>();
-
-        Leaf addLeaf() {
-            leaves.add(new Leaf());
-            return getLeaf(leaves.size() - 1);
-        }
-
-        Leaf getLeaf(final int index) {
-            return leaves.get(index);
-        }
-
-        Iterator<Leaf> leafIterator() {
-            return leaves.iterator();
-        }
-    }
-
-    static class Forest {
-
-        List<Tree> trees = new ArrayList<>();
-
-        Tree addTree() {
-            trees.add(new Tree());
-            return getTree(trees.size() - 1);
-        }
-
-        Tree getTree(final int index) {
-            return trees.get(index);
-        }
-
-        Iterator<Tree> treeIterator() {
-            return trees.iterator();
-        }
-    }
-
-    static class Leaf {
-
-        String color;
-
-        String getColor() {
-            return color;
-        }
-
-        void setColor(final String color) {
-            this.color = color;
-        }
-    }
-
-    static class LeafFinder implements Transformer<Object, Object> {
-
-        @Override
-        public Object transform(final Object input) {
-            if (input instanceof Forest) {
-                return ((Forest) input).treeIterator();
-            }
-            if (input instanceof Tree) {
-                return ((Tree) input).branchIterator();
-            }
-            if (input instanceof Branch) {
-                return ((Branch) input).leafIterator();
-            }
-            if (input instanceof Leaf) {
-                return input;
-            }
-            throw new ClassCastException();
-        }
-    }
-
-    static class Tree {
-
-        List<Branch> branches = new ArrayList<>();
-
-        Branch addBranch() {
-            branches.add(new Branch());
-            return getBranch(branches.size() - 1);
-        }
-
-        Iterator<Branch> branchIterator() {
-            return branches.iterator();
-        }
-
-        Branch getBranch(final int index) {
-            return branches.get(index);
-        }
+        nestedIterators = List.of(list1.iterator(), list2.iterator(), list3.iterator());
     }
 
     @Test
-    void testIteratorConstructorRemove() {
-        final List<Iterator<String>> iteratorList = new ArrayList<>();
-        iteratorList.add(list1.iterator());
-        iteratorList.add(list2.iterator());
-        iteratorList.add(list3.iterator());
-        final Iterator<Object> it = new ObjectGraphIterator<>(iteratorList.iterator());
-        for (int i = 0; i < 6; i++) {
-            assertEquals(testArray[i], it.next());
-            it.remove();
+    void whenRemovingElements_thenUnderlyingCollectionsShouldBeModified() {
+        // Arrange
+        // The ObjectGraphIterator is initialized with an iterator that itself yields other iterators.
+        // This tests the constructor designed for handling nested iterators.
+        final Iterator<Object> objectGraphIterator = new ObjectGraphIterator<>(nestedIterators.iterator());
+        final List<Object> traversedElements = new ArrayList<>();
+        final List<String> expectedElements = List.of("One", "Two", "Three", "Four", "Five", "Six");
+
+        // Act
+        // Traverse the entire graph, collecting elements and removing them as we go.
+        while (objectGraphIterator.hasNext()) {
+            traversedElements.add(objectGraphIterator.next());
+            objectGraphIterator.remove();
         }
-        assertFalse(it.hasNext());
-        assertEquals(0, list1.size());
-        assertEquals(0, list2.size());
-        assertEquals(0, list3.size());
+
+        // Assert
+        // 1. Verify that all expected elements were traversed in the correct order.
+        assertEquals(expectedElements, traversedElements, "Should have traversed all elements in order");
+
+        // 2. Verify that the remove() operation emptied the underlying source lists.
+        assertTrue(list1.isEmpty(), "List 1 should be empty after removal");
+        assertTrue(list2.isEmpty(), "List 2 should be empty after removal");
+        assertTrue(list3.isEmpty(), "List 3 should be empty after removal");
+
+        // 3. Verify that the main iterator is now exhausted.
+        assertFalse(objectGraphIterator.hasNext(), "Iterator should have no more elements");
     }
 }
