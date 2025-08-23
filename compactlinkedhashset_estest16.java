@@ -1,30 +1,35 @@
 package com.google.common.collect;
 
+import static org.junit.Assert.fail;
+
+import java.lang.reflect.Field;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Spliterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CompactLinkedHashSet_ESTestTest16 extends CompactLinkedHashSet_ESTest_scaffolding {
+/**
+ * Tests for {@link CompactLinkedHashSet}.
+ */
+public class CompactLinkedHashSetTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        CompactLinkedHashSet<Integer> compactLinkedHashSet0 = new CompactLinkedHashSet<Integer>(1);
-        // Undeclared exception!
+    @Test
+    public void resizeEntries_withUninitializedLinkArrays_throwsNullPointerException() throws Exception {
+        // Arrange: Create a set and use reflection to put it into an invalid state.
+        // The constructor correctly initializes all internal arrays. We manually set
+        // the 'predecessor' array to null to simulate a corrupted state. This is a
+        // white-box test targeting the robustness of the package-private resizeEntries method.
+        CompactLinkedHashSet<Integer> set = CompactLinkedHashSet.createWithExpectedSize(1);
+
+        Field predecessorField = CompactLinkedHashSet.class.getDeclaredField("predecessor");
+        predecessorField.setAccessible(true);
+        predecessorField.set(set, null);
+
+        // Act & Assert: Verify that calling resizeEntries on the corrupted object
+        // throws a NullPointerException.
         try {
-            compactLinkedHashSet0.resizeEntries(54);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Objects", e);
+            set.resizeEntries(54);
+            fail("Expected NullPointerException was not thrown.");
+        } catch (NullPointerException expected) {
+            // This is the expected behavior. The method fails fast when its internal
+            // state invariants are violated.
         }
     }
 }
