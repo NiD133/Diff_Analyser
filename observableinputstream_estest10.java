@@ -1,45 +1,44 @@
 package org.apache.commons.io.input;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
+import static org.apache.commons.io.IOUtils.EOF;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
 import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+import org.junit.Test;
 
-public class ObservableInputStream_ESTestTest10 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ObservableInputStream}.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        Enumeration<ObjectInputStream> enumeration0 = (Enumeration<ObjectInputStream>) mock(Enumeration.class, new ViolatedAssumptionAnswer());
-        doReturn(false).when(enumeration0).hasMoreElements();
-        SequenceInputStream sequenceInputStream0 = new SequenceInputStream(enumeration0);
-        ObservableInputStream.Observer[] observableInputStream_ObserverArray0 = new ObservableInputStream.Observer[0];
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(sequenceInputStream0, observableInputStream_ObserverArray0);
-        byte[] byteArray0 = new byte[6];
-        int int0 = observableInputStream0.read(byteArray0, (int) (byte) (-69), 47);
-        assertEquals((-1), int0);
+    /**
+     * Tests that reading from an empty stream with invalid buffer arguments
+     * returns EOF (-1) without throwing an IndexOutOfBoundsException.
+     * <p>
+     * This test verifies a specific behavior of the underlying {@link SequenceInputStream}.
+     * When a SequenceInputStream is constructed with an empty enumeration of streams,
+     * its internal stream is null. Its {@code read(byte[], int, int)} method checks for
+     * this null state and returns -1 *before* it validates the offset and length arguments.
+     * </p>
+     */
+    @Test
+    public void readWithInvalidArgsOnEmptyStreamShouldReturnEOF() throws IOException {
+        // Arrange
+        // Create an empty stream using SequenceInputStream, which exhibits the desired pre-check behavior.
+        final InputStream emptyStream = new SequenceInputStream(Collections.emptyEnumeration());
+        final ObservableInputStream observableStream = new ObservableInputStream(emptyStream);
+
+        final byte[] buffer = new byte[10];
+        final int invalidOffset = -1; // An invalid offset that would normally cause an exception.
+        final int anyLength = 5;
+
+        // Act
+        final int bytesRead = observableStream.read(buffer, invalidOffset, anyLength);
+
+        // Assert
+        assertEquals("Reading from an empty stream should return EOF, even with invalid arguments.", EOF, bytesRead);
     }
 }
