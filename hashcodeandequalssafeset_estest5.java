@@ -1,30 +1,35 @@
 package org.mockito.internal.util.collections;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest5 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = new HashCodeAndEqualsSafeSet();
-        Object object0 = new Object();
-        hashCodeAndEqualsSafeSet0.add(object0);
-        ArrayDeque<HashCodeAndEqualsMockWrapper> arrayDeque0 = new ArrayDeque<HashCodeAndEqualsMockWrapper>();
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.retainAll(arrayDeque0);
-        assertTrue(boolean0);
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Test suite for {@link HashCodeAndEqualsSafeSet}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
+
+    /**
+     * Verifies that calling retainAll with an empty collection on a non-empty set
+     * correctly removes all elements and returns true, indicating the set was modified.
+     */
+    @Test
+    public void retainAll_shouldReturnTrueAndEmptyTheSet_whenCalledWithEmptyCollection() {
+        // Arrange: Create a set and add one element to it.
+        HashCodeAndEqualsSafeSet safeSet = new HashCodeAndEqualsSafeSet();
+        safeSet.add(new Object());
+
+        // Pre-condition check to ensure the test setup is correct.
+        assertFalse("Pre-condition failed: Set should not be empty before the test.", safeSet.isEmpty());
+
+        // Act: Call retainAll with an empty collection.
+        boolean wasModified = safeSet.retainAll(Collections.emptyList());
+
+        // Assert: Verify the set was modified and is now empty.
+        assertTrue("retainAll should return true because the set was modified.", wasModified);
+        assertTrue("The set should be empty after retaining an empty collection.", safeSet.isEmpty());
     }
 }
