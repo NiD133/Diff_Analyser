@@ -1,19 +1,29 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CharSequenceUtils_ESTestTest70 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CharSequenceUtils}.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        StringBuffer stringBuffer0 = new StringBuffer(0);
-        int int0 = CharSequenceUtils.indexOf(stringBuffer0, (CharSequence) null, 0);
-        assertEquals((-1), int0);
+    /**
+     * Tests that CharSequenceUtils.indexOf returns -1 when the search sequence is null,
+     * aligning with the class's null-safe contract.
+     */
+    @Test
+    public void indexOf_withNullSearchSequence_shouldReturnNotFound() {
+        // Arrange: Define the input data for the test.
+        // The content of the text to search is irrelevant when the search sequence is null.
+        final CharSequence textToSearch = "any non-null string";
+        final CharSequence nullSearchSequence = null;
+
+        // Act: Execute the method under test.
+        final int actualIndex = CharSequenceUtils.indexOf(textToSearch, nullSearchSequence, 0);
+
+        // Assert: Verify the outcome.
+        // The expected result is -1, which standardly indicates "not found".
+        assertEquals(-1, actualIndex);
     }
 }
