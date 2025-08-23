@@ -1,46 +1,38 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest12 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        YearMonth yearMonth0 = YearMonth.now();
-        DateTimeField dateTimeField0 = yearMonth0.getField(0);
-        assertNotNull(dateTimeField0);
+/**
+ * A test suite for the {@link AbstractPartial} class.
+ * This test focuses on the contract of the getField(int) method,
+ * using YearMonth as a concrete implementation for verification.
+ */
+public class AbstractPartialTest {
+
+    @Test
+    public void getField_withValidIndex_shouldReturnCorrespondingDateTimeField() {
+        // Arrange: Create a concrete implementation of AbstractPartial with a fixed value.
+        // Using a fixed date (June 2023) makes the test deterministic.
+        YearMonth yearMonth = new YearMonth(2023, 6);
+
+        // Act & Assert for the first field (index 0)
+        DateTimeField yearField = yearMonth.getField(0);
+
+        assertNotNull("The DateTimeField for index 0 should not be null.", yearField);
+        assertEquals("The field at index 0 should be of type 'year'.",
+                     DateTimeFieldType.year(), yearField.getType());
+
+        // Act & Assert for the second field (index 1)
+        DateTimeField monthField = yearMonth.getField(1);
+
+        assertNotNull("The DateTimeField for index 1 should not be null.", monthField);
+        assertEquals("The field at index 1 should be of type 'monthOfYear'.",
+                     DateTimeFieldType.monthOfYear(), monthField.getType());
     }
 }
