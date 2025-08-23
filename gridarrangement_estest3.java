@@ -1,137 +1,60 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
+import org.jfree.chart.util.Size2D;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest3 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Color;
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(105, 105);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range(105, 105);
-        assertEquals(105.0, range0.getCentralValue(), 0.01);
-        assertEquals(105.0, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals("Range[105.0,105.0]", range0.toString());
-        assertEquals(105.0, range0.getLowerBound(), 0.01);
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals(105.0, range0.getCentralValue(), 0.01);
-        assertEquals(105.0, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals("Range[105.0,105.0]", range0.toString());
-        assertEquals(105.0, range0.getLowerBound(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNotNull(blockContainer0);
-        SystemColor systemColor0 = SystemColor.textInactiveText;
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(255, systemColor0.getAlpha());
-        assertNotNull(systemColor0);
-        ColorBlock colorBlock0 = new ColorBlock(systemColor0, 0.0, Double.NEGATIVE_INFINITY);
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(255, systemColor0.getAlpha());
-        assertNull(colorBlock0.getID());
-        assertEquals(0.0, colorBlock0.getContentYOffset(), 0.01);
-        assertEquals(0.0, colorBlock0.getWidth(), 0.01);
-        assertEquals(0.0, colorBlock0.getContentXOffset(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, colorBlock0.getHeight(), 0.01);
-        assertNotNull(colorBlock0);
-        blockContainer0.add((Block) colorBlock0);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(255, systemColor0.getAlpha());
-        assertNull(colorBlock0.getID());
-        assertEquals(0.0, colorBlock0.getContentYOffset(), 0.01);
-        assertEquals(0.0, colorBlock0.getWidth(), 0.01);
-        assertEquals(0.0, colorBlock0.getContentXOffset(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, colorBlock0.getHeight(), 0.01);
-        blockContainer0.add((Block) colorBlock0);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals(128, systemColor0.getBlue());
-        assertEquals(128, systemColor0.getRed());
-        assertEquals(128, systemColor0.getGreen());
-        assertEquals((-8355712), systemColor0.getRGB());
-        assertEquals(1, systemColor0.getTransparency());
-        assertEquals(255, systemColor0.getAlpha());
-        assertNull(colorBlock0.getID());
-        assertEquals(0.0, colorBlock0.getContentYOffset(), 0.01);
-        assertEquals(0.0, colorBlock0.getWidth(), 0.01);
-        assertEquals(0.0, colorBlock0.getContentXOffset(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, colorBlock0.getHeight(), 0.01);
-        Size2D size2D0 = gridArrangement0.arrangeFN(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals(105.0, range0.getCentralValue(), 0.01);
-        assertEquals(105.0, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals("Range[105.0,105.0]", range0.toString());
-        assertEquals(105.0, range0.getLowerBound(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertFalse(blockContainer0.isEmpty());
-        assertEquals("Size2D[width=105.0, height=0.0]", size2D0.toString());
-        assertEquals(105.0, size2D0.getWidth(), 0.01);
-        assertEquals(0.0, size2D0.getHeight(), 0.01);
-        assertNotNull(size2D0);
-        assertEquals(0.0, size2D0.height, 0.01);
-        assertEquals(105.0, size2D0.width, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for the {@link GridArrangement} class, focusing on specific arrangement scenarios.
+ */
+public class GridArrangementTest {
+
+    /**
+     * This test verifies the behavior of the protected method {@code arrangeFN}
+     * (arrange with Fixed width, No height constraint).
+     *
+     * It specifically checks a scenario where the method is passed a
+     * {@link RectangleConstraint} that has a 'RANGE' type for its width,
+     * which is contrary to the method's 'FIXED' width assumption.
+     *
+     * The test expects {@code arrangeFN} to adapt by using the upper bound of the
+     * width range as the fixed width. It also ensures the total height is
+     * calculated as 0.0 when the container holds blocks with non-positive heights.
+     */
+    @Test
+    public void arrangeFN_withRangeConstraint_shouldUseRangeUpperBoundAsWidth() {
+        // Arrange
+        final int gridRows = 105;
+        final int gridCols = 105;
+        final double expectedWidth = 105.0;
+
+        GridArrangement gridArrangement = new GridArrangement(gridRows, gridCols);
+
+        // A container with a single block that has a negative height.
+        BlockContainer container = new BlockContainer();
+        Block blockWithNegativeHeight = new ColorBlock(Color.BLACK, 0.0, Double.NEGATIVE_INFINITY);
+        container.add(blockWithNegativeHeight);
+
+        // Create a constraint where the width is defined by a Range. The arrangeFN
+        // method is expected to treat the range's upper bound as the fixed width.
+        // The height constraint is irrelevant for arrangeFN but is included to
+        // match the original test's input.
+        Range widthAndHeightRange = new Range(expectedWidth, expectedWidth);
+        RectangleConstraint constraint = new RectangleConstraint(widthAndHeightRange, widthAndHeightRange);
+
+        // Act
+        // We are directly testing the protected method arrangeFN.
+        Size2D arrangedSize = gridArrangement.arrangeFN(container, (Graphics2D) null, constraint);
+
+        // Assert
+        assertEquals("Width should be constrained by the upper bound of the range",
+                expectedWidth, arrangedSize.width, 0.01);
+        assertEquals("Height should be 0 for blocks with negative height",
+                0.0, arrangedSize.height, 0.01);
     }
 }
