@@ -1,41 +1,25 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
 
-public class XmlTreeBuilder_ESTestTest34 extends XmlTreeBuilder_ESTest_scaffolding {
+/**
+ * Tests for the {@link XmlTreeBuilder} focusing on its token processing logic.
+ */
+public class XmlTreeBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Token.Comment token_Comment0 = new Token.Comment();
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        // Undeclared exception!
-        try {
-            xmlTreeBuilder0.process(token_Comment0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.TreeBuilder", e);
-        }
+    /**
+     * Verifies that the process method throws a NullPointerException when given a
+     * comment token that has not been properly initialized (i.e., its internal data is null).
+     * This is an edge case that ensures the builder is robust against malformed token inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void processShouldThrowNullPointerExceptionForUninitializedCommentToken() {
+        // Arrange: Create a new XmlTreeBuilder and a comment token in its default, uninitialized state.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        Token.Comment uninitializedCommentToken = new Token.Comment();
+
+        // Act & Assert: Processing the uninitialized token is expected to throw a NullPointerException
+        // because the underlying TreeBuilder will attempt to access its null data.
+        xmlTreeBuilder.process(uninitializedCommentToken);
     }
 }
