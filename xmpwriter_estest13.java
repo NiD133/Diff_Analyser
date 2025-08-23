@@ -1,55 +1,32 @@
 package com.itextpdf.text.xml.xmp;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest13 extends XmpWriter_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link XmpWriter} class, focusing on exception handling and edge cases.
+ */
+public class XmpWriterTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, "tZE9PB", 2097159);
-        xmpWriter0.xmpMeta = null;
-        // Undeclared exception!
-        try {
-            xmpWriter0.appendOrderedArrayItem("UTF-16BE", "UTF-16BE", "UTF-16");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.xml.xmp.XmpWriter", e);
-        }
+    /**
+     * Verifies that calling appendOrderedArrayItem throws a NullPointerException
+     * if the internal XMPMeta object is null. This is a white-box test that
+     * simulates an invalid internal state to ensure robustness.
+     */
+    @Test(expected = NullPointerException.class)
+    public void appendOrderedArrayItem_whenInternalMetaIsNull_throwsNullPointerException() throws IOException {
+        // Arrange: Create an XmpWriter and then manually set its internal xmpMeta
+        // field to null to simulate the state under test.
+        XmpWriter xmpWriter = new XmpWriter((OutputStream) null, XmpWriter.UTF8, 0);
+        xmpWriter.xmpMeta = null; // This is the specific condition being tested.
+
+        // Act: Attempt to append an item. This should trigger the exception because
+        // the method internally dereferences the null xmpMeta object.
+        xmpWriter.appendOrderedArrayItem("test_namespace", "test_arrayName", "test_value");
+
+        // Assert: The test passes if a NullPointerException is thrown, which is
+        // handled by the @Test(expected = ...) annotation.
     }
 }
