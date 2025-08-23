@@ -1,34 +1,35 @@
 package org.apache.commons.collections4.sequence;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+
+import java.util.Collections;
 import java.util.List;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequencesComparator_ESTestTest9 extends SequencesComparator_ESTest_scaffolding {
+/**
+ * Tests the constructor of {@link SequencesComparator}.
+ * This class focuses on ensuring the constructor correctly handles invalid arguments.
+ */
+public class SequencesComparatorConstructorTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DefaultEquator<Object> defaultEquator0 = DefaultEquator.defaultEquator();
-        SequencesComparator<Object> sequencesComparator0 = null;
-        try {
-            sequencesComparator0 = new SequencesComparator<Object>((List<Object>) null, (List<Object>) null, defaultEquator0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.sequence.SequencesComparator", e);
-        }
+    /**
+     * Tests that the constructor throws a NullPointerException if the first sequence is null.
+     * The constructor is expected to fail fast when provided with invalid input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionWhenFirstSequenceIsNull() {
+        // The constructor for SequencesComparator requires two non-null lists.
+        // This test verifies that a NullPointerException is thrown when the first list is null.
+        // An empty list is used for the second argument to isolate the failure condition.
+        new SequencesComparator<Object>(null, Collections.emptyList());
+    }
+
+    /**
+     * Tests that the constructor throws a NullPointerException if the second sequence is null.
+     * The constructor is expected to fail fast when provided with invalid input.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionWhenSecondSequenceIsNull() {
+        // This test verifies that a NullPointerException is thrown when the second list is null.
+        new SequencesComparator<Object>(Collections.emptyList(), null);
     }
 }
