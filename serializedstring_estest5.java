@@ -1,28 +1,40 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class SerializedString_ESTestTest5 extends SerializedString_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("0");
-        MockPrintStream mockPrintStream0 = new MockPrintStream("Sc2,\"g4ysda!5!{]");
-        int int0 = serializedString0.writeQuotedUTF8(mockPrintStream0);
-        assertEquals(1, int0);
+/**
+ * Contains tests for the {@link SerializedString} class, focusing on its
+ * writing capabilities.
+ */
+public class SerializedStringTest {
+
+    /**
+     * Tests that writeQuotedUTF8() correctly writes a simple, non-escaped string
+     * to an OutputStream and returns the accurate number of bytes written.
+     */
+    @Test
+    public void writeQuotedUTF8_withSimpleString_writesContentAndReturnsLength() throws IOException {
+        // Arrange: Create a SerializedString and an output stream to capture the result.
+        SerializedString serializedString = new SerializedString("0");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        
+        String expectedContent = "0";
+        int expectedBytesWritten = 1;
+
+        // Act: Write the string's quoted UTF-8 representation to the stream.
+        int actualBytesWritten = serializedString.writeQuotedUTF8(outputStream);
+
+        // Assert: Verify both the return value and the stream's content.
+        assertEquals("The method should return the number of bytes written.",
+                expectedBytesWritten, actualBytesWritten);
+
+        String actualContent = outputStream.toString(StandardCharsets.UTF_8.name());
+        assertEquals("The stream should contain the correct string content.",
+                expectedContent, actualContent);
     }
 }
