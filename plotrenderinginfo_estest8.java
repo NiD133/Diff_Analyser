@@ -1,29 +1,30 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.geom.Rectangle2D;
+import static org.junit.Assert.assertNull;
 
-public class PlotRenderingInfo_ESTestTest8 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        plotRenderingInfo0.setDataArea((Rectangle2D) null);
-        Rectangle2D rectangle2D0 = plotRenderingInfo0.getDataArea();
-        assertNull(rectangle2D0);
+    /**
+     * Verifies that getDataArea() returns null after the data area has been explicitly set to null.
+     * This confirms the setter and getter work correctly with null values.
+     */
+    @Test
+    public void getDataArea_shouldReturnNull_whenDataAreaIsSetToNull() {
+        // Arrange: Create a PlotRenderingInfo instance.
+        ChartRenderingInfo owner = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(owner);
+
+        // Act: Set the data area to null and then retrieve it.
+        plotInfo.setDataArea(null);
+        Rectangle2D result = plotInfo.getDataArea();
+
+        // Assert: The retrieved data area should be null.
+        assertNull("The data area should be null after being set to null.", result);
     }
 }
