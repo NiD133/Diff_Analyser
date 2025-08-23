@@ -1,27 +1,32 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import java.awt.Rectangle;
+
+/**
+ * Contains tests for the {@link StandardEntityCollection} class, focusing on cloning behavior.
+ */
 public class StandardEntityCollection_ESTestTest8 extends StandardEntityCollection_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        Line2D.Float line2D_Float0 = new Line2D.Float(0.0F, 0.0F, 0.0F, 0.0F);
-        ChartEntity chartEntity0 = new ChartEntity(line2D_Float0, " -ZHr,Q8I`#,X{EAHK", " -ZHr,Q8I`#,X{EAHK");
-        standardEntityCollection0.add(chartEntity0);
-        standardEntityCollection0.clone();
-        assertEquals(1, standardEntityCollection0.getEntityCount());
+    /**
+     * Verifies that calling clone() on a collection does not alter the original collection.
+     * This test ensures the clone operation is non-destructive to the source object.
+     */
+    @Test
+    public void clone_shouldNotModifyOriginalCollection() throws CloneNotSupportedException {
+        // Arrange: Create a collection and add one entity to it.
+        StandardEntityCollection originalCollection = new StandardEntityCollection();
+        ChartEntity entity = new ChartEntity(new Rectangle(10, 20, 30, 40), "Test Tooltip");
+        originalCollection.add(entity);
+
+        // Act: Clone the collection. The result is intentionally not used because this
+        // test specifically verifies that the original collection remains unchanged.
+        originalCollection.clone();
+
+        // Assert: The entity count of the original collection should be unaffected.
+        assertEquals("Cloning should not alter the size of the original collection.",
+                1, originalCollection.getEntityCount());
     }
 }
