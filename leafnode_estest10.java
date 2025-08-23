@@ -1,22 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.internal.QuietAppendable;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class LeafNode_ESTestTest10 extends LeafNode_ESTest_scaffolding {
+/**
+ * Tests for the {@link LeafNode#empty()} method.
+ */
+public class LeafNodeTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        XmlDeclaration xmlDeclaration0 = new XmlDeclaration("<eaHch", false);
-        xmlDeclaration0.siblingIndex = 1574;
-        Node node0 = xmlDeclaration0.empty();
-        assertSame(xmlDeclaration0, node0);
+    /**
+     * Verifies that calling empty() on a LeafNode, which cannot have children,
+     * is a no-op and returns the node instance itself.
+     */
+    @Test
+    public void emptyOnLeafNodeShouldReturnSameInstance() {
+        // Arrange: Create an instance of XmlDeclaration, a concrete subclass of LeafNode.
+        LeafNode leafNode = new XmlDeclaration("xml", false);
+
+        // Act: Call the empty() method.
+        Node result = leafNode.empty();
+
+        // Assert: The returned node should be the exact same instance as the original.
+        assertSame("Calling empty() on a LeafNode should return the instance itself.", leafNode, result);
     }
 }
