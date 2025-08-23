@@ -1,43 +1,29 @@
 package org.mockito.internal.util.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
+
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
-import org.junit.Rule;
+import java.util.Set;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
-public class HashCodeAndEqualsSafeSetTestTest13 {
-
-    @Rule
-    public MockitoRule r = MockitoJUnit.rule();
-
-    @Mock
-    private UnmockableHashCodeAndEquals mock1;
-
-    private static class UnmockableHashCodeAndEquals {
-
-        @Override
-        public final int hashCode() {
-            throw new NullPointerException("I'm failing on hashCode and I don't care");
-        }
-
-        @Override
-        public final boolean equals(Object obj) {
-            throw new NullPointerException("I'm failing on equals and I don't care");
-        }
-    }
+/**
+ * Tests for {@link HashCodeAndEqualsSafeSet#equals(Object)}.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
     @Test
-    public void isNotEqualToAnOtherTypeOfSetWithSameContent() {
-        HashCodeAndEqualsSafeSet set = HashCodeAndEqualsSafeSet.of();
-        assertThat(set).isNotEqualTo(new HashSet<Object>());
+    public void shouldNotBeEqualToDifferentSetImplementation() {
+        // Arrange
+        // Create an empty instance of the class under test.
+        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of();
+
+        // Create an empty instance of a standard Set for comparison.
+        Set<Object> standardHashSet = new HashSet<>();
+
+        // Act & Assert
+        // A HashCodeAndEqualsSafeSet should not be equal to other Set implementations
+        // (like HashSet), even if their contents are identical (e.g., both are empty).
+        // This verifies a specific contract of this custom Set implementation.
+        assertThat(safeSet).isNotEqualTo(standardHashSet);
     }
 }
