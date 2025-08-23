@@ -1,43 +1,35 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+/**
+ * This test class contains tests for the {@link Elements} class.
+ * Note: The original test class name 'Elements_ESTestTest163' and its extension
+ * 'Elements_ESTest_scaffolding' are preserved as changing them is beyond the scope
+ * of refactoring a single test case.
+ */
 public class Elements_ESTestTest163 extends Elements_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test162() throws Throwable {
-        Elements elements0 = new Elements();
-        // Undeclared exception!
+    /**
+     * Verifies that calling the traverse() method with a null NodeVisitor
+     * throws an IllegalArgumentException, as the visitor argument is mandatory.
+     */
+    @Test
+    public void traverseWithNullVisitorThrowsIllegalArgumentException() {
+        // Arrange: Create an empty Elements collection. The behavior should be
+        // consistent regardless of whether the collection contains elements or not.
+        Elements elements = new Elements();
+
+        // Act & Assert: Attempt to traverse with a null visitor and verify the exception.
         try {
-            elements0.traverse((NodeVisitor) null);
-            fail("Expecting exception: IllegalArgumentException");
+            elements.traverse(null);
+            fail("Expected an IllegalArgumentException to be thrown when the visitor is null.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // The method should validate its input and reject nulls.
+            // The "Object must not be null" message comes from the Validate helper class.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
