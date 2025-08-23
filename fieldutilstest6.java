@@ -1,49 +1,65 @@
 package org.joda.time.field;
 
-import java.math.RoundingMode;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
 
-public class FieldUtilsTestTest6 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Unit tests for {@link FieldUtils#safeDivide(long, long)}.
+ */
+class FieldUtils_SafeDivideLongTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestFieldUtils.class);
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSafeDivideLongLong() {
-        assertEquals(1L, FieldUtils.safeDivide(1L, 1L));
+    @Test
+    void safeDivide_performsStandardDivisionAndTruncation() {
+        // Basic cases
         assertEquals(1L, FieldUtils.safeDivide(3L, 3L));
-        assertEquals(0L, FieldUtils.safeDivide(1L, 3L));
         assertEquals(3L, FieldUtils.safeDivide(3L, 1L));
+        assertEquals(2L, FieldUtils.safeDivide(6L, 3L));
+
+        // Division with positive operands truncates toward zero
+        assertEquals(0L, FieldUtils.safeDivide(1L, 3L));
         assertEquals(1L, FieldUtils.safeDivide(5L, 3L));
+        assertEquals(2L, FieldUtils.safeDivide(7L, 3L));
+    }
+
+    @Test
+    void safeDivide_withNegativeOperands_truncatesTowardZero() {
+        // Dividend and divisor with different signs
         assertEquals(-1L, FieldUtils.safeDivide(5L, -3L));
         assertEquals(-1L, FieldUtils.safeDivide(-5L, 3L));
-        assertEquals(1L, FieldUtils.safeDivide(-5L, -3L));
-        assertEquals(2L, FieldUtils.safeDivide(6L, 3L));
-        assertEquals(-2L, FieldUtils.safeDivide(6L, -3L));
-        assertEquals(-2L, FieldUtils.safeDivide(-6L, 3L));
-        assertEquals(2L, FieldUtils.safeDivide(-6L, -3L));
-        assertEquals(2L, FieldUtils.safeDivide(7L, 3L));
         assertEquals(-2L, FieldUtils.safeDivide(7L, -3L));
         assertEquals(-2L, FieldUtils.safeDivide(-7L, 3L));
+
+        // Dividend and divisor with same negative sign
+        assertEquals(1L, FieldUtils.safeDivide(-5L, -3L));
+        assertEquals(2L, FieldUtils.safeDivide(-6L, -3L));
         assertEquals(2L, FieldUtils.safeDivide(-7L, -3L));
+    }
+
+    @Test
+    void safeDivide_byOne_returnsDividend() {
         assertEquals(Long.MAX_VALUE, FieldUtils.safeDivide(Long.MAX_VALUE, 1L));
         assertEquals(Long.MIN_VALUE, FieldUtils.safeDivide(Long.MIN_VALUE, 1L));
+    }
+
+    @Test
+    void safeDivide_byNegativeOne_returnsNegatedDividend() {
         assertEquals(-Long.MAX_VALUE, FieldUtils.safeDivide(Long.MAX_VALUE, -1L));
-        try {
-            FieldUtils.safeDivide(Long.MIN_VALUE, -1L);
-            fail();
-        } catch (ArithmeticException e) {
-        }
-        try {
+    }
+
+    @Test
+    void safeDivide_byZero_throwsArithmeticException() {
+        assertThrows(ArithmeticException.class, () -> {
             FieldUtils.safeDivide(1L, 0L);
-            fail();
-        } catch (ArithmeticException e) {
-        }
+        });
+    }
+
+    @Test
+    void safeDivide_whenMinValueDividedByNegativeOne_throwsArithmeticExceptionForOverflow() {
+        // This operation overflows because -Long.MIN_VALUE is larger than Long.MAX_VALUE
+        assertThrows(ArithmeticException.class, () -> {
+            FieldUtils.safeDivide(Long.MIN_VALUE, -1L);
+        });
     }
 }
