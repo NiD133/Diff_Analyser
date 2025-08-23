@@ -1,24 +1,28 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest17 extends QuotedPrintableCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertNull;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(charset0, true);
-        byte[] byteArray0 = quotedPrintableCodec0.decode((byte[]) null);
-        assertNull(byteArray0);
+/**
+ * Tests for {@link QuotedPrintableCodec}.
+ */
+public class QuotedPrintableCodecTest {
+
+    /**
+     * Tests that decoding a null byte array returns null, as per the codec contract.
+     */
+    @Test
+    public void decodeByteArrayShouldReturnNullForNullInput() throws DecoderException {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final byte[] nullInput = null;
+
+        // Act
+        final byte[] result = codec.decode(nullInput);
+
+        // Assert
+        assertNull("Decoding a null byte array should result in null.", result);
     }
 }
