@@ -1,54 +1,31 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
-import org.jfree.data.statistics.SimpleHistogramBin;
-import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ClusteredXYBarRenderer_ESTestTest17 extends ClusteredXYBarRenderer_ESTest_scaffolding {
+/**
+ * Contains tests for the clone() method in the {@link ClusteredXYBarRenderer} class.
+ */
+public class ClusteredXYBarRenderer_ESTestTest17 {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        DirectionalGradientPaintTransformer directionalGradientPaintTransformer0 = new DirectionalGradientPaintTransformer();
-        clusteredXYBarRenderer0.setGradientPaintTransformer(directionalGradientPaintTransformer0);
-        try {
-            clusteredXYBarRenderer0.clone();
-            fail("Expecting exception: CloneNotSupportedException");
-        } catch (CloneNotSupportedException e) {
-            //
-            // Object without clone() method is impossible.
-            //
-            verifyException("org.jfree.chart.internal.CloneUtils", e);
-        }
+    /**
+     * Verifies that clone() throws a CloneNotSupportedException if the renderer
+     * has a GradientPaintTransformer that does not implement Cloneable.
+     *
+     * The clone() method in the renderer's superclass attempts to deep-clone
+     * its properties. This test ensures that it correctly fails when a property,
+     * like DirectionalGradientPaintTransformer, is not cloneable.
+     */
+    @Test(expected = CloneNotSupportedException.class)
+    public void cloneWithNonCloneableGradientTransformerThrowsException() throws CloneNotSupportedException {
+        // Arrange: Create a renderer and set a GradientPaintTransformer that is not cloneable.
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        DirectionalGradientPaintTransformer nonCloneableTransformer = new DirectionalGradientPaintTransformer();
+        renderer.setGradientPaintTransformer(nonCloneableTransformer);
+
+        // Act: Attempt to clone the renderer.
+        // This is expected to throw a CloneNotSupportedException because the
+        // transformer property cannot be cloned.
+        renderer.clone();
     }
 }
