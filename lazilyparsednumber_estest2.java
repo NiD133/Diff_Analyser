@@ -1,18 +1,25 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LazilyParsedNumber_ESTestTest2 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("A_>sS8(ab<");
-        String string0 = lazilyParsedNumber0.toString();
-        assertEquals("A_>sS8(ab<", string0);
+    @Test
+    public void toString_shouldReturnTheOriginalStringRepresentation() {
+        // Arrange
+        // Use a string that is not a valid number to confirm that the toString() method
+        // returns the original raw value without performing any parsing or validation.
+        String originalValue = "A_>  sS8(ab<";
+        LazilyParsedNumber lazilyParsedNumber = new LazilyParsedNumber(originalValue);
+
+        // Act
+        String result = lazilyParsedNumber.toString();
+
+        // Assert
+        assertEquals(originalValue, result);
     }
 }
