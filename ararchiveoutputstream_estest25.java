@@ -1,34 +1,55 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest25 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ArArchiveOutputStream}.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        ArArchiveEntry arArchiveEntry0 = new ArArchiveEntry("jl^;TJ]T9ZU<Vh", 0);
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-        arArchiveOutputStream0.closeArchiveEntry();
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-        assertEquals(128, arArchiveOutputStream0.getCount());
+    /**
+     * An AR archive consists of a magic string ("!<arch>\n", 8 bytes)
+     * followed by a 60-byte header for each entry.
+     */
+    private static final int AR_MAGIC_HEADER_SIZE = 8;
+    private static final int AR_ENTRY_HEADER_SIZE = 60;
+
+    /**
+     * Verifies that writing multiple, consecutive entries to the archive
+     * correctly updates the total number of bytes written.
+     */
+    @Test
+    public void shouldWriteCorrectByteCountWhenAddingMultipleEntries() throws IOException {
+        // Arrange
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream);
+        
+        // Create a representative entry with zero content size.
+        ArArchiveEntry entry = new ArArchiveEntry("entry.txt", 0);
+
+        // Act: Write the first entry.
+        arOut.putArchiveEntry(entry);
+        arOut.closeArchiveEntry();
+
+        // Assert: The stream should contain the archive magic header plus one entry header.
+        long expectedSizeAfterFirstEntry = AR_MAGIC_HEADER_SIZE + AR_ENTRY_HEADER_SIZE;
+        assertEquals("Byte count after first entry is incorrect.",
+                expectedSizeAfterFirstEntry, arOut.getCount());
+
+        // Act: Write a second entry.
+        arOut.putArchiveEntry(entry);
+
+        // Assert: The stream should now also contain the header for the second entry.
+        long expectedSizeAfterSecondEntry = expectedSizeAfterFirstEntry + AR_ENTRY_HEADER_SIZE;
+        assertEquals("Byte count after second entry is incorrect.",
+                expectedSizeAfterSecondEntry, arOut.getCount());
+        
+        // The original test asserted a total of 128 bytes.
+        // Our calculation confirms this: 8 + 60 + 60 = 128.
+        assertEquals(128, arOut.getCount());
     }
 }
