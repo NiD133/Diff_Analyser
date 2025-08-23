@@ -1,289 +1,205 @@
 package org.jsoup.helper;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("deprecation") // keeps tests for ensureNotNull
 public class ValidateTest {
-    @Test
-    public void testNotNull() {
-        Validate.notNull("foo");
-        boolean threw = false;
-        try {
-            Validate.notNull(null);
-        } catch (IllegalArgumentException e) {
-            threw = true;
-        }
-        Assertions.assertTrue(threw);
+
+    private static <T extends Throwable> T assertThrowsWithMessage(Class<T> type, Executable exec, String expectedMessage) {
+        T ex = assertThrows(type, exec);
+        assertEquals(expectedMessage, ex.getMessage());
+        return ex;
     }
 
-    @Test
-    void stacktraceFiltersOutValidateClass() {
-        boolean threw = false;
-        try {
-            Validate.notNull(null);
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Object must not be null", e.getMessage());
-            StackTraceElement[] stackTrace = e.getStackTrace();
-            for (StackTraceElement trace : stackTrace) {
-                assertNotEquals(trace.getClassName(), Validate.class.getName());
+    @Nested
+    class NotNull {
+        @Test
+        void acceptsNonNull() {
+            Validate.notNull("foo");
+        }
+
+        @Test
+        void throwsWithDefaultMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notNull(null),
+                "Object must not be null");
+        }
+
+        @Test
+        void throwsWithCustomMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notNull(null, "Custom error"),
+                "Custom error");
+        }
+
+        @Test
+        void paramVariant_includesParamName() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notNullParam(null, "foo"),
+                "The parameter 'foo' must not be null.");
+        }
+
+        @Test
+        void stacktraceFiltersOutValidateClass() {
+            ValidationException ex = assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notNull(null),
+                "Object must not be null");
+
+            // Ensure the Validate class is not present in the stack trace
+            for (StackTraceElement el : ex.getStackTrace()) {
+                assertNotEquals(Validate.class.getName(), el.getClassName());
             }
-            assertTrue(stackTrace.length >= 1);
+            assertTrue(ex.getStackTrace().length >= 1);
         }
-        Assertions.assertTrue(threw);
     }
 
-    @Test
-    void nonnullParam() {
-        boolean threw = true;
-        try {
-            Validate.notNullParam(null, "foo");
-        } catch (ValidationException e) {
-            assertEquals("The parameter 'foo' must not be null.", e.getMessage());
+    @Nested
+    class EnsureNotNull_Deprecated {
+        @Test
+        void returnsSameInstance() {
+            Object obj = new Object();
+            assertSame(obj, Validate.ensureNotNull(obj));
         }
-        assertTrue(threw);
+
+        @Test
+        void throwsWithDefaultMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.ensureNotNull(null),
+                "Object must not be null");
+        }
+
+        @Test
+        void throwsWithProvidedMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.ensureNotNull(null, "Custom error message"),
+                "Custom error message");
+        }
+
+        @Test
+        void throwsWithFormattedMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.ensureNotNull(null, "Object must not be null: %s", "additional info"),
+                "Object must not be null: additional info");
+        }
     }
 
-    @Test
-    public void testWtf() {
-        boolean threw = false;
-        try {
-            Validate.wtf("Unexpected state reached");
-        } catch (IllegalStateException e) {
-            threw = true;
-            assertEquals("Unexpected state reached", e.getMessage());
+    @Nested
+    class ExpectNotNull {
+        @Test
+        void returnsSameTypedInstance() {
+            String s = "Foo";
+            String result = Validate.expectNotNull(s);
+            assertSame(s, result);
         }
-        assertTrue(threw);
+
+        @Test
+        void throwsWithDefaultMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.expectNotNull(null),
+                "Object must not be null");
+        }
     }
 
-    @Test
-    public void testEnsureNotNull() {
-        // Test with a non-null object
-        Object obj = new Object();
-        assertSame(obj, Validate.ensureNotNull(obj));
-
-        // Test with a null object
-        boolean threw = false;
-        try {
-            Validate.ensureNotNull(null);
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Object must not be null", e.getMessage());
+    @Nested
+    class Strings {
+        @Test
+        void notEmpty_acceptsNonEmpty() {
+            Validate.notEmpty("foo");
         }
-        assertTrue(threw);
+
+        @Test
+        void notEmpty_rejectsEmpty() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notEmpty(""),
+                "String must not be empty");
+        }
+
+        @Test
+        void notEmpty_rejectsNull() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notEmpty(null),
+                "String must not be empty");
+        }
+
+        @Test
+        void notEmptyParam_rejectsEmpty_includesParamName() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notEmptyParam("", "param"),
+                "The 'param' parameter must not be empty.");
+        }
+
+        @Test
+        void notEmptyParam_rejectsNull_includesParamName() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notEmptyParam(null, "param"),
+                "The 'param' parameter must not be empty.");
+        }
+
+        @Test
+        void notEmpty_withCustomMessage_isUsedForEmpty() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notEmpty("", "Custom error message"),
+                "Custom error message");
+        }
+
+        @Test
+        void notEmpty_withCustomMessage_isUsedForNull() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.notEmpty(null, "Custom error message"),
+                "Custom error message");
+        }
     }
 
-    @Test
-    public void testEnsureNotNullWithMessage() {
-        // Test with a non-null object
-        Object obj = new Object();
-        assertSame(obj, Validate.ensureNotNull(obj, "Object must not be null"));
-
-        // Test with a null object
-        boolean threw = false;
-        try {
-            Validate.ensureNotNull(null, "Custom error message");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Custom error message", e.getMessage());
+    @Nested
+    class Booleans {
+        @Test
+        void isTrue_rejectsFalse_withDefaultMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.isTrue(false),
+                "Must be true");
         }
-        assertTrue(threw);
+
+        @Test
+        void isFalse_rejectsTrue_withDefaultMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.isFalse(true),
+                "Must be false");
+        }
     }
 
-    @Test
-    public void testEnsureNotNullWithFormattedMessage() {
-        // Test with a non-null object
-        Object obj = new Object();
-        assertSame(obj, Validate.ensureNotNull(obj, "Object must not be null: %s", "additional info"));
-
-        // Test with a null object
-        boolean threw = false;
-        try {
-            Validate.ensureNotNull(null, "Object must not be null: %s", "additional info");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Object must not be null: additional info", e.getMessage());
+    @Nested
+    class Arrays {
+        @Test
+        void noNullElements_acceptsArrayWithoutNulls() {
+            Validate.noNullElements(new Object[] { new Object(), new Object() });
         }
-        assertTrue(threw);
+
+        @Test
+        void noNullElements_rejectsArrayWithNull_withCustomMessage() {
+            assertThrowsWithMessage(ValidationException.class,
+                () -> Validate.noNullElements(new Object[] { new Object(), null }, "Custom error message"),
+                "Custom error message");
+        }
     }
 
-    @Test void expectNotNull() {
-        String foo = "Foo";
-        String foo2 = Validate.expectNotNull(foo);
-        assertSame(foo, foo2);
-
-        // Test with a null object
-        String bar = null;
-        boolean threw = false;
-        try {
-            Validate.expectNotNull(bar);
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Object must not be null", e.getMessage());
+    @Nested
+    class Failures {
+        @Test
+        void wtf_throwsIllegalStateWithProvidedMessage() {
+            assertThrowsWithMessage(IllegalStateException.class,
+                () -> Validate.wtf("Unexpected state reached"),
+                "Unexpected state reached");
         }
-        assertTrue(threw);
+
+        @Test
+        void assertFail_alwaysThrowsIllegalState_withProvidedMessage() {
+            assertThrowsWithMessage(IllegalStateException.class,
+                () -> Validate.assertFail("This should fail"),
+                "This should fail");
+        }
     }
-
-    @Test
-    public void testNotNullParam() {
-        // Test with a non-null object
-        Object obj = new Object();
-        Validate.notNullParam(obj, "param");
-
-        // Test with a null object
-        boolean threw = false;
-        try {
-            Validate.notNullParam(null, "param");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("The parameter 'param' must not be null.", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
-    @Test
-    public void testNotEmpty() {
-        // Test with a non-empty string
-        String str = "foo";
-        Validate.notEmpty(str);
-
-        // Test with an empty string
-        boolean threw = false;
-        try {
-            Validate.notEmpty("");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("String must not be empty", e.getMessage());
-        }
-        assertTrue(threw);
-
-        // Test with a null string
-        threw = false;
-        try {
-            Validate.notEmpty(null);
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("String must not be empty", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
-    @Test
-    public void testIsTrue() {
-        // Test with a true value
-        Validate.isTrue(true);
-
-        // Test with a false value
-        boolean threw = false;
-        try {
-            Validate.isTrue(false);
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Must be true", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
-    @Test
-    public void testIsFalse() {
-        // Test with a false value
-        Validate.isFalse(false);
-
-        // Test with a true value
-        boolean threw = false;
-        try {
-            Validate.isFalse(true);
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Must be false", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
-    @Test
-    public void testAssertFail() {
-        boolean result = false;
-        boolean threw = false;
-        try {
-            result = Validate.assertFail("This should fail");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("This should fail", e.getMessage());
-        }
-        assertTrue(threw);
-        assertFalse(result);
-    }
-
-    @Test
-    public void testNotEmptyParam() {
-        // Test with a non-empty string
-        Validate.notEmptyParam("foo", "param");
-
-        // Test with an empty string
-        boolean threw = false;
-        try {
-            Validate.notEmptyParam("", "param");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("The 'param' parameter must not be empty.", e.getMessage());
-        }
-        assertTrue(threw);
-
-        // Test with a null string
-        threw = false;
-        try {
-            Validate.notEmptyParam(null, "param");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("The 'param' parameter must not be empty.", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
-    @Test
-    public void testNoNullElementsWithMessage() {
-        // Test with an array with no null elements
-        Object[] array = {new Object(), new Object()};
-        Validate.noNullElements(array, "Custom error message");
-
-        // Test with an array containing a null element
-        boolean threw = false;
-        try {
-            Validate.noNullElements(new Object[]{new Object(), null}, "Custom error message");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Custom error message", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
-    @Test
-    public void testNotEmptyWithMessage() {
-        // Test with a non-empty string
-        Validate.notEmpty("foo", "Custom error message");
-
-        // Test with an empty string
-        boolean threw = false;
-        try {
-            Validate.notEmpty("", "Custom error message");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Custom error message", e.getMessage());
-        }
-        assertTrue(threw);
-
-        // Test with a null string
-        threw = false;
-        try {
-            Validate.notEmpty(null, "Custom error message");
-        } catch (ValidationException e) {
-            threw = true;
-            assertEquals("Custom error message", e.getMessage());
-        }
-        assertTrue(threw);
-    }
-
 }
