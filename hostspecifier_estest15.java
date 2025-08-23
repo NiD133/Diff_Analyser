@@ -1,18 +1,23 @@
 package com.google.common.net;
 
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.text.ParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HostSpecifier_ESTestTest15 extends HostSpecifier_ESTest_scaffolding {
+/**
+ * Tests for {@link HostSpecifier}.
+ */
+public class HostSpecifierTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        boolean boolean0 = HostSpecifier.isValid("E$U|;qI:3");
-        assertFalse(boolean0);
+    @Test
+    public void isValid_returnsFalse_forStringWithInvalidCharacters() {
+        // The HostSpecifier.isValid() method should return false for a string
+        // containing characters that are not permitted in domain names or IP addresses,
+        // such as '$', '|', or ';'.
+        String specifierWithInvalidChars = "E$U|;qI:3";
+
+        assertFalse(
+                "Specifier with invalid characters should be considered invalid",
+                HostSpecifier.isValid(specifierWithInvalidChars));
     }
 }
