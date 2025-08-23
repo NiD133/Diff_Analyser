@@ -1,50 +1,27 @@
 package org.threeten.extra;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Month;
-import java.time.YearMonth;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockMinguoDate;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class DayOfMonth_ESTestTest42 extends DayOfMonth_ESTest_scaffolding {
+/**
+ * Tests for {@link DayOfMonth}.
+ */
+public class DayOfMonthTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        // Undeclared exception!
+    @Test
+    public void now_givenNullZoneId_shouldThrowNullPointerException() {
+        // The Javadoc for now(ZoneId) specifies that the zone parameter must not be null.
+        // This test verifies that a NullPointerException is thrown as expected.
         try {
             DayOfMonth.now((ZoneId) null);
-            fail("Expecting exception: NullPointerException");
+            fail("DayOfMonth.now(null) should have thrown a NullPointerException.");
         } catch (NullPointerException e) {
-            //
-            // zone
-            //
-            verifyException("java.util.Objects", e);
+            // The underlying implementation uses Objects.requireNonNull(zone, "zone"),
+            // so we can assert the specific message for a more robust test.
+            assertEquals("zone", e.getMessage());
         }
     }
 }
