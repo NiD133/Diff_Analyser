@@ -1,35 +1,32 @@
 package org.apache.ibatis.datasource.jndi;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.Properties;
-import javax.sql.DataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JndiDataSourceFactory_ESTestTest2 extends JndiDataSourceFactory_ESTest_scaffolding {
+/**
+ * Tests for the JndiDataSourceFactory class.
+ */
+public class JndiDataSourceFactoryTest {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        JndiDataSourceFactory jndiDataSourceFactory0 = new JndiDataSourceFactory();
-        Properties properties0 = new Properties();
-        UnpooledDataSource unpooledDataSource0 = new UnpooledDataSource("initial_context", "data_source", properties0);
-        Object object0 = new Object();
-        properties0.put(unpooledDataSource0, object0);
-        // Undeclared exception!
-        try {
-            jndiDataSourceFactory0.setProperties(properties0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // class org.apache.ibatis.datasource.unpooled.UnpooledDataSource cannot be cast to class java.lang.String (org.apache.ibatis.datasource.unpooled.UnpooledDataSource is in unnamed module of loader org.evosuite.instrumentation.InstrumentingClassLoader @69dd31fb; java.lang.String is in module java.base of loader 'bootstrap')
-            //
-            verifyException("org.apache.ibatis.datasource.jndi.JndiDataSourceFactory", e);
-        }
+    /**
+     * The setProperties method iterates over the given properties, casting each key to a String.
+     * This test verifies that a ClassCastException is thrown if a key is not a String,
+     * ensuring the method fails fast with invalid input.
+     */
+    @Test(expected = ClassCastException.class)
+    public void setPropertiesShouldThrowClassCastExceptionForNonStringKey() {
+        // Arrange
+        JndiDataSourceFactory factory = new JndiDataSourceFactory();
+        Properties invalidProperties = new Properties();
+
+        // The Properties object allows non-String keys, but the factory's implementation
+        // expects String keys. We use a generic Object to represent any non-String key.
+        Object nonStringKey = new Object();
+        invalidProperties.put(nonStringKey, "any-value");
+
+        // Act & Assert
+        // This call is expected to throw a ClassCastException because the internal
+        // implementation attempts to cast the non-String key.
+        factory.setProperties(invalidProperties);
     }
 }
