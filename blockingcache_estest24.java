@@ -1,23 +1,32 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.CountDownLatch;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BlockingCache_ESTestTest24 extends BlockingCache_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        PerpetualCache perpetualCache0 = new PerpetualCache("Detected an attempt at releasing unacquired lock. This should never happen.");
-        SoftCache softCache0 = new SoftCache(perpetualCache0);
-        BlockingCache blockingCache0 = new BlockingCache(softCache0);
-        int int0 = blockingCache0.getSize();
-        assertEquals(0, int0);
+/**
+ * Test suite for the BlockingCache decorator.
+ */
+public class BlockingCacheTest {
+
+    /**
+     * Verifies that getSize() on a newly created BlockingCache returns 0.
+     * The BlockingCache should delegate the getSize() call to its underlying cache,
+     * which is empty upon creation.
+     */
+    @Test
+    public void shouldReturnZeroSizeForNewEmptyCache() {
+        // Arrange
+        // A PerpetualCache is a simple, in-memory cache implementation suitable for testing.
+        Cache delegateCache = new PerpetualCache("test-cache");
+        BlockingCache blockingCache = new BlockingCache(delegateCache);
+
+        // Act
+        int size = blockingCache.getSize();
+
+        // Assert
+        assertEquals("A new, empty cache should have a size of 0.", 0, size);
     }
 }
