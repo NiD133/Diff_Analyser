@@ -1,26 +1,36 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
+import static org.junit.Assert.assertTrue;
+
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeWriter_ESTestTest27 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Contains an improved, more understandable version of the original test for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterImprovedTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginObject();
-        jsonTreeWriter0.setHtmlSafe(true);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.endObject();
-        assertTrue(jsonWriter0.getSerializeNulls());
+    /**
+     * Verifies that the 'serializeNulls' property, which is true by default,
+     * is not altered after writing a simple JSON object.
+     */
+    @Test
+    public void writingAnObjectDoesNotChangeDefaultSerializeNullsProperty() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        // By default, JsonWriter is configured to serialize nulls. This test ensures
+        // that this setting is not unexpectedly changed by basic write operations.
+
+        // Act
+        // Write a simple, empty JSON object.
+        writer.beginObject();
+        JsonWriter finishedWriter = writer.endObject();
+
+        // Assert
+        assertTrue(
+            "The 'serializeNulls' property should remain true after writing an object.",
+            finishedWriter.getSerializeNulls()
+        );
     }
 }
