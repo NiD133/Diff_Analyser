@@ -1,26 +1,34 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest70 extends NumberOutput_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        char[] charArray0 = new char[5];
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on boundary and error conditions.
+ */
+public class NumberOutputTest {
+
+    /**
+     * Verifies that calling {@code outputInt} with an offset that is outside the
+     * bounds of the destination buffer correctly throws an {@link ArrayIndexOutOfBoundsException}.
+     */
+    @Test
+    public void outputIntShouldThrowExceptionWhenOffsetIsOutOfBounds() {
+        // Arrange: Set up a small buffer and an offset far beyond its length.
+        char[] buffer = new char[10];
+        int numberToWrite = 123;
+        int invalidOffset = 100;
+
+        // Act & Assert: Attempt the operation and verify the expected exception.
         try {
-            NumberOutput.outputInt(10, charArray0, 806);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
+            NumberOutput.outputInt(numberToWrite, buffer, invalidOffset);
+            fail("Expected an ArrayIndexOutOfBoundsException because the offset is out of bounds.");
         } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 806
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
+            // The exception is expected. For robustness, we can also verify that the
+            // exception message correctly reports the index that caused the error.
+            assertEquals(String.valueOf(invalidOffset), e.getMessage());
         }
     }
 }
