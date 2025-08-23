@@ -1,25 +1,28 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class CustomCategoryURLGenerator_ESTestTest23 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        customCategoryURLGenerator0.addURLSeries((List<String>) null);
-        String string0 = customCategoryURLGenerator0.getURL(0, 0);
-        assertNull(string0);
+    /**
+     * Verifies that getURL returns null for a series that was added as a null list.
+     * This tests the generator's ability to handle cases where a specific series
+     * has no associated URLs.
+     */
+    @Test
+    public void getURL_whenSeriesUrlListIsNull_shouldReturnNull() {
+        // Arrange: Create a URL generator and add a null list for the first series.
+        CustomCategoryURLGenerator urlGenerator = new CustomCategoryURLGenerator();
+        urlGenerator.addURLSeries(null);
+
+        // Act: Attempt to retrieve the URL for an item in that series.
+        String retrievedUrl = urlGenerator.getURL(0, 0);
+
+        // Assert: The returned URL should be null.
+        assertNull("The URL should be null for an item in a series that was added as a null list.", retrievedUrl);
     }
 }
