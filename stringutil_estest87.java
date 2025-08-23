@@ -1,28 +1,23 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StringUtil_ESTestTest87 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for {@link StringUtil}.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test86() throws Throwable {
-        boolean boolean0 = StringUtil.isBlank("_5s]9,");
-        assertFalse(boolean0);
+    /**
+     * Verifies that isBlank() returns false for a string that contains
+     * non-whitespace characters.
+     */
+    @Test
+    public void isBlank_shouldReturnFalse_forNonBlankString() {
+        // Arrange: A string with various non-whitespace characters
+        String nonBlankString = "_5s]9,";
+
+        // Act & Assert: The string should not be considered blank
+        assertFalse("A string with content should not be identified as blank.", StringUtil.isBlank(nonBlankString));
     }
 }
