@@ -1,22 +1,30 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class OptionFormatter_ESTestTest19 extends OptionFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link OptionFormatter}.
+ */
+public class OptionFormatterTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        OptionFormatter optionFormatter0 = OptionFormatter.from((Option) null);
-        String string0 = optionFormatter0.toOptional(", ");
-        assertEquals("[, ]", string0);
+    /**
+     * Verifies that the toOptional() method correctly wraps a string with the
+     * default delimiters, which are '[' and ']'.
+     */
+    @Test
+    public void toOptionalShouldWrapTextWithDefaultDelimiters() {
+        // Arrange: Create a formatter using the static factory method.
+        // Passing null ensures that the formatter is initialized with default settings.
+        OptionFormatter formatter = OptionFormatter.from((Option) null);
+        final String textToWrap = ", ";
+        final String expectedWrappedText = "[, ]";
+
+        // Act: Call the method under test.
+        final String actualWrappedText = formatter.toOptional(textToWrap);
+
+        // Assert: Check if the output matches the expected wrapped string.
+        assertEquals(expectedWrappedText, actualWrappedText);
     }
 }
