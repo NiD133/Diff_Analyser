@@ -1,31 +1,37 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest42 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test041() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        List<XNode> list0 = xNode0.evalNodes("org.apache.ibatis.parsing.PropertyParser.default-value-separator");
-        assertFalse(list0.contains(xNode0));
+    /**
+     * Verifies that evalNodes returns an empty list when the XPath expression
+     * does not match any nodes within the current context.
+     */
+    @Test
+    public void evalNodesShouldReturnEmptyListForNonexistentPath() {
+        // Arrange
+        // An empty DOM node serves as the context for our XNode.
+        Node emptyNode = new IIOMetadataNode();
+        XPathParser parser = new XPathParser((Document) null, true);
+        XNode xNode = new XNode(parser, emptyNode, new Properties());
+
+        // Act
+        // Attempt to find nodes using an XPath expression that will not match anything.
+        List<XNode> resultNodes = xNode.evalNodes("nonexistent/path");
+
+        // Assert
+        // The method should return an empty list, confirming no nodes were found.
+        assertTrue("Evaluating a non-existent path should result in an empty list.", resultNodes.isEmpty());
     }
 }
