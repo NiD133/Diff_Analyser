@@ -1,60 +1,40 @@
 package org.apache.commons.io.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.TempFile;
 import org.junit.jupiter.api.Test;
 
-public class BoundedReaderTestTest14 {
+/**
+ * Tests for {@link BoundedReader}.
+ */
+class BoundedReaderTest {
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
-
-    private static final String STRING_END_NO_EOL = "0\n1\n2";
-
-    private static final String STRING_END_EOL = "0\n1\n2\n";
-
-    private final Reader sr = new BufferedReader(new StringReader("01234567890"));
-
-    private final Reader shortReader = new BufferedReader(new StringReader("01"));
-
-    private void testLineNumberReader(final Reader source) throws IOException {
-        try (LineNumberReader reader = new LineNumberReader(new BoundedReader(source, 10_000_000))) {
-            while (reader.readLine() != null) {
-                // noop
-            }
-        }
-    }
-
-    void testLineNumberReaderAndFileReaderLastLine(final String data) throws IOException {
-        try (TempFile path = TempFile.create(getClass().getSimpleName(), ".txt")) {
-            final File file = path.toFile();
-            FileUtils.write(file, data, StandardCharsets.ISO_8859_1);
-            try (Reader source = Files.newBufferedReader(file.toPath())) {
-                testLineNumberReader(source);
-            }
-        }
-    }
-
+    /**
+     * Tests that reading from a BoundedReader stops at the specified limit,
+     * returning -1 (EOF) for subsequent reads, even if the underlying
+     * reader has more data.
+     */
     @Test
-    void testReadTillEnd() throws IOException {
-        try (BoundedReader mr = new BoundedReader(sr, 3)) {
-            mr.read();
-            mr.read();
-            mr.read();
-            assertEquals(-1, mr.read());
+    void readShouldReturnEofWhenLimitIsReached() throws IOException {
+        // Arrange
+        final String content = "0123456789";
+        final int limit = 3;
+        final Reader underlyingReader = new StringReader(content);
+
+        // The BoundedReader should only allow reading the first 3 characters: "012".
+        try (final BoundedReader boundedReader = new BoundedReader(underlyingReader, limit)) {
+
+            // Act & Assert
+            // Read the first 3 characters, which are within the bound.
+            assertEquals('0', boundedReader.read());
+            assertEquals('1', boundedReader.read());
+            assertEquals('2', boundedReader.read());
+
+            // The next read should hit the bound and return EOF (-1).
+            assertEquals(-1, boundedReader.read(), "Should return EOF after reading the specified number of characters.");
         }
     }
 }
