@@ -1,30 +1,28 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class JsonArray_ESTestTest66 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonArray} class, focusing on its convenience getter methods.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test65() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        // Undeclared exception!
-        try {
-            jsonArray0.getAsBigDecimal();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Array must have size 1, but has size 0
-            //
-            verifyException("com.google.gson.JsonArray", e);
-        }
+    @Test
+    public void getAsBigDecimalShouldThrowIllegalStateExceptionWhenArrayIsEmpty() {
+        // Arrange: Create an empty JsonArray instance.
+        JsonArray emptyArray = new JsonArray();
+        String expectedErrorMessage = "Array must have size 1, but has size 0";
+
+        // Act & Assert: Verify that calling getAsBigDecimal() on an empty array
+        // throws an IllegalStateException with the expected message.
+        IllegalStateException thrownException = assertThrows(
+            IllegalStateException.class,
+            () -> emptyArray.getAsBigDecimal(),
+            "Expected getAsBigDecimal() to throw, but it did not"
+        );
+
+        assertEquals(expectedErrorMessage, thrownException.getMessage());
     }
 }
