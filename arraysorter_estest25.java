@@ -1,20 +1,27 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ArraySorter_ESTestTest25 extends ArraySorter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ArraySorter} class.
+ */
+public class ArraySorterTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        double[] doubleArray0 = ArraySorter.sort((double[]) null);
-        assertNull(doubleArray0);
+    /**
+     * Tests that ArraySorter.sort() returns null when the input double array is null.
+     * This verifies the null-safe behavior of the method.
+     */
+    @Test
+    public void sort_shouldReturnNull_whenInputDoubleArrayIsNull() {
+        // Arrange: No arrangement needed as the input is null.
+        // The cast to (double[]) is necessary to resolve ambiguity between
+        // the overloaded sort() methods.
+
+        // Act
+        final double[] sortedArray = ArraySorter.sort((double[]) null);
+
+        // Assert
+        assertNull("The result of sorting a null array should be null.", sortedArray);
     }
 }
