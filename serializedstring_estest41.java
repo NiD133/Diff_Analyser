@@ -1,28 +1,43 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializedString_ESTestTest41 extends SerializedString_ESTest_scaffolding {
+import java.nio.charset.StandardCharsets;
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("TP1aO6Zd");
-        byte[] byteArray0 = serializedString0.asUnquotedUTF8();
-        int int0 = serializedString0.appendUnquotedUTF8(byteArray0, 0);
-        assertEquals(8, int0);
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Contains tests for the {@link SerializedString} class, focusing on its
+ * byte-appending functionality.
+ */
+public class SerializedStringTest {
+
+    /**
+     * Verifies that appendUnquotedUTF8 correctly appends the string's UTF-8 bytes
+     * into a destination buffer and returns the number of bytes written.
+     */
+    @Test
+    public void appendUnquotedUTF8_shouldAppendBytesAndReturnCorrectLength() {
+        // Arrange
+        final String content = "TP1aO6Zd";
+        final SerializedString serializedString = new SerializedString(content);
+        final byte[] destinationBuffer = new byte[16]; // A buffer larger than the content
+        final int offset = 0;
+
+        // Act
+        final int bytesAppended = serializedString.appendUnquotedUTF8(destinationBuffer, offset);
+
+        // Assert
+        // 1. Verify the method returns the correct number of bytes appended.
+        final byte[] expectedBytes = content.getBytes(StandardCharsets.UTF_8);
+        assertEquals("The number of appended bytes should match the content's UTF-8 length.",
+                     expectedBytes.length, bytesAppended);
+
+        // 2. Verify the content was actually written to the destination buffer.
+        final byte[] actualAppendedBytes = new byte[bytesAppended];
+        System.arraycopy(destinationBuffer, offset, actualAppendedBytes, 0, bytesAppended);
+        assertArrayEquals("The destination buffer should contain the correct byte sequence.",
+                          expectedBytes, actualAppendedBytes);
     }
 }
