@@ -1,30 +1,36 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SequenceReader_ESTestTest17 extends SequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+public class SequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        StringReader stringReader0 = new StringReader("T37");
-        arrayDeque0.add(stringReader0);
-        arrayDeque0.add(stringReader0);
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        sequenceReader0.close();
+    /**
+     * Tests that closing a SequenceReader succeeds even if the underlying collection
+     * contains the same Reader instance multiple times.
+     * <p>
+     * According to the {@link java.io.Reader#close()} contract, closing an already-closed
+     * stream has no effect. This test ensures that SequenceReader correctly handles
+     * this scenario without throwing an exception.
+     * </p>
+     */
+    @Test
+    public void closeShouldSucceedWhenCollectionContainsDuplicateReaderInstances() throws IOException {
+        // Arrange: Create a list containing the same reader instance twice.
+        StringReader sharedReader = new StringReader("test data");
+        List<StringReader> readersWithDuplicates = Arrays.asList(sharedReader, sharedReader);
+
+        SequenceReader sequenceReader = new SequenceReader(readersWithDuplicates);
+
+        // Act & Assert: The close() method should execute without throwing an exception.
+        // The test will pass if no exception is thrown, verifying idempotent behavior.
+        sequenceReader.close();
     }
 }
