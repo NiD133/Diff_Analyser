@@ -2,29 +2,33 @@ package org.joda.time.chrono;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
 
-public class IslamicChronology_ESTestTest33 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link IslamicChronology}.
+ * This focuses on edge cases for year calculations.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        // Undeclared exception!
+    /**
+     * Tests that calculateFirstDayOfYearMillis() throws an ArithmeticException
+     * if the requested year is greater than the maximum supported year.
+     */
+    @Test
+    public void calculateFirstDayOfYearMillis_shouldThrowExceptionWhenYearIsTooLarge() {
+        // Arrange: Create a chronology instance and determine an invalid year
+        // that is just beyond the maximum supported limit.
+        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
+        int maxYear = chronology.getMaxYear();
+        int invalidYear = maxYear + 1;
+
+        // Act & Assert: Call the method and verify that the correct exception is thrown.
         try {
-            islamicChronology0.calculateFirstDayOfYearMillis(292272984);
-            fail("Expecting exception: ArithmeticException");
+            chronology.calculateFirstDayOfYearMillis(invalidYear);
+            fail("Expected an ArithmeticException for a year exceeding the maximum limit.");
         } catch (ArithmeticException e) {
-            //
-            // Year is too large: 292272984 > 292271022
-            //
-            verifyException("org.joda.time.chrono.IslamicChronology", e);
+            // Verify that the exception message is informative and correct.
+            String expectedMessage = "Year is too large: " + invalidYear + " > " + maxYear;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
