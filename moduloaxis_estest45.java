@@ -1,46 +1,55 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest45 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        moduloAxis0.resizeRange(1005.89236, 0.13377999998920131);
-        Line2D.Float line2D_Float0 = new Line2D.Float();
-        Rectangle2D rectangle2D0 = line2D_Float0.getBounds2D();
-        RectangleEdge rectangleEdge0 = RectangleEdge.RIGHT;
-        double double0 = moduloAxis0.java2DToValue(0.8662200000107987, rectangle2D0, rectangleEdge0);
-        assertEquals(0.7675599999784026, moduloAxis0.getUpperBound(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY, double0, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * An improved version of the test for the ModuloAxis class, focusing on understandability.
+ */
+public class ModuloAxisTest {
+
+    /**
+     * Tests that java2DToValue() returns positive infinity when the plot area
+     * has zero height for a vertical axis. This scenario is expected to cause a
+     * division-by-zero in the underlying coordinate transformation logic.
+     */
+    @Test
+    public void java2DToValueWithZeroHeightAreaShouldReturnInfinity() {
+        // Arrange: Set up the axis and a degenerate plot area.
+        final double resizePercent = 1005.89236;
+        final double anchorValue = 0.13377999998920131;
+        final double expectedUpperBoundAfterResize = 0.7675599999784026;
+
+        // The ModuloAxis is initialized with a fixed range of 0.0 to 1.0.
+        Range fixedRange = new Range(0.0, 1.0);
+        ModuloAxis axis = new ModuloAxis("Test Modulo Axis", fixedRange);
+
+        // This call resizes the axis's display range, putting it into the
+        // specific state required by the original test case.
+        axis.resizeRange(resizePercent, anchorValue);
+
+        // A zero-height rectangle represents a degenerate plot area. For a vertical
+        // axis (like one on the RIGHT edge), this will lead to a division by zero.
+        Rectangle2D.Double zeroHeightPlotArea = new Rectangle2D.Double(0, 0, 100, 0);
+        RectangleEdge edge = RectangleEdge.RIGHT;
+        double arbitraryJava2DCoordinate = 0.8662200000107987;
+
+        // Act: Attempt to convert a 2D coordinate to a data value using the
+        // zero-height plot area.
+        double convertedValue = axis.java2DToValue(arbitraryJava2DCoordinate, zeroHeightPlotArea, edge);
+
+        // Assert: Verify the axis state and the result of the conversion.
+        // 1. Confirm that the axis was resized as expected.
+        assertEquals("The upper bound after resizing should match the expected value.",
+                expectedUpperBoundAfterResize, axis.getUpperBound(), 1E-9);
+
+        // 2. Confirm that the conversion correctly results in infinity.
+        assertEquals("A coordinate conversion on a zero-height plot area should result in infinity.",
+                Double.POSITIVE_INFINITY, convertedValue, 0.0);
     }
 }
