@@ -40,11 +40,12 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import org.jfree.chart.TestUtils;
-import org.jfree.chart.internal.CloneUtils;
 import org.jfree.chart.api.PublicCloneable;
-
+import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,93 +55,120 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class IntervalCategoryToolTipGeneratorTest {
 
-    /**
-     * Tests the equals() method.
-     */
+    // Common, self-explanatory constants used across tests
+    private static final String CUSTOM_LABEL = "{3} - {4}";
+    private static final String NUMBER_PATTERN = "0.000";
+    private static final String DATE_PATTERN = "d-MMM";
+
+    private static IntervalCategoryToolTipGenerator newWithNumberFormat() {
+        return new IntervalCategoryToolTipGenerator(CUSTOM_LABEL, new DecimalFormat(NUMBER_PATTERN));
+    }
+
+    private static IntervalCategoryToolTipGenerator newWithDateFormat() {
+        // Locale specified for determinism across environments
+        return new IntervalCategoryToolTipGenerator(CUSTOM_LABEL, new SimpleDateFormat(DATE_PATTERN, Locale.US));
+    }
+
     @Test
-    public void testEquals() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2
-                = new IntervalCategoryToolTipGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g2, g1);
+    @DisplayName("equals: default instances are equal (and symmetric)")
+    public void equals_defaultInstancesAreEqual() {
+        IntervalCategoryToolTipGenerator a = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator b = new IntervalCategoryToolTipGenerator();
 
-        g1 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new DecimalFormat("0.000"));
-        assertNotEquals(g1, g2);
-        g2 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new DecimalFormat("0.000"));
-        assertEquals(g1, g2);
+        assertEquals(a, b);
+        assertEquals(b, a); // symmetry
+    }
 
-        g1 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new SimpleDateFormat("d-MMM"));
-        assertNotEquals(g1, g2);
-        g2 = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                new SimpleDateFormat("d-MMM"));
-        assertEquals(g1, g2);
+    @Test
+    @DisplayName("equals: differently configured instance is not equal; same NumberFormat is equal")
+    public void equals_withNumberFormat() {
+        IntervalCategoryToolTipGenerator defaultGen = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator numberGen1 = newWithNumberFormat();
+
+        // Different configuration -> not equal
+        assertNotEquals(numberGen1, defaultGen);
+
+        // Same configuration -> equal
+        IntervalCategoryToolTipGenerator numberGen2 = newWithNumberFormat();
+        assertEquals(numberGen1, numberGen2);
+    }
+
+    @Test
+    @DisplayName("equals: differently configured instance is not equal; same DateFormat is equal")
+    public void equals_withDateFormat() {
+        IntervalCategoryToolTipGenerator defaultGen = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator dateGen1 = newWithDateFormat();
+
+        // Different configuration -> not equal
+        assertNotEquals(dateGen1, defaultGen);
+
+        // Same configuration -> equal
+        IntervalCategoryToolTipGenerator dateGen2 = newWithDateFormat();
+        assertEquals(dateGen1, dateGen2);
     }
 
     /**
-     * Check that the subclass is not equal to an instance of the superclass.
+     * Check that an instance is not equal to a different (superclass) type.
      */
     @Test
-    public void testEquals2() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        StandardCategoryToolTipGenerator g2
-                = new StandardCategoryToolTipGenerator(
-                IntervalCategoryToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT_STRING,
-                NumberFormat.getInstance());
-        assertNotEquals(g1, g2);
+    @DisplayName("equals: not equal to an instance of the superclass")
+    public void equals_notEqualToSuperclassInstance() {
+        IntervalCategoryToolTipGenerator intervalGen = new IntervalCategoryToolTipGenerator();
+        StandardCategoryToolTipGenerator standardGen =
+                new StandardCategoryToolTipGenerator(
+                        IntervalCategoryToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT_STRING,
+                        NumberFormat.getInstance());
+
+        assertNotEquals(intervalGen, standardGen);
     }
 
     /**
-     * Simple check that hashCode is implemented.
+     * Simple check that equal objects have the same hashCode.
      */
     @Test
-    public void testHashCode() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2
-                = new IntervalCategoryToolTipGenerator();
-        assertEquals(g1, g2);
-        assertEquals(g1.hashCode(), g2.hashCode());
+    @DisplayName("hashCode: equal objects must have equal hash codes")
+    public void hashCode_consistentWithEquals() {
+        IntervalCategoryToolTipGenerator a = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator b = new IntervalCategoryToolTipGenerator();
+
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
     }
 
     /**
-     * Confirm that cloning works.
+     * Confirm that cloning creates a distinct but equal instance.
      */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        IntervalCategoryToolTipGenerator g2 = CloneUtils.clone(g1);
-        assertNotSame(g1, g2);
-        assertSame(g1.getClass(), g2.getClass());
-        assertEquals(g1, g2);
+    @DisplayName("clone: produces a distinct but equal copy")
+    public void clone_producesEqualButDistinctCopy() throws CloneNotSupportedException {
+        IntervalCategoryToolTipGenerator original = new IntervalCategoryToolTipGenerator();
+        IntervalCategoryToolTipGenerator clone = CloneUtils.clone(original);
+
+        assertNotSame(original, clone);
+        assertSame(original.getClass(), clone.getClass());
+        assertEquals(original, clone);
     }
 
     /**
-     * Check to ensure that this class implements PublicCloneable.
+     * Check that this class implements PublicCloneable (contract of the library).
      */
     @Test
-    public void testPublicCloneable() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator();
-        assertTrue(g1 instanceof PublicCloneable);
+    @DisplayName("implements PublicCloneable")
+    public void implementsPublicCloneableInterface() {
+        IntervalCategoryToolTipGenerator gen = new IntervalCategoryToolTipGenerator();
+        assertTrue(gen instanceof PublicCloneable);
     }
 
     /**
      * Serialize an instance, restore it, and check for equality.
      */
     @Test
-    public void testSerialization() {
-        IntervalCategoryToolTipGenerator g1
-                = new IntervalCategoryToolTipGenerator("{3} - {4}",
-                DateFormat.getInstance());
-        IntervalCategoryToolTipGenerator g2 = TestUtils.serialised(g1);
-        assertEquals(g1, g2);
-    }
+    @DisplayName("serialization: round-trip preserves equality")
+    public void serialization_roundTripPreservesEquality() {
+        IntervalCategoryToolTipGenerator original =
+                new IntervalCategoryToolTipGenerator(CUSTOM_LABEL, DateFormat.getInstance());
+        IntervalCategoryToolTipGenerator restored = TestUtils.serialised(original);
 
+        assertEquals(original, restored);
+    }
 }
