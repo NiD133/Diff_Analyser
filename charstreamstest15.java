@@ -1,96 +1,88 @@
 package com.google.common.io;
 
 import static org.junit.Assert.assertThrows;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import java.io.EOFException;
-import java.io.FilterReader;
+import static org.junit.Assert.assertSame;
+
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import java.util.List;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class CharStreamsTestTest15 extends IoTestCase {
-
-    private static final String TEXT = "The quick brown fox jumped over the lazy dog.";
-
-    /**
-     * Returns a reader wrapping the given reader that only reads half of the maximum number of
-     * characters that it could read in read(char[], int, int).
-     */
-    private static Reader newNonBufferFillingReader(Reader reader) {
-        return new FilterReader(reader) {
-
-            @Override
-            public int read(char[] cbuf, int off, int len) throws IOException {
-                // if a buffer isn't being cleared correctly, this method will eventually start being called
-                // with a len of 0 forever
-                if (len <= 0) {
-                    fail("read called with a len of " + len);
-                }
-                // read fewer than the max number of chars to read
-                // shouldn't be a problem unless the buffer is shrinking each call
-                return in.read(cbuf, off, Math.max(len - 1024, 0));
-            }
-        };
-    }
+/**
+ * Tests for {@link CharStreams#nullWriter()}.
+ */
+@RunWith(JUnit4.class)
+public class CharStreamsTest {
 
     /**
-     * Wrap an appendable in an appendable to defeat any type specific optimizations.
+     * The primary contract of nullWriter() is that its write and append operations
+     * should do nothing and not throw exceptions. This test verifies that behavior
+     * for all standard operations.
      */
-    private static Appendable wrapAsGenericAppendable(Appendable a) {
-        return new Appendable() {
-
-            @Override
-            public Appendable append(CharSequence csq) throws IOException {
-                a.append(csq);
-                return this;
-            }
-
-            @Override
-            public Appendable append(CharSequence csq, int start, int end) throws IOException {
-                a.append(csq, start, end);
-                return this;
-            }
-
-            @Override
-            public Appendable append(char c) throws IOException {
-                a.append(c);
-                return this;
-            }
-        };
-    }
-
-    /**
-     * Wrap a readable in a readable to defeat any type specific optimizations.
-     */
-    private static Readable wrapAsGenericReadable(Readable a) {
-        return new Readable() {
-
-            @Override
-            public int read(CharBuffer cb) throws IOException {
-                return a.read(cb);
-            }
-        };
-    }
-
-    public void testNullWriter() throws Exception {
-        // create a null writer
+    @Test
+    public void testNullWriter_writeAndAppendOperations_doNotThrow() throws IOException {
         Writer nullWriter = CharStreams.nullWriter();
-        // write to the writer
-        nullWriter.write('n');
-        String test = "Test string for NullWriter";
-        nullWriter.write(test);
-        nullWriter.write(test, 2, 10);
+        
+        // All of these operations should be successful no-ops.
+        // The test passes if no exceptions are thrown.
+        nullWriter.write('a');
+        nullWriter.write("test");
+        nullWriter.write("test".toCharArray());
+        nullWriter.write("test", 1, 2);
+        nullWriter.write("test".toCharArray(), 1, 2);
+        nullWriter.append('a');
+        nullWriter.append("test");
+        nullWriter.append("test", 1, 3);
+        nullWriter.flush();
+        nullWriter.close();
+    }
+
+    /**
+     * The append methods handle a null CharSequence by treating it as the string "null".
+     * This test verifies that these calls are handled gracefully without throwing a
+     * NullPointerException.
+     */
+    @Test
+    public void testNullWriter_appendNullCharSequence_isHandledGracefully() throws IOException {
+        Writer nullWriter = CharStreams.nullWriter();
+
+        // Appending a null CharSequence should not throw.
         nullWriter.append(null);
-        nullWriter.append(null, 0, 4);
-        assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(null, -1, 4));
+
+        // Appending a subsequence of a null CharSequence is treated as appending a
+        // subsequence of "null". This should succeed as the indices are valid for "null".
+        nullWriter.append(null, 0, 4); // Equivalent to "null".substring(0, 4)
+    }
+
+    /**
+     * While most operations are no-ops, the nullWriter must still adhere to the contract
+     * of its parent classes. This test verifies that calls with invalid arguments, such
+     * as out-of-bounds indices, throw the appropriate exceptions.
+     */
+    @Test
+    public void testNullWriter_append_throwsForInvalidIndices() {
+        Writer nullWriter = CharStreams.nullWriter();
+        String testString = "test"; // length 4
+
+        // Test with a non-null string
+        assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(testString, -1, 2));
+        assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(testString, 0, 5));
+        assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(testString, 2, 1));
+
+        // Test with a null CharSequence, which is treated as "null" (length 4)
+        assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(null, -1, 2));
         assertThrows(IndexOutOfBoundsException.class, () -> nullWriter.append(null, 0, 5));
-        // nothing really to assert?
-        assertSame(CharStreams.nullWriter(), CharStreams.nullWriter());
+    }
+
+    /**
+     * The documentation for nullWriter() implies it returns a singleton instance.
+     * This test verifies that multiple calls return the exact same object.
+     */
+    @Test
+    public void testNullWriter_isSingleton() {
+        Writer writer1 = CharStreams.nullWriter();
+        Writer writer2 = CharStreams.nullWriter();
+        assertSame("CharStreams.nullWriter() should return a singleton instance", writer1, writer2);
     }
 }
