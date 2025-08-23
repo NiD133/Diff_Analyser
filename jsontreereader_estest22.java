@@ -1,34 +1,27 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * This class contains tests for {@link JsonTreeReader}.
+ * The original test class name and inheritance are kept for context.
+ */
 public class JsonTreeReader_ESTestTest22 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test021() throws Throwable {
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader((JsonElement) null);
-        // Undeclared exception!
-        try {
-            jsonTreeReader0.nextLong();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling {@link JsonTreeReader#nextLong()} on a reader initialized
+     * with a null {@link JsonElement} throws a {@link NullPointerException}.
+     *
+     * This is expected because the reader has no underlying element to process.
+     */
+    @Test(expected = NullPointerException.class)
+    public void nextLong_whenInitializedWithNullElement_shouldThrowNullPointerException() {
+        // Arrange: Create a reader with a null JsonElement, which is an invalid starting state.
+        JsonTreeReader reader = new JsonTreeReader(null);
+
+        // Act & Assert: Attempting to read a long value should fail immediately.
+        // The @Test(expected) annotation handles the assertion.
+        reader.nextLong();
     }
 }
