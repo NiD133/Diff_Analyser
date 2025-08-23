@@ -1,25 +1,19 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest46 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for the static helper methods in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        // Undeclared exception!
-        try {
-            QueryParser.or((Evaluator) null, (Evaluator) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.select.CombiningEvaluator", e);
-        }
+    /**
+     * Tests that the {@code QueryParser.or()} method throws a NullPointerException
+     * when its arguments are null. This is because the underlying combining evaluator
+     * requires non-null evaluators.
+     */
+    @Test(expected = NullPointerException.class)
+    public void orThrowsNullPointerExceptionForNullEvaluators() {
+        QueryParser.or(null, null);
     }
 }
