@@ -1,31 +1,45 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TaiInstant_ESTestTest28 extends TaiInstant_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link TaiInstant} class, focusing on comparison logic.
+ */
+public class TaiInstantComparisonTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        Instant instant0 = MockInstant.now();
-        TaiInstant taiInstant0 = TaiInstant.of(instant0);
-        TaiInstant taiInstant1 = taiInstant0.withTaiSeconds((-2L));
-        int int0 = taiInstant1.compareTo(taiInstant0);
-        assertEquals(320000000, taiInstant1.getNano());
-        assertEquals((-1), int0);
-        assertEquals(320000000, taiInstant0.getNano());
-        assertEquals((-2L), taiInstant1.getTaiSeconds());
+    /**
+     * Tests that compareTo() correctly identifies an instant as being before another.
+     * This test also verifies that withTaiSeconds() correctly creates a new instant
+     * while preserving the nano-of-second value.
+     */
+    @Test
+    public void compareTo_returnsNegative_whenInstantIsBeforeAnother() {
+        // Arrange
+        // The value "2014-02-15T10:15:30.320Z" is the fixed instant returned by MockInstant.now().
+        // Using an explicit Instant makes the origin of the nano value (320,000,000) clear.
+        Instant baseJavaInstant = Instant.parse("2014-02-15T10:15:30.320Z");
+        TaiInstant laterInstant = TaiInstant.of(baseJavaInstant);
+
+        // Create an earlier instant by setting the TAI seconds to a smaller value.
+        long earlierSeconds = -2L;
+        TaiInstant earlierInstant = laterInstant.withTaiSeconds(earlierSeconds);
+
+        // Act
+        int comparisonResult = earlierInstant.compareTo(laterInstant);
+
+        // Assert
+        // 1. Verify the result of the comparison.
+        assertTrue(
+            "An earlier instant should compare as less than a later one.",
+            comparisonResult < 0);
+
+        // 2. Verify the state of the newly created 'earlierInstant'.
+        assertEquals("The TAI seconds should be updated to the new value.",
+            earlierSeconds, earlierInstant.getTaiSeconds());
+        assertEquals("The nano-of-second should be preserved from the original instant.",
+            laterInstant.getNano(), earlierInstant.getNano());
     }
 }
