@@ -2,22 +2,40 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JacksonInject_ESTestTest6 extends JacksonInject_ESTest_scaffolding {
+/**
+ * This test class focuses on the behavior of the {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Boolean boolean0 = new Boolean("gJ%*=b`O<@AxM)o");
-        Boolean boolean1 = Boolean.FALSE;
-        JacksonInject.Value jacksonInject_Value0 = new JacksonInject.Value((Object) null, boolean0, boolean1);
-        JacksonInject.Value jacksonInject_Value1 = jacksonInject_Value0.withOptional((Boolean) null);
-        assertFalse(jacksonInject_Value1.equals((Object) jacksonInject_Value0));
-        assertNotSame(jacksonInject_Value1, jacksonInject_Value0);
+    /**
+     * Tests that the `withOptional()` method creates a new, distinct instance of
+     * {@link JacksonInject.Value} when the 'optional' property is changed.
+     * This verifies the immutability of the Value object.
+     */
+    @Test
+    public void withOptional_whenValueIsChanged_shouldCreateNewUnequalInstance() {
+        // Arrange: Create an initial JacksonInject.Value with a defined 'optional' state.
+        final Boolean initialUseInput = false;
+        final Boolean initialOptional = false;
+        JacksonInject.Value initialValue = JacksonInject.Value.construct(null, initialUseInput, initialOptional);
+
+        // Define the new 'optional' value, which is different from the original.
+        final Boolean newOptional = null;
+
+        // Act: Call the "wither" method to create a new instance with the updated 'optional' value.
+        JacksonInject.Value updatedValue = initialValue.withOptional(newOptional);
+
+        // Assert: Verify the outcome.
+        // 1. The method must return a new object instance, confirming immutability.
+        assertNotSame("The withOptional() method should create a new instance.", initialValue, updatedValue);
+
+        // 2. The new instance should not be equal to the original due to the changed 'optional' property.
+        assertNotEquals("Instances with different 'optional' values should not be equal.", initialValue, updatedValue);
+
+        // 3. The new instance should have the correct properties.
+        assertEquals("The 'id' property should remain unchanged.", initialValue.getId(), updatedValue.getId());
+        assertEquals("The 'useInput' property should remain unchanged.", initialUseInput, updatedValue.getUseInput());
+        assertEquals("The 'optional' property should be updated to the new value.", newOptional, updatedValue.getOptional());
     }
 }
