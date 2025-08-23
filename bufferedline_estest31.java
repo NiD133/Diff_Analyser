@@ -1,28 +1,34 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest31 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(4190.070059671743, Double.NaN, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 4190.070059671743, spatialContext0);
-        bufferedLine0.hashCode();
-        assertTrue(bufferedLine0.hasArea());
+/**
+ * Test suite for {@link BufferedLine}.
+ */
+public class BufferedLineTest {
+
+    private final SpatialContext context = SpatialContext.GEO;
+
+    /**
+     * Tests that a BufferedLine with a positive buffer correctly reports that it has an area.
+     * This holds true even for a degenerate line where the start and end points are identical.
+     */
+    @Test
+    public void lineWithPositiveBufferShouldHaveArea() {
+        // Arrange
+        // A degenerate line (start and end points are the same) is effectively a buffered point.
+        Point point = context.makePoint(0, 0);
+        double buffer = 10.0;
+        BufferedLine bufferedLine = new BufferedLine(point, point, buffer, context);
+
+        // Act
+        boolean hasArea = bufferedLine.hasArea();
+
+        // Assert
+        assertTrue("A buffered line with a positive buffer should have an area.", hasArea);
     }
 }
