@@ -1,39 +1,34 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class SerializationUtils_ESTestTest15 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.SerializationUtils}.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Integer integer0 = new Integer((-106));
-        // Undeclared exception!
-        try {
-            SerializationUtils.serialize((Serializable) integer0, (OutputStream) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // outputStream
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that calling serialize() with a null OutputStream throws a NullPointerException,
+     * as per the method's contract.
+     */
+    @Test
+    public void serializeToNullOutputStreamThrowsNullPointerException() {
+        // Arrange: Create a sample serializable object. The specific object doesn't matter.
+        final Integer objectToSerialize = 1;
+
+        // Act & Assert: Call the method with a null output stream and verify that
+        // a NullPointerException is thrown.
+        final NullPointerException exception = assertThrows(
+            NullPointerException.class,
+            () -> SerializationUtils.serialize(objectToSerialize, (OutputStream) null)
+        );
+
+        // Further Assert: Check the exception message for more precise validation.
+        // The method is expected to use Objects.requireNonNull, which uses the
+        // parameter name as the message.
+        assertEquals("outputStream", exception.getMessage());
     }
 }
