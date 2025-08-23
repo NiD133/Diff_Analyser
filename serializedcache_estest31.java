@@ -1,34 +1,27 @@
 package org.apache.ibatis.cache.decorators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SerializedCache_ESTestTest31 extends SerializedCache_ESTest_scaffolding {
+/**
+ * Test suite for the SerializedCache decorator.
+ */
+public class SerializedCacheTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        SerializedCache serializedCache0 = new SerializedCache((Cache) null);
-        // Undeclared exception!
-        try {
-            serializedCache0.getId();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.ibatis.cache.decorators.SerializedCache", e);
-        }
+    /**
+     * Verifies that method calls on a SerializedCache instance will throw a
+     * NullPointerException if the underlying delegate cache has not been provided (is null).
+     * The SerializedCache is a decorator and requires a concrete Cache instance to function.
+     */
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerExceptionWhenDelegateCacheIsNull() {
+        // Arrange: Create a SerializedCache with a null delegate.
+        // The constructor allows a null delegate, but subsequent method calls should fail.
+        Cache serializedCache = new SerializedCache(null);
+
+        // Act & Assert: Calling getId() on the decorator should attempt to access the
+        // null delegate, resulting in a NullPointerException. The @Test annotation
+        // handles the assertion.
+        serializedCache.getId();
     }
 }
