@@ -1,43 +1,33 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class DeviationRenderer_ESTestTest16 extends DeviationRenderer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DeviationRenderer} class, focusing on input validation.
+ */
+public class DeviationRendererTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DeviationStepRenderer deviationStepRenderer0 = new DeviationStepRenderer(false, true);
-        // Undeclared exception!
+    /**
+     * Verifies that the setAlpha() method throws an IllegalArgumentException when provided
+     * with an alpha value greater than 1.0. The valid range for alpha is [0.0, 1.0].
+     */
+    @Test
+    public void setAlpha_shouldThrowIllegalArgumentException_whenAlphaIsGreaterThanOne() {
+        // Arrange
+        // DeviationStepRenderer is a concrete subclass of DeviationRenderer, suitable for testing.
+        DeviationRenderer renderer = new DeviationStepRenderer(false, true);
+        float invalidAlpha = 1.1f; // A value clearly outside the valid range.
+        String expectedErrorMessage = "Requires 'alpha' in the range 0.0 to 1.0.";
+
+        // Act & Assert
         try {
-            deviationStepRenderer0.setAlpha(2255.623F);
-            fail("Expecting exception: IllegalArgumentException");
+            renderer.setAlpha(invalidAlpha);
+            fail("Expected an IllegalArgumentException because the alpha value is out of range.");
         } catch (IllegalArgumentException e) {
-            //
-            // Requires 'alpha' in the range 0.0 to 1.0.
-            //
-            verifyException("org.jfree.chart.renderer.xy.DeviationRenderer", e);
+            // Verify that the correct exception with the expected message was thrown.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
