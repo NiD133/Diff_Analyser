@@ -1,174 +1,149 @@
+/*
+ *    Copyright 2009-2024 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.apache.ibatis.builder;
 
 import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ParameterExpressionTest {
 
-  /**
-   * Tests parsing of a simple property without any additional attributes or types.
-   */
   @Test
-  void testSimplePropertyParsing() {
+  void simpleProperty() {
     Map<String, String> result = new ParameterExpression("id");
-    Assertions.assertEquals(1, result.size(), "Expected one entry for a simple property");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
+    Assertions.assertEquals(1, result.size());
+    Assertions.assertEquals("id", result.get("property"));
   }
 
-  /**
-   * Tests parsing of a property with spaces around it.
-   */
   @Test
-  void testPropertyWithSpaces() {
+  void propertyWithSpacesInside() {
     Map<String, String> result = new ParameterExpression(" with spaces ");
-    Assertions.assertEquals(1, result.size(), "Expected one entry for a property with spaces");
-    Assertions.assertEquals("with spaces", result.get("property"), "Property should be 'with spaces'");
+    Assertions.assertEquals(1, result.size());
+    Assertions.assertEquals("with spaces", result.get("property"));
   }
 
-  /**
-   * Tests parsing of a property with an old-style JDBC type.
-   */
   @Test
-  void testPropertyWithOldStyleJdbcType() {
+  void simplePropertyWithOldStyleJdbcType() {
     Map<String, String> result = new ParameterExpression("id:VARCHAR");
-    Assertions.assertEquals(2, result.size(), "Expected two entries for property with JDBC type");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "JDBC type should be 'VARCHAR'");
+    Assertions.assertEquals(2, result.size());
+    Assertions.assertEquals("id", result.get("property"));
+    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
   }
 
-  /**
-   * Tests parsing of a property with extra whitespaces and an old-style JDBC type.
-   */
   @Test
-  void testOldStyleJdbcTypeWithExtraWhitespaces() {
+  void oldStyleJdbcTypeWithExtraWhitespaces() {
     Map<String, String> result = new ParameterExpression(" id :  VARCHAR ");
-    Assertions.assertEquals(2, result.size(), "Expected two entries for property with extra whitespaces and JDBC type");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "JDBC type should be 'VARCHAR'");
+    Assertions.assertEquals(2, result.size());
+    Assertions.assertEquals("id", result.get("property"));
+    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
   }
 
-  /**
-   * Tests parsing of an expression with an old-style JDBC type.
-   */
   @Test
-  void testExpressionWithOldStyleJdbcType() {
+  void expressionWithOldStyleJdbcType() {
     Map<String, String> result = new ParameterExpression("(id.toString()):VARCHAR");
-    Assertions.assertEquals(2, result.size(), "Expected two entries for expression with JDBC type");
-    Assertions.assertEquals("id.toString()", result.get("expression"), "Expression should be 'id.toString()'");
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "JDBC type should be 'VARCHAR'");
+    Assertions.assertEquals(2, result.size());
+    Assertions.assertEquals("id.toString()", result.get("expression"));
+    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
   }
 
-  /**
-   * Tests parsing of a simple property with one attribute.
-   */
   @Test
-  void testSimplePropertyWithOneAttribute() {
+  void simplePropertyWithOneAttribute() {
     Map<String, String> result = new ParameterExpression("id,name=value");
-    Assertions.assertEquals(2, result.size(), "Expected two entries for property with one attribute");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
-    Assertions.assertEquals("value", result.get("name"), "Attribute 'name' should be 'value'");
+    Assertions.assertEquals(2, result.size());
+    Assertions.assertEquals("id", result.get("property"));
+    Assertions.assertEquals("value", result.get("name"));
   }
 
-  /**
-   * Tests parsing of an expression with one attribute.
-   */
   @Test
-  void testExpressionWithOneAttribute() {
+  void expressionWithOneAttribute() {
     Map<String, String> result = new ParameterExpression("(id.toString()),name=value");
-    Assertions.assertEquals(2, result.size(), "Expected two entries for expression with one attribute");
-    Assertions.assertEquals("id.toString()", result.get("expression"), "Expression should be 'id.toString()'");
-    Assertions.assertEquals("value", result.get("name"), "Attribute 'name' should be 'value'");
+    Assertions.assertEquals(2, result.size());
+    Assertions.assertEquals("id.toString()", result.get("expression"));
+    Assertions.assertEquals("value", result.get("name"));
   }
 
-  /**
-   * Tests parsing of a simple property with multiple attributes.
-   */
   @Test
-  void testSimplePropertyWithManyAttributes() {
+  void simplePropertyWithManyAttributes() {
     Map<String, String> result = new ParameterExpression("id, attr1=val1, attr2=val2, attr3=val3");
-    Assertions.assertEquals(4, result.size(), "Expected four entries for property with multiple attributes");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
-    Assertions.assertEquals("val1", result.get("attr1"), "Attribute 'attr1' should be 'val1'");
-    Assertions.assertEquals("val2", result.get("attr2"), "Attribute 'attr2' should be 'val2'");
-    Assertions.assertEquals("val3", result.get("attr3"), "Attribute 'attr3' should be 'val3'");
+    Assertions.assertEquals(4, result.size());
+    Assertions.assertEquals("id", result.get("property"));
+    Assertions.assertEquals("val1", result.get("attr1"));
+    Assertions.assertEquals("val2", result.get("attr2"));
+    Assertions.assertEquals("val3", result.get("attr3"));
   }
 
-  /**
-   * Tests parsing of an expression with multiple attributes.
-   */
   @Test
-  void testExpressionWithManyAttributes() {
+  void expressionWithManyAttributes() {
     Map<String, String> result = new ParameterExpression("(id.toString()), attr1=val1, attr2=val2, attr3=val3");
-    Assertions.assertEquals(4, result.size(), "Expected four entries for expression with multiple attributes");
-    Assertions.assertEquals("id.toString()", result.get("expression"), "Expression should be 'id.toString()'");
-    Assertions.assertEquals("val1", result.get("attr1"), "Attribute 'attr1' should be 'val1'");
-    Assertions.assertEquals("val2", result.get("attr2"), "Attribute 'attr2' should be 'val2'");
-    Assertions.assertEquals("val3", result.get("attr3"), "Attribute 'attr3' should be 'val3'");
+    Assertions.assertEquals(4, result.size());
+    Assertions.assertEquals("id.toString()", result.get("expression"));
+    Assertions.assertEquals("val1", result.get("attr1"));
+    Assertions.assertEquals("val2", result.get("attr2"));
+    Assertions.assertEquals("val3", result.get("attr3"));
   }
 
-  /**
-   * Tests parsing of a simple property with an old-style JDBC type and multiple attributes.
-   */
   @Test
-  void testSimplePropertyWithOldStyleJdbcTypeAndAttributes() {
+  void simplePropertyWithOldStyleJdbcTypeAndAttributes() {
     Map<String, String> result = new ParameterExpression("id:VARCHAR, attr1=val1, attr2=val2");
-    Assertions.assertEquals(4, result.size(), "Expected four entries for property with JDBC type and attributes");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "JDBC type should be 'VARCHAR'");
-    Assertions.assertEquals("val1", result.get("attr1"), "Attribute 'attr1' should be 'val1'");
-    Assertions.assertEquals("val2", result.get("attr2"), "Attribute 'attr2' should be 'val2'");
+    Assertions.assertEquals(4, result.size());
+    Assertions.assertEquals("id", result.get("property"));
+    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
+    Assertions.assertEquals("val1", result.get("attr1"));
+    Assertions.assertEquals("val2", result.get("attr2"));
   }
 
-  /**
-   * Tests parsing of a simple property with spaces and multiple attributes.
-   */
   @Test
-  void testSimplePropertyWithSpaceAndManyAttributes() {
+  void simplePropertyWithSpaceAndManyAttributes() {
     Map<String, String> result = new ParameterExpression("user name, attr1=val1, attr2=val2, attr3=val3");
-    Assertions.assertEquals(4, result.size(), "Expected four entries for property with spaces and attributes");
-    Assertions.assertEquals("user name", result.get("property"), "Property should be 'user name'");
-    Assertions.assertEquals("val1", result.get("attr1"), "Attribute 'attr1' should be 'val1'");
-    Assertions.assertEquals("val2", result.get("attr2"), "Attribute 'attr2' should be 'val2'");
-    Assertions.assertEquals("val3", result.get("attr3"), "Attribute 'attr3' should be 'val3'");
+    Assertions.assertEquals(4, result.size());
+    Assertions.assertEquals("user name", result.get("property"));
+    Assertions.assertEquals("val1", result.get("attr1"));
+    Assertions.assertEquals("val2", result.get("attr2"));
+    Assertions.assertEquals("val3", result.get("attr3"));
   }
 
-  /**
-   * Tests that leading and trailing spaces are ignored in parsing.
-   */
   @Test
-  void testIgnoreLeadingAndTrailingSpaces() {
+  void shouldIgnoreLeadingAndTrailingSpaces() {
     Map<String, String> result = new ParameterExpression(" id , jdbcType =  VARCHAR,  attr1 = val1 ,  attr2 = val2 ");
-    Assertions.assertEquals(4, result.size(), "Expected four entries ignoring leading and trailing spaces");
-    Assertions.assertEquals("id", result.get("property"), "Property should be 'id'");
-    Assertions.assertEquals("VARCHAR", result.get("jdbcType"), "JDBC type should be 'VARCHAR'");
-    Assertions.assertEquals("val1", result.get("attr1"), "Attribute 'attr1' should be 'val1'");
-    Assertions.assertEquals("val2", result.get("attr2"), "Attribute 'attr2' should be 'val2'");
+    Assertions.assertEquals(4, result.size());
+    Assertions.assertEquals("id", result.get("property"));
+    Assertions.assertEquals("VARCHAR", result.get("jdbcType"));
+    Assertions.assertEquals("val1", result.get("attr1"));
+    Assertions.assertEquals("val2", result.get("attr2"));
   }
 
-  /**
-   * Tests handling of invalid old JDBC type format.
-   */
   @Test
-  void testInvalidOldJdbcTypeFormat() {
+  void invalidOldJdbcTypeFormat() {
     try {
       new ParameterExpression("id:");
-      Assertions.fail("Expected BuilderException due to invalid JDBC type format");
+      Assertions.fail();
     } catch (BuilderException e) {
-      Assertions.assertTrue(e.getMessage().contains("Parsing error in {id:} in position 3"), "Exception message should indicate parsing error");
+      Assertions.assertTrue(e.getMessage().contains("Parsing error in {id:} in position 3"));
     }
   }
 
-  /**
-   * Tests handling of invalid JDBC type option using an expression.
-   */
   @Test
-  void testInvalidJdbcTypeOptUsingExpression() {
+  void invalidJdbcTypeOptUsingExpression() {
     try {
       new ParameterExpression("(expression)+");
-      Assertions.fail("Expected BuilderException due to invalid JDBC type option");
+      Assertions.fail();
     } catch (BuilderException e) {
-      Assertions.assertTrue(e.getMessage().contains("Parsing error in {(expression)+} in position 12"), "Exception message should indicate parsing error");
+      Assertions.assertTrue(e.getMessage().contains("Parsing error in {(expression)+} in position 12"));
     }
   }
+
 }
