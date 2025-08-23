@@ -2,67 +2,107 @@ package org.apache.commons.cli.help;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+
 import java.util.stream.Stream;
 import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.Option;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class OptionFormatterTestTest3 {
+/**
+ * Tests for formatting deprecated {@link Option} instances, primarily focusing on
+ * {@link OptionFormatter#COMPLEX_DEPRECATED_FORMAT}.
+ */
+@DisplayName("OptionFormatter Deprecation Formatting")
+public class OptionFormatterTest {
 
-    public static Stream<Arguments> deprecatedAttributesData() {
-        final List<Arguments> lst = new ArrayList<>();
-        final DeprecatedAttributes.Builder daBuilder = DeprecatedAttributes.builder();
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated]"));
-        daBuilder.setSince("now");
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated since now]"));
-        daBuilder.setForRemoval(true);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal since now]"));
-        daBuilder.setSince(null);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal]"));
-        daBuilder.setForRemoval(false);
-        daBuilder.setDescription("Use something else");
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated. Use something else]"));
-        daBuilder.setForRemoval(true);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal. Use something else]"));
-        daBuilder.setForRemoval(false);
-        daBuilder.setSince("then");
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated since then. Use something else]"));
-        daBuilder.setForRemoval(true);
-        lst.add(Arguments.of(daBuilder.get(), "[Deprecated for removal since then. Use something else]"));
-        return lst.stream();
+    /**
+     * Provides different deprecation scenarios and their expected formatted string output.
+     * Each argument set is self-contained and describes a specific case.
+     *
+     * @return A stream of arguments, each containing DeprecatedAttributes, the expected
+     *         formatted string, and a description of the test case.
+     */
+    static Stream<Arguments> provideDeprecatedAttributesAndExpectedFormat() {
+        return Stream.of(
+            Arguments.of(
+                "Basic deprecation",
+                DeprecatedAttributes.builder().get(),
+                "[Deprecated]"
+            ),
+            Arguments.of(
+                "Deprecation with 'since'",
+                DeprecatedAttributes.builder().setSince("1.5").get(),
+                "[Deprecated since 1.5]"
+            ),
+            Arguments.of(
+                "Deprecation with 'forRemoval'",
+                DeprecatedAttributes.builder().setForRemoval(true).get(),
+                "[Deprecated for removal]"
+            ),
+            Arguments.of(
+                "Deprecation with 'forRemoval' and 'since'",
+                DeprecatedAttributes.builder().setForRemoval(true).setSince("1.5").get(),
+                "[Deprecated for removal since 1.5]"
+            ),
+            Arguments.of(
+                "Deprecation with description",
+                DeprecatedAttributes.builder().setDescription("Use --new-option instead").get(),
+                "[Deprecated. Use --new-option instead]"
+            ),
+            Arguments.of(
+                "Deprecation with 'forRemoval' and description",
+                DeprecatedAttributes.builder().setForRemoval(true).setDescription("Use --new-option instead").get(),
+                "[Deprecated for removal. Use --new-option instead]"
+            ),
+            Arguments.of(
+                "Deprecation with 'since' and description",
+                DeprecatedAttributes.builder().setSince("1.5").setDescription("Use --new-option instead").get(),
+                "[Deprecated since 1.5. Use --new-option instead]"
+            ),
+            Arguments.of(
+                "Full deprecation details",
+                DeprecatedAttributes.builder().setForRemoval(true).setSince("1.5").setDescription("Use --new-option instead").get(),
+                "[Deprecated for removal since 1.5. Use --new-option instead]"
+            )
+        );
     }
 
-    private void assertEquivalent(final OptionFormatter formatter, final OptionFormatter formatter2) {
-        assertEquals(formatter.toSyntaxOption(), formatter2.toSyntaxOption());
-        assertEquals(formatter.toSyntaxOption(true), formatter2.toSyntaxOption(true));
-        assertEquals(formatter.toSyntaxOption(false), formatter2.toSyntaxOption(false));
-        assertEquals(formatter.getOpt(), formatter2.getOpt());
-        assertEquals(formatter.getLongOpt(), formatter2.getLongOpt());
-        assertEquals(formatter.getBothOpt(), formatter2.getBothOpt());
-        assertEquals(formatter.getDescription(), formatter2.getDescription());
-        assertEquals(formatter.getArgName(), formatter2.getArgName());
-        assertEquals(formatter.toOptional("foo"), formatter2.toOptional("foo"));
-    }
+    @DisplayName("COMPLEX_DEPRECATED_FORMAT should correctly combine all attributes")
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("provideDeprecatedAttributesAndExpectedFormat")
+    void testComplexDeprecationFormat(final String testCase, final DeprecatedAttributes deprecatedAttributes, final String expectedFormat) {
+        // Arrange
+        final Option optionWithoutDesc = Option.builder("o").deprecated(deprecatedAttributes).get();
+        final Option optionWithDesc = Option.builder("o").desc("The description").deprecated(deprecatedAttributes).get();
+        final String expectedFormatWithOptionDesc = expectedFormat + " The description";
 
-    @ParameterizedTest(name = "{index} {0}")
-    @MethodSource("deprecatedAttributesData")
-    void testComplexDeprecationFormat(final DeprecatedAttributes da, final String expected) {
-        final Option.Builder builder = Option.builder("o").deprecated(da);
-        final Option.Builder builderWithDesc = Option.builder("o").desc("The description").deprecated(da);
-        assertEquals(expected, OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(builder.get()));
-        assertEquals(expected + " The description", OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(builderWithDesc.get()));
+        // Act & Assert: Test formatting on an option without its own description.
+        // The output should only contain the deprecation message.
+        assertEquals(expectedFormat, OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(optionWithoutDesc));
+
+        // Act & Assert: Test formatting on an option that also has its own description.
+        // The output should append the option's description after the deprecation message.
+        assertEquals(expectedFormatWithOptionDesc, OptionFormatter.COMPLEX_DEPRECATED_FORMAT.apply(optionWithDesc));
     }
 
     @Test
-    void testCli343Part1() {
-        assertThrows(IllegalStateException.class, () -> Option.builder().required(false).build());
-        assertThrows(IllegalStateException.class, () -> Option.builder().required(false).get());
+    @DisplayName("Option.Builder should throw IllegalStateException if no name is provided")
+    void buildingOptionWithoutNameShouldThrowException() {
+        // Note: This test validates Option.Builder behavior (related to JIRA issue CLI-343)
+        // rather than OptionFormatter. An Option must have at least a short or long name
+        // to be valid.
+        
+        // Arrange
+        final Option.Builder builder = Option.builder().required(false);
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, builder::build,
+            "build() should throw when no option name is set.");
+        assertThrows(IllegalStateException.class, builder::get,
+            "get() should throw (alias for build()) when no option name is set.");
     }
 }
