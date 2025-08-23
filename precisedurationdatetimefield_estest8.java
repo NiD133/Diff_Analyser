@@ -1,41 +1,65 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Weeks;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.LenientChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeField_ESTestTest8 extends PreciseDurationDateTimeField_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.yearOfCentury();
-        MillisDurationField millisDurationField0 = (MillisDurationField) MillisDurationField.INSTANCE;
-        JulianChronology julianChronology0 = JulianChronology.getInstance();
-        DateTimeZone dateTimeZone0 = DateTimeZone.UTC;
-        ZonedChronology zonedChronology0 = ZonedChronology.getInstance(julianChronology0, dateTimeZone0);
-        DurationField durationField0 = zonedChronology0.days();
-        PreciseDateTimeField preciseDateTimeField0 = new PreciseDateTimeField(dateTimeFieldType0, millisDurationField0, durationField0);
-        long long0 = preciseDateTimeField0.set((-3012L), 82);
-        assertEquals((-86399918L), long0);
+/**
+ * Unit tests for {@link PreciseDurationDateTimeField}.
+ * This test focuses on the behavior of the set() method.
+ */
+public class PreciseDurationDateTimeFieldTest {
+
+    @Test
+    public void set_withNegativeInstant_returnsCorrectlyCalculatedInstant() {
+        // ARRANGE
+        // The test uses a concrete PreciseDateTimeField to test the set() logic,
+        // which is inherited from BaseDateTimeField. This logic depends on the get()
+        // implementation in PreciseDateTimeField, especially for negative instants.
+
+        // 1. Define the field's unit and range.
+        // The unit duration is 1 millisecond.
+        DurationField unitField = MillisDurationField.INSTANCE;
+        // The range duration is 1 day (86,400,000 milliseconds).
+        // Using a standard day field from a UTC chronology is a simple way to get this.
+        DurationField rangeField = GregorianChronology.getInstanceUTC().days();
+
+        // 2. Create the field under test.
+        // The DateTimeFieldType is metadata and not used in this calculation.
+        PreciseDateTimeField field = new PreciseDateTimeField(
+                DateTimeFieldType.millisOfDay(), unitField, rangeField);
+
+        // 3. Define test inputs.
+        long initialInstant = -3012L;
+        int valueToSet = 82;
+
+        // ACT
+        long resultInstant = field.set(initialInstant, valueToSet);
+
+        // ASSERT
+        // The expected value is calculated based on the formula in BaseDateTimeField.set():
+        //   result = instant - (get(instant) - value) * unitMillis
+        //
+        // For a negative instant, PreciseDateTimeField.get(instant) is calculated as:
+        //   get(instant) = range - 1 + (((instant + 1) / unitMillis) % range)
+        //
+        // Calculation steps:
+        //   unitMillis = 1
+        //   range = 86,400,000 / 1 = 86,400,000
+        //
+        //   currentValue = get(-3012L)
+        //                = 86,400,000 - 1 + (((-3012 + 1) / 1) % 86,400,000)
+        //                = 86,399,999 + (-3011 % 86,400,000)
+        //                = 86,399,999 - 3011
+        //                = 86,396,988
+        //
+        //   resultInstant = -3012L - (86,396,988 - 82) * 1L
+        //                 = -3012L - 86,396,906L
+        //                 = -86,399,918L
+        long expectedInstant = -86399918L;
+        assertEquals(expectedInstant, resultInstant);
     }
 }
