@@ -1,54 +1,42 @@
 package com.itextpdf.text.xml.xmp;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class XmpWriter_ESTestTest29 extends XmpWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        Map<String, String> map0 = ZoneId.SHORT_IDS;
-        XmpWriter xmpWriter0 = new XmpWriter((OutputStream) null, map0);
+/**
+ * Test suite for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
+
+    /**
+     * Verifies that calling the deprecated method {@code addRdfDescription} with content
+     * that is not valid XML throws an {@code IOException}.
+     */
+    @Test
+    public void addRdfDescription_withInvalidXmlContent_shouldThrowIOException() throws IOException {
+        // Arrange: Set up the test objects and inputs.
+        // Use a ByteArrayOutputStream as a valid, non-null stream. While the method under test
+        // doesn't use the stream, this is safer than passing null and prevents potential NPEs.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XmpWriter xmpWriter = new XmpWriter(outputStream, Collections.emptyMap());
+
+        String namespace = "UTF-16BE"; // Value from the original generated test.
+        String invalidXmlContent = "com.itextpdf.text.io.FileChannelRandomAccessSource";
+
+        // Act & Assert: Execute the method and verify the outcome.
         try {
-            xmpWriter0.addRdfDescription("UTF-16BE", "com.itextpdf.text.io.FileChannelRandomAccessSource");
-            fail("Expecting exception: IOException");
+            xmpWriter.addRdfDescription(namespace, invalidXmlContent);
+            fail("Expected an IOException to be thrown for invalid XML content.");
         } catch (IOException e) {
-            //
-            // XML parsing failure
-            //
-            verifyException("com.itextpdf.text.xml.xmp.XmpWriter", e);
+            // The method is expected to fail while attempting to parse the invalid XML string.
+            // The original test indicated an "XML parsing failure" message.
+            assertEquals("XML parsing failure", e.getMessage());
         }
     }
 }
