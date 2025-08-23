@@ -1,230 +1,55 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class DateTimeComparatorTestTest16 extends TestCase {
+/**
+ * Tests for {@link DateTimeComparator} specifically for millisecond-only comparisons.
+ */
+public class DateTimeComparatorMillisTest {
 
-    private static final Chronology ISO = ISOChronology.getInstance();
-
-    /**
-     * A reference to a DateTime object.
-     */
-    DateTime aDateTime = null;
+    private static final DateTimeZone UTC = DateTimeZone.UTC;
 
     /**
-     * A reference to a DateTime object.
+     * Tests a comparator that only considers the millisecond-of-second field.
+     * This is achieved by creating a comparator with an upper limit of {@link DateTimeFieldType#secondOfMinute()}.
      */
-    DateTime bDateTime = null;
+    @Test
+    public void testCompare_withMillisecondOnlyComparator() {
+        // Arrange
+        // This comparator only considers fields smaller than a second (i.e., milliseconds)
+        // because the upper limit (secondOfMinute) is exclusive.
+        Comparator<Object> millisOnlyComparator = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for millis of seconds.
-     */
-    Comparator cMillis = null;
+        // Test data with varying milliseconds but identical higher-order fields.
+        DateTime baseTime = new DateTime(2023, 1, 1, 12, 0, 0, 500, UTC);
+        DateTime laterTime = new DateTime(2023, 1, 1, 12, 0, 0, 501, UTC);
+        DateTime sameTime = new DateTime(2023, 1, 1, 12, 0, 0, 500, UTC);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for seconds.
-     */
-    Comparator cSecond = null;
+        // Test data with same milliseconds but different higher-order fields.
+        DateTime differentSecond = new DateTime(2023, 1, 1, 12, 0, 1, 500, UTC);
+        DateTime differentDay = new DateTime(2024, 5, 5, 10, 10, 10, 500, UTC);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for minutes.
-     */
-    Comparator cMinute = null;
+        // Act & Assert
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for hours.
-     */
-    Comparator cHour = null;
+        // Test standard comparison logic: less than, greater than, and equals.
+        assertTrue("Comparator should return negative when first instant is earlier in milliseconds",
+                millisOnlyComparator.compare(baseTime, laterTime) < 0);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the week.
-     */
-    Comparator cDayOfWeek = null;
+        assertTrue("Comparator should return positive when first instant is later in milliseconds",
+                millisOnlyComparator.compare(laterTime, baseTime) > 0);
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the month.
-     */
-    Comparator cDayOfMonth = null;
+        assertEquals("Comparator should return zero for instants with the same milliseconds",
+                0, millisOnlyComparator.compare(baseTime, sameTime));
 
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for day of the year.
-     */
-    Comparator cDayOfYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for week of the weekyear.
-     */
-    Comparator cWeekOfWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year given a week of the year.
-     */
-    Comparator cWeekyear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for months.
-     */
-    Comparator cMonth = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for year.
-     */
-    Comparator cYear = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the date portion of an
-     * object.
-     */
-    Comparator cDate = null;
-
-    /**
-     * A reference to a DateTimeComparator object
-     * (a Comparator) for the time portion of an
-     * object.
-     */
-    Comparator cTime = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestDateTimeComparator.class);
-    }
-
-    /**
-     * Junit <code>setUp()</code> method.
-     */
-    @Override
-    public void setUp() /* throws Exception */
-    {
-        Chronology chrono = ISOChronology.getInstanceUTC();
-        // super.setUp();
-        // Obtain comparator's
-        cMillis = DateTimeComparator.getInstance(null, DateTimeFieldType.secondOfMinute());
-        cSecond = DateTimeComparator.getInstance(DateTimeFieldType.secondOfMinute(), DateTimeFieldType.minuteOfHour());
-        cMinute = DateTimeComparator.getInstance(DateTimeFieldType.minuteOfHour(), DateTimeFieldType.hourOfDay());
-        cHour = DateTimeComparator.getInstance(DateTimeFieldType.hourOfDay(), DateTimeFieldType.dayOfYear());
-        cDayOfWeek = DateTimeComparator.getInstance(DateTimeFieldType.dayOfWeek(), DateTimeFieldType.weekOfWeekyear());
-        cDayOfMonth = DateTimeComparator.getInstance(DateTimeFieldType.dayOfMonth(), DateTimeFieldType.monthOfYear());
-        cDayOfYear = DateTimeComparator.getInstance(DateTimeFieldType.dayOfYear(), DateTimeFieldType.year());
-        cWeekOfWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekOfWeekyear(), DateTimeFieldType.weekyear());
-        cWeekyear = DateTimeComparator.getInstance(DateTimeFieldType.weekyear());
-        cMonth = DateTimeComparator.getInstance(DateTimeFieldType.monthOfYear(), DateTimeFieldType.year());
-        cYear = DateTimeComparator.getInstance(DateTimeFieldType.year());
-        cDate = DateTimeComparator.getDateOnlyInstance();
-        cTime = DateTimeComparator.getTimeOnlyInstance();
-    }
-
-    /**
-     * Junit <code>tearDown()</code> method.
-     */
-    @Override
-    protected void tearDown() /* throws Exception */
-    {
-        // super.tearDown();
-        aDateTime = null;
-        bDateTime = null;
-        //
-        cMillis = null;
-        cSecond = null;
-        cMinute = null;
-        cHour = null;
-        cDayOfWeek = null;
-        cDayOfMonth = null;
-        cDayOfYear = null;
-        cWeekOfWeekyear = null;
-        cWeekyear = null;
-        cMonth = null;
-        cYear = null;
-        cDate = null;
-        cTime = null;
-    }
-
-    /**
-     * Creates a date to test with.
-     */
-    private DateTime getADate(String s) {
-        DateTime retDT = null;
-        try {
-            retDT = new DateTime(s, DateTimeZone.UTC);
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return retDT;
-    }
-
-    /**
-     * Load a string array.
-     */
-    private List loadAList(String[] someStrs) {
-        List newList = new ArrayList();
-        try {
-            for (int i = 0; i < someStrs.length; ++i) {
-                newList.add(new DateTime(someStrs[i], DateTimeZone.UTC));
-            }
-            // end of the for
-        } catch (IllegalArgumentException pe) {
-            pe.printStackTrace();
-        }
-        return newList;
-    }
-
-    /**
-     * Check if the list is sorted.
-     */
-    private boolean isListSorted(List tl) {
-        // tl must be populated with DateTime objects.
-        DateTime lhDT = (DateTime) tl.get(0);
-        DateTime rhDT = null;
-        Long lhVal = new Long(lhDT.getMillis());
-        Long rhVal = null;
-        for (int i = 1; i < tl.size(); ++i) {
-            rhDT = (DateTime) tl.get(i);
-            rhVal = new Long(rhDT.getMillis());
-            if (lhVal.compareTo(rhVal) > 0)
-                return false;
-            //
-            // swap for next iteration
-            lhVal = rhVal;
-            // swap for next iteration
-            lhDT = rhDT;
-        }
-        return true;
-    }
-
-    /**
-     * Test unequal comparisons with millis of second comparators.
-     */
-    public void testMillis() {
-        aDateTime = new DateTime(System.currentTimeMillis(), DateTimeZone.UTC);
-        bDateTime = new DateTime(aDateTime.getMillis() + 1, DateTimeZone.UTC);
-        assertEquals("MillisM1", -1, cMillis.compare(aDateTime, bDateTime));
-        assertEquals("MillisP1", 1, cMillis.compare(bDateTime, aDateTime));
+        // Test that higher-order fields are ignored, as this is a millisecond-only comparison.
+        assertEquals("Comparator should ignore the second field, returning zero for same milliseconds",
+                0, millisOnlyComparator.compare(baseTime, differentSecond));
+                
+        assertEquals("Comparator should ignore all date and time fields, returning zero for same milliseconds",
+                0, millisOnlyComparator.compare(baseTime, differentDay));
     }
 }
