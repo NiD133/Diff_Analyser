@@ -1,19 +1,29 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertArrayEquals;
 
-public class PercentCodec_ESTestTest5 extends PercentCodec_ESTest_scaffolding {
+/**
+ * Test cases for the {@link PercentCodec} class.
+ */
+public class PercentCodecTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        PercentCodec percentCodec0 = new PercentCodec();
-        byte[] byteArray0 = new byte[0];
-        byte[] byteArray1 = percentCodec0.decode(byteArray0);
-        assertEquals(0, byteArray1.length);
+    /**
+     * Verifies that decoding an empty byte array results in an empty byte array.
+     * This test covers the edge case of handling empty input.
+     */
+    @Test
+    public void decodeEmptyByteArrayShouldReturnEmptyByteArray() throws DecoderException {
+        // Arrange: Set up the test conditions.
+        final PercentCodec codec = new PercentCodec();
+        final byte[] emptyInput = new byte[0];
+
+        // Act: Call the method under test.
+        final byte[] decodedResult = codec.decode(emptyInput);
+
+        // Assert: Verify the outcome is as expected.
+        final byte[] expectedResult = new byte[0];
+        assertArrayEquals("Decoding an empty array should produce an empty array.", expectedResult, decodedResult);
     }
 }
