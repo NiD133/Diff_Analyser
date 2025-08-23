@@ -1,22 +1,39 @@
 package org.locationtech.spatial4j.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
+import static org.junit.Assert.assertArrayEquals;
 
-public class GeohashUtils_ESTestTest18 extends GeohashUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link GeohashUtils}.
+ */
+public class GeohashUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        String[] stringArray0 = GeohashUtils.getSubGeohashes("");
-        assertEquals(32, stringArray0.length);
+    /**
+     * The 32 single-character geohashes that form the base of the encoding system.
+     * The source documentation for getSubGeohashes states the result is sorted.
+     */
+    private static final String[] GEOHASH_BASE_32_STRINGS = {
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "b", "c", "d", "e", "f", "g",
+        "h", "j", "k", "m", "n", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+    };
+
+    @Test
+    public void getSubGeohashes_withEmptyBase_returnsAllBaseCharacters() {
+        // Arrange
+        // An empty string represents the root of the geohash hierarchy.
+        String emptyBaseGeohash = "";
+
+        // Act
+        // Calling getSubGeohashes on the empty base should return all possible
+        // first-level (i.e., single-character) geohashes.
+        String[] actualSubGeohashes = GeohashUtils.getSubGeohashes(emptyBaseGeohash);
+
+        // Assert
+        // The result should be a sorted array containing each of the 32 base geohash characters.
+        assertArrayEquals(
+            "Expected all 32 base geohash characters in sorted order",
+            GEOHASH_BASE_32_STRINGS,
+            actualSubGeohashes
+        );
     }
 }
