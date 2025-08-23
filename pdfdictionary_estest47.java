@@ -1,28 +1,33 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Contains tests for the {@link PdfDictionary} class.
+ */
+// The original test class name is kept for context, but in a real scenario,
+// it would be renamed to something like PdfDictionaryTest.
 public class PdfDictionary_ESTestTest47 extends PdfDictionary_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        PdfTransparencyGroup pdfTransparencyGroup0 = new PdfTransparencyGroup();
-        PdfName pdfName0 = PdfName.FUNCTIONTYPE;
-        pdfTransparencyGroup0.put(pdfName0, pdfName0);
-        assertEquals(10, PdfObject.INDIRECT);
+    /**
+     * Verifies that the put() method correctly adds a new key-value pair
+     * to an empty dictionary.
+     */
+    @Test
+    public void put_onEmptyDictionary_shouldAddKeyValuePair() {
+        // Arrange: Create an empty dictionary and a key-value pair to add.
+        PdfDictionary dictionary = new PdfDictionary();
+        PdfName key = PdfName.TYPE;
+        PdfObject value = PdfName.CATALOG; // A typical value for the TYPE key.
+
+        // Act: Add the key-value pair to the dictionary.
+        dictionary.put(key, value);
+
+        // Assert: Verify that the dictionary now contains the new entry.
+        assertEquals("The dictionary should contain exactly one entry.", 1, dictionary.size());
+        assertTrue("The dictionary should report containing the added key.", dictionary.contains(key));
+        assertEquals("The value retrieved for the key should match the value that was put.", value, dictionary.get(key));
     }
 }
