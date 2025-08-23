@@ -1,32 +1,41 @@
 package com.fasterxml.jackson.core.json;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.ContentReference;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonReadContext_ESTestTest14 extends JsonReadContext_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DupDetector dupDetector0 = DupDetector.rootDetector((JsonParser) null);
-        JsonReadContext jsonReadContext0 = JsonReadContext.createRootContext(0, 1, dupDetector0);
-        JsonLocation jsonLocation0 = jsonReadContext0.getStartLocation((Object) null);
-        assertEquals((-1L), jsonLocation0.getCharOffset());
-        assertEquals(1, jsonLocation0.getColumnNr());
-        assertEquals(0, jsonReadContext0.getNestingDepth());
-        assertEquals(0, jsonReadContext0.getEntryCount());
-        assertEquals(0, jsonLocation0.getLineNr());
-        assertEquals("ROOT", jsonReadContext0.getTypeDesc());
+/**
+ * Unit tests for the {@link JsonReadContext} class, focusing on its initial state
+ * and location reporting capabilities.
+ */
+public class JsonReadContextTest {
+
+    @Test
+    public void getStartLocationForRootContextShouldReturnCorrectLocationDetails() {
+        // Arrange: Create a root context at a specific line and column.
+        final int expectedLine = 0;
+        final int expectedColumn = 1;
+        DupDetector dupDetector = DupDetector.rootDetector((JsonParser) null);
+        JsonReadContext rootContext = JsonReadContext.createRootContext(expectedLine, expectedColumn, dupDetector);
+
+        // Act: Get the start location.
+        // The getStartLocation(Object) method is deprecated, but we test its behavior.
+        // It creates a JsonLocation from the context's line/col and the provided source (null here).
+        JsonLocation startLocation = rootContext.getStartLocation(null);
+
+        // Assert: Verify the initial state of the root context and the details of the start location.
+
+        // 1. Check the properties of the root context itself.
+        assertEquals("ROOT", rootContext.getTypeDesc());
+        assertEquals(0, rootContext.getNestingDepth());
+        assertEquals(0, rootContext.getEntryCount());
+
+        // 2. Check the properties of the returned JsonLocation.
+        assertEquals(expectedLine, startLocation.getLineNr());
+        assertEquals(expectedColumn, startLocation.getColumnNr());
+        // Character offset is -1 because no source reference was provided to getStartLocation().
+        assertEquals(-1L, startLocation.getCharOffset());
     }
 }
