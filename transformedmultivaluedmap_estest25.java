@@ -1,66 +1,64 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
 import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest25 extends TransformedMultiValuedMap_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Transformer<Object, Integer> transformer0 = ConstantTransformer.nullTransformer();
-        Integer integer0 = new Integer(1270);
-        ArrayDeque<Integer> arrayDeque0 = new ArrayDeque<Integer>();
-        arrayDeque0.offerFirst(integer0);
-        ArrayListValuedLinkedHashMap<Integer, Object> arrayListValuedLinkedHashMap0 = new ArrayListValuedLinkedHashMap<Integer, Object>((-1330));
-        TransformedMultiValuedMap<Integer, Object> transformedMultiValuedMap0 = TransformedMultiValuedMap.transformingMap((MultiValuedMap<Integer, Object>) arrayListValuedLinkedHashMap0, (Transformer<? super Integer, ? extends Integer>) transformer0, (Transformer<? super Object, ?>) transformer0);
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for {@link TransformedMultiValuedMap}.
+ * This specific test focuses on ensuring that exceptions from the backing map
+ * during a putAll operation are correctly propagated.
+ */
+public class TransformedMultiValuedMapTest {
+
+    /**
+     * Tests that if the decorated map throws an exception when creating a new
+     * value collection, the exception is propagated up through the
+     * TransformedMultiValuedMap's putAll method.
+     */
+    @Test
+    public void testPutAllShouldPropagateExceptionWhenBackingMapFailsToCreateValueCollection() {
+        // Arrange
+        final int illegalListCapacity = -1;
+        final int initialMapCapacity = 16; // A valid capacity for the map itself.
+
+        // 1. Create a backing map that is deliberately misconfigured.
+        // The original test used an incorrect constructor call which would fail immediately.
+        // We use the correct two-argument constructor to set an illegal capacity
+        // for the internal lists that hold values. This setup ensures the map
+        // is created successfully but will fail later when a new key is added.
+        MultiValuedMap<Integer, Object> backingMap =
+                new ArrayListValuedLinkedHashMap<>(initialMapCapacity, illegalListCapacity);
+
+        // 2. Define transformers. Using a null transformer ensures that when we add
+        // an element to the empty map, the transformed key (null) is guaranteed
+        // to be new. This triggers the creation of a new value collection in the
+        // backing map, which in turn triggers our expected exception.
+        Transformer<Integer, Integer> keyTransformer = ConstantTransformer.nullTransformer();
+        Transformer<Object, Object> valueTransformer = ConstantTransformer.nullTransformer();
+
+        // 3. Create the map to be tested, decorating the faulty backing map.
+        TransformedMultiValuedMap<Integer, Object> transformedMap =
+                TransformedMultiValuedMap.transformingMap(backingMap, keyTransformer, valueTransformer);
+
+        final Integer keyToAdd = 1270;
+        final Iterable<Integer> valuesToAdd = Collections.singletonList(keyToAdd);
+
+        // Act & Assert
         try {
-            transformedMultiValuedMap0.putAll(integer0, (Iterable<?>) arrayDeque0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal Capacity: -1330
-            //
-            verifyException("java.util.ArrayList", e);
+            // This call will fail because the backing map tries to create a new
+            // ArrayList for the transformed key (null) with the illegal capacity.
+            transformedMap.putAll(keyToAdd, valuesToAdd);
+            fail("Expected an IllegalArgumentException to be thrown.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception is the one we expect from ArrayList's constructor.
+            assertEquals("Illegal Capacity: " + illegalListCapacity, e.getMessage());
         }
     }
 }
