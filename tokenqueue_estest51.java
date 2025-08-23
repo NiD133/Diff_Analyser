@@ -10,18 +10,19 @@ import org.junit.runner.RunWith;
 public class TokenQueue_ESTestTest51 extends TokenQueue_ESTest_scaffolding {
 
     @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("\u0005");
-        tokenQueue0.chompBalanced('J', 'x');
-        // Undeclared exception!
+    public void consumeCssIdentifierShouldThrowExceptionIfQueueDoesNotStartWithValidIdentifier() {
+        // Arrange: Create a queue that starts with a character ('+') which is not a valid
+        // start for a CSS identifier.
+        TokenQueue queue = new TokenQueue("+");
+
+        // Act & Assert
         try {
-            tokenQueue0.consumeCssIdentifier();
-            fail("Expecting exception: IllegalArgumentException");
+            queue.consumeCssIdentifier();
+            fail("Expected an IllegalArgumentException because the queue does not start with a valid CSS identifier.");
         } catch (IllegalArgumentException e) {
-            //
-            // CSS identifier expected, but end of input found
-            //
-            verifyException("org.jsoup.parser.TokenQueue", e);
+            // The implementation throws this specific message when it cannot find an identifier at the current position.
+            String expectedMessage = "CSS identifier expected, but end of input found";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
