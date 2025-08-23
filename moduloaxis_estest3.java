@@ -1,46 +1,42 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest3 extends ModuloAxis_ESTest_scaffolding {
+import java.awt.geom.Rectangle2D;
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        DateRange dateRange0 = DateAxis.DEFAULT_DATE_RANGE;
-        ModuloAxis moduloAxis0 = new ModuloAxis("", dateRange0);
-        moduloAxis0.resizeRange(1005.89236);
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
-        moduloAxis0.resizeRange(2.0, (-5.439710113));
-        double double0 = moduloAxis0.lengthToJava2D(0.13377999998920131, rectangle2D_Double0, rectangleEdge0);
-        assertFalse(moduloAxis0.isAutoRange());
-        assertEquals(0.0, double0, 0.01);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Unit tests for the {@link ModuloAxis} class.
+ */
+public class ModuloAxisTest {
+
+    /**
+     * Verifies that lengthToJava2D returns 0 when the drawing area has no height
+     * for a vertical axis. The Java2D length should be proportional to the
+     * available drawing space, so zero space must result in zero length.
+     */
+    @Test
+    public void lengthToJava2DShouldReturnZeroForZeroHeightDrawingArea() {
+        // Arrange: Create a ModuloAxis and a drawing area with zero height.
+        Range fixedRange = new Range(0.0, 360.0);
+        ModuloAxis axis = new ModuloAxis("Angle Axis", fixedRange);
+
+        // Define a drawing area with a width but zero height.
+        Rectangle2D drawArea = new Rectangle2D.Double(0.0, 0.0, 200.0, 0.0);
+        
+        // The axis is positioned vertically on the left edge.
+        RectangleEdge edge = RectangleEdge.LEFT;
+        
+        // An arbitrary length in the data's coordinate system.
+        double dataLength = 90.0;
+
+        // Act: Convert the data length to its Java2D representation.
+        double java2dLength = axis.lengthToJava2D(dataLength, drawArea, edge);
+
+        // Assert: The resulting length in Java2D coordinates must be 0.
+        assertEquals(0.0, java2dLength, 0.0);
     }
 }
