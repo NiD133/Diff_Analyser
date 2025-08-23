@@ -1,32 +1,60 @@
 package org.apache.commons.compress.harmony.unpack200.bytecode;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PipedOutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.commons.compress.harmony.pack200.Pack200Exception;
 import org.apache.commons.compress.harmony.unpack200.Segment;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CodeAttribute_ESTestTest25 extends CodeAttribute_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        int[] intArray0 = new int[3];
-        OperandManager operandManager0 = new OperandManager(intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0, intArray0);
-        byte[] byteArray0 = new byte[3];
-        LinkedList<ExceptionTableEntry> linkedList0 = new LinkedList<ExceptionTableEntry>();
-        CodeAttribute codeAttribute0 = new CodeAttribute((byte) 0, (byte) 0, byteArray0, (Segment) null, operandManager0, linkedList0);
-        assertEquals(0, linkedList0.size());
-        codeAttribute0.renumber(codeAttribute0.byteCodeOffsets);
-        assertEquals(0, codeAttribute0.maxStack);
-        assertEquals(0, codeAttribute0.maxLocals);
-        assertEquals(3, codeAttribute0.codeLength);
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for {@link CodeAttribute}.
+ */
+public class CodeAttributeTest {
+
+    /**
+     * Tests that the CodeAttribute is correctly initialized by the constructor and that
+     * a subsequent call to renumber() with the same offsets does not alter its state.
+     */
+    @Test
+    public void renumberWithUnchangedOffsetsShouldNotAffectCodeAttributeState() throws Pack200Exception {
+        // Arrange
+        final int maxStack = 0;
+        final int maxLocals = 0;
+
+        // The bytecode array represents three 'nop' (0x00) instructions.
+        // Each 'nop' is 1 byte long, so the total code length should be 3.
+        final byte[] byteCodePacked = {0x00, 0x00, 0x00};
+        final int expectedCodeLength = byteCodePacked.length;
+
+        // The OperandManager is a required dependency, but its internal state is not
+        // relevant for this test as 'nop' instructions don't have operands.
+        // We can safely provide empty arrays.
+        final int[] noOperands = new int[0];
+        final OperandManager operandManager = new OperandManager(
+            noOperands, noOperands, noOperands, noOperands, noOperands, noOperands,
+            noOperands, noOperands, noOperands, noOperands, noOperands, noOperands,
+            noOperands, noOperands, noOperands, noOperands, noOperands, noOperands,
+            noOperands, noOperands, noOperands
+        );
+
+        final List<ExceptionTableEntry> exceptionTable = Collections.emptyList();
+        final Segment segment = null; // The segment is not used for this test case.
+
+        // Act
+        // 1. Construct the CodeAttribute, which parses the bytecode.
+        final CodeAttribute codeAttribute = new CodeAttribute(maxStack, maxLocals, byteCodePacked, segment, operandManager, exceptionTable);
+
+        // 2. Call renumber with the attribute's own, unmodified list of offsets.
+        // This action should not change the attribute's state.
+        codeAttribute.renumber(codeAttribute.byteCodeOffsets);
+
+        // Assert
+        // Verify that the state set during construction remains unchanged.
+        assertEquals("Max stack should be initialized correctly", maxStack, codeAttribute.maxStack);
+        assertEquals("Max locals should be initialized correctly", maxLocals, codeAttribute.maxLocals);
+        assertEquals("Code length should be calculated from bytecode", expectedCodeLength, codeAttribute.codeLength);
     }
 }
