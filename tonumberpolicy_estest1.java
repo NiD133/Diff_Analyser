@@ -1,30 +1,37 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.google.gson.stream.JsonReader;
+import java.io.IOException;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ToNumberPolicy_ESTestTest1 extends ToNumberPolicy_ESTest_scaffolding {
+/**
+ * Tests for {@link ToNumberPolicy#LONG_OR_DOUBLE}.
+ */
+public class ToNumberPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test0() throws Throwable {
-        StringReader stringReader0 = new StringReader("\"*.\"{/");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        ToNumberPolicy toNumberPolicy0 = ToNumberPolicy.LONG_OR_DOUBLE;
-        // Undeclared exception!
+    /**
+     * Verifies that the LONG_OR_DOUBLE policy throws a JsonParseException when it
+     * encounters a JSON string that cannot be parsed as a Long or a Double.
+     */
+    @Test
+    public void longOrDoublePolicy_shouldThrowExceptionForNonNumericString() throws IOException {
+        // Arrange
+        ToNumberStrategy policy = ToNumberPolicy.LONG_OR_DOUBLE;
+        // The input is a valid JSON string, but its content is not a valid number.
+        String json = "\"not-a-number\"";
+        JsonReader jsonReader = new JsonReader(new StringReader(json));
+
+        // Act & Assert
         try {
-            toNumberPolicy0.readNumber(jsonReader0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Cannot parse *.; at path $
-            //
-            verifyException("com.google.gson.ToNumberPolicy$3", e);
+            policy.readNumber(jsonReader);
+            fail("Expected a JsonParseException to be thrown, but no exception was thrown.");
+        } catch (JsonParseException expected) {
+            // Verify that the exception message clearly indicates the parsing failure.
+            assertEquals("Cannot parse not-a-number; at path $", expected.getMessage());
         }
     }
 }
