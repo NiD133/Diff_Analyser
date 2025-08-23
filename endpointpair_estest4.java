@@ -1,21 +1,28 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest4 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Locale.Category locale_Category0 = Locale.Category.DISPLAY;
-        EndpointPair<Locale.Category> endpointPair0 = EndpointPair.unordered(locale_Category0, locale_Category0);
-        Locale.Category locale_Category1 = endpointPair0.nodeV();
-        assertSame(locale_Category0, locale_Category1);
+    /**
+     * Tests that for an unordered self-loop edge (where both nodes are the same),
+     * nodeV() returns the correct node instance.
+     */
+    @Test
+    public void unorderedPair_selfLoop_nodeV_returnsSameNode() {
+        // Arrange: Create an unordered EndpointPair representing a self-loop edge on a single node.
+        String node = "A";
+        EndpointPair<String> selfLoopPair = EndpointPair.unordered(node, node);
+
+        // Act: Get the 'V' node from the pair.
+        String nodeV = selfLoopPair.nodeV();
+
+        // Assert: The returned node should be the same instance as the original node.
+        assertSame("For a self-loop, nodeV() should return the node itself.", node, nodeV);
     }
 }
