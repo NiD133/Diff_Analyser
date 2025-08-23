@@ -1,38 +1,47 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Entities_ESTestTest13 extends Entities_ESTest_scaffolding {
+import java.io.IOException;
+import java.io.PipedWriter;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        PipedWriter pipedWriter0 = new PipedWriter();
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(pipedWriter0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        // Undeclared exception!
+import static org.junit.Assert.*;
+
+/**
+ * Test suite for {@link Entities}.
+ * This specific test focuses on exception handling during the escape process.
+ */
+public class EntitiesExceptionTest {
+
+    /**
+     * Verifies that when {@link Entities#escape(Appendable, String, Document.OutputSettings, int)}
+     * attempts to write to an Appendable that throws an {@link IOException},
+     * the exception is correctly wrapped and re-thrown as a {@link RuntimeException}.
+     */
+    @Test
+    public void escapeToFailingAppendableRethrowsIOExceptionAsRuntimeException() {
+        // Arrange: Set up an Appendable that will fail on any write operation.
+        // A PipedWriter that is not connected to a PipedReader will throw an
+        // IOException("Pipe not connected") upon the first write attempt.
+        // The QuietAppendable wrapper is expected to catch this and re-throw it as a RuntimeException.
+        PipedWriter unconnectedWriter = new PipedWriter();
+        Appendable failingAppendable = QuietAppendable.wrap(unconnectedWriter);
+        
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        String inputToEscape = "text < to > escape"; // Content is irrelevant as the write will fail immediately.
+        int arbitraryEscapeOptions = 0; // The specific options do not affect this exception-handling test.
+
+        // Act & Assert
         try {
-            Entities.escape(quietAppendable0, "ai\"~k6zS*y qshCo<", document_OutputSettings0, 373);
-            fail("Expecting exception: RuntimeException");
+            Entities.escape(failingAppendable, inputToEscape, outputSettings, arbitraryEscapeOptions);
+            fail("A RuntimeException should have been thrown because the underlying writer failed.");
         } catch (RuntimeException e) {
-            //
-            // java.io.IOException: Pipe not connected
-            //
-            verifyException("org.jsoup.internal.QuietAppendable$BaseAppendable", e);
+            // Verify that the cause of the RuntimeException is the expected IOException.
+            Throwable cause = e.getCause();
+            assertNotNull("The RuntimeException should have a cause.", cause);
+            assertTrue("The cause should be an IOException.", cause instanceof IOException);
+            assertEquals("The IOException message is incorrect.", "Pipe not connected", cause.getMessage());
         }
     }
 }
