@@ -1,55 +1,41 @@
 package org.apache.commons.collections4.multimap;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.PriorityQueue;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionFactory;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class TransformedMultiValuedMap_ESTestTest5 extends TransformedMultiValuedMap_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        ArrayListValuedHashMap<Integer, Object> arrayListValuedHashMap0 = new ArrayListValuedHashMap<Integer, Object>(0, 0);
-        TransformedMultiValuedMap<Integer, Object> transformedMultiValuedMap0 = TransformedMultiValuedMap.transformingMap((MultiValuedMap<Integer, Object>) arrayListValuedHashMap0, (Transformer<? super Integer, ? extends Integer>) null, (Transformer<? super Object, ?>) null);
-        Object object0 = new Object();
-        Object object1 = transformedMultiValuedMap0.transformValue(object0);
-        assertSame(object0, object1);
+/**
+ * Tests for {@link TransformedMultiValuedMap}.
+ * This class focuses on specific behaviors of the transformation logic.
+ */
+public class TransformedMultiValuedMapTest {
+
+    /**
+     * Tests that the {@code transformValue} method returns the original object
+     * instance when the value transformer provided during construction is null.
+     * This verifies that a null transformer acts as a no-op identity function.
+     */
+    @Test
+    public void transformValueShouldReturnOriginalValueWhenTransformerIsNull() {
+        // Arrange
+        // Create a base map to be decorated.
+        final MultiValuedMap<Integer, Object> backingMap = new ArrayListValuedHashMap<>();
+
+        // Create the TransformedMultiValuedMap with a null value transformer.
+        // The key transformer is also null but is not relevant for this test.
+        final TransformedMultiValuedMap<Integer, Object> transformedMap =
+                TransformedMultiValuedMap.transformingMap(backingMap, null, null);
+
+        final Object originalValue = new Object();
+
+        // Act
+        // Call the method under test.
+        final Object transformedValue = transformedMap.transformValue(originalValue);
+
+        // Assert
+        // The returned value should be the exact same instance as the input.
+        assertSame("Expected the original object instance when the transformer is null",
+                     originalValue, transformedValue);
     }
 }
