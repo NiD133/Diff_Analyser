@@ -1,28 +1,36 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SerializedString_ESTestTest45 extends SerializedString_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SerializedString} class, focusing on its
+ * UTF-8 appending functionality.
+ */
+public class SerializedStringTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        SerializedString serializedString0 = new SerializedString("M:oX:\"bsoHuP");
-        byte[] byteArray0 = new byte[14];
-        int int0 = serializedString0.appendQuotedUTF8(byteArray0, (byte) 77);
-        assertEquals((-1), int0);
+    /**
+     * Verifies that `appendQuotedUTF8` returns -1 when the provided offset
+     * is so large that there is no space in the destination buffer to write the string.
+     * A return value of -1 is the contract for indicating insufficient space.
+     */
+    @Test
+    public void appendQuotedUTF8ShouldReturnNegativeOneWhenOffsetExceedsBufferCapacity() {
+        // Arrange
+        // The specific string content is not critical, as the out-of-bounds offset
+        // is the primary condition being tested.
+        SerializedString serializedString = new SerializedString("M:oX:\"bsoHuP");
+        byte[] buffer = new byte[14];
+        int outOfBoundsOffset = 77; // An offset well beyond the buffer's length.
+
+        // Act
+        int result = serializedString.appendQuotedUTF8(buffer, outOfBoundsOffset);
+
+        // Assert
+        // The method is expected to return -1 to signal that the append operation
+        // failed due to insufficient space.
+        final int INSUFFICIENT_SPACE_FLAG = -1;
+        assertEquals("Should return -1 for an offset that leaves no room in the buffer",
+                INSUFFICIENT_SPACE_FLAG, result);
     }
 }
