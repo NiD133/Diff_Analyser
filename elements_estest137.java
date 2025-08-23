@@ -1,36 +1,39 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest137 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test136() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("", "");
-        Elements elements0 = document0.getElementsContainingText("");
-        Elements elements1 = elements0.toggleClass("   ");
-        assertFalse(elements1.isEmpty());
+/**
+ * Test for the {@link Elements#toggleClass(String)} method.
+ */
+public class ElementsToggleClassTest {
+
+    /**
+     * Verifies that calling toggleClass with a class name containing only whitespace
+     * is ignored and does not modify the elements' class attributes.
+     */
+    @Test
+    public void toggleClassWithWhitespaceOnlyClassNameShouldBeIgnored() {
+        // Arrange: Create a document with two elements that have no class attribute.
+        Document doc = Jsoup.parse("<div></div><p></p>");
+        Elements elements = doc.select("div, p");
+
+        // Act: Call the method under test with a whitespace-only string.
+        Elements returnedElements = elements.toggleClass("   ");
+
+        // Assert:
+        // 1. The method should return the same Elements instance to allow for method chaining.
+        assertSame("toggleClass should return the same instance for chaining.", elements, returnedElements);
+
+        // 2. The class attributes of the elements should remain unchanged (i.e., empty).
+        for (Element el : elements) {
+            assertEquals("The class attribute should not be added for a whitespace-only class name.",
+                         "", el.attr("class"));
+        }
     }
 }
