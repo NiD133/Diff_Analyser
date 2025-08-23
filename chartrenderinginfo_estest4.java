@@ -1,34 +1,46 @@
 package org.jfree.chart;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
 import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for the {@link ChartRenderingInfo} class, focusing on its state after a chart rendering operation.
+ */
 public class ChartRenderingInfo_ESTestTest4 extends ChartRenderingInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        SimpleTimeZone simpleTimeZone0 = new SimpleTimeZone(1, ",:Q.N1exKdJ$");
-        Locale locale0 = Locale.JAPANESE;
-        DateAxis dateAxis0 = new DateAxis(",:Q.N1exKdJ$", simpleTimeZone0, locale0);
-        CombinedRangeCategoryPlot combinedRangeCategoryPlot0 = new CombinedRangeCategoryPlot(dateAxis0);
-        JFreeChart jFreeChart0 = new JFreeChart(combinedRangeCategoryPlot0);
-        jFreeChart0.createBufferedImage(10, 10, 1749.95538, (double) 2.0F, chartRenderingInfo0);
-        EntityCollection entityCollection0 = chartRenderingInfo0.getEntityCollection();
-        assertEquals(3, entityCollection0.getEntityCount());
+    /**
+     * Verifies that the entity collection within ChartRenderingInfo is populated
+     * after a chart has been rendered.
+     */
+    @Test
+    public void getEntityCollection_afterChartRendering_returnsPopulatedCollection() {
+        // Arrange: Create a ChartRenderingInfo object and a simple chart to be rendered.
+        ChartRenderingInfo renderingInfo = new ChartRenderingInfo();
+
+        // A simple plot with one axis is sufficient to test entity creation.
+        CombinedRangeCategoryPlot plot = new CombinedRangeCategoryPlot(new NumberAxis("Value"));
+        JFreeChart chart = new JFreeChart("Test Chart", plot);
+
+        int imageWidth = 100;
+        int imageHeight = 100;
+
+        // Act: Render the chart. This action should populate the renderingInfo object,
+        // including the entity collection.
+        chart.createBufferedImage(imageWidth, imageHeight, renderingInfo);
+
+        // Assert: Check if the entity collection was created and contains the expected number of entities.
+        EntityCollection entities = renderingInfo.getEntityCollection();
+        assertNotNull("Entity collection should not be null after rendering", entities);
+
+        // The rendering process creates entities for the chart background, the plot,
+        // and the range axis.
+        int expectedEntityCount = 3;
+        assertEquals("The entity collection should contain the correct number of entities",
+                expectedEntityCount, entities.getEntityCount());
     }
 }
