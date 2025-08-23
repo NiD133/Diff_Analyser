@@ -1,31 +1,31 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest38 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that safeToInt throws an ArithmeticException if the long value
+     * is smaller than Integer.MIN_VALUE.
+     */
+    @Test
+    public void safeToInt_throwsException_whenValueIsLessThanIntegerMinValue() {
+        // Arrange: A long value that is just outside the lower bound of an integer.
+        final long valueTooSmall = (long) Integer.MIN_VALUE - 1;
+
+        // Act & Assert
         try {
-            FieldUtils.safeToInt((-2147483671L));
-            fail("Expecting exception: ArithmeticException");
+            FieldUtils.safeToInt(valueTooSmall);
+            fail("Expected an ArithmeticException because the value is too small to fit in an int.");
         } catch (ArithmeticException e) {
-            //
-            // Value cannot fit in an int: -2147483671
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Verify that the exception message is informative and correct.
+            String expectedMessage = "Value cannot fit in an int: " + valueTooSmall;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
