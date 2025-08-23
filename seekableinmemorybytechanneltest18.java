@@ -3,46 +3,69 @@ package org.apache.commons.compress.utils;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class SeekableInMemoryByteChannelTestTest18 {
+/**
+ * Tests for positioning and writing behavior in {@link SeekableInMemoryByteChannel}.
+ * This suite focuses on the requirements of the {@link SeekableByteChannel} interface.
+ */
+public class SeekableInMemoryByteChannelPositioningTest {
 
-    private final byte[] testData = "Some data".getBytes(UTF_8);
-
-    /*
-     * <q>Setting the position to a value that is greater than the current size is legal but does not change the size of the entity. A later attempt to write
-     * bytes at such a position will cause the entity to grow to accommodate the new bytes; the values of any bytes between the previous end-of-file and the
-     * newly-written bytes are unspecified.</q>
+    /**
+     * Tests that writing to a position beyond the current end of the channel
+     * grows the channel and leaves a "gap". This behavior is specified by the
+     * SeekableByteChannel interface. The gap's content is unspecified by the
+     * interface, but this implementation fills it with null bytes.
      */
-    public void writingToAPositionAfterEndGrowsChannel() throws Exception {
-        try (SeekableByteChannel c = new SeekableInMemoryByteChannel()) {
-            c.position(2);
-            assertEquals(2, c.position());
-            final ByteBuffer inData = ByteBuffer.wrap(testData);
-            assertEquals(testData.length, c.write(inData));
-            assertEquals(testData.length + 2, c.size());
-            c.position(2);
-            final ByteBuffer readBuffer = ByteBuffer.allocate(testData.length);
-            c.read(readBuffer);
-            assertArrayEquals(testData, Arrays.copyOf(readBuffer.array(), testData.length));
+    @Test
+    void writeAtPositionBeyondSizeShouldGrowChannel() throws IOException {
+        // Arrange
+        final byte[] dataToWrite = "Some data".getBytes(UTF_8);
+        final int positionBeyondSize = 2;
+        final long expectedSize = positionBeyondSize + dataToWrite.length;
+
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel()) {
+            assertEquals(0, channel.size(), "Initial size should be 0");
+
+            // Act: Set position past the end and write data.
+            channel.position(positionBeyondSize);
+            final int bytesWritten = channel.write(ByteBuffer.wrap(dataToWrite));
+
+            // Assert: Verify size, position, and number of bytes written.
+            assertEquals(dataToWrite.length, bytesWritten, "Should write all bytes from the buffer");
+            assertEquals(expectedSize, channel.size(), "Channel size should grow to accommodate the gap and new data");
+            assertEquals(expectedSize, channel.position(), "Position should be at the end of the written data");
+
+            // Assert: Verify the gap is filled with null bytes.
+            final byte[] gap = new byte[positionBeyondSize];
+            channel.position(0);
+            channel.read(ByteBuffer.wrap(gap));
+            assertArrayEquals(new byte[]{0, 0}, gap, "The gap should be filled with null bytes");
+
+            // Assert: Verify the written data can be read back correctly.
+            final ByteBuffer readBuffer = ByteBuffer.allocate(dataToWrite.length);
+            channel.position(positionBeyondSize);
+            channel.read(readBuffer);
+            assertArrayEquals(dataToWrite, readBuffer.array(), "The data written should be readable from the new position");
         }
     }
 
-    /*
-     * <q>IOException - If the new position is negative</q>
+    /**
+     * Tests that attempting to set a negative position throws an IOException,
+     * as required by the SeekableByteChannel interface.
      */
     @Test
-    void testThrowsIOExceptionWhenPositionIsSetToANegativeValue() throws Exception {
-        try (SeekableByteChannel c = new SeekableInMemoryByteChannel()) {
-            assertThrows(IOException.class, () -> c.position(-1));
+    void positionShouldThrowIOExceptionForNegativeValue() throws IOException {
+        // Arrange
+        try (SeekableByteChannel channel = new SeekableInMemoryByteChannel()) {
+            // Act & Assert
+            assertThrows(IOException.class, () -> channel.position(-1),
+                "Setting a negative position should throw IOException");
         }
     }
 }
