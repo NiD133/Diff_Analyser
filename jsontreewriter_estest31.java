@@ -1,25 +1,28 @@
 package com.google.gson.internal.bind;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JsonTreeWriter_ESTestTest31 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonTreeWriter} class.
+ * This class focuses on verifying the state and behavior of the writer.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.setHtmlSafe(true);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
-        assertFalse(jsonWriter0.isLenient());
+    /**
+     * Verifies that the writer is not lenient by default after beginning an object,
+     * even when other settings like htmlSafe have been configured.
+     */
+    @Test
+    public void beginObjectShouldNotChangeDefaultLeniency() throws Exception {
+        // Arrange: Create a writer and configure a non-default setting.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.setHtmlSafe(true);
+
+        // Act: Start writing a JSON object.
+        writer.beginObject();
+
+        // Assert: The writer should retain its default non-lenient state.
+        assertFalse("A new writer should not be lenient by default", writer.isLenient());
     }
 }
