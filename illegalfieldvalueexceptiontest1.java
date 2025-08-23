@@ -1,62 +1,101 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.chrono.GJChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
 import org.joda.time.field.FieldUtils;
-import org.joda.time.field.SkipDateTimeField;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class IllegalFieldValueExceptionTestTest1 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+/**
+ * Tests for {@link IllegalFieldValueException}.
+ */
+class IllegalFieldValueExceptionTest {
+
+    @Test
+    @DisplayName("When verifying a DateTimeField, an out-of-bounds value should throw an exception with correct details")
+    void verifyValueBounds_forDateTimeField_throwsExceptionWithCorrectDetails() {
+        // Arrange
+        DateTimeField monthOfYearField = ISOChronology.getInstance().monthOfYear();
+        int illegalValue = -5;
+        int lowerBound = 1;
+        int upperBound = 31;
+
+        // Act
+        IllegalFieldValueException thrown = assertThrows(
+            IllegalFieldValueException.class,
+            () -> FieldUtils.verifyValueBounds(monthOfYearField, illegalValue, lowerBound, upperBound)
+        );
+
+        // Assert
+        assertAll("Exception properties for DateTimeField",
+            () -> assertEquals(DateTimeFieldType.monthOfYear(), thrown.getDateTimeFieldType()),
+            () -> assertNull(thrown.getDurationFieldType()),
+            () -> assertEquals("monthOfYear", thrown.getFieldName()),
+            () -> assertEquals(illegalValue, thrown.getIllegalNumberValue().intValue()),
+            () -> assertNull(thrown.getIllegalStringValue()),
+            () -> assertEquals(String.valueOf(illegalValue), thrown.getIllegalValueAsString()),
+            () -> assertEquals(lowerBound, thrown.getLowerBound().intValue()),
+            () -> assertEquals(upperBound, thrown.getUpperBound().intValue())
+        );
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestIllegalFieldValueException.class);
+    @Test
+    @DisplayName("When verifying a DateTimeFieldType, an out-of-bounds value should throw an exception with correct details")
+    void verifyValueBounds_forDateTimeFieldType_throwsExceptionWithCorrectDetails() {
+        // Arrange
+        DateTimeFieldType hourOfDayType = DateTimeFieldType.hourOfDay();
+        int illegalValue = 27;
+        int lowerBound = 0;
+        int upperBound = 23;
+
+        // Act
+        IllegalFieldValueException thrown = assertThrows(
+            IllegalFieldValueException.class,
+            () -> FieldUtils.verifyValueBounds(hourOfDayType, illegalValue, lowerBound, upperBound)
+        );
+
+        // Assert
+        assertAll("Exception properties for DateTimeFieldType",
+            () -> assertEquals(hourOfDayType, thrown.getDateTimeFieldType()),
+            () -> assertNull(thrown.getDurationFieldType()),
+            () -> assertEquals("hourOfDay", thrown.getFieldName()),
+            () -> assertEquals(illegalValue, thrown.getIllegalNumberValue().intValue()),
+            () -> assertNull(thrown.getIllegalStringValue()),
+            () -> assertEquals(String.valueOf(illegalValue), thrown.getIllegalValueAsString()),
+            () -> assertEquals(lowerBound, thrown.getLowerBound().intValue()),
+            () -> assertEquals(upperBound, thrown.getUpperBound().intValue())
+        );
     }
 
-    public void testVerifyValueBounds() {
-        try {
-            FieldUtils.verifyValueBounds(ISOChronology.getInstance().monthOfYear(), -5, 1, 31);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.monthOfYear(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("monthOfYear", e.getFieldName());
-            assertEquals(new Integer(-5), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("-5", e.getIllegalValueAsString());
-            assertEquals(new Integer(1), e.getLowerBound());
-            assertEquals(new Integer(31), e.getUpperBound());
-        }
-        try {
-            FieldUtils.verifyValueBounds(DateTimeFieldType.hourOfDay(), 27, 0, 23);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.hourOfDay(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("hourOfDay", e.getFieldName());
-            assertEquals(new Integer(27), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("27", e.getIllegalValueAsString());
-            assertEquals(new Integer(0), e.getLowerBound());
-            assertEquals(new Integer(23), e.getUpperBound());
-        }
-        try {
-            FieldUtils.verifyValueBounds("foo", 1, 2, 3);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(null, e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("foo", e.getFieldName());
-            assertEquals(new Integer(1), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("1", e.getIllegalValueAsString());
-            assertEquals(new Integer(2), e.getLowerBound());
-            assertEquals(new Integer(3), e.getUpperBound());
-        }
+    @Test
+    @DisplayName("When verifying a field by name, an out-of-bounds value should throw an exception with correct details")
+    void verifyValueBounds_forStringFieldName_throwsExceptionWithCorrectDetails() {
+        // Arrange
+        String fieldName = "foo";
+        int illegalValue = 1;
+        int lowerBound = 2;
+        int upperBound = 3;
+
+        // Act
+        IllegalFieldValueException thrown = assertThrows(
+            IllegalFieldValueException.class,
+            () -> FieldUtils.verifyValueBounds(fieldName, illegalValue, lowerBound, upperBound)
+        );
+
+        // Assert
+        assertAll("Exception properties for String field name",
+            () -> assertNull(thrown.getDateTimeFieldType()),
+            () -> assertNull(thrown.getDurationFieldType()),
+            () -> assertEquals(fieldName, thrown.getFieldName()),
+            () -> assertEquals(illegalValue, thrown.getIllegalNumberValue().intValue()),
+            () -> assertNull(thrown.getIllegalStringValue()),
+            () -> assertEquals(String.valueOf(illegalValue), thrown.getIllegalValueAsString()),
+            () -> assertEquals(lowerBound, thrown.getLowerBound().intValue()),
+            () -> assertEquals(upperBound, thrown.getUpperBound().intValue())
+        );
     }
 }
