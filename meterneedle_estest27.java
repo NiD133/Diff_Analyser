@@ -2,37 +2,27 @@ package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MeterNeedle_ESTestTest27 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the equals() method in the MeterNeedle class.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        ShipNeedle shipNeedle0 = new ShipNeedle();
-        PointerNeedle pointerNeedle0 = new PointerNeedle();
-        Color color0 = Color.MAGENTA;
-        pointerNeedle0.setOutlinePaint(color0);
-        shipNeedle0.equals(pointerNeedle0);
-        assertEquals(5, pointerNeedle0.getSize());
-        assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
-        assertEquals(0.5, pointerNeedle0.getRotateX(), 0.01);
-        assertEquals(0.5, shipNeedle0.getRotateX(), 0.01);
+    /**
+     * Verifies that two MeterNeedle instances are not considered equal if one
+     * has a different outline paint.
+     */
+    @Test
+    public void testEquals_differentOutlinePaint_returnsFalse() {
+        // Arrange: Create two needle instances. By default, their outline paint is black.
+        PointerNeedle needle1 = new PointerNeedle();
+        PointerNeedle needle2 = new PointerNeedle();
+
+        // Act: Change the outline paint on the second needle.
+        needle2.setOutlinePaint(Color.MAGENTA);
+
+        // Assert: The two needles should no longer be equal.
+        assertFalse("Needles with different outline paints should not be equal.", needle1.equals(needle2));
     }
 }
