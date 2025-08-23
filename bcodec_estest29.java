@@ -1,22 +1,26 @@
 package org.apache.commons.codec.net;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class BCodec_ESTestTest29 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for the BCodec class.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        byte[] byteArray0 = bCodec0.doDecoding((byte[]) null);
-        assertNull(byteArray0);
+    /**
+     * Tests that decoding a null byte array returns null, which is the expected behavior
+     * for lenient decoding of invalid input.
+     */
+    @Test
+    public void doDecodingWithNullInputShouldReturnNull() {
+        // Arrange
+        BCodec codec = new BCodec();
+
+        // Act
+        byte[] result = codec.doDecoding(null);
+
+        // Assert
+        assertNull("Decoding a null byte array should result in null.", result);
     }
 }
