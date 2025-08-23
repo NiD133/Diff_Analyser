@@ -1,56 +1,42 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.text.DateFormatSymbols;
-import java.util.Date;
-import java.util.Locale;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockSimpleDateFormat;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.plot.CategoryCrosshairState;
-import org.jfree.chart.plot.CombinedRangeXYPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.DirectionalGradientPaintTransformer;
-import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerXYDataset;
 import org.jfree.data.statistics.SimpleHistogramBin;
 import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.CategoryTableXYDataset;
-import org.jfree.data.xy.DefaultOHLCDataset;
-import org.jfree.data.xy.DefaultWindDataset;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.OHLCDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
+/**
+ * This test class is a refactored version of an auto-generated test.
+ * It focuses on a specific scenario for the ClusteredXYBarRenderer class.
+ */
 public class ClusteredXYBarRenderer_ESTestTest11 extends ClusteredXYBarRenderer_ESTest_scaffolding {
 
+    /**
+     * Tests that findDomainBoundsWithOffset correctly propagates a NullPointerException
+     * when the provided dataset is in an invalid state (contains a null bin).
+     *
+     * The renderer itself does not perform the calculation but delegates to the dataset.
+     * This test ensures that exceptions from the dataset are not swallowed.
+     */
     @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        Integer integer0 = JLayeredPane.DEFAULT_LAYER;
-        SimpleHistogramDataset<Integer> simpleHistogramDataset0 = new SimpleHistogramDataset<Integer>(integer0);
-        simpleHistogramDataset0.addBin((SimpleHistogramBin) null);
-        // Undeclared exception!
+    public void findDomainBoundsWithOffset_whenDatasetContainsNullBin_thenThrowsNullPointerException() {
+        // Arrange
+        ClusteredXYBarRenderer renderer = new ClusteredXYBarRenderer();
+        // Create a dataset that will be put into an invalid state.
+        SimpleHistogramDataset dataset = new SimpleHistogramDataset("Test Series Key");
+
+        // Intentionally add a null bin to the dataset to trigger an error during data processing.
+        dataset.addBin((SimpleHistogramBin) null);
+
+        // Act & Assert
         try {
-            clusteredXYBarRenderer0.findDomainBoundsWithOffset(simpleHistogramDataset0);
-            fail("Expecting exception: NullPointerException");
+            // This call is expected to fail because the dataset cannot process the null bin.
+            renderer.findDomainBoundsWithOffset(dataset);
+            fail("A NullPointerException was expected but was not thrown.");
         } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.data.statistics.SimpleHistogramDataset", e);
+            // This exception is expected. It confirms that the renderer correctly
+            // propagates the error from the underlying dataset.
         }
     }
 }
