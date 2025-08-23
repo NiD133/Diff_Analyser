@@ -1,21 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class LocaleUtils_ESTestTest23 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Tests for {@link LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Locale locale0 = LocaleUtils.toLocale("fr");
-        assertNotNull(locale0);
-        assertEquals("fr", locale0.getLanguage());
+    /**
+     * Tests that {@link LocaleUtils#toLocale(String)} correctly converts a
+     * string containing only a two-letter language code.
+     */
+    @Test
+    public void toLocale_withLanguageCodeOnly_returnsCorrectLocale() {
+        // Arrange
+        final String localeString = "fr";
+        final Locale expectedLocale = new Locale("fr");
+
+        // Act
+        final Locale actualLocale = LocaleUtils.toLocale(localeString);
+
+        // Assert
+        assertEquals(expectedLocale, actualLocale);
     }
 }
