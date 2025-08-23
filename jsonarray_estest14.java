@@ -1,24 +1,28 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonArray_ESTestTest14 extends JsonArray_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonArray} class, focusing on convenience getter methods.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        Character character0 = Character.valueOf('6');
-        jsonArray0.add(character0);
-        float float0 = jsonArray0.getAsFloat();
-        assertEquals(6.0F, float0, 0.01F);
+    /**
+     * Verifies that getAsFloat() correctly returns the float value
+     * when the array contains a single element that is a character representing a digit.
+     */
+    @Test
+    public void getAsFloat_whenArrayContainsSingleCharacterDigit_returnsCorrespondingFloat() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add('6'); // The character '6' is added to the array
+
+        // Act
+        float actualFloat = jsonArray.getAsFloat();
+
+        // Assert
+        float expectedFloat = 6.0F;
+        assertEquals(expectedFloat, actualFloat, 0.01F);
     }
 }
