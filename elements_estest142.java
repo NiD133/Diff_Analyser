@@ -1,37 +1,45 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.util.Collections;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class Elements_ESTestTest142 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class Elements_ESTestTest142 { // Note: Class name kept from original for consistency.
 
-    @Test(timeout = 4000)
-    public void test141() throws Throwable {
-        Document document0 = Document.createShell("<m-2,eXTA:N5y7");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.attr("x", "x");
-        List<String> list0 = elements1.eachAttr("x");
-        assertTrue(list0.contains("x"));
+    /**
+     * Verifies that `eachAttr` correctly retrieves the attribute values from all elements in the collection
+     * after the attribute has been set using `attr(key, value)`.
+     */
+    @Test
+    public void eachAttrRetrievesAttributeValuesFromAllElements() {
+        // Arrange
+        // A shell document contains <html>, <head>, <title>, and <body> elements.
+        Document doc = Document.createShell("");
+        Elements elements = doc.getAllElements();
+        int elementCount = elements.size();
+        assertTrue("Test setup should have multiple elements", elementCount > 1);
+
+        String attributeKey = "data-id";
+        String attributeValue = "test-value";
+
+        // Act
+        // Set the same attribute on all elements in the collection.
+        elements.attr(attributeKey, attributeValue);
+        // Retrieve the value of that attribute from each element.
+        List<String> retrievedValues = elements.eachAttr(attributeKey);
+
+        // Assert
+        // The list of retrieved values should have one entry for each element.
+        assertEquals("Should retrieve an attribute value for each element", elementCount, retrievedValues.size());
+
+        // Verify that every retrieved value is the one we set.
+        List<String> expectedValues = Collections.nCopies(elementCount, attributeValue);
+        assertEquals("All retrieved attribute values should match the set value", expectedValues, retrievedValues);
     }
 }
