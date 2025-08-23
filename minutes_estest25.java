@@ -1,18 +1,25 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Minutes_ESTestTest25 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Minutes minutes0 = Minutes.ZERO;
-        Minutes minutes1 = minutes0.minus(0);
-        assertEquals(0, minutes1.getMinutes());
+    /**
+     * Verifies that subtracting zero from a Minutes object results in an equal Minutes object.
+     */
+    @Test
+    public void minusZeroShouldReturnAnEquivalentInstance() {
+        // Arrange: Create an instance of Minutes representing zero.
+        Minutes zeroMinutes = Minutes.ZERO;
+
+        // Act: Subtract zero from the instance.
+        Minutes result = zeroMinutes.minus(0);
+
+        // Assert: The resulting object should be equal to the original.
+        assertEquals(zeroMinutes, result);
     }
 }
