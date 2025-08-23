@@ -1,30 +1,29 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class Attribute_ESTestTest40 extends Attribute_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Attribute} class.
+ */
+public class AttributeTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Attribute attribute0 = Attribute.createFromEncoded("^B_1", "^B_1");
-        Attribute attribute1 = attribute0.clone();
-        boolean boolean0 = attribute1.equals(attribute0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that the {@link Attribute#clone()} method creates a new Attribute instance
+     * that is equal to the original but is not the same object reference.
+     */
+    @Test
+    public void cloneCreatesEqualButNotSameInstance() {
+        // Arrange: Create an original attribute with a common key and value.
+        Attribute original = new Attribute("href", "/index.html");
+
+        // Act: Clone the attribute.
+        Attribute cloned = original.clone();
+
+        // Assert: The clone should be a different object instance but equal in value.
+        // The equals() method in Attribute compares the key and value.
+        assertNotSame("A cloned attribute should be a new object instance.", original, cloned);
+        assertEquals("A cloned attribute should be equal to the original.", original, cloned);
     }
 }
