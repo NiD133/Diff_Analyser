@@ -1,55 +1,38 @@
 package org.threeten.extra.chrono;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import org.junit.rules.ExpectedException;
+
 import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest33 extends InternationalFixedChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link InternationalFixedChronology} class.
+ */
+public class InternationalFixedChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = new InternationalFixedChronology();
-        // Undeclared exception!
-        try {
-            internationalFixedChronology0.dateNow((Clock) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // clock
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * A JUnit Rule for verifying that a method throws a specific exception.
+     * This is a standard and flexible way to test exception-throwing behavior in JUnit 4.
+     */
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Verifies that dateNow(Clock) throws a NullPointerException when passed a null clock.
+     * This is the expected behavior, as the method's contract requires a non-null clock.
+     */
+    @Test
+    public void dateNow_nullClock_throwsNullPointerException() {
+        // Expect a NullPointerException to be thrown.
+        thrown.expect(NullPointerException.class);
+        // The original test's structure suggested it was verifying the message from
+        // Objects.requireNonNull, so we'll check for that message explicitly.
+        thrown.expectMessage("clock");
+
+        // When the dateNow(Clock) method is called with a null argument...
+        InternationalFixedChronology.INSTANCE.dateNow((Clock) null);
+        
+        // ...the test will pass only if the expected exception is thrown.
     }
 }
