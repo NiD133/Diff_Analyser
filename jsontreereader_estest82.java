@@ -1,31 +1,31 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This class contains tests for the {@link JsonTreeReader}.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class JsonTreeReader_ESTestTest82 extends JsonTreeReader_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test081() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        Boolean boolean0 = Boolean.TRUE;
-        jsonArray0.add(boolean0);
-        jsonTreeReader0.beginArray();
-        boolean boolean1 = jsonTreeReader0.nextBoolean();
-        assertTrue(boolean1);
+    /**
+     * Verifies that {@link JsonTreeReader#nextBoolean()} correctly reads a 'true'
+     * boolean value from a JSON array.
+     */
+    @Test
+    public void nextBoolean_whenArrayContainsTrue_returnsTrue() throws Exception {
+        // Arrange: Create a JsonTreeReader for a JSON array: [true]
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(true);
+        JsonTreeReader jsonTreeReader = new JsonTreeReader(jsonArray);
+
+        // Act: Navigate into the array and read the boolean value.
+        jsonTreeReader.beginArray();
+        boolean actualValue = jsonTreeReader.nextBoolean();
+
+        // Assert: The read value should be true.
+        assertTrue(actualValue);
     }
 }
