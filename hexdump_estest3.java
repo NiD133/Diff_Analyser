@@ -1,35 +1,34 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class HexDump_ESTestTest3 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} class.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        byte[] byteArray0 = new byte[8];
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("\n", false);
-        OutputStreamWriter outputStreamWriter0 = new OutputStreamWriter(mockFileOutputStream0);
-        HexDump.dump(byteArray0, (long) (byte) (-1), (Appendable) outputStreamWriter0, 6, (int) (byte) 0);
-        assertArrayEquals(new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 }, byteArray0);
+    /**
+     * Tests that calling HexDump.dump() with a length of zero produces no output.
+     * The method should handle this edge case gracefully without writing anything
+     * to the provided Appendable.
+     */
+    @Test
+    public void dumpWithZeroLengthShouldWriteNothing() throws IOException {
+        // Arrange
+        final byte[] data = new byte[8]; // The content of the data array is irrelevant for this test.
+        final StringWriter writer = new StringWriter();
+        final long offset = 0L;
+        final int startIndex = 0;
+        final int length = 0;
+
+        // Act
+        HexDump.dump(data, offset, writer, startIndex, length);
+
+        // Assert
+        assertEquals("Output should be empty when dump length is zero.", "", writer.toString());
     }
 }
