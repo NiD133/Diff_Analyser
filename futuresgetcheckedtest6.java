@@ -1,63 +1,40 @@
 package com.google.common.util.concurrent;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.util.concurrent.ClassPathUtil.parseJavaClassPath;
 import static com.google.common.util.concurrent.Futures.getChecked;
-import static com.google.common.util.concurrent.Futures.immediateFuture;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.CHECKED_EXCEPTION;
 import static com.google.common.util.concurrent.FuturesGetCheckedInputs.ERROR;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.ERROR_FUTURE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_CHECKED_EXCEPTION;
 import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_ERROR;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_OTHER_THROWABLE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.FAILED_FUTURE_UNCHECKED_EXCEPTION;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.OTHER_THROWABLE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.RUNTIME_EXCEPTION;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.RUNTIME_EXCEPTION_FUTURE;
-import static com.google.common.util.concurrent.FuturesGetCheckedInputs.UNCHECKED_EXCEPTION;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertThrows;
-import com.google.common.testing.GcFinalization;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithBadConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithGoodAndBadConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithManyConstructors;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithManyConstructorsButOnlyOneThrowable;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithPrivateConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithSomePrivateConstructors;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithWrongTypesConstructor;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.ExceptionWithoutThrowableConstructor;
+
 import com.google.common.util.concurrent.FuturesGetCheckedInputs.TwoArgConstructorException;
-import com.google.common.util.concurrent.FuturesGetCheckedInputs.TwoArgConstructorRuntimeException;
-import java.lang.ref.WeakReference;
-import java.net.URLClassLoader;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import java.util.concurrent.ExecutionError;
+import org.junit.Test;
 
-public class FuturesGetCheckedTestTest6 extends TestCase {
+/**
+ * Tests for {@link Futures#getChecked(java.util.concurrent.Future, Class)} that focus on how it
+ * handles a {@code Future} that fails with an {@link Error}.
+ */
+public class FuturesGetCheckedErrorHandlingTest {
 
-    /**
-     * Loads {@link WillBeUnloadedException} in a separate {@code ClassLoader}, calls {@code
-     * getChecked(future, WillBeUnloadedException.class)}, and returns the loader. The caller can then
-     * test that the {@code ClassLoader} can still be GCed. The test amounts to a test that {@code
-     * getChecked} holds no strong references to the class.
-     */
-    private WeakReference<?> doTestClassUnloading() throws Exception {
-        URLClassLoader shadowLoader = new URLClassLoader(parseJavaClassPath(), null);
-        @SuppressWarnings("unchecked")
-        Class<WillBeUnloadedException> shadowClass = (Class<WillBeUnloadedException>) Class.forName(WillBeUnloadedException.class.getName(), false, shadowLoader);
-        assertNotSame(shadowClass, WillBeUnloadedException.class);
-        getChecked(immediateFuture("foo"), shadowClass);
-        return new WeakReference<>(shadowLoader);
-    }
+  /**
+   * Verifies that when the input future fails with an {@link Error}, {@code getChecked} wraps it in
+   * an {@link ExecutionError} rather than the declared exception type. The original {@code Error}
+   * should be preserved as the cause.
+   */
+  @Test
+  public void getChecked_whenFutureFailsWithError_throwsExecutionError()
+      throws TwoArgConstructorException {
+    // The signature of getChecked is `getChecked(Future<V>, Class<X>) throws X`.
+    // The compiler thus requires this method to declare that it throws X
+    // (TwoArgConstructorException), even though this test asserts that a
+    // different exception (ExecutionError) is thrown for this specific input.
 
-    public static final class WillBeUnloadedException extends Exception {
-    }
+    ExecutionError thrown =
+        assertThrows(
+            "getChecked should wrap a causal Error in an ExecutionError",
+            ExecutionError.class,
+            () -> getChecked(FAILED_FUTURE_ERROR, TwoArgConstructorException.class));
 
-    public void testGetCheckedUntimed_executionExceptionError() throws TwoArgConstructorException {
-        ExecutionError expected = assertThrows(ExecutionError.class, () -> getChecked(FAILED_FUTURE_ERROR, TwoArgConstructorException.class));
-        assertThat(expected).hasCauseThat().isEqualTo(ERROR);
-    }
+    assertThat(thrown).hasCauseThat().isEqualTo(ERROR);
+  }
 }
