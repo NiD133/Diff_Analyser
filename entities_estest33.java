@@ -1,30 +1,36 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
 
 public class Entities_ESTestTest33 extends Entities_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        StringWriter stringWriter0 = new StringWriter();
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(stringWriter0);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        Entities.escape(quietAppendable0, "                  ", document_OutputSettings0, 1157);
-        assertEquals(" ", stringWriter0.toString());
+    /**
+     * Tests that the internal Entities.escape() method correctly collapses multiple
+     * whitespace characters (spaces, tabs, newlines) into a single space when the
+     * 'Normalise' option is specified.
+     */
+    @Test
+    public void escapeWithNormaliseOptionCollapsesMultipleWhitespaceCharacters() {
+        // Arrange
+        StringWriter writer = new StringWriter();
+        QuietAppendable appendable = QuietAppendable.wrap(writer);
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        String inputWithMultipleWhitespace = "   \n  \t "; // A mix of spaces, newline, and tab
+        
+        // The 'Normalise' option flag instructs the escape method to collapse whitespace.
+        int options = Entities.Normalise;
+
+        // Act
+        Entities.escape(appendable, inputWithMultipleWhitespace, outputSettings, options);
+
+        // Assert
+        String expectedOutput = " ";
+        assertEquals("Multiple whitespace characters should be collapsed to a single space.",
+                expectedOutput, writer.toString());
     }
 }
