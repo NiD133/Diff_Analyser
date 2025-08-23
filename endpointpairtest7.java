@@ -1,56 +1,43 @@
 package com.google.common.graph;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.testing.EqualsTester;
-import java.util.Collection;
+
 import java.util.Set;
-import org.jspecify.annotations.NullUnmarked;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-public class EndpointPairTestTest7 {
+/**
+ * Tests for {@link EndpointPair}, focusing on its behavior within an undirected {@link Graph}.
+ */
+public class EndpointPairTest {
 
-    private static final Integer N0 = 0;
-
-    private static final Integer N1 = 1;
-
-    private static final Integer N2 = 2;
-
-    private static final Integer N3 = 3;
-
-    private static final Integer N4 = 4;
-
-    private static final String E12 = "1-2";
-
-    private static final String E12_A = "1-2a";
-
-    private static final String E21 = "2-1";
-
-    private static final String E13 = "1-3";
-
-    private static final String E44 = "4-4";
-
-    private static void containsExactlySanityCheck(Collection<?> collection, Object... varargs) {
-        assertThat(collection).hasSize(varargs.length);
-        for (Object obj : varargs) {
-            assertThat(collection).contains(obj);
-        }
-        assertThat(collection).containsExactly(varargs);
-    }
+    private static final Integer NODE_1 = 1;
+    private static final Integer NODE_2 = 2;
+    private static final Integer NODE_3 = 3;
+    private static final Integer NODE_4 = 4;
 
     @Test
-    public void endpointPair_undirectedGraph() {
-        MutableGraph<Integer> undirectedGraph = GraphBuilder.undirected().allowsSelfLoops(true).build();
-        undirectedGraph.addNode(N0);
-        undirectedGraph.putEdge(N1, N2);
-        // does nothing
-        undirectedGraph.putEdge(N2, N1);
-        undirectedGraph.putEdge(N1, N3);
-        undirectedGraph.putEdge(N4, N4);
-        containsExactlySanityCheck(undirectedGraph.edges(), EndpointPair.unordered(N1, N2), EndpointPair.unordered(N1, N3), EndpointPair.unordered(N4, N4));
+    public void edges_onUndirectedGraph_returnsUnorderedEndpointPairs() {
+        // ARRANGE: Create an undirected graph with a standard edge, a self-loop,
+        // and a redundant edge to verify set-like behavior.
+        MutableGraph<Integer> graph = GraphBuilder.undirected().allowsSelfLoops(true).build();
+
+        graph.putEdge(NODE_1, NODE_2);
+        graph.putEdge(NODE_1, NODE_3);
+        graph.putEdge(NODE_4, NODE_4); // A self-loop edge
+
+        // In an undirected graph, edge {1, 2} is the same as {2, 1}.
+        // This call should not add a new edge.
+        graph.putEdge(NODE_2, NODE_1);
+
+        // ACT: Retrieve the set of edges from the graph.
+        Set<EndpointPair<Integer>> edges = graph.edges();
+
+        // ASSERT: The set should contain the correct unordered endpoint pairs,
+        // ignoring the redundant edge.
+        assertThat(edges)
+            .containsExactly(
+                EndpointPair.unordered(NODE_1, NODE_2),
+                EndpointPair.unordered(NODE_1, NODE_3),
+                EndpointPair.unordered(NODE_4, NODE_4));
     }
 }
