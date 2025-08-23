@@ -1,29 +1,36 @@
 package org.apache.commons.io.output;
 
+import static org.evosuite.runtime.EvoAssertions.verifyException;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
 public class ThresholdingOutputStream_ESTestTest14 extends ThresholdingOutputStream_ESTest_scaffolding {
 
+    /**
+     * Tests that calling {@code checkThreshold} on a {@link DeferredFileOutputStream}
+     * created with a default builder throws a {@link NullPointerException}.
+     * <p>
+     * The default builder does not configure an output directory. When the threshold
+     * is exceeded, the stream attempts to create a temporary file in a null directory,
+     * causing an NPE inside {@code java.nio.file.Files}.
+     * </p>
+     */
     @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DeferredFileOutputStream.Builder deferredFileOutputStream_Builder0 = new DeferredFileOutputStream.Builder();
-        DeferredFileOutputStream deferredFileOutputStream0 = deferredFileOutputStream_Builder0.get();
-        // Undeclared exception!
+    public void checkThresholdWithDefaultBuilderThrowsNullPointerException() throws Throwable {
+        // Arrange: Create a DeferredFileOutputStream using the default builder, which
+        // does not set a directory for the output file.
+        final DeferredFileOutputStream.Builder builder = new DeferredFileOutputStream.Builder();
+        final DeferredFileOutputStream outputStream = builder.get();
+
+        // Act & Assert: Expect a NullPointerException when the threshold is checked.
         try {
-            deferredFileOutputStream0.checkThreshold(1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
+            // A count of 1 is sufficient to trigger the threshold-exceeded logic.
+            outputStream.checkThreshold(1);
+            fail("A NullPointerException was expected because no output directory was configured.");
+        } catch (final NullPointerException e) {
+            // Verify that the NPE originates from the file system utility class,
+            // confirming our assumption about the cause of the failure.
             verifyException("java.nio.file.Files", e);
         }
     }
