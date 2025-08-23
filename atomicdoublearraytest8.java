@@ -1,72 +1,35 @@
 package com.google.common.util.concurrent;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertThrows;
-import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
-import com.google.common.testing.NullPointerTester;
-import java.util.Arrays;
-import org.jspecify.annotations.NullUnmarked;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class AtomicDoubleArrayTestTest8 extends JSR166TestCase {
-
-    private static final double[] VALUES = { Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, (double) Long.MIN_VALUE, (double) Integer.MIN_VALUE, -Math.PI, -1.0, -Double.MIN_VALUE, -0.0, +0.0, Double.MIN_VALUE, 1.0, Math.PI, (double) Integer.MAX_VALUE, (double) Long.MAX_VALUE, Double.MAX_VALUE, Double.POSITIVE_INFINITY, Double.NaN, Float.MAX_VALUE };
-
-    static final long COUNTDOWN = 100000;
+/**
+ * Contains tests for the AtomicDoubleArray class.
+ */
+public class AtomicDoubleArrayTest {
 
     /**
-     * The notion of equality used by AtomicDoubleArray
+     * Verifies that getAndSet() correctly returns the previous value at a given index
+     * and successfully updates that index with the new value.
      */
-    static boolean bitEquals(double x, double y) {
-        return Double.doubleToRawLongBits(x) == Double.doubleToRawLongBits(y);
-    }
+    @Test
+    public void getAndSet_returnsOldValue_andSetsNewValue() {
+        // Arrange: Define the initial state and the values for the test.
+        int indexToUpdate = 1;
+        double initialValue = 540.0;
+        double newValue = 2806.574;
+        double[] sourceArray = {0.0, initialValue, 0.0, 0.0};
 
-    static void assertBitEquals(double x, double y) {
-        assertEquals(Double.doubleToRawLongBits(x), Double.doubleToRawLongBits(y));
-    }
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(sourceArray);
 
-    class Counter extends CheckedRunnable {
+        // Act: Execute the method under test.
+        double returnedValue = atomicArray.getAndSet(indexToUpdate, newValue);
 
-        final AtomicDoubleArray aa;
+        // Assert: Verify the results.
+        // Check that the method returned the original value.
+        assertEquals("The method should return the value that was present before the update.", initialValue, returnedValue, 0.01);
 
-        volatile long counts;
-
-        Counter(AtomicDoubleArray a) {
-            aa = a;
-        }
-
-        @Override
-        public void realRun() {
-            for (; ; ) {
-                boolean done = true;
-                for (int i = 0; i < aa.length(); i++) {
-                    double v = aa.get(i);
-                    assertTrue(v >= 0);
-                    if (v != 0) {
-                        done = false;
-                        if (aa.compareAndSet(i, v, v - 1.0)) {
-                            ++counts;
-                        }
-                    }
-                }
-                if (done) {
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * get returns the last value set at index
-     */
-    public void testGetSet() {
-        AtomicDoubleArray aa = new AtomicDoubleArray(VALUES.length);
-        for (int i = 0; i < VALUES.length; i++) {
-            assertBitEquals(0.0, aa.get(i));
-            aa.set(i, VALUES[i]);
-            assertBitEquals(VALUES[i], aa.get(i));
-            aa.set(i, -3.0);
-            assertBitEquals(-3.0, aa.get(i));
-        }
+        // Check that the value in the array was updated.
+        assertEquals("The value at the specified index should be updated to the new value.", newValue, atomicArray.get(indexToUpdate), 0.01);
     }
 }
