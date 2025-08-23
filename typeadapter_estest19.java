@@ -1,35 +1,40 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-public class TypeAdapter_ESTestTest19 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Contains tests for the final convenience methods of the {@link TypeAdapter} class.
+ */
+public class TypeAdapterTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        Gson.FutureTypeAdapter<Object> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Object>();
-        TypeAdapter<Object> typeAdapter0 = gson_FutureTypeAdapter0.nullSafe();
-        try {
-            typeAdapter0.fromJson("CU^I6g<Up/h/ru@&");
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 1 path $
-            // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
-            //
-            verifyException("com.google.gson.stream.JsonReader", e);
-        }
+    /**
+     * Verifies that calling {@link TypeAdapter#fromJson(String)} with a malformed JSON string
+     * throws an {@link IOException}. This behavior is expected because the underlying
+     * {@link com.google.gson.stream.JsonReader} operates in a strict mode by default.
+     */
+    @Test
+    public void fromJson_withMalformedJsonString_shouldThrowIOException() {
+        // Arrange
+        // We need a concrete TypeAdapter instance to test the final `fromJson` method.
+        // A FutureTypeAdapter is a simple internal class that serves this purpose.
+        TypeAdapter<Object> typeAdapter = new Gson.FutureTypeAdapter<>().nullSafe();
+        String malformedJson = "This is not valid JSON";
+
+        // Act & Assert
+        // The fromJson method should fail because the input string is not a valid JSON value.
+        IOException thrownException = assertThrows(IOException.class, () -> {
+            typeAdapter.fromJson(malformedJson);
+        });
+
+        // For a more robust test, we can check that the exception message contains
+        // the helpful hint provided by Gson's parser.
+        String expectedMessageHint = "Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON";
+        assertTrue(
+            "The exception message should guide the user to use lenient parsing.",
+            thrownException.getMessage().contains(expectedMessageHint)
+        );
     }
 }
