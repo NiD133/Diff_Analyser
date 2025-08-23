@@ -1,33 +1,46 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.apache.ibatis.executor.result.ResultMapException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class BaseTypeHandler_ESTestTest17 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Test suite for the BaseTypeHandler class.
+ * This focuses on the common exception handling logic in the base class.
+ */
+class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        ObjectTypeHandler objectTypeHandler0 = ObjectTypeHandler.INSTANCE;
-        // Undeclared exception!
-        try {
-            objectTypeHandler0.getResult((ResultSet) null, "(?y^aVym-^?qnK=B\"");
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error attempting to get column '(?y^aVym-^?qnK=B\"' from result set.  Cause: java.lang.NullPointerException
-            //
-            verifyException("org.apache.ibatis.type.BaseTypeHandler", e);
-        }
+    // Using a concrete implementation for testing the abstract BaseTypeHandler
+    private BaseTypeHandler<Object> typeHandler;
+
+    @BeforeEach
+    void setUp() {
+        typeHandler = new ObjectTypeHandler();
+    }
+
+    /**
+     * Verifies that getResult(ResultSet, String) wraps any exception
+     * in a descriptive ResultMapException.
+     */
+    @Test
+    void getResultByColumnNameShouldThrowDescriptiveExceptionOnNullResultSet() {
+        // Arrange
+        String columnName = "anyColumn";
+        // The condition under test is the null ResultSet.
+
+        // Act & Assert
+        // We expect a ResultMapException that wraps the underlying NullPointerException.
+        ResultMapException thrown = assertThrows(ResultMapException.class, () -> {
+            typeHandler.getResult((ResultSet) null, columnName);
+        });
+
+        // Verify the exception details for better diagnostics and to confirm the wrapping logic.
+        assertTrue(thrown.getMessage().contains("Error attempting to get column 'anyColumn' from result set."));
+        assertTrue(thrown.getCause() instanceof NullPointerException, "The cause of the exception should be a NullPointerException.");
     }
 }
