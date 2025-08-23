@@ -1,23 +1,32 @@
 package org.jfree.chart;
 
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import org.jfree.chart.entity.ChartEntity;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.internal.CloneUtils;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import java.awt.geom.Rectangle2D;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ChartRenderingInfoTestTest3 {
+/**
+ * A collection of tests for the serialization of the {@link ChartRenderingInfo} class.
+ */
+class ChartRenderingInfoSerializationTest {
 
     /**
-     * Serialize an instance, restore it, and check for equality.
+     * Verifies that a ChartRenderingInfo instance can be serialized and then
+     * deserialized, resulting in an object that is equal to the original.
+     * This is crucial for features like saving chart state or transferring
+     * it over a network.
      */
     @Test
-    public void testSerialization() {
-        ChartRenderingInfo i1 = new ChartRenderingInfo();
-        i1.setChartArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
-        ChartRenderingInfo i2 = TestUtils.serialised(i1);
-        assertEquals(i1, i2);
+    void aSerializedAndDeserializedInstanceShouldBeEqualToTheOriginal() {
+        // Arrange: Create an instance and configure its state.
+        // The chartArea is a transient field with custom serialization logic,
+        // so it's important to test its state is preserved.
+        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
+        originalInfo.setChartArea(new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0));
+
+        // Act: Serialize and then deserialize the instance.
+        ChartRenderingInfo deserializedInfo = TestUtils.serialised(originalInfo);
+
+        // Assert: The deserialized object should be equal to the original.
+        assertEquals(originalInfo, deserializedInfo);
     }
 }
