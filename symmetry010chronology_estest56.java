@@ -1,44 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertNull;
+
+/**
+ * This test class contains tests for the Symmetry010Chronology class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class Symmetry010Chronology_ESTestTest56 extends Symmetry010Chronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        String string0 = symmetry010Chronology0.getCalendarType();
-        assertNull(string0);
+    /**
+     * Verifies that getCalendarType() returns null as specified by its contract.
+     * <p>
+     * The Javadoc for {@link Symmetry010Chronology#getCalendarType()} states that
+     * the Unicode LDML specification does not define an identifier for this calendar system,
+     * so the method is expected to return null.
+     */
+    @Test
+    public void getCalendarType_shouldReturnNull() {
+        // Arrange: The Symmetry010Chronology is a singleton, so we use its public instance.
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+
+        // Act: Get the calendar type from the chronology.
+        String calendarType = chronology.getCalendarType();
+
+        // Assert: The returned calendar type should be null.
+        assertNull("The calendar type should be null as it is not defined in LDML.", calendarType);
     }
 }
