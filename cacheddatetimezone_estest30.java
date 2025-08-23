@@ -1,25 +1,33 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest30 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        Instant instant0 = Instant.now();
-        DateTimeZone dateTimeZone0 = instant0.getZone();
-        CachedDateTimeZone cachedDateTimeZone0 = CachedDateTimeZone.forZone(dateTimeZone0);
-        DateTimeZone dateTimeZone1 = cachedDateTimeZone0.getUncachedZone();
-        assertSame(dateTimeZone1, dateTimeZone0);
+/**
+ * Unit tests for {@link CachedDateTimeZone}.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that getUncachedZone() returns the original DateTimeZone instance
+     * that the CachedDateTimeZone was created with.
+     */
+    @Test
+    public void getUncachedZone_shouldReturnTheOriginalZoneInstance() {
+        // Arrange: Create a specific, non-fixed time zone.
+        // Using a specific zone like "Europe/London" makes the test more stable
+        // and independent of the system's default time zone.
+        DateTimeZone originalZone = DateTimeZone.forID("Europe/London");
+
+        // Act: Create a cached wrapper and then retrieve the underlying zone.
+        CachedDateTimeZone cachedZone = CachedDateTimeZone.forZone(originalZone);
+        DateTimeZone unwrappedZone = cachedZone.getUncachedZone();
+
+        // Assert: The unwrapped zone should be the exact same instance as the original.
+        // We use assertSame to check for object identity, which is the contract
+        // of getUncachedZone().
+        assertSame("The unwrapped zone should be the same instance as the original", originalZone, unwrappedZone);
     }
 }
