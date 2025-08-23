@@ -2,17 +2,25 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Weeks_ESTestTest6 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Weeks weeks0 = Weeks.parseWeeks((String) null);
-        Minutes minutes0 = weeks0.toStandardMinutes();
-        assertEquals(1, minutes0.size());
+    /**
+     * Tests that parsing a null string returns a period of zero weeks,
+     * as specified by the method's contract.
+     */
+    @Test
+    public void parseWeeks_withNullInput_returnsZeroWeeks() {
+        // Arrange: The Javadoc for parseWeeks() specifies that a null input
+        // should be treated as a zero-week period.
+
+        // Act: Call the method with a null input.
+        Weeks result = Weeks.parseWeeks(null);
+
+        // Assert: The result should be the constant for zero weeks.
+        assertEquals(Weeks.ZERO, result);
     }
 }
