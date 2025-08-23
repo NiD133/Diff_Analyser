@@ -1,26 +1,41 @@
 package com.google.common.util.concurrent;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
+import static org.junit.Assert.assertEquals;
+
 import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AtomicDoubleArray_ESTestTest3 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Unit tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        double[] doubleArray0 = new double[12];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        double double0 = atomicDoubleArray0.getAndAdd(4, 4);
-        assertEquals(0.0, double0, 0.01);
-        DoubleUnaryOperator doubleUnaryOperator0 = DoubleUnaryOperator.identity();
-        double double1 = atomicDoubleArray0.updateAndGet(4, doubleUnaryOperator0);
-        assertEquals(4.0, double1, 0.01);
+    /**
+     * This test verifies a sequence of atomic operations. First, it calls {@code getAndAdd}
+     * to modify a value and checks its return value. Then, it calls {@code updateAndGet} on
+     * the same element to ensure the state is correctly handled between operations.
+     */
+    @Test
+    public void getAndAdd_followedByUpdateAndGet_modifiesArrayAndReturnsCorrectValues() {
+        // Arrange: Create an array where all elements are initially 0.0.
+        final int indexToUpdate = 4;
+        final double valueToAdd = 4.0;
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(12);
+
+        // Act & Assert: Part 1 - Test getAndAdd
+        // This should return the old value (0.0) and update the element at the index to 4.0.
+        double valueBeforeAdd = atomicArray.getAndAdd(indexToUpdate, valueToAdd);
+
+        assertEquals("getAndAdd should return the value before the addition.", 0.0, valueBeforeAdd, 0.0);
+        assertEquals("The value at the index should be updated after getAndAdd.", 4.0, atomicArray.get(indexToUpdate), 0.0);
+
+        // Act & Assert: Part 2 - Test updateAndGet on the modified array
+        // The identity function x -> x should not change the current value (4.0).
+        // updateAndGet should return the new (which is the same) value.
+        DoubleUnaryOperator identityOperator = DoubleUnaryOperator.identity();
+        double valueAfterUpdate = atomicArray.updateAndGet(indexToUpdate, identityOperator);
+
+        assertEquals("updateAndGet should return the updated value.", 4.0, valueAfterUpdate, 0.0);
+        assertEquals("The value should be unchanged after applying the identity function.", 4.0, atomicArray.get(indexToUpdate), 0.0);
     }
 }
