@@ -1,18 +1,30 @@
 package org.apache.commons.codec.digest;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class MurmurHash2_ESTestTest7 extends MurmurHash2_ESTest_scaffolding {
+/**
+ * Tests for the {@link MurmurHash2} class.
+ */
+public class MurmurHash2Test {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        byte[] byteArray0 = new byte[0];
-        int int0 = MurmurHash2.hash32(byteArray0, 0, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that the 32-bit hash of an empty byte array with a seed of 0
+     * correctly returns 0. This verifies a fundamental edge case of the
+     * hashing algorithm.
+     */
+    @Test
+    public void hash32ShouldReturnZeroForEmptyDataAndZeroSeed() {
+        // Arrange: Define the inputs for the test case
+        final byte[] emptyData = new byte[0];
+        final int length = 0;
+        final int seed = 0;
+        final int expectedHash = 0;
+
+        // Act: Call the method under test
+        final int actualHash = MurmurHash2.hash32(emptyData, length, seed);
+
+        // Assert: Verify the result is as expected
+        assertEquals(expectedHash, actualHash);
     }
 }
