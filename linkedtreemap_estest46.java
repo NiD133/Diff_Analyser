@@ -2,24 +2,25 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class LinkedTreeMap_ESTestTest46 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Tests for the inner class {@link LinkedTreeMap.Node}.
+ */
+public class LinkedTreeMapNodeTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, Integer> linkedTreeMap_Node0 = new LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, Integer>(true);
-        Integer integer0 = linkedTreeMap_Node0.setValue((Integer) null);
-        assertNull(integer0);
+    @Test
+    public void setValueOnNewNodeShouldReturnNull() {
+        // Arrange
+        // Create a new "header" node that allows null values. The specific key and
+        // value types (e.g., String, Integer) are not important for this test.
+        LinkedTreeMap.Node<String, Integer> node = new LinkedTreeMap.Node<>(true);
+
+        // Act
+        // Set a value on the newly created node and capture the returned (previous) value.
+        Integer previousValue = node.setValue(null);
+
+        // Assert
+        // For a new node, the previous value should always be null.
+        assertNull("The previous value of a new node should be null", previousValue);
     }
 }
