@@ -1,48 +1,44 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest1 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        YearMonth yearMonth0 = new YearMonth();
-        YearMonth yearMonth1 = yearMonth0.plusMonths(4989);
-        boolean boolean0 = yearMonth1.isEqual(yearMonth0);
-        assertFalse(boolean0);
-        assertEquals(11, yearMonth1.getMonthOfYear());
+/**
+ * Test suite for the comparison methods in {@link AbstractPartial}.
+ * This suite uses {@link YearMonth} as a concrete implementation of AbstractPartial
+ * to verify the behavior of methods like isEqual().
+ */
+public class AbstractPartialComparisonTest {
+
+    @Test
+    public void isEqual_shouldReturnFalse_whenPartialsAreDifferent() {
+        // Arrange
+        // Use a fixed date to ensure the test is deterministic.
+        YearMonth baseYearMonth = new YearMonth(2023, 2); // February 2023
+        YearMonth differentYearMonth = baseYearMonth.plusMonths(1); // March 2023
+
+        // Act
+        // The isEqual method is inherited from the AbstractPartial class.
+        boolean areEqual = baseYearMonth.isEqual(differentYearMonth);
+
+        // Assert
+        assertFalse("isEqual() should return false for two different partials.", areEqual);
+    }
+
+    @Test
+    public void isEqual_shouldReturnTrue_whenPartialsRepresentTheSameValue() {
+        // Arrange
+        // Create two separate but identical YearMonth instances.
+        YearMonth yearMonthOne = new YearMonth(2023, 2); // February 2023
+        YearMonth yearMonthTwo = new YearMonth(2023, 2); // February 2023
+
+        // Act
+        boolean areEqual = yearMonthOne.isEqual(yearMonthTwo);
+
+        // Assert
+        assertTrue("isEqual() should return true for two identical partials.", areEqual);
     }
 }
