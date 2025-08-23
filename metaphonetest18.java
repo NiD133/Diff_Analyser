@@ -1,60 +1,38 @@
 package org.apache.commons.codec.language;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+
 import org.apache.commons.codec.AbstractStringEncoderTest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MetaphoneTestTest18 extends AbstractStringEncoderTest<Metaphone> {
-
-    public void assertIsMetaphoneEqual(final String source, final String[] matches) {
-        // match source to all matches
-        for (final String matche : matches) {
-            assertTrue(getStringEncoder().isMetaphoneEqual(source, matche), "Source: " + source + ", should have same Metaphone as: " + matche);
-        }
-        // match to each other
-        for (final String matche : matches) {
-            for (final String matche2 : matches) {
-                assertTrue(getStringEncoder().isMetaphoneEqual(matche, matche2));
-            }
-        }
-    }
-
-    public void assertMetaphoneEqual(final String[][] pairs) {
-        validateFixture(pairs);
-        for (final String[] pair : pairs) {
-            final String name0 = pair[0];
-            final String name1 = pair[1];
-            final String failMsg = "Expected match between " + name0 + " and " + name1;
-            assertTrue(getStringEncoder().isMetaphoneEqual(name0, name1), failMsg);
-            assertTrue(getStringEncoder().isMetaphoneEqual(name1, name0), failMsg);
-        }
-    }
+/**
+ * Tests the {@link Metaphone#isMetaphoneEqual(String, String)} method.
+ */
+@DisplayName("Metaphone.isMetaphoneEqual")
+class MetaphoneIsEqualTest extends AbstractStringEncoderTest<Metaphone> {
 
     @Override
     protected Metaphone createStringEncoder() {
         return new Metaphone();
     }
 
-    public void validateFixture(final String[][] pairs) {
-        if (pairs.length == 0) {
-            fail("Test fixture is empty");
-        }
-        for (int i = 0; i < pairs.length; i++) {
-            if (pairs[i].length != 2) {
-                fail("Error in test fixture in the data array at index " + i);
+    @Test
+    @DisplayName("should return true for a set of words that are phonetically equivalent")
+    void testIsMetaphoneEqualForEquivalentSet() {
+        // This test verifies that a group of words, which all produce the same Metaphone code ("RT"),
+        // are considered equal by the isMetaphoneEqual method.
+        // The set includes "Wright" to test the rule where an initial "WR" is coded as "R".
+        final String[] equivalentWords = {"Wright", "Rota", "Rudd", "Ryde"};
+
+        // To confirm that the set is truly equivalent, we perform a pairwise comparison.
+        // Every word in the set should be metaphonically equal to every other word,
+        // which also transitively confirms their equality.
+        for (final String word1 : equivalentWords) {
+            for (final String word2 : equivalentWords) {
+                assertTrue(getStringEncoder().isMetaphoneEqual(word1, word2),
+                    () -> String.format("Expected '%s' and '%s' to be metaphonically equal, but they were not.", word1, word2));
             }
         }
-    }
-
-    /**
-     * Initial WR case.
-     *
-     * Match data computed from http://www.lanw.com/java/phonetic/default.htm
-     */
-    @Test
-    void testIsMetaphoneEqualWright() {
-        assertIsMetaphoneEqual("Wright", new String[] { "Rota", "Rudd", "Ryde" });
     }
 }
