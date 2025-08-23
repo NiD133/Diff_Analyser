@@ -1,73 +1,44 @@
 package org.apache.ibatis.jdbc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import javax.sql.DataSource;
 import org.apache.ibatis.BaseDataTest;
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.io.Resources;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class ScriptRunnerTestTest4 extends BaseDataTest {
+/**
+ * Tests for the ScriptRunner class, focusing on edge cases and error handling.
+ */
+class ScriptRunnerTest extends BaseDataTest {
 
-    private static final String LINE_SEPARATOR = System.lineSeparator();
+  private static final String SCRIPT_WITH_MISSING_TERMINATOR = "org/apache/ibatis/jdbc/ScriptMissingEOLTerminator.sql";
 
-    private void runJPetStoreScripts(ScriptRunner runner) throws IOException, SQLException {
-        runScript(runner, JPETSTORE_DDL);
-        runScript(runner, JPETSTORE_DATA);
+  /**
+   * Verifies that the ScriptRunner throws an exception if it processes a script
+   * where the final SQL statement is not properly terminated by a delimiter.
+   */
+  @Test
+  void shouldThrowExceptionWhenScriptIsMissingTerminator() throws Exception {
+    // Arrange
+    DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
+    try (Connection connection = ds.getConnection();
+        Reader reader = Resources.getResourceAsReader(SCRIPT_WITH_MISSING_TERMINATOR)) {
+
+      ScriptRunner runner = new ScriptRunner(connection);
+      runner.setStopOnError(false);
+      runner.setAutoCommit(true);
+      runner.setLogWriter(null);        // Suppress console output for clean test logs
+      runner.setErrorLogWriter(null);   // Suppress error output for clean test logs
+
+      // Act & Assert
+      // Expect an exception because the script file contains a statement without a final delimiter.
+      JdbcSqlException thrown = assertThrows(JdbcSqlException.class, () -> runner.runScript(reader));
+
+      assertTrue(thrown.getMessage().contains("Script missing end-of-line terminator"));
     }
-
-    private void assertProductsTableExistsAndLoaded() throws IOException, SQLException {
-        PooledDataSource ds = createPooledDataSource(JPETSTORE_PROPERTIES);
-        try (Connection conn = ds.getConnection()) {
-            SqlRunner executor = new SqlRunner(conn);
-            List<Map<String, Object>> products = executor.selectAll("SELECT * FROM PRODUCT");
-            assertEquals(16, products.size());
-        } finally {
-            ds.forceCloseAll();
-        }
-    }
-
-    private StringBuilder y(StringBuilder sb) {
-        sb.append("ABC");
-        return sb;
-    }
-
-    @Test
-    void shouldReturnWarningIfEndOfLineTerminatorNotFound() throws Exception {
-        DataSource ds = createUnpooledDataSource(JPETSTORE_PROPERTIES);
-        String resource = "org/apache/ibatis/jdbc/ScriptMissingEOLTerminator.sql";
-        try (Connection conn = ds.getConnection();
-            Reader reader = Resources.getResourceAsReader(resource)) {
-            ScriptRunner runner = new ScriptRunner(conn);
-            runner.setAutoCommit(true);
-            runner.setStopOnError(false);
-            runner.setErrorLogWriter(null);
-            runner.setLogWriter(null);
-            try {
-                runner.runScript(reader);
-                fail("Expected script runner to fail due to missing end of line terminator.");
-            } catch (Exception e) {
-                assertTrue(e.getMessage().contains("end-of-line terminator"));
-            }
-        }
-    }
+  }
 }
