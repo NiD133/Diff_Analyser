@@ -1,33 +1,32 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.CharArrayWriter;
+
 import java.io.IOException;
 import java.io.PipedReader;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.io.Reader;
 
-public class ProxyReader_ESTestTest26 extends ProxyReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ProxyReader} class.
+ */
+public class ProxyReaderTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        PipedReader pipedReader0 = new PipedReader();
-        CloseShieldReader closeShieldReader0 = CloseShieldReader.wrap(pipedReader0);
-        // Undeclared exception!
-        try {
-            closeShieldReader0.read((char[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.io.Reader", e);
-        }
+    /**
+     * Tests that calling read(char[]) with a null buffer correctly throws a
+     * NullPointerException. The ProxyReader should delegate the call to the
+     * underlying reader, which is the source of the expected exception.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readWithNullCharArrayShouldThrowNullPointerException() throws IOException {
+        // Arrange: Create a proxy reader instance for the test.
+        // CloseShieldReader is a concrete subclass of ProxyReader.
+        Reader proxyReader = CloseShieldReader.wrap(new PipedReader());
+
+        // Act: Attempt to read from the stream into a null buffer.
+        // This action is expected to throw the exception.
+        proxyReader.read((char[]) null);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // as specified by the @Test(expected=...) annotation.
     }
 }
