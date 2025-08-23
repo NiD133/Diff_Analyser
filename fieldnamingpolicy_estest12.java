@@ -1,27 +1,22 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.lang.reflect.Field;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldNamingPolicy_ESTestTest12 extends FieldNamingPolicy_ESTest_scaffolding {
+/**
+ * Tests for the {@link FieldNamingPolicy} enum, focusing on edge cases.
+ */
+public class FieldNamingPolicyTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        FieldNamingPolicy fieldNamingPolicy0 = FieldNamingPolicy.LOWER_CASE_WITH_DOTS;
-        // Undeclared exception!
-        try {
-            fieldNamingPolicy0.translateName((Field) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.FieldNamingPolicy$7", e);
-        }
+    /**
+     * Verifies that calling translateName with a null Field argument
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void translateName_whenFieldIsNull_shouldThrowNullPointerException() {
+        FieldNamingPolicy policy = FieldNamingPolicy.LOWER_CASE_WITH_DOTS;
+        
+        // This call is expected to throw a NullPointerException because the input Field is null.
+        policy.translateName(null);
     }
 }
