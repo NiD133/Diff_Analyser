@@ -1,33 +1,38 @@
 package com.itextpdf.text.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for {@link GroupedRandomAccessSource}.
+ * This specific test case was refactored for improved readability.
+ */
 public class GroupedRandomAccessSource_ESTestTest12 extends GroupedRandomAccessSource_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        RandomAccessSource[] randomAccessSourceArray0 = new RandomAccessSource[1];
-        byte[] byteArray0 = new byte[7];
-        ArrayRandomAccessSource arrayRandomAccessSource0 = new ArrayRandomAccessSource(byteArray0);
-        randomAccessSourceArray0[0] = (RandomAccessSource) arrayRandomAccessSource0;
-        GroupedRandomAccessSource groupedRandomAccessSource0 = new GroupedRandomAccessSource(randomAccessSourceArray0);
-        // Undeclared exception!
-        try {
-            groupedRandomAccessSource0.get((long) 1, byteArray0, 5239, 1);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-        }
+    /**
+     * Verifies that the get() method throws an ArrayIndexOutOfBoundsException
+     * when the provided offset for the destination buffer is out of bounds.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void get_withOffsetOutOfBoundsForDestinationArray_throwsArrayIndexOutOfBoundsException() throws IOException {
+        // Arrange: Set up a GroupedRandomAccessSource and a destination buffer.
+        int sourceLength = 7;
+        byte[] sourceBytes = new byte[sourceLength];
+        RandomAccessSource singleSource = new ArrayRandomAccessSource(sourceBytes);
+        RandomAccessSource[] sources = { singleSource };
+        GroupedRandomAccessSource groupedSource = new GroupedRandomAccessSource(sources);
+
+        byte[] destinationBuffer = new byte[sourceLength];
+        long readPosition = 1L;
+        int readLength = 1;
+        // Use an offset that is clearly outside the bounds of the destination buffer.
+        int invalidOffset = destinationBuffer.length + 1;
+
+        // Act: Attempt to read from the source into the destination buffer at an invalid offset.
+        // This call is expected to throw an ArrayIndexOutOfBoundsException because the offset
+        // for the destinationBuffer is invalid.
+        groupedSource.get(readPosition, destinationBuffer, invalidOffset, readLength);
+
+        // Assert: The exception is implicitly verified by the @Test(expected = ...) annotation.
     }
 }
