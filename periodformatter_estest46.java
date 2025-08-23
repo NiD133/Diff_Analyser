@@ -2,36 +2,45 @@ package org.joda.time.format;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 import org.joda.time.MutablePeriod;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.Seconds;
-import org.joda.time.Weeks;
-import org.joda.time.Years;
-import org.junit.runner.RunWith;
 
-public class PeriodFormatter_ESTestTest46 extends PeriodFormatter_ESTest_scaffolding {
+/**
+ * Tests for {@link PeriodFormatter}.
+ */
+public class PeriodFormatter_ESTestTest46 {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        PeriodFormatterBuilder.Literal periodFormatterBuilder_Literal0 = PeriodFormatterBuilder.Literal.EMPTY;
-        PeriodFormatter periodFormatter0 = new PeriodFormatter(periodFormatterBuilder_Literal0, periodFormatterBuilder_Literal0);
-        MutablePeriod mutablePeriod0 = MutablePeriod.parse("", periodFormatter0);
-        int int0 = periodFormatter0.parseInto(mutablePeriod0, "", 514);
-        assertEquals((-515), int0);
+    /**
+     * Tests that parseInto() correctly indicates a parse failure when the starting
+     * position is beyond the length of the input string.
+     *
+     * The contract of parseInto() specifies that on failure, it returns a negative number.
+     * The bitwise complement (~) of this return value should be the position where the
+     * parse failed. In this case, parsing fails immediately at the out-of-bounds
+     * starting position.
+     */
+    @Test
+    public void parseIntoShouldReturnFailureIndexWhenStartPositionIsOutOfBounds() {
+        // Arrange
+        // A formatter that successfully parses an empty string.
+        PeriodFormatter formatter = new PeriodFormatter(
+                PeriodFormatterBuilder.Literal.EMPTY,
+                PeriodFormatterBuilder.Literal.EMPTY);
+
+        MutablePeriod period = new MutablePeriod();
+        String emptyText = "";
+        int outOfBoundsPosition = 514;
+
+        // The expected return value for a failure is the bitwise complement of the failure position.
+        int expectedReturnValue = ~outOfBoundsPosition; // This evaluates to -515
+
+        // Act
+        int actualReturnValue = formatter.parseInto(period, emptyText, outOfBoundsPosition);
+
+        // Assert
+        assertEquals(
+            "Expected return value to be the bitwise complement of the out-of-bounds start position",
+            expectedReturnValue,
+            actualReturnValue
+        );
     }
 }
