@@ -1,80 +1,26 @@
 package org.joda.time.convert;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.TimeOfDay;
-import org.joda.time.chrono.BuddhistChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
+import static org.junit.Assert.assertEquals;
 
-public class StringConverterTestTest2 extends TestCase {
+import org.junit.Test;
 
-    private static final DateTimeZone ONE_HOUR = DateTimeZone.forOffsetHours(1);
+/**
+ * Unit tests for the {@link StringConverter} class.
+ */
+public class StringConverterTest {
 
-    private static final DateTimeZone SIX = DateTimeZone.forOffsetHours(6);
+    /**
+     * Tests that the converter correctly identifies its supported type.
+     */
+    @Test
+    public void getSupportedType_shouldReturnStringClass() {
+        // Arrange: The StringConverter is a singleton, accessed via INSTANCE.
+        StringConverter converter = StringConverter.INSTANCE;
 
-    private static final DateTimeZone SEVEN = DateTimeZone.forOffsetHours(7);
+        // Act: Call the method under test.
+        Class<?> supportedType = converter.getSupportedType();
 
-    private static final DateTimeZone EIGHT = DateTimeZone.forOffsetHours(8);
-
-    private static final DateTimeZone UTC = DateTimeZone.UTC;
-
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
-
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
-
-    private static final Chronology ISO_EIGHT = ISOChronology.getInstance(EIGHT);
-
-    private static final Chronology ISO_PARIS = ISOChronology.getInstance(PARIS);
-
-    private static final Chronology ISO_LONDON = ISOChronology.getInstance(LONDON);
-
-    private static Chronology ISO;
-
-    private static Chronology JULIAN;
-
-    private DateTimeZone zone = null;
-
-    private Locale locale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        return new TestSuite(TestStringConverter.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        zone = DateTimeZone.getDefault();
-        locale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        Locale.setDefault(Locale.UK);
-        JULIAN = JulianChronology.getInstance();
-        ISO = ISOChronology.getInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeZone.setDefault(zone);
-        Locale.setDefault(locale);
-        zone = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSupportedType() throws Exception {
-        assertEquals(String.class, StringConverter.INSTANCE.getSupportedType());
+        // Assert: Verify that the returned type is String.class.
+        assertEquals("The converter should support String.class", String.class, supportedType);
     }
 }
