@@ -1,33 +1,28 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for the {@link Tokeniser} class.
+ * This test focuses on the behavior of the emit() method.
+ */
+// The original test class name and inheritance are kept for context.
 public class Tokeniser_ESTestTest10 extends Tokeniser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("", "");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        // Undeclared exception!
-        try {
-            tokeniser0.emit((int[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.Tokeniser", e);
-        }
+    /**
+     * Verifies that calling the emit() method with a null codepoints array
+     * results in a NullPointerException.
+     */
+    @Test(timeout = 4000, expected = NullPointerException.class)
+    public void emitWithNullCodepointsArrayShouldThrowNullPointerException() {
+        // Arrange: Create a Tokeniser instance.
+        // The Tokeniser requires an initialized TreeBuilder for its construction.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        xmlTreeBuilder.parse("", ""); // Initializes the internal reader
+        Tokeniser tokeniser = new Tokeniser(xmlTreeBuilder);
+
+        // Act: Call the emit method with a null argument.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        tokeniser.emit((int[]) null);
     }
 }
