@@ -2,23 +2,46 @@ package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Separators_ESTestTest34 extends Separators_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Separators} class, focusing on its immutability
+ * and fluent "with" methods.
+ */
+public class SeparatorsTest {
 
-    @Test(timeout = 4000)
-    public void test33() throws Throwable {
-        Separators separators0 = Separators.createDefaultInstance();
-        Separators separators1 = separators0.withRootSeparator((String) null);
-        String string0 = separators1.getRootSeparator();
-        assertEquals(',', separators0.getObjectEntrySeparator());
-        assertNull(string0);
-        assertEquals(Separators.Spacing.NONE, separators1.getArrayValueSpacing());
-        assertEquals(':', separators0.getObjectFieldValueSeparator());
-        assertEquals(Separators.Spacing.BOTH, separators1.getObjectFieldValueSpacing());
-        assertEquals(',', separators0.getArrayValueSeparator());
-        assertEquals(Separators.Spacing.NONE, separators1.getObjectEntrySpacing());
+    /**
+     * Tests that `withRootSeparator` creates a new instance with the specified
+     * root separator while leaving the original instance unchanged.
+     */
+    @Test
+    public void withRootSeparator_shouldReturnNewInstanceWithUpdatedValue() {
+        // Arrange: Create a default Separators instance.
+        final Separators originalSeparators = Separators.createDefaultInstance();
+        final String newRootSeparator = null;
+
+        // Act: Call the method under test to create a modified instance.
+        final Separators modifiedSeparators = originalSeparators.withRootSeparator(newRootSeparator);
+
+        // Assert: Verify the behavior.
+
+        // 1. A new, distinct instance should be returned.
+        assertNotSame("The 'with' method should return a new instance.",
+                originalSeparators, modifiedSeparators);
+
+        // 2. The new instance should have the updated root separator.
+        assertNull("The new instance's root separator should be updated.",
+                modifiedSeparators.getRootSeparator());
+
+        // 3. The original instance must remain unchanged (verifying immutability).
+        assertEquals("The original instance should be immutable.",
+                Separators.DEFAULT_ROOT_VALUE_SEPARATOR, originalSeparators.getRootSeparator());
+
+        // 4. All other properties should be copied from the original to the new instance.
+        assertEquals(originalSeparators.getObjectFieldValueSeparator(), modifiedSeparators.getObjectFieldValueSeparator());
+        assertEquals(originalSeparators.getObjectEntrySeparator(), modifiedSeparators.getObjectEntrySeparator());
+        assertEquals(originalSeparators.getArrayValueSeparator(), modifiedSeparators.getArrayValueSeparator());
+        assertEquals(originalSeparators.getObjectFieldValueSpacing(), modifiedSeparators.getObjectFieldValueSpacing());
+        assertEquals(originalSeparators.getObjectEntrySpacing(), modifiedSeparators.getObjectEntrySpacing());
+        assertEquals(originalSeparators.getArrayValueSpacing(), modifiedSeparators.getArrayValueSpacing());
     }
 }
