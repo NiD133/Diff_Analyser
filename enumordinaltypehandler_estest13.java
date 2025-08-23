@@ -1,26 +1,48 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class EnumOrdinalTypeHandler_ESTestTest13 extends EnumOrdinalTypeHandler_ESTest_scaffolding {
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Class<JdbcType> class0 = JdbcType.class;
-        EnumOrdinalTypeHandler<JdbcType> enumOrdinalTypeHandler0 = new EnumOrdinalTypeHandler<JdbcType>(class0);
-        ResultSet resultSet0 = mock(ResultSet.class, new ViolatedAssumptionAnswer());
-        doReturn((-1)).when(resultSet0).getInt(anyString());
-        doReturn(false).when(resultSet0).wasNull();
-        enumOrdinalTypeHandler0.getNullableResult(resultSet0, (String) null);
+/**
+ * This test focuses on the behavior of EnumOrdinalTypeHandler when handling
+ * invalid data from a ResultSet.
+ */
+public class EnumOrdinalTypeHandlerTest { // Renamed for clarity
+
+    /**
+     * Verifies that getNullableResult throws an IllegalArgumentException when the
+     * ResultSet provides an ordinal value that is out of bounds for the target enum.
+     * An enum's ordinal is a zero-based index, so a negative value like -1 is always invalid.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentExceptionForInvalidOrdinal() throws SQLException {
+        // Arrange
+        // 1. Create a handler for a specific enum type (JdbcType).
+        EnumOrdinalTypeHandler<JdbcType> handler = new EnumOrdinalTypeHandler<>(JdbcType.class);
+
+        // 2. Mock a ResultSet to simulate a database result.
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        // 3. Configure the mock to return an invalid ordinal (-1) for any column.
+        when(mockResultSet.getInt(anyString())).thenReturn(-1);
+
+        // 4. Ensure the database value is not treated as SQL NULL.
+        // This forces the handler to attempt conversion instead of returning null.
+        when(mockResultSet.wasNull()).thenReturn(false);
+
+        // Act
+        // Attempt to retrieve the enum value. This should trigger the exception because
+        // the ordinal -1 does not correspond to any enum constant.
+        handler.getNullableResult(mockResultSet, "anyColumnName");
+
+        // Assert
+        // The test passes if an IllegalArgumentException is thrown, as declared by the
+        // @Test(expected = ...) annotation.
     }
 }
