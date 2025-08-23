@@ -1,46 +1,30 @@
 package com.google.common.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.EOFException;
-import java.io.FileDescriptor;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.PushbackReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.MalformedInputException;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileReader;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.junit.runner.RunWith;
 
-public class CharStreams_ESTestTest39 extends CharStreams_ESTest_scaffolding {
+/**
+ * Tests for {@link CharStreams#copy(Readable, Appendable)}.
+ */
+public class CharStreamsCopyTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        StringReader stringReader0 = new StringReader("|liEWG");
-        StringBuilder stringBuilder0 = new StringBuilder();
-        long long0 = CharStreams.copy(stringReader0, stringBuilder0);
-        assertEquals("|liEWG", stringBuilder0.toString());
-        assertEquals(6L, long0);
+    @Test
+    public void copy_fromReadableToAppendable_copiesAllCharactersAndReturnsCount() throws IOException {
+        // Arrange
+        String inputString = "This is a test string.";
+        StringReader sourceReader = new StringReader(inputString);
+        StringBuilder destinationBuilder = new StringBuilder();
+
+        // Act
+        long charsCopied = CharStreams.copy(sourceReader, destinationBuilder);
+
+        // Assert
+        assertEquals("The destination should contain the full input string.",
+                inputString, destinationBuilder.toString());
+        assertEquals("The returned count should match the input string's length.",
+                (long) inputString.length(), charsCopied);
     }
 }
