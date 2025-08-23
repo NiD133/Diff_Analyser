@@ -1,38 +1,29 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotEquals;
 
-public class GridArrangement_ESTestTest2 extends GridArrangement_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link GridArrangement#equals(Object)} method.
+ */
+public class GridArrangement_ESTestTest2 {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(0, 0);
-        assertNotNull(gridArrangement0);
-        GridArrangement gridArrangement1 = new GridArrangement(0, (-1901));
-        assertNotNull(gridArrangement1);
-        assertFalse(gridArrangement1.equals((Object) gridArrangement0));
-        boolean boolean0 = gridArrangement1.equals(gridArrangement0);
-        assertNotSame(gridArrangement0, gridArrangement1);
-        assertNotSame(gridArrangement1, gridArrangement0);
-        assertFalse(boolean0);
-        assertFalse(gridArrangement0.equals((Object) gridArrangement1));
-        assertFalse(gridArrangement1.equals((Object) gridArrangement0));
+    /**
+     * Verifies that two GridArrangement instances are not considered equal if they
+     * have the same row count but different column counts. This test also ensures
+     * that the equals() implementation is symmetric.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenColumnCountsDiffer() {
+        // Arrange: Create two arrangements with the same number of rows but
+        // different numbers of columns.
+        GridArrangement arrangementA = new GridArrangement(0, 0);
+        GridArrangement arrangementB = new GridArrangement(0, -1901);
+
+        // Assert: The two arrangements should not be equal.
+        // Using assertNotEquals is more expressive than assertFalse(a.equals(b)).
+        // We test both directions to confirm the method is symmetric.
+        assertNotEquals(arrangementA, arrangementB);
+        assertNotEquals(arrangementB, arrangementA);
     }
 }
