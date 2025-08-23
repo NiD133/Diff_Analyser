@@ -1,26 +1,29 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest41 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on edge cases and error handling.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial((byte[]) null, 2078);
-        // Undeclared exception!
-        try {
-            byteArrayBuilder0.append(4000);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+    /**
+     * Verifies that calling `append()` on a ByteArrayBuilder initialized with a null
+     * internal buffer throws a NullPointerException.
+     *
+     * This scenario can occur when using the static factory `fromInitial()` with a null byte array.
+     * The `append()` method requires a non-null buffer to write to, and this test ensures
+     * it fails as expected in this state.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void appendShouldThrowNullPointerExceptionWhenInitializedWithNullBuffer() {
+        // GIVEN a ByteArrayBuilder created with a null initial buffer.
+        // The initial length parameter is arbitrary for this test's purpose.
+        int initialLength = 2078;
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(null, initialLength);
+
+        // WHEN attempting to append a byte to the builder
+        // THEN a NullPointerException is expected because the internal buffer is null.
+        builder.append(1);
     }
 }
