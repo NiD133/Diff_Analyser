@@ -1,32 +1,40 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.stream.JsonReader;
-import java.io.Reader;
+import org.junit.Test;
+
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonParser_ESTestTest22 extends JsonParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        StringReader stringReader0 = new StringReader("?3p");
-        JsonReader jsonReader0 = new JsonReader(stringReader0);
-        jsonParser0.parse(jsonReader0);
-        // Undeclared exception!
+/**
+ * Tests for {@link JsonParser}.
+ */
+public class JsonParserTest {
+
+    /**
+     * Tests that attempting to parse from a JsonReader that has already been fully consumed
+     * results in an IllegalStateException. The parser should not be able to read a second
+     * top-level value if only one exists.
+     */
+    @Test
+    public void parseReader_onExhaustedReader_throwsIllegalStateException() {
+        // Arrange: Create a reader for a single, complete JSON document.
+        String json = "\"a single json value\"";
+        JsonReader jsonReader = new JsonReader(new StringReader(json));
+
+        // Act 1: Consume the first (and only) JSON element from the reader.
+        // This advances the reader to the end of the stream.
+        JsonParser.parseReader(jsonReader);
+
+        // Act 2 & Assert: Attempting to parse again from the same, now-exhausted reader
+        // should fail because it finds an END_DOCUMENT token instead of a new value.
         try {
-            jsonParser0.parse(jsonReader0);
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Unexpected token: END_DOCUMENT
-            //
-            verifyException("com.google.gson.internal.bind.JsonElementTypeAdapter", e);
+            JsonParser.parseReader(jsonReader);
+            fail("Expected an IllegalStateException to be thrown when parsing an exhausted reader.");
+        } catch (IllegalStateException expected) {
+            assertEquals("Unexpected token: END_DOCUMENT", expected.getMessage());
         }
     }
 }
