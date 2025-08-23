@@ -1,0 +1,24 @@
+package org.apache.commons.codec.language.bm;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.nio.CharBuffer;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.junit.runner.RunWith;
+
+public class PhoneticEngine_ESTestTest1 extends PhoneticEngine_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test00() throws Throwable {
+        NameType nameType0 = NameType.ASHKENAZI;
+        RuleType ruleType0 = RuleType.APPROX;
+        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false);
+        boolean boolean0 = phoneticEngine0.isConcat();
+        assertFalse(boolean0);
+        assertEquals(20, phoneticEngine0.getMaxPhonemes());
+    }
+}
