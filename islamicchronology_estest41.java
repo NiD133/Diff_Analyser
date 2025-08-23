@@ -1,22 +1,30 @@
 package org.joda.time.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
-import org.joda.time.DateTimeZone;
-import org.joda.time.tz.UTCProvider;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IslamicChronology_ESTestTest41 extends IslamicChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the IslamicChronology class.
+ */
+public class IslamicChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        int int0 = islamicChronology0.getDaysInMonthMax(12);
-        assertEquals(30, int0);
+    /**
+     * Tests that the maximum number of days for the 12th month (Dhú'l-Hijja) is 30.
+     * <p>
+     * In the Islamic calendar, the 12th month has 29 days in a common year
+     * and is extended to 30 days in a leap year. Therefore, its maximum possible
+     * number of days is 30.
+     */
+    @Test
+    public void maxDaysInLastMonth_shouldBe30() {
+        // Arrange
+        IslamicChronology islamicChronology = IslamicChronology.getInstanceUTC();
+        int lastMonthOfYear = 12;
+
+        // Act
+        int maxDays = islamicChronology.getDaysInMonthMax(lastMonthOfYear);
+
+        // Assert
+        assertEquals(30, maxDays);
     }
 }
