@@ -1,18 +1,23 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class Minutes_ESTestTest45 extends Minutes_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Minutes} class.
+ */
+public class MinutesTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        Minutes minutes0 = Minutes.MIN_VALUE;
-        boolean boolean0 = minutes0.isLessThan((Minutes) null);
-        assertTrue(boolean0);
+    @Test
+    public void isLessThan_shouldReturnTrue_whenNegativeMinutesIsComparedToNull() {
+        // Arrange: Create a Minutes instance with a negative value.
+        // The isLessThan() method's contract states that a null argument is treated as zero.
+        Minutes negativeMinutes = Minutes.MIN_VALUE;
+
+        // Act: Compare the negative Minutes instance to null.
+        boolean result = negativeMinutes.isLessThan(null);
+
+        // Assert: The result should be true because any negative value is less than zero.
+        assertTrue("A negative Minutes value should be considered less than null (which represents zero).", result);
     }
 }
