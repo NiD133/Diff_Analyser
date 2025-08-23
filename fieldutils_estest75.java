@@ -1,23 +1,27 @@
 package org.joda.time.field;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest75 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test74() throws Throwable {
-        long long0 = FieldUtils.safeMultiply((long) (-1), (-1));
-        assertEquals(1L, long0);
+    /**
+     * Tests that multiplying two negative long values results in a positive product.
+     */
+    @Test
+    public void safeMultiply_twoNegativeLongs_returnsPositiveProduct() {
+        // Arrange
+        final long multiplicand = -1L;
+        final long multiplier = -1L;
+        final long expectedProduct = 1L;
+
+        // Act
+        final long actualProduct = FieldUtils.safeMultiply(multiplicand, multiplier);
+
+        // Assert
+        assertEquals(expectedProduct, actualProduct);
     }
 }
