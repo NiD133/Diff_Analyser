@@ -1,21 +1,33 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class JsonIncludeProperties_ESTestTest1 extends JsonIncludeProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIncludeProperties.Value} class.
+ */
+public class JsonIncludePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
-        Set<String> set0 = jsonIncludeProperties_Value0.getIncluded();
-        assertNull(set0);
+    /**
+     * Verifies that the constant {@code JsonIncludeProperties.Value.ALL} returns a null set
+     * for its included properties.
+     * <p>
+     * According to the class documentation, a null set from {@code getIncluded()} signifies
+     * that all properties are included (i.e., no specific inclusion filter is defined). This
+     * test confirms that the 'ALL' constant correctly represents this "not defined" state.
+     */
+    @Test
+    public void shouldReturnNullForIncludedPropertiesWhenValueIsAll() {
+        // Arrange: Get the predefined 'ALL' instance.
+        JsonIncludeProperties.Value allValue = JsonIncludeProperties.Value.ALL;
+
+        // Act: Retrieve the set of included properties.
+        Set<String> includedProperties = allValue.getIncluded();
+
+        // Assert: The set should be null to indicate no specific properties are filtered.
+        assertNull("The 'ALL' value should return a null set of included properties, " +
+                   "indicating that no specific inclusion filter is applied.",
+                   includedProperties);
     }
 }
