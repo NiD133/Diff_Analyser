@@ -1,25 +1,35 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest15 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        FileTime fileTime0 = FileTimes.now();
-        FileTime fileTime1 = FileTimes.minusSeconds(fileTime0, (-3169L));
-        assertFalse(fileTime1.equals((Object) fileTime0));
+    /**
+     * Tests that subtracting a negative number of seconds from a FileTime is
+     * equivalent to adding the corresponding positive number of seconds.
+     */
+    @Test
+    public void testMinusSecondsWithNegativeValueIsEquivalentToAddition() {
+        // Arrange: Create a starting point in time and define the duration.
+        final FileTime initialFileTime = FileTime.from(Instant.now());
+        final long seconds = 1234L; // A non-zero, positive duration.
+
+        // Act: Subtract a negative duration from the initial time.
+        final FileTime timeAfterSubtraction = FileTimes.minusSeconds(initialFileTime, -seconds);
+
+        // Assert: The result should be the same as adding the positive duration.
+        final FileTime expectedFileTime = FileTimes.plusSeconds(initialFileTime, seconds);
+        assertEquals(expectedFileTime, timeAfterSubtraction);
+
+        // Also, verify that the time has indeed changed from the original.
+        assertNotEquals(initialFileTime, timeAfterSubtraction);
     }
 }
