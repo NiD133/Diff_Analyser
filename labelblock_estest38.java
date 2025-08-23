@@ -1,40 +1,34 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
-public class LabelBlock_ESTestTest38 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("");
-        Graphics2D graphics2D0 = mock(Graphics2D.class, new ViolatedAssumptionAnswer());
-        LengthConstraintType lengthConstraintType0 = LengthConstraintType.FIXED;
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(0.0F, (Range) null, lengthConstraintType0, 3392.70533605612, (Range) null, lengthConstraintType0);
-        Size2D size2D0 = labelBlock0.arrange(graphics2D0, rectangleConstraint0);
-        assertEquals(0.0, size2D0.getHeight(), 0.01);
+    /**
+     * Verifies that arranging a LabelBlock containing an empty string results
+     * in a size of zero width and zero height.
+     */
+    @Test
+    public void arrangeWithEmptyTextShouldReturnZeroSize() {
+        // Arrange: Create a LabelBlock with no text and a mock Graphics2D context.
+        LabelBlock emptyLabelBlock = new LabelBlock("");
+        Graphics2D mockGraphics = mock(Graphics2D.class);
+        
+        // Use a simple, non-restrictive constraint. The result for an empty
+        // label should be zero regardless of the constraint.
+        RectangleConstraint constraint = RectangleConstraint.NONE;
+
+        // Act: Arrange the block to calculate its size.
+        Size2D arrangedSize = emptyLabelBlock.arrange(mockGraphics, constraint);
+
+        // Assert: A label with no text should have no dimensions.
+        assertEquals("Width of an empty label block should be 0.0", 0.0, arrangedSize.getWidth(), 0.001);
+        assertEquals("Height of an empty label block should be 0.0", 0.0, arrangedSize.getHeight(), 0.001);
     }
 }
