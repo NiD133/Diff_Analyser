@@ -1,38 +1,48 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This test class contains an improved version of a test for CookieUtil.
+ * The original test was automatically generated and lacked clarity.
+ */
 public class CookieUtil_ESTestTest11 extends CookieUtil_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        HttpConnection.Request httpConnection_Request0 = new HttpConnection.Request();
-        URL uRL0 = httpConnection_Request0.url;
-        HashMap<String, List<String>> hashMap0 = new HashMap<String, List<String>>();
-        LinkedList<String> linkedList0 = new LinkedList<String>();
-        linkedList0.add("XtzONrG&vb");
-        hashMap0.put("Set-Cookie", linkedList0);
-        HttpConnection.Response httpConnection_Response0 = new HttpConnection.Response(httpConnection_Request0);
-        CookieUtil.storeCookies(httpConnection_Request0, httpConnection_Response0, uRL0, hashMap0);
-        assertEquals(0, httpConnection_Response0.statusCode());
+    /**
+     * Verifies that CookieUtil.storeCookies correctly parses a 'Set-Cookie' header
+     * from a response and stores the resulting cookie in both the
+     * HttpConnection.Response object and the HttpConnection.Request's cookie manager.
+     */
+    @Test
+    public void storeCookies_whenSetCookieHeaderIsPresent_storesCookieInResponseAndRequest() throws Exception {
+        // Arrange: Set up the necessary objects for the test.
+        URL url = new URL("http://example.com/");
+
+        // Create a request and associate it with the URL.
+        HttpConnection.Request request = new HttpConnection.Request();
+        request.url(url);
+
+        // Create a map of response headers containing a simple 'Set-Cookie' directive.
+        Map<String, List<String>> responseHeaders = new HashMap<>();
+        responseHeaders.put("Set-Cookie", Collections.singletonList("user_id=12345"));
+
+        // Create a response object linked to the original request.
+        HttpConnection.Response response = new HttpConnection.Response(request);
+
+        // Act: Call the method under test.
+        CookieUtil.storeCookies(request, response, url, responseHeaders);
+
+        // Assert: Verify that the cookie was stored correctly.
+        // The cookie should be available in the response object...
+        assertEquals("12345", response.cookie("user_id"));
+        // ...and also in the request's cookie manager for subsequent requests.
+        assertEquals("12345", request.cookie("user_id"));
     }
 }
