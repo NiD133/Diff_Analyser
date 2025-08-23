@@ -1,36 +1,42 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest10 extends ByteUtils_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ByteUtils.ByteSupplier byteUtils_ByteSupplier0 = mock(ByteUtils.ByteSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn((-325), (-250), 1623, 0, (-325)).when(byteUtils_ByteSupplier0).getAsByte();
-        long long0 = ByteUtils.fromLittleEndian(byteUtils_ByteSupplier0, 8);
-        assertEquals((-325L), long0);
+/**
+ * Tests for the {@link ByteUtils} class, focusing on the fromLittleEndian method.
+ */
+public class ByteUtilsTest {
+
+    /**
+     * Verifies that fromLittleEndian correctly constructs a long value from an 8-byte sequence
+     * provided by a ByteSupplier in little-endian order.
+     */
+    @Test
+    public void fromLittleEndian_givenByteSupplier_buildsCorrectLongFromEightBytes() throws IOException {
+        // Arrange
+        // We want to construct the 8-byte long value 0x0807060504030201L.
+        // In little-endian format, the bytes are supplied from the least significant (LSB)
+        // to the most significant (MSB).
+        final long expectedLong = 0x0807060504030201L;
+        final int length = 8;
+
+        ByteUtils.ByteSupplier mockSupplier = mock(ByteUtils.ByteSupplier.class);
+
+        // Stub the supplier to return the bytes for expectedLong in little-endian order.
+        // LSB (0x01) is returned first, MSB (0x08) is returned last.
+        when(mockSupplier.getAsByte()).thenReturn(
+            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+        );
+
+        // Act
+        long actualLong = ByteUtils.fromLittleEndian(mockSupplier, length);
+
+        // Assert
+        assertEquals(expectedLong, actualLong);
     }
 }
