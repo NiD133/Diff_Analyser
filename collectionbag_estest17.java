@@ -1,49 +1,25 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeSet;
 import org.apache.commons.collections4.Bag;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionBag_ESTestTest17 extends CollectionBag_ESTest_scaffolding {
+/**
+ * Tests for {@link CollectionBag} to ensure it correctly handles null arguments.
+ */
+public class CollectionBagTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        TreeBag<Integer> treeBag0 = new TreeBag<Integer>();
-        CollectionBag<Integer> collectionBag0 = new CollectionBag<Integer>(treeBag0);
-        // Undeclared exception!
-        try {
-            collectionBag0.addAll((Collection<? extends Integer>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bag.CollectionBag", e);
-        }
+    /**
+     * Verifies that calling addAll() with a null collection
+     * throws a NullPointerException, as specified by the
+     * {@link java.util.Collection#addAll(java.util.Collection)} contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void addAllWithNullCollectionShouldThrowNullPointerException() {
+        // Arrange: Create an empty CollectionBag instance for the test.
+        final Bag<Integer> collectionBag = new CollectionBag<>(new TreeBag<>());
+
+        // Act: Call the method under test with a null argument.
+        // The test framework will assert that a NullPointerException is thrown.
+        collectionBag.addAll(null);
     }
 }
