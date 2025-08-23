@@ -1,40 +1,39 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
-public class ComparatorChain_ESTestTest4 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * This test suite contains tests for the {@link ComparatorChain} class.
+ * This specific test focuses on the locking behavior of the chain.
+ */
+public class ComparatorChainLockingTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        ToLongFunction<Object> toLongFunction0 = (ToLongFunction<Object>) mock(ToLongFunction.class, new ViolatedAssumptionAnswer());
-        doReturn(513L, (-971L)).when(toLongFunction0).applyAsLong(any());
-        Comparator<Object> comparator0 = Comparator.comparingLong((ToLongFunction<? super Object>) toLongFunction0);
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>(comparator0);
-        LinkedList<Comparator<ComparatorChain<LongBuffer>>> linkedList0 = new LinkedList<Comparator<ComparatorChain<LongBuffer>>>();
-        ComparatorChain<ComparatorChain<LongBuffer>> comparatorChain1 = new ComparatorChain<ComparatorChain<LongBuffer>>(linkedList0);
-        Object object0 = new Object();
-        comparatorChain0.compare(comparatorChain1, object0);
-        boolean boolean0 = comparatorChain0.isLocked();
-        assertTrue(boolean0);
+    /**
+     * Tests that the ComparatorChain becomes locked after the compare() method is called for the first time.
+     * A locked chain prevents any further modifications, such as adding new comparators.
+     */
+    @Test
+    public void shouldBeLockedAfterFirstComparison() {
+        // Arrange
+        // A simple comparator is needed to create a valid, non-empty chain.
+        @SuppressWarnings("unchecked") // Safe to suppress for a mock of a generic type
+        final Comparator<Object> mockComparator = mock(Comparator.class);
+        final ComparatorChain<Object> comparatorChain = new ComparatorChain<>(mockComparator);
+
+        // Pre-condition: The chain should not be locked upon creation.
+        assertFalse("ComparatorChain should not be locked before compare() is called.", comparatorChain.isLocked());
+
+        // Act
+        // Calling compare() should trigger the internal state to become "locked".
+        // The actual objects being compared and the result are irrelevant for this test.
+        comparatorChain.compare(new Object(), new Object());
+
+        // Assert
+        // The chain should now be locked.
+        assertTrue("ComparatorChain should be locked after compare() has been called.", comparatorChain.isLocked());
     }
 }
