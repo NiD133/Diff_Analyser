@@ -1,31 +1,39 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class ISO8601Utils_ESTestTest11 extends ISO8601Utils_ESTest_scaffolding {
+/**
+ * Test suite for {@link ISO8601Utils}.
+ * This focuses on improving the understandability of a single, auto-generated test case.
+ */
+public class ISO8601UtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition(0);
+    /**
+     * Verifies that {@link ISO8601Utils#parse(String, ParsePosition)} throws a
+     * {@link ParseException} when given a string that does not conform to the
+     * expected ISO 8601 format.
+     */
+    @Test
+    public void parse_shouldThrowParseException_forInvalidDateString() {
+        // Arrange: Define an input string that is clearly not a valid date.
+        String invalidDateString = "&R[&";
+        ParsePosition position = new ParsePosition(0);
+
+        // Act & Assert: Attempt to parse the invalid string and verify the exception.
         try {
-            ISO8601Utils.parse("&R[&", parsePosition0);
-            fail("Expecting exception: ParseException");
+            ISO8601Utils.parse(invalidDateString, position);
+            fail("A ParseException should have been thrown for the invalid date string.");
         } catch (ParseException e) {
-            //
-            // Failed to parse date [\"&R[&\"]: Invalid number: &R[&
-            //
-            verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
+            // Verify that the exception message clearly indicates the failure reason.
+            String expectedMessage = "Failed to parse date [\"" + invalidDateString + "\"]: Invalid number: " + invalidDateString;
+            assertEquals(expectedMessage, e.getMessage());
+
+            // Verify that the parsing error was detected at the beginning of the string.
+            assertEquals(0, e.getErrorOffset());
         }
     }
 }
