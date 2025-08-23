@@ -1,45 +1,58 @@
 package org.apache.commons.codec.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.CodecPolicy;
+import java.util.stream.Stream;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class BCodecTestTest12 {
+/**
+ * Tests for UTF-8 encoding and decoding using BCodec.
+ */
+class BCodecUtf8Test {
 
-    private static final String[] BASE64_IMPOSSIBLE_CASES = { // Require the RFC 1522 "encoded-word" header
-    "=?ASCII?B?ZE==?=", "=?ASCII?B?ZmC=?=", "=?ASCII?B?Zm9vYE==?=", "=?ASCII?B?Zm9vYmC=?=", "=?ASCII?B?AB==?=" };
-
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+    /**
+     * Provides test cases for UTF-8 strings.
+     * Each argument set contains the original plain text string and its expected
+     * RFC 1522 'B' encoded representation.
+     *
+     * @return A stream of arguments for the parameterized test.
+     */
+    private static Stream<Arguments> utf8StringProvider() {
+        return Stream.of(
+            Arguments.of(
+                "Grüezi_zämä", // Swiss-German
+                "=?UTF-8?B?R3LDvGV6aV96w6Rtw6Q=?="
+            ),
+            Arguments.of(
+                "Всем_привет", // Russian
+                "=?UTF-8?B?0JLRgdC10Lxf0L/RgNC40LLQtdGC?="
+            )
+        );
     }
 
-    @Test
-    void testUTF8RoundTrip() throws Exception {
-        final String ru_msg = constructString(RUSSIAN_STUFF_UNICODE);
-        final String ch_msg = constructString(SWISS_GERMAN_STUFF_UNICODE);
-        final BCodec bcodec = new BCodec(CharEncoding.UTF_8);
-        assertEquals("=?UTF-8?B?0JLRgdC10Lxf0L/RgNC40LLQtdGC?=", bcodec.encode(ru_msg));
-        assertEquals("=?UTF-8?B?R3LDvGV6aV96w6Rtw6Q=?=", bcodec.encode(ch_msg));
-        assertEquals(ru_msg, bcodec.decode(bcodec.encode(ru_msg)));
-        assertEquals(ch_msg, bcodec.decode(bcodec.encode(ch_msg)));
+    @ParameterizedTest
+    @MethodSource("utf8StringProvider")
+    void shouldEncodeAndDecodeUtf8StringCorrectly(final String originalString, final String expectedEncodedString)
+            throws EncoderException, DecoderException {
+        // Arrange
+        final BCodec bCodec = new BCodec(StandardCharsets.UTF_8);
+
+        // Act: Encode the original string
+        final String actualEncodedString = bCodec.encode(originalString);
+
+        // Assert: Verify the encoded string matches the expected format
+        assertEquals(expectedEncodedString, actualEncodedString, "The encoded string should match the expected RFC 1522 format.");
+
+        // Act: Decode the encoded string to test the round-trip
+        final String decodedString = bCodec.decode(actualEncodedString);
+
+        // Assert: Verify the decoded string is identical to the original
+        assertEquals(originalString, decodedString, "The decoded string should be identical to the original string after a round-trip.");
     }
 }
