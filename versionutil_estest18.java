@@ -1,27 +1,35 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.Version;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class VersionUtil_ESTestTest18 extends VersionUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        // Undeclared exception!
+/**
+ * Tests for the utility methods in {@link VersionUtil}.
+ */
+public class VersionUtilTest {
+
+    /**
+     * Verifies that calling {@code VersionUtil.throwInternal()} always throws a
+     * {@link RuntimeException} with a specific, predefined message. This method
+     * is designed to signal an illegal state that should never be reached.
+     */
+    @Test
+    public void throwInternal_shouldAlwaysThrowRuntimeExceptionWithSpecificMessage() {
+        // Arrange
+        String expectedMessage = "Internal error: this code path should never get executed";
+
         try {
+            // Act
             VersionUtil.throwInternal();
-            fail("Expecting exception: RuntimeException");
+
+            // Assert: Fail the test if the method does not throw an exception as expected.
+            fail("Expected VersionUtil.throwInternal() to throw a RuntimeException, but it did not.");
         } catch (RuntimeException e) {
-            //
-            // Internal error: this code path should never get executed
-            //
-            verifyException("com.fasterxml.jackson.core.util.VersionUtil", e);
+            // Assert: Verify that the thrown exception has the correct message.
+            assertEquals("The exception message does not match the expected value.",
+                         expectedMessage, e.getMessage());
         }
     }
 }
