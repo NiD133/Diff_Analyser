@@ -1,31 +1,37 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest56 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test55() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that safeMultiplyToInt throws an ArithmeticException when the
+     * product of two long values is less than Integer.MIN_VALUE, causing an overflow.
+     */
+    @Test
+    public void safeMultiplyToInt_whenProductIsTooSmallForInt_throwsArithmeticException() {
+        // Arrange: Define two long values whose product will not fit in an int.
+        // The product is -6,863,357,739,008, which is less than Integer.MIN_VALUE.
+        long multiplicand = 3196L;
+        long multiplier = Integer.MIN_VALUE;
+
         try {
-            FieldUtils.safeMultiplyToInt(3196L, Integer.MIN_VALUE);
-            fail("Expecting exception: ArithmeticException");
+            // Act: Attempt the multiplication that is expected to overflow.
+            FieldUtils.safeMultiplyToInt(multiplicand, multiplier);
+            
+            // Assert: If no exception is thrown, the test fails.
+            fail("Expected an ArithmeticException due to integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // Value cannot fit in an int: -6863357739008
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Assert: Verify that the correct exception was thrown with a message
+            // indicating the exact value that caused the overflow.
+            long expectedProduct = multiplicand * multiplier;
+            String expectedMessage = "Value cannot fit in an int: " + expectedProduct;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
