@@ -1,63 +1,37 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class JulianChronology_ESTestTest33 extends JulianChronology_ESTest_scaffolding {
+/**
+ * Test for the dateYearDay() method in JulianChronology.
+ */
+public class JulianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        // Undeclared exception!
+    /**
+     * Tests that dateYearDay() throws a DateTimeException when the day-of-year
+     * value is outside the valid range.
+     */
+    @Test
+    public void dateYearDay_whenDayOfYearIsTooLarge_throwsDateTimeException() {
+        // Arrange: Use the recommended singleton instance and define an invalid day-of-year.
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        int year = 2024; // An arbitrary leap year.
+        int invalidDayOfYear = 367; // A value just beyond the maximum possible (366 for a leap year).
+
+        // Act & Assert: Expect a DateTimeException for the out-of-range day.
         try {
-            julianChronology0.dateYearDay(2373, 2373);
-            fail("Expecting exception: DateTimeException");
+            julianChronology.dateYearDay(year, invalidDayOfYear);
+            fail("Expected DateTimeException was not thrown for an invalid day of year.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for DayOfYear (valid values 1 - 365/366): 2373
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            // Verify that the exception message clearly indicates the problem.
+            String expectedMessageContent = "Invalid value for DayOfYear";
+            assertTrue(
+                "Exception message should explain the error. Actual: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageContent)
+            );
         }
     }
 }
