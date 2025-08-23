@@ -1,32 +1,25 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class UtcInstant_ESTestTest43 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Unit tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(1000000000L, 1000000000L);
-        // Undeclared exception!
-        try {
-            utcInstant0.durationUntil((UtcInstant) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.threeten.extra.scale.UtcInstant", e);
-        }
+    /**
+     * Tests that durationUntil() throws a NullPointerException when the end instant is null.
+     * The method contract does not specify behavior for null arguments, so throwing a
+     * NullPointerException is the expected behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void durationUntil_whenEndInstantIsNull_throwsNullPointerException() {
+        // Arrange: Create an arbitrary UtcInstant instance to call the method on.
+        // The specific value of this instant does not affect the outcome of a null check.
+        UtcInstant startInstant = UtcInstant.ofModifiedJulianDay(0, 0);
+
+        // Act & Assert: Calling durationUntil with a null argument should throw a NullPointerException.
+        // The assertion is handled by the `expected` attribute of the @Test annotation.
+        startInstant.durationUntil(null);
     }
 }
