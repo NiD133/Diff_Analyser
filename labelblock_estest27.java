@@ -1,37 +1,26 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class LabelBlock_ESTestTest27 extends LabelBlock_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LabelBlock} class.
+ */
+public class LabelBlockTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("Sg~6fAVv>P)");
-        String string0 = labelBlock0.getToolTipText();
-        assertNull(string0);
+    /**
+     * Verifies that the tool tip text is null by default when a LabelBlock is
+     * created using the simple constructor.
+     */
+    @Test
+    public void getToolTipText_shouldReturnNull_whenNotExplicitlySet() {
+        // Arrange: Create a new LabelBlock instance without setting a tool tip.
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+
+        // Act: Retrieve the tool tip text.
+        String toolTipText = labelBlock.getToolTipText();
+
+        // Assert: The default tool tip text should be null.
+        assertNull("The tool tip text should be null by default.", toolTipText);
     }
 }
