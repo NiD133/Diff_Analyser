@@ -2,21 +2,35 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SimpleObjectIdResolver_ESTestTest5 extends SimpleObjectIdResolver_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SimpleObjectIdResolver} class.
+ */
+public class SimpleObjectIdResolverTest {
 
-    @Test(timeout = 4000)
-    public void test4() throws Throwable {
-        SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-        Class<Object> class0 = Object.class;
-        Class<String> class1 = String.class;
-        ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class1, simpleObjectIdResolver0);
-        simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, (Object) null);
-        Object object0 = simpleObjectIdResolver0.resolveId(objectIdGenerator_IdKey0);
-        assertNull(object0);
+    /**
+     * Verifies that if an ID is explicitly bound to a null object,
+     * resolving that same ID correctly returns null.
+     */
+    @Test
+    public void resolveId_shouldReturnNull_whenIdIsBoundToNull() {
+        // Arrange
+        SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+        
+        // Create a unique key to represent an object's ID.
+        // The key is a composite of type, scope, and the actual key value.
+        Object keyPayload = "some-unique-id";
+        ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(Object.class, String.class, keyPayload);
+
+        // Act
+        // Bind the ID key to a null value.
+        resolver.bindItem(idKey, null);
+        
+        // Attempt to retrieve the object associated with the ID key.
+        Object resolvedObject = resolver.resolveId(idKey);
+
+        // Assert
+        // The resolved object should be the null value that was bound.
+        assertNull("The resolver should return null for an ID explicitly bound to null.", resolvedObject);
     }
 }
