@@ -1,25 +1,21 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QueryParser_ESTestTest7 extends QueryParser_ESTest_scaffolding {
+/**
+ * Test suite for the static methods in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        // Undeclared exception!
-        try {
-            QueryParser.combinator((Evaluator) null, '+', (Evaluator) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.select.StructuralEvaluator$ImmediatePreviousSibling", e);
-        }
+    /**
+     * Verifies that calling the combinator method with the '+' (adjacent sibling)
+     * operator and null Evaluator arguments throws a NullPointerException.
+     * This ensures the method correctly handles invalid null inputs.
+     */
+    @Test(expected = NullPointerException.class)
+    public void combinatorWithAdjacentSiblingThrowsNPEForNullEvaluators() {
+        // The '+' combinator requires non-null evaluators for the left and right-hand sides.
+        // This call is expected to fail with a NullPointerException.
+        QueryParser.combinator(null, '+', null);
     }
 }
