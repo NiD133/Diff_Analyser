@@ -1,33 +1,40 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
-import org.junit.jupiter.api.Test;
 
-public class ByteOrderMarkTestTest6 {
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    private static final ByteOrderMark TEST_BOM_1 = new ByteOrderMark("test1", 1);
+/**
+ * Tests for {@link ByteOrderMark#get(int)}.
+ */
+@DisplayName("ByteOrderMark#get(int)")
+class ByteOrderMarkTest {
 
-    private static final ByteOrderMark TEST_BOM_2 = new ByteOrderMark("test2", 1, 2);
+    private static final ByteOrderMark BOM_1_BYTE = new ByteOrderMark("BOM_1_BYTE", 1);
+    private static final ByteOrderMark BOM_2_BYTES = new ByteOrderMark("BOM_2_BYTES", 1, 2);
+    private static final ByteOrderMark BOM_3_BYTES = new ByteOrderMark("BOM_3_BYTES", 1, 2, 3);
 
-    private static final ByteOrderMark TEST_BOM_3 = new ByteOrderMark("test3", 1, 2, 3);
+    static Stream<Arguments> getArguments() {
+        return Stream.of(
+            // Test with a 1-byte BOM
+            Arguments.of("1-byte BOM, index 0", BOM_1_BYTE, 0, 1),
+            // Test with a 2-byte BOM
+            Arguments.of("2-byte BOM, index 0", BOM_2_BYTES, 0, 1),
+            Arguments.of("2-byte BOM, index 1", BOM_2_BYTES, 1, 2),
+            // Test with a 3-byte BOM
+            Arguments.of("3-byte BOM, index 0", BOM_3_BYTES, 0, 1),
+            Arguments.of("3-byte BOM, index 1", BOM_3_BYTES, 1, 2),
+            Arguments.of("3-byte BOM, index 2", BOM_3_BYTES, 2, 3)
+        );
+    }
 
-    /**
-     * Tests {@link ByteOrderMark#get(int)}
-     */
-    @Test
-    void testGetInt() {
-        assertEquals(1, TEST_BOM_1.get(0), "test1 get(0)");
-        assertEquals(1, TEST_BOM_2.get(0), "test2 get(0)");
-        assertEquals(2, TEST_BOM_2.get(1), "test2 get(1)");
-        assertEquals(1, TEST_BOM_3.get(0), "test3 get(0)");
-        assertEquals(2, TEST_BOM_3.get(1), "test3 get(1)");
-        assertEquals(3, TEST_BOM_3.get(2), "test3 get(2)");
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("getArguments")
+    void shouldReturnCorrectByteForGivenIndex(final String testName, final ByteOrderMark bom, final int index, final int expectedByte) {
+        assertEquals(expectedByte, bom.get(index));
     }
 }
