@@ -1,26 +1,23 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest40 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.math.IEEE754rUtils}.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        double[] doubleArray0 = new double[0];
-        // Undeclared exception!
-        try {
-            IEEE754rUtils.max(doubleArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Array cannot be empty.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
-        }
+    /**
+     * Tests that calling max() with an empty double array throws an IllegalArgumentException,
+     * as the input array is not allowed to be empty.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void maxOfEmptyDoubleArrayShouldThrowIllegalArgumentException() {
+        // Arrange: An empty array is an invalid argument for the max method.
+        final double[] emptyArray = new double[0];
+
+        // Act: Calling the method with the empty array.
+        // Assert: The @Test annotation expects an IllegalArgumentException to be thrown.
+        IEEE754rUtils.max(emptyArray);
     }
 }
