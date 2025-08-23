@@ -1,30 +1,33 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TagSet_ESTestTest13 extends TagSet_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TagSet} class.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        TagSet tagSet0 = TagSet.HtmlTagSet;
-        ParseSettings parseSettings0 = ParseSettings.preserveCase;
-        // Undeclared exception!
+    /**
+     * Verifies that the valueOf method throws an IllegalArgumentException
+     * when the provided tag name is an empty string.
+     */
+    @Test
+    public void valueOfShouldThrowIllegalArgumentExceptionForEmptyTagName() {
+        // Arrange
+        TagSet htmlTagSet = TagSet.HtmlTagSet;
+        ParseSettings settings = ParseSettings.preserveCase;
+        String emptyTagName = "";
+        String namespace = ""; // The namespace can also be empty for this test case
+
+        // Act & Assert
         try {
-            tagSet0.valueOf("", "", parseSettings0);
-            fail("Expecting exception: IllegalArgumentException");
+            htmlTagSet.valueOf(emptyTagName, namespace, settings);
+            fail("Expected an IllegalArgumentException to be thrown for an empty tag name, but it was not.");
         } catch (IllegalArgumentException e) {
-            //
-            // String must not be empty
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is correct, confirming the validation logic.
+            assertEquals("String must not be empty", e.getMessage());
         }
     }
 }
