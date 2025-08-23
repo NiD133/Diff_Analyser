@@ -1,20 +1,30 @@
 package org.jsoup.helper;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ValidateTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * Tests for {@link Validate}.
+ */
+public class ValidateTest {
 
     @Test
-    public void testWtf() {
-        boolean threw = false;
-        try {
-            Validate.wtf("Unexpected state reached");
-        } catch (IllegalStateException e) {
-            threw = true;
-            assertEquals("Unexpected state reached", e.getMessage());
-        }
-        assertTrue(threw);
+    @DisplayName("wtf() should always throw an IllegalStateException")
+    void wtfAlwaysThrowsIllegalStateException() {
+        // Arrange
+        String expectedMessage = "Unexpected state reached";
+
+        // Act & Assert
+        // Verify that calling Validate.wtf() throws the correct exception.
+        IllegalStateException thrown = assertThrows(
+            IllegalStateException.class,
+            () -> Validate.wtf(expectedMessage)
+        );
+
+        // Verify that the exception has the expected message.
+        assertEquals(expectedMessage, thrown.getMessage());
     }
 }
