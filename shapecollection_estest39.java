@@ -1,34 +1,37 @@
 package org.locationtech.spatial4j.shape;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.impl.PointImpl;
-import org.locationtech.spatial4j.shape.jts.JtsPoint;
 
-public class ShapeCollection_ESTestTest39 extends ShapeCollection_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        ArrayList<JtsPoint> arrayList0 = new ArrayList<JtsPoint>();
-        HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
-        ShapeCollection<JtsPoint> shapeCollection0 = new ShapeCollection<JtsPoint>(arrayList0, spatialContext0);
-        SpatialContext spatialContext1 = shapeCollection0.getContext();
-        assertFalse(spatialContext1.isNormWrapLongitude());
+import static org.junit.Assert.assertSame;
+
+/**
+ * Unit tests for {@link ShapeCollection}.
+ */
+public class ShapeCollectionTest {
+
+    /**
+     * This test verifies that the getContext() method of ShapeCollection
+     * correctly returns the same SpatialContext instance that was provided
+     * to its constructor.
+     */
+    @Test
+    public void getContextShouldReturnContextProvidedInConstructor() {
+        // Arrange: Create a standard spatial context and an empty shape collection.
+        // Using SpatialContext.GEO is simpler and clearer than building a new context from a factory.
+        final SpatialContext expectedContext = SpatialContext.GEO;
+        List<Shape> emptyShapes = Collections.emptyList();
+        ShapeCollection<Shape> shapeCollection = new ShapeCollection<>(emptyShapes, expectedContext);
+
+        // Act: Retrieve the context from the shape collection.
+        SpatialContext actualContext = shapeCollection.getContext();
+
+        // Assert: The retrieved context should be the exact same instance as the one provided.
+        // Using assertSame is a more direct and robust test for a getter than checking a property.
+        assertSame("The context returned should be the same instance provided to the constructor.",
+                expectedContext, actualContext);
     }
 }
