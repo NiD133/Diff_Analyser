@@ -1,19 +1,26 @@
 package org.apache.commons.codec.binary;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Base16_ESTestTest6 extends Base16_ESTest_scaffolding {
+/**
+ * Tests for {@link Base16}.
+ */
+public class Base16Test {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Base16 base16_0 = new Base16();
-        byte[] byteArray0 = base16_0.decode("21");
-        assertArrayEquals(new byte[] { (byte) 33 }, byteArray0);
+    @Test
+    public void testDecodeValidHexString() {
+        // Arrange: Set up the test data and components.
+        final Base16 base16 = new Base16();
+        final String hexString = "21";
+        // The hexadecimal string "21" represents the byte with the value 0x21 (decimal 33).
+        final byte[] expectedDecodedBytes = { (byte) 0x21 };
+
+        // Act: Execute the method under test.
+        final byte[] actualDecodedBytes = base16.decode(hexString);
+
+        // Assert: Verify the result is as expected.
+        assertArrayEquals(expectedDecodedBytes, actualDecodedBytes);
     }
 }
