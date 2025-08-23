@@ -1,26 +1,31 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SimpleBloomFilter_ESTestTest45 extends SimpleBloomFilter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SimpleBloomFilter} class.
+ */
+public class SimpleBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        Shape shape0 = Shape.fromNMK(15, 15, 15);
-        SimpleBloomFilter simpleBloomFilter0 = new SimpleBloomFilter(shape0);
-        boolean boolean0 = simpleBloomFilter0.merge((BloomFilter<?>) simpleBloomFilter0);
-        assertTrue(boolean0);
-        int int0 = simpleBloomFilter0.cardinality();
-        assertEquals(0, int0);
-        assertEquals(0, simpleBloomFilter0.characteristics());
+    /**
+     * Tests that merging an empty SimpleBloomFilter with itself does not change its state
+     * and correctly reports that no modification occurred.
+     */
+    @Test
+    public void mergeWithSelfWhenEmptyShouldNotChangeFilterAndReturnFalse() {
+        // Arrange: Create an empty Bloom filter with a specific shape.
+        Shape shape = Shape.fromNMK(15, 15, 15);
+        SimpleBloomFilter emptyFilter = new SimpleBloomFilter(shape);
+
+        // Act: Merge the filter with itself.
+        boolean wasModified = emptyFilter.merge(emptyFilter);
+
+        // Assert: The merge operation should report no changes, and the filter's state should be unaltered.
+        assertFalse("Merging an empty filter with itself should return false, indicating no modification.", wasModified);
+        assertEquals("Cardinality should remain 0 after the merge.", 0, emptyFilter.cardinality());
+        assertEquals("Characteristics should remain 0 after the merge.", 0, emptyFilter.characteristics());
     }
 }
