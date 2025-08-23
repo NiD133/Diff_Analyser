@@ -1,39 +1,33 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest12 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Contains tests for the write operations of {@link ArArchiveOutputStream}.
+ */
+// The original test class name "ArArchiveOutputStream_ESTestTest12" was auto-generated.
+// A more descriptive name like "ArArchiveOutputStreamWriteTest" would be preferable in a real project.
+public class ArArchiveOutputStream_ESTestTest12 {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("*m{1/p6");
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(mockFileOutputStream0);
-        byte[] byteArray0 = new byte[7];
-        // Undeclared exception!
-        try {
-            arArchiveOutputStream0.write(byteArray0, (int) (byte) (-90), 315);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling the write(byte[], int, int) method with a negative offset
+     * correctly throws an ArrayIndexOutOfBoundsException, as expected from the OutputStream contract.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void writeWithNegativeOffsetShouldThrowException() throws IOException {
+        // Arrange: Set up the stream and the invalid arguments for the write method.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream);
+
+        byte[] buffer = new byte[10];
+        int negativeOffset = -1; // A negative offset is invalid.
+        int length = 20;         // The length is also out of bounds, but the offset is checked first.
+
+        // Act: Attempt to write with the invalid negative offset.
+        // The @Test(expected=...) annotation will assert that the correct exception is thrown.
+        arOut.write(buffer, negativeOffset, length);
     }
 }
