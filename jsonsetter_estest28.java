@@ -1,18 +1,28 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class JsonSetter_ESTestTest28 extends JsonSetter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonSetter.Value} class, focusing on its handling of default values.
+ */
+public class JsonSetterValueTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        JsonSetter.Value jsonSetter_Value0 = JsonSetter.Value.empty();
-        jsonSetter_Value0.nonDefaultContentNulls();
+    /**
+     * Verifies that {@link JsonSetter.Value#nonDefaultContentNulls()} returns null
+     * when the instance is created with the default setting for content nulls.
+     * The `empty()` factory method provides such an instance.
+     */
+    @Test
+    public void nonDefaultContentNulls_whenUsingDefaultValue_shouldReturnNull() {
+        // Arrange: Create an empty JsonSetter.Value, which uses Nulls.DEFAULT for contentNulls.
+        JsonSetter.Value value = JsonSetter.Value.empty();
+
+        // Act: Call the method under test.
+        Nulls result = value.nonDefaultContentNulls();
+
+        // Assert: The result should be null, as the purpose of the method is to
+        // return null for default settings.
+        assertNull("Expected null because the contentNulls setting is the default", result);
     }
 }
