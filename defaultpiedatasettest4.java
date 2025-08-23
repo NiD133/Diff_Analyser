@@ -1,37 +1,39 @@
 package org.jfree.data.general;
 
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class DefaultPieDatasetTestTest4 implements DatasetChangeListener {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-    private DatasetChangeEvent lastEvent;
+/**
+ * Tests for the cloning behavior of the {@link DefaultPieDataset} class.
+ */
+@DisplayName("DefaultPieDataset Cloning")
+class DefaultPieDatasetTest {
 
-    /**
-     * Records the last event.
-     *
-     * @param event  the last event.
-     */
-    @Override
-    public void datasetChanged(DatasetChangeEvent event) {
-        this.lastEvent = event;
-    }
-
-    /**
-     * Confirm that cloning works.
-     * @throws java.lang.CloneNotSupportedException
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        DefaultPieDataset<String> d1 = new DefaultPieDataset<>();
-        d1.setValue("V1", 1);
-        d1.setValue("V2", null);
-        d1.setValue("V3", 3);
-        DefaultPieDataset<String> d2 = CloneUtils.clone(d1);
-        assertNotSame(d1, d2);
-        assertSame(d1.getClass(), d2.getClass());
-        assertEquals(d1, d2);
+    @DisplayName("A cloned dataset should be an independent and equal copy of the original")
+    void cloneShouldCreateIndependentAndEqualInstance() {
+        // Arrange: Create an original dataset with some values, including a null.
+        DefaultPieDataset<String> originalDataset = new DefaultPieDataset<>();
+        originalDataset.setValue("Category A", 1.0);
+        originalDataset.setValue("Category B", null);
+        originalDataset.setValue("Category C", 3.0);
+
+        // Act: Clone the original dataset.
+        DefaultPieDataset<String> clonedDataset = CloneUtils.clone(originalDataset);
+
+        // Assert: The clone should be a separate object but logically equal to the original.
+        assertNotSame(originalDataset, clonedDataset,
+                "A cloned dataset must be a different object instance from the original.");
+
+        assertSame(originalDataset.getClass(), clonedDataset.getClass(),
+                "A cloned dataset must be of the exact same class as the original.");
+
+        assertEquals(originalDataset, clonedDataset,
+                "A cloned dataset must have content equal to the original.");
     }
 }
