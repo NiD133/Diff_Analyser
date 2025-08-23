@@ -1,29 +1,31 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class TypeAdapter_ESTestTest20 extends TypeAdapter_ESTest_scaffolding {
+/**
+ * Tests the behavior of {@link TypeAdapter} when a circular delegation is created
+ * using the internal {@code Gson.FutureTypeAdapter}.
+ */
+public class TypeAdapterCircularDelegationTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        Gson.FutureTypeAdapter<Integer> gson_FutureTypeAdapter0 = new Gson.FutureTypeAdapter<Integer>();
-        Gson.FutureTypeAdapter<Integer> gson_FutureTypeAdapter1 = new Gson.FutureTypeAdapter<Integer>();
-        gson_FutureTypeAdapter1.setDelegate(gson_FutureTypeAdapter0);
-        gson_FutureTypeAdapter0.setDelegate(gson_FutureTypeAdapter1);
-        // Undeclared exception!
-        gson_FutureTypeAdapter0.fromJson(")");
+    /**
+     * Tests that calling fromJson on a FutureTypeAdapter with a circular reference
+     * to another FutureTypeAdapter results in a StackOverflowError.
+     */
+    @Test
+    public void fromJson_withCircularDelegation_shouldThrowStackOverflowError() {
+        // Arrange: Create two FutureTypeAdapters and set them as delegates for each other,
+        // creating a circular dependency.
+        Gson.FutureTypeAdapter<Object> adapter1 = new Gson.FutureTypeAdapter<>();
+        Gson.FutureTypeAdapter<Object> adapter2 = new Gson.FutureTypeAdapter<>();
+        adapter1.setDelegate(adapter2);
+        adapter2.setDelegate(adapter1);
+
+        // Act & Assert: Calling fromJson should cause infinite recursion, leading to a
+        // StackOverflowError. The content of the JSON string is irrelevant.
+        assertThrows(StackOverflowError.class, () -> {
+            adapter1.fromJson("any string");
+        });
     }
 }
