@@ -1,39 +1,23 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * This test class contains tests for the {@link RandomAccessFileOrArray} class.
+ * The original test class name and inheritance are kept to match the provided context.
+ * In a real-world scenario, these would likely be simplified (e.g., to RandomAccessFileOrArrayTest).
+ */
 public class RandomAccessFileOrArray_ESTestTest101 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test100() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = null;
-        try {
-            randomAccessFileOrArray0 = new RandomAccessFileOrArray((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.io.ArrayRandomAccessSource", e);
-        }
+    /**
+     * Verifies that the constructor {@link RandomAccessFileOrArray#RandomAccessFileOrArray(byte[])}
+     * throws a {@link NullPointerException} when passed a null byte array.
+     * This is the expected behavior, as an underlying data source cannot be created from a null reference.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullByteArray_shouldThrowNullPointerException() {
+        // Act: Attempt to create an instance with a null byte array.
+        // Assert: A NullPointerException is expected, as declared in the @Test annotation.
+        new RandomAccessFileOrArray((byte[]) null);
     }
 }
