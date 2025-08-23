@@ -1,25 +1,35 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class JsonIncludeProperties_ESTestTest10 extends JsonIncludeProperties_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link JsonIncludeProperties.Value} class.
+ */
+public class JsonIncludePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        String[] stringArray0 = new String[0];
-        JsonIncludeProperties jsonIncludeProperties0 = mock(JsonIncludeProperties.class, CALLS_REAL_METHODS);
-        doReturn(stringArray0).when(jsonIncludeProperties0).value();
-        JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.from(jsonIncludeProperties0);
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        boolean boolean0 = linkedHashSet0.remove(jsonIncludeProperties_Value0);
-        assertFalse(boolean0);
+    /**
+     * This test verifies that creating a {@link JsonIncludeProperties.Value}
+     * from an annotation with an empty `value` array results in a `Value`
+     * instance that represents an empty set of included properties.
+     */
+    @Test
+    public void fromAnnotationWithNoPropertiesShouldYieldEmptyValue() {
+        // Arrange: Create a mock annotation that is configured to have no included properties.
+        JsonIncludeProperties mockAnnotation = mock(JsonIncludeProperties.class);
+        when(mockAnnotation.value()).thenReturn(new String[0]);
+
+        // Act: Create a Value instance from the mock annotation.
+        JsonIncludeProperties.Value value = JsonIncludeProperties.Value.from(mockAnnotation);
+
+        // Assert: The resulting Value should contain an empty, non-null set of included properties.
+        assertNotNull("The created Value instance should not be null.", value);
+        
+        Set<String> includedProperties = value.getIncluded();
+        assertNotNull("The set of included properties should not be null.", includedProperties);
+        assertTrue("The set of included properties should be empty.", includedProperties.isEmpty());
     }
 }
