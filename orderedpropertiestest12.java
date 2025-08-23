@@ -2,82 +2,103 @@ package org.apache.commons.collections4.properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class OrderedPropertiesTestTest12 {
+/**
+ * Tests for the remove() method in {@link OrderedProperties}.
+ */
+@DisplayName("OrderedProperties.remove()")
+class OrderedPropertiesRemoveTest {
 
-    private void assertAscendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 1;
-        final int last = 11;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, enumObjects.nextElement());
+    private OrderedProperties properties;
+
+    @BeforeEach
+    void setUp() {
+        // Arrange: Create a pre-populated OrderedProperties instance for each test.
+        // This setup is clear, self-contained, and does not rely on external files.
+        properties = new OrderedProperties();
+        properties.put("key.first", "value1");
+        properties.put("key.middle", "value2");
+        properties.put("key.last", "value3");
+    }
+
+    @Nested
+    @DisplayName("when key exists")
+    class WhenKeyExists {
+
+        @Test
+        @DisplayName("should return the associated value")
+        void shouldReturnValue() {
+            // Act
+            final Object removedValue = properties.remove("key.middle");
+
+            // Assert
+            assertEquals("value2", removedValue);
         }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, iterSet.next());
+
+        @Test
+        @DisplayName("should remove the key-value pair")
+        void shouldRemoveThePair() {
+            // Act
+            properties.remove("key.middle");
+
+            // Assert
+            assertEquals(2, properties.size(), "Size should be decremented");
+            assertFalse(properties.containsKey("key.middle"), "Key should no longer be present");
         }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i++) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i++) {
-            assertEquals("key" + i, propertyNames.nextElement());
+
+        @Test
+        @DisplayName("should preserve the order of remaining elements")
+        void shouldPreserveOrder() {
+            // Act
+            properties.remove("key.middle");
+
+            // Assert
+            final List<Object> expectedKeys = Arrays.asList("key.first", "key.last");
+
+            // Verify order in the modern keySet view
+            final List<Object> actualKeys = new ArrayList<>(properties.keySet());
+            assertEquals(expectedKeys, actualKeys, "Order in keySet() should be maintained");
+
+            // Verify order in the legacy propertyNames() view for backward compatibility
+            final List<Object> actualPropertyNames = Collections.list(properties.propertyNames());
+            assertEquals(expectedKeys, actualPropertyNames, "Order in propertyNames() should be maintained");
         }
     }
 
-    private OrderedProperties assertDescendingOrder(final OrderedProperties orderedProperties) {
-        final int first = 11;
-        final int last = 1;
-        final Enumeration<Object> enumObjects = orderedProperties.keys();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, enumObjects.nextElement());
-        }
-        final Iterator<Object> iterSet = orderedProperties.keySet().iterator();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, iterSet.next());
-        }
-        final Iterator<Entry<Object, Object>> iterEntrySet = orderedProperties.entrySet().iterator();
-        for (int i = first; i <= last; i--) {
-            final Entry<Object, Object> next = iterEntrySet.next();
-            assertEquals("key" + i, next.getKey());
-            assertEquals("value" + i, next.getValue());
-        }
-        final Enumeration<?> propertyNames = orderedProperties.propertyNames();
-        for (int i = first; i <= last; i--) {
-            assertEquals("key" + i, propertyNames.nextElement());
-        }
-        return orderedProperties;
-    }
+    @Nested
+    @DisplayName("when key does not exist")
+    class WhenKeyDoesNotExist {
 
-    private OrderedProperties loadOrderedKeysReverse() throws FileNotFoundException, IOException {
-        final OrderedProperties orderedProperties = new OrderedProperties();
-        try (FileReader reader = new FileReader("src/test/resources/org/apache/commons/collections4/properties/test-reverse.properties")) {
-            orderedProperties.load(reader);
-        }
-        return assertDescendingOrder(orderedProperties);
-    }
+        @Test
+        @DisplayName("should return null")
+        void shouldReturnNull() {
+            // Act
+            final Object removedValue = properties.remove("non.existent.key");
 
-    @Test
-    void testRemoveKey() throws FileNotFoundException, IOException {
-        final OrderedProperties props = loadOrderedKeysReverse();
-        final String k = "key1";
-        props.remove(k);
-        assertFalse(props.contains(k));
-        assertFalse(props.containsKey(k));
-        assertFalse(Collections.list(props.keys()).contains(k));
-        assertFalse(Collections.list(props.propertyNames()).contains(k));
+            // Assert
+            assertNull(removedValue);
+        }
+
+        @Test
+        @DisplayName("should not change the properties")
+        void shouldNotChangeProperties() {
+            // Act
+            properties.remove("non.existent.key");
+
+            // Assert
+            final List<Object> expectedKeys = Arrays.asList("key.first", "key.middle", "key.last");
+            assertEquals(3, properties.size(), "Size should remain unchanged");
+            assertEquals(expectedKeys, new ArrayList<>(properties.keySet()), "Key set should remain unchanged");
+        }
     }
 }
