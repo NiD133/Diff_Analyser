@@ -1,37 +1,32 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for the {@link StringUtil#join(String[], String)} method.
+ *
+ * Note: This class retains its original name and parent class for consistency with the
+ * provided code, but in a real-world scenario, it would be named something like
+ * `StringUtilTest` and would not extend a scaffolding class.
+ */
 public class StringUtil_ESTestTest100 extends StringUtil_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test99() throws Throwable {
-        String[] stringArray0 = new String[8];
-        // Undeclared exception!
-        try {
-            StringUtil.join(stringArray0, "oU%A");
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.System", e);
-        }
+    /**
+     * Verifies that StringUtil.join throws a NullPointerException when the input array
+     * contains a null element. The join operation cannot proceed with null values
+     * as it attempts to call methods on them.
+     */
+    @Test(expected = NullPointerException.class)
+    public void joinOnArrayContainingNullShouldThrowNullPointerException() {
+        // Arrange: Create an array of strings that includes a null element.
+        String[] arrayWithNull = {"first", null, "third"};
+        String separator = ", ";
+
+        // Act: Attempt to join the elements of the array.
+        // This call is expected to fail with a NullPointerException.
+        StringUtil.join(arrayWithNull, separator);
+
+        // Assert: The test passes if a NullPointerException is thrown,
+        // which is declared and handled by the @Test(expected=...) annotation.
     }
 }
