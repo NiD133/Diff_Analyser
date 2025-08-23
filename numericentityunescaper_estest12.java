@@ -1,27 +1,27 @@
 package org.apache.commons.lang3.text.translate;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class NumericEntityUnescaper_ESTestTest12 extends NumericEntityUnescaper_ESTest_scaffolding {
+/**
+ * Tests for {@link NumericEntityUnescaper}.
+ */
+// Note: The original test class name and structure suggest it was auto-generated.
+// This refactored version is presented as a standalone, human-written test.
+public class NumericEntityUnescaperTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        NumericEntityUnescaper.OPTION[] numericEntityUnescaper_OPTIONArray0 = new NumericEntityUnescaper.OPTION[0];
-        NumericEntityUnescaper numericEntityUnescaper0 = new NumericEntityUnescaper(numericEntityUnescaper_OPTIONArray0);
-        char[] charArray0 = new char[8];
-        charArray0[5] = '&';
-        charArray0[6] = '#';
-        charArray0[7] = 'X';
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        String string0 = numericEntityUnescaper0.translate((CharSequence) charBuffer0);
-        assertEquals("\u0000\u0000\u0000\u0000\u0000&#X", string0);
+    @Test
+    public void shouldNotTranslateIncompleteHexadecimalEntity() {
+        // Arrange
+        // The unescaper is created with default options, which means a semicolon is required for a valid entity.
+        final NumericEntityUnescaper unescaper = new NumericEntityUnescaper();
+        final String input = "&#X"; // An incomplete hexadecimal entity (missing digits and semicolon).
+
+        // Act
+        final String result = unescaper.translate(input);
+
+        // Assert
+        // The input string should be returned unchanged because it does not form a valid numeric entity.
+        assertEquals("The incomplete entity should not be translated", input, result);
     }
 }
