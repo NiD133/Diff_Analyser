@@ -1,34 +1,35 @@
 package org.apache.commons.collections4.comparators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparatorChain_ESTestTest1 extends ComparatorChain_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ComparatorChain} class, focusing on specific edge cases.
+ */
+public class ComparatorChainTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        ComparatorChain<Object> comparatorChain0 = new ComparatorChain<Object>();
-        Comparator<Object> comparator0 = Comparator.nullsLast((Comparator<? super Object>) comparatorChain0);
-        comparatorChain0.addComparator(comparator0, true);
-        comparatorChain0.hashCode();
+    /**
+     * Tests that calling hashCode() on a ComparatorChain that contains a circular
+     * reference to itself results in a StackOverflowError.
+     *
+     * This scenario can occur if a comparator that wraps the chain is added
+     * back into the chain itself. The test ensures this edge case behaves as expected
+     * (infinite recursion) rather than causing other unexpected errors.
+     */
+    @Test(timeout = 4000, expected = StackOverflowError.class)
+    public void hashCodeShouldThrowStackOverflowErrorOnCircularReference() {
+        // Arrange: Create a circular dependency.
+        // 1. A ComparatorChain is created.
+        // 2. A wrapper comparator is created that delegates to the chain.
+        // 3. The wrapper is added to the chain itself.
+        final ComparatorChain<Object> chainWithCircularReference = new ComparatorChain<>();
+        final Comparator<Object> wrapperComparator = Comparator.nullsLast(chainWithCircularReference);
+        chainWithCircularReference.addComparator(wrapperComparator);
+
+        // Act & Assert:
+        // Calling hashCode() will lead to infinite recursion:
+        // chain.hashCode() -> wrapper.hashCode() -> chain.hashCode() -> ...
+        // This is expected to throw a StackOverflowError.
+        chainWithCircularReference.hashCode();
     }
 }
