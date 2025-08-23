@@ -1,24 +1,27 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class QuotedPrintableCodec_ESTestTest46 extends QuotedPrintableCodec_ESTest_scaffolding {
+/**
+ * Unit tests for the QuotedPrintableCodec class.
+ */
+public class QuotedPrintableCodecTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        Charset charset0 = Charset.defaultCharset();
-        QuotedPrintableCodec quotedPrintableCodec0 = new QuotedPrintableCodec(charset0);
-        byte[] byteArray0 = quotedPrintableCodec0.encode((byte[]) null);
-        assertNull(byteArray0);
+    /**
+     * Tests that encoding a null byte array returns null, which is the expected
+     * behavior for encoders in this library when handling null input.
+     */
+    @Test
+    public void encodeByteArrayShouldReturnNullForNullInput() {
+        // Arrange: Create a codec instance. The specific charset doesn't matter
+        // for this test case, so the default constructor is used.
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+
+        // Act: Call the encode method with a null input.
+        final byte[] result = codec.encode(null);
+
+        // Assert: Verify that the output is null.
+        assertNull("Encoding a null byte array should return null.", result);
     }
 }
