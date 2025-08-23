@@ -1,33 +1,39 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest54 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for edge cases in the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        FileTime fileTime0 = FileTimes.now();
-        // Undeclared exception!
-        try {
-            FileTimes.minusSeconds(fileTime0, (-9223372036854775808L));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // long overflow
-            //
-            verifyException("java.lang.Math", e);
-        }
+    /**
+     * Tests that calling {@link FileTimes#minusSeconds(FileTime, long)} with {@link Long#MIN_VALUE}
+     * throws an {@link ArithmeticException}.
+     * <p>
+     * The subtraction operation internally requires negating the number of seconds.
+     * In two's complement arithmetic, the negation of {@code Long.MIN_VALUE} results in a value
+     * that is too large to be represented as a {@code long}, causing an overflow.
+     * </p>
+     */
+    @Test
+    public void minusSecondsWithLongMinValueThrowsArithmeticException() {
+        // Arrange: Get the current time and the value that will cause an overflow.
+        final FileTime now = FileTimes.now();
+        final long secondsToSubtract = Long.MIN_VALUE;
+
+        // Act & Assert: Verify that an ArithmeticException is thrown.
+        // The lambda expression ensures the exception is caught from the specific method call.
+        final ArithmeticException exception = assertThrows(ArithmeticException.class, () -> {
+            FileTimes.minusSeconds(now, secondsToSubtract);
+        });
+
+        // Further assert that the exception message indicates the expected cause.
+        assertTrue("The exception message should indicate an overflow.",
+            exception.getMessage().contains("long overflow"));
     }
 }
