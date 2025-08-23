@@ -1,32 +1,42 @@
 package org.jsoup.select;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.junit.jupiter.api.Test;
+
 import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ElementsTestTest46 {
 
     @Test
-    public void iteratorRemovesFromDom() {
-        Document doc = Jsoup.parse("<p>One<p>Two<p>Three<p>Four");
-        Elements ps = doc.select("p");
-        assertEquals(4, ps.size());
-        for (Iterator<Element> it = ps.iterator(); it.hasNext(); ) {
-            Element el = it.next();
-            if (el.text().contains("Two"))
-                it.remove();
+    void iteratorRemove_shouldModifyBothCollectionAndDom() {
+        // This test verifies a key contract of the Elements collection:
+        // modifications made via its iterator (e.g., iterator.remove())
+        // are reflected not only in the collection but also in the underlying DOM.
+
+        // Arrange: Create a document with four <p> elements.
+        Document doc = Jsoup.parse("<p>One</p><p>Two</p><p>Three</p><p>Four</p>");
+        Elements pElements = doc.select("p");
+        assertEquals(4, pElements.size(), "Verify initial count of paragraphs");
+
+        // Act: Remove the element containing "Two" using the iterator.
+        for (Iterator<Element> it = pElements.iterator(); it.hasNext(); ) {
+            Element p = it.next();
+            if (p.text().equals("Two")) {
+                it.remove(); // This should modify both the `pElements` list and the `doc`.
+            }
         }
-        assertEquals(3, ps.size());
-        assertEquals("<p>One</p>\n<p>Three</p>\n<p>Four</p>", doc.body().html());
+
+        // Assert: Check that both the collection and the DOM were updated correctly.
+        // 1. The live collection reflects the removal.
+        assertEquals(3, pElements.size(), "Collection size should be updated after removal");
+
+        // 2. The DOM is also modified. We verify this by re-selecting from the document.
+        Elements remainingElements = doc.select("p");
+        assertEquals(3, remainingElements.size(), "DOM should contain fewer elements");
+        assertEquals("One Three Four", remainingElements.text(), "Text of remaining elements should be correct");
     }
 }
