@@ -1,17 +1,27 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JavaVersion_ESTestTest7 extends JavaVersion_ESTest_scaffolding {
+/**
+ * Unit tests for the package-private helper methods in {@link JavaVersion}.
+ */
+public class JavaVersionTest {
 
-    @Test(timeout = 4000)
-    public void test6() throws Throwable {
-        int int0 = JavaVersion.parseMajorJavaVersion("1");
-        assertEquals(1, int0);
+    /**
+     * Verifies that parseMajorJavaVersion correctly handles a version string
+     * that consists of only a single digit, such as "1".
+     */
+    @Test
+    public void parseMajorJavaVersion_withSingleDigitString_returnsCorrectVersion() {
+        // Arrange
+        String javaVersionString = "1";
+        int expectedMajorVersion = 1;
+
+        // Act
+        int actualMajorVersion = JavaVersion.parseMajorJavaVersion(javaVersionString);
+
+        // Assert
+        assertEquals(expectedMajorVersion, actualMajorVersion);
     }
 }
