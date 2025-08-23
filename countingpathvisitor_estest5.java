@@ -1,42 +1,52 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
+
+import org.apache.commons.io.file.Counters.PathCounters;
 import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CountingPathVisitor_ESTestTest5 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link CountingPathVisitor}.
+ * This test focuses on the visitFile method.
+ */
+// Note: The original class name "CountingPathVisitor_ESTestTest5" is an artifact
+// from a test generation tool. A more conventional name would be "CountingPathVisitorTest".
+public class CountingPathVisitor_ESTestTest5 {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        CountingPathVisitor countingPathVisitor0 = CountingPathVisitor.withLongCounters();
-        MockFile mockFile0 = new MockFile("");
-        Path path0 = mockFile0.toPath();
-        BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
-        doReturn(0L).when(basicFileAttributes0).size();
-        FileVisitResult fileVisitResult0 = countingPathVisitor0.visitFile(path0, basicFileAttributes0);
-        assertEquals(FileVisitResult.CONTINUE, fileVisitResult0);
+    /**
+     * Tests that visiting a file correctly increments the file and byte counters
+     * and returns {@link FileVisitResult#CONTINUE}.
+     */
+    @Test
+    public void testVisitFileIncrementsCountersAndReturnsContinue() throws IOException {
+        // Arrange: Set up the visitor, a mock path, and its attributes.
+        final long fileSize = 123L;
+        final CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
+        final Path filePath = new MockFile("test-file.txt").toPath();
+
+        // Mock the file attributes to control the file size for the test.
+        final BasicFileAttributes mockAttributes = mock(BasicFileAttributes.class);
+        when(mockAttributes.size()).thenReturn(fileSize);
+
+        // Act: Call the method under test.
+        final FileVisitResult result = visitor.visitFile(filePath, mockAttributes);
+
+        // Assert: Verify the behavior and the resulting state.
+        // 1. The method should return CONTINUE to allow the file tree walk to proceed.
+        assertEquals("The visit result should be CONTINUE.", FileVisitResult.CONTINUE, result);
+
+        // 2. The visitor's counters should be updated correctly.
+        final PathCounters counters = visitor.getPathCounters();
+        assertEquals("File count should be incremented to 1.", 1, counters.getFileCounter().get());
+        assertEquals("Byte count should be updated with the file's size.", fileSize, counters.getByteCounter().get().longValue());
+        assertEquals("Directory count should remain unchanged.", 0, counters.getDirectoryCounter().get());
     }
 }
