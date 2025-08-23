@@ -1,27 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest21 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities} class, focusing on character escaping.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        String string0 = Entities.escape("rNMdgQN,%1L1O-D\"");
-        assertEquals("rNMdgQN,%1L1O-D&quot;", string0);
+    /**
+     * Verifies that the escape() method correctly converts a double quote character (")
+     * into its corresponding HTML entity (&quot;), while leaving other characters unchanged.
+     */
+    @Test
+    public void escapeShouldEncodeDoubleQuoteToQuotEntity() {
+        // Arrange: Define an input string containing a double quote.
+        String originalString = "This is a string with a \"double quote\".";
+        String expectedEscapedString = "This is a string with a &quot;double quote&quot;.";
+
+        // Act: Call the escape method on the input string.
+        String actualEscapedString = Entities.escape(originalString);
+
+        // Assert: Verify that the double quote was correctly escaped.
+        assertEquals(expectedEscapedString, actualEscapedString);
     }
 }
