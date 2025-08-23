@@ -1,21 +1,30 @@
 package org.jfree.chart.title;
 
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.internal.CloneUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ShortTextTitleTestTest3 {
+/**
+ * Tests for the cloning functionality of the {@link ShortTextTitle} class.
+ */
+class ShortTextTitleTest {
 
-    /**
-     * Confirm that cloning works.
-     */
     @Test
-    public void testCloning() throws CloneNotSupportedException {
-        ShortTextTitle t1 = new ShortTextTitle("ABC");
-        ShortTextTitle t2 = CloneUtils.clone(t1);
-        assertNotSame(t1, t2);
-        assertSame(t1.getClass(), t2.getClass());
-        assertEquals(t1, t2);
+    @DisplayName("A cloned ShortTextTitle is an independent and equal copy")
+    void clone_shouldCreateIndependentAndEqualCopy() throws CloneNotSupportedException {
+        // Arrange: Create an original ShortTextTitle instance.
+        ShortTextTitle original = new ShortTextTitle("Test Title");
+
+        // Act: Clone the original instance.
+        ShortTextTitle clone = CloneUtils.clone(original);
+
+        // Assert: Verify that the clone is a new, independent object with the same state.
+        assertAll("A cloned title must be an independent copy with equal state",
+            () -> assertNotSame(original, clone, "Clone should be a new object instance."),
+            () -> assertEquals(original, clone, "Clone should be equal to the original in content."),
+            () -> assertSame(original.getClass(), clone.getClass(), "Clone should be of the exact same class.")
+        );
     }
 }
