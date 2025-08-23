@@ -2,51 +2,62 @@ package org.apache.commons.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class IOCaseTestTest3 {
+/**
+ * Tests for {@link IOCase#checkEndsWith(String, String)}.
+ */
+@DisplayName("IOCase.checkEndsWith")
+class IOCaseCheckEndsWithTest {
 
-    private static final boolean WINDOWS = File.separatorChar == '\\';
+    private static final boolean IS_WINDOWS = File.separatorChar == '\\';
 
-    private void assert0(final byte[] arr) {
-        for (final byte e : arr) {
-            assertEquals(0, e);
-        }
-    }
+    @Test
+    @DisplayName("SENSITIVE should perform a case-sensitive check")
+    void sensitiveCheckEndsWithIsCaseSensitive() {
+        final String text = "Apache Commons IO";
 
-    private void assert0(final char[] arr) {
-        for (final char e : arr) {
-            assertEquals(0, e);
-        }
-    }
-
-    private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try (ObjectOutputStream out = new ObjectOutputStream(buf)) {
-            out.writeObject(value);
-            out.flush();
-        }
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
+        assertTrue(IOCase.SENSITIVE.checkEndsWith(text, "IO"), "Exact match should return true");
+        assertFalse(IOCase.SENSITIVE.checkEndsWith(text, "io"), "Different case should return false");
+        assertFalse(IOCase.SENSITIVE.checkEndsWith(text, "Apache"), "Should not match the start");
     }
 
     @Test
-    void test_checkEndsWith_case() {
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "Bc"));
-        assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "BC"));
-        assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "Bc"));
-        assertTrue(IOCase.SYSTEM.checkEndsWith("ABC", "BC"));
-        assertEquals(WINDOWS, IOCase.SYSTEM.checkEndsWith("ABC", "Bc"));
+    @DisplayName("INSENSITIVE should perform a case-insensitive check")
+    void insensitiveCheckEndsWithIsCaseInsensitive() {
+        final String text = "Apache Commons IO";
+
+        assertTrue(IOCase.INSENSITIVE.checkEndsWith(text, "IO"), "Exact match should return true");
+        assertTrue(IOCase.INSENSITIVE.checkEndsWith(text, "io"), "Different case should also return true");
+        assertFalse(IOCase.INSENSITIVE.checkEndsWith(text, "Apache"), "Should not match the start");
+    }
+
+    @Test
+    @DisplayName("SYSTEM should use OS-dependent case sensitivity")
+    void systemCheckEndsWithIsOsDependent() {
+        final String text = "Apache Commons IO";
+
+        // An exact match should always work, regardless of the OS.
+        assertTrue(IOCase.SYSTEM.checkEndsWith(text, "IO"));
+
+        // A case-different match should only work on Windows.
+        // On Windows, IS_WINDOWS is true, and the check is case-insensitive (returns true).
+        // On other OS, IS_WINDOWS is false, and the check is case-sensitive (returns false).
+        assertEquals(IS_WINDOWS, IOCase.SYSTEM.checkEndsWith(text, "io"));
+    }
+
+    @Test
+    @DisplayName("should return false for null inputs")
+    void checkEndsWithReturnsFalseForNull() {
+        // All IOCase types should behave identically for null inputs.
+        final IOCase caseType = IOCase.SENSITIVE;
+
+        assertFalse(caseType.checkEndsWith(null, "IO"), "Null string should return false");
+        assertFalse(caseType.checkEndsWith("Apache Commons IO", null), "Null suffix should return false");
+        assertFalse(caseType.checkEndsWith(null, null), "Both null should return false");
     }
 }
