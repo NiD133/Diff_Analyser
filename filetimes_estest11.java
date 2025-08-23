@@ -1,24 +1,26 @@
 package org.apache.commons.io.file.attribute;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest11 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        long long0 = FileTimes.toNtfsTime((-11644473600000L));
-        assertEquals(0L, long0);
+    /**
+     * The NTFS epoch (1601-01-01T00:00:00Z) represented as milliseconds from the
+     * Java/Unix epoch (1970-01-01T00:00:00Z).
+     */
+    private static final long NTFS_EPOCH_AS_JAVA_MILLIS = -11644473600000L;
+
+    @Test
+    public void toNtfsTime_withNtfsEpochInMillis_shouldReturnZero() {
+        // The method under test converts a Java time (milliseconds since the Unix epoch)
+        // to an NTFS time (100-nanosecond intervals since the NTFS epoch).
+        // When the input is the NTFS epoch itself, the result should be 0.
+        final long actualNtfsTime = FileTimes.toNtfsTime(NTFS_EPOCH_AS_JAVA_MILLIS);
+
+        assertEquals("The NTFS time for the NTFS epoch should be 0", 0L, actualNtfsTime);
     }
 }
