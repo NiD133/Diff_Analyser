@@ -1,26 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Weeks_ESTestTest64 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class, focusing on edge cases and exceptional behavior.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        Weeks weeks0 = Weeks.MAX_VALUE;
-        // Undeclared exception!
-        try {
-            weeks0.minus((-876));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // The calculation caused an overflow: 2147483647 + 876
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Verifies that subtracting a negative value from Weeks.MAX_VALUE
+     * throws an ArithmeticException due to integer overflow.
+     * The operation is equivalent to an addition that exceeds Integer.MAX_VALUE.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void testMinusFromMaxValueWithNegativeNumberThrowsArithmeticException() {
+        // Arrange: Start with the maximum possible value for Weeks.
+        Weeks maxWeeks = Weeks.MAX_VALUE;
+
+        // Act: Attempt to subtract a negative number. This is equivalent to
+        // Integer.MAX_VALUE - (-1), or Integer.MAX_VALUE + 1, which overflows.
+        maxWeeks.minus(-1);
+
+        // Assert: The test expects an ArithmeticException, which is declared
+        // in the @Test annotation. If no exception is thrown, the test will fail.
     }
 }
