@@ -1,27 +1,35 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest35 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CircularByteBuffer} class.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        // Undeclared exception!
+    /**
+     * Tests that the peek() method throws an IllegalArgumentException
+     * when called with a negative offset.
+     */
+    @Test
+    public void peekShouldThrowIllegalArgumentExceptionForNegativeOffset() {
+        // Arrange: Create a buffer and define the invalid arguments for the peek method.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] sourceBuffer = new byte[10]; // The buffer content doesn't matter for this test.
+        final int negativeOffset = -1;
+        final int anyValidLength = 1; // Use a valid length to isolate the negative offset as the cause.
+
+        // Act & Assert: Call peek() and verify that the correct exception is thrown.
         try {
-            circularByteBuffer0.peek(byteArray0, (-1), (-1));
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: -1
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.peek(sourceBuffer, negativeOffset, anyValidLength);
+            fail("Expected an IllegalArgumentException to be thrown due to the negative offset.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message is specific and helpful.
+            final String expectedMessage = "Illegal offset: " + negativeOffset;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
