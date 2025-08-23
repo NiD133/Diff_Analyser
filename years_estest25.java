@@ -1,26 +1,34 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Years_ESTestTest25 extends Years_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Years years0 = Years.MIN_VALUE;
-        // Undeclared exception!
+/**
+ * Test suite for the Years class, focusing on edge cases.
+ */
+public class YearsTest {
+
+    /**
+     * Verifies that subtracting MIN_VALUE from a Years object throws an ArithmeticException.
+     * This occurs because the subtraction operation involves negating the subtrahend (the
+     * argument to minus()), and Integer.MIN_VALUE cannot be negated without causing an
+     * integer overflow.
+     */
+    @Test
+    public void minus_whenSubtractingMinValue_throwsArithmeticException() {
+        Years minValueYears = Years.MIN_VALUE;
+
         try {
-            years0.minus(years0);
-            fail("Expecting exception: ArithmeticException");
+            // This operation is equivalent to: MIN_VALUE - MIN_VALUE
+            // Internally, this is calculated as safeAdd(MIN_VALUE, -MIN_VALUE).
+            // The negation of Integer.MIN_VALUE overflows.
+            minValueYears.minus(minValueYears);
+            fail("Expected an ArithmeticException to be thrown due to integer overflow.");
         } catch (ArithmeticException e) {
-            //
-            // Integer.MIN_VALUE cannot be negated
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // Assert that the correct exception was thrown for the correct reason.
+            assertEquals("Integer.MIN_VALUE cannot be negated", e.getMessage());
         }
     }
 }
