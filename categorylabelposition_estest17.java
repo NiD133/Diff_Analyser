@@ -1,24 +1,52 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
 import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryLabelPosition_ESTestTest17 extends CategoryLabelPosition_ESTest_scaffolding {
+import static org.junit.Assert.*;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition();
-        Object object0 = new Object();
-        boolean boolean0 = categoryLabelPosition0.equals(object0);
-        assertFalse(boolean0);
-        assertEquals(0.95F, categoryLabelPosition0.getWidthRatio(), 0.01F);
-        assertEquals(0.0, categoryLabelPosition0.getAngle(), 0.01);
+/**
+ * Unit tests for the {@link CategoryLabelPosition} class.
+ */
+public class CategoryLabelPositionTest {
+
+    private static final double DELTA = 1e-9;
+
+    /**
+     * Tests that the default constructor initializes all properties to their
+     * expected default values. This provides a clear specification of the
+     * default state.
+     */
+    @Test
+    public void defaultConstructor_shouldSetDefaultValues() {
+        // Arrange
+        CategoryLabelPosition position = new CategoryLabelPosition();
+
+        // Assert
+        assertEquals(RectangleAnchor.CENTER, position.getCategoryAnchor());
+        assertEquals(TextBlockAnchor.BOTTOM_CENTER, position.getLabelAnchor());
+        assertEquals(TextAnchor.CENTER, position.getRotationAnchor());
+        assertEquals(CategoryLabelWidthType.CATEGORY, position.getWidthType());
+        assertEquals(0.0, position.getAngle(), DELTA);
+        assertEquals(0.95f, position.getWidthRatio(), DELTA);
+    }
+
+    /**
+     * Verifies that the equals() method correctly returns false when comparing
+     * a CategoryLabelPosition instance with an object of a different type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange
+        CategoryLabelPosition position = new CategoryLabelPosition();
+        Object otherObject = new Object();
+
+        // Act
+        boolean isEqual = position.equals(otherObject);
+
+        // Assert
+        assertFalse(isEqual);
     }
 }
