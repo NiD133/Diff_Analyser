@@ -1,28 +1,35 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest62 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        BufferedLine bufferedLine0 = new BufferedLine(pointImpl0, pointImpl0, 0.0, spatialContext0);
-        bufferedLine0.getB();
-        assertEquals(0.0, bufferedLine0.getBuf(), 0.01);
+/**
+ * Unit tests for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
+
+    private final SpatialContext spatialContext = SpatialContext.GEO;
+
+    /**
+     * Tests that the getBuf() method correctly returns the buffer value
+     * that was provided in the constructor.
+     */
+    @Test
+    public void getBufShouldReturnTheConstructedBufferValue() {
+        // Arrange
+        Point point = new PointImpl(0.0, 0.0, spatialContext);
+        double expectedBuffer = 0.0;
+
+        // A zero-length line is created here, but the test's focus is on the buffer.
+        BufferedLine bufferedLine = new BufferedLine(point, point, expectedBuffer, spatialContext);
+
+        // Act
+        double actualBuffer = bufferedLine.getBuf();
+
+        // Assert
+        assertEquals(expectedBuffer, actualBuffer, 0.0);
     }
 }
