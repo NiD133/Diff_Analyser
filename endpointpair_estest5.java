@@ -1,25 +1,28 @@
 package com.google.common.graph;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class EndpointPair_ESTestTest5 extends EndpointPair_ESTest_scaffolding {
+/**
+ * Tests for {@link EndpointPair}.
+ */
+public class EndpointPairTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Integer integer0 = new Integer((-1));
-        NetworkBuilder<Object, Object> networkBuilder0 = NetworkBuilder.directed();
-        StandardValueGraph<Object, Integer> standardValueGraph0 = new StandardValueGraph<Object, Integer>(networkBuilder0);
-        ImmutableValueGraph<Object, Integer> immutableValueGraph0 = ImmutableValueGraph.copyOf((ValueGraph<Object, Integer>) standardValueGraph0);
-        ImmutableGraph<Object> immutableGraph0 = new ImmutableGraph<Object>(immutableValueGraph0);
-        EndpointPair<Object> endpointPair0 = EndpointPair.of((Graph<?>) immutableGraph0, (Object) integer0, (Object) standardValueGraph0);
-        boolean boolean0 = endpointPair0.isOrdered();
-        assertTrue(boolean0);
+    @Test
+    public void of_forDirectedGraph_returnsOrderedPair() {
+        // Arrange: Create a directed graph to provide context for the EndpointPair.
+        // The nodes don't need to actually exist in the graph.
+        Graph<String> directedGraph = GraphBuilder.directed().build();
+        String source = "A";
+        String target = "B";
+
+        // Act: Create an EndpointPair using the directed graph.
+        EndpointPair<String> endpointPair = EndpointPair.of(directedGraph, source, target);
+
+        // Assert: The pair should be ordered because the graph is directed.
+        assertTrue(
+            "EndpointPair.of() for a directed graph should return an ordered pair",
+            endpointPair.isOrdered());
     }
 }
