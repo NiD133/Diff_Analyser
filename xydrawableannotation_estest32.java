@@ -1,58 +1,76 @@
 package org.jfree.chart.annotations;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.math.BigInteger;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.Drawable;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.BlockContainer;
-import org.jfree.chart.legend.LegendTitle;
-import org.jfree.chart.plot.MeterPlot;
+import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.PolarAxisLocation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.AbstractRenderer;
-import org.jfree.chart.renderer.category.ScatterRenderer;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.title.CompositeTitle;
-import org.jfree.chart.title.DateTitle;
-import org.jfree.chart.title.ShortTextTitle;
 import org.jfree.chart.title.TextTitle;
-import org.jfree.data.general.DefaultValueDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XYDrawableAnnotation_ESTestTest32 extends XYDrawableAnnotation_ESTest_scaffolding {
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        TextTitle textTitle0 = new TextTitle("x");
-        XYDrawableAnnotation xYDrawableAnnotation0 = new XYDrawableAnnotation(738.4170062070756, 738.4170062070756, 738.4170062070756, 738.4170062070756, textTitle0);
-        xYDrawableAnnotation0.setURL("x");
-        XYPlot<PolarAxisLocation> xYPlot0 = new XYPlot<PolarAxisLocation>();
-        RoundRectangle2D.Float roundRectangle2D_Float0 = new RoundRectangle2D.Float();
-        Rectangle2D rectangle2D0 = roundRectangle2D_Float0.getBounds2D();
-        NumberAxis numberAxis0 = new NumberAxis("x");
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-        JFreeChart jFreeChart0 = new JFreeChart(xYPlot0);
-        BufferedImage bufferedImage0 = jFreeChart0.createBufferedImage(1564, 1564, (double) 0.0F, 50.70624, chartRenderingInfo0);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        xYDrawableAnnotation0.draw(graphics2D0, xYPlot0, rectangle2D0, numberAxis0, numberAxis0, 3697, plotRenderingInfo0);
-        assertEquals(1.0, xYDrawableAnnotation0.getDrawScaleFactor(), 0.01);
-        assertEquals(738.4170062070756, xYDrawableAnnotation0.getDisplayWidth(), 0.01);
-        assertEquals(738.4170062070756, xYDrawableAnnotation0.getX(), 0.01);
-        assertEquals(738.4170062070756, xYDrawableAnnotation0.getDisplayHeight(), 0.01);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Tests for the {@link XYDrawableAnnotation} class, focusing on the draw method's behavior.
+ */
+public class XYDrawableAnnotationTest {
+
+    /**
+     * Verifies that the draw() method correctly adds a ChartEntity to the
+     * PlotRenderingInfo when a URL is set for the annotation. This entity is
+     * crucial for features like clickable image maps in web applications.
+     */
+    @Test
+    public void draw_whenUrlIsSet_shouldAddEntityToRenderingInfo() {
+        // Arrange
+        // 1. Define the annotation's properties with clear, simple values.
+        final double x = 10.0;
+        final double y = 20.0;
+        final double width = 100.0;
+        final double height = 50.0;
+        final String urlText = "https://www.jfree.org/jfreechart/";
+        final String toolTipText = "Visit the JFreeChart website";
+
+        // 2. Create the annotation and set its interactive properties.
+        TextTitle drawable = new TextTitle("Clickable Annotation");
+        XYDrawableAnnotation annotation = new XYDrawableAnnotation(x, y, width, height, drawable);
+        annotation.setURL(urlText);
+        annotation.setToolTipText(toolTipText);
+
+        // 3. Set up the required objects for the draw() method.
+        XYPlot plot = new XYPlot();
+        Rectangle2D dataArea = new Rectangle2D.Double(0, 0, 400, 300);
+        ValueAxis domainAxis = new NumberAxis("X");
+        ValueAxis rangeAxis = new NumberAxis("Y");
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
+
+        // Create a graphics context to draw on.
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        int rendererIndex = 0; // A standard renderer index.
+
+        // Act
+        // Call the method under test.
+        annotation.draw(g2, plot, dataArea, domainAxis, rangeAxis, rendererIndex, plotInfo);
+
+        // Assert
+        // 1. Verify that one entity was added to the rendering information.
+        assertEquals("An entity should have been added for the annotation.",
+                1, chartInfo.getEntityCollection().getEntityCount());
+
+        // 2. Retrieve the entity and verify its properties.
+        ChartEntity entity = chartInfo.getEntityCollection().getEntity(0);
+        assertNotNull("The retrieved entity should not be null.", entity);
+        assertEquals("The entity's URL should match the one set on the annotation.",
+                urlText, entity.getURLText());
+        assertEquals("The entity's tool-tip text should match the one set on the annotation.",
+                toolTipText, entity.getToolTipText());
     }
 }
