@@ -1,26 +1,32 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Soundex_ESTestTest7 extends Soundex_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        Soundex soundex0 = new Soundex("]jH");
-        // Undeclared exception!
+/**
+ * Tests for {@link Soundex} focusing on exception handling with custom mappings.
+ */
+public class SoundexTest {
+
+    @Test
+    public void encodeShouldThrowIllegalArgumentExceptionForUnmappedCharacter() {
+        // Arrange: Create a Soundex instance with a custom mapping that is too short
+        // to map all letters of the alphabet. This mapping only covers 'A', 'B', and 'C'.
+        final String shortMapping = "ABC";
+        final Soundex soundex = new Soundex(shortMapping);
+        final String inputWithUnmappedChar = "David"; // The character 'D' is not covered by the mapping.
+
+        // Act & Assert
         try {
-            soundex0.encode((Object) "]jH");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The character is not mapped: J (index=9)
-            //
-            verifyException("org.apache.commons.codec.language.Soundex", e);
+            soundex.encode(inputWithUnmappedChar);
+            fail("Expected an IllegalArgumentException because the input contains a character not in the mapping.");
+        } catch (final IllegalArgumentException e) {
+            // The character 'D' has an index of 3 ('D' - 'A'), which is out of bounds for the mapping of length 3.
+            // We verify that the exception message is informative and correct.
+            final String expectedMessage = "The character is not mapped: D (index=3)";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
