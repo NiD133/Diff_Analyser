@@ -1,20 +1,25 @@
 package org.jfree.chart.plot;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import org.jfree.chart.TestUtils;
 import org.jfree.data.Range;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class MeterIntervalTestTest2 {
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-    /**
-     * This class is immutable so cloning isn't required.
-     */
+/**
+ * Unit tests for the {@link MeterInterval} class.
+ */
+@DisplayName("MeterInterval")
+class MeterIntervalTest {
+
     @Test
-    public void testCloning() {
-        MeterInterval m1 = new MeterInterval("X", new Range(1.0, 2.0));
-        assertFalse(m1 instanceof Cloneable);
+    @DisplayName("should not be cloneable because it is immutable")
+    void meterIntervalShouldNotImplementCloneable() {
+        // The MeterInterval class is designed to be immutable, so it should not
+        // implement the Cloneable interface. This test verifies that design choice.
+        MeterInterval interval = new MeterInterval("Test Interval", new Range(1.0, 2.0));
+
+        assertFalse(interval instanceof Cloneable,
+                "As an immutable class, MeterInterval should not implement Cloneable.");
     }
 }
