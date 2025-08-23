@@ -1,44 +1,39 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
+
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
 
-public class Symmetry454Chronology_ESTestTest5 extends Symmetry454Chronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = Symmetry454Chronology.INSTANCE;
-        LocalDateTime localDateTime0 = MockLocalDateTime.now();
-        ChronoLocalDateTime<Symmetry454Date> chronoLocalDateTime0 = symmetry454Chronology0.localDateTime(localDateTime0);
-        assertNotNull(chronoLocalDateTime0);
+/**
+ * Tests for {@link Symmetry454Chronology#localDateTime(java.time.temporal.TemporalAccessor)}.
+ */
+public class Symmetry454Chronology_ESTestTest5 { // Retaining original class name for context
+
+    @Test
+    public void localDateTime_fromIsoLocalDateTime_convertsSuccessfully() {
+        // Arrange
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+        // Use a fixed, non-mocked date-time for a deterministic and clear test case.
+        LocalDateTime isoLocalDateTime = LocalDateTime.of(2024, 7, 22, 12, 30, 45);
+
+        // Act
+        // Convert the standard ISO LocalDateTime to the Symmetry454 calendar system.
+        ChronoLocalDateTime<Symmetry454Date> symmetryLocalDateTime = chronology.localDateTime(isoLocalDateTime);
+
+        // Assert
+        assertNotNull("The converted ChronoLocalDateTime should not be null.", symmetryLocalDateTime);
+
+        // Verify that the date part has been converted to the target chronology.
+        assertTrue("The date part should be an instance of Symmetry454Date.",
+                symmetryLocalDateTime.toLocalDate() instanceof Symmetry454Date);
+
+        // According to the ChronoLocalDateTime contract, the time part should be preserved.
+        assertEquals("The time part should remain unchanged after conversion.",
+                isoLocalDateTime.toLocalTime(), symmetryLocalDateTime.toLocalTime());
     }
 }
