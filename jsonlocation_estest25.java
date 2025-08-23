@@ -1,21 +1,34 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest25 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Object object0 = new Object();
-        ErrorReportConfiguration errorReportConfiguration0 = new ErrorReportConfiguration(0, 0);
-        ContentReference contentReference0 = ContentReference.construct(true, object0, 2492, 0, errorReportConfiguration0);
-        ContentReference contentReference1 = JsonLocation._wrap(contentReference0);
-        assertSame(contentReference0, contentReference1);
+/**
+ * Unit tests for the {@link JsonLocation} class.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Tests that the internal {@code _wrap()} helper method returns the exact same instance
+     * when the input object is already a {@link ContentReference}.
+     * <p>
+     * This behavior is an optimization to avoid redundant object creation.
+     */
+    @Test
+    public void wrap_whenGivenContentReference_shouldReturnSameInstance() {
+        // Arrange: Create a ContentReference instance to use as input.
+        // The specific constructor arguments are not relevant to this test's logic.
+        Object sourceObject = new Object();
+        ContentReference originalContentReference = ContentReference.construct(
+                false, sourceObject, 0, 0, null);
+
+        // Act: Call the _wrap method with the existing ContentReference.
+        ContentReference result = JsonLocation._wrap(originalContentReference);
+
+        // Assert: The method should return the identical instance, not a new one.
+        assertSame("The _wrap method should not create a new object if one is already provided.",
+                originalContentReference, result);
     }
 }
