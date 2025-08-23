@@ -1,54 +1,42 @@
 package org.threeten.extra;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
+
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
 import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQuery;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockYearMonth;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockThaiBuddhistDate;
-import org.junit.runner.RunWith;
 
-public class DayOfYear_ESTestTest46 extends DayOfYear_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        DayOfYear dayOfYear0 = DayOfYear.now();
-        // Undeclared exception!
+/**
+ * This test class contains tests for the DayOfYear class.
+ * The original test class was likely auto-generated, hence the name DayOfYear_ESTestTest46.
+ * A more conventional name would be DayOfYearTest.
+ */
+public class DayOfYearTest {
+
+    /**
+     * Tests that attempting to create a {@link Year} from a {@link DayOfYear} fails with a DateTimeException.
+     * <p>
+     * A {@code DayOfYear} is a partial temporal entity that only represents the day within a year (1-366).
+     * It does not contain year information. Therefore, any attempt to extract a year from it should fail.
+     */
+    @Test
+    public void yearFrom_whenSourceIsDayOfYear_throwsDateTimeException() {
+        // Arrange: Create a DayOfYear instance. Using a fixed value makes the test deterministic.
+        DayOfYear dayOfYear = DayOfYear.of(45);
+
+        // Act & Assert: Verify that calling Year.from() throws the expected exception.
         try {
-            MockYear.from(dayOfYear0);
-            fail("Expecting exception: DateTimeException");
+            Year.from(dayOfYear);
+            fail("Expected a DateTimeException to be thrown, but no exception occurred.");
         } catch (DateTimeException e) {
-            //
-            // Unable to obtain Year from TemporalAccessor: DayOfYear:45 of type org.threeten.extra.DayOfYear
-            //
-            verifyException("java.time.Year", e);
+            // Verify that the exception message is informative and confirms the cause.
+            String expectedMessageFragment = "Unable to obtain Year from TemporalAccessor";
+            assertTrue(
+                "Exception message should explain why the conversion failed. Actual: " + e.getMessage(),
+                e.getMessage().contains(expectedMessageFragment)
+            );
         }
     }
 }
