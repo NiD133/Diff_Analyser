@@ -1,16 +1,17 @@
 package org.apache.commons.collections4.set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.Collection;
+
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import org.apache.commons.collections4.set.CompositeSet.SetMutator;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Contains specific tests for CompositeSet behavior, supplementing the
+ * general contract tests in AbstractSetTest.
+ *
+ * @param <E> the type of the elements in the set
+ */
 public class CompositeSetTestTest2<E> extends AbstractSetTest<E> {
 
     @SuppressWarnings("unchecked")
@@ -47,17 +48,39 @@ public class CompositeSetTestTest2<E> extends AbstractSetTest<E> {
         return set;
     }
 
+    /**
+     * Tests that adding sets with overlapping elements to a CompositeSet without a
+     * SetMutator throws an UnsupportedOperationException.
+     */
     @Test
     @SuppressWarnings("unchecked")
-    void testAddCompositedCollision() {
-        final HashSet<E> set1 = new HashSet<>();
-        set1.add((E) "1");
-        set1.add((E) "2");
-        set1.add((E) "3");
-        final HashSet<E> set2 = new HashSet<>();
-        set2.add((E) "4");
-        final CompositeSet<E> set3 = new CompositeSet<>(set1);
-        assertThrows(UnsupportedOperationException.class, () -> set3.addComposited(set1, buildOne()), "Expecting UnsupportedOperationException.");
-        assertThrows(UnsupportedOperationException.class, () -> set3.addComposited(set1, buildOne(), buildTwo()), "Expecting UnsupportedOperationException.");
+    void addCompositedWithOverlappingSetsAndNoMutatorShouldThrowException() {
+        // Arrange: Create a set to be part of the composite.
+        final Set<E> initialSet = new HashSet<>();
+        initialSet.add((E) "1");
+        initialSet.add((E) "2");
+        initialSet.add((E) "3");
+
+        // Arrange: Create a CompositeSet containing the initial set.
+        // By default, it has no SetMutator, so it cannot resolve collisions.
+        final CompositeSet<E> compositeSet = new CompositeSet<>(initialSet);
+
+        // Arrange: Create sets that will cause collisions.
+        // collidingSetA overlaps with initialSet on elements "1" and "2".
+        final Set<E> collidingSetA = buildOne(); // Contains {"1", "2"}
+        // collidingSetB overlaps with initialSet on element "3".
+        final Set<E> collidingSetB = buildTwo(); // Contains {"3", "4"}
+
+        // Act & Assert: Attempting to add sets that are already present or have
+        // overlapping elements should fail because no collision resolution
+        // strategy (SetMutator) has been defined.
+
+        // Scenario 1: Adding the initial set again, plus another colliding set.
+        assertThrows(UnsupportedOperationException.class,
+            () -> compositeSet.addComposited(initialSet, collidingSetA));
+
+        // Scenario 2: Adding the initial set again, plus two other colliding sets.
+        assertThrows(UnsupportedOperationException.class,
+            () -> compositeSet.addComposited(initialSet, collidingSetA, collidingSetB));
     }
 }
