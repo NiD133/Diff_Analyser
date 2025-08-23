@@ -1,30 +1,29 @@
 package org.apache.commons.io.function;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.time.chrono.HijrahEra;
-import java.util.Comparator;
-import java.util.concurrent.ForkJoinTask;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.LongStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class Uncheck_ESTestTest4 extends Uncheck_ESTest_scaffolding {
+/**
+ * Tests for the {@link Uncheck} utility class.
+ */
+public class UncheckTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        IOPredicate<String> iOPredicate0 = IOPredicate.alwaysTrue();
-        boolean boolean0 = Uncheck.test(iOPredicate0, "after");
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link Uncheck#test(IOPredicate, Object)} correctly returns true
+     * when the provided predicate evaluates to true and does not throw an exception.
+     */
+    @Test
+    public void testShouldReturnTrueWhenPredicateIsTrue() {
+        // Arrange: Create a predicate that always returns true.
+        // The specific input value does not matter for this test.
+        final IOPredicate<String> alwaysTruePredicate = IOPredicate.alwaysTrue();
+        final String dummyInput = "any-string";
+
+        // Act: Call the method under test.
+        final boolean result = Uncheck.test(alwaysTruePredicate, dummyInput);
+
+        // Assert: Verify that the result is true.
+        assertTrue("Expected true for a predicate that always returns true", result);
     }
 }
