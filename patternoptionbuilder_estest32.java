@@ -1,17 +1,25 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class PatternOptionBuilder_ESTestTest32 extends PatternOptionBuilder_ESTest_scaffolding {
+/**
+ * Tests for {@link PatternOptionBuilder}.
+ */
+public class PatternOptionBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Class<?> class0 = PatternOptionBuilder.getValueType(';');
-        assertNull(class0);
+    @Test
+    public void getValueTypeShouldReturnNullForUnrecognizedCharacter() {
+        // Arrange: According to the PatternOptionBuilder documentation, value type
+        // specifiers are characters like '@', '>', '%', etc. The semicolon ';'
+        // is not a recognized specifier.
+        final char unrecognizedChar = ';';
+
+        // Act: Attempt to get the value type for the unrecognized character.
+        final Class<?> valueType = PatternOptionBuilder.getValueType(unrecognizedChar);
+
+        // Assert: The method should return null when given a character that does not
+        // map to a known value type.
+        assertNull("Expected null for an unrecognized value type character", valueType);
     }
 }
