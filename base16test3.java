@@ -1,57 +1,42 @@
 package org.apache.commons.codec.binary;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
-import org.apache.commons.codec.CodecPolicy;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 
-public class Base16TestTest3 {
-
-    private static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
-
-    private final Random random = new Random();
-
-    /**
-     * @return the random.
-     */
-    public Random getRandom() {
-        return this.random;
-    }
-
-    private void testBase16InBuffer(final int startPasSize, final int endPadSize) {
-        final String content = "Hello World";
-        final String encodedContent;
-        final byte[] bytesUtf8 = StringUtils.getBytesUtf8(content);
-        byte[] buffer = ArrayUtils.addAll(bytesUtf8, new byte[endPadSize]);
-        buffer = ArrayUtils.addAll(new byte[startPasSize], buffer);
-        final byte[] encodedBytes = new Base16().encode(buffer, startPasSize, bytesUtf8.length);
-        encodedContent = StringUtils.newStringUtf8(encodedBytes);
-        assertEquals("48656C6C6F20576F726C64", encodedContent, "encoding hello world");
-    }
-
-    private String toString(final byte[] data) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            buf.append(data[i]);
-            if (i != data.length - 1) {
-                buf.append(",");
-            }
-        }
-        return buf.toString();
-    }
+/**
+ * Tests for the {@link Base16} class.
+ */
+class Base16Test {
 
     @Test
-    void testBase16AtBufferMiddle() {
-        testBase16InBuffer(100, 100);
+    void shouldCorrectlyEncodeSubArrayWithOffsetAndLength() {
+        // Arrange
+        final String originalData = "Hello World";
+        final byte[] dataToEncode = originalData.getBytes(StandardCharsets.UTF_8);
+        final String expectedEncodedData = "48656C6C6F20576F726C64";
+
+        final int prefixPaddingSize = 100;
+        final int suffixPaddingSize = 100;
+
+        // Create a larger buffer with the data to be encoded placed in the middle,
+        // surrounded by padding. This setup is designed to verify that the encode method
+        // correctly handles the offset and length parameters, only processing the
+        -        // intended segment of the buffer.
+        final byte[] prefix = new byte[prefixPaddingSize];
+        final byte[] suffix = new byte[suffixPaddingSize];
+        final byte[] buffer = ArrayUtils.addAll(ArrayUtils.addAll(prefix, dataToEncode), suffix);
+
+        final Base16 base16 = new Base16();
+
+        // Act
+        // Execute the encode operation on the middle part of the buffer.
+        final byte[] encodedBytes = base16.encode(buffer, prefixPaddingSize, dataToEncode.length);
+        final String actualEncodedData = new String(encodedBytes, StandardCharsets.UTF_8);
+
+        // Assert
+        assertEquals(expectedEncodedData, actualEncodedData);
     }
 }
