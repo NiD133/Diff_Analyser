@@ -1,44 +1,57 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
-import java.io.IOException;
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest32 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0, 500);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, pipedInputStream0, (byte[]) null, 2541, 2);
-        mergedStream0.mark(0);
+/**
+ * Contains tests for the {@link MergedStream} class, focusing on its behavior
+ * regarding stream marking.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Verifies that calling mark() on a MergedStream is safely ignored,
+     * as this stream does not support the mark/reset functionality.
+     *
+     * The test ensures that no exception is thrown even when the stream is
+     * constructed with a null internal buffer, confirming that mark() is a no-op.
+     */
+    @Test
+    public void markShouldBeIgnoredWhenMarkIsNotSupported() {
+        // Arrange: Set up a MergedStream instance.
+        // The IOContext is a required dependency for MergedStream.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                null, // StreamWriteConstraints not relevant for this input stream
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.redacted(),
+                true);
+
+        InputStream underlyingStream = new PipedInputStream();
+
+        // Create the MergedStream with a null buffer and invalid start/end indices.
+        // This creates an edge-case scenario to ensure mark() does not attempt to
+        // interact with the buffer, which would cause a NullPointerException.
+        int start = 2541;
+        int end = 2;
+        MergedStream mergedStream = new MergedStream(ioContext, underlyingStream, null, start, end);
+
+        // Assert: First, confirm the precondition that mark/reset is not supported.
+        // This is the fundamental reason the mark() call should be ignored.
+        assertFalse("MergedStream should not support the mark() operation.", mergedStream.markSupported());
+
+        // Act: Call the mark() method.
+        // The test's success is defined by this action not throwing an exception.
+        mergedStream.mark(100); // The read-ahead limit is irrelevant.
+
+        // No further assertions are needed. The absence of an exception proves the behavior.
     }
 }
