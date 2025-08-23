@@ -1,50 +1,43 @@
 package org.apache.commons.io.file;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
+import java.nio.file.Paths;
+import org.junit.Test;
 
-public class CountingPathVisitor_ESTestTest13 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link CountingPathVisitor}.
+ */
+public class CountingPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
-        String[] stringArray0 = new String[3];
-        stringArray0[0] = "hCUJ&KIcnhn";
-        stringArray0[1] = "*Qus;#HzV)I)";
-        stringArray0[2] = "&V8coOO1NH$";
-        DeletingPathVisitor deletingPathVisitor0 = new DeletingPathVisitor(counters_PathCounters0, stringArray0);
-        File file0 = MockFile.createTempFile("-i8e'2;3AOg#yY!", "fileFilter");
-        Path path0 = file0.toPath();
-        MockIOException mockIOException0 = new MockIOException();
+    /**
+     * Tests that postVisitDirectory re-throws the IOException it receives,
+     * which is the expected behavior when a directory visit is terminated by an error.
+     */
+    @Test
+    public void testPostVisitDirectoryRethrowsSuppliedException() {
+        // Arrange
+        // Create a standard visitor instance.
+        final CountingPathVisitor visitor = CountingPathVisitor.withLongCounters();
+        
+        // A dummy path for the directory parameter. It does not need to exist on the file system.
+        final Path dummyDirectory = Paths.get("any/directory");
+        
+        // The exception simulating an I/O error that occurred while visiting the directory.
+        final IOException inputException = new IOException("Simulated I/O error");
+
+        // Act & Assert
+        // The postVisitDirectory method should re-throw the exact exception it receives.
         try {
-            deletingPathVisitor0.postVisitDirectory(path0, (IOException) mockIOException0);
-            fail("Expecting exception: NoSuchFileException");
-        } catch (NoSuchFileException e) {
+            visitor.postVisitDirectory(dummyDirectory, inputException);
+            fail("Expected an IOException to be thrown.");
+        } catch (final IOException thrownException) {
+            // Verify that the thrown exception is the same instance we passed in.
+            assertSame("The method should re-throw the exact same exception instance.", 
+                         inputException, thrownException);
         }
     }
 }
