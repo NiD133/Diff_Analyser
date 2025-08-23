@@ -1,21 +1,31 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonIncludeProperties_ESTestTest17 extends JsonIncludeProperties_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonIncludeProperties.Value} class.
+ */
+public class JsonIncludePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        JsonIncludeProperties.Value jsonIncludeProperties_Value0 = JsonIncludeProperties.Value.ALL;
-        Class<JsonIncludeProperties> class0 = jsonIncludeProperties_Value0.valueFor();
-        assertEquals("interface com.fasterxml.jackson.annotation.JsonIncludeProperties", class0.toString());
+    /**
+     * Verifies that the valueFor() method correctly returns the
+     * {@link JsonIncludeProperties} annotation class it is associated with.
+     * This behavior is part of the contract for the {@link JacksonAnnotationValue} interface.
+     */
+    @Test
+    public void valueFor_shouldReturnAssociatedAnnotationClass() {
+        // Arrange
+        // The .ALL instance is a default, pre-configured value representing the inclusion of all properties.
+        JsonIncludeProperties.Value allPropertiesValue = JsonIncludeProperties.Value.ALL;
+
+        // Act
+        // The valueFor() method should return the annotation type this value class corresponds to.
+        Class<JsonIncludeProperties> annotationClass = allPropertiesValue.valueFor();
+
+        // Assert
+        // The returned class should be exactly JsonIncludeProperties.class.
+        // Comparing class literals is more robust than comparing string representations.
+        assertEquals(JsonIncludeProperties.class, annotationClass);
     }
 }
