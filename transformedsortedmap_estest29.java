@@ -1,49 +1,36 @@
 package org.apache.commons.collections4.map;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
+
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TransformedSortedMap_ESTestTest29 extends TransformedSortedMap_ESTest_scaffolding {
+/**
+ * This test suite contains improvements to an existing test for TransformedSortedMap.
+ */
+public class TransformedSortedMapTest {
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        TreeMap<Object, Object> treeMap0 = new TreeMap<Object, Object>();
-        TransformedSortedMap<Object, Object> transformedSortedMap0 = TransformedSortedMap.transformedSortedMap((SortedMap<Object, Object>) treeMap0, (Transformer<? super Object, ?>) null, (Transformer<? super Object, ?>) null);
-        // Undeclared exception!
-        try {
-            transformedSortedMap0.tailMap((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.TreeMap", e);
-        }
+    /**
+     * Tests that calling tailMap() with a null key throws a NullPointerException
+     * when the decorated map is a TreeMap, which does not permit null keys.
+     * This verifies that the decorator correctly propagates exceptions from the
+     * underlying map.
+     */
+    @Test(expected = NullPointerException.class)
+    public void tailMapShouldPropagateNullPointerExceptionFromUnderlyingMap() {
+        // Arrange: Create a TransformedSortedMap that wraps a TreeMap.
+        // A TreeMap is used because it does not support null keys.
+        // No transformers are supplied, so the map only acts as a decorator.
+        final SortedMap<Object, Object> baseMap = new TreeMap<>();
+        final SortedMap<Object, Object> transformedMap =
+            TransformedSortedMap.transformedSortedMap(baseMap, null, null);
+
+        // Act: Attempt to get a tail map using a null key.
+        // This action is delegated to the underlying TreeMap, which will throw
+        // a NullPointerException.
+        transformedMap.tailMap(null);
+
+        // Assert: The test succeeds if a NullPointerException is thrown,
+        // as specified by the @Test(expected) annotation.
     }
 }
