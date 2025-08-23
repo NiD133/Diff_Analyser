@@ -1,18 +1,30 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class DateTimeComparator_ESTestTest18 extends DateTimeComparator_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DateTimeComparator} class.
+ */
+public class DateTimeComparatorTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        DateTimeComparator dateTimeComparator0 = DateTimeComparator.getTimeOnlyInstance();
-        DateTimeFieldType dateTimeFieldType0 = dateTimeComparator0.getUpperLimit();
-        assertEquals("dayOfYear", dateTimeFieldType0.toString());
+    /**
+     * Verifies that the upper limit for a time-only comparator is 'dayOfYear'.
+     *
+     * A time-only comparator is designed to ignore date-related fields. By setting 'dayOfYear'
+     * as the exclusive upper limit, all fields of that magnitude or greater (day, month, year, etc.)
+     * are excluded from the comparison, effectively isolating the time portion of a datetime.
+     */
+    @Test
+    public void getUpperLimit_forTimeOnlyInstance_shouldReturnDayOfYear() {
+        // Arrange: Get the singleton instance of the time-only comparator.
+        DateTimeComparator timeOnlyComparator = DateTimeComparator.getTimeOnlyInstance();
+
+        // Act: Retrieve the upper limit field type from the comparator.
+        DateTimeFieldType upperLimit = timeOnlyComparator.getUpperLimit();
+
+        // Assert: The upper limit should be dayOfYear to exclude all date fields.
+        assertEquals("The upper limit for a time-only comparator should be dayOfYear.",
+                DateTimeFieldType.dayOfYear(), upperLimit);
     }
 }
