@@ -1,46 +1,53 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest44 extends UTF8Writer_ESTest_scaffolding {
+/**
+ * Test suite for the {@link UTF8Writer} class.
+ *
+ * Note: The original test class name "UTF8Writer_ESTestTest44" was non-descriptive.
+ * This class demonstrates a clearer, more maintainable testing style.
+ */
+public class UTF8WriterTest { // Renamed for clarity
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext((StreamReadConstraints) null, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        // Undeclared exception!
-        try {
-            uTF8Writer0.write((char[]) null, (-1), 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.UTF8Writer", e);
-        }
+    /**
+     * Creates a default IOContext for testing purposes, encapsulating boilerplate setup.
+     * @return A new IOContext instance with default configurations.
+     */
+    private IOContext createDefaultIOContext() {
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        return new IOContext(
+            null, // StreamReadConstraints: not relevant for a writer test.
+            StreamWriteConstraints.defaults(),
+            ErrorReportConfiguration.defaults(),
+            bufferRecycler,
+            null, // ContentReference: not relevant for this test.
+            false // recycling: not relevant for this test.
+        );
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void write_whenBufferIsNull_shouldThrowNullPointerException() throws IOException {
+        // Arrange
+        IOContext ioContext = createDefaultIOContext();
+        // Use a simple ByteArrayOutputStream as a sink for the writer.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, outputStream);
+
+        char[] nullBuffer = null;
+        int offset = -1; // An invalid offset
+        int length = 1;  // A valid length
+
+        // Act & Assert
+        // This call is expected to throw a NullPointerException because the buffer is null.
+        // The exception should be thrown before the invalid offset is checked.
+        // The 'expected' attribute on the @Test annotation handles the assertion.
+        utf8Writer.write(nullBuffer, offset, length);
     }
 }
