@@ -1,31 +1,41 @@
 package org.jsoup.nodes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
 import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest32 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite focusing on the Entities.escape() method.
+ * This provides a more descriptive class name than the original "Entities_ESTestTest32".
+ */
+public class EntitiesEscapeTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        File file0 = MockFile.createTempFile("sIXVxioN'm:", "ScriptDataDoubleEscapeEnd");
-        MockPrintStream mockPrintStream0 = new MockPrintStream(file0);
-        QuietAppendable quietAppendable0 = QuietAppendable.wrap(mockPrintStream0);
-        Entities.escape(quietAppendable0, "nQgZ:cx{U Z", document_OutputSettings0, 732);
-        assertEquals(11L, file0.length());
+    /**
+     * Verifies that a string with no special characters that require escaping is
+     * written to the provided Appendable without any changes.
+     */
+    @Test
+    public void escapeWritesStringWithNoSpecialCharsUnchanged() {
+        // Arrange
+        // Use a StringBuilder as a simple, in-memory Appendable. This is clearer
+        // and more efficient than using a mock file and print stream.
+        StringBuilder stringBuilder = new StringBuilder();
+        QuietAppendable appendable = QuietAppendable.wrap(stringBuilder);
+
+        String input = "A string with no special characters.";
+        OutputSettings settings = new Document.OutputSettings();
+
+        // The method under test takes an 'options' integer. Using a defined constant
+        // makes the test's intent clear, unlike the original magic number '732'.
+        int options = Entities.ForText;
+
+        // Act
+        Entities.escape(appendable, input, settings, options);
+
+        // Assert
+        // Asserting the final string content is more explicit and robust than
+        // just checking the length. This ensures the output is exactly as expected.
+        assertEquals(input, stringBuilder.toString());
     }
 }
