@@ -1,19 +1,23 @@
 package org.apache.commons.lang3.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IEEE754rUtils_ESTestTest4 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        double[] doubleArray0 = new double[1];
-        doubleArray0[0] = (double) 1.0F;
-        double double0 = IEEE754rUtils.min(doubleArray0);
-        assertEquals(1.0, double0, 0.01);
+    @Test
+    public void minOfSingleElementArrayShouldReturnTheElement() {
+        // Arrange: Create an array with a single element.
+        final double[] values = {1.0};
+        final double expected = 1.0;
+
+        // Act: Call the min method with the single-element array.
+        final double actual = IEEE754rUtils.min(values);
+
+        // Assert: The result should be the single element in the array.
+        assertEquals("The minimum of a single-element array should be the element itself.", expected, actual, 0.0);
     }
 }
