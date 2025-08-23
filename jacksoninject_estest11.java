@@ -1,20 +1,20 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JacksonInject_ESTestTest11 extends JacksonInject_ESTest_scaffolding {
+/**
+ * Tests for {@link JacksonInject.Value}.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Boolean boolean0 = Boolean.TRUE;
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.construct((Object) null, (Boolean) null, boolean0);
-        assertFalse(jacksonInject_Value0.hasId());
+    @Test
+    public void hasId_shouldReturnFalse_whenConstructedWithNullId() {
+        // Arrange: Create a JacksonInject.Value instance where the ID is null.
+        // The 'useInput' and 'optional' parameters are not relevant to this test.
+        JacksonInject.Value injectValue = JacksonInject.Value.construct(null, null, true);
+
+        // Act & Assert: Verify that hasId() correctly reports that no ID is present.
+        assertFalse("hasId() should return false for a null ID", injectValue.hasId());
     }
 }
