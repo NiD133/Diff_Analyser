@@ -1,27 +1,44 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest19 extends BufferedLine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        PointImpl pointImpl0 = new PointImpl(0.0, 0.0, spatialContext0);
-        double double0 = BufferedLine.expandBufForLongitudeSkew(pointImpl0, pointImpl0, (-43.390550600565));
-        assertEquals((-43.390550600565), double0, 0.01);
+/**
+ * Test suite for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
+
+    /**
+     * The {@link BufferedLine#expandBufForLongitudeSkew(Point, Point, double)} method
+     * is designed to compensate for the fact that a degree of longitude represents
+     * a smaller distance as latitude increases away from the equator.
+     *
+     * This test verifies the base case: for points located on the equator (latitude 0),
+     * where there is no longitudinal distortion, the method should return the original
+     * buffer value without any modification.
+     */
+    @Test
+    public void expandBufForLongitudeSkew_withPointsOnEquator_shouldReturnOriginalBuffer() {
+        // Arrange
+        // A geographic context is needed for creating points.
+        final SpatialContext geoContext = SpatialContext.GEO;
+
+        // The method's behavior depends on the latitude. At the equator (latitude 0),
+        // no expansion should occur.
+        final Point pointOnEquator = new PointImpl(0.0, 0.0, geoContext);
+        final double originalBuffer = -43.390550600565;
+
+        // Act
+        // Calculate the expanded buffer for two identical points on the equator.
+        final double expandedBuffer = BufferedLine.expandBufForLongitudeSkew(
+                pointOnEquator, pointOnEquator, originalBuffer);
+
+        // Assert
+        // The returned buffer should be identical to the original.
+        final double delta = 0.01;
+        assertEquals(originalBuffer, expandedBuffer, delta);
     }
 }
