@@ -1,39 +1,29 @@
 package org.apache.commons.io.file;
 
+import static org.junit.Assert.assertNotEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class CountingPathVisitor_ESTestTest22 extends CountingPathVisitor_ESTest_scaffolding {
+/**
+ * Contains tests for the equals() and hashCode() contract of {@link CountingPathVisitor}.
+ */
+public class CountingPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withBigIntegerCounters();
-        CountingPathVisitor countingPathVisitor0 = CleaningPathVisitor.withBigIntegerCounters();
-        boolean boolean0 = countingPathVisitor0.equals(accumulatorPathVisitor0);
-        assertFalse(boolean0);
+    /**
+     * Tests that a CountingPathVisitor instance is not equal to an instance of a different,
+     * unrelated visitor class. This test compares a CleaningPathVisitor (a subclass of
+     * CountingPathVisitor) with an AccumulatorPathVisitor to ensure the equals() method
+     * correctly handles different types.
+     */
+    @Test
+    public void testEqualsReturnsFalseForDifferentVisitorTypes() {
+        // Arrange: Create two different types of path visitors.
+        // CleaningPathVisitor extends CountingPathVisitor, while AccumulatorPathVisitor is a separate class.
+        CountingPathVisitor cleaningVisitor = CleaningPathVisitor.withBigIntegerCounters();
+        AccumulatorPathVisitor accumulatorVisitor = AccumulatorPathVisitor.withBigIntegerCounters();
+
+        // Act & Assert: The equals method should return false when comparing objects of
+        // incompatible types. Using assertNotEquals clearly expresses this intent.
+        assertNotEquals(cleaningVisitor, accumulatorVisitor);
     }
 }
