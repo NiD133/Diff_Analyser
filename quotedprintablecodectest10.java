@@ -1,36 +1,33 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest10 {
+/**
+ * Tests for the {@link QuotedPrintableCodec} class, focusing on its behavior
+ * when handling null input for string encoding.
+ */
+public class QuotedPrintableCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
+    /**
+     * Tests that encoding a null String object returns null, which is the
+     * expected behavior for encoders in this library.
+     */
     @Test
-    void testEncodeStringWithNull() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String test = null;
-        final String result = qpcodec.encode(test, "charset");
-        assertNull(result, "Result should be null");
+    void shouldReturnNullWhenEncodingNullString() {
+        // Arrange
+        final QuotedPrintableCodec codec = new QuotedPrintableCodec();
+        final String nullInput = null;
+
+        // Act
+        // We use the encode(String, Charset) overload, which is safer and more modern.
+        // The charset itself is not used when the input is null, but we provide a
+        // standard one for correctness.
+        final String encodedResult = codec.encode(nullInput, StandardCharsets.UTF_8);
+
+        // Assert
+        assertNull(encodedResult, "Encoding a null string should return null.");
     }
 }
