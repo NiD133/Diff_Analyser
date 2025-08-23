@@ -1,48 +1,31 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Period;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
+
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class InternationalFixedChronology_ESTestTest71 extends InternationalFixedChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test70() throws Throwable {
-        InternationalFixedChronology internationalFixedChronology0 = InternationalFixedChronology.INSTANCE;
-        InternationalFixedEra internationalFixedEra0 = InternationalFixedEra.CE;
-        InternationalFixedDate internationalFixedDate0 = internationalFixedChronology0.INSTANCE.date((Era) internationalFixedEra0, 7, 7, 7);
-        assertEquals((-716797L), internationalFixedDate0.toEpochDay());
+/**
+ * This class contains improved tests for the {@link InternationalFixedChronology}.
+ * The original test was part of an auto-generated suite and has been refactored for clarity.
+ */
+public class InternationalFixedChronologyImprovedTest {
+
+    @Test
+    public void dateFromEraYearMonthDay_createsDateWithCorrectEpochDay() {
+        // Arrange: Define the components of the date to be created.
+        InternationalFixedChronology chronology = InternationalFixedChronology.INSTANCE;
+        Era era = InternationalFixedEra.CE;
+        int yearOfEra = 7;
+        int month = 7;
+        int dayOfMonth = 7;
+        long expectedEpochDay = -716797L; // The pre-calculated epoch day for 0007-07-07 (IFC).
+
+        // Act: Create an InternationalFixedDate using the specified components.
+        InternationalFixedDate date = chronology.date(era, yearOfEra, month, dayOfMonth);
+
+        // Assert: Verify that the created date has the correct epoch day value.
+        assertEquals(expectedEpochDay, date.toEpochDay());
     }
 }
