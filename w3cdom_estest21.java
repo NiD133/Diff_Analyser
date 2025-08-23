@@ -1,40 +1,34 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
 import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
 
-public class W3CDom_ESTestTest21 extends W3CDom_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
+/**
+ * Test suite for {@link W3CDom}.
+ * This focuses on edge cases and error handling during the conversion process.
+ */
+public class W3CDomTest {
+
+    /**
+     * Verifies that converting a Jsoup document with a circular reference
+     * (e.g., a document that is a child of itself) results in a StackOverflowError.
+     * This is expected behavior, as traversing the node tree would lead to infinite recursion.
+     */
     @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Parser.parse("jsoupSource", "javax.xml.xpath.XPathFactory:jsoup");
-        document0.prependChild(document0);
-        // Undeclared exception!
-        w3CDom0.fromJsoup(document0);
+    public void fromJsoupWithCircularReferenceThrowsStackOverflowError() {
+        // Arrange: Create a Jsoup document and introduce a circular reference
+        // by making the document its own child.
+        W3CDom w3cDom = new W3CDom();
+        Document jsoupDoc = Parser.parse("<html><head></head><body></body></html>", "");
+        jsoupDoc.prependChild(jsoupDoc); // The document is now its own child
+
+        // Act & Assert: The conversion attempt should lead to infinite recursion,
+        // causing a StackOverflowError. We use assertThrows to verify this explicitly.
+        assertThrows(StackOverflowError.class, () -> {
+            w3cDom.fromJsoup(jsoupDoc);
+        });
     }
 }
