@@ -1,21 +1,37 @@
 package org.jfree.data.xy;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class XYInterval_ESTestTest10 extends XYInterval_ESTest_scaffolding {
+/**
+ * Tests for the {@link XYInterval} class.
+ */
+public class XYIntervalTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        XYInterval xYInterval0 = new XYInterval(2850.5914155, 2850.5914155, 2850.5914155, 2850.5914155, (-1461.548));
-        double double0 = xYInterval0.getY();
-        assertEquals(2850.5914155, double0, 0.01);
-        assertEquals(2850.5914155, xYInterval0.getYLow(), 0.01);
-        assertEquals(2850.5914155, xYInterval0.getXHigh(), 0.01);
-        assertEquals((-1461.548), xYInterval0.getYHigh(), 0.01);
-        assertEquals(2850.5914155, xYInterval0.getXLow(), 0.01);
+    private static final double DELTA = 1e-9;
+
+    @Test
+    public void gettersShouldReturnValuesSetInConstructor() {
+        // Arrange: Define clear, distinct input values for the interval.
+        final double expectedXLow = 1.0;
+        final double expectedXHigh = 2.0;
+        final double expectedY = 3.0;
+        final double expectedYLow = 4.0;
+        final double expectedYHigh = 5.0;
+
+        // Act: Create an instance of XYInterval with the defined values.
+        XYInterval interval = new XYInterval(expectedXLow, expectedXHigh, expectedY, expectedYLow, expectedYHigh);
+
+        // Assert: Verify that each getter returns the value passed to the constructor.
+        assertEquals("The x-low value should match the constructor argument.",
+                expectedXLow, interval.getXLow(), DELTA);
+        assertEquals("The x-high value should match the constructor argument.",
+                expectedXHigh, interval.getXHigh(), DELTA);
+        assertEquals("The y-value should match the constructor argument.",
+                expectedY, interval.getY(), DELTA);
+        assertEquals("The y-low value should match the constructor argument.",
+                expectedYLow, interval.getYLow(), DELTA);
+        assertEquals("The y-high value should match the constructor argument.",
+                expectedYHigh, interval.getYHigh(), DELTA);
     }
 }
