@@ -1,23 +1,30 @@
 package org.apache.ibatis.mapping;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Properties;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.decorators.BlockingCache;
-import org.apache.ibatis.cache.decorators.SynchronizedCache;
-import org.apache.ibatis.cache.impl.PerpetualCache;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CacheBuilder_ESTestTest11 extends CacheBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        CacheBuilder cacheBuilder0 = new CacheBuilder("");
-        CacheBuilder cacheBuilder1 = cacheBuilder0.addDecorator((Class<? extends Cache>) null);
-        assertSame(cacheBuilder0, cacheBuilder1);
+/**
+ * Test suite for {@link CacheBuilder}.
+ */
+public class CacheBuilderTest {
+
+    /**
+     * Verifies that the CacheBuilder maintains its fluent interface by returning the same instance
+     * when a null decorator class is provided. This ensures that adding a null decorator is a
+     * safe no-op.
+     */
+    @Test
+    public void addDecoratorShouldReturnSameInstanceForFluentChainingWhenGivenNull() {
+        // Arrange: Create a CacheBuilder instance.
+        CacheBuilder cacheBuilder = new CacheBuilder("test_cache");
+
+        // Act: Attempt to add a null decorator.
+        // The cast to (Class<? extends Cache>) is required to resolve the correct method overload.
+        CacheBuilder returnedBuilder = cacheBuilder.addDecorator(null);
+
+        // Assert: The method should return the same instance to allow method chaining.
+        assertSame("The builder instance returned should be the same as the original.", cacheBuilder, returnedBuilder);
     }
 }
