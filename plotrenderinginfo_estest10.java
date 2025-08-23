@@ -1,29 +1,39 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.awt.geom.Rectangle2D;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public class PlotRenderingInfo_ESTestTest10 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo((ChartRenderingInfo) null);
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double((-452.97088092026), (-452.97088092026), (-452.97088092026), (-452.97088092026));
-        plotRenderingInfo0.setDataArea(rectangle2D_Double0);
-        Rectangle2D.Double rectangle2D_Double1 = (Rectangle2D.Double) plotRenderingInfo0.getDataArea();
-        assertEquals((-452.97088092026), rectangle2D_Double1.height, 0.01);
+    /**
+     * Verifies that getDataArea() correctly returns the Rectangle2D object
+     * that was previously set by setDataArea().
+     */
+    @Test
+    public void testGetDataAreaReturnsPreviouslySetDataArea() {
+        // Arrange
+        // The ChartRenderingInfo owner is not relevant for this specific test.
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(null);
+        Rectangle2D expectedDataArea = new Rectangle2D.Double(10.0, 20.0, 100.0, 50.0);
+
+        // Act
+        plotInfo.setDataArea(expectedDataArea);
+        Rectangle2D actualDataArea = plotInfo.getDataArea();
+
+        // Assert
+        // We assert that the retrieved object is the exact same instance that was set.
+        // This is a stronger guarantee than just comparing field values.
+        assertSame("The retrieved data area should be the same instance as the one set.",
+                expectedDataArea, actualDataArea);
+        
+        // For completeness, we can also verify the objects are equal.
+        assertEquals("The retrieved data area should be equal to the one set.",
+                expectedDataArea, actualDataArea);
     }
 }
