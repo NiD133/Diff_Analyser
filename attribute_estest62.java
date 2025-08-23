@@ -1,30 +1,35 @@
 package org.jsoup.nodes;
 
+import org.jsoup.nodes.Range.AttributeRange;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
 
-public class Attribute_ESTestTest62 extends Attribute_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        Attribute attribute0 = new Attribute("X@BGZ^/[A&M>", "_w_8_4p");
-        attribute0.sourceRange();
-        assertEquals("X@BGZ^/[A&M>", attribute0.getKey());
-        assertEquals("_w_8_4p", attribute0.getValue());
+/**
+ * Tests for the {@link Attribute} class.
+ */
+public class AttributeTest {
+
+    /**
+     * Verifies that an Attribute created programmatically (i.e., not from parsing source HTML)
+     * returns the 'untracked' singleton for its source range.
+     */
+    @Test
+    public void sourceRangeReturnsUntrackedForProgrammaticallyCreatedAttribute() {
+        // Arrange: Create a new attribute directly.
+        String key = "id";
+        String value = "product-123";
+        Attribute attribute = new Attribute(key, value);
+
+        // Act: Get the source range for the attribute.
+        AttributeRange range = attribute.sourceRange();
+
+        // Assert: The range should be the special 'untracked' instance, as it wasn't parsed.
+        // Also, confirm the attribute's state for completeness.
+        assertSame("Source range should be untracked for a programmatically created attribute.",
+            AttributeRange.untracked(), range);
+        assertEquals(key, attribute.getKey());
+        assertEquals(value, attribute.getValue());
     }
 }
