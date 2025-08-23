@@ -1,19 +1,46 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest15 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class, focusing on specific encoding rules and default configuration.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("SCi");
-        //  // Unstable assertion: assertEquals("X", string0);
-        //  // Unstable assertion: assertEquals(4, metaphone0.getMaxCodeLen());
+    /**
+     * Tests that the Metaphone encoding for "SCi" is "X".
+     * This case covers the specific rule where "SC" at the beginning of a word,
+     * when followed by a front vowel ('I', 'E', 'Y'), is encoded as 'X'.
+     */
+    @Test
+    public void metaphoneShouldEncodeInitialScFollowedByFrontVowelAsX() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final String input = "SCi";
+        final String expectedEncoding = "X";
+
+        // Act
+        final String actualEncoding = metaphone.metaphone(input);
+
+        // Assert
+        assertEquals("Encoding 'SCi' should result in 'X'", expectedEncoding, actualEncoding);
+    }
+
+    /**
+     * Tests that a new Metaphone instance is configured with the default
+     * maximum code length of 4.
+     */
+    @Test
+    public void newMetaphoneInstanceShouldHaveDefaultMaxCodeLength() {
+        // Arrange
+        final Metaphone metaphone = new Metaphone();
+        final int expectedMaxCodeLen = 4;
+
+        // Act
+        final int actualMaxCodeLen = metaphone.getMaxCodeLen();
+
+        // Assert
+        assertEquals("Default max code length should be 4", expectedMaxCodeLen, actualMaxCodeLen);
     }
 }
