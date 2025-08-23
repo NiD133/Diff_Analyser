@@ -1,19 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSet_ESTestTest4 extends CharSet_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSet}.
+ */
+public class CharSetTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        String[] stringArray0 = new String[3];
-        CharSet charSet0 = new CharSet(stringArray0);
-        CharRange[] charRangeArray0 = charSet0.getCharRanges();
-        assertEquals(0, charRangeArray0.length);
+    /**
+     * Tests that the CharSet constructor correctly handles an input array containing
+     * only null elements, resulting in an empty CharSet.
+     */
+    @Test
+    public void testConstructorWithNullArrayElementsCreatesEmptySet() {
+        // Arrange: Create an array of strings containing only nulls.
+        // This simulates a scenario where the input definitions are invalid or missing.
+        String[] setDefinitions = new String[]{null, null, null};
+
+        // Act: Create a CharSet from the array of nulls.
+        CharSet charSet = new CharSet(setDefinitions);
+
+        // Assert: The resulting CharSet should contain no character ranges.
+        CharRange[] charRanges = charSet.getCharRanges();
+        assertEquals("A CharSet created from an array of nulls should be empty.", 0, charRanges.length);
     }
 }
