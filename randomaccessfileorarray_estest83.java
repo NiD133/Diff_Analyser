@@ -1,41 +1,26 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class RandomAccessFileOrArray_ESTestTest83 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Test suite for the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test082() throws Throwable {
-        byte[] byteArray0 = new byte[9];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        // Undeclared exception!
-        try {
-            randomAccessFileOrArray0.readFully((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.itextpdf.text.pdf.RandomAccessFileOrArray", e);
-        }
+    /**
+     * Verifies that the {@link RandomAccessFileOrArray#readFully(byte[])} method
+     * throws a {@link NullPointerException} when a null buffer is provided.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readFully_withNullBuffer_shouldThrowNullPointerException() throws IOException {
+        // Arrange: Create an instance of RandomAccessFileOrArray with dummy data.
+        byte[] sourceData = new byte[9];
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+
+        // Act: Attempt to read into a null buffer.
+        // The test framework will assert that a NullPointerException is thrown.
+        fileOrArray.readFully(null);
     }
 }
