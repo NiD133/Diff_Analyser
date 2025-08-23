@@ -1,33 +1,31 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
+/**
+ * Test suite for the {@link Tokeniser} class.
+ */
+// The original test class name and inheritance are preserved as per the prompt.
+// In a real-world scenario, this would be renamed to TokeniserTest and the scaffolding inheritance removed.
 public class Tokeniser_ESTestTest13 extends Tokeniser_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("</", "</");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        // Undeclared exception!
-        try {
-            tokeniser0.emit((Token) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.parser.Tokeniser", e);
-        }
+    /**
+     * Verifies that the emit() method throws a NullPointerException when passed a null token.
+     * This is crucial to ensure the method correctly handles invalid input and prevents
+     * unexpected null-related errors downstream.
+     */
+    @Test(expected = NullPointerException.class)
+    public void emitShouldThrowNullPointerExceptionForNullToken() {
+        // Arrange: Create a Tokeniser instance.
+        // The parse() call is a necessary step to initialize the internal state of the TreeBuilder,
+        // which is required by the Tokeniser's constructor. The content being parsed is not
+        // relevant to this specific test.
+        XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
+        xmlTreeBuilder.parse("<p>", "https://example.com");
+        Tokeniser tokeniser = new Tokeniser(xmlTreeBuilder);
+
+        // Act: Attempt to emit a null token.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        tokeniser.emit((Token) null);
     }
 }
