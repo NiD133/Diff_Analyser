@@ -1,56 +1,29 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
 import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BritishCutoverChronology_ESTestTest15 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Test suite for the BritishCutoverChronology.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        ResolverStyle resolverStyle0 = ResolverStyle.SMART;
-        // Undeclared exception!
-        try {
-            britishCutoverChronology0.resolveDate((Map<TemporalField, Long>) null, resolverStyle0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.time.chrono.AbstractChronology", e);
-        }
+    /**
+     * Tests that resolveDate() throws a NullPointerException if the field map is null.
+     * The underlying AbstractChronology class mandates this behavior, so this test
+     * confirms compliance with the contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void resolveDate_whenFieldMapIsNull_throwsNullPointerException() {
+        // Obtain an instance of the chronology using the recommended singleton
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        
+        // The specific resolver style is not relevant for a null map, so any can be used
+        ResolverStyle style = ResolverStyle.SMART;
+
+        // This call is expected to throw a NullPointerException
+        chronology.resolveDate((Map<TemporalField, Long>) null, style);
     }
 }
