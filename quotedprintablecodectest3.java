@@ -1,43 +1,75 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class QuotedPrintableCodecTestTest3 {
+/**
+ * Tests the generic decode(Object) method in QuotedPrintableCodec.
+ * This suite verifies the method's behavior with valid inputs (String, byte[]),
+ * null input, and unsupported object types.
+ */
+class QuotedPrintableCodecObjectDecodingTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
+    private final QuotedPrintableCodec codec = new QuotedPrintableCodec();
 
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
+    @Test
+    @DisplayName("decode(Object) should correctly decode a String object")
+    void decodeObjectShouldSucceedForStringInput() throws DecoderException {
+        // Arrange
+        final String encodedString = "1+1 =3D 2";
+        final String expectedDecodedString = "1+1 = 2";
 
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
+        // Act
+        final String actualDecodedString = (String) codec.decode((Object) encodedString);
+
+        // Assert
+        assertEquals(expectedDecodedString, actualDecodedString);
     }
 
     @Test
-    void testDecodeObjects() throws Exception {
-        final QuotedPrintableCodec qpcodec = new QuotedPrintableCodec();
-        final String plain = "1+1 =3D 2";
-        String decoded = (String) qpcodec.decode((Object) plain);
-        assertEquals("1+1 = 2", decoded, "Basic quoted-printable decoding test");
-        final byte[] plainBA = plain.getBytes(StandardCharsets.UTF_8);
-        final byte[] decodedBA = (byte[]) qpcodec.decode((Object) plainBA);
-        decoded = new String(decodedBA);
-        assertEquals("1+1 = 2", decoded, "Basic quoted-printable decoding test");
-        final Object result = qpcodec.decode((Object) null);
-        assertNull(result, "Decoding a null Object should return null");
-        assertThrows(DecoderException.class, () -> qpcodec.decode(Double.valueOf(3.0d)), "Trying to url encode a Double object should cause an exception.");
+    @DisplayName("decode(Object) should correctly decode a byte[] object")
+    void decodeObjectShouldSucceedForByteArrayInput() throws DecoderException {
+        // Arrange
+        final byte[] encodedBytes = "1+1 =3D 2".getBytes(StandardCharsets.UTF_8);
+        final byte[] expectedDecodedBytes = "1+1 = 2".getBytes(StandardCharsets.UTF_8);
+
+        // Act
+        final byte[] actualDecodedBytes = (byte[]) codec.decode((Object) encodedBytes);
+
+        // Assert
+        assertArrayEquals(expectedDecodedBytes, actualDecodedBytes);
+    }
+
+    @Test
+    @DisplayName("decode(Object) should return null when the input is null")
+    void decodeObjectShouldReturnNullForNullInput() throws DecoderException {
+        // Act
+        final Object result = codec.decode(null);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("decode(Object) should throw DecoderException for unsupported input types")
+    void decodeObjectShouldThrowExceptionForUnsupportedInputType() {
+        // Arrange
+        final Double unsupportedObject = 3.0d;
+
+        // Act & Assert
+        final DecoderException exception = assertThrows(DecoderException.class, () -> {
+            codec.decode(unsupportedObject);
+        });
+
+        // Verify the exception message for robustness and clarity.
+        final String expectedMessage = "Objects of type " + unsupportedObject.getClass().getName() + " cannot be decoded";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
