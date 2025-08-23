@@ -1,26 +1,22 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LazilyParsedNumber_ESTestTest12 extends LazilyParsedNumber_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LazilyParsedNumber} class.
+ */
+public class LazilyParsedNumberTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        LazilyParsedNumber lazilyParsedNumber0 = new LazilyParsedNumber("Deserialization is unsupported");
-        // Undeclared exception!
-        try {
-            lazilyParsedNumber0.longValue();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.math.BigDecimal", e);
-        }
+    /**
+     * Verifies that calling longValue() on an instance created with a non-numeric
+     * string correctly throws a NumberFormatException.
+     */
+    @Test(expected = NumberFormatException.class)
+    public void longValueShouldThrowNumberFormatExceptionForNonNumericString() {
+        // Arrange: Create a LazilyParsedNumber with a string that cannot be parsed as a number.
+        LazilyParsedNumber nonNumeric = new LazilyParsedNumber("not a number");
+
+        // Act & Assert: Calling longValue() should trigger the NumberFormatException.
+        nonNumeric.longValue();
     }
 }
