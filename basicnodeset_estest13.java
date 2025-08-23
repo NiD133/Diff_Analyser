@@ -1,24 +1,43 @@
 package org.apache.commons.jxpath;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BasicNodeSet_ESTestTest13 extends BasicNodeSet_ESTest_scaffolding {
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BasicNodeSet basicNodeSet0 = new BasicNodeSet();
-        QName qName0 = new QName("D@-&EQH");
-        BasicVariables basicVariables0 = new BasicVariables();
-        VariablePointer variablePointer0 = new VariablePointer(basicVariables0, qName0);
-        basicNodeSet0.add((Pointer) variablePointer0);
-        basicNodeSet0.add((NodeSet) basicNodeSet0);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
+/**
+ * Contains tests for the {@link BasicNodeSet} class.
+ * This class focuses on improving the understandability of a specific test case.
+ */
+public class BasicNodeSetTest {
+
+    /**
+     * Tests that adding a BasicNodeSet to itself does not result in
+     * duplicate pointers or an infinite loop. The operation should be idempotent
+     * when the set already contains all its own pointers.
+     */
+    @Test
+    public void addNodeSetToItselfShouldNotCreateDuplicates() {
+        // Arrange: Create a node set and add a single pointer to it.
+        BasicNodeSet nodeSet = new BasicNodeSet();
+        QName qName = new QName("testVar");
+        BasicVariables variables = new BasicVariables();
+        Pointer pointer = new VariablePointer(variables, qName);
+
+        nodeSet.add(pointer);
+        assertEquals("Pre-condition: Node set should contain one pointer", 1, nodeSet.getPointers().size());
+
+        // Act: Add the node set to itself.
+        nodeSet.add(nodeSet);
+
+        // Assert: The size of the node set should remain 1, as the pointer
+        // was already present and duplicates are not allowed.
+        List<Pointer> pointers = nodeSet.getPointers();
+        assertEquals("Node set size should not change after self-addition", 1, pointers.size());
+        assertSame("The original pointer should still be in the set", pointer, pointers.get(0));
     }
 }
