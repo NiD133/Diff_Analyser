@@ -1,18 +1,27 @@
 package com.google.common.primitives;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SignedBytes_ESTestTest27 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        byte byte0 = SignedBytes.saturatedCast(209L);
-        assertEquals((byte) 127, byte0);
+    /**
+     * Tests that {@link SignedBytes#saturatedCast(long)} correctly returns
+     * {@link Byte#MAX_VALUE} when the input long is greater than any value
+     * a byte can hold.
+     */
+    @Test
+    public void saturatedCast_withValueGreaterThanMaxByte_returnsMaxValue() {
+        // Arrange: A long value that is larger than Byte.MAX_VALUE.
+        long valueTooLarge = 209L;
+
+        // Act: Perform the saturated cast.
+        byte result = SignedBytes.saturatedCast(valueTooLarge);
+
+        // Assert: The result should be saturated to the maximum byte value.
+        assertEquals(Byte.MAX_VALUE, result);
     }
 }
