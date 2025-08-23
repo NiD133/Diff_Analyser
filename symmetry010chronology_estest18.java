@@ -1,53 +1,30 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
+import static org.junit.Assert.assertThrows;
+
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.Year;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.MockYear;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Symmetry010Chronology_ESTestTest18 extends Symmetry010Chronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link Symmetry010Chronology}.
+ */
+public class Symmetry010ChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Symmetry010Chronology symmetry010Chronology0 = new Symmetry010Chronology();
-        ZoneId zoneId0 = ZoneId.systemDefault();
-        // Undeclared exception!
-        try {
-            symmetry010Chronology0.zonedDateTime((Instant) null, zoneId0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.time.chrono.ChronoZonedDateTimeImpl", e);
-        }
+    /**
+     * Tests that creating a ZonedDateTime with a null Instant throws a NullPointerException.
+     * The ZoneId must also be non-null, but this test focuses on the Instant parameter.
+     */
+    @Test
+    public void zonedDateTime_whenInstantIsNull_throwsNullPointerException() {
+        // Arrange
+        Symmetry010Chronology chronology = Symmetry010Chronology.INSTANCE;
+        ZoneId zone = ZoneId.systemDefault();
+        Instant nullInstant = null;
+
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> {
+            chronology.zonedDateTime(nullInstant, zone);
+        });
     }
 }
