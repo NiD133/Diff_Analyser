@@ -1,20 +1,28 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class Years_ESTestTest42 extends Years_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link Years} class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test41() throws Throwable {
-        Years years0 = Years.years(0);
-        Years years1 = years0.TWO.plus(2);
-        boolean boolean0 = years0.isLessThan(years1);
-        assertEquals(4, years1.getYears());
-        assertTrue(boolean0);
+    @Test
+    public void isLessThan_shouldReturnTrue_whenComparingToLargerYears() {
+        // Arrange: Set up two Years instances, one smaller than the other.
+        final Years smallerYears = Years.ZERO; // 0 years
+        final Years largerYears = Years.TWO.plus(2); // 2 + 2 = 4 years
+
+        // Act: Perform the comparison.
+        final boolean result = smallerYears.isLessThan(largerYears);
+
+        // Assert: Verify the outcome.
+        // First, a sanity check to ensure our 'largerYears' variable is what we expect.
+        assertEquals("The value of largerYears should be 4", 4, largerYears.getYears());
+        
+        // Now, verify the main logic: 0 is indeed less than 4.
+        assertTrue("isLessThan should return true when comparing a smaller value to a larger one", result);
     }
 }
