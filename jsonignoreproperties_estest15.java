@@ -2,35 +2,48 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest15 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * This test class focuses on verifying the behavior of the JsonIgnoreProperties.Value class.
+ */
+public class JsonIgnoreProperties_ESTestTest15_Improved {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[6];
-        JsonIgnoreProperties jsonIgnoreProperties0 = mock(JsonIgnoreProperties.class, CALLS_REAL_METHODS);
-        doReturn(false).when(jsonIgnoreProperties0).allowGetters();
-        doReturn(false).when(jsonIgnoreProperties0).allowSetters();
-        doReturn(false).when(jsonIgnoreProperties0).ignoreUnknown();
-        doReturn((String[]) null).when(jsonIgnoreProperties0).value();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.from(jsonIgnoreProperties0);
-        jsonIgnoreProperties_ValueArray0[2] = jsonIgnoreProperties_Value0;
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_ValueArray0[2].withAllowSetters();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_Value1.withoutAllowSetters();
-        assertFalse(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value2.getMerge());
-        assertNotSame(jsonIgnoreProperties_Value2, jsonIgnoreProperties_Value1);
-        assertFalse(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertFalse(jsonIgnoreProperties_Value2.equals((Object) jsonIgnoreProperties_Value1));
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
+    /**
+     * Tests that the withAllowSetters() and withoutAllowSetters() methods
+     * correctly create new, immutable instances of JsonIgnoreProperties.Value
+     * with the 'allowSetters' flag updated appropriately.
+     */
+    @Test
+    public void withAndWithoutAllowSettersShouldCreateNewInstancesWithUpdatedFlag() {
+        // Arrange: Create a base Value instance with allowSetters initially set to false.
+        // We use the empty() factory method for a clean and readable starting point.
+        JsonIgnoreProperties.Value initialValue = JsonIgnoreProperties.Value.empty();
+        assertFalse("Precondition: initialValue should have allowSetters as false.", initialValue.getAllowSetters());
+
+        // Act
+        // 1. Create a new instance with allowSetters enabled.
+        JsonIgnoreProperties.Value valueWithSettersAllowed = initialValue.withAllowSetters();
+        
+        // 2. Create another instance from the previous one, but with allowSetters disabled again.
+        JsonIgnoreProperties.Value finalValue = valueWithSettersAllowed.withoutAllowSetters();
+
+        // Assert
+        // Verify the state of the instance where setters are allowed.
+        assertTrue("withAllowSetters() should enable the flag.", valueWithSettersAllowed.getAllowSetters());
+        // Other properties should remain unchanged from the initial state.
+        assertEquals(initialValue.getIgnored(), valueWithSettersAllowed.getIgnored());
+        assertEquals(initialValue.getIgnoreUnknown(), valueWithSettersAllowed.getIgnoreUnknown());
+        
+        // Verify the state of the final instance where setters are disallowed again.
+        assertFalse("withoutAllowSetters() should disable the flag.", finalValue.getAllowSetters());
+
+        // Verify immutability and equality.
+        // The 'with' and 'without' methods should return new instances.
+        assertNotSame("withAllowSetters() should return a new instance.", initialValue, valueWithSettersAllowed);
+        assertNotSame("withoutAllowSetters() should return a new instance.", valueWithSettersAllowed, finalValue);
+
+        // The final value should be logically equal to the initial value, as we've reverted the change.
+        assertEquals("Reverting the change should result in a value equal to the initial one.", initialValue, finalValue);
+        assertNotEquals("The intermediate value should not be equal to the initial one.", initialValue, valueWithSettersAllowed);
     }
 }
