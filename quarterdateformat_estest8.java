@@ -1,31 +1,29 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class QuarterDateFormat_ESTestTest8 extends QuarterDateFormat_ESTest_scaffolding {
+/**
+ * Unit tests for the equals() method in the {@link QuarterDateFormat} class.
+ */
+public class QuarterDateFormatTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        TimeZone timeZone0 = TimeZone.getDefault();
-        QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-        QuarterDateFormat quarterDateFormat1 = new QuarterDateFormat(timeZone0);
-        boolean boolean0 = quarterDateFormat1.equals(quarterDateFormat0);
-        assertTrue(boolean0);
+    /**
+     * Verifies that two QuarterDateFormat instances created with the same
+     * TimeZone and default settings are considered equal.
+     */
+    @Test
+    public void equals_shouldReturnTrue_forInstancesWithIdenticalConfiguration() {
+        // Arrange: Create two QuarterDateFormat instances with the same time zone.
+        // The other properties (quarter symbols, quarterFirst flag) will use default values.
+        TimeZone timeZone = TimeZone.getDefault();
+        QuarterDateFormat formatter1 = new QuarterDateFormat(timeZone);
+        QuarterDateFormat formatter2 = new QuarterDateFormat(timeZone);
+
+        // Act & Assert: The two instances should be equal.
+        // We use assertEquals for a more expressive test and a clearer failure message
+        // compared to assertTrue(formatter1.equals(formatter2)).
+        assertEquals(formatter1, formatter2);
     }
 }
