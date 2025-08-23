@@ -1,32 +1,31 @@
 package org.jfree.data.flow;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.HijrahEra;
-import java.util.List;
-import java.util.Set;
-import javax.swing.Icon;
-import javax.swing.JLayeredPane;
-import javax.swing.JRadioButtonMenuItem;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class DefaultFlowDataset_ESTestTest16 extends DefaultFlowDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultFlowDataset} class, focusing on exception handling.
+ */
+public class DefaultFlowDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        DefaultFlowDataset<Integer> defaultFlowDataset0 = new DefaultFlowDataset<Integer>();
-        // Undeclared exception!
-        try {
-            defaultFlowDataset0.getOutFlows((NodeKey) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'nodeKey' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that the getOutFlows() method throws an IllegalArgumentException
+     * when the provided nodeKey is null. This is the expected behavior for
+     * methods that do not permit null arguments.
+     */
+    @Test
+    public void getOutFlows_withNullNodeKey_throwsIllegalArgumentException() {
+        // Arrange: Create an empty dataset instance.
+        DefaultFlowDataset<String> dataset = new DefaultFlowDataset<>();
+
+        // Act & Assert: Call the method with a null argument and verify the exception.
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> dataset.getOutFlows(null)
+        );
+
+        // Assert: Check if the exception message is as expected.
+        assertEquals("Null 'nodeKey' argument.", exception.getMessage());
     }
 }
