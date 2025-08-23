@@ -1,27 +1,27 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
 import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class PdfDictionary_ESTestTest60 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test59() throws Throwable {
-        PdfDictionary pdfDictionary0 = new PdfDictionary();
-        Set<PdfName> set0 = pdfDictionary0.getKeys();
-        assertEquals(0, set0.size());
+    /**
+     * Verifies that the getKeys() method on a newly created PdfDictionary
+     * returns an empty set.
+     */
+    @Test
+    public void getKeys_onNewDictionary_shouldReturnEmptySet() {
+        // Arrange: Create a new, empty dictionary.
+        PdfDictionary dictionary = new PdfDictionary();
+
+        // Act: Retrieve the set of keys.
+        Set<PdfName> keys = dictionary.getKeys();
+
+        // Assert: The returned set should be empty.
+        assertTrue("A new PdfDictionary should not contain any keys.", keys.isEmpty());
     }
 }
