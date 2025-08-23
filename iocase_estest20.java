@@ -1,18 +1,29 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest20 extends IOCase_ESTest_scaffolding {
+/**
+ * This class contains tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        boolean boolean0 = iOCase0.checkStartsWith("vHnm-dNXF4", "2");
-        assertFalse(boolean0);
+    /**
+     * Tests that {@link IOCase#checkStartsWith(String, String)} returns false
+     * when the string does not begin with the specified prefix, using SYSTEM sensitivity.
+     * The result should be false regardless of the actual operating system's case sensitivity.
+     */
+    @Test
+    public void checkStartsWithShouldReturnFalseForNonMatchingPrefixWithSystemSensitivity() {
+        // Arrange
+        final IOCase systemCase = IOCase.SYSTEM;
+        final String text = "Apache Commons IO";
+        final String nonMatchingPrefix = "WrongPrefix";
+
+        // Act
+        final boolean startsWith = systemCase.checkStartsWith(text, nonMatchingPrefix);
+
+        // Assert
+        assertFalse("Expected the string not to start with the non-matching prefix.", startsWith);
     }
 }
