@@ -1,34 +1,37 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class MeterNeedle_ESTestTest43 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link MeterNeedle} class.
+ * <p>
+ * Since {@code MeterNeedle} is an abstract class, a concrete subclass,
+ * {@link PointerNeedle}, is instantiated to test the non-abstract functionality.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        PointerNeedle pointerNeedle0 = new PointerNeedle();
-        double double0 = pointerNeedle0.getRotateX();
-        assertEquals(0.5, double0, 0.01);
-        assertEquals(5, pointerNeedle0.getSize());
-        assertEquals(0.5, pointerNeedle0.getRotateY(), 0.01);
+    /**
+     * Verifies that the default constructor correctly initializes the needle's
+     * size and rotation point coordinates to their default values.
+     */
+    @Test
+    public void testDefaultConstructorInitializesProperties() {
+        // Arrange: MeterNeedle is abstract, so we instantiate a concrete subclass.
+        MeterNeedle needle = new PointerNeedle();
+
+        // Assert: Check that the properties have their expected default values.
+        final double expectedRotationCenter = 0.5;
+        final int expectedSize = 5;
+        final double delta = 0.0; // Use a delta of 0.0 for exact floating-point comparisons.
+
+        assertEquals("Default rotation X-coordinate should be 0.5.",
+                expectedRotationCenter, needle.getRotateX(), delta);
+
+        assertEquals("Default rotation Y-coordinate should be 0.5.",
+                expectedRotationCenter, needle.getRotateY(), delta);
+
+        assertEquals("Default size should be 5.",
+                expectedSize, needle.getSize());
     }
 }
