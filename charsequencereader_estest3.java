@@ -1,22 +1,29 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest3 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        CharBuffer charBuffer0 = CharBuffer.allocate(1191);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        long long0 = charSequenceReader0.skip(1191);
-        assertEquals(1191L, long0);
+    @Test
+    public void skip_whenSkippingAllCharacters_returnsTotalCharactersSkippedAndReachesEnd() throws IOException {
+        // Arrange
+        String inputSequence = "A test sequence with several characters.";
+        CharSequenceReader reader = new CharSequenceReader(inputSequence);
+        long totalCharacters = inputSequence.length();
+
+        // Act
+        long charactersSkipped = reader.skip(totalCharacters);
+
+        // Assert
+        assertEquals("The number of skipped characters should match the sequence length.",
+                totalCharacters, charactersSkipped);
+        assertEquals("The reader should be at the end of the sequence after skipping all characters.",
+                -1, reader.read());
     }
 }
