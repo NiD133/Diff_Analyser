@@ -1,21 +1,40 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest24 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        ContentReference contentReference0 = ContentReference.redacted();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        ContentReference contentReference1 = ContentReference.construct(true, (Object) contentReference0, 0, 1929, errorReportConfiguration0);
-        ContentReference contentReference2 = JsonLocation._wrap(contentReference1);
-        assertTrue(contentReference2.hasTextualContent());
+/**
+ * This test suite focuses on the helper methods of the {@link JsonLocation} class.
+ */
+public class JsonLocation_ESTestTest24 {
+
+    /**
+     * Tests that the {@link JsonLocation#_wrap(Object)} method returns the
+     * exact same instance when the input object is already a {@link ContentReference}.
+     * This ensures the method avoids unnecessary object creation.
+     */
+    @Test
+    public void wrapWithContentReferenceShouldReturnSameInstance() {
+        // Arrange: Create a ContentReference instance to be used as input.
+        // The specific details of this instance are not critical, only that it is
+        // a ContentReference with a known property (in this case, textual content).
+        ContentReference contentToWrap = ContentReference.construct(
+                /* isTextual */ true,
+                /* rawContent */ ContentReference.redacted(),
+                /* start */ 0,
+                /* end */ 100);
+
+        // Act: Call the internal _wrap method with the ContentReference instance.
+        ContentReference result = JsonLocation._wrap(contentToWrap);
+
+        // Assert: The returned object should be the same instance as the input.
+        // This is a more direct and stronger assertion than just checking a property.
+        assertSame("The _wrap method should return the same ContentReference instance.", contentToWrap, result);
+
+        // As a secondary check, we can also verify that its properties are preserved.
+        assertTrue("The 'hasTextualContent' property should be preserved.", result.hasTextualContent());
     }
 }
