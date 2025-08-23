@@ -1,17 +1,28 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class RefinedSoundex_ESTestTest2 extends RefinedSoundex_ESTest_scaffolding {
+/**
+ * Tests for the {@link RefinedSoundex} class.
+ */
+public class RefinedSoundexTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        char[] charArray0 = new char[0];
-        RefinedSoundex refinedSoundex0 = new RefinedSoundex(charArray0);
+    /**
+     * Tests that the constructor successfully creates an instance when provided with an
+     * empty char array for the custom mapping. This ensures that edge cases like an
+     * empty mapping are handled gracefully without exceptions.
+     */
+    @Test
+    public void shouldCreateInstanceWithEmptyMapping() {
+        // Arrange: Create an empty character array for the mapping.
+        final char[] emptyMapping = new char[0];
+
+        // Act: Instantiate RefinedSoundex with the empty mapping.
+        // The test implicitly verifies that this does not throw an exception.
+        final RefinedSoundex refinedSoundex = new RefinedSoundex(emptyMapping);
+
+        // Assert: Confirm that the object was created successfully.
+        assertNotNull("The RefinedSoundex instance should not be null.", refinedSoundex);
     }
 }
