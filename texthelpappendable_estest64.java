@@ -1,53 +1,38 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class TextHelpAppendable_ESTestTest64 extends TextHelpAppendable_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        TextStyle.Builder textStyle_Builder0 = textHelpAppendable0.getTextStyleBuilder();
-        textHelpAppendable0.resize(textStyle_Builder0, (-82.94890902993546));
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.appendParagraph("9");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Width must be greater than 0
-            //
-            verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-        }
+/**
+ * Tests for {@link TextHelpAppendable}.
+ */
+public class TextHelpAppendableTest {
+
+    /**
+     * Tests that appendParagraph() throws an IllegalArgumentException if the text width
+     * has been resized to a negative value. The internal logic for wrapping text
+     * requires a positive width.
+     */
+    @Test
+    public void appendParagraphShouldThrowExceptionWhenWidthIsSetToNegative() {
+        // Arrange: Create a TextHelpAppendable and get its style builder.
+        // A StringWriter is used to prevent test output from printing to the console.
+        TextHelpAppendable helpAppendable = new TextHelpAppendable(new StringWriter());
+        TextStyle.Builder styleBuilder = helpAppendable.getTextStyleBuilder();
+
+        // Act: Resize the style builder with a negative fraction. This results in the
+        // underlying max width becoming a negative number.
+        helpAppendable.resize(styleBuilder, -1.0);
+
+        // Assert: Verify that attempting to append a paragraph throws an exception
+        // with the expected message.
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            helpAppendable.appendParagraph("Attempting to append with invalid width.");
+        });
+
+        assertEquals("Width must be greater than 0", exception.getMessage());
     }
 }
