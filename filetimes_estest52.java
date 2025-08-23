@@ -1,32 +1,20 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest52 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        // Undeclared exception!
-        try {
-            FileTimes.setLastModifiedTime((Path) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.nio.file.Files", e);
-        }
+    /**
+     * Tests that {@link FileTimes#setLastModifiedTime(Path)} throws a
+     * NullPointerException when the path argument is null. This is the
+     * expected behavior as per the contract of {@link java.nio.file.Files#setLastModifiedTime}.
+     */
+    @Test(expected = NullPointerException.class)
+    public void setLastModifiedTime_withNullPath_throwsNullPointerException() {
+        FileTimes.setLastModifiedTime((Path) null);
     }
 }
