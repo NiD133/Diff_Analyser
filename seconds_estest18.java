@@ -2,17 +2,36 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Seconds_ESTestTest18 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the Seconds class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        Seconds seconds0 = Seconds.seconds((-2530));
-        seconds0.negated();
-        assertEquals((-2530), seconds0.getSeconds());
+    /**
+     * Tests that the negated() method is immutable. It should return a new instance
+     * with the negated value and leave the original instance unchanged.
+     */
+    @Test
+    public void negated_shouldReturnNewInstanceWithOppositeValue() {
+        // Arrange: Create a Seconds instance with a specific value.
+        final int initialValue = -2530;
+        Seconds originalSeconds = Seconds.seconds(initialValue);
+
+        // Act: Call the method under test.
+        Seconds negatedSeconds = originalSeconds.negated();
+
+        // Assert: Verify the behavior.
+        // 1. The original object must remain unchanged (immutability).
+        assertEquals("The original Seconds object should not be modified.",
+                initialValue, originalSeconds.getSeconds());
+
+        // 2. The new object should have the correctly negated value.
+        assertEquals("The new Seconds object should have the negated value.",
+                -initialValue, negatedSeconds.getSeconds());
+
+        // 3. The method should return a new instance, not the same one.
+        assertNotSame("negated() should return a new instance.",
+                originalSeconds, negatedSeconds);
     }
 }
