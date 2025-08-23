@@ -1,21 +1,29 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class TagSet_ESTestTest24 extends TagSet_ESTest_scaffolding {
+/**
+ * Tests for the {@link TagSet} class, focusing on tag retrieval.
+ */
+public class TagSetTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        TagSet tagSet0 = TagSet.Html();
-        Tag tag0 = tagSet0.get("}+z\")6FP@lJ{n*Mufp", "org.jsoup.nodes.Document$OutputSettings$Syntax");
-        assertNull(tag0);
+    /**
+     * Verifies that TagSet.get() returns null when asked for a tag that does not exist
+     * in the set.
+     */
+    @Test
+    public void getReturnsNullForNonExistentTag() {
+        // Arrange: Get the default HTML TagSet and define a tag name and namespace
+        // that are not expected to be present.
+        TagSet htmlTagSet = TagSet.Html();
+        String unknownTagName = "nonexistent-tag";
+        String customNamespace = "http://my.custom.namespace/";
+
+        // Act: Attempt to retrieve the non-existent tag from the set.
+        Tag foundTag = htmlTagSet.get(unknownTagName, customNamespace);
+
+        // Assert: The result should be null, confirming the tag was not found.
+        assertNull("Expected get() to return null for a non-existent tag.", foundTag);
     }
 }
