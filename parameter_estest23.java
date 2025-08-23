@@ -1,22 +1,38 @@
 package com.google.common.reflect;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.lang.annotation.Annotation;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Parameter_ESTestTest23 extends Parameter_ESTest_scaffolding {
+/**
+ * Tests for {@link Parameter#toString()}.
+ */
+public class ParameterToStringTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        Annotation[] annotationArray0 = new Annotation[0];
-        Parameter parameter0 = new Parameter((Invokable<?, ?>) null, 11, (TypeToken<?>) null, annotationArray0, (Object) null);
-        String string0 = parameter0.toString();
-        assertEquals("null arg11", string0);
+    @Test
+    public void toString_withNullType_returnsStringWithNullAndArgumentIndex() {
+        // Arrange
+        final int parameterPosition = 11;
+        
+        // This test case simulates a scenario where the Parameter's type is unknown (null).
+        // The Parameter constructor is package-private, so this test is structured as if
+        // it were in the same package, focusing on the unit behavior of toString().
+        Parameter parameter = new Parameter(
+                null,              // invokable
+                parameterPosition,
+                null,              // typeToken
+                new Annotation[0], // annotations
+                null               // annotatedType
+        );
+
+        String expectedToString = "null arg11";
+
+        // Act
+        String actualToString = parameter.toString();
+
+        // Assert
+        assertEquals("The toString() output should correctly format a parameter with a null type.",
+                expectedToString, actualToString);
     }
 }
