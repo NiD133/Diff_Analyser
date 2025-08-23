@@ -1,18 +1,29 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class IOCase_ESTestTest30 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test29() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        int int0 = iOCase0.checkIndexOf((String) null, 6, (String) null);
-        assertEquals((-1), int0);
+    /**
+     * Tests that checkIndexOf() returns -1 when both the string to search in and
+     * the string to search for are null, regardless of the starting index.
+     */
+    @Test
+    public void checkIndexOfShouldReturnMinusOneForNullInputStrings() {
+        // Arrange
+        final IOCase insensitiveSearch = IOCase.INSENSITIVE;
+        final String stringToSearchIn = null;
+        final String stringToSearchFor = null;
+        final int irrelevantStartIndex = 6;
+
+        // Act
+        final int actualIndex = insensitiveSearch.checkIndexOf(stringToSearchIn, irrelevantStartIndex, stringToSearchFor);
+
+        // Assert
+        assertEquals("Expected -1 for null input strings", -1, actualIndex);
     }
 }
