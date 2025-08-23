@@ -1,21 +1,30 @@
 package org.apache.commons.io.output;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.OutputStream;
-import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ThresholdingOutputStream_ESTestTest27 extends ThresholdingOutputStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ThresholdingOutputStream} class.
+ */
+public class ThresholdingOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        ThresholdingOutputStream thresholdingOutputStream0 = new ThresholdingOutputStream(76);
-        thresholdingOutputStream0.close();
-        assertEquals(76, thresholdingOutputStream0.getThreshold());
+    /**
+     * Tests that the configured threshold value can still be retrieved
+     * after the stream has been closed.
+     */
+    @Test
+    public void shouldReturnThresholdAfterStreamIsClosed() throws IOException {
+        // Arrange: Create a stream with a specific threshold.
+        final int expectedThreshold = 76;
+        final ThresholdingOutputStream stream = new ThresholdingOutputStream(expectedThreshold);
+
+        // Act: Close the stream.
+        stream.close();
+
+        // Assert: Verify that the threshold remains unchanged.
+        final int actualThreshold = stream.getThreshold();
+        assertEquals("The threshold should not change after the stream is closed.", expectedThreshold, actualThreshold);
     }
 }
