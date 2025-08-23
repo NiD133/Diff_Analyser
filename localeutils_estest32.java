@@ -1,20 +1,29 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class LocaleUtils_ESTestTest32 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        boolean boolean0 = LocaleUtils.isLanguageUndetermined((Locale) null);
-        assertTrue(boolean0);
+    /**
+     * Tests that isLanguageUndetermined() returns true for a null Locale input.
+     * The method is designed to handle nulls gracefully without throwing an exception.
+     */
+    @Test
+    public void isLanguageUndeterminedShouldReturnTrueForNullLocale() {
+        // Arrange: The class contract states that null input should be handled gracefully.
+        // For this method, a null locale is considered to have an undetermined language.
+        final Locale nullLocale = null;
+
+        // Act: Call the method with the null locale.
+        final boolean isUndetermined = LocaleUtils.isLanguageUndetermined(nullLocale);
+
+        // Assert: Verify that the result is true as expected.
+        assertTrue("A null locale should be treated as having an undetermined language.", isUndetermined);
     }
 }
