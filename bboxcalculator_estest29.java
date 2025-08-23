@@ -1,27 +1,41 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest29 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        bBoxCalculator0.expandXRange(1198.228879, Double.NaN);
-        bBoxCalculator0.expandXRange(1198.228879, Double.NaN);
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
+/**
+ * Unit tests for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    /**
+     * Tests that expanding only the X-axis range does not affect the Y-axis bounds.
+     * The Y-axis bounds should remain in their initial, uninitialized state.
+     */
+    @Test
+    public void expandXRangeShouldNotAffectYBounds() {
+        // ARRANGE: Create a BBoxCalculator with a geographic context.
+        // A new calculator starts with Y bounds at positive/negative infinity.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator bBoxCalculator = new BBoxCalculator(geoContext);
+
+        // Sanity check the initial state before acting.
+        assertEquals("Initial minY should be positive infinity",
+                Double.POSITIVE_INFINITY, bBoxCalculator.getMinY(), 0.0);
+        assertEquals("Initial maxY should be negative infinity",
+                Double.NEGATIVE_INFINITY, bBoxCalculator.getMaxY(), 0.0);
+
+        // ACT: Expand the X-axis range. The original test used NaN, which is a
+        // valid edge case to ensure stability. This operation should not
+        // modify the Y-axis bounds.
+        bBoxCalculator.expandXRange(10.0, Double.NaN);
+
+        // ASSERT: Verify that the Y-axis bounds have not changed from their initial state.
+        assertEquals("minY should remain unchanged after expandXRange",
+                Double.POSITIVE_INFINITY, bBoxCalculator.getMinY(), 0.0);
+        assertEquals("maxY should remain unchanged after expandXRange",
+                Double.NEGATIVE_INFINITY, bBoxCalculator.getMaxY(), 0.0);
     }
 }
