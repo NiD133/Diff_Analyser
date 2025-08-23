@@ -1,22 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest47 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        FieldUtils.verifyValueBounds("['}_&a'Qh", (-3236), (-3236), (-3236));
+    /**
+     * Tests that verifyValueBounds() does not throw an exception when the value
+     * is equal to both the lower and upper bounds. This tests the boundary condition
+     * where the valid range consists of a single number.
+     */
+    @Test
+    public void verifyValueBounds_shouldNotThrowException_whenValueIsAtTheBoundary() {
+        // Arrange
+        final String fieldName = "dayOfMonth";
+        final int value = 15;
+        final int lowerBound = 15;
+        final int upperBound = 15;
+
+        // Act & Assert
+        // The method should complete without throwing an exception because the value (15)
+        // is within the inclusive bounds [15, 15].
+        FieldUtils.verifyValueBounds(fieldName, value, lowerBound, upperBound);
     }
 }
