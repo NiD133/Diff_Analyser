@@ -1,32 +1,47 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest36 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test035() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode(" />\n");
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Double double0 = new Double(768.82985);
-        Double double1 = xNode0.getDoubleAttribute("(z|PWb^", double0);
-        assertEquals(768.82985, (double) double1, 0.01);
+    /**
+     * Tests that getDoubleAttribute() returns the provided default value
+     * when the specified attribute does not exist on the XML node.
+     */
+    @Test
+    public void getDoubleAttributeShouldReturnDefaultValueWhenAttributeIsMissing() {
+        // Arrange
+        // 1. Create a simple XML node without any attributes.
+        //    IIOMetadataNode is a concrete implementation of org.w3c.dom.Node,
+        //    suitable for creating a test node without a full XML document.
+        Node nodeWithoutAttributes = new IIOMetadataNode("configuration");
+
+        // 2. The XNode constructor requires an XPathParser. For this test, its
+        //    internal state is not important, so we can initialize it with a null document.
+        XPathParser xPathParser = new XPathParser((Document) null, true);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(xPathParser, nodeWithoutAttributes, variables);
+
+        // 3. Define the name of the non-existent attribute and the expected default value.
+        String attributeName = "port";
+        Double defaultValue = 768.82985;
+
+        // Act
+        // Attempt to retrieve the double value of an attribute that does not exist.
+        Double actualValue = xNode.getDoubleAttribute(attributeName, defaultValue);
+
+        // Assert
+        // The returned value should be the default value we provided.
+        // A delta of 0.0 is used for the floating-point comparison, requiring an exact match.
+        assertEquals(defaultValue, actualValue, 0.0);
     }
 }
