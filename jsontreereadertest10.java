@@ -1,31 +1,49 @@
 package com.google.gson.internal.bind;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.common.MoreAsserts;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
-public class JsonTreeReaderTestTest10 {
+/**
+ * Verifies that {@link JsonTreeReader} correctly overrides the necessary methods
+ * from its superclass, {@link JsonReader}.
+ */
+public class JsonTreeReaderOverridesTest {
 
     /**
-     * {@link JsonTreeReader} effectively replaces the complete reading logic of {@link JsonReader} to
-     * read from a {@link JsonElement} instead of a {@link Reader}. Therefore all relevant methods of
-     * {@code JsonReader} must be overridden.
+     * A list of method signatures from {@link JsonReader} that should NOT be overridden
+     * by {@link JsonTreeReader}.
+     * <p>
+     * These methods are related to configuring a stream-based parser (e.g., setting
+     * leniency or resource limits), which is not applicable when reading from an
+     * in-memory {@link com.google.gson.JsonElement} tree.
      */
+    private static final List<String> IGNORED_STREAM_CONFIG_METHODS = Arrays.asList(
+        "setLenient(boolean)",
+        "isLenient()",
+        "setStrictness(com.google.gson.Strictness)",
+        "getStrictness()",
+        "setNestingLimit(int)",
+        "getNestingLimit()"
+    );
+
     @Test
-    public void testOverrides() {
-        List<String> ignoredMethods = Arrays.asList("setLenient(boolean)", "isLenient()", "setStrictness(com.google.gson.Strictness)", "getStrictness()", "setNestingLimit(int)", "getNestingLimit()");
-        MoreAsserts.assertOverridesMethods(JsonReader.class, JsonTreeReader.class, ignoredMethods);
+    public void shouldOverrideAllRelevantJsonReaderMethods() {
+        /*
+         * The JsonTreeReader class provides a JsonReader API over an in-memory JsonElement,
+         * completely replacing the stream-based parsing logic of its superclass. To ensure
+         * it functions as a valid substitute, it is crucial that it overrides all relevant
+         * methods from JsonReader.
+         *
+         * This test asserts that all public and protected methods are overridden,
+         * excluding those that are specific to stream configuration.
+         */
+        MoreAsserts.assertOverridesMethods(
+            JsonReader.class,
+            JsonTreeReader.class,
+            IGNORED_STREAM_CONFIG_METHODS
+        );
     }
 }
