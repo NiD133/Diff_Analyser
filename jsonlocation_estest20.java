@@ -1,23 +1,44 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest20 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        ContentReference contentReference0 = ContentReference.redacted();
-        JsonLocation jsonLocation0 = new JsonLocation(contentReference0, 1852L, (-413L), 0, 74);
-        long long0 = jsonLocation0.getByteOffset();
-        assertEquals(1852L, long0);
-        assertEquals(0, jsonLocation0.getLineNr());
-        assertEquals((-413L), jsonLocation0.getCharOffset());
-        assertEquals(74, jsonLocation0.getColumnNr());
+/**
+ * Contains tests for the {@link JsonLocation} class, focusing on its constructor and basic property accessors.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Verifies that the JsonLocation constructor correctly initializes all properties
+     * (byte offset, char offset, line number, and column number), and that the
+     * corresponding getter methods return these exact values.
+     */
+    @Test
+    public void constructorShouldSetAllPropertiesCorrectly() {
+        // Arrange: Define the input parameters for the JsonLocation object.
+        final ContentReference contentReference = ContentReference.redacted();
+        final long expectedByteOffset = 1852L;
+        final long expectedCharOffset = -413L;
+        final int expectedLineNumber = 0;
+        final int expectedColumnNumber = 74;
+
+        // Act: Create a new JsonLocation instance with the specified parameters.
+        JsonLocation jsonLocation = new JsonLocation(contentReference,
+                expectedByteOffset,
+                expectedCharOffset,
+                expectedLineNumber,
+                expectedColumnNumber);
+
+        // Assert: Verify that each getter returns the value passed to the constructor.
+        assertEquals("The byte offset should match the value provided in the constructor.",
+                expectedByteOffset, jsonLocation.getByteOffset());
+        assertEquals("The char offset should match the value provided in the constructor.",
+                expectedCharOffset, jsonLocation.getCharOffset());
+        assertEquals("The line number should match the value provided in the constructor.",
+                expectedLineNumber, jsonLocation.getLineNr());
+        assertEquals("The column number should match the value provided in the constructor.",
+                expectedColumnNumber, jsonLocation.getColumnNr());
     }
 }
