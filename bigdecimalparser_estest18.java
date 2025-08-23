@@ -1,27 +1,35 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.math.BigDecimal;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BigDecimalParser_ESTestTest18 extends BigDecimalParser_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        char[] charArray0 = new char[3];
-        // Undeclared exception!
+/**
+ * Test suite for {@link BigDecimalParser}.
+ */
+public class BigDecimalParserTest {
+
+    /**
+     * Tests that parsing a char array containing only null characters, which is not a
+     * valid number, results in a NumberFormatException.
+     */
+    @Test
+    public void parse_whenGivenNullCharacters_shouldThrowNumberFormatException() {
+        // Arrange: Create an input that is invalid for BigDecimal parsing.
+        // An array of null characters is not a valid number representation.
+        char[] invalidInput = new char[]{'\u0000', '\u0000', '\u0000'};
+
         try {
-            BigDecimalParser.parse(charArray0);
-            fail("Expecting exception: NumberFormatException");
+            // Act: Attempt to parse the invalid input.
+            BigDecimalParser.parse(invalidInput);
+            fail("A NumberFormatException was expected, but it was not thrown.");
         } catch (NumberFormatException e) {
-            //
-            // Value \"\u0000\u0000\u0000\" can not be deserialized as `java.math.BigDecimal`, reason:  Not a valid number representation
-            //
-            verifyException("com.fasterxml.jackson.core.io.BigDecimalParser", e);
+            // Assert: Verify that the exception message is informative and correct.
+            String expectedMessage = "Value \"\u0000\u0000\u0000\" can not be deserialized as `java.math.BigDecimal`, reason:  Not a valid number representation";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
