@@ -1,37 +1,50 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
+import org.jfree.data.Range;
 import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class DeviationRenderer_ESTestTest6 extends DeviationRenderer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DeviationRenderer deviationRenderer0 = new DeviationRenderer();
-        DefaultIntervalXYDataset<DatasetRenderingOrder> defaultIntervalXYDataset0 = new DefaultIntervalXYDataset<DatasetRenderingOrder>();
-        deviationRenderer0.findRangeBounds(defaultIntervalXYDataset0);
-        assertTrue(deviationRenderer0.getDrawSeriesLineAsPath());
-        assertEquals(0.5F, deviationRenderer0.getAlpha(), 0.01F);
+/**
+ * Unit tests for the {@link DeviationRenderer} class.
+ */
+public class DeviationRendererTest {
+
+    /**
+     * Verifies that the default constructor initializes the renderer's properties
+     * to their expected default values.
+     */
+    @Test
+    public void constructor_shouldInitializePropertiesToDefaults() {
+        // Arrange & Act: Create a new instance of the renderer.
+        DeviationRenderer renderer = new DeviationRenderer();
+
+        // Assert: Check that the properties have the correct default values.
+        
+        // The default alpha transparency for the deviation shading should be 0.5.
+        assertEquals("Default alpha", 0.5F, renderer.getAlpha(), 0.0f);
+
+        // This renderer requires drawing the series line as a path.
+        assertTrue("drawSeriesLineAsPath should default to true", renderer.getDrawSeriesLineAsPath());
+    }
+
+    /**
+     * Verifies that findRangeBounds() returns null when the dataset is empty,
+     * as there is no data from which to determine a range.
+     */
+    @Test
+    public void findRangeBounds_withEmptyDataset_shouldReturnNull() {
+        // Arrange
+        DeviationRenderer renderer = new DeviationRenderer();
+        DefaultIntervalXYDataset emptyDataset = new DefaultIntervalXYDataset();
+
+        // Act
+        Range result = renderer.findRangeBounds(emptyDataset);
+
+        // Assert
+        assertNull("The range for an empty dataset should be null", result);
     }
 }
