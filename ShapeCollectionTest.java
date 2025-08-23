@@ -8,12 +8,12 @@
 
 package org.locationtech.spatial4j.shape;
 
-import org.junit.Rule;
-import org.junit.Test;
 import org.locationtech.spatial4j.TestLog;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
 import org.locationtech.spatial4j.shape.impl.RectangleImpl;
+import org.junit.Rule;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,57 +28,55 @@ public class ShapeCollectionTest extends RandomizedShapeTest {
   public static final String WORLD180 = getLonRangeString(SpatialContext.GEO.getWorldBounds());
 
   protected static String getLonRangeString(Rectangle bbox) {
-    return bbox.getMinX() + " " + bbox.getMaxX();
+    return bbox.getMinX()+" "+bbox.getMaxX();
   }
 
   @Rule
   public final TestLog testLog = TestLog.instance;
 
   @Test
-  public void testBoundingBoxCoversWorld() {
-    // Test cases where bounding boxes should cover the world
-    assertBoundingBoxCoversWorld(-180, 180, -180, 180);
-    assertBoundingBoxCoversWorld(-180, 0, 0, 180);
-    assertBoundingBoxCoversWorld(-90, 90, 90, -90);
+  public void testBbox() {
+    validateWorld(-180, 180, -180, 180);
+    validateWorld(-180, 0, 0, +180);
+    validateWorld(-90, +90, +90, -90);
   }
 
   @Test
-  public void testBoundingBoxDoesNotWorldWrap() {
+  public void testBboxNotWorldWrap() {
     ctx = SpatialContext.GEO;
-    // Create rectangles that do not contain 102, thus should not world-wrap
+    //doesn't contain 102, thus shouldn't world-wrap
     Rectangle r1 = ctx.makeRectangle(-92, 90, -10, 10);
     Rectangle r2 = ctx.makeRectangle(130, 172, -10, 10);
     Rectangle r3 = ctx.makeRectangle(172, -60, -10, 10);
-    ShapeCollection<Rectangle> shapeCollection = new ShapeCollection<>(Arrays.asList(r1, r2, r3), ctx);
-    assertEquals("130.0 90.0", getLonRangeString(shapeCollection.getBoundingBox()));
-    // Note: BBoxCalculatorTest thoroughly tests the longitude range
+    ShapeCollection<Rectangle> s = new ShapeCollection<>(Arrays.asList(r1, r2, r3), ctx);
+    assertEquals("130.0 90.0", getLonRangeString(s.getBoundingBox()));
+    // note: BBoxCalculatorTest thoroughly tests the longitude range
   }
 
-  private void assertBoundingBoxCoversWorld(double r1MinX, double r1MaxX, double r2MinX, double r2MaxX) {
+
+  private void validateWorld(double r1MinX, double r1MaxX, double r2MinX, double r2MaxX) {
     ctx = SpatialContext.GEO;
     Rectangle r1 = ctx.makeRectangle(r1MinX, r1MaxX, -10, 10);
     Rectangle r2 = ctx.makeRectangle(r2MinX, r2MaxX, -10, 10);
 
-    ShapeCollection<Rectangle> shapeCollection = new ShapeCollection<>(Arrays.asList(r1, r2), ctx);
-    assertEquals(WORLD180, getLonRangeString(shapeCollection.getBoundingBox()));
+    ShapeCollection<Rectangle> s = new ShapeCollection<>(Arrays.asList(r1, r2), ctx);
+    assertEquals(WORLD180, getLonRangeString(s.getBoundingBox()));
 
-    // Flip r1, r2 order
-    shapeCollection = new ShapeCollection<>(Arrays.asList(r2, r1), ctx);
-    assertEquals(WORLD180, getLonRangeString(shapeCollection.getBoundingBox()));
+    //flip r1, r2 order
+    s = new ShapeCollection<>(Arrays.asList(r2, r1), ctx);
+    assertEquals(WORLD180, getLonRangeString(s.getBoundingBox()));
   }
 
   @Test
-  public void testRectangleIntersection() {
-    SpatialContext ctx = new SpatialContextFactory() {{
-      geo = false;
-      worldBounds = new RectangleImpl(-100, 100, -50, 50, null);
-    }}.newSpatialContext();
+  public void testRectIntersect() {
+    SpatialContext ctx = new SpatialContextFactory()
+      {{geo = false; worldBounds = new RectangleImpl(-100, 100, -50, 50, null);}}.newSpatialContext();
 
     new ShapeCollectionRectIntersectionTestHelper(ctx).testRelateWithRectangle();
   }
 
   @Test
-  public void testGeoRectangleIntersection() {
+  public void testGeoRectIntersect() {
     ctx = SpatialContext.GEO;
     new ShapeCollectionRectIntersectionTestHelper(ctx).testRelateWithRectangle();
   }
@@ -93,14 +91,14 @@ public class ShapeCollectionTest extends RandomizedShapeTest {
     protected ShapeCollection generateRandomShape(Point nearP) {
       testLog.log("Break on nearP.toString(): {}", nearP);
       List<Rectangle> shapes = new ArrayList<>();
-      int count = randomIntBetween(1, 4);
-      for (int i = 0; i < count; i++) {
-        // First 2 are near nearP, the others are anywhere
-        shapes.add(randomRectangle(i < 2 ? nearP : null));
+      int count = randomIntBetween(1,4);
+      for(int i = 0; i < count; i++) {
+        //1st 2 are near nearP, the others are anywhere
+        shapes.add(randomRectangle( i < 2 ? nearP : null));
       }
       ShapeCollection<Rectangle> shapeCollection = new ShapeCollection<>(shapes, ctx);
 
-      // Test shapeCollection.getBoundingBox();
+      //test shapeCollection.getBoundingBox();
       Rectangle msBbox = shapeCollection.getBoundingBox();
       if (shapes.size() == 1) {
         assertEquals(shapes.get(0), msBbox.getBoundingBox());
@@ -118,7 +116,7 @@ public class ShapeCollectionTest extends RandomizedShapeTest {
             }
           }
           if (!valid)
-            fail("ShapeCollection bbox world-wrap doesn't contain " + lonTest + " for shapes: " + shapes);
+            fail("ShapeCollection bbox world-wrap doesn't contain "+lonTest+" for shapes: "+shapes);
         }
       }
       return shapeCollection;
