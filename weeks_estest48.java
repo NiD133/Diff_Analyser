@@ -2,17 +2,23 @@ package org.joda.time;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Weeks_ESTestTest48 extends Weeks_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Weeks} class.
+ */
+public class WeeksTest {
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        Weeks weeks0 = Weeks.MIN_VALUE;
-        Weeks weeks1 = weeks0.minus((Weeks) null);
-        assertSame(weeks0, weeks1);
+    @Test
+    public void minus_whenArgumentIsNull_shouldReturnSameInstance() {
+        // Arrange: According to the Javadoc, a null argument to minus() is treated as zero.
+        // Subtracting zero is a no-op, so the method should return the original instance
+        // as an optimization, without creating a new object.
+        Weeks initialWeeks = Weeks.MIN_VALUE;
+
+        // Act: Call the minus() method with a null argument.
+        Weeks result = initialWeeks.minus((Weeks) null);
+
+        // Assert: The returned object should be the exact same instance, not just an equal one.
+        assertSame("Subtracting a null Weeks object should return the same instance", initialWeeks, result);
     }
 }
