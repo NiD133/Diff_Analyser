@@ -1,44 +1,34 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest59 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test058() throws Throwable {
-        Document document0 = Parser.parseBodyFragment("Bb,Y6", "Bb,Y6");
-        Elements elements0 = document0.getAllElements();
-        // Undeclared exception!
+/**
+ * Test suite for the {@link Elements} class.
+ */
+public class ElementsTest {
+
+    /**
+     * Verifies that calling toggleClass with a null class name throws an IllegalArgumentException.
+     * This is the expected behavior as the class name must not be null.
+     */
+    @Test
+    public void toggleClassWithNullClassNameThrowsIllegalArgumentException() {
+        // Arrange: Create a simple document and select an element.
+        Document doc = Parser.parse("<p class='existing'>Test</p>");
+        Elements elements = doc.select("p");
+
+        // Act & Assert: Attempt to toggle a null class and verify the exception.
         try {
-            elements0.toggleClass((String) null);
-            fail("Expecting exception: IllegalArgumentException");
+            elements.toggleClass(null);
+            fail("Expected an IllegalArgumentException to be thrown for a null class name.");
         } catch (IllegalArgumentException e) {
-            //
-            // Object must not be null
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the exception message is clear and helpful.
+            assertEquals("Object must not be null", e.getMessage());
         }
     }
 }
