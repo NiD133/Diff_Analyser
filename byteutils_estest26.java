@@ -1,42 +1,29 @@
 package org.apache.commons.compress.utils;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest26 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        // Undeclared exception!
-        try {
-            ByteUtils.fromLittleEndian((ByteUtils.ByteSupplier) null, 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.utils.ByteUtils", e);
-        }
+    /**
+     * Verifies that calling {@link ByteUtils#fromLittleEndian(ByteUtils.ByteSupplier, int)}
+     * with a null supplier throws a {@link NullPointerException}.
+     */
+    @Test
+    public void fromLittleEndianWithNullSupplierShouldThrowNullPointerException() {
+        // Arrange: Define the arguments for the method under test.
+        // The supplier is null, which is the condition we are testing.
+        final ByteUtils.ByteSupplier nullSupplier = null;
+        // The length value is arbitrary as the method should fail before using it.
+        final int length = 1;
+
+        // Act & Assert: Verify that executing the method throws the expected exception.
+        assertThrows(NullPointerException.class, () -> {
+            ByteUtils.fromLittleEndian(nullSupplier, length);
+        });
     }
 }
