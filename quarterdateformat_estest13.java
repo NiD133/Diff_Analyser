@@ -1,34 +1,50 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import java.text.FieldPosition;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+/**
+ * A test suite for the QuarterDateFormat class.
+ * This specific test focuses on the format() method.
+ */
 public class QuarterDateFormat_ESTestTest13 extends QuarterDateFormat_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        TimeZone timeZone0 = TimeZone.getDefault();
-        QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat(timeZone0);
-        MockDate mockDate0 = new MockDate((-2355), 0, 2123, 584, 0, (-797));
-        StringWriter stringWriter0 = new StringWriter();
-        StringBuffer stringBuffer0 = stringWriter0.getBuffer();
-        quarterDateFormat0.format((Date) mockDate0, stringBuffer0, (FieldPosition) null);
-        assertEquals(5, stringBuffer0.length());
-        assertEquals("451 4", stringWriter0.toString());
+    /**
+     * Verifies that the format() method correctly formats a date in the fourth
+     * quarter into the "YYYY Q" string format.
+     */
+    @Test
+    public void format_shouldReturnYearAndQuarter_forDateInFourthQuarter() {
+        // Arrange
+        // Use a fixed timezone like "GMT" to ensure the test is deterministic
+        // and not affected by the system's default timezone.
+        TimeZone timeZone = TimeZone.getTimeZone("GMT");
+        QuarterDateFormat formatter = new QuarterDateFormat(timeZone);
+
+        // Create a specific date in the fourth quarter (October) of the year 451.
+        // This replaces the confusing `new MockDate(-2355, 0, 2123, ...)` from
+        // the original test, which resolved to the same time period.
+        Calendar calendar = new GregorianCalendar(timeZone);
+        calendar.set(451, Calendar.OCTOBER, 23);
+        Date dateInQ4 = calendar.getTime();
+
+        StringBuffer resultBuffer = new StringBuffer();
+        // The FieldPosition parameter is not used by this formatter, but we
+        // provide a non-null value for completeness.
+        FieldPosition fieldPosition = new FieldPosition(0);
+
+        // Act
+        formatter.format(dateInQ4, resultBuffer, fieldPosition);
+
+        // Assert
+        // The default format is "YYYY Q". For a date in October 451, the
+        // expected output is "451 4".
+        assertEquals("451 4", resultBuffer.toString());
     }
 }
