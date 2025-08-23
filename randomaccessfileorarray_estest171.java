@@ -1,32 +1,33 @@
 package com.itextpdf.text.pdf;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
 import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+/*
+ * Note: In a real-world scenario, this test class would be renamed to something more
+ * descriptive, like `RandomAccessFileOrArrayTest`, and would not extend a scaffolding class
+ * unless it provides essential, well-understood functionality.
+ */
 public class RandomAccessFileOrArray_ESTestTest171 extends RandomAccessFileOrArray_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test170() throws Throwable {
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray((RandomAccessSource) null);
-        randomAccessFileOrArray0.getByteSource();
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
+    /**
+     * Verifies that constructing a RandomAccessFileOrArray with a null source
+     * results in a valid object with a correctly initialized state.
+     * Specifically, it checks that the internal source is null and the file pointer is at 0.
+     */
+    @Test
+    public void constructorWithNullSource_initializesStateCorrectly() throws IOException {
+        // Arrange: Create an instance with a null RandomAccessSource.
+        // The cast is necessary to resolve constructor ambiguity.
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray((RandomAccessSource) null);
+
+        // Assert: Verify the initial state of the object.
+        assertNull("The underlying byte source should be null after construction.", fileOrArray.getByteSource());
+        assertEquals("The initial file pointer should be 0.", 0L, fileOrArray.getFilePointer());
     }
 }
