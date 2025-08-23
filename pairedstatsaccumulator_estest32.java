@@ -1,30 +1,26 @@
 package com.google.common.math;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PairedStatsAccumulator_ESTestTest32 extends PairedStatsAccumulator_ESTest_scaffolding {
+/**
+ * Tests for {@link PairedStatsAccumulator}.
+ */
+public class PairedStatsAccumulatorTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        PairedStatsAccumulator pairedStatsAccumulator0 = new PairedStatsAccumulator();
-        pairedStatsAccumulator0.add(4.9E-324, (-118.2309144));
-        pairedStatsAccumulator0.add((-118.2309144), (-118.2309144));
-        // Undeclared exception!
-        try {
-            pairedStatsAccumulator0.pearsonsCorrelationCoefficient();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.common.base.Preconditions", e);
-        }
+    /**
+     * Verifies that pearsonsCorrelationCoefficient() throws an IllegalStateException
+     * when the y-values have zero variance, as the correlation is undefined in this case.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void pearsonsCorrelationCoefficient_throwsIllegalStateExceptionWhenYValuesHaveZeroVariance() {
+        // Arrange: Create an accumulator and add data points where y-values are constant,
+        // resulting in zero variance for the y-dataset.
+        PairedStatsAccumulator accumulator = new PairedStatsAccumulator();
+        accumulator.add(10.0, 5.0);
+        accumulator.add(20.0, 5.0); // Different x, but same y
+
+        // Act: Attempt to calculate the correlation coefficient.
+        // This is expected to throw an IllegalStateException.
+        accumulator.pearsonsCorrelationCoefficient();
     }
 }
