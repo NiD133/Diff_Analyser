@@ -1,26 +1,27 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest46 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on handling invalid inputs.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        char[] charArray0 = new char[3];
-        // Undeclared exception!
-        try {
-            NumberOutput.outputInt((-4804), charArray0, 4118);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 4118
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that outputInt() throws an ArrayIndexOutOfBoundsException
+     * when the provided offset is outside the bounds of the destination buffer.
+     * The method is not expected to write anything and should fail fast.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void outputInt_shouldThrowException_whenOffsetIsOutOfBounds() {
+        // Arrange: Define a buffer and an offset that is clearly invalid.
+        char[] buffer = new char[5];
+        int numberToWrite = -4804;
+        int invalidOffset = 10; // An offset well beyond the buffer's capacity (length 5).
+
+        // Act & Assert: Attempt to write the integer at the invalid offset.
+        // The @Test(expected) annotation handles the assertion, ensuring the
+        // correct exception is thrown.
+        NumberOutput.outputInt(numberToWrite, buffer, invalidOffset);
     }
 }
