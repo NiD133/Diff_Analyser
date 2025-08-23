@@ -1,34 +1,26 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.internal.bind.JsonTreeWriter;
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+// The original test class name and inheritance are preserved for context.
 public class JsonTreeWriter_ESTestTest59 extends JsonTreeWriter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test58() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.beginObject();
-        jsonWriter0.endObject();
-        // Undeclared exception!
-        try {
-            jsonWriter0.endArray();
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
-        }
+    /**
+     * Verifies that calling endArray() when the writer is not in an array context
+     * (e.g., at the top level after an object has been closed) throws an IllegalStateException.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void endArray_whenNotInArrayContext_throwsIllegalStateException() throws IOException {
+        // Arrange: Create a writer and write a complete, closed object.
+        // This leaves the writer at the top level, not inside an array.
+        JsonTreeWriter writer = new JsonTreeWriter();
+        writer.beginObject();
+        writer.endObject();
+
+        // Act: Attempt to close an array, which was never opened.
+        // Assert: The @Test(expected) annotation asserts that an IllegalStateException is thrown.
+        writer.endArray();
     }
 }
