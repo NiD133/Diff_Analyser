@@ -1,18 +1,28 @@
 package org.jfree.chart.renderer.xy;
 
-import org.jfree.chart.TestUtils;
 import org.jfree.chart.api.PublicCloneable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class DeviationRendererTestTest4 {
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
+/**
+ * Unit tests for the {@link DeviationRenderer} class.
+ */
+class DeviationRendererTest {
 
     /**
-     * Verify that this class implements {@link PublicCloneable}.
+     * Verifies that the renderer implements the PublicCloneable interface,
+     * which is a required contract for objects that support cloning.
      */
     @Test
-    public void testPublicCloneable() {
-        DeviationRenderer r1 = new DeviationRenderer();
-        assertTrue(r1 instanceof PublicCloneable);
+    @DisplayName("DeviationRenderer should be publicly cloneable")
+    void rendererShouldImplementPublicCloneable() {
+        // Arrange
+        DeviationRenderer renderer = new DeviationRenderer();
+
+        // Assert
+        assertInstanceOf(PublicCloneable.class, renderer,
+                "The renderer must implement PublicCloneable to support cloning.");
     }
 }
