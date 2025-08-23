@@ -1,28 +1,29 @@
 package org.jfree.chart.plot;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class PlotRenderingInfo_ESTestTest16 extends PlotRenderingInfo_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link PlotRenderingInfo} class.
+ */
+public class PlotRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = new PlotRenderingInfo(chartRenderingInfo0);
-        int int0 = plotRenderingInfo0.getSubplotCount();
-        assertEquals(0, int0);
+    /**
+     * Verifies that a newly instantiated PlotRenderingInfo object
+     * correctly reports having zero subplots.
+     */
+    @Test
+    public void newPlotRenderingInfoShouldHaveZeroSubplots() {
+        // Arrange: Create a new PlotRenderingInfo instance, which requires a
+        // ChartRenderingInfo owner.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = new PlotRenderingInfo(chartInfo);
+
+        // Act: Retrieve the subplot count from the new instance.
+        int subplotCount = plotInfo.getSubplotCount();
+
+        // Assert: The initial subplot count should be zero.
+        assertEquals("A new PlotRenderingInfo should have no subplots.", 0, subplotCount);
     }
 }
