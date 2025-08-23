@@ -12,7 +12,7 @@ public class OptionBuilder_ESTestTest25 extends OptionBuilder_ESTest_scaffolding
     @Test(timeout = 4000)
     public void test24() throws Throwable {
         OptionBuilder.isRequired(true);
-        Option option0 = OptionBuilder.create('');
+        Option option0 = OptionBuilder.create(' ');
         assertEquals((-1), option0.getArgs());
         assertEquals(127, option0.getId());
     }
