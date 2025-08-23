@@ -1,39 +1,55 @@
 package org.jsoup.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.PipedReader;
-import java.io.PipedWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.CDataNode;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.LeafNode;
-import org.jsoup.select.Elements;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import java.io.StringReader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * This test class contains an improved version of a test for the XmlTreeBuilder.
+ * The original test was auto-generated and lacked clarity.
+ */
 public class XmlTreeBuilder_ESTestTest15 extends XmlTreeBuilder_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        Parser parser0 = new Parser(xmlTreeBuilder0);
-        StreamParser streamParser0 = new StreamParser(parser0);
-        Element element0 = new Element("http://www.w3.org/2000/svg", "http://www.w3.org/1999/xhtml");
-        streamParser0.parseFragment("7~n", element0, "7~n");
-        boolean boolean0 = xmlTreeBuilder0.processStartTag("http://www.w3.org/2000/svg");
-        assertTrue(boolean0);
-        Element element1 = xmlTreeBuilder0.pop();
-        assertEquals("http://www.w3.org/XML/1998/namespace", xmlTreeBuilder0.defaultNamespace());
-        assertEquals("http://www.w3.org/2000/svg", element1.tagName());
+    /**
+     * Verifies that processStartTag correctly creates a new element
+     * and pushes it onto the builder's stack.
+     */
+    @Test
+    public void processStartTag_whenInvoked_pushesNewElementOntoStack() {
+        // Arrange
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        
+        // To process tags, the builder needs to be initialized. The original test
+        // used a complex setup; a direct initialization is clearer and achieves
+        // the same prerequisite state.
+        Parser parser = new Parser(builder);
+        builder.initialiseParse(new StringReader(""), "http://example.com", parser);
+
+        // The original test also established a parsing context with an element on the stack.
+        // We simulate this by pushing a dummy context element. The specific nature of this
+        // element is not relevant to the behavior under test.
+        builder.push(new Element("context"));
+
+        // The original test used a URL as a tag name. We retain this to ensure
+        // the test continues to cover this specific edge case.
+        String newTagName = "http://www.w3.org/2000/svg";
+
+        // Act
+        // The processStartTag method should create a new element and add it to the stack.
+        boolean wasProcessed = builder.processStartTag(newTagName);
+
+        // Assert
+        assertTrue("processStartTag should return true upon successful processing.", wasProcessed);
+
+        // Verify that the new element was indeed pushed to the stack.
+        Element pushedElement = builder.pop();
+        assertEquals("The popped element should have the specified tag name.", newTagName, pushedElement.tagName());
+
+        // This assertion, also from the original test, confirms the builder is
+        // correctly configured for XML parsing.
+        assertEquals("The default namespace should be the standard XML namespace.",
+            "http://www.w3.org/XML/1998/namespace", builder.defaultNamespace());
     }
 }
