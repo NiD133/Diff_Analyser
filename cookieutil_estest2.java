@@ -1,43 +1,37 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.TextNode;
-import org.junit.runner.RunWith;
 
-public class CookieUtil_ESTestTest2 extends CookieUtil_ESTest_scaffolding {
+/**
+ * Test suite for {@link CookieUtil}.
+ */
+public class CookieUtilTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        HttpConnection.Response httpConnection_Response0 = new HttpConnection.Response();
-        HttpConnection.Request httpConnection_Request0 = new HttpConnection.Request();
-        Map<String, List<String>> map0 = httpConnection_Request0.headers;
-        MockFile mockFile0 = new MockFile("@]?3#", "@]?3#");
-        URL uRL0 = mockFile0.toURL();
-        try {
-            CookieUtil.storeCookies(httpConnection_Request0, httpConnection_Response0, uRL0, map0);
-            fail("Expecting exception: MalformedURLException");
-        } catch (MalformedURLException e) {
-            //
-            // Illegal character in path at index 53: file:/Users/tenghaha/Desktop/EvoSuiteProjects/jsoup/@]?3#/@]?3#
-            //
-            verifyException("org.jsoup.helper.CookieUtil", e);
-        }
+    /**
+     * Verifies that storeCookies throws a MalformedURLException when given a URL
+     * that contains characters that are illegal for a URI. The method under test
+     * must convert the URL to a URI, which is where the failure is expected.
+     */
+    @Test(expected = MalformedURLException.class)
+    public void storeCookiesWithUrlContainingIllegalCharactersThrowsException() throws MalformedURLException {
+        // Arrange
+        // Create a URL that is a valid URL object but contains a space, which is an
+        // illegal character when the URL is converted to a URI string.
+        URL urlWithIllegalChars = new URL("http://example.com/path with space");
+
+        // Create dummy request, response, and header objects required by the method signature.
+        HttpConnection.Request request = new HttpConnection.Request();
+        HttpConnection.Response response = new HttpConnection.Response();
+        Map<String, List<String>> responseHeaders = Collections.emptyMap();
+
+        // Act
+        // This call is expected to throw a MalformedURLException because the URL cannot be
+        // converted to a valid URI. The assertion is handled by the @Test(expected=...) annotation.
+        CookieUtil.storeCookies(request, response, urlWithIllegalChars, responseHeaders);
     }
 }
