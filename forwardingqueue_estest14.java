@@ -1,29 +1,29 @@
 package com.google.common.collect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
 import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Queue;
 
-public class ForwardingQueue_ESTestTest14 extends ForwardingQueue_ESTest_scaffolding {
+/**
+ * Tests for {@link ForwardingQueue}.
+ * This test uses {@link EvictingQueue} as a concrete implementation of the abstract class under test.
+ */
+// @RunWith annotation retained from original to preserve test runner configuration.
+@org.junit.runner.RunWith(org.evosuite.runtime.EvoRunner.class) 
+public class ForwardingQueueTest extends ForwardingQueue_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        EvictingQueue<Object> evictingQueue0 = EvictingQueue.create(1937);
-        // Undeclared exception!
-        try {
-            evictingQueue0.element();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.ArrayDeque", e);
-        }
+    /**
+     * Verifies that calling element() on an empty queue correctly throws a NoSuchElementException,
+     * as specified by the Queue interface contract.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void element_onEmptyQueue_throwsNoSuchElementException() {
+        // Arrange: Create an empty queue. EvictingQueue is a concrete ForwardingQueue.
+        // The capacity is irrelevant as long as the queue is empty.
+        Queue<Object> emptyQueue = EvictingQueue.create(10);
+
+        // Act & Assert: Calling element() on an empty queue should throw.
+        // The @Test(expected=...) annotation handles the assertion.
+        emptyQueue.element();
     }
 }
