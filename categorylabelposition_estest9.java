@@ -1,26 +1,53 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleAnchor;
 import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CategoryLabelPosition_ESTestTest9 extends CategoryLabelPosition_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        RectangleAnchor rectangleAnchor0 = RectangleAnchor.TOP_RIGHT;
-        TextBlockAnchor textBlockAnchor0 = TextBlockAnchor.CENTER_RIGHT;
-        TextAnchor textAnchor0 = TextAnchor.TOP_RIGHT;
-        CategoryLabelWidthType categoryLabelWidthType0 = CategoryLabelWidthType.RANGE;
-        CategoryLabelPosition categoryLabelPosition0 = new CategoryLabelPosition(rectangleAnchor0, textBlockAnchor0, textAnchor0, (-1.0), categoryLabelWidthType0, 3650.8F);
-        double double0 = categoryLabelPosition0.getAngle();
-        assertEquals((-1.0), double0, 0.01);
-        assertEquals(3650.8F, categoryLabelPosition0.getWidthRatio(), 0.01F);
+/**
+ * Tests for the {@link CategoryLabelPosition} class.
+ */
+public class CategoryLabelPositionTest {
+
+    private static final double DELTA = 0.01;
+
+    /**
+     * Verifies that the constructor correctly initializes the object's state
+     * and that the corresponding getters return the expected values.
+     */
+    @Test
+    public void constructorShouldCorrectlySetAllProperties() {
+        // Arrange: Define the parameters for creating a CategoryLabelPosition instance.
+        RectangleAnchor categoryAnchor = RectangleAnchor.TOP_RIGHT;
+        TextBlockAnchor labelAnchor = TextBlockAnchor.CENTER_RIGHT;
+        TextAnchor rotationAnchor = TextAnchor.TOP_RIGHT;
+        CategoryLabelWidthType widthType = CategoryLabelWidthType.RANGE;
+        double expectedAngle = -1.0;
+        float expectedWidthRatio = 3650.8F;
+
+        // Act: Create a new CategoryLabelPosition instance.
+        CategoryLabelPosition position = new CategoryLabelPosition(
+                categoryAnchor,
+                labelAnchor,
+                rotationAnchor,
+                expectedAngle,
+                widthType,
+                expectedWidthRatio
+        );
+
+        // Assert: Check that the getters return the values passed to the constructor.
+        // Note: The original test only checked angle and width ratio, but a thorough
+        // constructor test should verify all properties.
+        assertEquals(categoryAnchor, position.getCategoryAnchor());
+        assertEquals(labelAnchor, position.getLabelAnchor());
+        assertEquals(rotationAnchor, position.getRotationAnchor());
+        assertEquals(widthType, position.getWidthType());
+        assertEquals("The angle should match the value set in the constructor.",
+                expectedAngle, position.getAngle(), DELTA);
+        assertEquals("The width ratio should match the value set in the constructor.",
+                expectedWidthRatio, position.getWidthRatio(), DELTA);
     }
 }
