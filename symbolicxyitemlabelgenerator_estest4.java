@@ -1,35 +1,31 @@
 package org.jfree.chart.labels;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.jfree.chart.date.SerialDate;
-import org.jfree.data.time.DynamicTimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class SymbolicXYItemLabelGenerator_ESTestTest4 extends SymbolicXYItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link SymbolicXYItemLabelGenerator} class.
+ */
+public class SymbolicXYItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test3() throws Throwable {
-        SymbolicXYItemLabelGenerator symbolicXYItemLabelGenerator0 = new SymbolicXYItemLabelGenerator();
-        // Undeclared exception!
-        try {
-            symbolicXYItemLabelGenerator0.generateToolTip((XYDataset) null, 44, 44);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null 'dataset' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
-        }
+    /**
+     * Verifies that the generateToolTip method throws an IllegalArgumentException
+     * when the dataset argument is null. This is the expected behavior as the
+     * method contract requires a non-null dataset.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void generateToolTip_withNullDataset_shouldThrowIllegalArgumentException() {
+        // Arrange: Create an instance of the label generator.
+        SymbolicXYItemLabelGenerator generator = new SymbolicXYItemLabelGenerator();
+        
+        // The specific values for series and item indices are irrelevant for this test,
+        // as the null dataset check should occur first.
+        int series = 0;
+        int item = 0;
+
+        // Act & Assert: Call the method with a null dataset.
+        // The @Test(expected=...) annotation handles the assertion,
+        // ensuring that an IllegalArgumentException is thrown.
+        generator.generateToolTip((XYDataset) null, series, item);
     }
 }
