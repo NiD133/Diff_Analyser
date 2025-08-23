@@ -1,51 +1,34 @@
 package org.apache.commons.io.file;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.function.UnaryOperator;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.EmptyFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.PathEqualsFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
+import java.io.IOException;
+
+/**
+ * This test class contains tests for CountingPathVisitor and its subclasses.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class CountingPathVisitor_ESTestTest11 extends CountingPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        CountingPathVisitor.Builder countingPathVisitor_Builder0 = new CountingPathVisitor.Builder();
-        Counters.PathCounters counters_PathCounters0 = countingPathVisitor_Builder0.getPathCounters();
-        String[] stringArray0 = new String[3];
-        stringArray0[0] = "org.apache.commons.io.file.CountingPathVisitor$AbstractBuilder";
-        stringArray0[1] = "Z'flPCE";
-        stringArray0[2] = "";
-        CleaningPathVisitor cleaningPathVisitor0 = new CleaningPathVisitor(counters_PathCounters0, (DeleteOption[]) null, stringArray0);
-        // Undeclared exception!
-        try {
-            cleaningPathVisitor0.preVisitDirectory((Path) null, (BasicFileAttributes) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that preVisitDirectory throws a NullPointerException when given a null path.
+     * <p>
+     * This behavior is part of the contract of the FileVisitor interface and is tested
+     * here through the CleaningPathVisitor subclass, which inherits the method from
+     * CountingPathVisitor.
+     * </p>
+     */
+    @Test(expected = NullPointerException.class)
+    public void testPreVisitDirectoryThrowsExceptionForNullPath() throws IOException {
+        // Arrange: Create a visitor instance.
+        // The specific counters and other constructor arguments are not relevant for this test,
+        // as we are only verifying the null-check on the path parameter.
+        final Counters.PathCounters counters = CountingPathVisitor.withLongCounters().getPathCounters();
+        final String[] noPathsToDelete = {};
+        final CleaningPathVisitor visitor = new CleaningPathVisitor(counters, null, noPathsToDelete);
+
+        // Act: Call the method with a null path, which is expected to cause an exception.
+        // Assert: A NullPointerException is expected, as specified by the @Test annotation.
+        visitor.preVisitDirectory(null, null);
     }
 }
