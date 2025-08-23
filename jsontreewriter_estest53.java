@@ -1,32 +1,38 @@
 package com.google.gson.internal.bind;
 
+import com.google.gson.internal.bind.JsonTreeWriter;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest53 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test52() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        // Undeclared exception!
+/**
+ * Tests for {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    /**
+     * Verifies that calling {@link JsonTreeWriter#name(String)} is not allowed when the writer
+     * is not in an object scope. A name can only be written after {@code beginObject()} has been called.
+     */
+    @Test
+    public void name_whenNotInObject_throwsIllegalStateException() {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        String expectedErrorMessage = "Did not expect a name";
+
+        // Act & Assert
         try {
-            jsonTreeWriter0.name("");
-            fail("Expecting exception: IllegalStateException");
+            writer.name("test.name");
+            fail("Expected an IllegalStateException because name() was called outside of an object.");
         } catch (IllegalStateException e) {
-            //
-            // Did not expect a name
-            //
-            verifyException("com.google.gson.internal.bind.JsonTreeWriter", e);
+            // This is the expected outcome
+            assertEquals(expectedErrorMessage, e.getMessage());
+        } catch (IOException e) {
+            // The method signature includes IOException, but it's not expected in this scenario.
+            fail("An unexpected IOException was thrown: " + e.getMessage());
         }
     }
 }
