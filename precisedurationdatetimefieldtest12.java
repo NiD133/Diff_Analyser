@@ -1,235 +1,74 @@
 package org.joda.time.field;
 
-import java.util.Arrays;
-import java.util.Locale;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.TimeOfDay;
 import org.joda.time.chrono.ISOChronology;
+import org.junit.Test;
 
-public class PreciseDurationDateTimeFieldTestTest12 extends TestCase {
+import java.util.Locale;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+import static org.junit.Assert.assertEquals;
 
-    public static TestSuite suite() {
-        return new TestSuite(TestPreciseDurationDateTimeField.class);
-    }
+/**
+ * Test case for the PreciseDurationDateTimeField class, focusing on the
+ * getAsText(int, Locale) method inherited from BaseDateTimeField.
+ */
+public class PreciseDurationDateTimeFieldTest {
 
-    @Override
-    protected void setUp() throws Exception {
-    }
+    /**
+     * A minimal concrete implementation of the abstract PreciseDurationDateTimeField.
+     * <p>
+     * This class is necessary to create an instance to test the concrete method
+     * {@code getAsText(int, Locale)}, which is inherited from {@link BaseDateTimeField}.
+     * The implemented abstract methods are not relevant to this specific test.
+     */
+    private static class TestPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockPreciseDurationDateTimeField extends PreciseDurationDateTimeField {
-
-        protected MockPreciseDurationDateTimeField() {
-            super(DateTimeFieldType.secondOfMinute(), new MockCountingDurationField(DurationFieldType.seconds()));
+        protected TestPreciseDurationDateTimeField() {
+            // Provide a standard, precise duration field to satisfy the super constructor.
+            super(DateTimeFieldType.secondOfMinute(), ISOChronology.getInstanceUTC().seconds());
         }
 
-        protected MockPreciseDurationDateTimeField(DateTimeFieldType type, DurationField dur) {
-            super(type, dur);
-        }
-
+        // The following methods must be implemented but are not called by the test.
         @Override
         public int get(long instant) {
-            return (int) (instant / 60L);
+            return 0;
         }
 
         @Override
         public DurationField getRangeDurationField() {
-            return new MockCountingDurationField(DurationFieldType.minutes());
+            return null;
         }
 
         @Override
         public int getMaximumValue() {
+            // This value is intentionally less than the value used in the test (80)
+            // to demonstrate that getAsText does not perform validation.
             return 59;
         }
     }
 
-    static class MockStandardBaseDateTimeField extends MockPreciseDurationDateTimeField {
+    @Test
+    public void getAsText_shouldConvertValueToStringAndIgnoreLocale() {
+        // Arrange
+        // The getAsText(int, Locale) method is inherited from BaseDateTimeField.
+        // This test verifies that it simply converts the integer to its string
+        // representation, ignoring the provided Locale.
+        BaseDateTimeField field = new TestPreciseDurationDateTimeField();
+        int value = 80;
 
-        protected MockStandardBaseDateTimeField() {
-            super();
-        }
+        // The test uses a value (80) that is higher than the field's declared
+        // maximum value (59) to confirm that getAsText does not validate the input.
 
-        @Override
-        public DurationField getDurationField() {
-            return ISOChronology.getInstanceUTC().seconds();
-        }
+        // Act
+        String textWithEnglishLocale = field.getAsText(value, Locale.ENGLISH);
+        String textWithNullLocale = field.getAsText(value, null);
 
-        @Override
-        public DurationField getRangeDurationField() {
-            return ISOChronology.getInstanceUTC().minutes();
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockCountingDurationField extends BaseDurationField {
-
-        static int add_int = 0;
-
-        static int add_long = 0;
-
-        static int difference_long = 0;
-
-        protected MockCountingDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 60;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            add_int++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            add_long++;
-            return instant + (value * 60L);
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            difference_long++;
-            return 30;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockZeroDurationField extends BaseDurationField {
-
-        protected MockZeroDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            return true;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            // this is zero
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    //-----------------------------------------------------------------------
-    static class MockImpreciseDurationField extends BaseDurationField {
-
-        protected MockImpreciseDurationField(DurationFieldType type) {
-            super(type);
-        }
-
-        @Override
-        public boolean isPrecise() {
-            // this is false
-            return false;
-        }
-
-        @Override
-        public long getUnitMillis() {
-            return 0;
-        }
-
-        @Override
-        public long getValueAsLong(long duration, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(int value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long getMillis(long value, long instant) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, int value) {
-            return 0;
-        }
-
-        @Override
-        public long add(long instant, long value) {
-            return 0;
-        }
-
-        @Override
-        public long getDifferenceAsLong(long minuendInstant, long subtrahendInstant) {
-            return 0;
-        }
-    }
-
-    public void test_getAsText_int_Locale() {
-        BaseDateTimeField field = new MockPreciseDurationDateTimeField();
-        assertEquals("80", field.getAsText(80, Locale.ENGLISH));
-        assertEquals("80", field.getAsText(80, null));
+        // Assert
+        String expectedText = "80";
+        assertEquals("getAsText should return the string representation of the value.",
+                expectedText, textWithEnglishLocale);
+        assertEquals("getAsText should ignore the locale.",
+                expectedText, textWithNullLocale);
     }
 }
