@@ -1,18 +1,27 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class IOCase_ESTestTest41 extends IOCase_ESTest_scaffolding {
+/**
+ * Tests for the {@link IOCase} enum, focusing on the {@code value} static method.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        IOCase iOCase0 = IOCase.SYSTEM;
-        IOCase iOCase1 = IOCase.value((IOCase) null, iOCase0);
-        assertEquals(IOCase.SYSTEM, iOCase1);
+    /**
+     * Tests that {@link IOCase#value(IOCase, IOCase)} returns the default value
+     * when the first argument is null.
+     */
+    @Test
+    public void valueShouldReturnDefaultWhenFirstArgumentIsNull() {
+        // Arrange
+        final IOCase defaultValue = IOCase.SYSTEM;
+
+        // Act
+        final IOCase result = IOCase.value(null, defaultValue);
+
+        // Assert
+        assertSame("The method should return the provided default value when the input value is null.",
+                   defaultValue, result);
     }
 }
