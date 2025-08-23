@@ -1,22 +1,32 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class JacksonInject_ESTestTest3 extends JacksonInject_ESTest_scaffolding {
+/**
+ * This test suite focuses on the JacksonInject.Value class.
+ */
+public class JacksonInjectValueTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Boolean boolean0 = Boolean.FALSE;
-        Boolean boolean1 = new Boolean("");
-        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.construct((Object) null, boolean0, boolean1);
-        boolean boolean2 = jacksonInject_Value0.willUseInput(false);
-        assertFalse(boolean2);
+    /**
+     * Tests that willUseInput() returns the explicitly configured 'useInput' value
+     * (which is false in this case), and correctly ignores the provided default value.
+     */
+    @Test
+    public void willUseInput_WhenUseInputIsExplicitlyFalse_ShouldReturnFalse() {
+        // Arrange: Create a Value instance where 'useInput' is explicitly set to FALSE.
+        Boolean useInput = Boolean.FALSE;
+        Boolean optional = Boolean.FALSE; // Not relevant for this test, but needed for constructor.
+        JacksonInject.Value injectValue = JacksonInject.Value.construct(null, useInput, optional);
+
+        // Use a default value that is different from the expected result to ensure
+        // the method is not accidentally returning the default.
+        boolean defaultValueToIgnore = true;
+
+        // Act: Call the method under test.
+        boolean result = injectValue.willUseInput(defaultValueToIgnore);
+
+        // Assert: The result should be false, matching the explicitly set value.
+        assertFalse("Expected willUseInput to return the explicit value (false), not the default.", result);
     }
 }
