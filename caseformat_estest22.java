@@ -1,19 +1,29 @@
 package com.google.common.base;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CaseFormat_ESTestTest22 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_HYPHEN;
-        CaseFormat caseFormat1 = CaseFormat.LOWER_UNDERSCORE;
-        String string0 = caseFormat0.to(caseFormat1, "S:^5jO-|]r");
-        assertEquals("S:^5jO_|]r", string0);
+    @Test
+    public void to_fromLowerHyphenToLowerUnderscore_convertsHyphenAndPreservesSpecialCharacters() {
+        // Arrange
+        CaseFormat sourceFormat = CaseFormat.LOWER_HYPHEN;
+        CaseFormat targetFormat = CaseFormat.LOWER_UNDERSCORE;
+        
+        // The input string does not strictly conform to LOWER_HYPHEN, 
+        // but contains a hyphen and other special characters.
+        // The conversion should be a "best effort".
+        String input = "S:^5jO-|]r";
+        String expectedOutput = "S:^5jO_|]r";
+
+        // Act
+        String convertedString = sourceFormat.to(targetFormat, input);
+
+        // Assert
+        assertEquals(expectedOutput, convertedString);
     }
 }
