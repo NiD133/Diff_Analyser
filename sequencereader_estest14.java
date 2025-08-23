@@ -1,37 +1,48 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.io.PipedReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class SequenceReader_ESTestTest14 extends SequenceReader_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        ArrayDeque<StringReader> arrayDeque0 = new ArrayDeque<StringReader>();
-        SequenceReader sequenceReader0 = new SequenceReader(arrayDeque0);
-        char[] charArray0 = new char[7];
-        // Undeclared exception!
+/**
+ * Tests for {@link SequenceReader}.
+ * This class contains the improved test case.
+ */
+public class SequenceReaderTest {
+
+    /**
+     * Tests that calling read() with a buffer and negative values for offset and length
+     * correctly throws an IndexOutOfBoundsException.
+     */
+    @Test
+    public void readWithBufferShouldThrowExceptionForNegativeOffsetAndLength() {
+        // Arrange: Create a SequenceReader and a buffer for reading.
+        // The reader can be empty, as the exception is thrown before any reading occurs.
+        SequenceReader sequenceReader = new SequenceReader(Collections.<Reader>emptyList());
+        char[] buffer = new char[7];
+        int invalidOffset = -1;
+        int invalidLength = -1;
+
+        // Act & Assert
         try {
-            sequenceReader0.read(charArray0, (-1), (-1));
-            fail("Expecting exception: IndexOutOfBoundsException");
+            sequenceReader.read(buffer, invalidOffset, invalidLength);
+            fail("Expected an IndexOutOfBoundsException to be thrown for negative offset and length.");
         } catch (IndexOutOfBoundsException e) {
-            //
-            // Array Size=7, offset=-1, length=-1
-            //
-            verifyException("org.apache.commons.io.input.SequenceReader", e);
+            // Success: The expected exception was caught.
+            // Verify the exception message contains details about the invalid arguments.
+            String expectedMessageContent = "Array Size=7, offset=-1, length=-1";
+            assertTrue(
+                "The exception message should contain the invalid offset and length.",
+                e.getMessage().contains(expectedMessageContent)
+            );
+        } catch (IOException e) {
+            // The read method signature includes IOException, but it's not expected in this specific scenario.
+            fail("An unexpected IOException was thrown: " + e.getMessage());
         }
     }
 }
