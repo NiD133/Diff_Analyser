@@ -1,56 +1,38 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
 import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class BritishCutoverChronology_ESTestTest1 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = new BritishCutoverChronology();
-        JulianEra julianEra0 = JulianEra.AD;
-        // Undeclared exception!
+    /**
+     * Tests that creating a date with a month value outside the valid range (1-12)
+     * throws a DateTimeException.
+     */
+    @Test
+    public void date_withInvalidMonth_throwsDateTimeException() {
+        // Arrange
+        // The SUT's documentation recommends using the singleton INSTANCE.
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        Era adEra = JulianEra.AD;
+        int yearOfEra = 6;
+        int invalidMonth = 1000; // Valid months are 1-12.
+        int dayOfMonth = 1;
+        
+        String expectedErrorMessage = "Invalid value for MonthOfYear (valid values 1 - 12): 1000";
+
+        // Act & Assert
         try {
-            britishCutoverChronology0.date((Era) julianEra0, 6, 1000, 1);
-            fail("Expecting exception: DateTimeException");
+            chronology.date(adEra, yearOfEra, invalidMonth, dayOfMonth);
+            fail("Expected a DateTimeException to be thrown for an invalid month, but it was not.");
         } catch (DateTimeException e) {
-            //
-            // Invalid value for MonthOfYear (valid values 1 - 12): 1000
-            //
-            verifyException("java.time.temporal.ValueRange", e);
+            assertEquals("The exception message did not match the expected value.", expectedErrorMessage, e.getMessage());
         }
     }
 }
