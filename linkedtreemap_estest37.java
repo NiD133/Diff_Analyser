@@ -2,32 +2,37 @@ package com.google.gson.internal;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+// Note: Unused imports from the original file have been removed for clarity.
+// The original test class name is kept as requested.
 public class LinkedTreeMap_ESTestTest37 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        Integer integer0 = new Integer((-1));
-        Integer integer1 = Integer.valueOf(1);
-        Integer integer2 = new Integer((-1));
-        linkedTreeMap0.putIfAbsent(integer2, integer2);
-        Integer integer3 = linkedTreeMap0.putIfAbsent(integer1, integer1);
-        assertNull(integer3);
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap0.find(integer0, true);
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node1 = linkedTreeMap_Node0.last();
-        assertNotSame(linkedTreeMap_Node1, linkedTreeMap_Node0);
-        assertNotNull(linkedTreeMap_Node1);
+    /**
+     * Tests that {@link LinkedTreeMap.Node#last()} returns the node with the largest key
+     * within the subtree rooted at the current node.
+     */
+    @Test
+    public void nodeLast_whenCalledOnRoot_returnsNodeWithLargestKey() {
+        // Arrange
+        // Create a map and add two elements. Due to the natural ordering of integers,
+        // the node with key -1 will be the root, and the node with key 1 will be its right child.
+        LinkedTreeMap<Integer, Integer> map = new LinkedTreeMap<>();
+        Integer keyMinusOne = -1;
+        Integer keyOne = 1;
+        map.put(keyMinusOne, -1);
+        map.put(keyOne, 1);
+
+        // Act
+        // Find the node for key -1, which is the root of the entire tree.
+        LinkedTreeMap.Node<Integer, Integer> rootNode = map.find(keyMinusOne, false);
+        // Call last() on the root node. This should find the rightmost node in its subtree.
+        LinkedTreeMap.Node<Integer, Integer> lastNodeInSubtree = rootNode.last();
+
+        // Assert
+        // The last node in the subtree of the root should be the node with the largest key in the map.
+        assertNotNull("The last node should not be null", lastNodeInSubtree);
+        assertEquals("The last node should have the key 1", keyOne, lastNodeInSubtree.getKey());
+        assertNotSame("The last node should be a different object than the root node",
+                rootNode, lastNodeInSubtree);
     }
 }
