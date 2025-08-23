@@ -1,79 +1,34 @@
 package org.joda.time.chrono;
 
-import java.util.Locale;
-import java.util.TimeZone;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.DateTime.Property;
+import org.junit.Test;
 
-public class IslamicChronologyTestTest1 extends TestCase {
+/**
+ * Unit tests for the factory methods of {@link IslamicChronology}.
+ * This test focuses on the getInstanceUTC() factory method.
+ */
+public class IslamicChronologyTest {
 
-    private static long SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
+    /**
+     * Tests that the getInstanceUTC() factory method returns a non-null instance of
+     * IslamicChronology configured with the UTC time zone.
+     */
+    @Test
+    public void getInstanceUTC_shouldReturnChronologyInstanceWithUTCZone() {
+        // Arrange: No setup is needed as we are testing a static factory method.
 
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+        // Act: Get the singleton instance of the IslamicChronology in UTC.
+        IslamicChronology chronology = IslamicChronology.getInstanceUTC();
 
-    private static final DateTimeZone LONDON = DateTimeZone.forID("Europe/London");
+        // Assert: Verify that the returned chronology has the correct properties.
+        // 1. The time zone must be UTC.
+        assertEquals("The chronology's time zone should be UTC", DateTimeZone.UTC, chronology.getZone());
 
-    private static final DateTimeZone TOKYO = DateTimeZone.forID("Asia/Tokyo");
-
-    private static final Chronology ISLAMIC_UTC = IslamicChronology.getInstanceUTC();
-
-    private static final Chronology JULIAN_UTC = JulianChronology.getInstanceUTC();
-
-    private static final Chronology ISO_UTC = ISOChronology.getInstanceUTC();
-
-    long y2002days = 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365 + 365 + 365 + 366 + 365;
-
-    // 2002-06-09
-    private long TEST_TIME_NOW = (y2002days + 31L + 28L + 31L + 30L + 31L + 9L - 1L) * DateTimeConstants.MILLIS_PER_DAY;
-
-    private DateTimeZone originalDateTimeZone = null;
-
-    private TimeZone originalTimeZone = null;
-
-    private Locale originalLocale = null;
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static TestSuite suite() {
-        SKIP = 1 * DateTimeConstants.MILLIS_PER_DAY;
-        return new TestSuite(TestIslamicChronology.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TEST_TIME_NOW);
-        originalDateTimeZone = DateTimeZone.getDefault();
-        originalTimeZone = TimeZone.getDefault();
-        originalLocale = Locale.getDefault();
-        DateTimeZone.setDefault(LONDON);
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
-        Locale.setDefault(Locale.UK);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        DateTimeUtils.setCurrentMillisSystem();
-        DateTimeZone.setDefault(originalDateTimeZone);
-        TimeZone.setDefault(originalTimeZone);
-        Locale.setDefault(originalLocale);
-        originalDateTimeZone = null;
-        originalTimeZone = null;
-        originalLocale = null;
-    }
-
-    //-----------------------------------------------------------------------
-    public void testFactoryUTC() {
-        assertEquals(DateTimeZone.UTC, IslamicChronology.getInstanceUTC().getZone());
-        assertSame(IslamicChronology.class, IslamicChronology.getInstanceUTC().getClass());
+        // 2. The returned object should be an instance of IslamicChronology.
+        assertSame("The returned object should be of type IslamicChronology",
+                IslamicChronology.class, chronology.getClass());
     }
 }
