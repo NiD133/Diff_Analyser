@@ -1,19 +1,28 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest1 extends ByteArrayBuilder_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteArrayBuilder} class, focusing on exception handling.
+ */
+public class ByteArrayBuilderTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        ByteArrayBuilder byteArrayBuilder0 = ByteArrayBuilder.fromInitial(byteArray0, (byte) 74);
-        byteArrayBuilder0.write(byteArray0, (int) (byte) 74, (-278));
-        assertEquals(74, byteArrayBuilder0.size());
+    /**
+     * Verifies that the write(byte[], int, int) method throws an
+     * IndexOutOfBoundsException when provided with a negative length argument.
+     * This behavior is consistent with the contract of java.io.OutputStream.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void writeWithNegativeLengthShouldThrowException() {
+        // Given a ByteArrayBuilder instance
+        ByteArrayBuilder builder = new ByteArrayBuilder();
+        byte[] anyData = new byte[10];
+        int validOffset = 0;
+        int invalidNegativeLength = -1;
+
+        // When writing with a negative length
+        builder.write(anyData, validOffset, invalidNegativeLength);
+
+        // Then an IndexOutOfBoundsException is expected
     }
 }
