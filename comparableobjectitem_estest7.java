@@ -1,28 +1,24 @@
 package org.jfree.data;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparableObjectItem_ESTestTest7 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem("h", "h");
-        // Undeclared exception!
-        try {
-            comparableObjectItem0.compareTo((ComparableObjectItem) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.data.ComparableObjectItem", e);
-        }
+    /**
+     * Verifies that the compareTo() method throws a NullPointerException when
+     * the argument is null, which is the expected behavior according to the
+     * java.lang.Comparable contract.
+     */
+    @Test(expected = NullPointerException.class)
+    public void compareTo_withNullArgument_shouldThrowNullPointerException() {
+        // Arrange: Create an instance of the class under test.
+        ComparableObjectItem item = new ComparableObjectItem("anyComparable", "anyObject");
+
+        // Act: Call the method with a null argument.
+        // The @Test(expected) annotation will automatically handle the assertion.
+        item.compareTo(null);
     }
 }
