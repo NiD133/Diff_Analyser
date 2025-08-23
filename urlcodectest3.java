@@ -1,44 +1,49 @@
 package org.apache.commons.codec.net;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class URLCodecTestTest3 {
+/**
+ * Tests for {@link URLCodec} focusing on specific decoding scenarios.
+ */
+// The original class name "URLCodecTestTest3" was renamed for clarity.
+public class URLCodecTest {
 
-    static final int[] SWISS_GERMAN_STUFF_UNICODE = { 0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4 };
-
-    static final int[] RUSSIAN_STUFF_UNICODE = { 0x412, 0x441, 0x435, 0x43C, 0x5F, 0x43F, 0x440, 0x438, 0x432, 0x435, 0x442 };
-
-    private String constructString(final int[] unicodeChars) {
-        final StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (final int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar);
-            }
-        }
-        return buffer.toString();
-    }
-
-    private void validateState(final URLCodec urlCodec) {
-        // no tests for now.
-    }
-
+    /**
+     * This test verifies that the {@code decode(byte[])} method correctly handles
+     * byte arrays that do not contain any URL-encoded sequences (i.e., no '%'
+     * escape characters or '+' for spaces). In this scenario, the method should
+     * return the input byte array unmodified.
+     *
+     * The original test was named "testDecodeInvalidContent", which was misleading
+     * as the input is valid but simply contains nothing to decode.
+     */
     @Test
-    void testDecodeInvalidContent() throws DecoderException {
-        final String ch_msg = constructString(SWISS_GERMAN_STUFF_UNICODE);
+    @DisplayName("decode(byte[]) should pass through bytes that are not URL-encoded")
+    void decodeByteArrayWithNoEncodedCharsReturnsSameArray() throws DecoderException {
+        // Arrange
+        // The original test used a helper method to build this string from an array of
+        // Unicode code points. Using a string literal is more direct and readable.
+        // The string contains non-ASCII characters ('ü', 'ä') to ensure the test
+        // correctly handles byte values greater than 127.
+        final String originalString = "Grüezi_zämä";
+        final byte[] inputBytes = originalString.getBytes(StandardCharsets.ISO_8859_1);
+
         final URLCodec urlCodec = new URLCodec();
-        final byte[] input = ch_msg.getBytes(StandardCharsets.ISO_8859_1);
-        final byte[] output = urlCodec.decode(input);
-        assertEquals(input.length, output.length);
-        for (int i = 0; i < input.length; i++) {
-            assertEquals(input[i], output[i]);
-        }
-        validateState(urlCodec);
+
+        // Act
+        // The decode method is expected to iterate through the bytes and, finding
+        // no characters to decode, return the original byte array.
+        final byte[] resultBytes = urlCodec.decode(inputBytes);
+
+        // Assert
+        // The output should be identical to the input.
+        // The original test used a for-loop for comparison, but assertArrayEquals
+        // is more concise and idiomatic for this purpose.
+        assertArrayEquals(inputBytes, resultBytes);
     }
 }
