@@ -1,36 +1,32 @@
 package org.apache.commons.compress.utils;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ByteUtils_ESTestTest41 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test40() throws Throwable {
-        ByteUtils.ByteSupplier byteUtils_ByteSupplier0 = mock(ByteUtils.ByteSupplier.class, new ViolatedAssumptionAnswer());
-        doReturn(0).when(byteUtils_ByteSupplier0).getAsByte();
-        long long0 = ByteUtils.fromLittleEndian(byteUtils_ByteSupplier0, 1);
-        assertEquals(0L, long0);
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(ByteUtils.ByteSupplier, int)}
+     * correctly converts a single byte with the value 0 into the long value 0L.
+     */
+    @Test
+    public void fromLittleEndianWithSupplierReadsSingleZeroByteAsZero() throws IOException {
+        // Arrange: Create a mock ByteSupplier that returns a single byte with value 0.
+        // The method under test will read 'length' bytes, which is 1 in this case.
+        final ByteUtils.ByteSupplier mockSupplier = mock(ByteUtils.ByteSupplier.class);
+        when(mockSupplier.getAsByte()).thenReturn(0);
+
+        // Act: Call the method to convert one byte from the supplier to a long.
+        final long result = ByteUtils.fromLittleEndian(mockSupplier, 1);
+
+        // Assert: The resulting long should be 0.
+        assertEquals(0L, result);
     }
 }
