@@ -1,21 +1,31 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.util.Date;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TypeHandler_ESTestTest2 extends TypeHandler_ESTest_scaffolding {
+/**
+ * Tests for {@link TypeHandler}.
+ */
+public class TypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        Object object0 = TypeHandler.createValue("", (Object) null);
-        assertEquals("", object0);
+    /**
+     * Tests that the deprecated {@code createValue(String, Object)} method returns the
+     * input string itself when the provided type object is null. This behavior
+     * indicates that a null type defaults to treating the value as a String.
+     */
+    @Test
+    public void createValueWithNullTypeShouldReturnTheStringUnchanged() {
+        // Arrange: Define the input values for the test.
+        final String inputValue = "";
+        final Object nullType = null;
+
+        // Act: Call the method under test.
+        // This method is deprecated, but its behavior is still being verified.
+        @SuppressWarnings("deprecation")
+        final Object result = TypeHandler.createValue(inputValue, nullType);
+
+        // Assert: Verify the outcome is as expected.
+        // When the type is null, the method should return the original string.
+        assertEquals("The returned value should be the input string", inputValue, result);
     }
 }
