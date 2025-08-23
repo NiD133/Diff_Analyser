@@ -1,25 +1,30 @@
 package org.jsoup.select;
 
 import org.jsoup.Jsoup;
-import org.jsoup.TextUtil;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.util.Iterator;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ElementsTestTest9 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Tests for the {@link Elements#text()} method.
+ */
+public class ElementsTest {
 
     @Test
-    public void text() {
-        String h = "<div><p>Hello<p>there<p>world</div>";
-        Document doc = Jsoup.parse(h);
-        assertEquals("Hello there world", doc.select("div > *").text());
+    @DisplayName("text() should return the combined text of all elements, separated by spaces")
+    void textReturnsCombinedTextOfAllElements() {
+        // Arrange
+        String html = "<div><p>Hello</p><p>there</p><p>world</p></div>";
+        Document document = Jsoup.parse(html);
+        Elements elements = document.select("div > p");
+        String expectedText = "Hello there world";
+
+        // Act
+        String actualText = elements.text();
+
+        // Assert
+        assertEquals(expectedText, actualText);
     }
 }
