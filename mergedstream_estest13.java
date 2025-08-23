@@ -1,47 +1,63 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest13 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[9];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, 1, 1);
-        mergedStream0.read(byteArray0, 1, 1);
+/**
+ * Contains tests for the {@link MergedStream} class, focusing on its behavior
+ * when transitioning from its internal buffer to the underlying stream.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Verifies that after the internal buffer is fully read, MergedStream correctly
+     * delegates subsequent read calls to the underlying input stream.
+     */
+    @Test
+    public void shouldReadFromUnderlyingStreamAfterInternalBufferIsExhausted() {
+        // Arrange:
+        // 1. Create an underlying stream that is guaranteed to fail upon reading.
+        //    An unconnected PipedInputStream is perfect for this scenario.
+        PipedInputStream failingUnderlyingStream = new PipedInputStream();
+
+        // 2. Define a buffer to be "pre-pended" by the MergedStream.
+        //    The range [start, end] is inclusive, so start=1 and end=1 defines a 1-byte buffer.
+        byte[] internalBuffer = new byte[10];
+        int bufferStart = 1;
+        int bufferEnd = 1;
+
+        // 3. Instantiate the MergedStream with the buffer and the failing stream.
+        //    The IOContext is not relevant for this test path, so it can be null.
+        MergedStream mergedStream = new MergedStream(null, failingUnderlyingStream, internalBuffer, bufferStart, bufferEnd);
+
+        byte[] destination = new byte[10];
+
+        // Act & Assert - Part 1: The first read should succeed by consuming the internal buffer.
         try {
-            mergedStream0.read(byteArray0, 1, 1);
-            fail("Expecting exception: IOException");
+            int bytesRead = mergedStream.read(destination, 0, 1);
+            assertEquals("Should read exactly one byte from the internal buffer", 1, bytesRead);
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedInputStream", e);
+            fail("Reading from the pre-pended buffer should not cause an IOException: " + e.getMessage());
+        }
+
+        // Act & Assert - Part 2: The second read should fail.
+        // The internal buffer is now exhausted, so MergedStream must delegate to the
+        // underlying stream, which we designed to throw an exception.
+        try {
+            mergedStream.read(destination, 0, 1);
+            fail("Expected an IOException when attempting to read from the underlying stream");
+        } catch (IOException e) {
+            // Verify that the expected exception from the PipedInputStream was thrown.
+            assertTrue(
+                "Exception message should indicate a connection problem",
+                e.getMessage().contains("Pipe not connected")
+            );
         }
     }
 }
