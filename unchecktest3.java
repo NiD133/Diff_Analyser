@@ -2,71 +2,49 @@ package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest3 {
+/**
+ * Tests for {@link Uncheck#accept(IOConsumer, Object)}.
+ */
+class UncheckAcceptTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
+    private AtomicReference<String> sideEffectState;
 
     @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
+    void setUp() {
+        sideEffectState = new AtomicReference<>();
     }
 
     @Test
-    void testAcceptIOConsumerOfTT() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(t -> {
-            throw new IOException();
-        }, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(TestUtils.throwingIOConsumer(), null));
-        Uncheck.accept(t -> TestUtils.compareAndSetThrowsIO(ref1, t), "new1");
-        assertEquals("new1", ref1.get());
+    @DisplayName("Should wrap IOException from the consumer in an UncheckedIOException")
+    void acceptShouldThrowUncheckedIOExceptionWhenConsumerThrowsIOException() {
+        // Define an IOConsumer that always throws an IOException
+        final IOConsumer<String> throwingConsumer = t -> {
+            throw new IOException("Test Exception");
+        };
+
+        // Assert that calling Uncheck.accept with this consumer results in an UncheckedIOException
+        assertThrows(UncheckedIOException.class, () -> Uncheck.accept(throwingConsumer, "anyValue"));
+    }
+
+    @Test
+    @DisplayName("Should execute the consumer when no exception is thrown")
+    void acceptShouldExecuteConsumerSuccessfully() {
+        // Define the input value and the consumer that will be executed
+        final String inputValue = "expected-value";
+        final IOConsumer<String> consumer = sideEffectState::set;
+
+        // Act: Execute the consumer via Uncheck.accept
+        Uncheck.accept(consumer, inputValue);
+
+        // Assert: Verify that the consumer was executed and modified the state as expected
+        assertEquals(inputValue, sideEffectState.get());
     }
 }
