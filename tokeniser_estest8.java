@@ -1,32 +1,32 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.XmlDeclaration;
-import org.junit.runner.RunWith;
 
-public class Tokeniser_ESTestTest8 extends Tokeniser_ESTest_scaffolding {
+/**
+ * Tests for the {@link Tokeniser} class.
+ */
+public class TokeniserTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        XmlTreeBuilder xmlTreeBuilder0 = new XmlTreeBuilder();
-        xmlTreeBuilder0.parse("< ", "< ");
-        Tokeniser tokeniser0 = new Tokeniser(xmlTreeBuilder0);
-        // Undeclared exception!
-        try {
-            tokeniser0.read();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * This test verifies that the Tokeniser crashes as expected when it is created from a
+     * TreeBuilder that has already completed a parsing operation. This is an improper use
+     * of the API, as the builder's internal state (like its character reader) is exhausted.
+     * The test documents the resulting NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void readThrowsNPEWhenCreatedFromConsumedBuilder() {
+        // ARRANGE: Create a builder and run a parse, which consumes its internal reader.
+        // The input "< " represents an incomplete and invalid tag.
+        XmlTreeBuilder builder = new XmlTreeBuilder();
+        builder.parse("< ", "http://example.com");
+
+        // ACT: Create a new Tokeniser from the already-used builder.
+        Tokeniser tokeniser = new Tokeniser(builder);
+
+        // The call to read() is expected to throw a NullPointerException because the
+        // Tokeniser is in an invalid state, having been initialized from a consumed builder.
+        tokeniser.read();
+
+        // ASSERT: The expected exception is declared in the @Test annotation.
     }
 }
