@@ -1,100 +1,78 @@
 package com.google.common.math;
 
-import static com.google.common.math.StatsTesting.ALLOWED_ERROR;
-import static com.google.common.math.StatsTesting.ALL_MANY_VALUES;
-import static com.google.common.math.StatsTesting.EMPTY_STATS_ITERABLE;
 import static com.google.common.math.StatsTesting.MANY_VALUES;
 import static com.google.common.math.StatsTesting.MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.MANY_VALUES_STATS_ITERABLE;
-import static com.google.common.math.StatsTesting.MANY_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
 import static com.google.common.math.StatsTesting.ONE_VALUE;
-import static com.google.common.math.StatsTesting.ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_COUNT;
-import static com.google.common.math.StatsTesting.OTHER_MANY_VALUES_STATS;
 import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE;
-import static com.google.common.math.StatsTesting.OTHER_ONE_VALUE_STATS;
 import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES;
-import static com.google.common.math.StatsTesting.OTHER_TWO_VALUES_STATS;
 import static com.google.common.math.StatsTesting.TWO_VALUES;
-import static com.google.common.math.StatsTesting.TWO_VALUES_STATS;
-import static com.google.common.math.StatsTesting.TWO_VALUES_SUM_OF_PRODUCTS_OF_DELTAS;
-import static com.google.common.math.StatsTesting.assertDiagonalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertHorizontalLinearTransformation;
-import static com.google.common.math.StatsTesting.assertLinearTransformationNaN;
-import static com.google.common.math.StatsTesting.assertStatsApproxEqual;
-import static com.google.common.math.StatsTesting.assertVerticalLinearTransformation;
 import static com.google.common.math.StatsTesting.createFilledPairedStatsAccumulator;
 import static com.google.common.math.StatsTesting.createPartitionedFilledPairedStatsAccumulator;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.Assert.assertThrows;
-import com.google.common.math.StatsTesting.ManyValues;
-import java.util.Collections;
-import junit.framework.TestCase;
-import org.jspecify.annotations.NullUnmarked;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class PairedStatsAccumulatorTestTest1 extends TestCase {
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    private PairedStatsAccumulator emptyAccumulator;
+/**
+ * Tests for {@link PairedStatsAccumulator#count()}.
+ */
+@DisplayName("PairedStatsAccumulator.count()")
+class PairedStatsAccumulatorTest {
 
-    private PairedStatsAccumulator emptyAccumulatorByAddAllEmptyPairedStats;
+    /**
+     * Provides various PairedStatsAccumulator instances for testing. Each instance is created using
+     * different methods (e.g., direct `add`, `addAll` with partitions) to ensure consistent behavior.
+     */
+    private static Stream<Arguments> accumulatorsProvider() {
+        // Scenario 1: Empty accumulator
+        PairedStatsAccumulator emptyAccumulator = new PairedStatsAccumulator();
+        PairedStatsAccumulator emptyAccumulatorByAddAll = new PairedStatsAccumulator();
+        emptyAccumulatorByAddAll.addAll(new PairedStatsAccumulator().snapshot());
 
-    private PairedStatsAccumulator oneValueAccumulator;
-
-    private PairedStatsAccumulator oneValueAccumulatorByAddAllEmptyPairedStats;
-
-    private PairedStatsAccumulator twoValuesAccumulator;
-
-    private PairedStatsAccumulator twoValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator manyValuesAccumulator;
-
-    private PairedStatsAccumulator manyValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator horizontalValuesAccumulator;
-
-    private PairedStatsAccumulator horizontalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator verticalValuesAccumulator;
-
-    private PairedStatsAccumulator verticalValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    private PairedStatsAccumulator constantValuesAccumulator;
-
-    private PairedStatsAccumulator constantValuesAccumulatorByAddAllPartitionedPairedStats;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        emptyAccumulator = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        emptyAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        oneValueAccumulator = new PairedStatsAccumulator();
+        // Scenario 2: Accumulator with a single pair of values
+        PairedStatsAccumulator oneValueAccumulator = new PairedStatsAccumulator();
         oneValueAccumulator.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats = new PairedStatsAccumulator();
-        oneValueAccumulatorByAddAllEmptyPairedStats.add(ONE_VALUE, OTHER_ONE_VALUE);
-        oneValueAccumulatorByAddAllEmptyPairedStats.addAll(emptyAccumulator.snapshot());
-        twoValuesAccumulator = createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
-        twoValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
-        manyValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
-        manyValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
-        horizontalValuesAccumulator = createFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        horizontalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
-        verticalValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES);
-        verticalValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(OTHER_MANY_VALUES_COUNT, ONE_VALUE), OTHER_MANY_VALUES, 2);
-        constantValuesAccumulator = createFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE));
-        constantValuesAccumulatorByAddAllPartitionedPairedStats = createPartitionedFilledPairedStatsAccumulator(Collections.nCopies(MANY_VALUES_COUNT, ONE_VALUE), Collections.nCopies(MANY_VALUES_COUNT, OTHER_ONE_VALUE), 2);
+        PairedStatsAccumulator oneValueAccumulatorByAddAll = new PairedStatsAccumulator();
+        oneValueAccumulatorByAddAll.add(ONE_VALUE, OTHER_ONE_VALUE);
+        oneValueAccumulatorByAddAll.addAll(new PairedStatsAccumulator().snapshot()); // Add an empty snapshot
+
+        // Scenario 3: Accumulator with two pairs of values
+        PairedStatsAccumulator twoValuesAccumulator =
+                createFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES);
+        PairedStatsAccumulator twoValuesAccumulatorByAddAll =
+                createPartitionedFilledPairedStatsAccumulator(TWO_VALUES, OTHER_TWO_VALUES, 1);
+
+        // Scenario 4: Accumulator with many pairs of values
+        PairedStatsAccumulator manyValuesAccumulator =
+                createFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES);
+        PairedStatsAccumulator manyValuesAccumulatorByAddAll =
+                createPartitionedFilledPairedStatsAccumulator(MANY_VALUES, OTHER_MANY_VALUES, 2);
+
+        return Stream.of(
+                arguments("Empty accumulator", emptyAccumulator, 0L),
+                arguments("Empty accumulator from addAll(empty)", emptyAccumulatorByAddAll, 0L),
+                arguments("Single-pair accumulator", oneValueAccumulator, 1L),
+                arguments("Single-pair accumulator with addAll(empty)", oneValueAccumulatorByAddAll, 1L),
+                arguments("Two-pair accumulator", twoValuesAccumulator, 2L),
+                arguments("Two-pair accumulator from partitioned addAll", twoValuesAccumulatorByAddAll, 2L),
+                arguments("Many-pair accumulator", manyValuesAccumulator, (long) MANY_VALUES_COUNT),
+                arguments("Many-pair accumulator from partitioned addAll", manyValuesAccumulatorByAddAll, (long) MANY_VALUES_COUNT)
+        );
     }
 
-    public void testCount() {
-        assertThat(emptyAccumulator.count()).isEqualTo(0);
-        assertThat(emptyAccumulatorByAddAllEmptyPairedStats.count()).isEqualTo(0);
-        assertThat(oneValueAccumulator.count()).isEqualTo(1);
-        assertThat(oneValueAccumulatorByAddAllEmptyPairedStats.count()).isEqualTo(1);
-        assertThat(twoValuesAccumulator.count()).isEqualTo(2);
-        assertThat(twoValuesAccumulatorByAddAllPartitionedPairedStats.count()).isEqualTo(2);
-        assertThat(manyValuesAccumulator.count()).isEqualTo(MANY_VALUES_COUNT);
-        assertThat(manyValuesAccumulatorByAddAllPartitionedPairedStats.count()).isEqualTo(MANY_VALUES_COUNT);
+    @ParameterizedTest(name = "[{index}] {0}: count should be {2}")
+    @MethodSource("accumulatorsProvider")
+    void count_returnsCorrectNumberOfPairs(
+            String description, PairedStatsAccumulator accumulator, long expectedCount) {
+        // WHEN the count is retrieved
+        long actualCount = accumulator.count();
+
+        // THEN it should match the number of pairs added
+        assertThat(actualCount).isEqualTo(expectedCount);
     }
 }
