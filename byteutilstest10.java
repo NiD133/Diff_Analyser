@@ -1,28 +1,37 @@
 package org.apache.commons.compress.utils;
 
 import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
 import org.junit.jupiter.api.Test;
 
-public class ByteUtilsTestTest10 {
+/**
+ * Tests for {@link ByteUtils}.
+ */
+public class ByteUtilsTest {
 
     @Test
-    void testFromLittleEndianFromDataInputUnsignedInt32() throws IOException {
-        final DataInput din = new DataInputStream(new ByteArrayInputStream(new byte[] { 2, 3, 4, (byte) 128 }));
-        assertEquals(2 + 3 * 256 + 4 * 256 * 256 + 128L * 256 * 256 * 256, fromLittleEndian(din, 4));
+    void fromLittleEndianDataInputShouldReadUnsigned32BitValue() throws IOException {
+        // Arrange
+        // These bytes represent the number 2,147,746,562 in little-endian format.
+        // This value (0x80040302) is larger than Integer.MAX_VALUE, which allows us
+        // to verify that the method correctly reads a 4-byte value into a long
+        // without incorrect sign extension.
+        final byte[] littleEndianBytes = {0x02, 0x03, 0x04, (byte) 0x80};
+        final DataInput dataInput = new DataInputStream(new ByteArrayInputStream(littleEndianBytes));
+
+        // The expected value in hexadecimal makes the little-endian conversion obvious.
+        // Bytes: 02 03 04 80 (LE) -> Long: 0x80040302L
+        final long expectedValue = 0x80040302L;
+
+        // Act
+        final long actualValue = fromLittleEndian(dataInput, 4);
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
