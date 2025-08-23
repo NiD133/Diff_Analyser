@@ -1,28 +1,33 @@
 package org.apache.commons.codec.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.apache.commons.codec.DecoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.UnsupportedEncodingException;
-import java.util.BitSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class URLCodec_ESTestTest33 extends URLCodec_ESTest_scaffolding {
+/**
+ * Test suite for the URLCodec class.
+ */
+public class URLCodecTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        byteArray0[0] = (byte) 37;
+    /**
+     * Tests that {@link URLCodec#decodeUrl(byte[])} throws a DecoderException when the
+     * input byte array ends with a single percent sign ('%'). A lone '%' is an
+     * incomplete escape sequence, as it must be followed by two hexadecimal digits.
+     */
+    @Test
+    public void decodeUrlShouldThrowExceptionForIncompleteEscapeSequence() {
+        // A byte array containing just the escape character '%' is an invalid encoding.
+        byte[] bytesWithIncompleteSequence = {'%'};
+
         try {
-            URLCodec.decodeUrl(byteArray0);
-            fail("Expecting exception: Exception");
-        } catch (Exception e) {
-            //
-            // Invalid URL encoding:
-            //
-            verifyException("org.apache.commons.codec.net.URLCodec", e);
+            URLCodec.decodeUrl(bytesWithIncompleteSequence);
+            fail("Expected DecoderException to be thrown for an incomplete escape sequence.");
+        } catch (final DecoderException e) {
+            // The exception is expected. We verify its message to ensure it's thrown for the correct reason.
+            final String expectedMessage = "Invalid URL encoding: Incomplete trailing escape (%) sequence";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
