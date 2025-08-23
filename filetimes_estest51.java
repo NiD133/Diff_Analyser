@@ -1,25 +1,30 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
+import static org.junit.Assert.assertEquals;
+
 import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest51 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test50() throws Throwable {
-        Instant instant0 = FileTimes.ntfsTimeToInstant((-1L));
-        long long0 = FileTimes.toNtfsTime(instant0);
-        assertEquals((-1L), long0);
+    /**
+     * Tests that converting an NTFS time to an Instant and back results in the original NTFS time value.
+     * This is also known as a round-trip or inversion test.
+     */
+    @Test
+    public void testNtfsTimeInstantRoundTripConversion() {
+        // Arrange: Define an original NTFS time value.
+        // Using -1L as a non-trivial test case.
+        final long originalNtfsTime = -1L;
+
+        // Act: Convert the NTFS time to an Instant, and then convert it back.
+        final Instant intermediateInstant = FileTimes.ntfsTimeToInstant(originalNtfsTime);
+        final long roundTripNtfsTime = FileTimes.toNtfsTime(intermediateInstant);
+
+        // Assert: The final NTFS time should be identical to the original value.
+        assertEquals("The round-trip conversion should yield the original value", originalNtfsTime, roundTripNtfsTime);
     }
 }
