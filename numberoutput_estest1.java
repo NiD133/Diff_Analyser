@@ -1,25 +1,26 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NumberOutput_ESTestTest1 extends NumberOutput_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link NumberOutput} class, focusing on handling of invalid arguments.
+ */
+public class NumberOutputTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        // Undeclared exception!
-        try {
-            NumberOutput.outputLong((long) (byte) 99, (byte[]) null, (int) (byte) 91);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.core.io.NumberOutput", e);
-        }
+    /**
+     * Verifies that calling {@code outputLong} with a null buffer
+     * correctly throws a {@code NullPointerException}. The method must not
+     * proceed if the destination buffer does not exist.
+     */
+    @Test(expected = NullPointerException.class)
+    public void outputLongShouldThrowNullPointerExceptionWhenBufferIsNull() {
+        // Given a valid number and offset, but a null buffer
+        long valueToWrite = 99L;
+        byte[] nullBuffer = null;
+        int offset = 91;
+
+        // When attempting to write the long to the null buffer
+        // Then a NullPointerException should be thrown
+        NumberOutput.outputLong(valueToWrite, nullBuffer, offset);
     }
 }
