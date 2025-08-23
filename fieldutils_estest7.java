@@ -1,31 +1,27 @@
 package org.joda.time.field;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FieldUtils_ESTestTest7 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link FieldUtils}.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.verifyValueBounds((DateTimeField) null, 24, (-2147483646), (-2147483646));
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that verifyValueBounds throws a NullPointerException if the DateTimeField argument is null.
+     * The method should fail fast before it even checks the value against the bounds.
+     */
+    @Test(expected = NullPointerException.class)
+    public void verifyValueBounds_shouldThrowNullPointerException_whenFieldIsNull() {
+        // Arrange: The first argument (DateTimeField) is null.
+        // The other arguments' values are irrelevant for this test.
+        DateTimeField nullField = null;
+        int value = 10;
+        int lowerBound = 0;
+        int upperBound = 20;
+
+        // Act & Assert: Call the method and expect a NullPointerException.
+        FieldUtils.verifyValueBounds(nullField, value, lowerBound, upperBound);
     }
 }
