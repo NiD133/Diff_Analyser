@@ -1,45 +1,58 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
+import org.junit.Test;
+
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest29 extends MergedStream_ESTest_scaffolding {
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, false);
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        BufferedInputStream bufferedInputStream0 = new BufferedInputStream(pipedInputStream0);
-        MergedStream mergedStream0 = new MergedStream(iOContext0, bufferedInputStream0, (byte[]) null, 65536, 3);
-        boolean boolean0 = mergedStream0.markSupported();
-        assertTrue(boolean0);
+/**
+ * Contains tests for the {@link MergedStream} class.
+ */
+public class MergedStreamTest {
+
+    /**
+     * Tests that MergedStream correctly reports mark support based on its underlying stream.
+     * If the wrapped InputStream supports mark(), MergedStream should also report that it does.
+     */
+    @Test
+    public void givenUnderlyingStreamSupportsMark_whenMarkSupportedIsCalled_thenReturnsTrue() throws IOException {
+        // Arrange
+        // 1. Set up an IOContext, which is a required dependency for MergedStream.
+        // The specific configuration details are not critical for this test.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.unknown(),
+                false);
+
+        // 2. Create an underlying input stream that supports marking.
+        //    BufferedInputStream is a standard example of such a stream.
+        InputStream underlyingStream = new BufferedInputStream(new PipedInputStream());
+
+        // 3. Instantiate MergedStream with the mark-supporting underlying stream.
+        //    The byte buffer is null for this scenario, so the stream will read
+        //    directly from the underlying source.
+        MergedStream mergedStream = new MergedStream(ioContext, underlyingStream, null, 0, 0);
+
+        // Act
+        boolean isMarkSupported = mergedStream.markSupported();
+
+        // Assert
+        // MergedStream should delegate the markSupported() check to the underlying stream.
+        // Since BufferedInputStream supports marking, the result must be true.
+        assertTrue("MergedStream should report mark support when the underlying stream does.", isMarkSupported);
+        
+        // Cleanup
+        mergedStream.close();
     }
 }
