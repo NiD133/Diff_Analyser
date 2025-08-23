@@ -1,27 +1,23 @@
 package org.apache.commons.cli;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class OptionGroup_ESTestTest6 extends OptionGroup_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link OptionGroup} class.
+ */
+public class OptionGroupTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        OptionGroup optionGroup0 = new OptionGroup();
-        // Undeclared exception!
-        try {
-            optionGroup0.addOption((Option) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.OptionGroup", e);
-        }
+    /**
+     * Verifies that attempting to add a null Option to an OptionGroup
+     * results in a NullPointerException.
+     */
+    @Test(expected = NullPointerException.class)
+    public void addOption_whenOptionIsNull_shouldThrowNullPointerException() {
+        // Arrange: Create a new OptionGroup instance.
+        OptionGroup optionGroup = new OptionGroup();
+
+        // Act: Attempt to add a null option.
+        // The @Test(expected) annotation will handle the assertion.
+        optionGroup.addOption(null);
     }
 }
