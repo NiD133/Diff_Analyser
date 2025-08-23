@@ -1,26 +1,28 @@
 package org.apache.commons.lang3.math;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class IEEE754rUtils_ESTestTest36 extends IEEE754rUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link IEEE754rUtils} class.
+ */
+public class IEEE754rUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        double[] doubleArray0 = new double[0];
-        // Undeclared exception!
+    @Test
+    public void minOfEmptyDoubleArrayShouldThrowIllegalArgumentException() {
+        // Arrange: Create an empty array to test the edge case.
+        final double[] emptyArray = new double[0];
+
+        // Act & Assert: Verify that the method throws the correct exception with the expected message.
         try {
-            IEEE754rUtils.min(doubleArray0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Array cannot be empty.
-            //
-            verifyException("org.apache.commons.lang3.Validate", e);
+            IEEE754rUtils.min(emptyArray);
+            fail("Expected an IllegalArgumentException to be thrown for an empty array.");
+        } catch (final IllegalArgumentException e) {
+            // The Javadoc states that an empty array is illegal.
+            // This also verifies that the underlying validation provides a clear message.
+            assertEquals("The validated array is empty", e.getMessage());
         }
     }
 }
