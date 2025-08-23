@@ -1,33 +1,49 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest90 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode#toString()} method.
+ */
+public class XNodeToStringTest {
 
-    @Test(timeout = 4000)
-    public void test089() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        IIOMetadataNode iIOMetadataNode1 = new IIOMetadataNode();
-        iIOMetadataNode0.appendChild(iIOMetadataNode1);
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        String string0 = xNode0.toString();
-        assertEquals("<null>\n  <null />\n</null>\n", string0);
+    /**
+     * Verifies that {@link XNode#toString()} correctly formats a node with a single, empty child.
+     * The expected output is a pretty-printed, XML-like string with proper indentation.
+     */
+    @Test
+    public void toStringShouldCorrectlyFormatNodeWithSingleChild() {
+        // Arrange
+        // 1. Create a parent node with a single child. We use IIOMetadataNode as a concrete
+        // implementation of org.w3c.dom.Node. Its default node name is null, which the
+        // XNode renders as the string "null".
+        Node parentNode = new IIOMetadataNode();
+        Node childNode = new IIOMetadataNode();
+        parentNode.appendChild(childNode);
+
+        // 2. An XPathParser and Properties are required for XNode instantiation,
+        // though they are not directly relevant to this toString() test.
+        XPathParser xPathParser = new XPathParser((Document) null, false);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(xPathParser, parentNode, variables);
+
+        // 3. Define the expected string. It should represent the parent node containing
+        // the indented child. The child is rendered as a self-closing tag as it is empty.
+        String expectedXmlString =
+                "<null>\n" +
+                "  <null />\n" +
+                "</null>\n";
+
+        // Act
+        String actualXmlString = xNode.toString();
+
+        // Assert
+        assertEquals(expectedXmlString, actualXmlString);
     }
 }
