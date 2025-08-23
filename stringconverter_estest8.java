@@ -1,56 +1,38 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
 import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
 import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
 import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+// The test class name is inherited from the original. 
+// A more descriptive name like `StringConverterTest` would be preferable in a real project.
 public class StringConverter_ESTestTest8 extends StringConverter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        IslamicChronology islamicChronology0 = IslamicChronology.getInstanceUTC();
-        MutableInterval mutableInterval0 = new MutableInterval();
-        // Undeclared exception!
+    /**
+     * Verifies that setInto() throws an IllegalArgumentException when attempting to parse
+     * an interval from a string that is missing the required '/' separator.
+     */
+    @Test
+    public void setIntoInterval_shouldThrowException_forMalformedStringMissingSeparator() {
+        // Arrange: Set up the converter, a target interval, and a malformed input string.
+        StringConverter converter = StringConverter.INSTANCE;
+        ReadWritableInterval interval = new MutableInterval();
+        Chronology chronology = ISOChronology.getInstanceUTC(); // A standard, neutral chronology.
+        String malformedIntervalString = "2023-01-01T10:00:00Z_to_2023-01-01T12:00:00Z";
+
+        // Act & Assert: Attempt the conversion and verify the expected exception.
         try {
-            stringConverter0.setInto((ReadWritableInterval) mutableInterval0, (Object) "The chronology of ehe time does not match", (Chronology) islamicChronology0);
-            fail("Expecting exception: IllegalArgumentException");
+            converter.setInto(interval, malformedIntervalString, chronology);
+            fail("Expected an IllegalArgumentException to be thrown due to the malformed string.");
         } catch (IllegalArgumentException e) {
-            //
-            // Format requires a '/' separator: The chronology of ehe time does not match
-            //
-            verifyException("org.joda.time.convert.StringConverter", e);
+            // Verify that the exception message clearly states the parsing problem.
+            String expectedMessage = "Format requires a '/' separator: " + malformedIntervalString;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
