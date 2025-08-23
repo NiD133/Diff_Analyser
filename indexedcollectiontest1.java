@@ -1,17 +1,19 @@
 package org.apache.commons.collections4.collection;
 
 import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.apache.commons.collections4.Transformer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class IndexedCollectionTestTest1 extends AbstractCollectionTest<String> {
+// Renamed class for clarity and to follow standard naming conventions.
+public class IndexedCollectionTest extends AbstractCollectionTest<String> {
 
     protected Collection<String> decorateCollection(final Collection<String> collection) {
         return IndexedCollection.nonUniqueIndexedCollection(collection, new IntegerTransformer());
@@ -40,6 +42,8 @@ public class IndexedCollectionTestTest1 extends AbstractCollectionTest<String> {
     public Collection<String> makeConfirmedFullCollection() {
         return new ArrayList<>(Arrays.asList(getFullElements()));
     }
+
+
 
     @Override
     public Collection<String> makeFullCollection() {
@@ -76,19 +80,28 @@ public class IndexedCollectionTestTest1 extends AbstractCollectionTest<String> {
     }
 
     @Test
-    void testAddedObjectsCanBeRetrievedByKey() throws Exception {
-        final Collection<String> coll = makeTestCollection();
-        coll.add("12");
-        coll.add("16");
-        coll.add("1");
-        coll.addAll(asList("2", "3", "4"));
-        @SuppressWarnings("unchecked")
-        final IndexedCollection<Integer, String> indexed = (IndexedCollection<Integer, String>) coll;
-        assertEquals("12", indexed.get(12));
-        assertEquals("16", indexed.get(16));
-        assertEquals("1", indexed.get(1));
-        assertEquals("2", indexed.get(2));
-        assertEquals("3", indexed.get(3));
-        assertEquals("4", indexed.get(4));
+    @DisplayName("get() should return an object that was previously added, using its transformed key")
+    void getShouldReturnCorrectObjectForGivenKey() {
+        // Arrange: Create a non-unique indexed collection where the key is the integer value of the string.
+        // Instantiating the specific class under test makes the setup clearer and avoids casting.
+        final IndexedCollection<Integer, String> indexedCollection =
+            IndexedCollection.nonUniqueIndexedCollection(new ArrayList<>(), new IntegerTransformer());
+
+        // Act: Add several elements to the collection.
+        indexedCollection.add("12");
+        indexedCollection.add("16");
+        indexedCollection.add("1");
+        indexedCollection.addAll(asList("2", "3", "4"));
+
+        // Assert: Verify that each added object can be retrieved by its corresponding key.
+        // Using assertAll groups related checks and reports all failures at once.
+        assertAll("Retrieve added objects by key",
+            () -> assertEquals("12", indexedCollection.get(12)),
+            () -> assertEquals("16", indexedCollection.get(16)),
+            () -> assertEquals("1", indexedCollection.get(1)),
+            () -> assertEquals("2", indexedCollection.get(2)),
+            () -> assertEquals("3", indexedCollection.get(3)),
+            () -> assertEquals("4", indexedCollection.get(4))
+        );
     }
 }
