@@ -1,0 +1,36 @@
+package org.jfree.chart.renderer.xy;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Date;
+import java.util.Locale;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.axis.CategoryAnchor;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.plot.DatasetRenderingOrder;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.DefaultHighLowDataset;
+import org.jfree.data.xy.DefaultIntervalXYDataset;
+import org.jfree.data.xy.MatrixSeries;
+import org.jfree.data.xy.MatrixSeriesCollection;
+import org.junit.runner.RunWith;
+
+public class DeviationRenderer_ESTestTest3 extends DeviationRenderer_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test02() throws Throwable {
+        DeviationStepRenderer deviationStepRenderer0 = new DeviationStepRenderer(false, false);
+        assertEquals(0.5F, deviationStepRenderer0.getAlpha(), 0.01F);
+        deviationStepRenderer0.setAlpha(0.0F);
+        assertEquals(0.0F, deviationStepRenderer0.getAlpha(), 0.01F);
+    }
+}
