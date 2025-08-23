@@ -1,22 +1,48 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
+
 import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BCodec_ESTestTest35 extends BCodec_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test34() throws Throwable {
-        BCodec bCodec0 = new BCodec("l9");
-        String string0 = bCodec0.encode("l9", "l9");
-        assertEquals("=?ISO-8859-15?B?bDk=?=", string0);
+/**
+ * Tests for the {@link BCodec} class.
+ */
+public class BCodecTest {
+
+    /**
+     * Tests that the encode method correctly handles a charset alias.
+     * <p>
+     * According to RFC 2047, the encoded-word should contain the canonical
+     * charset name. This test verifies that when an alias ("l9") is provided,
+     * the codec correctly resolves it to its canonical name ("ISO-8859-15")
+     * and uses it in the output string.
+     * </p>
+     *
+     * @throws EncoderException if the encoding fails, which is not expected in this test.
+     */
+    @Test
+    public void testEncodeStringWithCharsetAliasUsesCanonicalNameInResult() throws EncoderException, UnsupportedCharsetException {
+        // Arrange
+        final BCodec bCodec = new BCodec(); // Using default constructor for clarity.
+        final String textToEncode = "l9";
+
+        // "l9" is a known, albeit obscure, alias for the ISO-8859-15 charset.
+        final String charsetAlias = "l9";
+
+        // The expected format is =?charset?B?encoded_text?=
+        // - The charset should be the canonical name "ISO-8859-15".
+        // - 'B' indicates Base64 encoding.
+        // - The Base64 encoding of "l9" is "bDk=".
+        final String expectedEncodedString = "=?ISO-8859-15?B?bDk=?=";
+
+        // Act
+        final String actualEncodedString = bCodec.encode(textToEncode, charsetAlias);
+
+        // Assert
+        assertEquals("The encoded string does not match the expected format.",
+                expectedEncodedString, actualEncodedString);
     }
 }
