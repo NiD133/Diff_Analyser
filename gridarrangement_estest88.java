@@ -1,33 +1,42 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest88 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test87() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(105, 105);
-        Range range0 = new Range(0.0, 0.0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        Size2D size2D0 = gridArrangement0.arrangeRF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
-        assertEquals("Size2D[width=0.0, height=0.0]", size2D0.toString());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Unit tests for the GridArrangement class.
+ */
+public class GridArrangementTest {
+
+    /**
+     * Tests that arranging an empty container with a zero-size constraint
+     * results in a size of zero width and zero height.
+     */
+    @Test
+    public void arrangeRFWithEmptyContainerAndZeroConstraintShouldReturnZeroSize() {
+        // Arrange
+        // The grid dimensions (1x1) are arbitrary since the container is empty.
+        GridArrangement arrangement = new GridArrangement(1, 1);
+        BlockContainer emptyContainer = new BlockContainer();
+
+        // Create a constraint that effectively fixes both width and height to zero.
+        Range zeroRange = new Range(0.0, 0.0);
+        RectangleConstraint zeroConstraint = new RectangleConstraint(zeroRange, zeroRange);
+
+        // Act
+        // The 'RF' in arrangeRF stands for Range-width, Fixed-height.
+        // Here, both are constrained to a fixed value of 0.0.
+        Size2D resultSize = arrangement.arrangeRF(emptyContainer, (Graphics2D) null, zeroConstraint);
+
+        // Assert
+        // The resulting size should have zero width and zero height.
+        assertNotNull("The resulting size should not be null.", resultSize);
+        assertEquals("Width should be 0.0 for a zero-size constraint.", 0.0, resultSize.getWidth(), 0.0);
+        assertEquals("Height should be 0.0 for a zero-size constraint.", 0.0, resultSize.getHeight(), 0.0);
     }
 }
