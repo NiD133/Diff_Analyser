@@ -1,21 +1,32 @@
 package org.apache.commons.cli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class DeprecatedAttributes_ESTestTest2 extends DeprecatedAttributes_ESTest_scaffolding {
+/**
+ * Tests for the {@link DeprecatedAttributes} class.
+ */
+public class DeprecatedAttributesTest {
 
-    @Test(timeout = 4000)
-    public void test1() throws Throwable {
-        DeprecatedAttributes.Builder deprecatedAttributes_Builder0 = DeprecatedAttributes.builder();
-        DeprecatedAttributes.Builder deprecatedAttributes_Builder1 = deprecatedAttributes_Builder0.setSince("+,ygu");
-        DeprecatedAttributes deprecatedAttributes0 = deprecatedAttributes_Builder1.get();
-        String string0 = deprecatedAttributes0.getSince();
-        assertEquals("", deprecatedAttributes0.getDescription());
-        assertFalse(deprecatedAttributes0.isForRemoval());
-        assertEquals("+,ygu", string0);
+    /**
+     * Tests that the 'since' attribute can be set correctly using the builder,
+     * and that other attributes retain their expected default values.
+     */
+    @Test
+    public void testBuilderSetsSinceAndRetainsDefaults() {
+        // Arrange
+        final String expectedSince = "1.5";
+
+        // Act
+        final DeprecatedAttributes attributes = DeprecatedAttributes.builder()
+                .setSince(expectedSince)
+                .get();
+
+        // Assert
+        assertEquals("The 'since' attribute should match the value set.", expectedSince, attributes.getSince());
+        assertEquals("The 'description' attribute should be empty by default.", "", attributes.getDescription());
+        assertFalse("The 'forRemoval' attribute should be false by default.", attributes.isForRemoval());
     }
 }
