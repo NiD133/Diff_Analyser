@@ -1,23 +1,17 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.FormatFlagsConversionMismatchException;
-import java.util.IllegalFormatConversionException;
-import java.util.IllegalFormatFlagsException;
-import java.util.IllegalFormatWidthException;
-import java.util.MissingFormatArgumentException;
-import java.util.MissingFormatWidthException;
-import java.util.UnknownFormatConversionException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class Validate_ESTestTest46 extends Validate_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Validate} utility class.
+ */
+public class ValidateTest {
 
-    @Test(timeout = 4000)
-    public void test45() throws Throwable {
-        Validate.notNull((Object) "Yh'=Xhkb9Q");
+    @Test
+    public void notNullWithNonNullObjectDoesNotThrowException() {
+        // This test covers the "happy path" scenario for Validate.notNull().
+        // The method is expected to complete without throwing an exception
+        // when provided with a non-null object.
+        Validate.notNull(new Object());
     }
 }
