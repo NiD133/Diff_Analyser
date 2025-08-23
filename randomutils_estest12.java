@@ -1,20 +1,40 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.security.SecureRandom;
-import java.util.Random;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtils_ESTestTest12 extends RandomUtils_ESTest_scaffolding {
+/**
+ * Test suite for the {@link RandomUtils} class.
+ */
+public class RandomUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        RandomUtils randomUtils0 = RandomUtils.secureStrong();
-        long long0 = randomUtils0.randomLong(0L, 452L);
-        //  // Unstable assertion: assertEquals(428L, long0);
+    /**
+     * Verifies that {@code RandomUtils.secureStrong().randomLong(start, end)}
+     * generates a long value within the expected range [start, end).
+     */
+    @Test
+    public void secureStrongRandomLongReturnsValueInCorrectRange() {
+        // Arrange
+        final long startInclusive = 0L;
+        final long endExclusive = 452L;
+        final RandomUtils randomUtils = RandomUtils.secureStrong();
+
+        // Act
+        // Generate a random long within the specified bounds.
+        final long generatedLong = randomUtils.randomLong(startInclusive, endExclusive);
+
+        // Assert
+        // A random number cannot be asserted to be a specific value.
+        // Instead, we verify that it falls within the specified boundaries.
+        assertTrue(
+            "The generated long should be greater than or equal to the start boundary. " +
+            "Expected >= " + startInclusive + ", but was " + generatedLong,
+            generatedLong >= startInclusive
+        );
+        assertTrue(
+            "The generated long should be less than the exclusive end boundary. " +
+            "Expected < " + endExclusive + ", but was " + generatedLong,
+            generatedLong < endExclusive
+        );
     }
 }
