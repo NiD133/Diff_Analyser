@@ -1,29 +1,35 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
+import org.junit.Test;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class JsonTreeReader_ESTestTest64 extends JsonTreeReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link JsonTreeReader} class.
+ */
+public class JsonTreeReaderTest {
 
-    @Test(timeout = 4000)
-    public void test063() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        String string0 = jsonTreeReader0.getPreviousPath();
-        assertEquals("$[0]", string0);
+    /**
+     * Verifies that getPreviousPath() returns the JSON path of the first element's index
+     * immediately after beginArray() is called.
+     */
+    @Test
+    public void getPreviousPath_afterBeginArray_returnsPathOfFirstElementIndex() throws IOException {
+        // Arrange
+        JsonArray emptyJsonArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyJsonArray);
+
+        // Consume the BEGIN_ARRAY token to enter the array context.
+        // The reader is now positioned just before the first element.
+        reader.beginArray();
+
+        // Act
+        String path = reader.getPreviousPath();
+
+        // Assert
+        String expectedPath = "$[0]";
+        assertEquals("After calling beginArray(), getPreviousPath() should return the path to the first element's index.",
+                expectedPath, path);
     }
 }
