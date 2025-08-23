@@ -1,30 +1,33 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest33 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test032() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Double double0 = xNode0.getDoubleBody((Double) null);
-        assertNull(double0);
+import static org.junit.Assert.assertNull;
+
+/**
+ * Test suite for the XNode class.
+ */
+public class XNodeTest {
+
+    /**
+     * Tests that getDoubleBody() returns the provided default value (null in this case)
+     * when the XML node has no body content.
+     */
+    @Test
+    public void getDoubleBodyShouldReturnNullDefaultWhenNodeBodyIsEmpty() {
+        // Arrange: Create an XNode from an empty XML node, which results in a null body.
+        Node emptyXmlNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyXmlNode, new Properties());
+        Double defaultValue = null;
+
+        // Act: Call the method under test with a null default value.
+        Double result = xNode.getDoubleBody(defaultValue);
+
+        // Assert: The method should return the provided default value because the node's body is empty.
+        assertNull("Expected the default value (null) when the node body is empty", result);
     }
 }
