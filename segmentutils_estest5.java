@@ -1,17 +1,27 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SegmentUtils_ESTestTest5 extends SegmentUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link SegmentUtils} class.
+ */
+public class SegmentUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        int int0 = SegmentUtils.countArgs("1.8()JbKnQPYyNxq!");
-        assertEquals(0, int0);
+    /**
+     * Tests that {@link SegmentUtils#countArgs(String)} correctly returns 0
+     * for a method descriptor that has no arguments.
+     */
+    @Test
+    public void countArgsShouldReturnZeroForMethodWithNoArguments() {
+        // Arrange: A standard Java method descriptor for a method that takes no arguments
+        // and returns void. The key part is the empty parentheses "()".
+        final String descriptorWithNoArgs = "()V";
+
+        // Act: Call the method to count the arguments in the descriptor.
+        final int argumentCount = SegmentUtils.countArgs(descriptorWithNoArgs);
+
+        // Assert: The result should be 0, as there are no types listed between the parentheses.
+        assertEquals(0, argumentCount);
     }
 }
