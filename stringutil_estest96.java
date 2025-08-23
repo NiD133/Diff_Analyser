@@ -1,30 +1,27 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest96 extends StringUtil_ESTest_scaffolding {
+/**
+ * Note: The original test was auto-generated and appeared to be testing for a
+ * resource-exhaustion error under specific, unclear conditions.
+ * This version has been rewritten to be a clear, deterministic functional test
+ * that verifies the correctness of `normaliseWhitespace` with large input.
+ */
+public class StringUtilTest { // Renamed for clarity
 
-    @Test(timeout = 4000)
-    public void test95() throws Throwable {
-        String string0 = StringUtil.padding(8170, (-1));
-        StringUtil.normaliseWhitespace(string0);
-        // Undeclared exception!
-        StringUtil.normaliseWhitespace(string0);
+    @Test
+    public void normaliseWhitespaceWithLargePaddedStringReturnsSingleSpace() {
+        // Arrange: Create a very long string consisting only of spaces.
+        // The original test used 8170, which we preserve here in case of significance.
+        final int largePaddingWidth = 8170;
+        String largeWhitespaceString = StringUtil.padding(largePaddingWidth, -1); // -1 means unlimited padding
+
+        // Act: Normalize the whitespace in the large string.
+        String result = StringUtil.normaliseWhitespace(largeWhitespaceString);
+
+        // Assert: The entire string of spaces should be collapsed into a single space.
+        assertEquals(" ", result);
     }
 }
