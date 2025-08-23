@@ -1,24 +1,30 @@
 package com.google.gson;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.TestTypes.BagOfPrimitives;
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonReader;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
-import java.io.IOException;
+
 import java.io.StringReader;
 import org.junit.Test;
 
-public class JsonParserTestTest11 {
+/**
+ * Unit tests for {@link JsonParser}.
+ */
+public class JsonParserTest {
 
     @Test
-    public void testParseReader() {
-        StringReader reader = new StringReader("{a:10,b:'c'}");
-        JsonElement e = JsonParser.parseReader(reader);
-        assertThat(e.isJsonObject()).isTrue();
-        assertThat(e.getAsJsonObject().get("a").getAsInt()).isEqualTo(10);
-        assertThat(e.getAsJsonObject().get("b").getAsString()).isEqualTo("c");
+    public void parseReader_withLenientJson_succeeds() {
+        // Arrange
+        // JsonParser is lenient by default, so it should handle non-standard JSON
+        // like unquoted keys and single-quoted string values.
+        String lenientJson = "{a:10,b:'c'}";
+        StringReader reader = new StringReader(lenientJson);
+
+        // Act
+        JsonElement parsedElement = JsonParser.parseReader(reader);
+
+        // Assert
+        assertThat(parsedElement.isJsonObject()).isTrue();
+        JsonObject jsonObject = parsedElement.getAsJsonObject();
+        assertThat(jsonObject.get("a").getAsInt()).isEqualTo(10);
+        assertThat(jsonObject.get("b").getAsString()).isEqualTo("c");
     }
 }
