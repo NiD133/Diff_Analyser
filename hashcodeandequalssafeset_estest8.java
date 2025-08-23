@@ -2,29 +2,29 @@ package org.mockito.internal.util.collections;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class HashCodeAndEqualsSafeSet_ESTestTest8 extends HashCodeAndEqualsSafeSet_ESTest_scaffolding {
+/**
+ * Test suite for {@link HashCodeAndEqualsSafeSet}.
+ * Note: The original test class name 'HashCodeAndEqualsSafeSet_ESTestTest8' 
+ * has been simplified for clarity.
+ */
+public class HashCodeAndEqualsSafeSetTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Object[] objectArray0 = new Object[3];
-        Object object0 = new Object();
-        objectArray0[0] = object0;
-        HashCodeAndEqualsSafeSet hashCodeAndEqualsSafeSet0 = HashCodeAndEqualsSafeSet.of(objectArray0);
-        boolean boolean0 = hashCodeAndEqualsSafeSet0.remove(object0);
-        assertTrue(boolean0);
+    @Test
+    public void remove_shouldReturnTrueAndModifySet_whenElementIsPresent() {
+        // Arrange: Create a set containing a specific element.
+        Object elementToRemove = new Object();
+        HashCodeAndEqualsSafeSet safeSet = HashCodeAndEqualsSafeSet.of(elementToRemove);
+        
+        // Pre-condition check to ensure the initial state is correct.
+        assertEquals("Precondition: Set should contain one element before removal.", 1, safeSet.size());
+
+        // Act: Attempt to remove the element from the set.
+        boolean wasRemoved = safeSet.remove(elementToRemove);
+
+        // Assert: Verify that the removal was successful and the set's state was updated correctly.
+        assertTrue("remove() should return true for an element that exists in the set.", wasRemoved);
+        assertTrue("The set should be empty after its only element is removed.", safeSet.isEmpty());
+        assertFalse("The element should no longer be present in the set after removal.", safeSet.contains(elementToRemove));
     }
 }
