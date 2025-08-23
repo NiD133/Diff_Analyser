@@ -1,33 +1,26 @@
 package org.apache.commons.collections4.comparators;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.util.BitSet;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ExceptionClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
+
+// Note: The original class name and extension are retained for context.
+// A more conventional name would be "ComparatorChainTest".
 public class ComparatorChain_ESTestTest36 extends ComparatorChain_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test35() throws Throwable {
-        ComparatorChain<ComparatorPredicate.Criterion> comparatorChain0 = new ComparatorChain<ComparatorPredicate.Criterion>();
-        int int0 = comparatorChain0.size();
-        assertEquals(0, int0);
+    /**
+     * Tests that the size() method returns 0 for a newly created, empty ComparatorChain.
+     */
+    @Test
+    public void sizeOfNewEmptyChainShouldBeZero() {
+        // Arrange: Create a new ComparatorChain using the default constructor.
+        // This chain is expected to be empty.
+        final ComparatorChain<Object> emptyChain = new ComparatorChain<>();
+
+        // Act: Get the size of the newly created chain.
+        final int size = emptyChain.size();
+
+        // Assert: Verify that the size is 0.
+        assertEquals(0, size);
     }
 }
