@@ -1,28 +1,26 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest6 extends Entities_ESTest_scaffolding {
+/**
+ * Tests for the {@link Entities} class.
+ */
+public class EntitiesTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        String string0 = Entities.escape((String) null, document_OutputSettings0);
-        assertEquals("", string0);
+    /**
+     * Verifies that calling Entities.escape() with a null input string
+     * returns an empty string, preventing NullPointerExceptions.
+     */
+    @Test
+    public void escapeWithNullInputShouldReturnEmptyString() {
+        // Arrange: Create the necessary configuration for the method under test.
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+
+        // Act: Call the escape method with a null input.
+        String result = Entities.escape(null, outputSettings);
+
+        // Assert: Verify that the result is an empty string as expected.
+        assertEquals("", result);
     }
 }
