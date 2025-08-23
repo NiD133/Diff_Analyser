@@ -1,27 +1,33 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+import static org.junit.Assert.assertEquals;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LoopingListIterator_ESTestTest16 extends LoopingListIterator_ESTest_scaffolding {
+/**
+ * Contains tests for the LoopingListIterator class.
+ * This is a cleaned-up version of a single test case.
+ */
+public class LoopingListIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        LoopingListIterator<Object> loopingListIterator0 = new LoopingListIterator<Object>(linkedList0);
-        loopingListIterator0.add(linkedList0);
-        int int0 = loopingListIterator0.previousIndex();
-        assertEquals(0, int0);
+    /**
+     * Tests that after adding an element to an empty list via the iterator,
+     * previousIndex() correctly returns 0.
+     */
+    @Test
+    public void previousIndexShouldBeZeroAfterAddingFirstElement() {
+        // Arrange: Create a LoopingListIterator for an empty list.
+        final List<String> list = new LinkedList<>();
+        final LoopingListIterator<String> iterator = new LoopingListIterator<>(list);
+
+        // Act: Add an element to the list using the iterator.
+        // According to the ListIterator#add contract, the cursor is now positioned
+        // immediately after the new element.
+        iterator.add("Element 1");
+
+        // Assert: The previousIndex() should be the index of the element that was just added (0).
+        assertEquals("The previous index should point to the newly added element.", 0, iterator.previousIndex());
     }
 }
