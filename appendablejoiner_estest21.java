@@ -1,41 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.sql.SQLNonTransientConnectionException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import org.apache.commons.lang3.function.FailableBiConsumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class AppendableJoiner_ESTestTest21 extends AppendableJoiner_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        AppendableJoiner.Builder<StringBuilder> appendableJoiner_Builder0 = AppendableJoiner.builder();
-        AppendableJoiner<StringBuilder> appendableJoiner0 = appendableJoiner_Builder0.get();
-        ArrayList<StringBuilder> arrayList0 = new ArrayList<StringBuilder>();
-        // Undeclared exception!
-        try {
-            appendableJoiner0.join((StringBuilder) null, (Iterable<StringBuilder>) arrayList0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.lang3.AppendableJoiner", e);
-        }
+/**
+ * Unit tests for {@link AppendableJoiner}.
+ */
+public class AppendableJoinerTest {
+
+    /**
+     * Tests that the join() method throws a NullPointerException when the target
+     * StringBuilder is null.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testJoinWithNullStringBuilderThrowsNullPointerException() {
+        // Arrange
+        // Create a default joiner instance.
+        final AppendableJoiner<String> joiner = AppendableJoiner.builder().get();
+        
+        // The list of elements to join can be empty for this test's purpose.
+        final List<String> elements = Collections.emptyList();
+        
+        // Act & Assert
+        // The join method should throw a NullPointerException when the target StringBuilder is null.
+        joiner.join((StringBuilder) null, elements);
     }
 }
