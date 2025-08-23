@@ -1,28 +1,22 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class StringUtil_ESTestTest67 extends StringUtil_ESTest_scaffolding {
+/**
+ * Tests for the {@link StringUtil} class.
+ */
+public class StringUtilTest {
 
-    @Test(timeout = 4000)
-    public void test66() throws Throwable {
-        boolean boolean0 = StringUtil.isInvisibleChar(173);
-        assertTrue(boolean0);
+    @Test
+    public void isInvisibleCharIdentifiesSoftHyphenAsInvisible() {
+        // The character code 173 (U+00AD) represents a soft hyphen (&shy;).
+        // This character is used to suggest a line-break point and is not typically visible.
+        final int softHyphenCodePoint = 173;
+
+        assertTrue(
+            "The soft hyphen character should be considered invisible.",
+            StringUtil.isInvisibleChar(softHyphenCodePoint)
+        );
     }
 }
