@@ -1,23 +1,30 @@
 package org.apache.commons.cli.help;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.BiFunction;
 import org.apache.commons.cli.Option;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class OptionFormatter_ESTestTest31 extends OptionFormatter_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        Option option0 = new Option((String) null, (String) null);
-        OptionFormatter optionFormatter0 = OptionFormatter.from(option0);
-        String string0 = optionFormatter0.getBothOpt();
-        assertEquals("", string0);
+/**
+ * Tests for {@link OptionFormatter}.
+ * This class focuses on verifying the formatting logic for command-line options.
+ */
+public class OptionFormatterTest {
+
+    /**
+     * Verifies that getBothOpt() returns an empty string when an Option
+     * is created without a short or long name.
+     */
+    @Test
+    public void getBothOpt_shouldReturnEmptyString_whenOptionHasNoNames() {
+        // Arrange: Create an option with null for both the short and long name.
+        final Option optionWithNoNames = new Option(null, null);
+        final OptionFormatter formatter = OptionFormatter.from(optionWithNoNames);
+
+        // Act: Get the formatted string representing both option names.
+        final String formattedOpt = formatter.getBothOpt();
+
+        // Assert: The result should be an empty string, as there are no names to format.
+        assertEquals("The formatted string should be empty for an option with no names.", "", formattedOpt);
     }
 }
