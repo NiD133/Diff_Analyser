@@ -1,77 +1,52 @@
 package org.apache.commons.io.input;
 
-import static org.apache.commons.io.IOUtils.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest9 {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+class SequenceReaderTest {
 
-    private static final char NUL = 0;
-
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
-
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
-
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
-
-    private static class CustomReader extends Reader {
-
-        boolean closed;
-
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
-        }
+    /**
+     * Verifies that a reader has reached the end of the stream (EOF) and
+     * consistently returns EOF on subsequent reads.
+     *
+     * @param reader The reader to check.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void assertReaderIsAtEof(final Reader reader) throws IOException {
+        final int eof = -1;
+        assertEquals(eof, reader.read(), "Reader should be at the end of the stream.");
+        // Check a second time to ensure it stays at EOF
+        assertEquals(eof, reader.read(), "Reader should remain at the end of the stream.");
     }
 
     @Test
-    void testReadCollection() throws IOException {
-        final Collection<Reader> readers = new ArrayList<>();
-        readers.add(new StringReader("F"));
-        readers.add(new StringReader("B"));
-        try (Reader reader = new SequenceReader(readers)) {
-            assertEquals('F', reader.read());
-            assertEquals('B', reader.read());
-            checkReadEof(reader);
+    @DisplayName("Reads from a collection of readers sequentially until all are exhausted")
+    void read_withCollectionOfReaders_readsAllInSequence() throws IOException {
+        // Arrange: Create a collection of two readers with single-character content.
+        final Collection<Reader> readers = Arrays.asList(
+            new StringReader("A"),
+            new StringReader("B")
+        );
+
+        // Act & Assert: Use a try-with-resources to ensure the SequenceReader is closed.
+        try (final Reader sequenceReader = new SequenceReader(readers)) {
+            // Assert that characters are read in the correct order from the underlying readers.
+            assertEquals('A', sequenceReader.read(), "Should read the character from the first reader.");
+            assertEquals('B', sequenceReader.read(), "Should read the character from the second reader.");
+
+            // Assert that the end of the stream is reached after all readers are consumed.
+            assertReaderIsAtEof(sequenceReader);
         }
     }
 }
