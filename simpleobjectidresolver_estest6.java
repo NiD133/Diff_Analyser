@@ -2,28 +2,51 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SimpleObjectIdResolver_ESTestTest6 extends SimpleObjectIdResolver_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link SimpleObjectIdResolver} class.
+ */
+public class SimpleObjectIdResolverTest {
 
-    @Test(timeout = 4000)
-    public void test5() throws Throwable {
-        SimpleObjectIdResolver simpleObjectIdResolver0 = new SimpleObjectIdResolver();
-        Class<Object> class0 = Object.class;
-        ObjectIdGenerator.IdKey objectIdGenerator_IdKey0 = new ObjectIdGenerator.IdKey(class0, class0, simpleObjectIdResolver0);
-        simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, class0);
-        // Undeclared exception!
+    /**
+     * This test verifies that attempting to bind an ID that is already associated
+     * with an object to a new, different object results in an IllegalStateException.
+     * This prevents an ID from being accidentally reassigned.
+     */
+    @Test
+    public void bindItem_whenIdIsAlreadyBound_throwsIllegalStateExceptionOnRebind() {
+        // Arrange: Create a resolver, define a unique ID, and bind it to an initial object.
+        SimpleObjectIdResolver resolver = new SimpleObjectIdResolver();
+        Object initialObject = new Object();
+        
+        // Use distinct types for the key's components to make the test's intent clear.
+        ObjectIdGenerator.IdKey idKey = new ObjectIdGenerator.IdKey(
+                Object.class, // Type
+                String.class, // Scope
+                "test-id-123" // Key
+        );
+
+        // The first binding of the ID to an object should succeed.
+        resolver.bindItem(idKey, initialObject);
+
+        // Act & Assert: Attempt to re-bind the same ID to a different object (in this case, null).
+        // This action is expected to throw an IllegalStateException.
         try {
-            simpleObjectIdResolver0.bindItem(objectIdGenerator_IdKey0, (Object) null);
-            fail("Expecting exception: IllegalStateException");
+            resolver.bindItem(idKey, null);
+            fail("Expected an IllegalStateException because the ID is already bound to a different object.");
         } catch (IllegalStateException e) {
-            //
-            // Object Id conflict: Id [ObjectId: key=com.fasterxml.jackson.annotation.SimpleObjectIdResolver@1, type=java.lang.Object, scope=java.lang.Object] already bound to an Object (type: `java.lang.Class`, value: java.lang.Class@0000000003): attempt to re-bind to a different Object (null)
-            //
-            verifyException("com.fasterxml.jackson.annotation.SimpleObjectIdResolver", e);
+            // Verify that the exception and its message are correct.
+            String actualMessage = e.getMessage();
+            String expectedMessageStart = "Object Id conflict";
+
+            assertTrue(
+                "Exception message should indicate an ID conflict.",
+                actualMessage.startsWith(expectedMessageStart)
+            );
+            assertTrue(
+                "Exception message should contain the string representation of the conflicting ID key.",
+                actualMessage.contains(idKey.toString())
+            );
         }
     }
 }
