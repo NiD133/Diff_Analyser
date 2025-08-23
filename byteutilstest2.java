@@ -1,28 +1,35 @@
 package org.apache.commons.compress.utils;
 
-import static org.apache.commons.compress.utils.ByteUtils.fromLittleEndian;
-import static org.apache.commons.compress.utils.ByteUtils.toLittleEndian;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.ByteArrayInputStream;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.Arrays;
-import org.apache.commons.compress.utils.ByteUtils.InputStreamByteSupplier;
-import org.apache.commons.compress.utils.ByteUtils.OutputStreamByteConsumer;
-import org.junit.jupiter.api.Test;
+import java.io.OutputStream;
 
-public class ByteUtilsTestTest2 {
+/**
+ * This test suite evaluates the behavior of the ByteUtils.toLittleEndian method,
+ * focusing on edge cases related to its parameters.
+ */
+public class ByteUtilsTest {
 
+    /**
+     * Tests that calling toLittleEndian with a negative length argument
+     * results in no bytes being written to the OutputStream.
+     * This is because the internal loop condition (i < length) is immediately false.
+     */
     @Test
-    void testFromLittleEndianFromArrayOneArg() {
-        final byte[] b = { 2, 3, 4 };
-        assertEquals(2 + 3 * 256 + 4 * 256 * 256, fromLittleEndian(b));
+    public void toLittleEndianWithOutputStreamShouldWriteNoBytesForNegativeLength() throws IOException {
+        // Arrange: Set up an in-memory output stream and define the input parameters.
+        // A negative length is an invalid edge case we want to test.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        long valueToWrite = 8L;
+        int negativeLength = -1;
+
+        // Act: Call the method under test with the prepared parameters.
+        ByteUtils.toLittleEndian(outputStream, valueToWrite, negativeLength);
+
+        // Assert: Verify that the output stream is empty, confirming that
+        // no data was written for a negative length.
+        assertEquals("No bytes should be written for a negative length", 0, outputStream.size());
     }
 }
