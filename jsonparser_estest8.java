@@ -1,22 +1,34 @@
 package com.google.gson;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
+import static org.junit.Assert.assertEquals;
+
 import java.io.Reader;
 import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonParser_ESTestTest8 extends JsonParser_ESTest_scaffolding {
+/**
+ * Contains tests for {@link JsonParser}, focusing on its lenient parsing behavior.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
-        StringReader stringReader0 = new StringReader("M(");
-        JsonPrimitive jsonPrimitive0 = (JsonPrimitive) jsonParser0.parse((Reader) stringReader0);
-        assertFalse(jsonPrimitive0.isBoolean());
+    /**
+     * Tests that parsing an unquoted string, which is invalid in strict JSON,
+     * is handled leniently by being parsed as a JsonPrimitive containing that string.
+     * This is the default behavior of the parser.
+     */
+    @Test
+    public void parseReader_withUnquotedString_parsesAsJsonPrimitiveString() {
+        // Arrange
+        String unquotedString = "M(";
+        Reader reader = new StringReader(unquotedString);
+        JsonElement expectedElement = new JsonPrimitive(unquotedString);
+
+        // Act
+        // The parseReader method uses a lenient JsonReader by default,
+        // which allows it to successfully parse unquoted strings.
+        JsonElement actualElement = JsonParser.parseReader(reader);
+
+        // Assert
+        assertEquals(expectedElement, actualElement);
     }
 }
