@@ -1,30 +1,29 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class BoundedReader_ESTestTest10 extends BoundedReader_ESTest_scaffolding {
+/**
+ * Tests for {@link BoundedReader} focusing on edge cases and invalid arguments.
+ */
+public class BoundedReaderTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        BoundedReader boundedReader0 = new BoundedReader((Reader) null, 1);
-        char[] charArray0 = new char[1];
-        // Undeclared exception!
-        try {
-            boundedReader0.read(charArray0, 1, 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.io.input.BoundedReader", e);
-        }
+    /**
+     * Verifies that the read(char[], int, int) method throws a NullPointerException
+     * when the BoundedReader is constructed with a null underlying reader.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testReadWithNullReaderThrowsNullPointerException() throws IOException {
+        // Arrange: Create a BoundedReader with a null target reader.
+        // The max size is arbitrary but required by the constructor.
+        final int maxSize = 10;
+        final BoundedReader boundedReader = new BoundedReader(null, maxSize);
+        final char[] buffer = new char[5];
+
+        // Act & Assert: Calling read should throw a NullPointerException
+        // because it will attempt to delegate to the null reader.
+        boundedReader.read(buffer, 0, buffer.length);
     }
 }
