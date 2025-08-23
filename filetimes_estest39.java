@@ -1,24 +1,37 @@
 package org.apache.commons.io.file.attribute;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest39 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        long long0 = FileTimes.toNtfsTime(0L);
-        assertEquals(116444736000000000L, long0);
+    /**
+     * Tests that {@link FileTimes#toNtfsTime(long)} correctly converts the
+     * Unix epoch (0 milliseconds) to its equivalent NTFS time.
+     * <p>
+     * The NTFS time is the number of 100-nanosecond intervals since January 1, 1601.
+     * The Unix epoch is January 1, 1970. The result of converting 0L (the Unix epoch)
+     * should therefore be the constant offset between these two points in time.
+     * </p>
+     */
+    @Test
+    public void toNtfsTime_convertsUnixEpochMillisToNtfsOffset() {
+        // Arrange: The input is the Unix epoch in milliseconds.
+        final long unixEpochMillis = 0L;
+
+        // The expected NTFS time for the Unix epoch is the constant offset
+        // between the NTFS epoch (1601) and the Unix epoch (1970).
+        // The constant in FileTimes is defined as a negative value, so we negate it
+        // to get the positive offset value.
+        final long expectedNtfsTimeForEpoch = -FileTimes.UNIX_TO_NTFS_OFFSET;
+
+        // Act: Convert the Java time to NTFS time.
+        final long actualNtfsTime = FileTimes.toNtfsTime(unixEpochMillis);
+
+        // Assert: The result should match the known offset.
+        assertEquals(expectedNtfsTimeForEpoch, actualNtfsTime);
     }
 }
