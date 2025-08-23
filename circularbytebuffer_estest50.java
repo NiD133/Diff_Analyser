@@ -1,18 +1,29 @@
 package org.apache.commons.io.input.buffer;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest50 extends CircularByteBuffer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        circularByteBuffer0.clear();
-        assertEquals(8192, circularByteBuffer0.getSpace());
+/**
+ * Tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
+
+    @Test
+    public void clear_onNewEmptyBuffer_resetsSpaceToFullCapacity() {
+        // Arrange
+        // A new buffer is created with the default size, so it's initially empty.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final int expectedCapacity = IOUtils.DEFAULT_BUFFER_SIZE;
+
+        // Act
+        // The clear operation is called on the already empty buffer.
+        buffer.clear();
+
+        // Assert
+        // The available space should be equal to the buffer's total capacity.
+        assertEquals("After clearing a new buffer, space should equal its full capacity.",
+                expectedCapacity, buffer.getSpace());
     }
 }
