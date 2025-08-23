@@ -1,24 +1,23 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class UtcInstant_ESTestTest54 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for the {@link UtcInstant} class.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test53() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        boolean boolean0 = utcInstant0.isAfter(utcInstant0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that isAfter() returns false when an instant is compared to itself,
+     * which is a fundamental property for any consistent comparison method.
+     */
+    @Test
+    public void isAfter_whenComparedToSelf_returnsFalse() {
+        // Arrange: Create an arbitrary instant. The specific value does not matter for this test.
+        UtcInstant instant = UtcInstant.ofModifiedJulianDay(0L, 0L);
+
+        // Act & Assert: An instant should not be considered "after" itself.
+        assertFalse("An instant should not be considered after itself.", instant.isAfter(instant));
     }
 }
