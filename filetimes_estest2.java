@@ -1,24 +1,26 @@
 package org.apache.commons.io.file.attribute;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
 
-public class FileTimes_ESTestTest2 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for {@link FileTimes}.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        boolean boolean0 = FileTimes.isUnixTime((-2147483648L));
-        assertTrue(boolean0);
+    /**
+     * Tests that {@link FileTimes#isUnixTime(long)} returns true for the minimum value
+     * of a 32-bit signed integer. This value represents the lower bound of the traditional
+     * Unix time range, which is significant due to the "Year 2038 problem" context.
+     */
+    @Test
+    public void isUnixTimeShouldReturnTrueForMinimum32BitIntegerValue() {
+        // The value Integer.MIN_VALUE (-2^31) corresponds to 1901-12-13.
+        // It is the earliest time representable by a 32-bit signed Unix timestamp.
+        final long minUnixTimeSeconds = Integer.MIN_VALUE;
+
+        assertTrue("The minimum 32-bit integer value should be considered a valid Unix time",
+            FileTimes.isUnixTime(minUnixTimeSeconds));
     }
 }
