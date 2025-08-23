@@ -2,25 +2,29 @@ package org.jsoup.parser;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class TokenQueue_ESTestTest63 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for {@link TokenQueue}.
+ * This class contains tests for the chompBalanced method.
+ */
+public class TokenQueueChompBalancedTest {
 
-    @Test(timeout = 4000)
-    public void test62() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("The '%s' parameter must not be empty.");
-        // Undeclared exception!
+    @Test
+    public void chompBalanced_shouldThrowException_whenClosingMarkerIsNotFound() {
+        // Arrange: Create a queue where the opening marker exists but the closing one does not.
+        String input = "The '%s' parameter must not be empty.";
+        TokenQueue queue = new TokenQueue(input);
+        char marker = 'T';
+
+        // Act & Assert: Expect an IllegalArgumentException when chompBalanced is called.
         try {
-            tokenQueue0.chompBalanced('T', 'T');
-            fail("Expecting exception: IllegalArgumentException");
+            queue.chompBalanced(marker, marker);
+            fail("Expected an IllegalArgumentException because the closing marker is missing.");
         } catch (IllegalArgumentException e) {
-            //
-            // Did not find balanced marker at 'he '%s' parameter must not be empty.'
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // The exception message should confirm that the marker was not found
+            // and show the remainder of the queue where the search took place.
+            String expectedMessage = "Did not find balanced marker at 'he '%s' parameter must not be empty.'";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
