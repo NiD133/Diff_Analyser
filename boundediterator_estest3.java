@@ -1,37 +1,33 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ConcurrentModificationException;
+
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class BoundedIterator_ESTestTest3 extends BoundedIterator_ESTest_scaffolding {
+/**
+ * Contains tests for {@link BoundedIterator}.
+ * This class focuses on edge cases and exception handling.
+ */
+public class BoundedIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        LinkedList<Boolean> linkedList0 = new LinkedList<Boolean>();
-        Iterator<Boolean> iterator0 = linkedList0.iterator();
-        BoundedIterator<Object> boundedIterator0 = new BoundedIterator<Object>(iterator0, 1909L, 1909L);
-        // Undeclared exception!
-        try {
-            boundedIterator0.next();
-            fail("Expecting exception: NoSuchElementException");
-        } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+    /**
+     * Tests that calling next() on a BoundedIterator that wraps an empty
+     * iterator throws a NoSuchElementException.
+     *
+     * The BoundedIterator's constructor should not fail, but the first
+     * call to next() must, as there are no elements to return.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void nextShouldThrowNoSuchElementExceptionWhenUnderlyingIteratorIsEmpty() {
+        // Arrange: Create a BoundedIterator wrapping an iterator with no elements.
+        // Using Collections.emptyIterator() is a clear and direct way to represent this.
+        final Iterator<String> emptyIterator = Collections.emptyIterator();
+        final BoundedIterator<String> boundedIterator = new BoundedIterator<>(emptyIterator, 0L, 10L);
+
+        // Act & Assert: Calling next() is expected to throw NoSuchElementException.
+        // The @Test(expected=...) annotation handles the assertion.
+        boundedIterator.next();
     }
 }
