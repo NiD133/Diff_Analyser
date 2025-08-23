@@ -1,26 +1,32 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonWriter;
+import org.junit.Test;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeWriter_ESTestTest61 extends JsonTreeWriter_ESTest_scaffolding {
+import static org.junit.Assert.assertSame;
 
-    @Test(timeout = 4000)
-    public void test60() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        jsonTreeWriter0.beginArray();
-        jsonTreeWriter0.beginArray();
-        JsonWriter jsonWriter0 = jsonTreeWriter0.endArray();
-        assertSame(jsonTreeWriter0, jsonWriter0);
+/**
+ * Tests for the fluent API of {@link JsonTreeWriter}.
+ */
+public class JsonTreeWriterTest {
+
+    @Test
+    public void endArray_shouldReturnSameWriterInstanceForChaining() throws IOException {
+        // Arrange
+        JsonTreeWriter writer = new JsonTreeWriter();
+        // Create a nested array structure `[[]]` to have an array to close.
+        writer.beginArray();
+        writer.beginArray();
+
+        // Act
+        // The endArray() method is called to close the inner array.
+        JsonWriter returnedWriter = writer.endArray();
+
+        // Assert
+        // The method should return the writer instance itself to support a fluent,
+        // chainable API.
+        assertSame("Expected endArray() to return the same writer instance", writer, returnedWriter);
     }
 }
