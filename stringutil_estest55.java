@@ -1,29 +1,37 @@
 package org.jsoup.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.stream.Collector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class StringUtil_ESTestTest55 extends StringUtil_ESTest_scaffolding {
+// The original test class was auto-generated. A more conventional name would be StringUtilTest.
+public class StringUtil_ESTestTest55 {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        String string0 = StringUtil.padding(8194, 8194);
-        StringBuilder stringBuilder0 = new StringBuilder((CharSequence) string0);
-        StringUtil.releaseBuilderVoid(stringBuilder0);
+    /**
+     * Verifies that {@link StringUtil#releaseBuilderVoid(StringBuilder)} correctly handles
+     * StringBuilders that exceed the internal maximum size for pooling. Such builders should be
+     * discarded without being modified (i.e., not cleared).
+     */
+    @Test
+    public void releaseBuilderVoidDoesNotModifyBuilderExceedingMaxSize() {
+        // Arrange: StringUtil's internal MaxBuilderSize is 8192.
+        // We create a builder larger than this to test the discard code path.
+        final int maxBuilderSize = 8192;
+        final int oversizedLength = maxBuilderSize + 1;
+        
+        StringBuilder oversizedBuilder = new StringBuilder(oversizedLength);
+        for (int i = 0; i < oversizedLength; i++) {
+            oversizedBuilder.append('a');
+        }
+        
+        // Sanity check the pre-condition
+        assertEquals(oversizedLength, oversizedBuilder.length());
+
+        // Act: Attempt to release the oversized builder back to the pool.
+        StringUtil.releaseBuilderVoid(oversizedBuilder);
+
+        // Assert: The builder was not cleared because its length exceeds the maximum
+        // size allowed for pooling. Therefore, its length should remain unchanged.
+        assertEquals("Builder should not be cleared as it's too large to be pooled",
+            oversizedLength, oversizedBuilder.length());
     }
 }
