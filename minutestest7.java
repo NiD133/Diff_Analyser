@@ -1,51 +1,49 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
-public class MinutesTestTest7 extends TestCase {
+import org.junit.Test;
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+/**
+ * Unit tests for the {@link Minutes#parseMinutes(String)} factory method.
+ */
+public class MinutesTest {
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void parseMinutes_givenNullString_shouldReturnZeroMinutes() {
+        // The method contract specifies that a null input string results in a zero-minute period.
+        assertEquals(Minutes.ZERO, Minutes.parseMinutes(null));
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
+    @Test
+    public void parseMinutes_givenValidISOStrings_shouldReturnCorrectMinutes() {
+        // Asserts that standard ISO-8601 period formats for minutes are parsed correctly.
+        assertEquals("Parsing PT0M should result in zero minutes",
+                Minutes.ZERO, Minutes.parseMinutes("PT0M"));
+        assertEquals("Parsing PT1M should result in one minute",
+                Minutes.ONE, Minutes.parseMinutes("PT1M"));
+        assertEquals("Parsing a negative duration PT-3M should be handled",
+                Minutes.minutes(-3), Minutes.parseMinutes("PT-3M"));
+
+        // Asserts that more complex ISO formats are parsed correctly,
+        // as long as only the minute component is non-zero.
+        assertEquals("Parsing a full format with only minutes like P0Y0M0DT2M",
+                Minutes.TWO, Minutes.parseMinutes("P0Y0M0DT2M"));
+        assertEquals("Parsing a time format with zero hours like PT0H2M",
+                Minutes.TWO, Minutes.parseMinutes("PT0H2M"));
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test(expected = IllegalArgumentException.class)
+    public void parseMinutes_givenStringWithNonZeroYearsAndDays_shouldThrowException() {
+        // According to the Javadoc, the parse accepts the full ISO syntax,
+        // but only the minutes component may be non-zero.
+        // This string has non-zero year and day components, so it is invalid.
+        Minutes.parseMinutes("P1Y1D");
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testFactory_parseMinutes_String() {
-        assertEquals(0, Minutes.parseMinutes((String) null).getMinutes());
-        assertEquals(0, Minutes.parseMinutes("PT0M").getMinutes());
-        assertEquals(1, Minutes.parseMinutes("PT1M").getMinutes());
-        assertEquals(-3, Minutes.parseMinutes("PT-3M").getMinutes());
-        assertEquals(2, Minutes.parseMinutes("P0Y0M0DT2M").getMinutes());
-        assertEquals(2, Minutes.parseMinutes("PT0H2M").getMinutes());
-        try {
-            Minutes.parseMinutes("P1Y1D");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
-        try {
-            Minutes.parseMinutes("P1DT1M");
-            fail();
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void parseMinutes_givenStringWithNonZeroDays_shouldThrowException() {
+        // This string has a non-zero day component, which is not allowed.
+        Minutes.parseMinutes("P1DT1M");
     }
 }
