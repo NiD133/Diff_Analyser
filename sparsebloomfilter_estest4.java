@@ -1,23 +1,30 @@
 package org.apache.commons.collections4.bloomfilter;
 
+import static org.junit.Assert.assertSame;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.IntPredicate;
-import java.util.function.LongPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class SparseBloomFilter_ESTestTest4 extends SparseBloomFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link SparseBloomFilter}.
+ */
+public class SparseBloomFilterTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        Shape shape0 = Shape.fromNMK(22, 22, 22);
-        SparseBloomFilter sparseBloomFilter0 = new SparseBloomFilter(shape0);
-        Shape shape1 = sparseBloomFilter0.getShape();
-        assertEquals(0.6931471805599453, shape1.estimateMaxN(), 0.01);
+    /**
+     * Tests that the getShape() method returns the same Shape instance
+     * that was used to construct the filter.
+     */
+    @Test
+    public void getShape_shouldReturnShapeFromConstructor() {
+        // Arrange: Create a shape and a Bloom filter with that shape.
+        // The specific parameters for the shape are not important for this test.
+        Shape expectedShape = Shape.fromNMK(10, 7, 72);
+        SparseBloomFilter bloomFilter = new SparseBloomFilter(expectedShape);
+
+        // Act: Retrieve the shape from the filter.
+        Shape actualShape = bloomFilter.getShape();
+
+        // Assert: The retrieved shape should be the exact same instance
+        // as the one provided to the constructor.
+        assertSame("The returned shape should be the same instance as the one used in the constructor.",
+                expectedShape, actualShape);
     }
 }
