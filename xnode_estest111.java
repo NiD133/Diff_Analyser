@@ -1,31 +1,44 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertFalse;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest111 extends XNode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XNode} class, focusing on XPath evaluation.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test110() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Boolean boolean0 = xNode0.evalBoolean("name");
-        assertFalse(boolean0);
+    /**
+     * Verifies that {@link XNode#evalBoolean(String)} returns false when the
+     * XPath expression does not match any element in the current node context.
+     */
+    @Test
+    public void evalBooleanShouldReturnFalseForNonexistentNode() {
+        // Arrange
+        // Create an empty DOM node to serve as the context for XPath evaluation.
+        // IIOMetadataNode is a standard, concrete implementation of org.w3c.dom.Node.
+        Node emptyNode = new IIOMetadataNode();
+        
+        // The XPathParser can be initialized with a null document for simple node evaluations.
+        XPathParser parser = new XPathParser((Document) null, true);
+        
+        // The XNode requires a Properties object, but it's not used in this evaluation.
+        Properties variables = new Properties();
+        
+        XNode xNode = new XNode(parser, emptyNode, variables);
+
+        // Act
+        // Evaluate an XPath expression ("name") that looks for a child element named "name".
+        // Since emptyNode has no children, this expression will not find a match.
+        Boolean result = xNode.evalBoolean("name");
+
+        // Assert
+        // A non-existent node-set in an XPath expression evaluates to false in a boolean context.
+        assertFalse("evalBoolean should return false for a non-matching expression", result);
     }
 }
