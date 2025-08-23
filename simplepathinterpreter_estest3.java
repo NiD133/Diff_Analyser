@@ -1,74 +1,64 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
 import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
 import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.evosuite.runtime.EvoRunner;
 
-public class SimplePathInterpreter_ESTestTest3 extends SimplePathInterpreter_ESTest_scaffolding {
+import java.util.Locale;
 
+import static org.apache.commons.jxpath.ri.Compiler.AXIS_SELF;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+// The EvoRunner is kept as it was part of the original test setup,
+// though the refactored test no longer relies on its specific behaviors.
+@RunWith(EvoRunner.class)
+public class SimplePathInterpreter_ESTestTest3 {
+
+    /**
+     * Tests that interpreting a path with a 'self' axis and a non-numeric string
+     * predicate on a non-existent node correctly creates a null pointer with an
+     * index of 0.
+     * <p>
+     * This behavior occurs because JXPath attempts to convert the string predicate
+     * to a numeric index. A non-numeric string evaluates to NaN (Not a Number),
+     * which is then cast to an integer index of 0.
+     */
     @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Locale locale0 = Locale.JAPANESE;
-        NullPointer nullPointer0 = new NullPointer(locale0, "");
-        Object object0 = new Object();
-        QName qName0 = new QName("#{WI2%=9byI>t{^<");
-        Locale locale1 = Locale.KOREA;
-        QName qName1 = new QName("#{WI2%=9byI>t{^<");
-        NodePointer nodePointer0 = NodePointer.newNodePointer(qName1, locale1, locale1);
-        Expression[] expressionArray0 = new Expression[1];
-        Constant constant0 = new Constant("<<unknown namespace>>");
-        expressionArray0[0] = (Expression) constant0;
-        CoreOperationAnd coreOperationAnd0 = new CoreOperationAnd(expressionArray0);
-        NameAttributeTest nameAttributeTest0 = new NameAttributeTest(coreOperationAnd0, expressionArray0[0]);
-        Step[] stepArray0 = new Step[2];
-        NodeNameTest nodeNameTest0 = new NodeNameTest(qName1);
-        Step step0 = mock(Step.class, new ViolatedAssumptionAnswer());
-        doReturn((-440), Integer.MIN_VALUE, 206, 5, 0).when(step0).getAxis();
-        doReturn(nodeNameTest0).when(step0).getNodeTest();
-        doReturn((Object) expressionArray0, (Object) expressionArray0, (Object) expressionArray0, (Object) expressionArray0, (Object) expressionArray0).when(step0).getPredicates();
-        stepArray0[0] = step0;
-        stepArray0[1] = step0;
-        SimplePathInterpreter.interpretSimpleExpressionPath((EvalContext) null, nodePointer0, expressionArray0, stepArray0);
-        NodePointer nodePointer1 = SimplePathInterpreter.interpretSimpleLocationPath((EvalContext) null, nullPointer0, stepArray0);
-        assertEquals(0, nodePointer1.getIndex());
+    public void interpretSimpleLocationPathWithSelfStepAndStringPredicateCreatesNullPointerWithIndexZero() {
+        // Arrange: Set up a path for a non-existent node.
+        // The path is self::someName["a-string-predicate"]
+        
+        // 1. Define the starting point: a pointer to a non-existent node.
+        NodePointer rootNullPointer = new NullPointer(Locale.ENGLISH, "testID");
+
+        // 2. Create the string-based predicate: ["a-string-predicate"]
+        Expression[] stringPredicate = {new Constant("a-string-predicate")};
+
+        // 3. Mock a 'self::someName' step containing the predicate.
+        Step mockSelfStep = mock(Step.class);
+        when(mockSelfStep.getAxis()).thenReturn(AXIS_SELF);
+        when(mockSelfStep.getNodeTest()).thenReturn(new NodeNameTest(new QName("someName")));
+        when(mockSelfStep.getPredicates()).thenReturn(stringPredicate);
+        
+        Step[] pathSteps = {mockSelfStep};
+
+        // Act: Interpret the path starting from the null pointer.
+        // The context can be null because the simple interpreter does not use it for this path.
+        NodePointer resultPointer = SimplePathInterpreter.interpretSimpleLocationPath(
+                (EvalContext) null, rootNullPointer, pathSteps);
+
+        // Assert: The resulting pointer should represent the unresolved path,
+        // with the string predicate converted to an index of 0.
+        assertEquals("Resulting pointer index should be 0", 0, resultPointer.getIndex());
     }
 }
