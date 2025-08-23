@@ -1,37 +1,50 @@
 package org.jfree.chart.renderer.xy;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.axis.CategoryAnchor;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.DatasetRenderingOrder;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.DefaultHighLowDataset;
-import org.jfree.data.xy.DefaultIntervalXYDataset;
-import org.jfree.data.xy.MatrixSeries;
-import org.jfree.data.xy.MatrixSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class DeviationRenderer_ESTestTest14 extends DeviationRenderer_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link DeviationRenderer} class and its subclasses,
+ * focusing on its default state and pass management logic.
+ */
+public class DeviationRendererTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        DeviationStepRenderer deviationStepRenderer0 = new DeviationStepRenderer();
-        boolean boolean0 = deviationStepRenderer0.isItemPass(2);
-        assertEquals(0.5F, deviationStepRenderer0.getAlpha(), 0.01F);
-        assertTrue(deviationStepRenderer0.getDrawSeriesLineAsPath());
-        assertTrue(boolean0);
+    /**
+     * Verifies that the constructor of a {@link DeviationStepRenderer}
+     * (a subclass of DeviationRenderer) correctly initializes its default properties.
+     * The alpha value should be 0.5f, and drawing the series line as a path
+     * should be enabled by default.
+     */
+    @Test
+    public void constructor_shouldSetDefaultProperties() {
+        // Arrange: Create a new renderer instance.
+        DeviationStepRenderer renderer = new DeviationStepRenderer();
+
+        // Assert: Verify the renderer's default state.
+        // 1. Check the default alpha transparency for the deviation shading.
+        assertEquals("Default alpha should be 0.5F", 0.5F, renderer.getAlpha(), 0.01F);
+
+        // 2. Check that drawing the series line as a path is enabled, as this is
+        // a required behavior for DeviationRenderer.
+        assertTrue("drawSeriesLineAsPath should be true by default", renderer.getDrawSeriesLineAsPath());
+    }
+
+    /**
+     * Verifies that the isItemPass() method returns true for pass 2.
+     * According to the DeviationRenderer's implementation, pass 2 is
+     * designated for drawing item shapes (the "item pass").
+     */
+    @Test
+    public void isItemPass_whenPassIsTwo_shouldReturnTrue() {
+        // Arrange: Create a renderer and define the pass number for drawing items.
+        DeviationStepRenderer renderer = new DeviationStepRenderer();
+        int itemDrawingPass = 2;
+
+        // Act: Check if the given pass is the item drawing pass.
+        boolean result = renderer.isItemPass(itemDrawingPass);
+
+        // Assert: The result should be true.
+        assertTrue("isItemPass(2) should return true, as it's the designated item drawing pass.", result);
     }
 }
