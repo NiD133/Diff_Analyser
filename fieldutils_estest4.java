@@ -1,22 +1,27 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest4 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        FieldUtils.verifyValueBounds("", 1, 1, 2000);
+    /**
+     * Tests that verifyValueBounds() does not throw an exception when the provided
+     * value is valid and equal to the lower bound of the specified range.
+     */
+    @Test
+    public void verifyValueBounds_shouldNotThrowException_whenValueIsAtLowerBound() {
+        // Arrange: Define a value that is exactly at the lower boundary of the valid range.
+        final String fieldName = "testField";
+        final int value = 1;
+        final int lowerBound = 1;
+        final int upperBound = 2000;
+
+        // Act & Assert: The method should execute without throwing an exception.
+        // The test will fail automatically if an IllegalFieldValueException is thrown,
+        // which is the expected behavior for a valid value.
+        FieldUtils.verifyValueBounds(fieldName, value, lowerBound, upperBound);
     }
 }
