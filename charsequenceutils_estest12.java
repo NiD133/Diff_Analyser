@@ -1,21 +1,30 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharSequenceUtils_ESTestTest12 extends CharSequenceUtils_ESTest_scaffolding {
+/**
+ * This test suite contains improved, human-readable tests for {@link CharSequenceUtils}.
+ * The original test was auto-generated and has been refactored for clarity and maintainability.
+ */
+public class CharSequenceUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StringBuilder stringBuilder0 = new StringBuilder("");
-        StringBuilder stringBuilder1 = new StringBuilder("");
-        stringBuilder0.appendCodePoint(0);
-        int int0 = CharSequenceUtils.lastIndexOf(stringBuilder0, stringBuilder1, 0);
-        assertEquals(0, int0);
+    /**
+     * Tests that lastIndexOf returns the start index when the search sequence is empty.
+     * This behavior is consistent with {@link String#lastIndexOf(String, int)}.
+     */
+    @Test
+    public void lastIndexOf_withEmptySearchSequence_shouldReturnStartIndex() {
+        // Arrange
+        final CharSequence textToSearch = "a\u0000b"; // A non-empty sequence containing the original character
+        final CharSequence emptySearchSequence = "";
+        final int startIndex = 0;
+        final int expectedIndex = 0;
+
+        // Act
+        final int actualIndex = CharSequenceUtils.lastIndexOf(textToSearch, emptySearchSequence, startIndex);
+
+        // Assert
+        assertEquals("Searching for an empty string should return the start index.", expectedIndex, actualIndex);
     }
 }
