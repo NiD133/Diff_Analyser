@@ -1,49 +1,32 @@
 package org.jfree.chart.axis;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Calendar;
-import java.util.TimeZone;
-import javax.swing.DropMode;
-import javax.swing.JScrollPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.legend.PaintScaleLegend;
-import org.jfree.chart.plot.MeterPlot;
-import org.jfree.chart.plot.ThermometerPlot;
-import org.jfree.chart.renderer.LookupPaintScale;
-import org.jfree.chart.renderer.PaintScale;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.general.DefaultValueDataset;
-import org.jfree.data.statistics.DefaultMultiValueCategoryDataset;
-import org.jfree.data.time.DateRange;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ModuloAxis_ESTestTest32 extends ModuloAxis_ESTest_scaffolding {
+/**
+ * Tests for the equals() method in the {@link ModuloAxis} class.
+ */
+public class ModuloAxisEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        ModuloAxis moduloAxis0 = new ModuloAxis("", (Range) null);
-        Object object0 = moduloAxis0.clone();
-        // Undeclared exception!
-        try {
-            moduloAxis0.equals(object0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jfree.chart.axis.ModuloAxis", e);
-        }
+    /**
+     * This test verifies that calling equals() on a ModuloAxis instance
+     * throws a NullPointerException if its 'fixedRange' field is null.
+     * This situation occurs when the axis is constructed with a null range.
+     * While this is likely a bug in the production code, this test
+     * documents the current behavior.
+     */
+    @Test(expected = NullPointerException.class)
+    public void equals_whenFixedRangeIsNull_shouldThrowNullPointerException() throws CloneNotSupportedException {
+        // Arrange: Create a ModuloAxis with a null fixedRange.
+        final String axisLabel = "Test Modulo Axis";
+        final ModuloAxis axisWithNullRange = new ModuloAxis(axisLabel, null);
+        
+        // Create a clone to compare against. The bug occurs when the equals method
+        // attempts to access a method on the null fixedRange field.
+        final ModuloAxis clonedAxis = (ModuloAxis) axisWithNullRange.clone();
+
+        // Act & Assert: Calling equals() is expected to throw a NullPointerException.
+        // The assertion is handled declaratively by the 'expected' attribute of the @Test annotation.
+        axisWithNullRange.equals(clonedAxis);
     }
 }
