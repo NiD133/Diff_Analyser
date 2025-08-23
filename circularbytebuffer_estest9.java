@@ -1,19 +1,34 @@
 package org.apache.commons.io.input.buffer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest9 extends CircularByteBuffer_ESTest_scaffolding {
+/**
+ * Unit tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        boolean boolean0 = circularByteBuffer0.hasSpace(1024);
-        assertTrue(boolean0);
-        assertEquals(8192, circularByteBuffer0.getSpace());
+    /**
+     * Tests that a new buffer created with the default constructor correctly reports
+     * its initial available space.
+     */
+    @Test
+    public void newBufferWithDefaultSizeShouldHaveFullSpace() {
+        // Arrange: Create a buffer using the default constructor.
+        // The default size is defined by IOUtils.DEFAULT_BUFFER_SIZE.
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+
+        // Act & Assert:
+        // 1. Verify the total available space is the default buffer size.
+        assertEquals("A new buffer should have space equal to the default size.",
+                IOUtils.DEFAULT_BUFFER_SIZE, buffer.getSpace());
+
+        // 2. Verify it has space for a reasonable number of bytes.
+        final int requestedSpace = 1024;
+        assertTrue("A new buffer should report having space for " + requestedSpace + " bytes.",
+                buffer.hasSpace(requestedSpace));
     }
 }
