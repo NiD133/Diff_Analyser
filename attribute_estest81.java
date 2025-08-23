@@ -1,31 +1,39 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedWriter;
 import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintWriter;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
+// The test class name and inheritance are preserved from the original auto-generated test.
 public class Attribute_ESTestTest81 extends Attribute_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test80() throws Throwable {
-        Attribute attribute0 = new Attribute("!m\"", "!m\"");
-        StringWriter stringWriter0 = new StringWriter(3969);
-        Document.OutputSettings document_OutputSettings0 = new Document.OutputSettings();
-        attribute0.html((Appendable) stringWriter0, document_OutputSettings0);
-        assertEquals("!m_=\"!m&quot;\"", stringWriter0.toString());
+    /**
+     * Tests that the html() method correctly sanitizes invalid characters in an attribute's key
+     * and escapes special characters in its value.
+     */
+    @Test
+    public void htmlOutputSanitizesInvalidKeyAndEscapesValue() throws IOException {
+        // Arrange
+        // An attribute key with a double quote, which is an invalid character for an HTML attribute name.
+        String keyWithInvalidChar = "key\"";
+        // An attribute value that also contains a double quote, which needs to be escaped in the output.
+        String valueWithQuote = "value\"";
+
+        Attribute attribute = new Attribute(keyWithInvalidChar, valueWithQuote);
+        Document.OutputSettings outputSettings = new Document.OutputSettings();
+        StringWriter writer = new StringWriter();
+
+        // The expected key is sanitized by replacing the invalid '\"' with '_'.
+        // The expected value has its internal '\"' escaped to '&quot;'.
+        // The final output format is key="value".
+        String expectedHtml = "key_=\"value&quot;\"";
+
+        // Act
+        attribute.html(writer, outputSettings);
+        String actualHtml = writer.toString();
+
+        // Assert
+        assertEquals(expectedHtml, actualHtml);
     }
 }
