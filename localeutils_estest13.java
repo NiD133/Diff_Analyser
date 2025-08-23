@@ -1,28 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class LocaleUtils_ESTestTest13 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that toLocale() throws an IllegalArgumentException when given a string
+     * that does not conform to the expected locale format.
+     */
+    @Test
+    public void toLocale_withInvalidFormatString_shouldThrowIllegalArgumentException() {
+        // Arrange: Define an input string that is not a valid locale format.
+        final String invalidLocaleString = "+";
+
+        // Act & Assert
         try {
-            LocaleUtils.toLocale("+");
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Invalid locale format: +
-            //
-            verifyException("org.apache.commons.lang3.LocaleUtils", e);
+            LocaleUtils.toLocale(invalidLocaleString);
+            fail("Expected an IllegalArgumentException for invalid format: " + invalidLocaleString);
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception message clearly indicates the problem.
+            final String expectedMessage = "Invalid locale format: " + invalidLocaleString;
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
