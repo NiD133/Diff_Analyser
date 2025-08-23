@@ -1,45 +1,47 @@
 package org.joda.time;
 
+import org.junit.Test;
+import static org.junit.Assert.assertSame;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-public class MinutesTestTest14 extends TestCase {
+/**
+ * Test class for the serialization behavior of the Minutes class.
+ */
+public class MinutesTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void serializingAndDeserializingAConstant_shouldReturnTheSameInstance() throws Exception {
+        // Arrange
+        Minutes originalMinutes = Minutes.THREE;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act
+        // Serialize the object to a byte array
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream)) {
+            objectOutputStream.writeObject(originalMinutes);
+        }
+        byte[] serializedBytes = byteOutputStream.toByteArray();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestMinutes.class);
-    }
+        // Deserialize the byte array back to an object
+        Minutes deserializedMinutes;
+        ByteArrayInputStream byteInputStream = new ByteArrayInputStream(serializedBytes);
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream)) {
+            deserializedMinutes = (Minutes) objectInputStream.readObject();
+        }
 
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    //-----------------------------------------------------------------------
-    public void testSerialization() throws Exception {
-        Minutes test = Minutes.THREE;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(test);
-        oos.close();
-        byte[] bytes = baos.toByteArray();
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Minutes result = (Minutes) ois.readObject();
-        ois.close();
-        assertSame(test, result);
+        // Assert
+        // The Minutes class uses the readResolve method to return singleton instances
+        // for its constants (ZERO, ONE, TWO, THREE). Therefore, the deserialized
+        // object should be the exact same instance as the original constant, not just an
+        // equal one.
+        assertSame(
+            "Deserialization should return the singleton instance",
+            originalMinutes,
+            deserializedMinutes
+        );
     }
 }
