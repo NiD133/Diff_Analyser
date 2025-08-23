@@ -1,30 +1,36 @@
 package org.apache.commons.io.output;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
+import java.nio.charset.StandardCharsets;
 import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class XmlStreamWriter_ESTestTest3 extends XmlStreamWriter_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XmlStreamWriter} class.
+ */
+public class XmlStreamWriterTest {
 
+    /**
+     * Tests that the deprecated constructor {@code XmlStreamWriter(File, String)}
+     * correctly defaults to UTF-8 when the specified encoding is null.
+     * This ensures backward compatibility is maintained.
+     */
     @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        MockFile mockFile0 = new MockFile("U-");
-        XmlStreamWriter xmlStreamWriter0 = new XmlStreamWriter(mockFile0, (String) null);
-        assertEquals("UTF-8", xmlStreamWriter0.getDefaultEncoding());
+    @SuppressWarnings("deprecation") // Intentionally testing a deprecated constructor.
+    public void constructorWithFileAndNullEncodingShouldDefaultToUtf8() throws IOException {
+        // Arrange: Create a mock file to avoid actual file system interaction.
+        final File testFile = new MockFile("test.xml");
+        final String nullEncoding = null;
+
+        // Act & Assert: Instantiate the writer and verify its default encoding.
+        // Using try-with-resources ensures the writer is closed automatically.
+        try (final XmlStreamWriter writer = new XmlStreamWriter(testFile, nullEncoding)) {
+            final String expectedEncoding = StandardCharsets.UTF_8.name();
+            final String actualEncoding = writer.getDefaultEncoding();
+            assertEquals("Default encoding should be UTF-8 when null is provided.", expectedEncoding, actualEncoding);
+        }
     }
 }
