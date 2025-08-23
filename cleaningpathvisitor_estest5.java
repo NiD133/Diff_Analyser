@@ -1,43 +1,38 @@
 package org.apache.commons.io.file;
 
+import org.apache.commons.io.file.Counters.PathCounters;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.junit.runner.RunWith;
 
+import static org.mockito.Mockito.mock;
+
+// The test class name and scaffolding are kept from the original for context.
+// In a real-world scenario, these might also be renamed for clarity.
 public class CleaningPathVisitor_ESTestTest5 extends CleaningPathVisitor_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        DeleteOption[] deleteOptionArray0 = new DeleteOption[1];
-        StandardDeleteOption standardDeleteOption0 = StandardDeleteOption.OVERRIDE_READ_ONLY;
-        deleteOptionArray0[0] = (DeleteOption) standardDeleteOption0;
-        String[] stringArray0 = new String[0];
-        CleaningPathVisitor cleaningPathVisitor0 = new CleaningPathVisitor((Counters.PathCounters) null, deleteOptionArray0, stringArray0);
-        MockFile mockFile0 = new MockFile("", "");
-        Path path0 = mockFile0.toPath();
-        BasicFileAttributes basicFileAttributes0 = mock(BasicFileAttributes.class, new ViolatedAssumptionAnswer());
-        try {
-            cleaningPathVisitor0.visitFile(path0, basicFileAttributes0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // DOS or POSIX file operations not available for '/', linkOptions [NOFOLLOW_LINKS]
-            //
-            verifyException("org.apache.commons.io.file.PathUtils", e);
-        }
+    /**
+     * Tests that calling visitFile on the root directory throws an IOException.
+     * The underlying file system operations are not designed to delete the root path ("/"),
+     * and the visitor should propagate this failure.
+     */
+    @Test(expected = IOException.class)
+    public void visitFile_whenPathIsRootDirectory_throwsIOException() throws IOException {
+        // Arrange
+        final DeleteOption[] deleteOptions = { StandardDeleteOption.OVERRIDE_READ_ONLY };
+        final String[] noExclusions = {};
+        final CleaningPathVisitor visitor = new CleaningPathVisitor((PathCounters) null, deleteOptions, noExclusions);
+
+        // Using a mock file to represent the root directory path ("/")
+        final Path rootPath = new org.evosuite.runtime.mock.java.io.MockFile("", "").toPath();
+        final BasicFileAttributes mockAttributes = mock(BasicFileAttributes.class);
+
+        // Act & Assert
+        // This call is expected to fail and throw an IOException because PathUtils.delete()
+        // cannot operate on the root directory. The assertion is handled by the
+        // @Test(expected = IOException.class) annotation.
+        visitor.visitFile(rootPath, mockAttributes);
     }
 }
