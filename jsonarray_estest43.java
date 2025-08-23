@@ -1,31 +1,31 @@
 package com.google.gson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonArray_ESTestTest43 extends JsonArray_ESTest_scaffolding {
+/**
+ * Tests for the {@link JsonArray} class, focusing on its type conversion methods.
+ */
+public class JsonArrayTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        jsonArray0.add((Number) null);
-        // Undeclared exception!
+    @Test
+    public void getAsBigInteger_whenArrayContainsSingleJsonNull_throwsUnsupportedOperationException() {
+        // Arrange
+        JsonArray jsonArray = new JsonArray();
+        // According to JsonArray documentation, adding a null value results in a JsonNull element.
+        jsonArray.add((Number) null);
+
+        // Act & Assert
         try {
-            jsonArray0.getAsBigInteger();
-            fail("Expecting exception: UnsupportedOperationException");
+            // The getAsBigInteger() method on JsonArray delegates to the single element within it.
+            jsonArray.getAsBigInteger();
+            fail("Expected an UnsupportedOperationException to be thrown, but it was not.");
         } catch (UnsupportedOperationException e) {
-            //
-            // JsonNull
-            //
-            verifyException("com.google.gson.JsonElement", e);
+            // Verify that the exception is thrown because JsonNull does not support this conversion.
+            // The exception message from JsonElement's default implementation is the simple class name.
+            assertEquals("JsonNull", e.getMessage());
         }
     }
 }
