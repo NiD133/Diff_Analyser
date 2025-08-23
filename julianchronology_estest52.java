@@ -1,63 +1,36 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.time.ZoneId;
+import org.junit.Test;
+
+/**
+ * This test class contains tests for the JulianChronology class.
+ * The original test was auto-generated and has been refactored for clarity.
+ */
 public class JulianChronology_ESTestTest52 extends JulianChronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test51() throws Throwable {
-        JulianChronology julianChronology0 = JulianChronology.INSTANCE;
-        // Undeclared exception!
+    /**
+     * Tests that calling dateNow(ZoneId) with a null argument throws a NullPointerException.
+     * The method contract requires a non-null ZoneId, and this test verifies that
+     * this precondition is enforced.
+     */
+    @Test
+    public void dateNow_withNullZoneId_throwsNullPointerException() {
+        // Arrange: Get an instance of the chronology to test.
+        JulianChronology chronology = JulianChronology.INSTANCE;
+
+        // Act & Assert: Call the method with a null ZoneId and verify the exception.
         try {
-            julianChronology0.dateNow((ZoneId) null);
-            fail("Expecting exception: NullPointerException");
+            chronology.dateNow((ZoneId) null);
+            fail("Expected a NullPointerException to be thrown, but nothing was thrown.");
         } catch (NullPointerException e) {
-            //
-            // zone
-            //
-            verifyException("java.util.Objects", e);
+            // The exception is expected. For robustness, we can also verify the message.
+            // The underlying implementation uses Objects.requireNonNull(zone, "zone"),
+            // which provides this specific message.
+            assertEquals("zone", e.getMessage());
         }
     }
 }
