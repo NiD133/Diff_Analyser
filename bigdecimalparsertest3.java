@@ -1,25 +1,35 @@
 package com.fasterxml.jackson.core.io;
 
 import java.math.BigDecimal;
-import ch.randelshofer.fastdoubleparser.JavaBigDecimalParser;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BigDecimalParserTestTest3 extends com.fasterxml.jackson.core.JUnit5TestBase {
+/**
+ * Tests for {@link BigDecimalParser} focusing on its handling of very long number strings,
+ * which triggers a specific optimization path.
+ */
+@DisplayName("BigDecimalParser: Long String Parsing")
+class BigDecimalParserLongStringTest extends com.fasterxml.jackson.core.JUnit5TestBase {
 
-    static String genLongInvalidString() {
-        final int len = 1500;
-        final StringBuilder sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append("A");
-        }
-        return sb.toString();
-    }
+    /**
+     * The SUT (System Under Test), {@link BigDecimalParser}, uses an optimized parsing strategy
+     * for strings longer than 500 characters. This test uses a length of 500 for the
+     * fractional part, resulting in a total string length of 503, to ensure this
+     * optimization path is tested.
+     */
+    private static final int LONG_STRING_TEST_LENGTH = 500;
 
-    static String genLongValidString(int len) {
-        final StringBuilder sb = new StringBuilder(len + 5);
+    /**
+     * Generates a valid, long decimal string in the format "0.0...01".
+     *
+     * @param fractionalZeros The number of zeros to place after the decimal point.
+     * @return A long decimal string.
+     */
+    private String generateLongDecimalString(int fractionalZeros) {
+        final StringBuilder sb = new StringBuilder(fractionalZeros + 3);
         sb.append("0.");
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < fractionalZeros; i++) {
             sb.append('0');
         }
         sb.append('1');
@@ -27,11 +37,31 @@ public class BigDecimalParserTestTest3 extends com.fasterxml.jackson.core.JUnit5
     }
 
     @Test
-    void longValidStringParse() {
-        String num = genLongValidString(500);
-        final BigDecimal EXP = new BigDecimal(num);
-        // Parse from String first, then char[]
-        assertEquals(EXP, BigDecimalParser.parse(num));
-        assertEquals(EXP, BigDecimalParser.parse(num.toCharArray(), 0, num.length()));
+    @DisplayName("should correctly parse a long number from a String")
+    void parsingLongStringShouldSucceed() {
+        // Arrange
+        final String longNumberString = generateLongDecimalString(LONG_STRING_TEST_LENGTH);
+        final BigDecimal expectedValue = new BigDecimal(longNumberString);
+
+        // Act
+        final BigDecimal actualValue = BigDecimalParser.parse(longNumberString);
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
+    }
+
+    @Test
+    @DisplayName("should correctly parse a long number from a char array")
+    void parsingLongCharArrayShouldSucceed() {
+        // Arrange
+        final String longNumberString = generateLongDecimalString(LONG_STRING_TEST_LENGTH);
+        final char[] numberChars = longNumberString.toCharArray();
+        final BigDecimal expectedValue = new BigDecimal(longNumberString);
+
+        // Act
+        final BigDecimal actualValue = BigDecimalParser.parse(numberChars, 0, numberChars.length);
+
+        // Assert
+        assertEquals(expectedValue, actualValue);
     }
 }
