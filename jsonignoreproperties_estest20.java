@@ -2,33 +2,47 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest20 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Test suite for the {@link JsonIgnoreProperties.Value} class.
+ * This class contains the refactored version of the original generated test.
+ */
+public class JsonIgnoreProperties_ESTestTest20 {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JsonIgnoreProperties.Value[] jsonIgnoreProperties_ValueArray0 = new JsonIgnoreProperties.Value[6];
-        String[] stringArray0 = new String[0];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoredProperties(stringArray0);
-        jsonIgnoreProperties_ValueArray0[0] = jsonIgnoreProperties_Value0;
-        jsonIgnoreProperties_ValueArray0[3] = jsonIgnoreProperties_ValueArray0[0];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_ValueArray0[3].withAllowSetters();
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value2 = jsonIgnoreProperties_Value1.withAllowGetters();
-        assertFalse(jsonIgnoreProperties_Value2.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value2.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getMerge());
-        assertFalse(jsonIgnoreProperties_Value1.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value2.getAllowGetters());
-        assertFalse(jsonIgnoreProperties_Value1.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value2.getMerge());
+    /**
+     * Tests the chaining of 'with' methods on JsonIgnoreProperties.Value.
+     * <p>
+     * This test verifies that each call to a {@code with...()} method, such as
+     * {@code withAllowSetters()} and {@code withAllowGetters()}, creates a new
+     * immutable instance with the correct properties updated, while leaving the
+     * original instance unchanged.
+     */
+    @Test
+    public void withAllowSettersAndGettersShouldCreateNewInstancesWithCorrectFlags() {
+        // Arrange: Start with a default Value instance.
+        // By default, flags like 'allowGetters' and 'allowSetters' are false.
+        JsonIgnoreProperties.Value initialValue = JsonIgnoreProperties.Value.forIgnoredProperties();
+
+        // Act: Create new instances by progressively enabling 'allowSetters' and then 'allowGetters'.
+        JsonIgnoreProperties.Value valueWithSetters = initialValue.withAllowSetters();
+        JsonIgnoreProperties.Value valueWithSettersAndGetters = valueWithSetters.withAllowGetters();
+
+        // Assert: Verify the properties of the intermediate instance ('valueWithSetters').
+        // It should have 'allowSetters' as true, but other flags should remain at their default values.
+        assertTrue("allowSetters should be true after withAllowSetters()", valueWithSetters.getAllowSetters());
+        assertFalse("allowGetters should remain false", valueWithSetters.getAllowGetters());
+        assertFalse("ignoreUnknown should remain false", valueWithSetters.getIgnoreUnknown());
+        assertTrue("merge should remain true by default", valueWithSetters.getMerge());
+
+        // Assert: Verify the properties of the final instance ('valueWithSettersAndGetters').
+        // It should have both 'allowSetters' and 'allowGetters' as true.
+        assertTrue("allowSetters should be carried over and remain true", valueWithSettersAndGetters.getAllowSetters());
+        assertTrue("allowGetters should be true after withAllowGetters()", valueWithSettersAndGetters.getAllowGetters());
+        assertFalse("ignoreUnknown should remain false", valueWithSettersAndGetters.getIgnoreUnknown());
+        assertTrue("merge should remain true by default", valueWithSettersAndGetters.getMerge());
+
+        // Assert: Crucially, verify that the original instance remains unchanged, proving immutability.
+        assertFalse("Original instance's allowSetters should be unchanged", initialValue.getAllowSetters());
+        assertFalse("Original instance's allowGetters should be unchanged", initialValue.getAllowGetters());
     }
 }
