@@ -2,26 +2,30 @@ package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JsonIgnoreProperties_ESTestTest27 extends JsonIgnoreProperties_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonIgnoreProperties.Value}.
+ */
+public class JsonIgnorePropertiesValueTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value0 = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
-        String[] stringArray0 = new String[0];
-        JsonIgnoreProperties.Value jsonIgnoreProperties_Value1 = jsonIgnoreProperties_Value0.withIgnored(stringArray0);
-        assertFalse(jsonIgnoreProperties_Value1.getAllowSetters());
-        assertTrue(jsonIgnoreProperties_Value1.getIgnoreUnknown());
-        assertTrue(jsonIgnoreProperties_Value1.getMerge());
-        assertFalse(jsonIgnoreProperties_Value0.getAllowGetters());
-        assertTrue(jsonIgnoreProperties_Value1.equals((Object) jsonIgnoreProperties_Value0));
+    @Test
+    public void withIgnored_whenGivenEmptyArray_shouldReturnEqualInstance() {
+        // Arrange: Create an initial Value instance and an empty array of properties.
+        JsonIgnoreProperties.Value initialValue = JsonIgnoreProperties.Value.forIgnoreUnknown(true);
+        String[] noPropertiesToIgnore = new String[0];
+
+        // Act: Call the method under test with the empty array.
+        JsonIgnoreProperties.Value resultValue = initialValue.withIgnored(noPropertiesToIgnore);
+
+        // Assert: The returned instance should be equal to the original,
+        // as no new properties were ignored.
+        assertEquals(initialValue, resultValue);
+
+        // For completeness, explicitly verify the properties of the resulting value.
+        assertTrue("ignoreUnknown should remain true", resultValue.getIgnoreUnknown());
+        assertFalse("allowSetters should retain its default value of false", resultValue.getAllowSetters());
+        assertFalse("allowGetters should retain its default value of false", resultValue.getAllowGetters());
+        assertTrue("merge should retain its default value of true", resultValue.getMerge());
+        assertTrue("The set of ignored properties should be empty", resultValue.getIgnored().isEmpty());
     }
 }
