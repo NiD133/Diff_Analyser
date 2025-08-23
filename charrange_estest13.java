@@ -1,22 +1,28 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class CharRange_ESTestTest13 extends CharRange_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CharRange} class.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        CharRange charRange0 = CharRange.isIn('8', 'A');
-        String string0 = charRange0.toString();
-        assertEquals("8-A", string0);
-        assertNotNull(string0);
+    /**
+     * Tests that the toString() method returns the correct string representation
+     * for a standard character range, formatted as "start-end".
+     */
+    @Test
+    public void toStringShouldReturnCorrectFormatForStandardRange() {
+        // Arrange
+        // Create a character range from '8' to 'A'.
+        final CharRange range = CharRange.isIn('8', 'A');
+        final String expectedString = "8-A";
+
+        // Act
+        final String actualString = range.toString();
+
+        // Assert
+        assertEquals(expectedString, actualString);
     }
 }
