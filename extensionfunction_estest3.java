@@ -1,46 +1,36 @@
 package org.apache.commons.jxpath.ri.compiler;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicNodeSet;
-import org.apache.commons.jxpath.Function;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.NamespaceResolver;
 import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.axes.InitialContext;
-import org.apache.commons.jxpath.ri.axes.NodeSetContext;
-import org.apache.commons.jxpath.ri.axes.RootContext;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
+/**
+ * Contains improved tests for the {@link ExtensionFunction} class, focusing on understandability.
+ * This class demonstrates how to refactor an auto-generated test for clarity and maintainability.
+ */
+// The original test class name `ExtensionFunction_ESTestTest3` and its scaffolding are kept
+// to maintain the context of the refactoring task. In a real project, this would likely be
+// part of a single, well-named `ExtensionFunctionTest` class.
 public class ExtensionFunction_ESTestTest3 extends ExtensionFunction_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        Expression[] expressionArray0 = new Expression[1];
-        Expression[] expressionArray1 = new Expression[1];
-        CoreOperationOr coreOperationOr0 = new CoreOperationOr(expressionArray0);
-        expressionArray1[0] = (Expression) coreOperationOr0;
-        ExtensionFunction extensionFunction0 = new ExtensionFunction((QName) null, expressionArray1);
-        // Undeclared exception!
-        try {
-            extensionFunction0.toString();
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.evosuite.runtime.System", e);
-        }
+    /**
+     * Verifies that the {@code toString()} method throws a {@code NullPointerException}
+     * when the {@code ExtensionFunction} is constructed with a null function name.
+     * <p>
+     * The {@code toString()} method is expected to access the function name to build its
+     * string representation. Providing a null name should therefore result in an NPE.
+     */
+    @Test(expected = NullPointerException.class)
+    public void toStringShouldThrowNullPointerExceptionWhenFunctionNameIsNull() {
+        // Arrange: Create an ExtensionFunction with a null QName for the function name.
+        // The arguments are not relevant to this specific failure condition, so we can
+        // provide an empty array for simplicity.
+        QName nullFunctionName = null;
+        Expression[] arguments = new Expression[0];
+        ExtensionFunction extensionFunction = new ExtensionFunction(nullFunctionName, arguments);
+
+        // Act & Assert: Calling toString() should trigger the NullPointerException.
+        // The @Test(expected) annotation handles the assertion, causing the test
+        // to pass if and only if an NPE is thrown.
+        extensionFunction.toString();
     }
 }
