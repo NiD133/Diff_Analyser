@@ -2,32 +2,31 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link DefaultPieDataset} class.
+ * This class focuses on verifying the behavior of the getItemCount() method.
+ */
+// The original test class name 'DefaultPieDataset_ESTestTest9' and its scaffolding
+// are kept to show the direct improvement of the provided code.
 public class DefaultPieDataset_ESTestTest9 extends DefaultPieDataset_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.DRAG_LAYER;
-        defaultPieDataset0.setValue(integer0, 0.8);
-        int int0 = defaultPieDataset0.getItemCount();
-        assertEquals(1, int0);
+    /**
+     * Verifies that getItemCount() returns 1 after a single item has been added
+     * to an empty dataset.
+     */
+    @Test
+    public void getItemCount_afterAddingOneItem_returnsOne() {
+        // Arrange: Create an empty dataset.
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+        String testKey = "Firefox";
+        double testValue = 45.0;
+
+        // Act: Add a single key-value pair to the dataset.
+        dataset.setValue(testKey, testValue);
+        int itemCount = dataset.getItemCount();
+
+        // Assert: The item count should now be 1.
+        assertEquals("The item count should be 1 after adding a single item.", 1, itemCount);
     }
 }
