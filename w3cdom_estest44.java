@@ -1,42 +1,44 @@
 package org.jsoup.helper;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class W3CDom_ESTestTest44 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for {@link W3CDom}.
+ * This test focuses on the conversion of Jsoup's DocumentType node.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        Document document0 = Document.createShell("javax.xml.xpath.XPathFactory:jsoup");
-        org.w3c.dom.Document document1 = w3CDom0.fromJsoup(document0);
-        DocumentType documentType0 = new DocumentType("jsoupSource", "&", "jsoupSource");
-        W3CDom.W3CBuilder w3CDom_W3CBuilder0 = new W3CDom.W3CBuilder(document1);
-        w3CDom_W3CBuilder0.traverse(documentType0);
-        assertTrue(w3CDom0.namespaceAware());
+    /**
+     * Verifies that a Jsoup Document containing a DocumentType node is correctly
+     * converted to a W3C Document, preserving the doctype's attributes.
+     */
+    @Test
+    public void convertsJsoupDocumentTypeToW3cDocumentType() {
+        // Arrange: Create a Jsoup document with a specific DocumentType.
+        Document jsoupDoc = Document.createShell("");
+        DocumentType jsoupDocType = new DocumentType(
+            "html",
+            "-//W3C//DTD XHTML 1.0 Transitional//EN",
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+        );
+        jsoupDoc.prependChild(jsoupDocType);
+
+        W3CDom w3cDomConverter = new W3CDom();
+
+        // Act: Convert the Jsoup document to a W3C DOM document.
+        org.w3c.dom.Document w3cDoc = w3cDomConverter.fromJsoup(jsoupDoc);
+
+        // Assert: Verify that the DocumentType was converted and its properties are correct.
+        assertNotNull("The resulting W3C document should not be null.", w3cDoc);
+        
+        org.w3c.dom.DocumentType w3cDocType = w3cDoc.getDoctype();
+        assertNotNull("The W3C document should have a doctype.", w3cDocType);
+
+        assertEquals("html", w3cDocType.getName());
+        assertEquals("-//W3C//DTD XHTML 1.0 Transitional//EN", w3cDocType.getPublicId());
+        assertEquals("http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd", w3cDocType.getSystemId());
     }
 }
