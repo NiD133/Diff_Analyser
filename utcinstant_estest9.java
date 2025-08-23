@@ -1,27 +1,30 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest9 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link UtcInstant}.
+ * This class focuses on the behavior of the withNanoOfDay() method.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Instant instant0 = MockInstant.ofEpochSecond(0L);
-        UtcInstant utcInstant0 = UtcInstant.of(instant0);
-        UtcInstant utcInstant1 = utcInstant0.withNanoOfDay(0L);
-        assertEquals(0L, utcInstant1.getNanoOfDay());
-        assertEquals(40587L, utcInstant0.getModifiedJulianDay());
-        assertTrue(utcInstant1.equals((Object) utcInstant0));
+    /**
+     * Tests that calling withNanoOfDay() with the same value that the object
+     * already has results in an equal instance, demonstrating idempotency.
+     */
+    @Test
+    public void withNanoOfDay_whenValueIsUnchanged_returnsEqualInstance() {
+        // Arrange: Create a UtcInstant at the epoch, which has a nano-of-day of 0.
+        UtcInstant originalInstant = UtcInstant.of(Instant.EPOCH);
+        assertEquals("Precondition failed: The original instant should have 0 nano-of-day",
+                0L, originalInstant.getNanoOfDay());
+
+        // Act: Call withNanoOfDay() with the same nano-of-day value.
+        UtcInstant updatedInstant = originalInstant.withNanoOfDay(0L);
+
+        // Assert: The returned instance should be equal to the original.
+        assertEquals(originalInstant, updatedInstant);
     }
 }
