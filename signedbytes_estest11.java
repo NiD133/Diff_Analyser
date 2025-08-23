@@ -1,18 +1,27 @@
 package com.google.common.primitives;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Comparator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class SignedBytes_ESTestTest11 extends SignedBytes_ESTest_scaffolding {
+/**
+ * Unit tests for {@link SignedBytes}.
+ */
+public class SignedBytesTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        byte byte0 = SignedBytes.checkedCast(0L);
-        assertEquals((byte) 0, byte0);
+    /**
+     * Tests that checkedCast correctly converts a long value of 0,
+     * which is well within the valid range of a byte.
+     */
+    @Test
+    public void checkedCast_withZero_returnsZeroByte() {
+        // Arrange
+        long valueToCast = 0L;
+        byte expectedResult = (byte) 0;
+
+        // Act
+        byte actualResult = SignedBytes.checkedCast(valueToCast);
+
+        // Assert
+        assertEquals(expectedResult, actualResult);
     }
 }
