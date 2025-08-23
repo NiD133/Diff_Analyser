@@ -1,21 +1,42 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class EthiopicChronology_ESTestTest21 extends EthiopicChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1962));
-        EthiopicChronology ethiopicChronology0 = EthiopicChronology.getInstance(dateTimeZone0);
-        Chronology chronology0 = ethiopicChronology0.withUTC();
-        assertNotSame(chronology0, ethiopicChronology0);
+/**
+ * Unit tests for the EthiopicChronology class.
+ */
+public class EthiopicChronologyTest {
+
+    /**
+     * Tests that calling withUTC() on a chronology with a non-UTC time zone
+     * returns a new instance configured for the UTC time zone.
+     */
+    @Test
+    public void withUTC_whenChronologyIsNotUTC_returnsNewInstanceWithUTCZone() {
+        // Arrange: Create a chronology with a specific, non-UTC time zone.
+        DateTimeZone nonUtcZone = DateTimeZone.forOffsetHours(2);
+        EthiopicChronology originalChronology = EthiopicChronology.getInstance(nonUtcZone);
+
+        // Act: Request the equivalent chronology in UTC.
+        Chronology utcChronology = originalChronology.withUTC();
+
+        // Assert: The method should return a different instance because the time zone has changed.
+        assertNotSame(
+            "A new Chronology instance should be returned for a different time zone.",
+            originalChronology,
+            utcChronology
+        );
+
+        // Further assert that the new instance has the correct (UTC) time zone.
+        assertEquals(
+            "The returned Chronology should have the UTC time zone.",
+            DateTimeZone.UTC,
+            utcChronology.getZone()
+        );
     }
 }
