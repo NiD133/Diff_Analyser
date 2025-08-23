@@ -1,26 +1,32 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class TokenQueue_ESTestTest62 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the chompBalanced method in TokenQueue.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("\"@=e|.=e88-P~");
-        // Undeclared exception!
+    /**
+     * Tests that chompBalanced throws an IllegalArgumentException if it consumes an opening
+     * character but cannot find a corresponding closing character before the end of the queue.
+     */
+    @Test
+    public void chompBalancedThrowsIfNoClosingMarkerIsFound() {
+        // Arrange: Create a queue with an opening quote but no matching closing quote.
+        String input = "\"@=e|.=e88-P~";
+        TokenQueue queue = new TokenQueue(input);
+        String expectedErrorMessage = "Did not find balanced marker at '@=e|.=e88-P~'";
+
+        // Act & Assert
         try {
-            tokenQueue0.chompBalanced('\"', '\"');
-            fail("Expecting exception: IllegalArgumentException");
+            queue.chompBalanced('"', '"');
+            fail("Expected an IllegalArgumentException to be thrown due to an unclosed marker.");
         } catch (IllegalArgumentException e) {
-            //
-            // Did not find balanced marker at '@=e|.=e88-P~'
-            //
-            verifyException("org.jsoup.helper.Validate", e);
+            // Verify that the correct exception was thrown with the expected message.
+            assertEquals(expectedErrorMessage, e.getMessage());
         }
     }
 }
