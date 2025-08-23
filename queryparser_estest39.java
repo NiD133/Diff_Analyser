@@ -1,26 +1,31 @@
 package org.jsoup.select;
 
+import org.jsoup.select.Selector.SelectorParseException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class QueryParser_ESTestTest39 extends QueryParser_ESTest_scaffolding {
+/**
+ * Tests for invalid query syntax in {@link QueryParser}.
+ */
+public class QueryParserTest {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Verifies that parsing a CSS selector with a trailing combinator (e.g., "div ~")
+     * throws a SelectorParseException, as a selector is expected to follow the combinator.
+     */
+    @Test
+    public void parse_selectorWithTrailingCombinator_throwsSelectorParseException() {
+        // Arrange: An invalid query with a combinator at the end.
+        String invalidQuery = "div ~";
+
         try {
-            QueryParser.parse(":nth-last-of-type(-464n-464) ~ ");
-            //  fail("Expecting exception: IllegalStateException");
-            // Unstable assertion
-        } catch (IllegalStateException e) {
-            //
-            // No match found
-            //
-            verifyException("java.util.regex.Matcher", e);
+            // Act
+            QueryParser.parse(invalidQuery);
+            fail("A SelectorParseException should have been thrown for a query with a trailing combinator.");
+        } catch (SelectorParseException e) {
+            // Assert: The exception is caught and its message is as expected.
+            assertEquals("Expected selector after combinator '~'", e.getMessage());
         }
     }
 }
