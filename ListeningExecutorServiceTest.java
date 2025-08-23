@@ -34,53 +34,93 @@ import java.util.concurrent.TimeoutException;
 import junit.framework.TestCase;
 import org.jspecify.annotations.NullUnmarked;
 
+/**
+ * Tests that the Duration-based overloads on ListeningExecutorService delegate
+ * to the long, TimeUnit methods using NANOSECONDS and preserve inputs.
+ */
 @NullUnmarked
 public final class ListeningExecutorServiceTest extends TestCase {
 
-  private Collection<? extends Callable<?>> recordedTasks;
-  private long recordedTimeout;
-  private TimeUnit recordedTimeUnit;
+  private final RecordingExecutorService executor = new RecordingExecutorService();
 
-  private final ListeningExecutorService executorService = new FakeExecutorService();
-
-  public void testInvokeAny() throws Exception {
-    Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAny");
-
-    String result = executorService.invokeAny(tasks, Duration.ofSeconds(7));
-
-    assertThat(result).isEqualTo("invokeAny");
-    assertThat(recordedTasks).isSameInstanceAs(tasks);
-    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofSeconds(7));
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    executor.clearRecordings();
   }
 
-  public void testInvokeAll() throws Exception {
-    Set<Callable<String>> tasks = Collections.singleton(() -> "invokeAll");
+  public void testInvokeAny_durationOverloadDelegatesWithNanos() throws Exception {
+    Duration timeout = Duration.ofSeconds(7);
+    Set<Callable<String>> tasks = singletonTaskReturning("invokeAny");
 
-    List<Future<String>> result = executorService.invokeAll(tasks, Duration.ofDays(365));
+    String result = executor.invokeAny(tasks, timeout);
+
+    assertThat(result).isEqualTo("invokeAny");
+    assertThat(executor.lastTasks()).isSameInstanceAs(tasks);
+    assertRecordedTimeoutEquals(timeout);
+  }
+
+  public void testInvokeAll_durationOverloadDelegatesWithNanos() throws Exception {
+    Duration timeout = Duration.ofDays(365);
+    Set<Callable<String>> tasks = singletonTaskReturning("invokeAll");
+
+    List<Future<String>> result = executor.invokeAll(tasks, timeout);
 
     assertThat(result).hasSize(1);
     assertThat(Futures.getDone(result.get(0))).isEqualTo("invokeAll");
-    assertThat(recordedTasks).isSameInstanceAs(tasks);
-    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofDays(365));
+    assertThat(executor.lastTasks()).isSameInstanceAs(tasks);
+    assertRecordedTimeoutEquals(timeout);
   }
 
-  public void testAwaitTermination() throws Exception {
-    boolean result = executorService.awaitTermination(Duration.ofMinutes(144));
+  public void testAwaitTermination_durationOverloadDelegatesWithNanos() throws Exception {
+    Duration timeout = Duration.ofMinutes(144);
+
+    boolean result = executor.awaitTermination(timeout);
 
     assertThat(result).isTrue();
-    assertThat(recordedTimeUnit).isEqualTo(NANOSECONDS);
-    assertThat(Duration.ofNanos(recordedTimeout)).isEqualTo(Duration.ofMinutes(144));
+    assertRecordedTimeoutEquals(timeout);
   }
 
-  private class FakeExecutorService extends AbstractListeningExecutorService {
+  private void assertRecordedTimeoutEquals(Duration expected) {
+    assertThat(executor.lastTimeUnit()).isEqualTo(NANOSECONDS);
+    assertThat(Duration.ofNanos(executor.lastTimeoutNanos())).isEqualTo(expected);
+  }
+
+  private static <T> Set<Callable<T>> singletonTaskReturning(T value) {
+    return Collections.singleton(() -> value);
+  }
+
+  /**
+   * Executor that records the last tasks and timeout/unit it was invoked with,
+   * then returns simple immediate results to keep tests focused on delegation.
+   */
+  private static final class RecordingExecutorService extends AbstractListeningExecutorService {
+    private Collection<? extends Callable<?>> lastTasks;
+    private long lastTimeoutNanos;
+    private TimeUnit lastUnit;
+
+    void clearRecordings() {
+      lastTasks = null;
+      lastTimeoutNanos = 0L;
+      lastUnit = null;
+    }
+
+    Collection<? extends Callable<?>> lastTasks() {
+      return lastTasks;
+    }
+
+    long lastTimeoutNanos() {
+      return lastTimeoutNanos;
+    }
+
+    TimeUnit lastTimeUnit() {
+      return lastUnit;
+    }
+
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
-      recordedTasks = tasks;
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
+      record(tasks, timeout, unit);
       try {
         return tasks.iterator().next().call();
       } catch (Exception e) {
@@ -92,9 +132,7 @@ public final class ListeningExecutorServiceTest extends TestCase {
     public <T> List<Future<T>> invokeAll(
         Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
         throws InterruptedException {
-      recordedTasks = tasks;
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
+      record(tasks, timeout, unit);
       try {
         return Collections.singletonList(immediateFuture(tasks.iterator().next().call()));
       } catch (Exception e) {
@@ -104,11 +142,17 @@ public final class ListeningExecutorServiceTest extends TestCase {
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) {
-      recordedTimeout = timeout;
-      recordedTimeUnit = unit;
+      record(null, timeout, unit);
       return true;
     }
 
+    private void record(Collection<? extends Callable<?>> tasks, long timeout, TimeUnit unit) {
+      this.lastTasks = tasks;
+      this.lastTimeoutNanos = timeout;
+      this.lastUnit = unit;
+    }
+
+    // Unused methods for this test.
     @Override
     public void execute(Runnable runnable) {
       throw new UnsupportedOperationException();
