@@ -1,31 +1,28 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
 
-public class FieldUtils_ESTestTest32 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the safe division methods in {@link FieldUtils}.
+ */
+public class FieldUtilsSafeDivideTest {
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        RoundingMode roundingMode0 = RoundingMode.HALF_EVEN;
-        // Undeclared exception!
-        try {
-            FieldUtils.safeDivide(0L, 0L, roundingMode0);
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Tests that safeDivide throws an ArithmeticException when the divisor is zero,
+     * as division by zero is an invalid mathematical operation.
+     */
+    @Test(expected = ArithmeticException.class)
+    public void safeDivide_shouldThrowArithmeticException_whenDividingByZero() {
+        // Arrange: Define the dividend, divisor, and rounding mode.
+        // The specific rounding mode is irrelevant here, as the division by zero
+        // check happens before any rounding logic is applied.
+        final long dividend = 100L;
+        final long divisor = 0L;
+        final RoundingMode roundingMode = RoundingMode.HALF_UP;
+
+        // Act: Attempt to divide by zero.
+        // Assert: The @Test(expected) annotation asserts that an ArithmeticException is thrown.
+        FieldUtils.safeDivide(dividend, divisor, roundingMode);
     }
 }
