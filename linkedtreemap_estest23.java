@@ -1,36 +1,41 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-public class LinkedTreeMap_ESTestTest23 extends LinkedTreeMap_ESTest_scaffolding {
+/**
+ * Tests for {@link LinkedTreeMap} focusing on its handling of key comparability.
+ */
+public class LinkedTreeMapTest {
 
-    @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        LinkedTreeMap<LinkedTreeMap<Integer, Integer>, LinkedTreeMap<Integer, Object>> linkedTreeMap0 = new LinkedTreeMap<LinkedTreeMap<Integer, Integer>, LinkedTreeMap<Integer, Object>>();
-        LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, LinkedTreeMap<Integer, Object>> linkedTreeMap_Node0 = new LinkedTreeMap.Node<LinkedTreeMap<Integer, Integer>, LinkedTreeMap<Integer, Object>>(true);
-        linkedTreeMap0.root = linkedTreeMap_Node0;
-        LinkedTreeMap<Integer, Integer> linkedTreeMap1 = new LinkedTreeMap<Integer, Integer>();
-        // Undeclared exception!
-        try {
-            linkedTreeMap0.find(linkedTreeMap1, true);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // com.google.gson.internal.LinkedTreeMap cannot be cast to java.lang.Comparable
-            //
-            verifyException("com.google.gson.internal.LinkedTreeMap", e);
-        }
+    /**
+     * A simple helper class that does not implement {@link Comparable}, used to test
+     * how LinkedTreeMap behaves with non-comparable keys.
+     */
+    private static class NonComparableKey {}
+
+    @Test
+    public void findWithNonComparableKeyThrowsClassCastException() {
+        // Arrange: Create a LinkedTreeMap with its default constructor.
+        // This configures the map to use natural ordering, which requires keys
+        // to implement the Comparable interface.
+        LinkedTreeMap<NonComparableKey, String> map = new LinkedTreeMap<>();
+        NonComparableKey key = new NonComparableKey();
+
+        // Act & Assert: Verify that calling find() with a non-comparable key
+        // throws a ClassCastException, as the map will attempt to cast the key
+        // to Comparable to perform a comparison.
+        ClassCastException exception = assertThrows(
+            ClassCastException.class,
+            () -> map.find(key, true) // Attempt to find and create the key
+        );
+
+        // Optional: A more specific assertion on the exception message ensures
+        // we're catching the expected error.
+        assertTrue(
+            "Exception message should indicate a casting problem to Comparable",
+            exception.getMessage().contains("cannot be cast to java.lang.Comparable")
+        );
     }
 }
