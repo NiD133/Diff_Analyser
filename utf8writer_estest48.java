@@ -1,47 +1,56 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest48 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test47() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        uTF8Writer0.write(2);
+/**
+ * Contains tests for the {@link UTF8Writer} class.
+ */
+public class UTF8WriterTest {
+
+    /**
+     * Tests that the close() method propagates an IOException thrown by the
+     * underlying output stream when flushing the buffer.
+     */
+    @Test
+    public void close_whenUnderlyingStreamIsFaulty_shouldPropagateIOException() throws IOException {
+        // ARRANGE
+        // 1. IOContext is a required dependency for UTF8Writer.
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                new BufferRecycler(),
+                ContentReference.redacted(),
+                true);
+
+        // 2. Use an unconnected PipedOutputStream to simulate a faulty stream.
+        //    Any attempt to write or flush to it will throw an IOException.
+        PipedOutputStream faultyOutputStream = new PipedOutputStream();
+        UTF8Writer utf8Writer = new UTF8Writer(ioContext, faultyOutputStream);
+
+        // 3. Write a character to the writer's internal buffer. This ensures that
+        //    the subsequent close() call will attempt to flush the buffer.
+        utf8Writer.write('A');
+
+        // ACT & ASSERT
         try {
-            uTF8Writer0.close();
-            fail("Expecting exception: IOException");
+            // The close() method will try to flush the buffered content ('A')
+            // to the faulty stream, triggering the exception.
+            utf8Writer.close();
+            fail("Expected an IOException because the underlying pipe is not connected.");
         } catch (IOException e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
+            // Verify that the exception is the one we expect from the PipedOutputStream.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
