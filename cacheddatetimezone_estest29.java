@@ -1,23 +1,43 @@
 package org.joda.time.tz;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDateTime;
-import org.joda.time.chrono.GregorianChronology;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CachedDateTimeZone_ESTestTest29 extends CachedDateTimeZone_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Test(timeout = 4000)
-    public void test28() throws Throwable {
-        DateTimeZone dateTimeZone0 = DateTimeZone.forID("WET");
-        String string0 = dateTimeZone0.getName(212544000000L);
-        assertEquals("Western European Time", string0);
+/**
+ * A test suite for the {@link CachedDateTimeZone} class.
+ */
+public class CachedDateTimeZoneTest {
+
+    /**
+     * Tests that {@link CachedDateTimeZone#getName(long)} returns the correct long name for a given instant.
+     * This test uses the "WET" time zone, which is a non-fixed zone that Joda-Time wraps
+     * with a {@link CachedDateTimeZone} instance by default.
+     */
+    @Test
+    public void getNameForWETZoneShouldReturnCorrectLongName() {
+        // Arrange
+        // The factory method DateTimeZone.forID() returns a CachedDateTimeZone for non-fixed zones like "WET".
+        final DateTimeZone wetZone = DateTimeZone.forID("WET");
+        final String expectedName = "Western European Time";
+
+        // Define a specific instant in time to test against.
+        // This corresponds to the magic number 212544000000L in the original test.
+        final long instant = new DateTime(1976, 9, 26, 0, 0, DateTimeZone.UTC).getMillis();
+
+        // Act
+        final String actualName = wetZone.getName(instant);
+
+        // Assert
+        // First, confirm we are indeed testing a CachedDateTimeZone instance.
+        assertTrue("The zone for 'WET' should be a CachedDateTimeZone instance.",
+                   wetZone instanceof CachedDateTimeZone);
+        
+        // Second, verify that the name is correct for the given instant.
+        assertEquals("The long name for the WET zone should be correct.",
+                     expectedName, actualName);
     }
 }
