@@ -1,30 +1,38 @@
 package org.apache.commons.codec.net;
 
+import org.apache.commons.codec.EncoderException;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 
-public class BCodec_ESTestTest13 extends BCodec_ESTest_scaffolding {
+/**
+ * Tests for {@link BCodec}.
+ *
+ * Note: The original test class name `BCodec_ESTestTest13` and its scaffolding
+ * suggest it was auto-generated. This version uses a more conventional name and structure.
+ */
+public class BCodecTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        BCodec bCodec0 = new BCodec();
-        // Undeclared exception!
-        try {
-            bCodec0.encode(" encoded content", (String) null);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Null charset name
-            //
-            verifyException("java.nio.charset.Charset", e);
-        }
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    /**
+     * Tests that calling encode() with a null charset name string results in an
+     * IllegalArgumentException. This is the expected behavior from the underlying
+     * java.nio.charset.Charset.forName(null) call.
+     */
+    @Test
+    public void encodeWithNullCharsetNameThrowsIllegalArgumentException() throws EncoderException {
+        // Arrange
+        final BCodec bCodec = new BCodec();
+        final String inputText = "any string";
+        final String nullCharsetName = null;
+
+        // Assert: Define the expected exception and its message.
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Null charset name");
+
+        // Act: Call the method that should throw the configured exception.
+        bCodec.encode(inputText, nullCharsetName);
     }
 }
