@@ -1,47 +1,29 @@
 package org.apache.commons.cli.help;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
 public class TextHelpAppendable_ESTestTest91 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test90() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        byteArray0[1] = (byte) 11;
-        ByteBuffer byteBuffer0 = ByteBuffer.wrap(byteArray0);
-        Charset charset0 = Charset.defaultCharset();
-        CharBuffer charBuffer0 = charset0.decode(byteBuffer0);
-        int int0 = TextHelpAppendable.indexOfWrap(charBuffer0, 74, 1);
-        assertEquals(1, int0);
+    /**
+     * Tests that indexOfWrap returns the starting position immediately if the character
+     * at that position is a line-breaking character (like a newline).
+     */
+    @Test
+    public void indexOfWrapShouldReturnStartIndexWhenCharacterIsBreakChar() {
+        // Arrange
+        // The text contains a newline character '\n' at index 1.
+        // According to the TextHelpAppendable implementation, '\n' is a break character.
+        final CharSequence textWithBreakChar = "a\nbc";
+        final int searchWidth = 10; // A width larger than the string to not affect the outcome.
+        final int startPosition = 1;
+
+        // Act
+        final int wrapIndex = TextHelpAppendable.indexOfWrap(textWithBreakChar, searchWidth, startPosition);
+
+        // Assert
+        // The method should find the break character at the starting position and return that index.
+        assertEquals("The wrap index should be the start position itself", startPosition, wrapIndex);
     }
 }
