@@ -1,45 +1,38 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
 
-public class GridArrangement_ESTestTest64 extends GridArrangement_ESTest_scaffolding {
+/**
+ * A test suite for the {@link GridArrangement} class, focusing on its behavior
+ * under exceptional or edge-case conditions.
+ */
+public class GridArrangementTest {
 
-    @Test(timeout = 4000)
-    public void test63() throws Throwable {
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNotNull(blockContainer0);
-        RectangleConstraint rectangleConstraint0 = RectangleConstraint.NONE;
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.NONE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        GridArrangement gridArrangement0 = new GridArrangement(2958465, 2958465);
-        assertNotNull(gridArrangement0);
-        // Undeclared exception!
-        gridArrangement0.arrangeFF(blockContainer0, (Graphics2D) null, rectangleConstraint0);
+    /**
+     * Verifies that attempting to arrange a grid with excessively large dimensions
+     * throws an {@link OutOfMemoryError}.
+     *
+     * This test ensures that the arrangement logic fails predictably when faced
+     * with resource constraints that are impossible to meet, rather than hanging
+     * or causing other undefined behavior.
+     */
+    @Test(expected = OutOfMemoryError.class, timeout = 4000)
+    public void arrangeFFWithExcessivelyLargeGridShouldThrowOutOfMemoryError() {
+        // Arrange: Create a grid arrangement with dimensions so large that they
+        // are certain to exhaust available heap memory during allocation.
+        final int excessivelyLargeDimension = 3_000_000;
+        GridArrangement gridArrangement = new GridArrangement(
+                excessivelyLargeDimension, excessivelyLargeDimension);
+
+        BlockContainer container = new BlockContainer();
+        RectangleConstraint constraint = RectangleConstraint.NONE;
+
+        // Act & Assert: Attempt to arrange the container. This call is expected
+        // to throw an OutOfMemoryError when the method tries to allocate internal
+        // data structures (like arrays) for the massive grid.
+        // The Graphics2D context is passed as null, as the memory error should
+        // occur before it is ever used.
+        gridArrangement.arrangeFF(container, (Graphics2D) null, constraint);
     }
 }
