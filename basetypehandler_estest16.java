@@ -1,27 +1,43 @@
 package org.apache.ibatis.type;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.sql.SQLException;
 
-public class BaseTypeHandler_ESTestTest16 extends BaseTypeHandler_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        StringTypeHandler stringTypeHandler0 = new StringTypeHandler();
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn(" Q9@^x<<xBG*k").when(callableStatement0).getString(anyInt());
-        String string0 = stringTypeHandler0.getResult(callableStatement0, 0);
-        assertEquals(" Q9@^x<<xBG*k", string0);
+/**
+ * Test suite for the StringTypeHandler.
+ * This focuses on testing the specific implementation of the BaseTypeHandler.
+ */
+public class StringTypeHandlerTest {
+
+    /**
+     * Tests that the handler can correctly retrieve a string value
+     * from a CallableStatement by its column index.
+     */
+    @Test
+    public void shouldGetStringResultFromCallableStatementByIndex() throws SQLException {
+        // Arrange
+        final String EXPECTED_STRING = "Hello World";
+        final int COLUMN_INDEX = 1;
+
+        // Create the handler to be tested
+        StringTypeHandler handler = new StringTypeHandler();
+
+        // Mock the database dependency (CallableStatement)
+        CallableStatement mockCallableStatement = mock(CallableStatement.class);
+        when(mockCallableStatement.getString(COLUMN_INDEX)).thenReturn(EXPECTED_STRING);
+
+        // Act
+        // Call the method under test to get the result
+        String actualString = handler.getResult(mockCallableStatement, COLUMN_INDEX);
+
+        // Assert
+        // Verify that the handler returned the expected string from the mock statement
+        assertEquals(EXPECTED_STRING, actualString);
     }
 }
