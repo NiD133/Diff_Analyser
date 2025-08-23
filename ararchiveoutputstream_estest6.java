@@ -1,32 +1,46 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest6 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the ArArchiveOutputStream class.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("*m{4/p6", false);
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(mockFileOutputStream0);
-        ArArchiveEntry arArchiveEntry0 = new ArArchiveEntry("User ID", 8589934591L, 61440, 7, (-2628), 0);
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
-        assertEquals(68L, arArchiveOutputStream0.getBytesWritten());
+    /**
+     * Verifies that writing the first entry to an AR archive correctly writes
+     * both the global archive header and the entry's header.
+     */
+    @Test
+    public void putFirstArchiveEntryWritesArchiveAndEntryHeaders() throws IOException {
+        // Arrange
+        // The AR format has a global "magic" header and a header for each entry.
+        // 1. Global AR magic header: "!<arch>\n" is 8 bytes.
+        // 2. Standard AR entry header: 60 bytes.
+        final long expectedHeaderSize = 8L + 60L;
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        // Use a try-with-resources statement to ensure the stream is closed automatically.
+        try (ArArchiveOutputStream arOut = new ArArchiveOutputStream(outputStream)) {
+            // Create a simple entry. The specific metadata values are not critical for this test,
+            // as long as the name is short enough to not trigger long filename handling.
+            ArArchiveEntry entry = new ArArchiveEntry("test_entry.txt", 1024L);
+
+            // Act
+            arOut.putArchiveEntry(entry);
+
+            // Assert
+            // The total bytes written should equal the sum of the global and entry header sizes.
+            assertEquals("Bytes written should be the sum of archive magic and entry header sizes.",
+                    expectedHeaderSize, arOut.getBytesWritten());
+
+            // For completeness, also verify the underlying stream received the correct number of bytes.
+            assertEquals("The underlying stream's size should match the expected header size.",
+                    (int) expectedHeaderSize, outputStream.size());
+        }
     }
 }
