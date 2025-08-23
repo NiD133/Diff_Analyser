@@ -1,37 +1,25 @@
 package org.apache.commons.collections4.bag;
 
+import org.apache.commons.collections4.bag.AbstractMapBag; // Only needed for the original test's type
+import org.apache.commons.collections4.bag.TreeBag;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+import java.util.Collection;
+
+/**
+ * This class contains tests for the {@link TreeBag} class.
+ * This specific test focuses on constructor behavior with invalid arguments.
+ */
+// The original class name is kept for context, but a name like TreeBagConstructorTest would be more descriptive.
 public class TreeBag_ESTestTest16 extends TreeBag_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        TreeBag<AbstractMapBag.MutableInteger> treeBag0 = null;
-        try {
-            treeBag0 = new TreeBag<AbstractMapBag.MutableInteger>((Collection<? extends AbstractMapBag.MutableInteger>) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.collections4.bag.AbstractMapBag", e);
-        }
+    /**
+     * Tests that the TreeBag constructor throws a NullPointerException
+     * when initialized with a null collection.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorWithNullCollectionShouldThrowNullPointerException() {
+        // Attempt to create a TreeBag from a null collection, which is not allowed.
+        new TreeBag<String>((Collection<String>) null);
     }
 }
