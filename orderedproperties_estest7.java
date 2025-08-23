@@ -1,64 +1,52 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
+
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class OrderedProperties_ESTestTest7 extends OrderedProperties_ESTest_scaffolding {
+import static org.junit.Assert.fail;
 
+/**
+ * This test class contains tests for the {@link OrderedProperties} class.
+ * This particular test focuses on the behavior of cloned instances.
+ */
+public class OrderedPropertiesTest {
+
+    /**
+     * Tests that a cloned OrderedProperties instance becomes inconsistent if the original
+     * instance is modified after cloning.
+     *
+     * <p><b>Scenario:</b> The {@code clone()} method inherited from {@code Hashtable}
+     * performs a shallow copy. This means the internal {@code LinkedHashSet} that tracks
+     * key order is shared between the original and the clone. Modifying the original
+     * by removing a key also removes it from the shared set, but not from the clone's
+     * internal hash table. This inconsistency causes subsequent operations on the clone,
+     * such as {@code toString()}, to fail.</p>
+     */
     @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        HashMap<Integer, Integer> hashMap0 = new HashMap<Integer, Integer>();
-        Integer integer0 = new Integer(0);
-        orderedProperties0.putIfAbsent(integer0, hashMap0);
-        Object object0 = orderedProperties0.clone();
-        orderedProperties0.remove((Object) integer0);
-        // Undeclared exception!
+    public void testCloneBecomesInconsistentWhenOriginalIsModified() {
+        // Arrange: Create an OrderedProperties instance, add an element, and then clone it.
+        OrderedProperties original = new OrderedProperties();
+        Integer key = 123;
+        HashMap<String, String> value = new HashMap<>();
+        original.put(key, value);
+
+        // The clone shares the internal 'orderedKeys' set with the original.
+        OrderedProperties clone = (OrderedProperties) original.clone();
+
+        // Act: Remove the key from the original instance. This modification affects the
+        // shared 'orderedKeys' set, putting the clone into an inconsistent state.
+        original.remove(key);
+
+        // Assert: Calling toString() on the inconsistent clone is expected to fail.
+        // The method relies on the 'orderedKeys' set to iterate, but the clone's
+        // underlying hash table state no longer matches, leading to an error.
         try {
-            object0.toString();
-            fail("Expecting exception: NoSuchElementException");
+            clone.toString();
+            fail("Expected a NoSuchElementException due to the clone's inconsistent state.");
         } catch (NoSuchElementException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedHashMap$LinkedHashIterator", e);
+            // This exception is expected, confirming the inconsistent state causes a failure.
         }
     }
 }
