@@ -1,41 +1,40 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Color;
-import java.awt.Font;
+import static org.junit.Assert.assertNull;
+
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for the draw(Graphics2D, Rectangle2D, Object) method in the LabelBlock class.
+ *
+ * Note: The original class name 'LabelBlock_ESTestTest18' and its scaffolding are preserved.
+ * In a real-world scenario, these would be refactored for better clarity
+ * (e.g., a class named 'LabelBlockDrawTest').
+ */
 public class LabelBlock_ESTestTest18 extends LabelBlock_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        LabelBlock labelBlock0 = new LabelBlock("9\"M5 ; _s");
-        BufferedImage bufferedImage0 = new BufferedImage(1, 1, 1);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        Point point0 = new Point();
-        Rectangle rectangle0 = new Rectangle(point0);
-        Object object0 = labelBlock0.draw(graphics2D0, (Rectangle2D) rectangle0, (Object) point0);
-        assertNull(object0);
+    /**
+     * Verifies that the draw() method with a 'params' object always returns null,
+     * as specified by its Javadoc contract.
+     */
+    @Test
+    public void drawWithParamsShouldAlwaysReturnNull() {
+        // Arrange: Create a LabelBlock instance and a dummy graphics context for drawing.
+        LabelBlock labelBlock = new LabelBlock("Test Label");
+        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D drawArea = new Rectangle2D.Double(0, 0, 100, 50);
+
+        // The third parameter ('params') is documented as being ignored by the method.
+        Object params = null;
+
+        // Act: Call the draw method whose return value is under test.
+        Object result = labelBlock.draw(g2, drawArea, params);
+
+        // Assert: The method's contract states it must always return null.
+        assertNull("The draw(g2, area, params) method should always return null.", result);
     }
 }
