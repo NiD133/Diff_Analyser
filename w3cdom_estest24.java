@@ -1,46 +1,26 @@
 package org.jsoup.helper;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jsoup.nodes.Attributes;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.XmlDeclaration;
-import org.jsoup.parser.Parser;
-import org.jsoup.parser.Tag;
-import org.junit.runner.RunWith;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Document;
 
-public class W3CDom_ESTestTest24 extends W3CDom_ESTest_scaffolding {
+/**
+ * Test suite for the {@link W3CDom} helper class.
+ */
+public class W3CDomTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        W3CDom w3CDom0 = new W3CDom();
-        // Undeclared exception!
-        try {
-            w3CDom0.convert((Element) null, (org.w3c.dom.Document) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.jsoup.helper.W3CDom$W3CBuilder", e);
-        }
+    /**
+     * Verifies that calling {@link W3CDom#convert(Element, Document)} with null arguments
+     * throws a NullPointerException. This is the expected behavior, as the method requires
+     * valid Jsoup and W3C document objects to perform the conversion.
+     */
+    @Test(expected = NullPointerException.class)
+    public void convertShouldThrowNullPointerExceptionForNullInputs() {
+        // Arrange: Create an instance of the class under test.
+        W3CDom w3cDom = new W3CDom();
+
+        // Act & Assert: Call the method with null inputs and expect an exception.
+        // The method should fail fast when provided with invalid arguments.
+        w3cDom.convert((Element) null, (Document) null);
     }
 }
