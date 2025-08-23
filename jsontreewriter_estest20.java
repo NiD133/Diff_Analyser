@@ -1,26 +1,28 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.Strictness;
-import com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
-public class JsonTreeWriter_ESTestTest20 extends JsonTreeWriter_ESTest_scaffolding {
+/**
+ * Tests for {@link JsonTreeWriter}.
+ * This class focuses on behaviors specific to or inherited by JsonTreeWriter.
+ */
+public class JsonTreeWriterTest {
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        JsonTreeWriter jsonTreeWriter0 = new JsonTreeWriter();
-        Strictness strictness0 = Strictness.LENIENT;
-        jsonTreeWriter0.setStrictness(strictness0);
-        JsonWriter jsonWriter0 = jsonTreeWriter0.nullValue();
-        assertTrue(jsonWriter0.isLenient());
+    /**
+     * Verifies that the strictness setting, a feature from the parent {@link com.google.gson.stream.JsonWriter},
+     * is correctly applied to the JsonTreeWriter instance.
+     */
+    @Test
+    public void setStrictnessToLenientShouldMakeWriterLenient() {
+        // Arrange: Create a new JsonTreeWriter. By default, it is not lenient.
+        JsonTreeWriter writer = new JsonTreeWriter();
+
+        // Act: Set the strictness mode to LENIENT.
+        writer.setStrictness(Strictness.LENIENT);
+
+        // Assert: Verify that the writer's mode is now lenient.
+        assertTrue("Writer should be in lenient mode after setting Strictness.LENIENT", writer.isLenient());
     }
 }
