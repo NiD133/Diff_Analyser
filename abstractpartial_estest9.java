@@ -1,47 +1,29 @@
 package org.joda.time.base;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Date;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.joda.time.MonthDay;
-import org.joda.time.Partial;
-import org.joda.time.ReadablePartial;
-import org.joda.time.Weeks;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class AbstractPartial_ESTestTest9 extends AbstractPartial_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        YearMonth yearMonth0 = new YearMonth();
-        DateTimeFieldType dateTimeFieldType0 = DateTimeFieldType.monthOfYear();
-        int int0 = yearMonth0.indexOf(dateTimeFieldType0);
-        assertEquals(1, int0);
+/**
+ * Unit tests for the {@link AbstractPartial} class, focusing on the indexOf method.
+ */
+public class AbstractPartialTest {
+
+    @Test
+    public void indexOf_shouldReturnCorrectIndexForSupportedField() {
+        // Arrange
+        // YearMonth is a concrete implementation of AbstractPartial.
+        // Its fields are defined as [year, monthOfYear].
+        YearMonth partial = new YearMonth();
+        DateTimeFieldType monthOfYearType = DateTimeFieldType.monthOfYear();
+        int expectedIndex = 1; // year is at index 0, monthOfYear is at index 1
+
+        // Act
+        int actualIndex = partial.indexOf(monthOfYearType);
+
+        // Assert
+        assertEquals("The index of monthOfYear should be 1", expectedIndex, actualIndex);
     }
 }
