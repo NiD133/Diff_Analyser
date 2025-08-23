@@ -1,51 +1,51 @@
 package org.joda.time;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.field.FieldUtils;
-import org.joda.time.field.SkipDateTimeField;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-public class IllegalFieldValueExceptionTestTest6 extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+/**
+ * Tests for {@link IllegalFieldValueException}.
+ * This test focuses on edge cases related to the Gregorian-Julian calendar cutover.
+ */
+class IllegalFieldValueExceptionTest {
 
-    public static TestSuite suite() {
-        return new TestSuite(TestIllegalFieldValueException.class);
-    }
+    @DisplayName("Setting day of month to a non-existent day during the GJ cutover should throw IllegalFieldValueException")
+    @ParameterizedTest(name = "Setting day to {1} on {0} should fail")
+    @CsvSource({
+        "'1582-10-04', 5",  // Try to set to a day within the gap from a date before the gap
+        "'1582-10-15', 14"  // Try to set to a day within the gap from a date after the gap
+    })
+    void setDayOfMonth_toInvalidDayInGJCutoverGap_throwsException(String initialDateStr, int invalidDayToSet) {
+        // The Gregorian calendar reform skipped the dates from October 5 to October 14, 1582.
+        // This test verifies that attempting to set the day of the month to any of these
+        // non-existent dates throws an IllegalFieldValueException with the correct details.
+        
+        // Arrange
+        DateTime initialDate = new DateTime(initialDateStr, GJChronology.getInstanceUTC());
 
-    public void testGJCutover() {
-        DateTime dt = new DateTime("1582-10-04", GJChronology.getInstanceUTC());
-        try {
-            dt.dayOfMonth().setCopy(5);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.dayOfMonth(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("dayOfMonth", e.getFieldName());
-            assertEquals(new Integer(5), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("5", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
-        dt = new DateTime("1582-10-15", GJChronology.getInstanceUTC());
-        try {
-            dt.dayOfMonth().setCopy(14);
-            fail();
-        } catch (IllegalFieldValueException e) {
-            assertEquals(DateTimeFieldType.dayOfMonth(), e.getDateTimeFieldType());
-            assertEquals(null, e.getDurationFieldType());
-            assertEquals("dayOfMonth", e.getFieldName());
-            assertEquals(new Integer(14), e.getIllegalNumberValue());
-            assertEquals(null, e.getIllegalStringValue());
-            assertEquals("14", e.getIllegalValueAsString());
-            assertEquals(null, e.getLowerBound());
-            assertEquals(null, e.getUpperBound());
-        }
+        // Act & Assert
+        IllegalFieldValueException thrownException = assertThrows(
+            IllegalFieldValueException.class,
+            () -> initialDate.dayOfMonth().setCopy(invalidDayToSet),
+            "Expected an IllegalFieldValueException for a non-existent day."
+        );
+
+        // Assert on Exception properties
+        assertEquals(DateTimeFieldType.dayOfMonth(), thrownException.getDateTimeFieldType(), "Field type should be dayOfMonth");
+        assertEquals("dayOfMonth", thrownException.getFieldName(), "Field name should be 'dayOfMonth'");
+        assertEquals(invalidDayToSet, thrownException.getIllegalNumberValue(), "Illegal number value should match the input");
+        assertEquals(String.valueOf(invalidDayToSet), thrownException.getIllegalValueAsString(), "Illegal string value should match the input");
+        
+        // Verify that properties not relevant to this exception type are null
+        assertNull(thrownException.getDurationFieldType(), "DurationFieldType should be null");
+        assertNull(thrownException.getIllegalStringValue(), "IllegalStringValue should be null for a numeric error");
+        assertNull(thrownException.getLowerBound(), "LowerBound is not specified for this error");
+        assertNull(thrownException.getUpperBound(), "UpperBound is not specified for this error");
     }
 }
