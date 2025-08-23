@@ -1,20 +1,40 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
-public class ByteOrderMark_ESTestTest19 extends ByteOrderMark_ESTest_scaffolding {
+/**
+ * Unit tests for the equals() method in {@link ByteOrderMark}.
+ */
+public class ByteOrderMarkEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test18() throws Throwable {
-        int[] intArray0 = new int[6];
-        ByteOrderMark byteOrderMark0 = new ByteOrderMark("Bt^D2-fqe2We[-^J#", intArray0);
-        Object object0 = new Object();
-        boolean boolean0 = byteOrderMark0.equals(object0);
-        assertFalse(boolean0);
+    @Test
+    public void equals_whenComparedWithDifferentObjectType_shouldReturnFalse() {
+        // Arrange
+        final ByteOrderMark byteOrderMark = new ByteOrderMark("Test-BOM", 0x01, 0x02, 0x03);
+        final Object otherObject = new Object();
+
+        // Act
+        final boolean isEqual = byteOrderMark.equals(otherObject);
+
+        // Assert
+        // A ByteOrderMark instance should never be equal to an object of a different type.
+        assertFalse("ByteOrderMark should not be equal to a generic Object", isEqual);
+
+        // An alternative, more semantic assertion:
+        assertNotEquals(byteOrderMark, otherObject);
+    }
+
+    @Test
+    public void equals_whenComparedWithNull_shouldReturnFalse() {
+        // Arrange
+        final ByteOrderMark byteOrderMark = new ByteOrderMark("Test-BOM", 0x01, 0x02, 0x03);
+
+        // Act
+        final boolean isEqual = byteOrderMark.equals(null);
+
+        // Assert
+        assertFalse("ByteOrderMark should not be equal to null", isEqual);
     }
 }
