@@ -1,19 +1,29 @@
 package com.google.common.base;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CaseFormat_ESTestTest2 extends CaseFormat_ESTest_scaffolding {
+/**
+ * Tests for {@link CaseFormat}.
+ */
+public class CaseFormatTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        CaseFormat caseFormat0 = CaseFormat.LOWER_CAMEL;
-        CaseFormat caseFormat1 = CaseFormat.LOWER_UNDERSCORE;
-        String string0 = caseFormat0.to(caseFormat1, "0P|{HG$S{ax$v|r_ ");
-        assertEquals("0_p|{_h_g$_s{ax$v|r_ ", string0);
+    @Test
+    public void to_fromLowerCamelToLoweUnderscore_withNonStandardInput_convertsAsBestEffort() {
+        // The `to` method documentation states a "best effort" approach is taken
+        // for strings that do not strictly conform to the source format. This test
+        // verifies that conversion works reasonably with a mix of numbers, symbols,
+        // and mixed-case letters, inserting an underscore before each capital letter.
+
+        // Arrange
+        final String nonStandardLowerCamel = "0P|{HG$S{ax$v|r_  ";
+        final String expectedLowerUnderscore = "0_p|{_h_g$_s{ax$v|r_  ";
+
+        // Act
+        final String result = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, nonStandardLowerCamel);
+
+        // Assert
+        assertEquals(expectedLowerUnderscore, result);
     }
 }
