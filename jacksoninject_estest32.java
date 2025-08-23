@@ -1,30 +1,35 @@
 package com.fasterxml.jackson.annotation;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class JacksonInject_ESTestTest32 extends JacksonInject_ESTest_scaffolding {
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    @Test(timeout = 4000)
-    public void test31() throws Throwable {
-        JacksonInject jacksonInject0 = mock(JacksonInject.class, CALLS_REAL_METHODS);
-        doReturn((OptBoolean) null).when(jacksonInject0).useInput();
-        doReturn((String) null).when(jacksonInject0).value();
-        // Undeclared exception!
-        try {
-            JacksonInject.Value.from(jacksonInject0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("com.fasterxml.jackson.annotation.JacksonInject$Value", e);
-        }
+/**
+ * Test suite for the {@link JacksonInject.Value} class.
+ */
+public class JacksonInjectValueTest {
+
+    /**
+     * Verifies that the factory method {@link JacksonInject.Value#from(JacksonInject)}
+     * throws a NullPointerException if the source annotation returns null for its properties.
+     * <p>
+     * The {@code from()} method internally attempts to call methods on the results of
+     * {@code useInput()} and {@code optional()}, and will fail if those methods return null
+     * instead of a valid {@link OptBoolean} instance.
+     */
+    @Test(expected = NullPointerException.class)
+    public void from_whenAnnotationReturnsNullProperties_shouldThrowNullPointerException() {
+        // Arrange: Create a mock JacksonInject annotation that is misconfigured
+        // to return null for its properties.
+        JacksonInject mockAnnotation = mock(JacksonInject.class);
+        when(mockAnnotation.value()).thenReturn(null);
+        when(mockAnnotation.useInput()).thenReturn(null); // This is the direct cause of the NPE.
+
+        // Act: Attempt to create a Value instance from the misconfigured annotation.
+        JacksonInject.Value.from(mockAnnotation);
+
+        // Assert: The test is expected to throw a NullPointerException, which is
+        // declared in the @Test annotation.
     }
 }
