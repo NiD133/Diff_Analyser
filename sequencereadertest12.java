@@ -1,77 +1,62 @@
 package org.apache.commons.io.input;
 
-import static org.apache.commons.io.IOUtils.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest12 {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+public class SequenceReaderTest {
 
-    private static final char NUL = 0;
-
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
-
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
-
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
-
-    private static class CustomReader extends Reader {
-
-        boolean closed;
-
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
-        }
-    }
-
+    /**
+     * Tests that the SequenceReader correctly concatenates the content of multiple
+     * underlying readers in the given order.
+     */
     @Test
-    void testReadLength1Readers() throws IOException {
-        try (Reader reader = new SequenceReader(// @formatter:off
-        new StringReader("0"), new StringReader("1"), new StringReader("2"), new StringReader("3"))) {
-            // @formatter:on
-            assertEquals('0', reader.read());
-            assertEquals('1', reader.read());
-            assertEquals('2', reader.read());
-            assertEquals('3', reader.read());
+    void shouldReadCharactersSequentiallyFromMultipleReaders() throws IOException {
+        // Arrange: Create a sequence of readers, each with a single character.
+        final String expectedContent = "0123";
+        final Reader[] readers = {
+            new StringReader("0"),
+            new StringReader("1"),
+            new StringReader("2"),
+            new StringReader("3")
+        };
+
+        // Act & Assert: The SequenceReader should read all characters in order,
+        // then report the end of the stream.
+        try (Reader sequenceReader = new SequenceReader(readers)) {
+            assertReaderContains(sequenceReader, expectedContent);
+            assertReaderIsAtEof(sequenceReader);
         }
+    }
+
+    /**
+     * Asserts that the reader's content matches the expected string.
+     *
+     * @param reader   The reader to test.
+     * @param expected The expected string content.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void assertReaderContains(final Reader reader, final String expected) throws IOException {
+        char[] actual = new char[expected.length()];
+        int n = reader.read(actual, 0, actual.length);
+
+        assertEquals(expected.length(), n, "Should have read the expected number of characters.");
+        assertEquals(expected, new String(actual), "The content read should match the expected string.");
+    }
+
+    /**
+     * Asserts that the reader has reached the end of the stream (EOF).
+     *
+     * @param reader The reader to test.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void assertReaderIsAtEof(final Reader reader) throws IOException {
+        assertEquals(-1, reader.read(), "Reader should be at the end of the stream (EOF).");
     }
 }
