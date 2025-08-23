@@ -1,26 +1,41 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest10 extends PhoneticEngine_ESTest_scaffolding {
+import java.util.Collections;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        NameType nameType0 = NameType.ASHKENAZI;
-        RuleType ruleType0 = RuleType.EXACT;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false, 0);
-        LinkedHashSet<String> linkedHashSet0 = new LinkedHashSet<String>();
-        Languages.LanguageSet languages_LanguageSet0 = Languages.LanguageSet.from(linkedHashSet0);
-        phoneticEngine0.encode("ben", languages_LanguageSet0);
-        assertFalse(phoneticEngine0.isConcat());
-        assertEquals(0, phoneticEngine0.getMaxPhonemes());
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * Tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
+
+    /**
+     * This test verifies the immutability of the PhoneticEngine.
+     * The class documentation guarantees that the engine's state does not change after creation.
+     * This test confirms that calling the encode() method does not alter the engine's
+     * configuration properties.
+     */
+    @Test
+    public void engineStateShouldRemainUnchangedAfterEncoding() {
+        // Arrange: Create a PhoneticEngine with a specific configuration.
+        final NameType nameType = NameType.ASHKENAZI;
+        final RuleType ruleType = RuleType.EXACT;
+        final boolean shouldConcat = false;
+        final int maxPhonemes = 0;
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, shouldConcat, maxPhonemes);
+
+        final Languages.LanguageSet emptyLanguageSet = Languages.LanguageSet.from(Collections.emptySet());
+        final String sampleInput = "ben";
+
+        // Act: Call the encode method. The return value is not relevant for this test,
+        // as we are only checking for side effects (state mutation).
+        engine.encode(sampleInput, emptyLanguageSet);
+
+        // Assert: Verify that the engine's configuration has not been mutated by the encode() call.
+        assertFalse("The 'concat' property should remain unchanged after encoding.", engine.isConcat());
+        assertEquals("The 'maxPhonemes' property should remain unchanged after encoding.", maxPhonemes, engine.getMaxPhonemes());
     }
 }
