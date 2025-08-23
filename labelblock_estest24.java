@@ -1,40 +1,31 @@
 package org.jfree.chart.block;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertFalse;
+
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Hashtable;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleContext;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.data.Range;
-import org.junit.runner.RunWith;
 
-public class LabelBlock_ESTestTest24 extends LabelBlock_ESTest_scaffolding {
+/**
+ * A test suite for the equals() method in the {@link LabelBlock} class.
+ */
+public class LabelBlockEqualsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        StyleContext styleContext0 = StyleContext.getDefaultStyleContext();
-        Font font0 = styleContext0.getFont("\"IAf&@`u", 1447, 1447);
-        Color color0 = Color.cyan;
-        LabelBlock labelBlock0 = new LabelBlock("\"IAf&@`u", font0, color0);
-        boolean boolean0 = labelBlock0.equals(color0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a LabelBlock
+     * is compared to an object of a different type.
+     */
+    @Test
+    public void equals_whenComparedWithDifferentType_shouldReturnFalse() {
+        // Arrange: Create a LabelBlock instance and an object of a different type.
+        Font font = new Font("SansSerif", Font.PLAIN, 12);
+        LabelBlock labelBlock = new LabelBlock("Test Label", font, Color.BLACK);
+        Object objectOfDifferentType = Color.CYAN;
+
+        // Act: Compare the LabelBlock with the other object.
+        boolean isEqual = labelBlock.equals(objectOfDifferentType);
+
+        // Assert: The result should be false, as the types are incompatible.
+        assertFalse(isEqual);
     }
 }
