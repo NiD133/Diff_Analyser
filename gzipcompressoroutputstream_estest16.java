@@ -1,38 +1,39 @@
 package org.apache.commons.compress.compressors.gzip;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GzipCompressorOutputStream_ESTestTest16 extends GzipCompressorOutputStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link GzipCompressorOutputStream} class, focusing on
+ * its constructor behavior with problematic underlying streams.
+ */
+// The original test extended a scaffolding class. We retain it to show a minimal change.
+public class GzipCompressorOutputStreamTest extends GzipCompressorOutputStream_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        GzipCompressorOutputStream gzipCompressorOutputStream0 = null;
+    /**
+     * Tests that the GzipCompressorOutputStream constructor throws an IOException
+     * when initialized with an unconnected PipedOutputStream.
+     * <p>
+     * The constructor immediately attempts to write a GZIP header to the underlying
+     * stream. This action will fail on an unconnected pipe, which is the expected
+     * behavior being verified.
+     */
+    @Test
+    public void constructorShouldThrowIOExceptionForUnconnectedPipe() {
+        // Arrange: Create a PipedOutputStream that is not connected to a PipedInputStream.
+        PipedOutputStream unconnectedPipe = new PipedOutputStream();
+
+        // Act & Assert: Attempting to create the GzipCompressorOutputStream should fail.
         try {
-            gzipCompressorOutputStream0 = new GzipCompressorOutputStream(pipedOutputStream0);
-            fail("Expecting exception: IOException");
-        } catch (Throwable e) {
-            //
-            // Pipe not connected
-            //
-            verifyException("java.io.PipedOutputStream", e);
+            new GzipCompressorOutputStream(unconnectedPipe);
+            fail("Expected an IOException because the underlying pipe is not connected.");
+        } catch (final IOException e) {
+            // Verify that the exception is the one expected from an unconnected PipedOutputStream.
+            assertEquals("Pipe not connected", e.getMessage());
         }
     }
 }
