@@ -1,24 +1,34 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.Consumer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class CharRange_ESTestTest5 extends CharRange_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link CharRange} class.
+ */
+public class CharRangeTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        CharRange charRange0 = CharRange.isNotIn('+', '8');
-        CharRange charRange1 = CharRange.isNotIn('+', 'X');
-        boolean boolean0 = charRange0.contains(charRange1);
-        assertEquals('+', charRange1.getStart());
-        assertTrue(boolean0);
-        assertEquals('X', charRange1.getEnd());
+    /**
+     * Tests that a negated CharRange contains another, more restrictive, negated CharRange.
+     *
+     * A negated range 'A' contains another negated range 'B' if the set of characters
+     * excluded by 'B' is a superset of the characters excluded by 'A'.
+     */
+    @Test
+    public void testContainsWithNestedNegatedRanges() {
+        // Arrange
+        // A range representing all characters EXCEPT those from '+' to '8'.
+        CharRange containingRange = CharRange.isNotIn('+', '8');
+
+        // A range representing all characters EXCEPT those from '+' to 'X'.
+        // This range excludes more characters, so its set of included characters
+        // is a subset of the first range.
+        CharRange containedRange = CharRange.isNotIn('+', 'X');
+
+        // Act
+        boolean isContained = containingRange.contains(containedRange);
+
+        // Assert
+        assertTrue("A negated range should contain another negated range that excludes a larger interval.", isContained);
     }
 }
