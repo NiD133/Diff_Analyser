@@ -1,31 +1,41 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertNull;
+
 import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest109 extends XNode_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link XNode} class, focusing on attribute parsing.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test108() throws Throwable {
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, true);
-        Properties properties0 = new Properties();
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        Long long0 = xNode0.getLongAttribute("");
-        assertNull(long0);
+    /**
+     * Verifies that getLongAttribute() returns null when the requested attribute
+     * does not exist and no default value is provided.
+     */
+    @Test
+    public void getLongAttributeShouldReturnNullWhenAttributeIsMissing() {
+        // Arrange
+        // Create a simple DOM node that has no attributes.
+        // IIOMetadataNode is a standard, concrete implementation of org.w3c.dom.Node.
+        Node nodeWithoutAttributes = new IIOMetadataNode();
+
+        // Instantiate an XNode. The XPathParser and Properties are required dependencies,
+        // but are not directly used in this test's logic.
+        XPathParser parser = new XPathParser((Document) null, true);
+        Properties variables = new Properties();
+        XNode xNode = new XNode(parser, nodeWithoutAttributes, variables);
+
+        // Act
+        // Attempt to retrieve a 'long' attribute that is not present on the node.
+        Long attributeValue = xNode.getLongAttribute("nonExistentAttribute");
+
+        // Assert
+        // The result should be null, as the attribute was not found.
+        assertNull(attributeValue);
     }
 }
