@@ -1,35 +1,27 @@
 package org.jsoup.select;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-public class Elements_ESTestTest47 extends Elements_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Elements#clone()} method.
+ */
+public class ElementsCloneTest {
 
-    @Test(timeout = 4000)
-    public void test046() throws Throwable {
-        Elements elements0 = new Elements();
-        Elements elements1 = elements0.clone();
-        assertNotSame(elements1, elements0);
+    @Test
+    public void cloneShouldCreateSeparateButEqualInstance() {
+        // Arrange: Create an empty Elements object.
+        Elements originalElements = new Elements();
+
+        // Act: Clone the original object.
+        Elements clonedElements = originalElements.clone();
+
+        // Assert: Verify the clone is a new instance but has the same content.
+        // 1. The cloned object should not be the same instance as the original.
+        assertNotSame("The cloned object should be a new instance.", originalElements, clonedElements);
+
+        // 2. The cloned object should be logically equal to the original.
+        assertEquals("The cloned object should be equal to the original.", originalElements, clonedElements);
     }
 }
