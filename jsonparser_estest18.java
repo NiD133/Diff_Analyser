@@ -1,29 +1,31 @@
 package com.google.gson;
 
+import static org.junit.Assert.fail;
+
+import com.google.gson.JsonSyntaxException;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.stream.JsonReader;
-import java.io.Reader;
-import java.io.StringReader;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonParser_ESTestTest18 extends JsonParser_ESTest_scaffolding {
+/**
+ * Test suite for {@link JsonParser}.
+ */
+public class JsonParserTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        JsonParser jsonParser0 = new JsonParser();
+    @Test
+    public void parsingUnquotedStringShouldThrowJsonSyntaxException() {
+        // Arrange: An unquoted string is not a valid JSON document.
+        // According to the JSON standard, a top-level value that is a string
+        // must be enclosed in double quotes.
+        String malformedJson = "This is not valid JSON.";
+
+        // Act & Assert
         try {
-            jsonParser0.parse("Did not consume the entire document.");
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // org.evosuite.runtime.mock.java.lang.MockThrowable: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 6 path $
-            // See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
-            //
-            verifyException("com.google.gson.JsonParser", e);
+            // Use the modern static `parseString` method, as the instance-based `parse` is deprecated.
+            JsonParser.parseString(malformedJson);
+            fail("Expected JsonParser.parseString to throw a JsonSyntaxException for malformed input, but it did not.");
+        } catch (JsonSyntaxException expected) {
+            // Success: The expected exception was correctly thrown.
+            // We are only verifying that parsing this specific type of malformed JSON fails,
+            // so no further assertions on the exception's content are needed here.
         }
     }
 }
