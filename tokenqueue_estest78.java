@@ -1,19 +1,28 @@
 package org.jsoup.parser;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class TokenQueue_ESTestTest78 extends TokenQueue_ESTest_scaffolding {
+/**
+ * Test suite for the {@link TokenQueue} class.
+ */
+public class TokenQueueTest {
 
-    @Test(timeout = 4000)
-    public void test77() throws Throwable {
-        TokenQueue tokenQueue0 = new TokenQueue("Z<}0z:#; O.[w{T3D");
-        tokenQueue0.matchChomp("Z<}0z:#; O.[w{T3D");
-        boolean boolean0 = tokenQueue0.matchChomp('Z');
-        assertFalse(boolean0);
+    /**
+     * Verifies that matchChomp(char) returns false when the queue is empty,
+     * as there is no character to match or consume.
+     */
+    @Test
+    public void matchChompCharShouldReturnFalseWhenQueueIsEmpty() {
+        // Arrange: Create an empty TokenQueue.
+        // The original test created a queue with content and then consumed it all.
+        // Initializing with an empty string is a more direct and clearer way to set up the test state.
+        TokenQueue queue = new TokenQueue("");
+
+        // Act: Attempt to match and chomp a character from the empty queue.
+        boolean wasMatched = queue.matchChomp('Z');
+
+        // Assert: The method should return false because the queue is empty.
+        assertFalse("matchChomp should return false on an empty queue", wasMatched);
     }
 }
