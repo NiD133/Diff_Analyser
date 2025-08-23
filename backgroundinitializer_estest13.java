@@ -1,50 +1,39 @@
 package org.apache.commons.lang3.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.concurrent.Delayed;
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.lang.MockException;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
+/**
+ * Contains tests for the {@link BackgroundInitializer} class.
+ *
+ * Note: This class has been refactored from an auto-generated test.
+ * The original test class name and scaffolding have been kept for context,
+ * but in a real-world scenario, they would likely be simplified.
+ */
 public class BackgroundInitializer_ESTestTest13 extends BackgroundInitializer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        ForkJoinPool forkJoinPool0 = ForkJoinPool.commonPool();
-        BackgroundInitializer<Object> backgroundInitializer0 = new BackgroundInitializer<Object>(forkJoinPool0);
-        backgroundInitializer0.getTaskCount();
-        backgroundInitializer0.getTaskCount();
-        BackgroundInitializer<Delayed> backgroundInitializer1 = new BackgroundInitializer<Delayed>();
-        MockException mockException0 = new MockException("haH:Z~P5");
-        StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[4];
-        StackTraceElement stackTraceElement0 = new StackTraceElement("'xA", "(V?Q)7A", "{j", 0);
-        stackTraceElementArray0[0] = stackTraceElement0;
-        StackTraceElement stackTraceElement1 = new StackTraceElement("haH:Z~P5", "qi(qTd2vR~eY:0^sHp", "qi(qTd2vR~eY:0^sHp", (-2077));
-        stackTraceElementArray0[1] = stackTraceElement1;
-        backgroundInitializer0.initialize();
-        StackTraceElement stackTraceElement2 = null;
-        try {
-            stackTraceElement2 = new StackTraceElement((String) null, "", "", 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // Declaring class is null
-            //
-            verifyException("java.util.Objects", e);
-        }
+    /**
+     * Tests that getTaskCount() returns 1 by default. This is the expected
+     * behavior for a standard BackgroundInitializer that has not been subclassed
+     * to perform more complex work.
+     */
+    @Test
+    public void getTaskCountShouldReturnOneByDefault() {
+        // Arrange
+        // Create a BackgroundInitializer instance. Using an external executor is a common
+        // use case, though not strictly necessary for this specific test.
+        final ExecutorService executor = ForkJoinPool.commonPool();
+        final BackgroundInitializer<Object> backgroundInitializer = new BackgroundInitializer<>(executor);
+
+        // Act
+        // Call the method under test.
+        final int taskCount = backgroundInitializer.getTaskCount();
+
+        // Assert
+        // Verify that the default task count is 1, as specified in the documentation.
+        assertEquals("The default task count should be 1.", 1, taskCount);
     }
 }
