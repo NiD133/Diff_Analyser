@@ -1,25 +1,25 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.util.Collection;
-import java.util.Iterator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StandardEntityCollection_ESTestTest11 extends StandardEntityCollection_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardEntityCollection} class.
+ */
+public class StandardEntityCollectionTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StandardEntityCollection standardEntityCollection0 = new StandardEntityCollection();
-        Object object0 = new Object();
-        boolean boolean0 = standardEntityCollection0.equals(object0);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when a StandardEntityCollection
+     * is compared to an object of a different, incompatible type.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparedWithDifferentType() {
+        // Arrange
+        StandardEntityCollection collection = new StandardEntityCollection();
+        Object nonCollectionObject = new Object();
+
+        // Act & Assert
+        assertFalse("A collection should not be equal to an object of a different type.",
+                collection.equals(nonCollectionObject));
     }
 }
