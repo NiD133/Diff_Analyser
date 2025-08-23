@@ -1,46 +1,47 @@
 package org.jfree.chart.title;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.JapaneseDate;
-import java.util.Calendar;
-import java.util.List;
-import javax.swing.JTable;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.evosuite.runtime.mock.java.util.MockCalendar;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CyclicNumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.RectangleConstraint;
 import org.jfree.chart.block.Size2D;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.SpiderWebPlot;
-import org.jfree.chart.plot.pie.PiePlot;
 import org.jfree.data.Range;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ShortTextTitle_ESTestTest2 extends ShortTextTitle_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        ShortTextTitle shortTextTitle0 = new ShortTextTitle(".p.");
-        BufferedImage bufferedImage0 = new BufferedImage(10, 10, 10);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        CyclicNumberAxis cyclicNumberAxis0 = new CyclicNumberAxis(90.0, 3.4028234663852886E38);
-        Size2D size2D0 = shortTextTitle0.arrangeRR(graphics2D0, cyclicNumberAxis0.DEFAULT_RANGE, (Range) null);
-        assertEquals("Size2D[width=0.0, height=0.0]", size2D0.toString());
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Tests for the {@link ShortTextTitle} class.
+ * This class focuses on verifying the layout and rendering behavior of short text titles.
+ */
+public class ShortTextTitleTest {
+
+    /**
+     * Verifies that arrangeRR() returns a zero size when the title's text
+     * is wider than the available width constraint. This is the core feature of
+     * ShortTextTitle: it should not be rendered at all if it doesn't fit.
+     */
+    @Test
+    public void arrangeRR_whenTextExceedsWidthConstraint_shouldReturnZeroSize() {
+        // Arrange
+        ShortTextTitle title = new ShortTextTitle("This is a title that is intentionally long");
+
+        // Create a dummy Graphics2D context, which is necessary for measuring text dimensions.
+        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+
+        // Define a very narrow width constraint that the title text cannot possibly fit into.
+        // The height constraint is null, meaning it is unconstrained for this test.
+        Range widthConstraint = new Range(0.0, 10.0);
+        Range heightConstraint = null;
+
+        // Act
+        // Attempt to arrange the title within the given constraints.
+        Size2D actualSize = title.arrangeRR(g2, widthConstraint, heightConstraint);
+
+        // Assert
+        // Because the text is too wide for the constraint, the resulting size should be zero.
+        Size2D expectedSize = new Size2D(0.0, 0.0);
+        assertEquals("The size should be zero when the text doesn't fit the width constraint",
+                expectedSize, actualSize);
     }
 }
