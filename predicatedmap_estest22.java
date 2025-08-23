@@ -1,46 +1,51 @@
 package org.apache.commons.collections4.map;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class PredicatedMap_ESTestTest22 extends PredicatedMap_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link PredicatedMap#put(Object, Object)} method.
+ */
+public class PredicatedMapTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        HashMap<Object, HashMap<Integer, Integer>> hashMap0 = new HashMap<Object, HashMap<Integer, Integer>>();
-        HashMap<Integer, Integer> hashMap1 = new HashMap<Integer, Integer>();
-        HashMap<Integer, Integer> hashMap2 = hashMap0.put((Object) null, hashMap1);
-        PredicatedMap<Object, HashMap<Integer, Integer>> predicatedMap0 = new PredicatedMap<Object, HashMap<Integer, Integer>>(hashMap0, (Predicate<? super Object>) null, (Predicate<? super HashMap<Integer, Integer>>) null);
-        HashMap<Integer, Integer> hashMap3 = predicatedMap0.put((Object) null, hashMap2);
-        assertEquals(0, hashMap3.size());
+    /**
+     * Tests that calling put() on an existing key returns the previous value
+     * when no key or value predicates are defined. This specific test case
+     * uses a null key and updates its value to null.
+     */
+    @Test
+    public void testPutOnExistingNullKeyReturnsPreviousValueWhenNoPredicates() {
+        // Arrange
+        // The map to be decorated, pre-populated with a null key and an initial value.
+        Map<Object, Map<Integer, Integer>> underlyingMap = new HashMap<>();
+        Map<Integer, Integer> initialValue = new HashMap<>();
+        underlyingMap.put(null, initialValue);
+
+        // Create a PredicatedMap with null predicates, meaning no validation will occur.
+        PredicatedMap<Object, Map<Integer, Integer>> predicatedMap =
+                new PredicatedMap<>(underlyingMap, null, null);
+
+        Map<Integer, Integer> newValue = null;
+
+        // Act
+        // Update the value for the null key. The put method should return the old value.
+        Map<Integer, Integer> previousValue = predicatedMap.put(null, newValue);
+
+        // Assert
+        // 1. The returned value should be the original value.
+        assertSame("The put method should return the previous value.", initialValue, previousValue);
+
+        // 2. The returned (previous) value was an empty map, as set up in Arrange.
+        assertTrue("The previous value was an empty map.", previousValue.isEmpty());
+
+        // 3. The map should now contain the new value for the null key.
+        assertNull("The new value for the null key should be null.", predicatedMap.get(null));
+        assertEquals("Map size should remain 1 after updating the key.", 1, predicatedMap.size());
     }
 }
