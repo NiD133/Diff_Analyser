@@ -1,51 +1,35 @@
 package org.threeten.extra.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahEra;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.time.ZoneId;
+import org.junit.Test;
+
+/**
+ * Tests for {@link Symmetry454Chronology}.
+ * This class focuses on a specific test case that was improved for clarity.
+ */
 public class Symmetry454Chronology_ESTestTest62 extends Symmetry454Chronology_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test61() throws Throwable {
-        Symmetry454Chronology symmetry454Chronology0 = new Symmetry454Chronology();
-        // Undeclared exception!
+    /**
+     * Tests that calling dateNow(ZoneId) with a null argument throws a NullPointerException.
+     * The underlying implementation is expected to perform a null check on the zone parameter.
+     */
+    @Test
+    public void dateNow_withNullZoneId_throwsNullPointerException() {
+        // Arrange: Get the singleton instance of the chronology.
+        // Using the INSTANCE field is preferred over the deprecated constructor.
+        Symmetry454Chronology chronology = Symmetry454Chronology.INSTANCE;
+
+        // Act & Assert: Call the method with a null argument and verify the resulting exception.
         try {
-            symmetry454Chronology0.dateNow((ZoneId) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // zone
-            //
-            verifyException("java.util.Objects", e);
+            chronology.dateNow((ZoneId) null);
+            fail("Expected a NullPointerException to be thrown for a null ZoneId.");
+        } catch (NullPointerException expectedException) {
+            // The underlying implementation uses Objects.requireNonNull(zone, "zone"),
+            // so we can verify the specific message for a more robust test.
+            assertEquals("zone", expectedException.getMessage());
         }
     }
 }
