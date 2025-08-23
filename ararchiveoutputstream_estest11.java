@@ -1,38 +1,30 @@
 package org.apache.commons.compress.archivers.ar;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
 
-public class ArArchiveOutputStream_ESTestTest11 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ArArchiveOutputStream} class.
+ *
+ * Note: The original test class name "ArArchiveOutputStream_ESTestTest11" and
+ * method name "test10" were auto-generated and have been renamed for clarity.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        // Undeclared exception!
-        try {
-            arArchiveOutputStream0.write((byte[]) null, 1, 1);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that calling the write() method with a null buffer
+     * throws a NullPointerException, as expected by the general contract of
+     * {@link java.io.OutputStream#write(byte[], int, int)}.
+     */
+    @Test(expected = NullPointerException.class, timeout = 4000)
+    public void writeWithNullBufferShouldThrowNullPointerException() throws IOException {
+        // Arrange: Create an ArArchiveOutputStream backed by an in-memory stream.
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final ArArchiveOutputStream arOutStream = new ArArchiveOutputStream(output);
+
+        // Act: Attempt to write from a null buffer.
+        // The @Test(expected=...) annotation will assert that a NullPointerException is thrown.
+        arOutStream.write(null, 1, 1);
     }
 }
