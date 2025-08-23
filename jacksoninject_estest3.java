@@ -1,0 +1,22 @@
+package com.fasterxml.jackson.annotation;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.evosuite.shaded.org.mockito.Mockito.*;
+import static org.evosuite.runtime.EvoAssertions.*;
+import org.evosuite.runtime.EvoRunner;
+import org.evosuite.runtime.EvoRunnerParameters;
+import org.evosuite.runtime.ViolatedAssumptionAnswer;
+import org.junit.runner.RunWith;
+
+public class JacksonInject_ESTestTest3 extends JacksonInject_ESTest_scaffolding {
+
+    @Test(timeout = 4000)
+    public void test02() throws Throwable {
+        Boolean boolean0 = Boolean.FALSE;
+        Boolean boolean1 = new Boolean("");
+        JacksonInject.Value jacksonInject_Value0 = JacksonInject.Value.construct((Object) null, boolean0, boolean1);
+        boolean boolean2 = jacksonInject_Value0.willUseInput(false);
+        assertFalse(boolean2);
+    }
+}
