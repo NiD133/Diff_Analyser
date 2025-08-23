@@ -1,176 +1,100 @@
 package org.apache.commons.lang3;
 
-import static org.apache.commons.lang3.LangAssertions.assertIndexOutOfBoundsException;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.Random;
-import java.util.stream.IntStream;
+
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CharSequenceUtilsTestTest7 extends AbstractLangTest {
+/**
+ * Tests for {@link CharSequenceUtils}.
+ * This class focuses on the {@code lastIndexOf} and {@code toCharArray} methods.
+ */
+@DisplayName("Tests for CharSequenceUtils")
+public class CharSequenceUtilsTest extends AbstractLangTest {
 
-    private static final TestData[] TEST_DATA = { // @formatter:off
-    //           Source  IgnoreCase Offset Other  Offset Length Result
-    new TestData("", true, -1, "", -1, -1, false), new TestData("", true, 0, "", 0, 1, false), new TestData("a", true, 0, "abc", 0, 0, true), new TestData("a", true, 0, "abc", 0, 1, true), new TestData("a", true, 0, null, 0, 0, NullPointerException.class), new TestData(null, true, 0, null, 0, 0, NullPointerException.class), new TestData(null, true, 0, "", 0, 0, NullPointerException.class), new TestData("Abc", true, 0, "abc", 0, 3, true), new TestData("Abc", false, 0, "abc", 0, 3, false), new TestData("Abc", true, 1, "abc", 1, 2, true), new TestData("Abc", false, 1, "abc", 1, 2, true), new TestData("Abcd", true, 1, "abcD", 1, 2, true), new TestData("Abcd", false, 1, "abcD", 1, 2, true) // @formatter:on
-    };
+    // --- Tests for lastIndexOf(CharSequence, CharSequence, int) ---
 
-    static Stream<Arguments> lastIndexWithStandardCharSequence() {
+    /**
+     * Provides test cases for {@code lastIndexOf} with various {@link CharSequence} implementations.
+     * The method is expected to behave like {@link String#lastIndexOf(String, int)}.
+     *
+     * @return a stream of arguments for the parameterized test.
+     */
+    static Stream<Arguments> lastIndexOfSource() {
         // @formatter:off
-        return Stream.of(arguments("abc", "b", 2, 1), arguments(new StringBuilder("abc"), "b", 2, 1), arguments(new StringBuffer("abc"), "b", 2, 1), arguments("abc", new StringBuilder("b"), 2, 1), arguments(new StringBuilder("abc"), new StringBuilder("b"), 2, 1), arguments(new StringBuffer("abc"), new StringBuffer("b"), 2, 1), arguments(new StringBuilder("abc"), new StringBuffer("b"), 2, 1));
+        return Stream.of(
+            // Arguments: CharSequence, search sequence, start index, expected result
+            arguments("abc", "b", 2, 1),
+            arguments(new StringBuilder("abc"), "b", 2, 1),
+            arguments(new StringBuffer("abc"), "b", 2, 1),
+            arguments("abc", new StringBuilder("b"), 2, 1),
+            arguments(new StringBuilder("abc"), new StringBuilder("b"), 2, 1),
+            arguments(new StringBuffer("abc"), new StringBuffer("b"), 2, 1),
+            arguments(new StringBuilder("abc"), new StringBuffer("b"), 2, 1)
+        );
         // @formatter:on
     }
 
-    @ParameterizedTest
-    @MethodSource("lastIndexWithStandardCharSequence")
-    void testLastIndexOfWithDifferentCharSequences(final CharSequence cs, final CharSequence search, final int start, final int expected) {
-        assertEquals(expected, CharSequenceUtils.lastIndexOf(cs, search, start));
+    @ParameterizedTest(name = "lastIndexOf({0}, {1}, {2}) should be {3}")
+    @MethodSource("lastIndexOfSource")
+    void lastIndexOf_withVariousCharSequenceTypes_returnsCorrectIndex(
+            final CharSequence cs, final CharSequence search, final int start, final int expected) {
+        // Act
+        final int actual = CharSequenceUtils.lastIndexOf(cs, search, start);
+
+        // Assert
+        assertEquals(expected, actual, "Failed for CharSequence of type " + cs.getClass().getSimpleName());
     }
 
-    private void testNewLastIndexOfSingle(final CharSequence a, final CharSequence b) {
-        final int maxa = Math.max(a.length(), b.length());
-        for (int i = -maxa - 10; i <= maxa + 10; i++) {
-            testNewLastIndexOfSingle(a, b, i);
-        }
-        testNewLastIndexOfSingle(a, b, Integer.MIN_VALUE);
-        testNewLastIndexOfSingle(a, b, Integer.MAX_VALUE);
-    }
+    // --- Tests for toCharArray(CharSequence) ---
 
-    private void testNewLastIndexOfSingle(final CharSequence a, final CharSequence b, final int start) {
-        testNewLastIndexOfSingleSingle(a, b, start);
-        testNewLastIndexOfSingleSingle(b, a, start);
-    }
+    @Nested
+    @DisplayName("toCharArray(CharSequence)")
+    class ToCharArrayTests {
 
-    private void testNewLastIndexOfSingleSingle(final CharSequence a, final CharSequence b, final int start) {
-        assertEquals(a.toString().lastIndexOf(b.toString(), start), CharSequenceUtils.lastIndexOf(new WrapperString(a.toString()), new WrapperString(b.toString()), start), "testNewLastIndexOf fails! original : " + a + " seg : " + b + " start : " + start);
-    }
+        @Test
+        @DisplayName("should convert a StringBuilder to a char array")
+        void toCharArray_withStringBuilder_returnsCorrectArray() {
+            // Arrange
+            final CharSequence cs = new StringBuilder("abcdefg");
+            final char[] expected = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 
-    private abstract static class RunTest {
+            // Act
+            final char[] actual = CharSequenceUtils.toCharArray(cs);
 
-        abstract boolean invoke();
-
-        void run(final TestData data, final String id) {
-            if (data.throwable != null) {
-                assertThrows(data.throwable, this::invoke, id + " Expected " + data.throwable);
-            } else {
-                final boolean stringCheck = invoke();
-                assertEquals(data.expected, stringCheck, id + " Failed test " + data);
-            }
-        }
-    }
-
-    static class TestData {
-
-        final String source;
-
-        final boolean ignoreCase;
-
-        final int toffset;
-
-        final String other;
-
-        final int ooffset;
-
-        final int len;
-
-        final boolean expected;
-
-        final Class<? extends Throwable> throwable;
-
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len, final boolean expected) {
-            this.source = source;
-            this.ignoreCase = ignoreCase;
-            this.toffset = toffset;
-            this.other = other;
-            this.ooffset = ooffset;
-            this.len = len;
-            this.expected = expected;
-            this.throwable = null;
+            // Assert
+            assertArrayEquals(expected, actual);
         }
 
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len, final Class<? extends Throwable> throwable) {
-            this.source = source;
-            this.ignoreCase = ignoreCase;
-            this.toffset = toffset;
-            this.other = other;
-            this.ooffset = ooffset;
-            this.len = len;
-            this.expected = false;
-            this.throwable = throwable;
+        @Test
+        @DisplayName("should convert a String to a char array")
+        void toCharArray_withString_returnsCorrectArray() {
+            // Arrange
+            final CharSequence cs = "abcdefg";
+            final char[] expected = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
+
+            // Act
+            final char[] actual = CharSequenceUtils.toCharArray(cs);
+
+            // Assert
+            assertArrayEquals(expected, actual);
         }
 
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(source).append("[").append(toffset).append("]");
-            sb.append(ignoreCase ? " caseblind " : " samecase ");
-            sb.append(other).append("[").append(ooffset).append("]");
-            sb.append(" ").append(len).append(" => ");
-            if (throwable != null) {
-                sb.append(throwable);
-            } else {
-                sb.append(expected);
-            }
-            return sb.toString();
+        @Test
+        @DisplayName("should return an empty array for null input")
+        void toCharArray_withNull_returnsEmptyArray() {
+            // Act
+            final char[] actual = CharSequenceUtils.toCharArray(null);
+
+            // Assert
+            assertArrayEquals(ArrayUtils.EMPTY_CHAR_ARRAY, actual);
         }
-    }
-
-    static class WrapperString implements CharSequence {
-
-        private final CharSequence inner;
-
-        WrapperString(final CharSequence inner) {
-            this.inner = inner;
-        }
-
-        @Override
-        public char charAt(final int index) {
-            return inner.charAt(index);
-        }
-
-        @Override
-        public IntStream chars() {
-            return inner.chars();
-        }
-
-        @Override
-        public IntStream codePoints() {
-            return inner.codePoints();
-        }
-
-        @Override
-        public int length() {
-            return inner.length();
-        }
-
-        @Override
-        public CharSequence subSequence(final int start, final int end) {
-            return inner.subSequence(start, end);
-        }
-
-        @Override
-        public String toString() {
-            return inner.toString();
-        }
-    }
-
-    @Test
-    void testToCharArray() {
-        final StringBuilder builder = new StringBuilder("abcdefg");
-        final char[] expected = builder.toString().toCharArray();
-        assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder));
-        assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder.toString()));
-        assertArrayEquals(ArrayUtils.EMPTY_CHAR_ARRAY, CharSequenceUtils.toCharArray(null));
     }
 }
