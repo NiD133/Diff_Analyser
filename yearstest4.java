@@ -1,42 +1,65 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class YearsTestTest4 extends TestCase {
+/**
+ * Unit tests for the {@link Years#yearsBetween(ReadablePartial, ReadablePartial)} factory method.
+ */
+public class YearsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    private static final LocalDate START_DATE = new LocalDate(2006, 6, 9);
+    private static final LocalDate END_DATE_3_YEARS_LATER = new LocalDate(2009, 6, 9);
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    @Test
+    public void yearsBetween_shouldReturnPositiveYears_whenEndIsAfterStart() {
+        // Arrange
+        Years expected = Years.THREE;
+
+        // Act
+        Years actual = Years.yearsBetween(START_DATE, END_DATE_3_YEARS_LATER);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    public static TestSuite suite() {
-        return new TestSuite(TestYears.class);
+    @Test
+    public void yearsBetween_shouldReturnZeroYears_whenStartAndEndAreSame() {
+        // Arrange
+        Years expected = Years.ZERO;
+
+        // Act
+        Years actual = Years.yearsBetween(START_DATE, START_DATE);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Test
+    public void yearsBetween_shouldReturnNegativeYears_whenStartIsAfterEnd() {
+        // Arrange
+        Years expected = Years.years(-3);
+
+        // Act
+        // Note the reversed order of start and end dates
+        Years actual = Years.yearsBetween(END_DATE_3_YEARS_LATER, START_DATE);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
+    @Test
+    @SuppressWarnings("deprecation") // Using deprecated YearMonthDay for test variety
+    public void yearsBetween_shouldWorkWithDifferentReadablePartialTypes() {
+        // Arrange
+        LocalDate startDate = new LocalDate(2006, 6, 9);
+        YearMonthDay endDate = new YearMonthDay(2012, 6, 9); // A different ReadablePartial type
+        Years expected = Years.years(6);
 
-    @SuppressWarnings("deprecation")
-    public void testFactory_yearsBetween_RPartial() {
-        LocalDate start = new LocalDate(2006, 6, 9);
-        LocalDate end1 = new LocalDate(2009, 6, 9);
-        YearMonthDay end2 = new YearMonthDay(2012, 6, 9);
-        assertEquals(3, Years.yearsBetween(start, end1).getYears());
-        assertEquals(0, Years.yearsBetween(start, start).getYears());
-        assertEquals(0, Years.yearsBetween(end1, end1).getYears());
-        assertEquals(-3, Years.yearsBetween(end1, start).getYears());
-        assertEquals(6, Years.yearsBetween(start, end2).getYears());
+        // Act
+        Years actual = Years.yearsBetween(startDate, endDate);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
