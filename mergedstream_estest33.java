@@ -1,38 +1,42 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest33 extends MergedStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MergedStream} class.
+ */
+public class MergedStreamTest {
 
-    @Test(timeout = 4000)
-    public void test32() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[1];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, (-629), (-629));
-        mergedStream0.mark((-629));
+    /**
+     * Tests that calling {@link MergedStream#mark(int)} with a negative readlimit
+     * does not throw an exception.
+     * <p>
+     * This scenario also uses a {@link MergedStream} constructed with invalid
+     * (negative) buffer indices to ensure the method is robust even when the
+     * object is in an unusual state. The test's success is confirmed by the
+     * absence of any thrown exceptions.
+     */
+    @Test
+    public void markWithNegativeReadlimitShouldNotThrowException() throws IOException {
+        // Arrange: Create a MergedStream with an invalid state (negative indices)
+        // to test the robustness of the mark() method.
+        InputStream underlyingStream = new ByteArrayInputStream(new byte[0]);
+        byte[] prefixBuffer = new byte[1];
+        int invalidStartIndex = -1;
+        int invalidEndIndex = -1;
+
+        // The IOContext is not relevant for this specific test, so it can be null.
+        MergedStream mergedStream = new MergedStream(null, underlyingStream, prefixBuffer, invalidStartIndex, invalidEndIndex);
+
+        // Act & Assert: Call mark() with a negative value.
+        // The test passes if this operation completes without throwing an exception.
+        // The InputStream contract does not specify behavior for a negative readlimit,
+        // so we are verifying that our implementation handles it gracefully.
+        int negativeReadlimit = -1;
+        mergedStream.mark(negativeReadlimit);
     }
 }
