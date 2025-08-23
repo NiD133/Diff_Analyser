@@ -1,34 +1,31 @@
 package org.jfree.chart.plot.compass;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
-import javax.swing.JScrollPane;
-import javax.swing.text.DefaultCaret;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class MeterNeedle_ESTestTest21 extends MeterNeedle_ESTest_scaffolding {
+/**
+ * A collection of tests for the {@link MeterNeedle} class.
+ * Since {@code MeterNeedle} is abstract, the concrete subclass {@link WindNeedle}
+ * is used for instantiation to test the default constructor behavior.
+ */
+public class MeterNeedleTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        WindNeedle windNeedle0 = new WindNeedle();
-        windNeedle0.getFillPaint();
-        assertEquals(0.5, windNeedle0.getRotateX(), 0.01);
-        assertEquals(5, windNeedle0.getSize());
-        assertEquals(0.5, windNeedle0.getRotateY(), 0.01);
+    /**
+     * Verifies that a MeterNeedle instance created with the default constructor
+     * is initialized with the expected default property values.
+     */
+    @Test
+    public void defaultConstructorShouldInitializePropertiesCorrectly() {
+        // Arrange: Create a concrete instance of MeterNeedle.
+        MeterNeedle needle = new WindNeedle();
+
+        // Act: No action is needed as we are testing the state after construction.
+
+        // Assert: Check that the properties have their expected default values.
+        assertNull("The default fill paint should be null.", needle.getFillPaint());
+        assertEquals("The default size should be 5.", 5, needle.getSize());
+        assertEquals("The default X rotation point should be 0.5.", 0.5, needle.getRotateX(), 0.01);
+        assertEquals("The default Y rotation point should be 0.5.", 0.5, needle.getRotateY(), 0.01);
     }
 }
