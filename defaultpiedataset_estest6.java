@@ -2,31 +2,30 @@ package org.jfree.data.general;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.chrono.ChronoLocalDate;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.SortOrder;
-import org.jfree.chart.api.TableOrder;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.category.SlidingCategoryDataset;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-import org.junit.runner.RunWith;
 
-public class DefaultPieDataset_ESTestTest6 extends DefaultPieDataset_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link DefaultPieDataset} class.
+ */
+public class DefaultPieDatasetTest {
 
-    @Test(timeout = 4000)
-    public void test05() throws Throwable {
-        DefaultPieDataset<Integer> defaultPieDataset0 = new DefaultPieDataset<Integer>();
-        Integer integer0 = JLayeredPane.FRAME_CONTENT_LAYER;
-        defaultPieDataset0.insertValue(0, integer0, (double) 0);
-        assertEquals(1, defaultPieDataset0.getItemCount());
+    /**
+     * Verifies that inserting a value into an empty dataset at the first position
+     * correctly adds the new item and results in an item count of one.
+     */
+    @Test
+    public void insertValue_intoEmptyDataset_addsItemAndIncreasesCount() {
+        // Arrange: Create an empty dataset and define the data to be inserted.
+        DefaultPieDataset<Integer> dataset = new DefaultPieDataset<>();
+        Integer key = 1;
+        double value = 100.0;
+        int insertPosition = 0;
+
+        // Act: Insert the new value into the dataset.
+        dataset.insertValue(insertPosition, key, value);
+
+        // Assert: Verify that the dataset's state is correct after the insertion.
+        assertEquals("The item count should be 1 after inserting one value.", 1, dataset.getItemCount());
+        assertEquals("The key at the insertion index should match the inserted key.", key, dataset.getKey(0));
+        assertEquals("The value at the insertion index should match the inserted value.", value, dataset.getValue(0).doubleValue(), 0.0);
     }
 }
