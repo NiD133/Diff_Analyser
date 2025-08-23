@@ -1,20 +1,30 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Chronology;
+import static org.junit.Assert.assertFalse;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CopticChronology_ESTestTest18 extends CopticChronology_ESTest_scaffolding {
+/**
+ * Unit tests for the CopticChronology class.
+ */
+public class CopticChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        CopticChronology copticChronology0 = CopticChronology.getInstance();
-        boolean boolean0 = copticChronology0.isLeapDay(1);
-        assertFalse(boolean0);
+    @Test
+    public void isLeapDay_shouldReturnFalse_forDayInNonLeapYear() {
+        // Arrange
+        // Use a fixed time zone (UTC) for reproducible tests.
+        CopticChronology copticChronology = CopticChronology.getInstance(DateTimeZone.UTC);
+
+        // The instant 1L (one millisecond after the Unix epoch) corresponds to
+        // 1970-01-01T00:00:00.001Z. This date falls within the Coptic year 1686.
+        // A Coptic year is a leap year if (year % 4) == 3.
+        // Since 1686 % 4 == 2, the year 1686 is not a leap year and thus has no leap day.
+        long instantInNonLeapYear = 1L;
+
+        // Act
+        boolean isLeap = copticChronology.isLeapDay(instantInNonLeapYear);
+
+        // Assert
+        assertFalse("A day within a non-leap year should not be a leap day.", isLeap);
     }
 }
