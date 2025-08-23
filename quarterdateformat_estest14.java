@@ -1,29 +1,31 @@
 package org.jfree.chart.axis;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.StringWriter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.NumberFormat;
+import static org.junit.Assert.assertNull;
+
 import java.text.ParsePosition;
 import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
 
-public class QuarterDateFormat_ESTestTest14 extends QuarterDateFormat_ESTest_scaffolding {
+/**
+ * Tests for the {@link QuarterDateFormat#parse(String, ParsePosition)} method.
+ */
+public class QuarterDateFormat_ESTestTest14 {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        QuarterDateFormat quarterDateFormat0 = new QuarterDateFormat();
-        Date date0 = quarterDateFormat0.parse(" ", (ParsePosition) null);
-        assertNull(date0);
+    /**
+     * Verifies that the parse() method always returns null, as it is
+     * documented as not being implemented.
+     */
+    @Test
+    public void parse_shouldAlwaysReturnNull() {
+        // Arrange
+        QuarterDateFormat formatter = new QuarterDateFormat();
+        String anyString = "some-irrelevant-string";
+        ParsePosition anyPosition = new ParsePosition(0);
+
+        // Act
+        Date result = formatter.parse(anyString, anyPosition);
+
+        // Assert
+        assertNull("The parse() method is not implemented and should always return null.", result);
     }
 }
