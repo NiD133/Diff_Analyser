@@ -1,34 +1,32 @@
 package org.jfree.chart.labels;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.chrono.ThaiBuddhistEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.text.MockDateFormat;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultIntervalCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class IntervalCategoryItemLabelGenerator_ESTestTest7 extends IntervalCategoryItemLabelGenerator_ESTest_scaffolding {
+/**
+ * Tests for the constructor of the {@link IntervalCategoryItemLabelGenerator} class.
+ */
+public class IntervalCategoryItemLabelGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        IntervalCategoryItemLabelGenerator intervalCategoryItemLabelGenerator0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException
+     * when initialized with a null DateFormat formatter. The constructor must
+     * reject null arguments to ensure the generator is always in a valid state.
+     */
+    @Test
+    public void constructor_WithNullDateFormat_ShouldThrowIllegalArgumentException() {
+        // Arrange: Define a label format string. The content is not important for this test.
+        String labelFormat = "{2}";
+        
+        // Act & Assert
         try {
-            intervalCategoryItemLabelGenerator0 = new IntervalCategoryItemLabelGenerator("{2}", (DateFormat) null);
-            fail("Expecting exception: IllegalArgumentException");
+            new IntervalCategoryItemLabelGenerator(labelFormat, (DateFormat) null);
+            fail("Expected an IllegalArgumentException to be thrown for a null formatter.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'formatter' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // Assert: Verify that the correct exception was thrown with the expected message.
+            assertEquals("Null 'formatter' argument.", e.getMessage());
         }
     }
 }
