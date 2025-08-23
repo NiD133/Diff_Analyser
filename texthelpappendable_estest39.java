@@ -1,52 +1,29 @@
 package org.apache.commons.cli.help;
 
+import org.apache.commons.cli.help.TextStyle;
+import org.apache.commons.cli.help.TextHelpAppendable;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link TextHelpAppendable}, focusing on exception handling.
+ */
 public class TextHelpAppendable_ESTestTest39 extends TextHelpAppendable_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        LinkedList<TextStyle> linkedList0 = new LinkedList<TextStyle>();
-        // Undeclared exception!
-        try {
-            textHelpAppendable0.makeColumnQueues((List<String>) null, linkedList0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.cli.help.TextHelpAppendable", e);
-        }
+    /**
+     * Tests that calling {@code makeColumnQueues} with a null list for column data
+     * results in a {@code NullPointerException}.
+     */
+    @Test(expected = NullPointerException.class)
+    public void makeColumnQueuesShouldThrowNullPointerExceptionWhenColumnDataIsNull() {
+        // Arrange: Create a TextHelpAppendable instance and a list for styles.
+        TextHelpAppendable textHelpAppendable = TextHelpAppendable.systemOut();
+        List<TextStyle> styles = new LinkedList<>(); // The list of styles can be empty for this test.
+
+        // Act & Assert: Call the method with a null argument for columnData.
+        // The @Test(expected) annotation asserts that a NullPointerException is thrown.
+        textHelpAppendable.makeColumnQueues(null, styles);
     }
 }
