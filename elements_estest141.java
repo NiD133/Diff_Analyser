@@ -1,36 +1,31 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+import static org.junit.Assert.assertSame;
 
-public class Elements_ESTestTest141 extends Elements_ESTest_scaffolding {
+/**
+ * This test verifies the fluent API of the Elements class.
+ */
+public class ElementsFluentApiTest {
 
-    @Test(timeout = 4000)
-    public void test140() throws Throwable {
-        Document document0 = new Document("Bb,Y6");
-        Elements elements0 = document0.getAllElements();
-        Elements elements1 = elements0.removeAttr("Bb,Y6");
-        assertSame(elements1, elements0);
+    /**
+     * Verifies that removeAttr() returns the same Elements instance to allow for method chaining.
+     */
+    @Test
+    public void removeAttrShouldReturnSameInstanceForChaining() {
+        // Arrange: Create a document and select some elements.
+        Document doc = new Document("http://example.com");
+        Elements elements = doc.getAllElements(); // Contains <html>, <head>, <body>
+
+        // Act: Call the method under test.
+        Elements returnedElements = elements.removeAttr("class");
+
+        // Assert: The returned object should be the exact same instance as the original.
+        assertSame(
+            "The removeAttr method should return the same Elements instance for a fluent API.",
+            elements,
+            returnedElements
+        );
     }
 }
