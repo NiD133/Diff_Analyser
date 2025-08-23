@@ -1,29 +1,35 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
 import com.google.gson.stream.JsonToken;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class JsonTreeReader_ESTestTest50 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test049() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonArray0);
-        jsonTreeReader0.beginArray();
-        JsonToken jsonToken0 = jsonTreeReader0.peek();
-        assertEquals(JsonToken.END_ARRAY, jsonToken0);
+/**
+ * Unit tests for {@link JsonTreeReader}.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that after starting to read an empty array, peeking at the next
+     * token correctly identifies the end of the array.
+     */
+    @Test
+    public void peekOnEmptyArrayReturnsEndArray() throws IOException {
+        // Arrange: Create a reader for an empty JSON array.
+        JsonArray emptyArray = new JsonArray();
+        JsonTreeReader reader = new JsonTreeReader(emptyArray);
+        
+        // Consume the token that begins the array.
+        reader.beginArray();
+
+        // Act: Peek at the next token in the stream.
+        JsonToken nextToken = reader.peek();
+
+        // Assert: The next token should be END_ARRAY, as the array is empty.
+        assertEquals(JsonToken.END_ARRAY, nextToken);
     }
 }
