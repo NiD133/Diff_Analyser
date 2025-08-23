@@ -1,21 +1,37 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class LocaleUtils_ESTestTest25 extends LocaleUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.LocaleUtils}.
+ */
+public class LocaleUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Locale locale0 = Locale.ENGLISH;
-        List<Locale> list0 = LocaleUtils.localeLookupList(locale0, locale0);
-        assertEquals(1, list0.size());
+    /**
+     * Tests that localeLookupList does not add a duplicate locale if the
+     * primary locale and the default locale are the same.
+     */
+    @Test
+    public void testLocaleLookupListWithIdenticalLocaleAndDefaultLocaleReturnsSingletonList() {
+        // The documentation for localeLookupList states:
+        // "The list will never contain the same locale twice."
+        // This test verifies this behavior.
+
+        // Arrange
+        final Locale englishLocale = Locale.ENGLISH;
+
+        // Act
+        final List<Locale> lookupList = LocaleUtils.localeLookupList(englishLocale, englishLocale);
+
+        // Assert
+        // The lookup for "en" should produce ["en"]. Since the default locale is also "en",
+        // it should not be added again. The final list must contain only one element.
+        final List<Locale> expectedList = Collections.singletonList(englishLocale);
+        assertEquals(expectedList, lookupList);
     }
 }
