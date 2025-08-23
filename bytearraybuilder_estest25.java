@@ -1,27 +1,37 @@
 package com.fasterxml.jackson.core.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ByteArrayBuilder_ESTestTest25 extends ByteArrayBuilder_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        ByteArrayBuilder byteArrayBuilder0 = new ByteArrayBuilder(0);
-        ByteArrayBuilder byteArrayBuilder1 = ByteArrayBuilder.fromInitial(byteArrayBuilder0.NO_BYTES, (-129));
-        // Undeclared exception!
-        try {
-            byteArrayBuilder1.write((-129));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // -129
-            //
-            verifyException("com.fasterxml.jackson.core.util.ByteArrayBuilder", e);
-        }
+/**
+ * Contains tests for the {@link ByteArrayBuilder} class, focusing on edge cases and error handling.
+ */
+public class ByteArrayBuilderTest {
+
+    /**
+     * Tests that calling the write() method throws an ArrayIndexOutOfBoundsException
+     * if the builder is initialized with a negative internal length pointer. This
+     * simulates a corrupted state to ensure the class behaves predictably even
+     * under invalid conditions.
+     */
+    @Test
+    public void write_whenInternalLengthIsNegative_shouldThrowArrayIndexOutOfBounds() {
+        // Arrange: Create a builder in an invalid state with a negative length.
+        // The `fromInitial` factory method is used here to directly manipulate the
+        // internal state for this specific test scenario.
+        final int negativeInitialLength = -129;
+        ByteArrayBuilder builder = ByteArrayBuilder.fromInitial(ByteArrayBuilder.NO_BYTES, negativeInitialLength);
+
+        // Act & Assert: Verify that attempting to write a byte triggers the expected exception.
+        // The exception occurs because the internal pointer `_currBlockPtr` is negative.
+        ArrayIndexOutOfBoundsException exception = assertThrows(
+            ArrayIndexOutOfBoundsException.class,
+            () -> builder.write(1) // The value being written is arbitrary.
+        );
+
+        // The exception message for ArrayIndexOutOfBoundsException typically contains the invalid index.
+        assertEquals(String.valueOf(negativeInitialLength), exception.getMessage());
     }
 }
