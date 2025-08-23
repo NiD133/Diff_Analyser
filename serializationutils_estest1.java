@@ -1,30 +1,31 @@
 package org.apache.commons.lang3;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
 
-public class SerializationUtils_ESTestTest1 extends SerializationUtils_ESTest_scaffolding {
+import java.io.ByteArrayOutputStream;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        MockPrintStream mockPrintStream0 = new MockPrintStream("objectData");
-        SerializationUtils.serialize((Serializable) null, (OutputStream) mockPrintStream0);
+/**
+ * Unit tests for {@link SerializationUtils}.
+ */
+public class SerializationUtilsTest {
+
+    /**
+     * Tests that serializing a null object to a stream completes without error
+     * and writes data to the stream.
+     */
+    @Test
+    public void serialize_withNullObject_writesToStream() {
+        // Arrange: Create an in-memory output stream to capture the serialized data.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Act: Call the method under test.
+        // According to the Javadoc, this should not throw an exception.
+        SerializationUtils.serialize(null, outputStream);
+
+        // Assert: Verify that the serialization process wrote data to the stream.
+        // A serialized null is not an empty stream; it contains header data and a null marker.
+        assertTrue("The output stream should contain data after serializing a null object.",
+                outputStream.size() > 0);
     }
 }
