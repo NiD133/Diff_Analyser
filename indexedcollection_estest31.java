@@ -1,66 +1,42 @@
 package org.apache.commons.collections4.collection;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedTransformer;
 import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ClosureTransformer;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.ForClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class IndexedCollection_ESTestTest31 extends IndexedCollection_ESTest_scaffolding {
+import java.util.Collections;
+import java.util.List;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        LinkedList<Object> linkedList0 = new LinkedList<Object>();
-        Object object0 = new Object();
-        linkedList0.addLast(object0);
-        Transformer<Object, Object> transformer0 = CloneTransformer.cloneTransformer();
-        // Undeclared exception!
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+/**
+ * Contains tests for {@link IndexedCollection}.
+ */
+public class IndexedCollectionTest {
+
+    /**
+     * Tests that creating an IndexedCollection with a CloneTransformer fails
+     * when the elements in the source collection are not publicly cloneable.
+     * The standard {@link Object} class has a protected clone method, not a public one,
+     * which does not satisfy the requirements of the CloneTransformer.
+     */
+    @Test
+    public void nonUniqueIndexedCollectionWithCloneTransformerShouldThrowExceptionForNonCloneableObject() {
+        // Arrange: Create a collection with an object that is not publicly cloneable.
+        final List<Object> sourceCollection = Collections.singletonList(new Object());
+        final Transformer<Object, Object> cloneTransformer = CloneTransformer.cloneTransformer();
+
+        // Act & Assert: Attempting to create the IndexedCollection should fail.
         try {
-            IndexedCollection.nonUniqueIndexedCollection((Collection<Object>) linkedList0, transformer0);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // The prototype must be cloneable via a public clone method
-            //
-            verifyException("org.apache.commons.collections4.functors.PrototypeFactory", e);
+            // The constructor calls reindex(), which applies the transformer to each element.
+            // The CloneTransformer will fail because java.lang.Object is not publicly cloneable.
+            IndexedCollection.nonUniqueIndexedCollection(sourceCollection, cloneTransformer);
+            fail("Expected an IllegalArgumentException because the object is not cloneable.");
+        } catch (final IllegalArgumentException e) {
+            // Verify that the exception is the one we expect from the underlying PrototypeFactory.
+            final String expectedMessage = "The prototype must be cloneable via a public clone method";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
