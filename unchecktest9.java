@@ -2,71 +2,64 @@ package org.apache.commons.io.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import org.apache.commons.io.input.BrokenInputStream;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 
-public class UncheckTestTest9 {
+/**
+ * Tests for {@link Uncheck#apply(IOFunction, Object)}.
+ */
+class UncheckApplyIOFunctionTest {
 
-    private static final byte[] BYTES = { 'a', 'b' };
-
-    private static final String CAUSE_MESSAGE = "CauseMessage";
-
-    private static final String CUSTOM_MESSAGE = "Custom message";
-
-    private AtomicInteger atomicInt;
-
-    private AtomicLong atomicLong;
-
-    private AtomicBoolean atomicBoolean;
-
-    private AtomicReference<String> ref1;
-
-    private AtomicReference<String> ref2;
-
-    private AtomicReference<String> ref3;
-
-    private AtomicReference<String> ref4;
-
-    private void assertUncheckedIOException(final IOException expected, final UncheckedIOException e) {
-        assertEquals(CUSTOM_MESSAGE, e.getMessage());
-        final IOException cause = e.getCause();
-        assertEquals(expected.getClass(), cause.getClass());
-        assertEquals(CAUSE_MESSAGE, cause.getMessage());
-    }
-
-    @BeforeEach
-    public void beforeEach() {
-        ref1 = new AtomicReference<>();
-        ref2 = new AtomicReference<>();
-        ref3 = new AtomicReference<>();
-        ref4 = new AtomicReference<>();
-        atomicInt = new AtomicInteger();
-        atomicLong = new AtomicLong();
-        atomicBoolean = new AtomicBoolean();
-    }
-
-    private ByteArrayInputStream newInputStream() {
-        return new ByteArrayInputStream(BYTES);
-    }
-
+    /**
+     * Tests that when the provided IOFunction throws an IOException,
+     * Uncheck.apply wraps it in an UncheckedIOException.
+     */
     @Test
-    void testApplyIOFunctionOfTRT() {
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(t -> {
-            throw new IOException();
-        }, null));
-        assertThrows(UncheckedIOException.class, () -> Uncheck.apply(TestConstants.THROWING_IO_FUNCTION, null));
-        Uncheck.apply(t -> TestUtils.compareAndSetThrowsIO(ref1, t), "new1");
-        assertEquals("new1", ref1.get());
+    void testApplyWrapsIOException() {
+        // Arrange
+        final IOException cause = new IOException("Test Exception");
+        final IOFunction<String, String> throwingFunction = t -> {
+            throw cause;
+        };
+
+        // Act & Assert
+        final UncheckedIOException thrown = assertThrows(UncheckedIOException.class, () -> {
+            Uncheck.apply(throwingFunction, "input");
+        });
+
+        // Verify that the original IOException is the cause of the UncheckedIOException
+        assertEquals(cause, thrown.getCause());
+    }
+
+    /**
+     * Tests that when the provided IOFunction executes successfully,
+     * Uncheck.apply returns the correct value and executes the function's logic.
+     */
+    @Test
+    void testApplyReturnsResultOnSuccess() {
+        // Arrange
+        final AtomicReference<String> sideEffectCheck = new AtomicReference<>();
+        final String input = "input value";
+        final String expectedResult = "output value";
+
+        // An IOFunction that performs a side-effect and returns a result.
+        // It is declared with 'throws IOException' but does not throw in this case.
+        final IOFunction<String, String> successfulFunction = t -> {
+            sideEffectCheck.set("processed: " + t);
+            return expectedResult;
+        };
+
+        // Act
+        final String actualResult = Uncheck.apply(successfulFunction, input);
+
+        // Assert
+        // 1. The return value should be what the function produced.
+        assertEquals(expectedResult, actualResult);
+        // 2. The side-effect of the function should have occurred.
+        assertEquals("processed: " + input, sideEffectCheck.get());
     }
 }
