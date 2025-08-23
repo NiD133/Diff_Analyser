@@ -1,74 +1,56 @@
 package org.apache.commons.lang3.stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
+
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class LangCollectorsTestTest1 {
+/**
+ * Tests for {@link LangCollectors}.
+ */
+@DisplayName("LangCollectors")
+class LangCollectorsTest {
 
-    private static final Long _1L = Long.valueOf(1);
+    /**
+     * Tests for the joining() collector overloads.
+     */
+    @Nested
+    @DisplayName("joining collector")
+    class JoiningTest {
 
-    private static final Long _2L = Long.valueOf(2);
+        private static final Collector<Object, ?, String> JOINING_WITH_DASH_DELIMITER = LangCollectors.joining("-");
 
-    private static final Long _3L = Long.valueOf(3);
-
-    private static final Function<Object, String> TO_STRING = Objects::toString;
-
-    private static final Collector<Object, ?, String> JOINING_0 = LangCollectors.joining();
-
-    private static final Collector<Object, ?, String> JOINING_1 = LangCollectors.joining("-");
-
-    private static final Collector<Object, ?, String> JOINING_3 = LangCollectors.joining("-", "<", ">");
-
-    private static final Collector<Object, ?, String> JOINING_4 = LangCollectors.joining("-", "<", ">", TO_STRING);
-
-    private static final Collector<Object, ?, String> JOINING_4_NUL = LangCollectors.joining("-", "<", ">", o -> Objects.toString(o, "NUL"));
-
-    private String join0(final Object... objects) {
-        return LangCollectors.collect(JOINING_0, objects);
-    }
-
-    private String join1(final Object... objects) {
-        return LangCollectors.collect(JOINING_1, objects);
-    }
-
-    private String join3(final Object... objects) {
-        return LangCollectors.collect(JOINING_3, objects);
-    }
-
-    private String join4(final Object... objects) {
-        return LangCollectors.collect(JOINING_4, objects);
-    }
-
-    private String join4NullToString(final Object... objects) {
-        return LangCollectors.collect(JOINING_4_NUL, objects);
-    }
-
-    private static final class Fixture {
-
-        int value;
-
-        private Fixture(final int value) {
-            this.value = value;
+        /**
+         * A helper method that centralizes the call to the collector under test.
+         *
+         * @param elements The objects to be joined.
+         * @return The joined string.
+         */
+        private String joinWithDash(final Object... elements) {
+            return LangCollectors.collect(JOINING_WITH_DASH_DELIMITER, elements);
         }
 
-        @Override
-        public String toString() {
-            return Integer.toString(value);
+        static Stream<Arguments> joiningWithDelimiterTestCases() {
+            return Stream.of(
+                Arguments.of("should return empty string for no elements", "", new Object[]{}),
+                Arguments.of("should return element as string for a single element", "1", new Object[]{"1"}),
+                Arguments.of("should join two elements with delimiter", "1-2", new Object[]{"1", "2"}),
+                Arguments.of("should join multiple elements with delimiter", "1-2-3", new Object[]{"1", "2", "3"}),
+                Arguments.of("should treat null as the string 'null'", "1-null-3", new Object[]{"1", null, "3"})
+            );
         }
-    }
 
-    @Test
-    void testCollectStrings1Arg() {
-        assertEquals("", join1());
-        assertEquals("1", join1("1"));
-        assertEquals("1-2", join1("1", "2"));
-        assertEquals("1-2-3", join1("1", "2", "3"));
-        assertEquals("1-null-3", join1("1", null, "3"));
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("joiningWithDelimiterTestCases")
+        @DisplayName("with a delimiter should correctly join elements")
+        void testJoiningWithDelimiter(final String description, final String expected, final Object... elements) {
+            final String result = joinWithDash(elements);
+            assertEquals(expected, result);
+        }
     }
 }
