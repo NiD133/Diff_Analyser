@@ -1,27 +1,31 @@
 package org.apache.commons.io.input.buffer;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CircularByteBuffer_ESTestTest4 extends CircularByteBuffer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test03() throws Throwable {
-        CircularByteBuffer circularByteBuffer0 = new CircularByteBuffer();
-        byte[] byteArray0 = new byte[1];
-        // Undeclared exception!
+/**
+ * Unit tests for {@link CircularByteBuffer}.
+ */
+public class CircularByteBufferTest {
+
+    @Test
+    public void readShouldThrowIllegalArgumentExceptionWhenOffsetIsOutsideTargetBounds() {
+        // Arrange
+        final CircularByteBuffer buffer = new CircularByteBuffer();
+        final byte[] destination = new byte[1];
+        final int invalidOffset = 1; // An offset of 1 is out of bounds for an array of length 1 (valid indices are 0).
+        final int length = 1;
+
+        // Act & Assert
         try {
-            circularByteBuffer0.read(byteArray0, (int) (byte) 1, (int) (byte) 1);
-            fail("Expecting exception: IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            //
-            // Illegal offset: 1
-            //
-            verifyException("org.apache.commons.io.input.buffer.CircularByteBuffer", e);
+            buffer.read(destination, invalidOffset, length);
+            fail("Expected an IllegalArgumentException because the offset is out of bounds for the destination array.");
+        } catch (final IllegalArgumentException e) {
+            // The exception is expected.
+            // We verify the message to ensure the correct validation failed.
+            assertEquals("Illegal offset: 1", e.getMessage());
         }
     }
 }
