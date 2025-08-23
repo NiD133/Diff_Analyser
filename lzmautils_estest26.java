@@ -1,16 +1,27 @@
 package org.apache.commons.compress.compressors.lzma;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNotNull;
 
-public class LZMAUtils_ESTestTest26 extends LZMAUtils_ESTest_scaffolding {
+/**
+ * Tests for the {@link LZMAUtils} class.
+ */
+public class LZMAUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        LZMAUtils.getCachedLZMAAvailability();
+    /**
+     * Verifies that the package-private helper method getCachedLZMAAvailability()
+     * runs without error and returns a non-null status. This serves as a basic
+     * smoke test for this internal-use method.
+     */
+    @Test
+    public void getCachedLZMAAvailabilityShouldReturnCurrentStatus() {
+        // The getCachedLZMAAvailability() method is a simple getter for an internal
+        // state field, primarily intended for use in other tests.
+        // We are calling it here to ensure it executes without throwing an exception.
+        LZMAUtils.CachedAvailability availability = LZMAUtils.getCachedLZMAAvailability();
+
+        // A simple assertion confirms that the method returns a valid enum constant,
+        // which should never be null.
+        assertNotNull("The cached availability status should not be null", availability);
     }
 }
