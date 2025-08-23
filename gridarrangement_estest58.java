@@ -1,93 +1,41 @@
 package org.jfree.chart.block;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.SystemColor;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockGregorianCalendar;
-import org.jfree.chart.api.HorizontalAlignment;
-import org.jfree.chart.api.RectangleAnchor;
-import org.jfree.chart.api.VerticalAlignment;
-import org.jfree.chart.text.TextBlockAnchor;
 import org.jfree.data.Range;
-import org.jfree.data.time.TimePeriodAnchor;
-import org.jfree.data.time.TimeSeries;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class GridArrangement_ESTestTest58 extends GridArrangement_ESTest_scaffolding {
+import java.awt.Graphics2D;
 
-    @Test(timeout = 4000)
-    public void test57() throws Throwable {
-        GridArrangement gridArrangement0 = new GridArrangement(15, 15);
-        assertNotNull(gridArrangement0);
-        Range range0 = new Range(2333.9152700999625, 2333.9152700999625);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(2333.9152700999625, range0.getLowerBound(), 0.01);
-        assertEquals(2333.9152700999625, range0.getCentralValue(), 0.01);
-        assertEquals(2333.9152700999625, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[2333.9152700999625,2333.9152700999625]", range0.toString());
-        assertNotNull(range0);
-        RectangleConstraint rectangleConstraint0 = new RectangleConstraint(range0, range0);
-        assertEquals(0.0, range0.getLength(), 0.01);
-        assertEquals(2333.9152700999625, range0.getLowerBound(), 0.01);
-        assertEquals(2333.9152700999625, range0.getCentralValue(), 0.01);
-        assertEquals(2333.9152700999625, range0.getUpperBound(), 0.01);
-        assertFalse(range0.isNaNRange());
-        assertEquals("Range[2333.9152700999625,2333.9152700999625]", range0.toString());
-        assertEquals(0.0, rectangleConstraint0.getHeight(), 0.01);
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getHeightConstraintType());
-        assertEquals(LengthConstraintType.RANGE, rectangleConstraint0.getWidthConstraintType());
-        assertEquals(0.0, rectangleConstraint0.getWidth(), 0.01);
-        assertNotNull(rectangleConstraint0);
-        BlockContainer blockContainer0 = new BlockContainer();
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNotNull(blockContainer0);
-        BlockContainer blockContainer1 = new BlockContainer();
-        assertNull(blockContainer1.getID());
-        assertEquals(0.0, blockContainer1.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer1.getWidth(), 0.01);
-        assertTrue(blockContainer1.isEmpty());
-        assertNotNull(blockContainer1);
-        assertTrue(blockContainer1.equals((Object) blockContainer0));
-        blockContainer1.add((Block) blockContainer0);
-        assertNotSame(blockContainer0, blockContainer1);
-        assertNotSame(blockContainer1, blockContainer0);
-        assertEquals(0.0, blockContainer0.getContentYOffset(), 0.01);
-        assertTrue(blockContainer0.isEmpty());
-        assertEquals(0.0, blockContainer0.getContentXOffset(), 0.01);
-        assertEquals(0.0, blockContainer0.getWidth(), 0.01);
-        assertNull(blockContainer0.getID());
-        assertEquals(0.0, blockContainer0.getHeight(), 0.01);
-        assertNull(blockContainer1.getID());
-        assertEquals(0.0, blockContainer1.getContentYOffset(), 0.01);
-        assertEquals(0.0, blockContainer1.getContentXOffset(), 0.01);
-        assertFalse(blockContainer1.isEmpty());
-        assertEquals(0.0, blockContainer1.getHeight(), 0.01);
-        assertEquals(0.0, blockContainer1.getWidth(), 0.01);
-        assertFalse(blockContainer0.equals((Object) blockContainer1));
-        assertFalse(blockContainer1.equals((Object) blockContainer0));
-        // Undeclared exception!
-        try {
-            gridArrangement0.arrangeFR(blockContainer1, (Graphics2D) null, rectangleConstraint0);
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Not implemented.
-            //
-            verifyException("org.jfree.chart.block.BorderArrangement", e);
-        }
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+/**
+ * Unit tests for the {@link GridArrangement} class.
+ */
+public class GridArrangementTest {
+
+    /**
+     * The arrangeFR() method, which handles arrangement for a fixed-width and
+     * range-height constraint, is not implemented in the current version.
+     * This test verifies that calling it throws a RuntimeException as expected.
+     */
+    @Test
+    public void arrangeFRShouldThrowExceptionAsItIsNotImplemented() {
+        // Arrange: Set up a grid arrangement, a container with a block, and a
+        // constraint that matches the method being tested (Fixed-width, Range-height).
+        GridArrangement gridArrangement = new GridArrangement(2, 2);
+        BlockContainer container = new BlockContainer();
+        container.add(new EmptyBlock(0, 0)); // Add a simple block to the container
+
+        // Create a constraint for a fixed width and a ranged height (FR).
+        RectangleConstraint frConstraint = new RectangleConstraint(100.0, new Range(50.0, 150.0));
+        Graphics2D g2 = null; // Graphics2D is not used by the unimplemented method.
+
+        // Act & Assert: Verify that calling the method throws a RuntimeException
+        // with the specific "Not implemented" message.
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            gridArrangement.arrangeFR(container, g2, frConstraint);
+        });
+
+        assertEquals("Not implemented.", exception.getMessage());
     }
 }
