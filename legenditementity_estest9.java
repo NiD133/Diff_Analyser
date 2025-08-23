@@ -1,31 +1,35 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Line2D;
+import static org.junit.Assert.assertFalse;
+
 import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
 
-public class LegendItemEntity_ESTestTest9 extends LegendItemEntity_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link LegendItemEntity} class, focusing on equality checks.
+ */
+public class LegendItemEntityTest {
 
-    @Test(timeout = 4000)
-    public void test08() throws Throwable {
-        Rectangle2D.Double rectangle2D_Double0 = new Rectangle2D.Double();
-        LegendItemEntity<Integer> legendItemEntity0 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-        Integer integer0 = JLayeredPane.POPUP_LAYER;
-        legendItemEntity0.setSeriesKey(integer0);
-        LegendItemEntity<Integer> legendItemEntity1 = new LegendItemEntity<Integer>(rectangle2D_Double0);
-        boolean boolean0 = legendItemEntity0.equals(legendItemEntity1);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing two entities
+     * with different series keys. This test specifically checks a case where one
+     * entity has a series key and the other has a null series key.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenSeriesKeysAreDifferent() {
+        // Arrange
+        // Create two LegendItemEntity objects with the same area shape.
+        Rectangle2D.Double commonArea = new Rectangle2D.Double(1.0, 2.0, 3.0, 4.0);
+
+        LegendItemEntity<Integer> entityWithKey = new LegendItemEntity<>(commonArea);
+        entityWithKey.setSeriesKey(100);
+
+        LegendItemEntity<Integer> entityWithoutKey = new LegendItemEntity<>(commonArea);
+        // The series key for entityWithoutKey remains null by default.
+
+        // Act & Assert
+        // The entities should not be equal because their series keys differ (100 vs. null).
+        assertFalse("Entities with different series keys should not be equal",
+                entityWithKey.equals(entityWithoutKey));
     }
 }
