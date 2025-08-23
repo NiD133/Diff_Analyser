@@ -1,24 +1,26 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class FieldUtils_ESTestTest40 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        Integer integer0 = new Integer((-1));
-        boolean boolean0 = FieldUtils.equals((Object) integer0, (Object) null);
-        assertFalse(boolean0);
+    /**
+     * Tests that FieldUtils.equals() returns false when comparing a non-null object to null.
+     * The comparison should be symmetrical, so this also implicitly covers comparing null to a non-null object.
+     */
+    @Test
+    public void equals_shouldReturnFalse_whenComparingNonNullObjectToNull() {
+        // Arrange
+        Object nonNullObject = -1; // Autoboxed to Integer
+
+        // Act
+        boolean result = FieldUtils.equals(nonNullObject, null);
+
+        // Assert
+        assertFalse("FieldUtils.equals(nonNull, null) should return false.", result);
     }
 }
