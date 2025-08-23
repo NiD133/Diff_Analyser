@@ -1,26 +1,39 @@
 package com.google.common.util.concurrent;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class AtomicDoubleArray_ESTestTest47 extends AtomicDoubleArray_ESTest_scaffolding {
+/**
+ * Tests for {@link AtomicDoubleArray}.
+ */
+public class AtomicDoubleArrayTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        double[] doubleArray0 = new double[8];
-        AtomicDoubleArray atomicDoubleArray0 = new AtomicDoubleArray(doubleArray0);
-        double double0 = atomicDoubleArray0.addAndGet(0, 1775.31884);
-        assertEquals(1775.31884, double0, 0.01);
-        double double1 = atomicDoubleArray0.get(0);
-        assertEquals(8, atomicDoubleArray0.length());
-        assertEquals(1775.31884, double1, 0.01);
+    /**
+     * Verifies that addAndGet() correctly adds a value to an element,
+     * returns the updated value, and permanently modifies the value in the array.
+     */
+    @Test
+    public void addAndGet_shouldUpdateValueAndReturnNewValue() {
+        // Arrange
+        // An array initialized with all zeros.
+        double[] initialValues = new double[8];
+        AtomicDoubleArray atomicArray = new AtomicDoubleArray(initialValues);
+
+        int indexToUpdate = 0;
+        double valueToAdd = 1775.31884;
+        double expectedResult = 0.0 + valueToAdd;
+
+        // Act
+        double returnedValue = atomicArray.addAndGet(indexToUpdate, valueToAdd);
+
+        // Assert
+        // 1. The method should return the new, updated value.
+        assertEquals(expectedResult, returnedValue, 0.0);
+
+        // 2. The value at the specified index in the array should be updated.
+        assertEquals(expectedResult, atomicArray.get(indexToUpdate), 0.0);
+
+        // 3. The array's length should remain unchanged.
+        assertEquals(8, atomicArray.length());
     }
 }
