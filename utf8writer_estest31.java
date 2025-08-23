@@ -1,39 +1,62 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class UTF8Writer_ESTestTest31 extends UTF8Writer_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.redacted();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, pipedOutputStream0);
-        int int0 = uTF8Writer0.convertSurrogate(57343);
-        assertEquals((-56556545), int0);
+/**
+ * Contains tests for the {@link UTF8Writer} class, focusing on specific edge cases.
+ */
+public class UTF8WriterTest {
+
+    /**
+     * Tests the behavior of the {@code convertSurrogate} method when it is called
+     * in an invalid state—that is, without a preceding high surrogate character.
+     *
+     * In this scenario, the writer's internal high surrogate value is 0. The method
+     * does not throw an exception but instead calculates and returns a meaningless,
+     * incorrect code point. This test verifies this specific, albeit unusual, behavior.
+     */
+    @Test
+    public void convertSurrogate_whenHighSurrogateIsMissing_returnsIncorrectCodepoint() throws IOException {
+        // Arrange: Set up the UTF8Writer.
+        // The IOContext and OutputStream are required for the constructor, but their
+        // specific configurations are not relevant to the convertSurrogate method itself.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                null, // content reference
+                true  // recycling
+        );
+        // Using a simple ByteArrayOutputStream as the actual output is not tested.
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UTF8Writer writer = new UTF8Writer(ioContext, out);
+
+        // The input is the highest possible value for a low surrogate character.
+        final int lowSurrogate = 0xDFFF; // 57343 in decimal
+
+        // Act: Call convertSurrogate without first setting a high surrogate.
+        // The writer's internal _surrogate field will be its default value, 0.
+        int actualCodepoint = writer.convertSurrogate(lowSurrogate);
+
+        // Assert: The result should be a garbage value based on the internal calculation.
+        // The formula used is: (highSurrogate << 10) + lowSurrogate + SURROGATE_BASE
+        // Since highSurrogate is 0, the expected result is simply lowSurrogate + SURROGATE_BASE.
+        int expectedCodepoint = lowSurrogate + UTF8Writer.SURROGATE_BASE;
+        assertEquals(expectedCodepoint, actualCodepoint);
+
+        // For reference, the original test asserted against the magic number -56556545.
+        // Our calculated value should match this.
+        assertEquals(-56556545, actualCodepoint);
     }
 }
