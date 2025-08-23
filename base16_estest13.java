@@ -1,19 +1,30 @@
 package org.apache.commons.codec.binary;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.apache.commons.codec.CodecPolicy;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class Base16_ESTestTest13 extends Base16_ESTest_scaffolding {
+/**
+ * Tests for the {@link Base16} class.
+ * This class focuses on verifying the behavior of the isInAlphabet method.
+ */
+public class Base16Test {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        Base16 base16_0 = new Base16();
-        boolean boolean0 = base16_0.isInAlphabet((byte) 92);
-        assertFalse(boolean0);
+    @Test
+    public void isInAlphabetShouldReturnFalseForCharacterOutsideAlphabet() {
+        // Arrange: Create a standard Base16 codec, which uses the uppercase
+        // hexadecimal alphabet (0-9, A-F) by default.
+        final Base16 base16 = new Base16();
+        
+        // The backslash character is not a valid Base16 character.
+        final byte nonAlphabetChar = '\\';
+
+        // Act: Check if the character is in the alphabet.
+        final boolean result = base16.isInAlphabet(nonAlphabetChar);
+
+        // Assert: The result should be false.
+        assertFalse(
+            "The backslash character '\\' should not be considered part of the Base16 alphabet.",
+            result
+        );
     }
 }
