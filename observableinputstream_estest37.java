@@ -1,42 +1,36 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.io.StringWriter;
-import java.nio.CharBuffer;
-import java.nio.file.NoSuchFileException;
-import java.security.MessageDigest;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class ObservableInputStream_ESTestTest37 extends ObservableInputStream_ESTest_scaffolding {
+/**
+ * Tests for the {@link ObservableInputStream} class.
+ */
+public class ObservableInputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test36() throws Throwable {
-        BufferedInputStream bufferedInputStream0 = new BufferedInputStream((InputStream) null);
-        ObservableInputStream observableInputStream0 = new ObservableInputStream(bufferedInputStream0);
-        byte[] byteArray0 = new byte[0];
-        int int0 = observableInputStream0.read(byteArray0);
-        assertEquals(0, int0);
+    /**
+     * Verifies that calling read() with a zero-length buffer returns 0,
+     * as specified by the InputStream contract.
+     */
+    @Test
+    public void readWithEmptyBufferShouldReturnZero() throws IOException {
+        // Arrange
+        // An empty stream is used, though its content is irrelevant since the
+        // underlying stream is not read from when the buffer length is zero.
+        final InputStream emptyStream = new ByteArrayInputStream(new byte[0]);
+        final ObservableInputStream observableInputStream = new ObservableInputStream(emptyStream);
+        final byte[] emptyBuffer = new byte[0];
+
+        // Act
+        final int bytesRead = observableInputStream.read(emptyBuffer);
+
+        // Assert
+        // The InputStream#read(byte[]) contract states that if the buffer length is zero,
+        // then no bytes are read and 0 must be returned.
+        assertEquals("Should return 0 when reading into an empty buffer", 0, bytesRead);
     }
 }
