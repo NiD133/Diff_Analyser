@@ -1,64 +1,39 @@
 package org.threeten.extra.chrono;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
 import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class JulianChronology_ESTestTest13 extends JulianChronology_ESTest_scaffolding {
+/**
+ * Unit tests for {@link JulianChronology}.
+ * This test focuses on exception handling when creating a ZonedDateTime from a partial TemporalAccessor.
+ */
+public class JulianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test12() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        ZoneOffset zoneOffset0 = ZoneOffset.MAX;
-        // Undeclared exception!
+    /**
+     * Tests that creating a ZonedDateTime from a TemporalAccessor that lacks
+     * date and time information throws a DateTimeException.
+     */
+    @Test
+    public void zonedDateTime_whenTemporalAccessorLacksDateTimeInfo_throwsException() {
+        // Arrange: A TemporalAccessor containing only zone information is insufficient
+        // to create a full ZonedDateTime.
+        JulianChronology julianChronology = JulianChronology.INSTANCE;
+        TemporalAccessor insufficientTemporal = ZoneOffset.MAX;
+
+        // Act & Assert: Attempting the conversion should result in a DateTimeException.
         try {
-            julianChronology0.zonedDateTime((TemporalAccessor) zoneOffset0);
-            fail("Expecting exception: DateTimeException");
+            julianChronology.zonedDateTime(insufficientTemporal);
+            fail("Expected a DateTimeException to be thrown, but no exception was thrown.");
         } catch (DateTimeException e) {
-            //
-            // Unable to obtain ChronoZonedDateTime from TemporalAccessor: class java.time.ZoneOffset
-            //
-            verifyException("java.time.chrono.Chronology", e);
+            // Verify that the exception message clearly explains the problem.
+            assertEquals(
+                "Unable to obtain ChronoZonedDateTime from TemporalAccessor: class java.time.ZoneOffset",
+                e.getMessage()
+            );
         }
     }
 }
