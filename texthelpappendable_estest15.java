@@ -1,44 +1,32 @@
 package org.apache.commons.cli.help;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class TextHelpAppendable_ESTestTest15 extends TextHelpAppendable_ESTest_scaffolding {
+/**
+ * Tests for {@link TextHelpAppendable}.
+ * This class focuses on specific behaviors related to its configuration.
+ */
+public class TextHelpAppendableTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        TextHelpAppendable textHelpAppendable0 = TextHelpAppendable.systemOut();
-        textHelpAppendable0.setMaxWidth((-2460));
-        textHelpAppendable0.getTextStyleBuilder();
-        assertEquals((-2460), textHelpAppendable0.getMaxWidth());
+    /**
+     * Tests that setMaxWidth can accept a negative value and that getMaxWidth
+     * correctly returns this negative value. This ensures that the component
+     * behaves predictably even with unconventional input, although negative
+     * widths may not be practically useful.
+     */
+    @Test
+    public void shouldSetAndGetNegativeMaxWidth() {
+        // Arrange
+        final TextHelpAppendable textHelpAppendable = TextHelpAppendable.systemOut();
+        final int negativeWidth = -2460;
+
+        // Act
+        textHelpAppendable.setMaxWidth(negativeWidth);
+        final int actualWidth = textHelpAppendable.getMaxWidth();
+
+        // Assert
+        assertEquals("The max width should be the negative value that was set.",
+                     negativeWidth, actualWidth);
     }
 }
