@@ -1,25 +1,27 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class UtcInstant_ESTestTest50 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link UtcInstant#equals(Object)} method.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test49() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        Boolean boolean0 = new Boolean("GeO");
-        boolean boolean1 = utcInstant0.equals(boolean0);
-        assertFalse(boolean1);
+    /**
+     * Tests that the equals() method returns false when a UtcInstant is
+     * compared with an object of a completely different type.
+     */
+    @Test
+    public void equals_returnsFalse_whenComparedWithObjectOfDifferentType() {
+        // Arrange: Create a UtcInstant instance and an object of an unrelated type.
+        UtcInstant utcInstant = UtcInstant.ofModifiedJulianDay(0L, 0L);
+        Object otherObject = new Object();
+
+        // Act: Compare the UtcInstant with the other object.
+        boolean isEqual = utcInstant.equals(otherObject);
+
+        // Assert: The result should be false, as per the equals contract.
+        assertFalse("UtcInstant.equals() must return false when compared to an object of a different type.", isEqual);
     }
 }
