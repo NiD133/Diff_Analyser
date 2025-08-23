@@ -1,31 +1,46 @@
 package org.apache.commons.compress.harmony.unpack200;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ClassFileEntry;
-import org.apache.commons.compress.harmony.unpack200.bytecode.ConstantPoolEntry;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class SegmentConstantPool_ESTestTest31 extends SegmentConstantPool_ESTest_scaffolding {
+/**
+ * This test suite focuses on the SegmentConstantPool class.
+ */
+public class SegmentConstantPoolTest {
 
-    @Test(timeout = 4000)
-    public void test30() throws Throwable {
-        String[] stringArray0 = new String[0];
-        SegmentConstantPool segmentConstantPool0 = new SegmentConstantPool((CpBands) null);
-        String[] stringArray1 = new String[2];
-        // Undeclared exception!
-        try {
-            segmentConstantPool0.matchSpecificPoolEntryIndex(stringArray1, stringArray0, stringArray1[1], ":M", 2501);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("org.apache.commons.compress.harmony.unpack200.SegmentConstantPool", e);
-        }
+    /**
+     * Tests that {@link SegmentConstantPool#matchSpecificPoolEntryIndex(String[], String[], String, String, int)}
+     * throws an {@link ArrayIndexOutOfBoundsException} when the secondary array is shorter than the primary array.
+     * The method's contract implies that both arrays should be of the same length, as it iterates through them
+     * concurrently.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void matchSpecificPoolEntryIndexShouldThrowExceptionWhenArraysHaveMismatchedLengths() {
+        // Arrange: Create a SegmentConstantPool instance. The CpBands can be null as the
+        // method under test does not rely on it.
+        SegmentConstantPool segmentConstantPool = new SegmentConstantPool(null);
+
+        // Arrange: Set up arrays with mismatched lengths to trigger the exception.
+        // A primary array with one element is sufficient to cause an access attempt on the empty secondary array.
+        String[] primaryArray = new String[]{"java/lang/Object"};
+        String[] secondaryArray = new String[0];
+
+        // Arrange: The values for comparison and the desired index are not relevant to this test,
+        // as the exception occurs during array iteration before these are used.
+        String primaryCompareString = "any-class-name";
+        String secondaryCompareRegex = "any-method-name";
+        int desiredIndex = 0;
+
+        // Act: Call the method with a primary array that is longer than the secondary array.
+        // This is expected to throw an ArrayIndexOutOfBoundsException.
+        segmentConstantPool.matchSpecificPoolEntryIndex(
+            primaryArray,
+            secondaryArray,
+            primaryCompareString,
+            secondaryCompareRegex,
+            desiredIndex
+        );
+
+        // Assert: The test will pass if the expected ArrayIndexOutOfBoundsException is thrown.
+        // This is handled by the @Test(expected=...) annotation.
     }
 }
