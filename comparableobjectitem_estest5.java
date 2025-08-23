@@ -2,27 +2,49 @@ package org.jfree.data;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Date;
 
-public class ComparableObjectItem_ESTestTest5 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ComparableObjectItem} class, focusing on the getObject() method.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        Comparable<Object> comparable0 = (Comparable<Object>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(comparable0).toString();
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, comparable0);
-        Object object0 = comparableObjectItem0.getObject();
-        // Undeclared exception!
-        try {
-            object0.hashCode();
-            //  fail("Expecting exception: IllegalArgumentException");
-            // Unstable assertion
-        } catch (IllegalArgumentException e) {
-        }
+    /**
+     * Verifies that the getObject() method returns the exact object instance
+     * that was provided to the constructor.
+     */
+    @Test
+    public void getObject_shouldReturnTheObjectSetInConstructor() {
+        // Arrange: Create distinct, concrete objects for the comparable (x) and the object (y).
+        // Using concrete types like String and Date makes the test's setup easy to understand.
+        String key = "2023-Q1";
+        Date value = new Date();
+        ComparableObjectItem item = new ComparableObjectItem(key, value);
+
+        // Act: Retrieve the object from the item.
+        Object retrievedObject = item.getObject();
+
+        // Assert: Verify that the retrieved object is the same instance as the one used during creation.
+        // assertSame is used to check for object identity, which is the expected contract of a getter.
+        assertSame("The object returned by getObject() should be the same instance provided to the constructor.",
+                value, retrievedObject);
+    }
+
+    /**
+     * Verifies that getObject() correctly returns a null value if null was
+     * passed to the constructor.
+     */
+    @Test
+    public void getObject_shouldReturnNullWhenConstructedWithNull() {
+        // Arrange
+        String key = "2023-Q2";
+        ComparableObjectItem item = new ComparableObjectItem(key, null);
+
+        // Act
+        Object retrievedObject = item.getObject();
+
+        // Assert
+        assertNull("getObject() should return null if the item was constructed with a null object.",
+                retrievedObject);
     }
 }
