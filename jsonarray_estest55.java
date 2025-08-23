@@ -1,25 +1,26 @@
 package com.google.gson;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class JsonArray_ESTestTest55 extends JsonArray_ESTest_scaffolding {
+/**
+ * Test for the {@link JsonArray#isEmpty()} method.
+ */
+public class JsonArrayIsEmptyTest {
 
-    @Test(timeout = 4000)
-    public void test54() throws Throwable {
-        JsonArray jsonArray0 = new JsonArray();
-        assertTrue(jsonArray0.isEmpty());
-        Character character0 = Character.valueOf('6');
-        jsonArray0.add(character0);
-        boolean boolean0 = jsonArray0.isEmpty();
-        assertFalse(boolean0);
+    @Test
+    public void isEmpty_returnsTrueForNewArray_andFalseAfterAddingElement() {
+        // Arrange: Create a new, empty JsonArray.
+        JsonArray jsonArray = new JsonArray();
+
+        // Assert: A newly created JsonArray should be empty.
+        assertTrue("A new JsonArray should be empty", jsonArray.isEmpty());
+
+        // Act: Add an element to the array.
+        jsonArray.add('6');
+
+        // Assert: The JsonArray should no longer be empty.
+        assertFalse("JsonArray should not be empty after adding an element", jsonArray.isEmpty());
     }
 }
