@@ -1,36 +1,35 @@
 package com.google.gson.internal.bind;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.Strictness;
-import com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonTreeReader_ESTestTest26 extends JsonTreeReader_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test025() throws Throwable {
-        JsonPrimitive jsonPrimitive0 = new JsonPrimitive("||9{dvk.\"Ana");
-        JsonTreeReader jsonTreeReader0 = new JsonTreeReader(jsonPrimitive0);
-        // Undeclared exception!
+/**
+ * Unit tests for the {@link JsonTreeReader} class.
+ */
+public class JsonTreeReaderTest {
+
+    /**
+     * Verifies that calling {@link JsonTreeReader#nextInt()} on a JSON primitive
+     * containing a non-numeric string correctly throws a {@link NumberFormatException}.
+     */
+    @Test
+    public void nextInt_onNonNumericString_throwsNumberFormatException() {
+        // Arrange: Create a reader for a JSON primitive that is a non-numeric string.
+        String nonNumericValue = "not a number";
+        JsonPrimitive jsonPrimitive = new JsonPrimitive(nonNumericValue);
+        JsonTreeReader reader = new JsonTreeReader(jsonPrimitive);
+
+        // Act & Assert: Verify that calling nextInt() throws the expected exception.
         try {
-            jsonTreeReader0.nextInt();
-            fail("Expecting exception: NumberFormatException");
-        } catch (NumberFormatException e) {
-            //
-            // For input string: \"||9{dvk.\"Ana\"
-            //
-            verifyException("java.lang.NumberFormatException", e);
+            reader.nextInt();
+            fail("A NumberFormatException was expected but not thrown.");
+        } catch (NumberFormatException expected) {
+            // Verify the exception message is informative and contains the problematic input.
+            String expectedMessage = "For input string: \"" + nonNumericValue + "\"";
+            assertEquals(expectedMessage, expected.getMessage());
         }
     }
 }
