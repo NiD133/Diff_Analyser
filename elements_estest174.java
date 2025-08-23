@@ -1,44 +1,35 @@
 package org.jsoup.select;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.FormElement;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class Elements_ESTestTest174 extends Elements_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test173() throws Throwable {
-        Document document0 = Parser.parse("nly http & htps prtocols supported", "nly http & htps prtocols supported");
-        Elements elements0 = document0.getAllElements();
-        // Undeclared exception!
-        try {
-            elements0.nextAll("lkr.7#E@P2PwMVQQ");
-            fail("Expecting exception: IllegalStateException");
-        } catch (IllegalStateException e) {
-            //
-            // Could not parse query 'lkr.7#E@P2PwMVQQ': unexpected token at '@P2PwMVQQ'
-            //
-            verifyException("org.jsoup.select.QueryParser", e);
-        }
+/**
+ * Test suite for the {@link Elements} class, focusing on exception handling.
+ */
+public class ElementsExceptionTest {
+
+    /**
+     * Verifies that calling nextAll() with a syntactically invalid CSS query
+     * throws an IllegalStateException.
+     */
+    @Test
+    public void nextAllWithInvalidQueryThrowsException() {
+        // Arrange: Create a simple Elements object. The content is not important for this test.
+        Document doc = Parser.parse("<div></div>");
+        Elements elements = doc.select("div");
+        String invalidQuery = "lkr.7#E@P2PwMVQQ";
+
+        // Act & Assert: Expect an IllegalStateException when the invalid query is used.
+        IllegalStateException thrown = assertThrows(
+            IllegalStateException.class,
+            () -> elements.nextAll(invalidQuery)
+        );
+
+        // Verify that the exception message is clear and helpful.
+        assertEquals("Could not parse query '" + invalidQuery + "': unexpected token at '@P2PwMVQQ'", thrown.getMessage());
     }
 }
