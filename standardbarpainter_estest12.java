@@ -1,27 +1,27 @@
 package org.jfree.chart.renderer.category;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class StandardBarPainter_ESTestTest12 extends StandardBarPainter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StandardBarPainter} class, focusing on its
+ * implementation of the equals() method.
+ */
+public class StandardBarPainterTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        StandardBarPainter standardBarPainter0 = new StandardBarPainter();
-        boolean boolean0 = standardBarPainter0.equals((Object) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the equals() method returns false when comparing an instance
+     * to null. This is a standard requirement of the Object.equals() contract.
+     */
+    @Test
+    public void equals_whenComparedWithNull_shouldReturnFalse() {
+        // Arrange
+        StandardBarPainter painter = new StandardBarPainter();
+
+        // Act: Compare the painter instance to null.
+        boolean result = painter.equals(null);
+
+        // Assert: The result should be false, as per the equals() contract.
+        assertFalse(result);
     }
 }
