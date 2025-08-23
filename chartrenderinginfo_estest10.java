@@ -1,37 +1,32 @@
 package org.jfree.chart;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ChartRenderingInfo_ESTestTest10 extends ChartRenderingInfo_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        PlotRenderingInfo plotRenderingInfo0 = chartRenderingInfo0.getPlotInfo();
-        plotRenderingInfo0.addSubplotInfo(plotRenderingInfo0);
-        // Undeclared exception!
-        try {
-            chartRenderingInfo0.hashCode();
-            fail("Expecting exception: StackOverflowError");
-        } catch (StackOverflowError e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+/**
+ * Contains focused tests for the {@link ChartRenderingInfo} class.
+ */
+public class ChartRenderingInfoTest {
+
+    /**
+     * Verifies that calling hashCode() on a ChartRenderingInfo instance throws a
+     * StackOverflowError if its PlotRenderingInfo contains a circular reference.
+     * This scenario occurs when a plot is added as its own subplot, creating an
+     * infinite loop during hash code calculation.
+     */
+    @Test
+    public void hashCode_withCircularPlotReference_throwsStackOverflowError() {
+        // Arrange: Create a ChartRenderingInfo and set up a circular reference
+        // where its PlotRenderingInfo is also its own subplot.
+        ChartRenderingInfo chartInfo = new ChartRenderingInfo();
+        PlotRenderingInfo plotInfo = chartInfo.getPlotInfo();
+        plotInfo.addSubplotInfo(plotInfo); // Create the cycle
+
+        // Act & Assert: Verify that calling hashCode() causes a StackOverflowError.
+        // The assertThrows method clearly expresses the expectation that an exception
+        // will be thrown by the provided lambda expression.
+        assertThrows(StackOverflowError.class, chartInfo::hashCode);
     }
 }
