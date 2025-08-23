@@ -1,49 +1,40 @@
 package com.itextpdf.text.xml.xmp;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.awt.AsianFontMapper;
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfAction;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.xmp.XMPMeta;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
-import javax.swing.DebugGraphics;
-import javax.swing.DropMode;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class XmpWriter_ESTestTest5 extends XmpWriter_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XmpWriter} class.
+ */
+public class XmpWriterTest {
 
+    /**
+     * Verifies that the deprecated method {@code addRdfDescription(String, String)}
+     * does not throw an exception when called with empty string arguments.
+     * <p>
+     * This test is important for ensuring backward compatibility with older code
+     * that might still use this deprecated method. The test passes if the method
+     * call completes without any errors.
+     * </p>
+     */
     @Test(timeout = 4000)
-    public void test04() throws Throwable {
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("Z>h7mej", true);
-        MockPrintStream mockPrintStream0 = new MockPrintStream(mockFileOutputStream0);
-        DefaultFontMapper defaultFontMapper0 = new DefaultFontMapper();
-        HashMap<String, String> hashMap0 = defaultFontMapper0.getAliases();
-        XmpWriter xmpWriter0 = new XmpWriter(mockPrintStream0, hashMap0);
-        xmpWriter0.addRdfDescription("", "");
+    public void addRdfDescriptionWithEmptyParametersShouldNotThrowException() throws IOException {
+        // Arrange: Set up the necessary objects for the test.
+        // Use a standard ByteArrayOutputStream to act as a sink for any output.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        
+        // The XmpWriter constructor requires a Map; an empty one suffices for this test.
+        Map<String, String> documentInfo = new HashMap<>();
+        
+        XmpWriter xmpWriter = new XmpWriter(outputStream, documentInfo);
+
+        // Act: Call the deprecated method with empty strings.
+        xmpWriter.addRdfDescription("", "");
+
+        // Assert: The test succeeds if no exception is thrown.
+        // This is handled automatically by the JUnit test runner. No explicit assertion is needed.
     }
 }
