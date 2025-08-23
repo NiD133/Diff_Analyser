@@ -1,31 +1,27 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class FieldUtils_ESTestTest86 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test85() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that safeNegate() throws an ArithmeticException when attempting to negate
+     * Integer.MIN_VALUE, as its positive counterpart is outside the valid integer range.
+     */
+    @Test
+    public void safeNegate_shouldThrowExceptionForIntegerMinValue() {
         try {
             FieldUtils.safeNegate(Integer.MIN_VALUE);
-            fail("Expecting exception: ArithmeticException");
+            fail("Expected an ArithmeticException to be thrown but it wasn't.");
         } catch (ArithmeticException e) {
-            //
-            // Integer.MIN_VALUE cannot be negated
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
+            // This is the expected behavior.
+            // Now, we verify that the exception message is clear and correct.
+            assertEquals("Integer.MIN_VALUE cannot be negated", e.getMessage());
         }
     }
 }
