@@ -1,31 +1,36 @@
 package com.google.common.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CharSequenceReader_ESTestTest16 extends CharSequenceReader_ESTest_scaffolding {
+/**
+ * Tests for {@link CharSequenceReader}.
+ */
+public class CharSequenceReaderTest {
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        char[] charArray0 = new char[1];
-        CharBuffer charBuffer0 = CharBuffer.wrap(charArray0);
-        CharSequenceReader charSequenceReader0 = new CharSequenceReader(charBuffer0);
-        charSequenceReader0.close();
+    /**
+     * Verifies that attempting to read from a reader that has been closed
+     * throws an IOException.
+     */
+    @Test
+    public void read_afterClose_throwsIOException() throws IOException {
+        // Arrange: Create a reader and then close it.
+        String sequence = "test-data";
+        CharSequenceReader reader = new CharSequenceReader(sequence);
+        reader.close();
+
+        CharBuffer targetBuffer = CharBuffer.allocate(sequence.length());
+
+        // Act & Assert: Attempting to read should fail with an IOException.
         try {
-            charSequenceReader0.read(charBuffer0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // reader closed
-            //
-            verifyException("com.google.common.io.CharSequenceReader", e);
+            reader.read(targetBuffer);
+            fail("Expected an IOException to be thrown when reading from a closed reader.");
+        } catch (IOException expected) {
+            assertEquals("reader closed", expected.getMessage());
         }
     }
 }
