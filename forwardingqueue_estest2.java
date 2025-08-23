@@ -1,23 +1,32 @@
 package com.google.common.collect;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ForwardingQueue_ESTestTest2 extends ForwardingQueue_ESTest_scaffolding {
+/**
+ * Unit tests for the standard helper methods in {@link ForwardingQueue}.
+ */
+public class ForwardingQueueTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        EvictingQueue<Locale.FilteringMode> evictingQueue0 = EvictingQueue.create(1);
-        Locale.FilteringMode locale_FilteringMode0 = Locale.FilteringMode.EXTENDED_FILTERING;
-        evictingQueue0.add(locale_FilteringMode0);
-        Locale.FilteringMode locale_FilteringMode1 = evictingQueue0.standardPeek();
-        assertSame(locale_FilteringMode1, locale_FilteringMode0);
+    @Test
+    public void standardPeek_onNonEmptyQueue_returnsHeadElementWithoutRemovingIt() {
+        // Arrange: Create a concrete ForwardingQueue implementation (EvictingQueue)
+        // and add an element to it.
+        EvictingQueue<String> queue = EvictingQueue.create(5);
+        String headElement = "first-element";
+        queue.add(headElement);
+
+        // Act: Call the standardPeek() method.
+        String peekedElement = queue.standardPeek();
+
+        // Assert: Verify that the returned element is the head of the queue
+        // and that the queue itself has not been modified.
+        assertSame(
+                "standardPeek() should return the same instance that is at the head of the queue.",
+                headElement,
+                peekedElement);
+        assertEquals("standardPeek() should not modify the queue's size.", 1, queue.size());
     }
 }
