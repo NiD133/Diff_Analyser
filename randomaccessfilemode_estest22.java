@@ -1,41 +1,47 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import org.apache.commons.io.function.IOConsumer;
-import org.apache.commons.io.function.IOFunction;
+import org.evosuite.runtime.mock.java.io.MockFile;
+import org.evosuite.runtime.testdata.FileSystemHandling;
+
+// The following imports are retained as they are part of the test class's original runner configuration.
 import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
 import org.junit.runner.RunWith;
 
 public class RandomAccessFileMode_ESTestTest22 extends RandomAccessFileMode_ESTest_scaffolding {
 
+    /**
+     * Tests that {@link RandomAccessFileMode#accept(Path, IOConsumer)}
+     * correctly propagates an {@link IOException} when the underlying file system
+     * fails to open a file.
+     */
     @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        MockFile mockFile0 = new MockFile("rw");
-        Path path0 = mockFile0.toPath();
+    public void acceptShouldPropagateIOExceptionWhenFileSystemFails() {
+        // Arrange: Configure the mock file system to throw an IOException on any file operation.
+        // This simulates a scenario where the file cannot be accessed due to I/O errors.
         FileSystemHandling.shouldAllThrowIOExceptions();
-        IOConsumer<RandomAccessFile> iOConsumer0 = IOConsumer.noop();
-        RandomAccessFileMode randomAccessFileMode0 = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+
+        final Path targetPath = new MockFile("test-file.txt").toPath();
+        final IOConsumer<RandomAccessFile> noopConsumer = IOConsumer.noop();
+        final RandomAccessFileMode mode = RandomAccessFileMode.READ_WRITE_SYNC_CONTENT;
+
+        // Act & Assert
         try {
-            randomAccessFileMode0.accept(path0, iOConsumer0);
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // Simulated IOException
-            //
-            verifyException("org.evosuite.runtime.vfs.VirtualFileSystem", e);
+            mode.accept(targetPath, noopConsumer);
+            fail("Expected an IOException to be thrown because the file system is mocked to fail.");
+        } catch (final IOException e) {
+            // Verify that the expected exception from the mock file system was caught.
+            final String expectedMessage = "Simulated IOException";
+            assertEquals("The exception message should match the one from the mock file system.",
+                expectedMessage, e.getMessage());
         }
     }
 }
