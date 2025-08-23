@@ -1,27 +1,38 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.GeodesicSphereDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
 
-public class BBoxCalculator_ESTestTest18 extends BBoxCalculator_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BBoxCalculator bBoxCalculator0 = new BBoxCalculator(spatialContext0);
-        double double0 = bBoxCalculator0.getMinX();
-        assertEquals(Double.POSITIVE_INFINITY, double0, 0.01);
-        assertEquals(Double.NEGATIVE_INFINITY, bBoxCalculator0.getMaxY(), 0.01);
-        assertEquals(Double.POSITIVE_INFINITY, bBoxCalculator0.getMinY(), 0.01);
+/**
+ * Test suite for {@link BBoxCalculator}.
+ */
+public class BBoxCalculatorTest {
+
+    // A delta of 0.0 is used for exact comparisons of infinity constants.
+    private static final double DELTA = 0.0;
+
+    /**
+     * Tests that a newly instantiated BBoxCalculator has inverted, infinite bounds,
+     * which is the expected initial state before any shapes are added.
+     */
+    @Test
+    public void newBBoxCalculatorShouldHaveInfiniteBounds() {
+        // Arrange: Create a BBoxCalculator with a standard geographic context.
+        SpatialContext geoContext = SpatialContext.GEO;
+        BBoxCalculator bboxCalculator = new BBoxCalculator(geoContext);
+
+        // Act & Assert: Verify the initial boundary values.
+        // An empty calculator should have its min values set to positive infinity
+        // and its max values set to negative infinity, representing an empty state.
+        assertEquals("Initial minX should be positive infinity",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinX(), DELTA);
+        assertEquals("Initial maxX should be negative infinity",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxX(), DELTA);
+        assertEquals("Initial minY should be positive infinity",
+                Double.POSITIVE_INFINITY, bboxCalculator.getMinY(), DELTA);
+        assertEquals("Initial maxY should be negative infinity",
+                Double.NEGATIVE_INFINITY, bboxCalculator.getMaxY(), DELTA);
     }
 }
