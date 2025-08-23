@@ -2,20 +2,28 @@ package org.jfree.data;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
 
-public class ComparableObjectItem_ESTestTest1 extends ComparableObjectItem_ESTest_scaffolding {
+/**
+ * Tests for the {@link ComparableObjectItem} class.
+ */
+public class ComparableObjectItemTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        Comparable<Object> comparable0 = (Comparable<Object>) mock(Comparable.class, new ViolatedAssumptionAnswer());
-        ComparableObjectItem comparableObjectItem0 = new ComparableObjectItem(comparable0, (Object) null);
-        Object object0 = comparableObjectItem0.getObject();
-        assertNull(object0);
+    /**
+     * Verifies that the getObject() method returns the exact object that was
+     * passed into the constructor. This test specifically checks the case
+     * where the object is null.
+     */
+    @Test
+    public void getObject_shouldReturnNull_whenConstructedWithNullObject() {
+        // Arrange: Create an item with a non-null comparable and a null object.
+        // The constructor allows the object (y-value) to be null.
+        Comparable<String> xValue = "X1";
+        ComparableObjectItem item = new ComparableObjectItem(xValue, null);
+
+        // Act: Retrieve the object from the item.
+        Object retrievedObject = item.getObject();
+
+        // Assert: The retrieved object should be the same null value provided at construction.
+        assertNull("The object retrieved should be null, as it was set to null in the constructor.", retrievedObject);
     }
 }
