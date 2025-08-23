@@ -1,28 +1,30 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class Entities_ESTestTest47 extends Entities_ESTest_scaffolding {
+/**
+ * Test suite for the {@link Entities.EscapeMode} enum.
+ */
+public class EntitiesEscapeModeTest {
 
-    @Test(timeout = 4000)
-    public void test46() throws Throwable {
-        Entities.EscapeMode entities_EscapeMode0 = Entities.EscapeMode.xhtml;
-        String string0 = entities_EscapeMode0.nameForCodepoint(9);
-        assertEquals("", string0);
+    @Test
+    public void nameForCodepointShouldReturnEmptyStringForUnmappedCodepointInXhtmlMode() {
+        // Rationale: The 'xhtml' escape mode is highly restricted and only defines named
+        // entities for essential XML characters like '<', '>', '&', and '"'.
+        // This test verifies that a common but unmapped character, like the horizontal tab,
+        // correctly returns no entity name.
+
+        // Arrange
+        final int tabCodepoint = 9; // The codepoint for the horizontal tab character ('\t')
+
+        // Act
+        String entityName = Entities.EscapeMode.xhtml.nameForCodepoint(tabCodepoint);
+
+        // Assert
+        assertTrue("Expected an empty string for an unmapped codepoint, but got: " + entityName, entityName.isEmpty());
+        // Or, for a more direct comparison:
+        // assertEquals("", entityName);
     }
 }
