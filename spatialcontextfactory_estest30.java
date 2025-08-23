@@ -16,7 +16,7 @@ public class SpatialContextFactory_ESTestTest30 extends SpatialContextFactory_ES
     @Test(timeout = 4000)
     public void test29() throws Throwable {
         HashMap<String, String> hashMap0 = new HashMap<String, String>();
-        hashMap0.put("worldBounds", "KLjy(V*@=mG*& @#o");
+        hashMap0.put("worldBounds", "KL jy(V*@=mG *& @#o");
         ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
         SpatialContext spatialContext0 = SpatialContextFactory.makeSpatialContext(hashMap0, classLoader0);
         assertTrue(spatialContext0.isGeo());
