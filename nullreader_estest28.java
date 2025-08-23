@@ -1,21 +1,38 @@
 package org.apache.commons.io.input;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.EOFException;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class NullReader_ESTestTest28 extends NullReader_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link NullReader} class.
+ */
+public class NullReaderTest {
 
-    @Test(timeout = 4000)
-    public void test27() throws Throwable {
-        NullReader nullReader0 = new NullReader((-3294L), false, false);
-        int int0 = nullReader0.read();
-        assertEquals(1L, nullReader0.getPosition());
-        assertEquals(0, int0);
+    /**
+     * Verifies that reading from a NullReader initialized with a negative size
+     * proceeds as if the reader has an infinite length. The read operation should
+     * return the default character (0) and increment the internal position.
+     * A negative size ensures the end-of-file condition (position == size) is never met
+     * for a positive position counter.
+     */
+    @Test
+    public void testReadWithNegativeSizeBehavesAsInfiniteReader() throws IOException {
+        // Arrange: Create a NullReader with a negative size, which effectively
+        // makes it an infinite stream since the position will never equal the size.
+        final long negativeSize = -100L;
+        final NullReader reader = new NullReader(negativeSize, false, false);
+        assertEquals("Initial position should be zero.", 0L, reader.getPosition());
+
+        // Act: Perform a single read operation.
+        final int characterRead = reader.read();
+
+        // Assert: The reader should return the default character and advance its position.
+        final long expectedPosition = 1L;
+        final int expectedCharacter = 0; // Default char returned by processChar()
+
+        assertEquals("Position should increment after a read.", expectedPosition, reader.getPosition());
+        assertEquals("Read should return the default character.", expectedCharacter, characterRead);
     }
 }
