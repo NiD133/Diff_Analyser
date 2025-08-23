@@ -1,18 +1,24 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest8 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        Seconds seconds0 = Seconds.ZERO;
-        Hours hours0 = seconds0.toStandardHours();
-        assertEquals(0, hours0.getHours());
+    @Test
+    public void toStandardHours_whenConvertingZeroSeconds_shouldReturnZeroHours() {
+        // Arrange
+        Seconds zeroSeconds = Seconds.ZERO;
+        int expectedHours = 0;
+
+        // Act
+        Hours actualHours = zeroSeconds.toStandardHours();
+
+        // Assert
+        assertEquals("Converting zero seconds to hours should result in zero hours.",
+                     expectedHours, actualHours.getHours());
     }
 }
