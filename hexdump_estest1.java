@@ -1,36 +1,54 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PipedOutputStream;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import java.nio.charset.StandardCharsets;
 
-public class HexDump_ESTestTest1 extends HexDump_ESTest_scaffolding {
+/**
+ * Tests for the {@link HexDump} class.
+ */
+public class HexDumpTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        byte[] byteArray0 = new byte[3];
-        MockFile mockFile0 = new MockFile("org.apache.commons.io.filefilter.EmptyFileFilter");
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream(mockFile0);
-        MockPrintStream mockPrintStream0 = new MockPrintStream(mockFileOutputStream0);
-        HexDump.dump(byteArray0, (-1131L), (OutputStream) mockPrintStream0, (int) (byte) 0);
-        assertEquals(61L, mockFile0.length());
+    /**
+     * Tests that the dump method correctly formats a partial line of data (less than 16 bytes)
+     * with a given offset. It verifies the entire formatted string, including the offset,
+     * hexadecimal values, and ASCII representation.
+     */
+    @Test
+    public void testDumpWithOffsetAndPartialLine() throws IOException {
+        // Arrange
+        final long offset = 0x100; // Use a clear, hexadecimal offset for readability
+        final int startIndex = 0;
+        // Use meaningful data that includes printable and non-printable characters
+        final byte[] dataToDump = new byte[] { 'H', 'e', 'l', 'l', 'o', 0x0A }; // "Hello\n"
+
+        // The expected output format for a line is:
+        // [8-char hex offset] [space] [16 bytes in hex] [space] [16 bytes in ASCII] [EOL]
+        // Our data is 6 bytes, so the line will be padded.
+        final String expectedHexValues = "48 65 6C 6C 6F 0A";
+        final String expectedAsciiValues = "Hello."; // 0x0A is a non-printable newline
+
+        // Construct the expected full output line with correct padding.
+        final String expectedOutput = String.format(
+            "%08X %-48s %-16s%s",
+            offset,
+            expectedHexValues,
+            expectedAsciiValues,
+            System.lineSeparator()
+        );
+
+        // Use ByteArrayOutputStream to capture the output in memory without using the file system.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Act
+        HexDump.dump(dataToDump, offset, outputStream, startIndex);
+
+        // Assert
+        // Verify the actual string content, which is more robust than just checking the length.
+        final String actualOutput = outputStream.toString(StandardCharsets.UTF_8.name());
+        assertEquals(expectedOutput, actualOutput);
     }
 }
