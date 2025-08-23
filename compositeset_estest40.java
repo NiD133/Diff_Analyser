@@ -1,69 +1,35 @@
 package org.apache.commons.collections4.set;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AnyPredicate;
-import org.apache.commons.collections4.functors.ChainedClosure;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NotPredicate;
-import org.apache.commons.collections4.functors.NullIsExceptionPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OnePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.TransformerClosure;
-import org.apache.commons.collections4.functors.TruePredicate;
 import org.apache.commons.collections4.functors.UniquePredicate;
-import org.apache.commons.collections4.functors.WhileClosure;
-import org.apache.commons.collections4.iterators.IteratorChain;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CompositeSet_ESTestTest40 extends CompositeSet_ESTest_scaffolding {
+import java.util.function.Predicate;
 
-    @Test(timeout = 4000)
-    public void test39() throws Throwable {
-        LinkedHashSet<Integer> linkedHashSet0 = new LinkedHashSet<Integer>();
-        assertNotNull(linkedHashSet0);
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        CompositeSet<Integer> compositeSet0 = new CompositeSet<Integer>(linkedHashSet0);
-        assertNotNull(compositeSet0);
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        compositeSet0.clear();
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        UniquePredicate<Object> uniquePredicate0 = new UniquePredicate<Object>();
-        assertNotNull(uniquePredicate0);
-        boolean boolean0 = compositeSet0.removeIf(uniquePredicate0);
-        assertEquals(0, linkedHashSet0.size());
-        assertTrue(linkedHashSet0.isEmpty());
-        assertFalse(boolean0);
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This class contains tests for the {@link CompositeSet} class, focusing on its behavior
+ * with mutation operations.
+ */
+public class CompositeSetTest {
+
+    /**
+     * Tests that calling {@code removeIf()} on an empty CompositeSet
+     * correctly returns false and leaves the set empty.
+     */
+    @Test
+    public void removeIfOnEmptySetShouldReturnFalse() {
+        // Arrange: Create an empty composite set and a predicate.
+        // A CompositeSet is empty if it contains no underlying sets.
+        final CompositeSet<Integer> emptySet = new CompositeSet<>();
+        final Predicate<Object> predicate = new UniquePredicate<>();
+
+        // Act: Call removeIf on the empty set.
+        final boolean wasModified = emptySet.removeIf(predicate);
+
+        // Assert: Verify that the method returned false and the set is still empty.
+        assertFalse("removeIf should return false when called on an empty set.", wasModified);
+        assertTrue("The set should remain empty after the removeIf operation.", emptySet.isEmpty());
     }
 }
