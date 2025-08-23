@@ -1,39 +1,44 @@
 package org.apache.ibatis.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
 
-public class XNode_ESTestTest60 extends XNode_ESTest_scaffolding {
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.xml.xpath.XPathExpressionException;
+import java.util.Properties;
 
-    @Test(timeout = 4000)
-    public void test059() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XPathParser xPathParser0 = new XPathParser((Document) null, false);
-        XNode xNode0 = new XNode(xPathParser0, iIOMetadataNode0, properties0);
-        // Undeclared exception!
-        try {
-            xNode0.evalString("<null>\n  <null />\n</null>\n");
-            fail("Expecting exception: RuntimeException");
-        } catch (RuntimeException e) {
-            //
-            // Error evaluating XPath.  Cause: javax.xml.xpath.XPathExpressionException: javax.xml.transform.TransformerException: A location path was expected, but the following token was encountered:  <
-            //
-            verifyException("org.apache.ibatis.parsing.XPathParser", e);
-        }
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Test suite for the {@link XNode} class, focusing on its XPath evaluation capabilities.
+ */
+@DisplayName("XNode XPath Evaluation Tests")
+class XNodeTest {
+
+    @Test
+    @DisplayName("evalString should throw RuntimeException for an invalid XPath expression")
+    void evalStringShouldThrowRuntimeExceptionForInvalidXPathExpression() {
+        // Arrange
+        // An invalid XPath expression that looks like XML, which is a common user error.
+        String invalidXPathExpression = "<null>\n  <null />\n</null>\n";
+
+        // Create a minimal XNode instance to test the evalString method.
+        // The actual node content does not matter here, as the XPath expression is syntactically invalid on its own.
+        Node dummyNode = new IIOMetadataNode();
+        XPathParser parser = new XPathParser((Document) null, false);
+        XNode xNode = new XNode(parser, dummyNode, new Properties());
+
+        // Act & Assert
+        // We expect a RuntimeException because the underlying XPathParser will fail to parse the invalid expression.
+        RuntimeException thrownException = assertThrows(RuntimeException.class,
+                () -> xNode.evalString(invalidXPathExpression));
+
+        // Verify the exception message and cause to ensure it's the correct error.
+        assertTrue(thrownException.getMessage().contains("Error evaluating XPath"),
+                "Exception message should indicate an XPath evaluation error.");
+        assertTrue(thrownException.getCause() instanceof XPathExpressionException,
+                "The root cause should be an XPathExpressionException.");
     }
 }
