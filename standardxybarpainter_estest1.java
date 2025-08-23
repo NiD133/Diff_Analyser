@@ -1,35 +1,48 @@
 package org.jfree.chart.renderer.xy;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import javax.swing.text.DefaultCaret;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.jfree.chart.api.RectangleEdge;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StandardXYBarPainter_ESTestTest1 extends StandardXYBarPainter_ESTest_scaffolding {
+import java.awt.Graphics2D;
+import java.awt.geom.Arc2D;
+import java.awt.image.BufferedImage;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        StandardXYBarPainter standardXYBarPainter0 = new StandardXYBarPainter();
-        Arc2D.Float arc2D_Float0 = new Arc2D.Float(1);
-        BufferedImage bufferedImage0 = new BufferedImage(1, 1, 1);
-        Graphics2D graphics2D0 = bufferedImage0.createGraphics();
-        ClusteredXYBarRenderer clusteredXYBarRenderer0 = new ClusteredXYBarRenderer();
-        clusteredXYBarRenderer0.setShadowYOffset(279.48324777286);
-        RectangleEdge rectangleEdge0 = RectangleEdge.LEFT;
-        standardXYBarPainter0.paintBarShadow(graphics2D0, clusteredXYBarRenderer0, 1, 1, arc2D_Float0, rectangleEdge0, false);
-        assertTrue(clusteredXYBarRenderer0.getDefaultSeriesVisible());
+/**
+ * Tests for the {@link StandardXYBarPainter} class, focusing on shadow painting.
+ */
+public class StandardXYBarPainter_ESTestTest1 {
+
+    /**
+     * Verifies that paintBarShadow executes without throwing an exception when provided
+     * with a bar whose base is on the left edge. This is a basic "smoke test" to ensure
+     * the rendering logic handles this configuration correctly.
+     */
+    @Test
+    public void paintBarShadowWithLeftEdgeBaseShouldExecuteWithoutError() {
+        // Arrange
+        StandardXYBarPainter painter = new StandardXYBarPainter();
+        XYBarRenderer renderer = new ClusteredXYBarRenderer();
+        
+        // Use a non-default shadow offset to test the calculation logic.
+        renderer.setShadowYOffset(279.48);
+
+        // Create a minimal graphics context, as required by the method signature.
+        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+
+        // Define the bar shape and its orientation.
+        Arc2D.Float bar = new Arc2D.Float(Arc2D.OPEN);
+        RectangleEdge barBaseEdge = RectangleEdge.LEFT;
+        
+        // Arbitrary row/column values for the method call.
+        int row = 1;
+        int column = 1;
+        boolean pegShadow = false;
+
+        // Act & Assert
+        // The test's purpose is to ensure that the method completes successfully.
+        // A pass is indicated by the absence of any thrown exceptions. The original,
+        // misleading assertion on a default renderer property has been removed.
+        painter.paintBarShadow(graphics, renderer, row, column, bar, barBaseEdge, pegShadow);
     }
 }
