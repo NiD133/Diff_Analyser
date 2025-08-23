@@ -1,22 +1,31 @@
 package org.joda.time.chrono;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ISOChronology_ESTestTest10 extends ISOChronology_ESTest_scaffolding {
+import static org.junit.Assert.assertNotEquals;
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        ISOChronology iSOChronology0 = ISOChronology.getInstanceUTC();
-        DateTimeZone dateTimeZone0 = DateTimeZone.forOffsetMillis((-1322));
-        Chronology chronology0 = iSOChronology0.withZone(dateTimeZone0);
-        boolean boolean0 = iSOChronology0.equals(chronology0);
-        assertFalse(boolean0);
+/**
+ * Unit tests for the {@link ISOChronology} class, focusing on its equality behavior.
+ */
+public class ISOChronologyTest {
+
+    /**
+     * Verifies that two ISOChronology instances are not considered equal
+     * if they are configured with different time zones.
+     */
+    @Test
+    public void equals_returnsFalse_forChronologiesWithDifferentTimeZones() {
+        // Arrange: Create a base chronology in UTC and a second one in a different time zone.
+        ISOChronology utcChronology = ISOChronology.getInstanceUTC();
+        DateTimeZone nonUtcZone = DateTimeZone.forOffsetMillis(-1322);
+        
+        // Act: Create a new chronology instance with the non-UTC zone.
+        Chronology nonUtcChronology = utcChronology.withZone(nonUtcZone);
+        
+        // Assert: The two chronologies should not be equal.
+        assertNotEquals("Chronologies with different time zones should not be equal.",
+                        utcChronology, nonUtcChronology);
     }
 }
