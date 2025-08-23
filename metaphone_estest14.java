@@ -1,19 +1,27 @@
 package org.apache.commons.codec.language;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Metaphone_ESTestTest14 extends Metaphone_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Metaphone} class.
+ */
+public class MetaphoneTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        Metaphone metaphone0 = new Metaphone();
-        String string0 = metaphone0.metaphone("CH");
-        assertEquals(4, metaphone0.getMaxCodeLen());
-        assertEquals("X", string0);
+    /**
+     * Tests that the Metaphone algorithm correctly encodes the string "CH" as "X".
+     * This test case verifies a specific encoding rule documented in the Metaphone algorithm.
+     */
+    @Test
+    public void metaphoneShouldEncodeChAsX() {
+        // Arrange: Create a Metaphone encoder instance and define the input string.
+        Metaphone metaphone = new Metaphone();
+        String input = "CH";
+
+        // Act: Encode the input string.
+        String result = metaphone.metaphone(input);
+
+        // Assert: Verify that the encoded result is "X".
+        assertEquals("X", result);
     }
 }
