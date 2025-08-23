@@ -1,30 +1,36 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import java.util.Properties;
+import static org.junit.Assert.assertNull;
 
-public class XNode_ESTestTest75 extends XNode_ESTest_scaffolding {
+/**
+ * Test suite for the {@link XNode} class.
+ */
+public class XNodeTest {
 
-    @Test(timeout = 4000)
-    public void test074() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Integer integer0 = xNode0.getIntAttribute("^5CYJ", (Integer) null);
-        assertNull(integer0);
+    /**
+     * Verifies that getIntAttribute returns the provided default value (null)
+     * when the requested attribute does not exist.
+     */
+    @Test
+    public void getIntAttributeShouldReturnNullDefaultWhenAttributeIsMissing() {
+        // Arrange
+        // Create an XNode based on a DOM node that has no attributes.
+        Node nodeWithoutAttributes = new IIOMetadataNode();
+        XNode xNode = new XNode(null, nodeWithoutAttributes, new Properties());
+        
+        String nonExistentAttributeName = "count";
+        Integer defaultValue = null;
+
+        // Act
+        // Attempt to get an integer attribute that is not present.
+        Integer actualValue = xNode.getIntAttribute(nonExistentAttributeName, defaultValue);
+
+        // Assert
+        // The method should return the default value provided.
+        assertNull("Expected a null value for a missing attribute when the default is null.", actualValue);
     }
 }
