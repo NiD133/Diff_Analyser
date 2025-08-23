@@ -1,59 +1,26 @@
 package org.apache.commons.collections4.properties;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import org.apache.commons.collections4.Equator;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AllPredicate;
-import org.apache.commons.collections4.functors.CloneTransformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.DefaultEquator;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.NOPTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NotNullPredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.SwitchTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertThrows;
 
-public class OrderedProperties_ESTestTest11 extends OrderedProperties_ESTest_scaffolding {
+/**
+ * Unit tests for {@link OrderedProperties}.
+ * This test focuses on the exception-handling behavior of the remove() method.
+ */
+public class OrderedPropertiesTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        OrderedProperties orderedProperties0 = new OrderedProperties();
-        // Undeclared exception!
-        try {
-            orderedProperties0.remove((Object) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.Hashtable", e);
-        }
+    /**
+     * Tests that calling remove() with a null key throws a NullPointerException.
+     * This is the expected behavior for map-like collections that do not permit null keys,
+     * as specified by the contract of java.util.Hashtable, the superclass of Properties.
+     */
+    @Test
+    public void removeWithNullKeyShouldThrowNullPointerException() {
+        // Arrange: Create an empty OrderedProperties instance.
+        final OrderedProperties orderedProperties = new OrderedProperties();
+
+        // Act & Assert: Verify that calling remove(null) throws a NullPointerException.
+        // The lambda expression concisely captures the action that is expected to fail.
+        assertThrows(NullPointerException.class, () -> orderedProperties.remove(null));
     }
 }
