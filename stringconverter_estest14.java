@@ -1,54 +1,26 @@
 package org.joda.time.convert;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.MonthDay;
-import org.joda.time.MutableDateTime;
-import org.joda.time.MutableInterval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.Partial;
-import org.joda.time.PeriodType;
-import org.joda.time.ReadWritableInterval;
-import org.joda.time.ReadWritablePeriod;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.chrono.CopticChronology;
-import org.joda.time.chrono.EthiopicChronology;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.chrono.GregorianChronology;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.JulianChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.DateTimePrinter;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class StringConverter_ESTestTest14 extends StringConverter_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link StringConverter} class.
+ */
+public class StringConverterTest {
 
-    @Test(timeout = 4000)
-    public void test13() throws Throwable {
-        StringConverter stringConverter0 = new StringConverter();
-        // Undeclared exception!
-        try {
-            stringConverter0.getInstantMillis((Object) null, (Chronology) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.joda.time.format.DateTimeFormatterBuilder$CharacterLiteral", e);
-        }
+    private final StringConverter converter = new StringConverter();
+
+    /**
+     * Tests that getInstantMillis() throws a NullPointerException when the input object is null.
+     * The public contract of the method implies that the input object must not be null,
+     * and a NullPointerException is the expected behavior for such an invalid argument.
+     */
+    @Test(expected = NullPointerException.class)
+    public void getInstantMillis_whenInputIsNull_throwsNullPointerException() {
+        // Act: Call the method with a null object.
+        // The Chronology argument can also be null for this test case.
+        converter.getInstantMillis(null, (Chronology) null);
+
+        // Assert: The @Test(expected) annotation handles the exception verification.
     }
 }
