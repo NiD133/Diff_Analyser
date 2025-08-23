@@ -1,63 +1,34 @@
 package org.apache.commons.collections4.iterators;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Comparator;
+
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
-import org.apache.commons.collections4.Factory;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.AndPredicate;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantFactory;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.FactoryTransformer;
-import org.apache.commons.collections4.functors.FalsePredicate;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.MapTransformer;
-import org.apache.commons.collections4.functors.NonePredicate;
-import org.apache.commons.collections4.functors.NullIsFalsePredicate;
-import org.apache.commons.collections4.functors.NullIsTruePredicate;
-import org.apache.commons.collections4.functors.OrPredicate;
-import org.apache.commons.collections4.functors.PredicateTransformer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.List;
 
-public class ObjectGraphIterator_ESTestTest24 extends ObjectGraphIterator_ESTest_scaffolding {
+/**
+ * Tests for {@link ObjectGraphIterator} focusing on its interaction with underlying iterators.
+ */
+public class ObjectGraphIteratorTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        LinkedList<Integer> linkedList0 = new LinkedList<Integer>();
-        ListIterator<Integer> listIterator0 = linkedList0.listIterator();
-        linkedList0.add((Integer) null);
-        ObjectGraphIterator<Object> objectGraphIterator0 = new ObjectGraphIterator<Object>(listIterator0);
-        // Undeclared exception!
-        try {
-            objectGraphIterator0.findNextByIterator(listIterator0);
-            fail("Expecting exception: ConcurrentModificationException");
-        } catch (ConcurrentModificationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("java.util.LinkedList$ListItr", e);
-        }
+    /**
+     * Tests that the iterator fails fast with a ConcurrentModificationException
+     * if the underlying source collection is modified after the iterator has been created.
+     * This is the standard, expected behavior for Java collection iterators.
+     */
+    @Test(expected = ConcurrentModificationException.class)
+    public void hasNextShouldThrowExceptionWhenUnderlyingCollectionIsModified() {
+        // Arrange: Create an ObjectGraphIterator from a list's iterator.
+        final List<Integer> sourceList = new LinkedList<>();
+        final Iterator<Integer> listIterator = sourceList.iterator();
+        final ObjectGraphIterator<Integer> graphIterator = new ObjectGraphIterator<>(listIterator);
+
+        // Act: Modify the source list directly. This invalidates the original listIterator.
+        sourceList.add(42);
+
+        // Assert: The next operation on the graphIterator, which delegates to the
+        // invalidated listIterator, should throw a ConcurrentModificationException.
+        graphIterator.hasNext();
     }
 }
