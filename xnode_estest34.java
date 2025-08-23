@@ -1,31 +1,35 @@
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.function.Supplier;
-import javax.imageio.metadata.IIOMetadataNode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.ext.DefaultHandler2;
+import static org.junit.Assert.assertEquals;
 
+import java.util.Properties;
+import javax.imageio.metadata.IIOMetadataNode;
+import org.w3c.dom.Node;
+
+/**
+ * Contains tests for the {@link XNode#getDoubleBody(Double)} method.
+ */
+// The original test class name and inheritance are preserved.
 public class XNode_ESTestTest34 extends XNode_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test033() throws Throwable {
-        Properties properties0 = new Properties();
-        IIOMetadataNode iIOMetadataNode0 = new IIOMetadataNode();
-        XNode xNode0 = new XNode((XPathParser) null, iIOMetadataNode0, properties0);
-        Double double0 = new Double((-1696L));
-        Double double1 = xNode0.getDoubleBody(double0);
-        assertEquals((-1696.0), (double) double1, 0.01);
+    /**
+     * Verifies that getDoubleBody(defaultValue) returns the provided default value
+     * when the XNode is based on a node with no text content (i.e., a null body).
+     */
+    @Test
+    public void getDoubleBodyShouldReturnDefaultValueWhenBodyIsNull() {
+        // Arrange
+        // An empty DOM node will result in the XNode having a null body.
+        Node emptyNode = new IIOMetadataNode();
+        XNode xNode = new XNode(null, emptyNode, new Properties());
+        Double defaultValue = -1696.0;
+
+        // Act
+        Double result = xNode.getDoubleBody(defaultValue);
+
+        // Assert
+        // The method should return the default value as the node's body is null.
+        assertEquals(defaultValue, result, 0.0);
     }
 }
