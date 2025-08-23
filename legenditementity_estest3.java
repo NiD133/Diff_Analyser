@@ -1,34 +1,30 @@
 package org.jfree.chart.entity;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.time.chrono.HijrahEra;
-import javax.swing.JLayeredPane;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.general.Dataset;
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XIntervalSeriesCollection;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class LegendItemEntity_ESTestTest3 extends LegendItemEntity_ESTest_scaffolding {
+/**
+ * Tests for the {@link LegendItemEntity} class.
+ */
+public class LegendItemEntityTest {
 
-    @Test(timeout = 4000)
-    public void test02() throws Throwable {
-        LegendItemEntity<Integer> legendItemEntity0 = null;
+    /**
+     * Verifies that the constructor throws an IllegalArgumentException
+     * when the 'area' argument is null. The underlying null check is
+     * performed by the superclass, ChartEntity.
+     */
+    @Test
+    public void constructorShouldThrowExceptionForNullArea() {
         try {
-            legendItemEntity0 = new LegendItemEntity<Integer>((Shape) null);
-            fail("Expecting exception: IllegalArgumentException");
+            // Attempt to create an entity with a null shape, which is not allowed.
+            new LegendItemEntity<>((Shape) null);
+            fail("Expected an IllegalArgumentException to be thrown for a null 'area'.");
         } catch (IllegalArgumentException e) {
-            //
-            // Null 'area' argument.
-            //
-            verifyException("org.jfree.chart.internal.Args", e);
+            // This is the expected outcome.
+            // Verify that the exception message is correct.
+            assertEquals("Null 'area' argument.", e.getMessage());
         }
     }
 }
