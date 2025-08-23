@@ -1,37 +1,39 @@
 package org.apache.commons.compress.utils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.BufferedInputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
-public class ByteUtils_ESTestTest38 extends ByteUtils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ByteUtils} class.
+ */
+public class ByteUtilsTest {
 
+    /**
+     * Tests that {@link ByteUtils#fromLittleEndian(InputStream, int)} correctly decodes a
+     * multi-byte zero value and consumes the correct number of bytes from the stream.
+     */
     @Test(timeout = 4000)
-    public void test37() throws Throwable {
-        byte[] byteArray0 = new byte[7];
-        ByteArrayInputStream byteArrayInputStream0 = new ByteArrayInputStream(byteArray0);
-        long long0 = ByteUtils.fromLittleEndian((InputStream) byteArrayInputStream0, 4);
-        assertEquals(3, byteArrayInputStream0.available());
-        assertEquals(0L, long0);
+    public void fromLittleEndianInputStreamShouldCorrectlyDecodeZeroValue() throws IOException {
+        // Arrange
+        // An input array with more bytes than we plan to read, all initialized to zero.
+        final byte[] inputData = new byte[7];
+        final InputStream inputStream = new ByteArrayInputStream(inputData);
+        final int bytesToRead = 4;
+        final int expectedRemainingBytes = inputData.length - bytesToRead; // 7 - 4 = 3
+
+        // Act
+        // Read 4 bytes from the stream and interpret them as a little-endian long.
+        final long actualValue = ByteUtils.fromLittleEndian(inputStream, bytesToRead);
+
+        // Assert
+        // The decoded value should be 0, as the source bytes were all zero.
+        assertEquals("The decoded long value should be 0", 0L, actualValue);
+        // Verify that exactly 4 bytes were consumed from the stream.
+        assertEquals("The number of available bytes should be correct after reading",
+                     expectedRemainingBytes, inputStream.available());
     }
 }
