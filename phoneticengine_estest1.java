@@ -1,24 +1,35 @@
 package org.apache.commons.codec.language.bm;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class PhoneticEngine_ESTestTest1 extends PhoneticEngine_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        NameType nameType0 = NameType.ASHKENAZI;
-        RuleType ruleType0 = RuleType.APPROX;
-        PhoneticEngine phoneticEngine0 = new PhoneticEngine(nameType0, ruleType0, false);
-        boolean boolean0 = phoneticEngine0.isConcat();
-        assertFalse(boolean0);
-        assertEquals(20, phoneticEngine0.getMaxPhonemes());
+/**
+ * Tests for the {@link PhoneticEngine} class.
+ */
+public class PhoneticEngineTest {
+
+    /**
+     * Tests that the three-argument constructor correctly initializes the engine's state,
+     * specifically setting the 'concat' flag and using the default value for max phonemes.
+     */
+    @Test
+    public void constructorShouldSetPropertiesAndUseDefaultMaxPhonemes() {
+        // Arrange
+        final NameType nameType = NameType.ASHKENAZI;
+        final RuleType ruleType = RuleType.APPROX;
+        final boolean shouldConcatenate = false;
+
+        // Act
+        final PhoneticEngine engine = new PhoneticEngine(nameType, ruleType, shouldConcatenate);
+
+        // Assert
+        // The 'concat' flag should reflect the value passed to the constructor.
+        assertFalse("The 'concat' flag should be false.", engine.isConcat());
+
+        // The three-argument constructor should use the default value for maxPhonemes.
+        // As per the source code, this default is 20.
+        assertEquals("Max phonemes should default to 20.", 20, engine.getMaxPhonemes());
     }
 }
