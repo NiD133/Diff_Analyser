@@ -1,27 +1,33 @@
 package org.jfree.chart.urls;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.ArrayList;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultKeyedValues2DDataset;
-import org.junit.runner.RunWith;
 
-public class CustomCategoryURLGenerator_ESTestTest8 extends CustomCategoryURLGenerator_ESTest_scaffolding {
+/**
+ * Tests for the {@link CustomCategoryURLGenerator} class.
+ */
+public class CustomCategoryURLGeneratorTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        CustomCategoryURLGenerator customCategoryURLGenerator0 = new CustomCategoryURLGenerator();
-        Stack<String> stack0 = new Stack<String>();
-        stack0.add("");
-        customCategoryURLGenerator0.addURLSeries(stack0);
-        String string0 = customCategoryURLGenerator0.getURL(0, 0);
-        assertEquals("", string0);
+    /**
+     * Verifies that getURL() retrieves the correct URL for a specific series and
+     * item index after the URL series has been added.
+     */
+    @Test
+    public void getURLShouldReturnCorrectURLForAddedSeries() {
+        // Arrange: Create a generator and define a list of URLs for a series.
+        CustomCategoryURLGenerator generator = new CustomCategoryURLGenerator();
+        String expectedUrl = "http://example.com/item0";
+        List<String> urlSeries = Arrays.asList(expectedUrl);
+
+        // Act: Add the URL series and then retrieve the URL for the first item.
+        generator.addURLSeries(urlSeries);
+        String actualUrl = generator.getURL(0, 0);
+
+        // Assert: The retrieved URL should match the one that was added.
+        assertEquals("The retrieved URL should match the one added for the specified series and item.",
+                     expectedUrl, actualUrl);
     }
 }
