@@ -1,24 +1,29 @@
 package org.threeten.extra.scale;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.nio.CharBuffer;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class UtcInstant_ESTestTest12 extends UtcInstant_ESTest_scaffolding {
+/**
+ * Tests for {@link UtcInstant}.
+ */
+public class UtcInstantTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        UtcInstant utcInstant0 = UtcInstant.ofModifiedJulianDay(0L, 0L);
-        UtcInstant utcInstant1 = utcInstant0.withModifiedJulianDay(0L);
-        assertEquals(0L, utcInstant1.getNanoOfDay());
+    /**
+     * Tests that calling {@code withModifiedJulianDay} with the same day value
+     * results in an equal UtcInstant.
+     */
+    @Test
+    public void withModifiedJulianDay_whenDayIsUnchanged_returnsEqualInstant() {
+        // Arrange: Create an initial UtcInstant
+        long initialMjd = 40587L; // Corresponds to 1970-01-01
+        long nanoOfDay = 12345L;
+        UtcInstant initialInstant = UtcInstant.ofModifiedJulianDay(initialMjd, nanoOfDay);
+
+        // Act: Call the method with the same Modified Julian Day
+        UtcInstant resultantInstant = initialInstant.withModifiedJulianDay(initialMjd);
+
+        // Assert: The new instant should be equal to the original,
+        // as no change was made.
+        assertEquals(initialInstant, resultantInstant);
     }
 }
