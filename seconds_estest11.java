@@ -1,18 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Seconds_ESTestTest11 extends Seconds_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link Seconds} class.
+ */
+public class SecondsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        Seconds seconds0 = Seconds.MIN_VALUE;
-        Duration duration0 = seconds0.toStandardDuration();
-        assertEquals((-2147483648000L), duration0.getMillis());
+    @Test
+    public void toStandardDuration_withMinValue_convertsToCorrectDurationInMilliseconds() {
+        // Arrange
+        Seconds minSeconds = Seconds.MIN_VALUE;
+        // A standard second is 1000 milliseconds. The expected duration is the
+        // number of seconds (Integer.MIN_VALUE) multiplied by 1000.
+        // We cast to long to prevent integer overflow during multiplication.
+        long expectedMillis = (long) Integer.MIN_VALUE * 1000L;
+
+        // Act
+        Duration resultingDuration = minSeconds.toStandardDuration();
+
+        // Assert
+        assertEquals("The duration in milliseconds should be Integer.MIN_VALUE * 1000.",
+                     expectedMillis, resultingDuration.getMillis());
     }
 }
