@@ -1,41 +1,45 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.DocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfString;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Stack;
-import java.util.TreeSet;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import java.util.Collections;
+
+import static org.junit.Assert.assertNull;
 
 public class TextRenderInfo_ESTestTest68 extends TextRenderInfo_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test67() throws Throwable {
-        PdfDate pdfDate0 = new PdfDate();
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfGState pdfGState0 = new PdfGState();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfGState0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        Stack<MarkedContentInfo> stack0 = new Stack<MarkedContentInfo>();
-        Matrix matrix0 = graphicsState0.getCtm();
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfDate0, graphicsState0, matrix0, stack0);
-        BaseColor baseColor0 = textRenderInfo0.getStrokeColor();
-        assertNull(baseColor0);
+    /**
+     * Verifies that getStrokeColor() returns null when the stroke color has not been
+     * explicitly set in the GraphicsState.
+     */
+    @Test
+    public void getStrokeColor_shouldReturnNull_whenNotSetInGraphicsState() {
+        // ARRANGE
+        // A default GraphicsState does not have a stroke color defined.
+        GraphicsState graphicsState = new GraphicsState();
+
+        // The TextRenderInfo constructor requires a font to be set in the GraphicsState
+        // to avoid a NullPointerException when it internally calls font.getFontMatrix().
+        // We create a dummy font for this purpose.
+        CMapAwareDocumentFont dummyFont = new CMapAwareDocumentFont(new PdfGState());
+        graphicsState.font = dummyFont;
+
+        // Create the TextRenderInfo instance with the default graphics state.
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                new PdfString(""),
+                graphicsState,
+                new Matrix(),
+                Collections.emptyList()
+        );
+
+        // ACT
+        BaseColor strokeColor = renderInfo.getStrokeColor();
+
+        // ASSERT
+        assertNull("The stroke color should be null by default.", strokeColor);
     }
 }
