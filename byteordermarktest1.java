@@ -1,32 +1,44 @@
 package org.apache.commons.io;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import java.nio.charset.Charset;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class ByteOrderMarkTestTest1 {
-
-    private static final ByteOrderMark TEST_BOM_1 = new ByteOrderMark("test1", 1);
-
-    private static final ByteOrderMark TEST_BOM_2 = new ByteOrderMark("test2", 1, 2);
-
-    private static final ByteOrderMark TEST_BOM_3 = new ByteOrderMark("test3", 1, 2, 3);
+/**
+ * Tests for {@link ByteOrderMark}.
+ */
+class ByteOrderMarkTest {
 
     /**
-     * Tests that {@link ByteOrderMark#getCharsetName()} can be loaded as a {@link java.nio.charset.Charset} as advertised.
+     * Provides a stream of the predefined {@link ByteOrderMark} constants for parameterized tests.
+     *
+     * @return A stream of standard {@link ByteOrderMark} constants.
      */
-    @Test
-    void testConstantCharsetNames() {
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_8.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_16BE.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_16LE.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_32BE.getCharsetName()));
-        assertNotNull(Charset.forName(ByteOrderMark.UTF_32LE.getCharsetName()));
+    private static Stream<ByteOrderMark> predefinedBomsProvider() {
+        return Stream.of(
+            ByteOrderMark.UTF_8,
+            ByteOrderMark.UTF_16BE,
+            ByteOrderMark.UTF_16LE,
+            ByteOrderMark.UTF_32BE,
+            ByteOrderMark.UTF_32LE
+        );
+    }
+
+    /**
+     * Tests that the charset name for each predefined BOM constant is valid and can be loaded
+     * as a {@link java.nio.charset.Charset} instance without throwing an exception.
+     *
+     * @param bom The predefined ByteOrderMark constant to test.
+     */
+    @ParameterizedTest
+    @MethodSource("predefinedBomsProvider")
+    void predefinedBomShouldHaveValidCharsetName(final ByteOrderMark bom) {
+        // Charset.forName() throws an exception for invalid charset names.
+        // This assertion directly verifies that the name from the BOM constant is valid.
+        assertDoesNotThrow(() -> Charset.forName(bom.getCharsetName()),
+            () -> "Charset.forName() should not throw for " + bom.getCharsetName());
     }
 }
