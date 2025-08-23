@@ -1,20 +1,27 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Arrays;
-import org.apache.commons.lang3.function.FailableIntFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
 
-public class ArrayFill_ESTestTest26 extends ArrayFill_ESTest_scaffolding {
+/**
+ * Tests for {@link org.apache.commons.lang3.ArrayFill}.
+ */
+public class ArrayFillTest {
 
-    @Test(timeout = 4000)
-    public void test25() throws Throwable {
-        double[] doubleArray0 = ArrayFill.fill((double[]) null, (double) (short) (-3333));
-        assertNull(doubleArray0);
+    /**
+     * Tests that ArrayFill.fill() returns null when the input double array is null,
+     * which is the expected behavior according to the method's contract.
+     */
+    @Test
+    public void testFillWithNullDoubleArrayShouldReturnNull() {
+        // Arrange: The method under test is designed to handle null array inputs gracefully.
+        // The specific fill value is irrelevant for this test case.
+        final double fillValue = 1.0;
+
+        // Act: Call the fill method with a null array.
+        final double[] result = ArrayFill.fill(null, fillValue);
+
+        // Assert: Verify that the method returns null as specified.
+        assertNull("Passing a null array to fill() should return null.", result);
     }
 }
