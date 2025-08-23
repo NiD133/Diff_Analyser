@@ -1,40 +1,39 @@
 package org.apache.commons.compress.archivers.ar;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.System;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class ArArchiveOutputStream_ESTestTest27 extends ArArchiveOutputStream_ESTest_scaffolding {
+/**
+ * Tests for {@link ArArchiveOutputStream}.
+ */
+public class ArArchiveOutputStreamTest {
 
-    @Test(timeout = 4000)
-    public void test26() throws Throwable {
-        ByteArrayOutputStream byteArrayOutputStream0 = new ByteArrayOutputStream();
-        ArArchiveOutputStream arArchiveOutputStream0 = new ArArchiveOutputStream(byteArrayOutputStream0);
-        ArArchiveEntry arArchiveEntry0 = new ArArchiveEntry("User ID", 0);
-        arArchiveOutputStream0.putArchiveEntry(arArchiveEntry0);
+    /**
+     * Verifies that calling finish() on an archive with an unclosed entry
+     * throws an IOException. An entry is considered "open" after putArchiveEntry()
+     * has been called, and it is "closed" by calling closeArchiveEntry().
+     */
+    @Test
+    public void finishShouldThrowIOExceptionForUnclosedEntry() throws IOException {
+        // Arrange: Create an archive stream and add an entry without closing it.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final ArArchiveOutputStream arOutputStream = new ArArchiveOutputStream(outputStream);
+        final ArArchiveEntry entry = new ArArchiveEntry("test_entry.txt", 0);
+
+        arOutputStream.putArchiveEntry(entry);
+
+        // Act & Assert: Attempting to finish the stream should fail.
         try {
-            arArchiveOutputStream0.finish();
-            fail("Expecting exception: IOException");
-        } catch (IOException e) {
-            //
-            // This archive contains unclosed entries.
-            //
-            verifyException("org.apache.commons.compress.archivers.ar.ArArchiveOutputStream", e);
+            arOutputStream.finish();
+            fail("Expected an IOException because an entry was left open.");
+        } catch (final IOException e) {
+            // Verify that the correct, descriptive error message is thrown.
+            final String expectedMessage = "This archive contains unclosed entries.";
+            assertEquals(expectedMessage, e.getMessage());
         }
     }
 }
