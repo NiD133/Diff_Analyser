@@ -1,31 +1,35 @@
 package org.joda.time.field;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.RoundingMode;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.DateTimeField;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.IslamicChronology;
-import org.joda.time.chrono.ZonedChronology;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class FieldUtils_ESTestTest78 extends FieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link FieldUtils} class.
+ */
+public class FieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test77() throws Throwable {
-        // Undeclared exception!
-        try {
-            FieldUtils.safeMultiply(2146641827, (-2531));
-            fail("Expecting exception: ArithmeticException");
-        } catch (ArithmeticException e) {
-            //
-            // Multiplication overflows an int: 2146641827 * -2531
-            //
-            verifyException("org.joda.time.field.FieldUtils", e);
-        }
+    /**
+     * Tests that safeMultiply(int, int) throws an ArithmeticException
+     * when the result of the multiplication overflows the integer range.
+     */
+    @Test
+    public void safeMultiplyByInt_shouldThrowException_whenResultOverflows() {
+        // Arrange: These two integers are chosen specifically because their product
+        // (-5,432,624,001,937) is far outside the valid range for an int
+        // (from -2,147,483,648 to 2,147,483,647), causing an overflow.
+        final int largePositiveValue = 2146641827;
+        final int negativeMultiplier = -2531;
+
+        // Act & Assert: Verify that the expected exception is thrown.
+        // The assertThrows method is a modern, clear way to test for exceptions.
+        ArithmeticException exception = assertThrows(
+            ArithmeticException.class,
+            () -> FieldUtils.safeMultiply(largePositiveValue, negativeMultiplier)
+        );
+
+        // Assert: Verify the exception message is correct to ensure the right error is reported.
+        String expectedMessage = "Multiplication overflows an int: 2146641827 * -2531";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
