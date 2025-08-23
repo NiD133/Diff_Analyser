@@ -1,87 +1,57 @@
 package org.threeten.extra;
 
-import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_MONTH;
-import static java.time.temporal.ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR;
-import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_MONTH;
-import static java.time.temporal.ChronoField.ALIGNED_WEEK_OF_YEAR;
-import static java.time.temporal.ChronoField.AMPM_OF_DAY;
-import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_AMPM;
-import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static java.time.temporal.ChronoField.DAY_OF_YEAR;
-import static java.time.temporal.ChronoField.EPOCH_DAY;
-import static java.time.temporal.ChronoField.ERA;
-import static java.time.temporal.ChronoField.HOUR_OF_AMPM;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.INSTANT_SECONDS;
-import static java.time.temporal.ChronoField.MICRO_OF_DAY;
-import static java.time.temporal.ChronoField.MICRO_OF_SECOND;
-import static java.time.temporal.ChronoField.MILLI_OF_DAY;
-import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
-import static java.time.temporal.ChronoField.MINUTE_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.NANO_OF_DAY;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.OFFSET_SECONDS;
-import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
-import static java.time.temporal.ChronoField.SECOND_OF_DAY;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-import static java.time.temporal.ChronoField.YEAR;
-import static java.time.temporal.ChronoField.YEAR_OF_ERA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Year;
-import java.time.ZoneId;
-import java.time.chrono.IsoChronology;
-import java.time.chrono.JapaneseDate;
-import java.time.format.DateTimeFormatter;
+
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.IsoFields;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQueries;
 import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.RetryingTest;
-import com.google.common.testing.EqualsTester;
 
-public class DayOfYearTestTest23 {
+/**
+ * Tests for the behavior of {@link DayOfYear}.
+ * This class focuses on interactions with {@link TemporalField}.
+ */
+public class DayOfYearTest {
 
-    private static final Year YEAR_STANDARD = Year.of(2007);
+    /**
+     * A test-specific implementation of {@link TemporalField} that delegates its
+     * logic to the standard {@code DAY_OF_YEAR} field.
+     * <p>
+     * This is used to verify that {@code DayOfYear} correctly interacts with custom
+     * field implementations via the {@code TemporalAccessor} interface.
+     */
+    private static class DelegatingDayOfYearField implements TemporalField {
 
-    private static final Year YEAR_LEAP = Year.of(2008);
+        public static final DelegatingDayOfYearField INSTANCE = new DelegatingDayOfYearField();
 
-    private static final int STANDARD_YEAR_LENGTH = 365;
+        private DelegatingDayOfYearField() {
+            // Prevent external instantiation
+        }
 
-    private static final int LEAP_YEAR_LENGTH = 366;
+        @Override
+        public long getFrom(TemporalAccessor temporal) {
+            // The core logic: delegate the query to the underlying DAY_OF_YEAR field.
+            return temporal.getLong(DAY_OF_YEAR);
+        }
 
-    private static final DayOfYear TEST = DayOfYear.of(12);
+        @Override
+        public boolean isSupportedBy(TemporalAccessor temporal) {
+            // This custom field is supported if the temporal object supports DAY_OF_YEAR.
+            return temporal.isSupported(DAY_OF_YEAR);
+        }
 
-    private static final ZoneId PARIS = ZoneId.of("Europe/Paris");
+        @Override
+        @SuppressWarnings("unchecked")
+        public <R extends Temporal> R adjustInto(R temporal, long newValue) {
+            // Delegate the adjustment to the underlying DAY_OF_YEAR field.
+            return (R) temporal.with(DAY_OF_YEAR, newValue);
+        }
 
-    private static class TestingField implements TemporalField {
-
-        public static final TestingField INSTANCE = new TestingField();
-
+        //<editor-fold desc="Boilerplate TemporalField methods">
         @Override
         public TemporalUnit getBaseUnit() {
             return ChronoUnit.DAYS;
@@ -94,7 +64,7 @@ public class DayOfYearTestTest23 {
 
         @Override
         public ValueRange range() {
-            return ValueRange.of(1, 365, 366);
+            return DAY_OF_YEAR.range();
         }
 
         @Override
@@ -108,29 +78,26 @@ public class DayOfYearTestTest23 {
         }
 
         @Override
-        public boolean isSupportedBy(TemporalAccessor temporal) {
-            return temporal.isSupported(DAY_OF_YEAR);
-        }
-
-        @Override
         public ValueRange rangeRefinedBy(TemporalAccessor temporal) {
-            return range();
+            return temporal.range(DAY_OF_YEAR);
         }
-
-        @Override
-        public long getFrom(TemporalAccessor temporal) {
-            return temporal.getLong(DAY_OF_YEAR);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <R extends Temporal> R adjustInto(R temporal, long newValue) {
-            return (R) temporal.with(DAY_OF_YEAR, newValue);
-        }
+        //</editor-fold>
     }
 
     @Test
-    public void test_getLong_derivedField() {
-        assertEquals(12L, TEST.getLong(TestingField.INSTANCE));
+    void getLong_shouldReturnCorrectValue_forCustomDelegatingField() {
+        // This test ensures that DayOfYear.getLong(TemporalField) correctly calls
+        // the getFrom(TemporalAccessor) method on a custom TemporalField implementation.
+
+        // Arrange
+        int dayValue = 12;
+        DayOfYear dayOfYear = DayOfYear.of(dayValue);
+        TemporalField customField = DelegatingDayOfYearField.INSTANCE;
+
+        // Act
+        long actualValue = dayOfYear.getLong(customField);
+
+        // Assert
+        assertEquals(dayValue, actualValue, "The value from the custom field should match the DayOfYear's value.");
     }
 }
