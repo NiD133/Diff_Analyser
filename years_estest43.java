@@ -1,17 +1,27 @@
 package org.joda.time;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Years_ESTestTest43 extends Years_ESTest_scaffolding {
+/**
+ * Test suite for the Years class.
+ */
+public class YearsTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        Years years0 = Years.years(Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, years0.getYears());
+    /**
+     * Tests that the factory method `years(int)` correctly creates an instance
+     * when given the maximum possible integer value.
+     */
+    @Test
+    public void yearsFactory_withMaxValue_createsYearsWithCorrectValue() {
+        // Arrange
+        int maxIntValue = Integer.MAX_VALUE;
+
+        // Act
+        Years maxYears = Years.years(maxIntValue);
+
+        // Assert
+        assertEquals("The number of years should match the maximum integer value",
+                     maxIntValue, maxYears.getYears());
     }
 }
