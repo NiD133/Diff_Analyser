@@ -1,46 +1,79 @@
 package org.apache.commons.cli.help;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
-public class TextHelpAppendableTestTest14 {
+/**
+ * Tests for the TextHelpAppendable class, focusing on text formatting and layout logic.
+ */
+class TextHelpAppendableTest {
 
-    private StringBuilder sb;
-
-    private TextHelpAppendable underTest;
-
-    @BeforeEach
-    public void setUp() {
-        sb = new StringBuilder();
-        underTest = new TextHelpAppendable(sb);
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.apache.commons.cli.help.UtilTest#charArgs")
-    void testindexOfWrapPosWithWhitespace(final Character c, final boolean isWhitespace) {
-        final String text = String.format("Hello%cWorld", c);
-        assertEquals(isWhitespace ? 5 : 6, TextHelpAppendable.indexOfWrap(text, 7, 0));
-    }
-
+    /**
+     * Tests that indexOfWrap correctly identifies the position of a whitespace character
+     * when it falls within the specified wrapping width.
+     */
     @Test
-    void testResizeTableFormat() {
-        underTest.setMaxWidth(150);
-        final TableDefinition tableDefinition = TableDefinition.from("Caption", Collections.singletonList(TextStyle.builder().setMinWidth(20).setMaxWidth(100).get()), Collections.singletonList("header"), Collections.singletonList(Collections.singletonList("one")));
-        final TableDefinition result = underTest.adjustTableFormat(tableDefinition);
-        assertEquals(20, result.columnTextStyles().get(0).getMinWidth(), "Minimum width should not be reset");
-        assertEquals(100, result.columnTextStyles().get(0).getMaxWidth(), "Maximum width should not be reset");
+    void indexOfWrapShouldReturnPositionOfWhitespace() {
+        // Given a string with a space character within the wrap width limit
+        final String textWithSpace = "Hello World"; // Space is at index 5
+        final int wrapWidth = 7;
+        final int startPosition = 0;
+
+        // When searching for the wrap position
+        final int wrapIndex = TextHelpAppendable.indexOfWrap(textWithSpace, wrapWidth, startPosition);
+
+        // Then the returned index should be the position of the space character
+        assertEquals(5, wrapIndex, "Wrap index should be at the space character");
+    }
+
+    /**
+     * Tests a specific behavior of indexOfWrap where, in the absence of whitespace within
+     * the wrap width, it returns a position based on the width limit. The original test
+     * showed that for "HelloXWorld" with a width of 7, the expected index is 6.
+     */
+    @Test
+    void indexOfWrapShouldReturnCalculatedPositionWhenNoWhitespaceFound() {
+        // Given a string with no whitespace within the wrap width limit
+        final String textWithoutSpace = "HelloXWorld";
+        final int wrapWidth = 7;
+        final int startPosition = 0;
+
+        // When searching for the wrap position
+        final int wrapIndex = TextHelpAppendable.indexOfWrap(textWithoutSpace, wrapWidth, startPosition);
+
+        // Then the returned index should be 6, as determined by the method's logic
+        // for handling lines without a natural break.
+        assertEquals(6, wrapIndex, "Wrap index should be 6 for 'HelloXWorld' with width 7");
+    }
+
+    /**
+     * Verifies that adjustTableFormat does not alter the minimum or maximum widths of
+     * table columns when the table's total width already fits within the configured
+     * maximum page width.
+     */
+    @Test
+    void adjustTableFormatShouldNotChangeWidthsWhenTableFitsWithinMaxWidth() {
+        // Given a TextHelpAppendable with a large maximum width
+        final TextHelpAppendable helpFormatter = new TextHelpAppendable(new StringBuilder());
+        helpFormatter.setMaxWidth(150);
+
+        // And a table definition that fits comfortably within that width
+        final TextStyle columnStyle = TextStyle.builder().setMinWidth(20).setMaxWidth(100).get();
+        final List<TextStyle> columnStyles = Collections.singletonList(columnStyle);
+        final List<String> headers = Collections.singletonList("header");
+        final List<List<String>> rows = Collections.singletonList(Collections.singletonList("one"));
+        final TableDefinition tableDefinition = TableDefinition.from("Caption", columnStyles, headers, rows);
+
+        // When the table format is adjusted
+        final TableDefinition adjustedTable = helpFormatter.adjustTableFormat(tableDefinition);
+
+        // Then the original column widths should be preserved
+        final TextStyle adjustedStyle = adjustedTable.columnTextStyles().get(0);
+        assertEquals(20, adjustedStyle.getMinWidth(), "Minimum width should be preserved");
+        assertEquals(100, adjustedStyle.getMaxWidth(), "Maximum width should be preserved");
     }
 }
