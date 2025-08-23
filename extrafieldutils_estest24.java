@@ -1,25 +1,20 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.zip.ZipException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class ExtraFieldUtils_ESTestTest24 extends ExtraFieldUtils_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link ExtraFieldUtils} class.
+ */
+public class ExtraFieldUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test23() throws Throwable {
-        // Undeclared exception!
-        try {
-            ExtraFieldUtils.createExtraField((ZipShort) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that {@code createExtraField} throws a NullPointerException
+     * when passed a null header ID. The underlying implementation uses this
+     * ID as a key in a map that does not permit nulls.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createExtraFieldWithNullHeaderIdShouldThrowNullPointerException() {
+        // Call the method under test with a null argument to trigger the exception.
+        ExtraFieldUtils.createExtraField(null);
     }
 }
