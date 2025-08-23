@@ -1,26 +1,27 @@
 package org.jsoup.nodes;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.File;
-import java.io.PipedWriter;
-import java.io.StringWriter;
-import java.nio.BufferOverflowException;
-import java.nio.CharBuffer;
-import java.nio.ReadOnlyBufferException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileWriter;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.jsoup.internal.QuietAppendable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class Entities_ESTestTest22 extends Entities_ESTest_scaffolding {
+/**
+ * A focused test suite for the {@link Entities.CoreCharset} inner enum.
+ */
+public class EntitiesCoreCharsetTest {
 
-    @Test(timeout = 4000)
-    public void test21() throws Throwable {
-        Entities.CoreCharset.byName("\"PvE5H.,d+SC ,Q,}'xM");
+    /**
+     * Verifies that the byName() method correctly returns the 'fallback'
+     * constant when provided with an unrecognized or invalid charset name.
+     */
+    @Test
+    public void byNameReturnsFallbackForUnrecognizedCharsetName() {
+        // Arrange: Define an input string that does not match any known core charset.
+        // The original test used this specific, randomly-generated string.
+        final String unrecognizedCharset = "\"PvE5H.,d+SC ,Q,}'xM";
+
+        // Act: Call the method under test.
+        Entities.CoreCharset result = Entities.CoreCharset.byName(unrecognizedCharset);
+
+        // Assert: The method should return the 'fallback' enum constant, not throw an exception.
+        assertEquals(Entities.CoreCharset.fallback, result);
     }
 }
