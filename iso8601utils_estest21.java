@@ -1,31 +1,38 @@
 package com.google.gson.internal.bind.util;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.util.MockDate;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class ISO8601Utils_ESTestTest21 extends ISO8601Utils_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link ISO8601Utils} class.
+ */
+public class ISO8601UtilsTest {
 
-    @Test(timeout = 4000)
-    public void test20() throws Throwable {
-        ParsePosition parsePosition0 = new ParsePosition(3);
+    /**
+     * Verifies that the parse method throws a ParseException when given a date string
+     * with a malformed year that has too many digits.
+     */
+    @Test
+    public void parse_withMalformedDateString_throwsParseException() {
+        // Arrange: Create a date string with a 9-digit year, which is an invalid format.
+        String malformedDateString = "208737754-05-17T20:36:25Z";
+        ParsePosition position = new ParsePosition(0); // Start parsing from the beginning.
+
+        // Act & Assert
         try {
-            ISO8601Utils.parse("208737754-05-17T20:36:25Z", parsePosition0);
-            fail("Expecting exception: ParseException");
+            ISO8601Utils.parse(malformedDateString, position);
+            fail("Expected a ParseException for a malformed date string, but none was thrown.");
         } catch (ParseException e) {
-            //
-            // Failed to parse date [\"208737754-05-17T20:36:25Z\"]: Mismatching time zone indicator: GMT-17T20:36:25Z given, resolves to GMT
-            //
-            verifyException("com.google.gson.internal.bind.util.ISO8601Utils", e);
+            // SUCCESS: The expected exception was thrown.
+            // For robustness, we can also verify the exception message.
+            String expectedMessagePrefix = "Failed to parse date";
+            assertTrue(
+                "The exception message should indicate a parsing failure. Actual message: \"" + e.getMessage() + "\"",
+                e.getMessage().startsWith(expectedMessagePrefix)
+            );
         }
     }
 }
