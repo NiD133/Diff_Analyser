@@ -1,18 +1,30 @@
 package org.apache.commons.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class IOCase_ESTestTest15 extends IOCase_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link IOCase} enum.
+ */
+public class IOCaseTest {
 
-    @Test(timeout = 4000)
-    public void test14() throws Throwable {
-        IOCase iOCase0 = IOCase.INSENSITIVE;
-        boolean boolean0 = iOCase0.checkRegionMatches("hM'", (-537), "hM'");
-        assertFalse(boolean0);
+    /**
+     * Verifies that checkRegionMatches returns false when provided with a negative start index.
+     * The underlying String.regionMatches method, which this method delegates to,
+     * is specified to return false for any negative start index.
+     */
+    @Test
+    public void checkRegionMatchesShouldReturnFalseForNegativeStartIndex() {
+        // Arrange
+        IOCase insensitiveCase = IOCase.INSENSITIVE;
+        String text = "AnyString";
+        String search = "Any";
+        int negativeStartIndex = -1;
+
+        // Act
+        boolean matches = insensitiveCase.checkRegionMatches(text, negativeStartIndex, search);
+
+        // Assert
+        assertFalse("A negative start index should always result in false.", matches);
     }
 }
