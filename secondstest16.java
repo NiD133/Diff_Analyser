@@ -1,36 +1,25 @@
 package org.joda.time;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-public class SecondsTestTest16 extends TestCase {
+/**
+ * Unit tests for the {@link Seconds} class, focusing on conversion capabilities.
+ */
+public class SecondsTest {
 
-    // (before the late 90's they were all over the place)
-    private static final DateTimeZone PARIS = DateTimeZone.forID("Europe/Paris");
+    @Test
+    public void toStandardDays_shouldConvertSecondsToEquivalentStandardDays() {
+        // Arrange: A standard day is defined as exactly 24 hours.
+        // We create a Seconds instance representing two standard days.
+        Seconds secondsInTwoDays = Seconds.seconds(2 * DateTimeConstants.SECONDS_PER_DAY);
+        Days expectedDays = Days.TWO;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
+        // Act: Convert the Seconds object to standard Days.
+        Days actualDays = secondsInTwoDays.toStandardDays();
 
-    public static TestSuite suite() {
-        return new TestSuite(TestSeconds.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
-    public void testToStandardDays() {
-        Seconds test = Seconds.seconds(60 * 60 * 24 * 2);
-        Days expected = Days.days(2);
-        assertEquals(expected, test.toStandardDays());
+        // Assert: The result should be exactly two days.
+        assertEquals("Conversion from seconds to days did not yield the expected result.",
+                expectedDays, actualDays);
     }
 }
