@@ -1,29 +1,53 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
-import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest7 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.mockito.Mockito.mock;
 
-    @Test(timeout = 4000)
-    public void test06() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl((-102L), 0L, noMoreInteractions0, false);
-        VerificationOverTimeImpl verificationOverTimeImpl1 = verificationOverTimeImpl0.copyWithVerificationMode(noMoreInteractions0);
-        assertEquals((-102L), verificationOverTimeImpl1.getPollingPeriodMillis());
-        assertEquals((-102L), verificationOverTimeImpl0.getPollingPeriodMillis());
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * This test verifies that the copyWithVerificationMode() method creates a new
+     * instance of VerificationOverTimeImpl, preserving the original's configuration
+     * such as polling period and duration.
+     */
+    @Test
+    public void copyWithVerificationMode_shouldCreateNewInstanceWithCopiedConfiguration() {
+        // Arrange
+        final long pollingPeriod = 50L;
+        final long duration = 100L;
+        final boolean returnOnSuccess = false;
+        final VerificationMode originalDelegate = new NoMoreInteractions();
+
+        VerificationOverTimeImpl originalVerification = new VerificationOverTimeImpl(
+            pollingPeriod,
+            duration,
+            originalDelegate,
+            returnOnSuccess
+        );
+
+        // A new delegate mode to be used in the copied instance.
+        VerificationMode newDelegate = mock(VerificationMode.class);
+
+        // Act
+        VerificationOverTimeImpl copiedVerification = originalVerification.copyWithVerificationMode(newDelegate);
+
+        // Assert
+        // 1. Ensure it's a new object instance.
+        assertNotSame("A new instance should be created", originalVerification, copiedVerification);
+
+        // 2. Verify that the configuration was copied from the original.
+        assertEquals("Polling period should be copied", pollingPeriod, copiedVerification.getPollingPeriodMillis());
+        assertEquals("Duration should be copied", duration, copiedVerification.getTimer().getDuration());
+        assertEquals("returnOnSuccess flag should be copied", returnOnSuccess, copiedVerification.isReturnOnSuccess());
+        
+        // 3. Confirm the new instance uses the new delegate mode.
+        assertEquals("The new delegate mode should be used", newDelegate, copiedVerification.getDelegate());
     }
 }
