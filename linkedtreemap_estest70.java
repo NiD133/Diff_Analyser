@@ -1,27 +1,36 @@
 package com.google.gson.internal;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.AbstractMap;
-import java.util.Comparator;
+
 import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class LinkedTreeMap_ESTestTest70 extends LinkedTreeMap_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test69() throws Throwable {
-        Integer integer0 = new Integer((-1960));
-        LinkedTreeMap<Integer, Integer> linkedTreeMap0 = new LinkedTreeMap<Integer, Integer>();
-        LinkedTreeMap.Node<Integer, Integer> linkedTreeMap_Node0 = linkedTreeMap0.find(integer0, true);
-        linkedTreeMap0.findByEntry(linkedTreeMap_Node0);
-        assertEquals(1, linkedTreeMap0.size());
+    /**
+     * Tests that findByEntry correctly locates an existing entry
+     * without altering the map's state.
+     */
+    @Test
+    public void findByEntry_whenEntryExists_shouldReturnTheEntryAndNotChangeMapSize() {
+        // Arrange
+        LinkedTreeMap<Integer, String> map = new LinkedTreeMap<>();
+        Integer key = -1960;
+
+        // The find(key, create=true) method inserts a new node if the key is not present.
+        // We use it here, as the original test did, to set up the map state with a single node.
+        LinkedTreeMap.Node<Integer, String> nodeToFind = map.find(key, true);
+        assertEquals("Pre-condition failed: Map should contain one entry after setup.", 1, map.size());
+
+        // Act
+        // Attempt to find the node that was just inserted.
+        Map.Entry<Integer, String> foundNode = map.findByEntry(nodeToFind);
+
+        // Assert
+        // Verify that the correct node was returned and the map's size remains unchanged.
+        assertSame("findByEntry should return the exact same node instance.", nodeToFind, foundNode);
+        assertEquals("Map size should not change after finding an entry.", 1, map.size());
     }
 }
