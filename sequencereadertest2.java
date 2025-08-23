@@ -2,72 +2,39 @@ package org.apache.commons.io.input;
 
 import static org.apache.commons.io.IOUtils.EOF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+
 import org.junit.jupiter.api.Test;
 
-public class SequenceReaderTestTest2 {
+/**
+ * Tests for {@link SequenceReader}.
+ */
+class SequenceReaderTest {
 
-    private static final char NUL = 0;
-
-    private void checkArray(final char[] expected, final char[] actual) {
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i], "Compare[" + i + "]");
-        }
-    }
-
-    private void checkRead(final Reader reader, final String expected) throws IOException {
-        for (int i = 0; i < expected.length(); i++) {
-            assertEquals(expected.charAt(i), (char) reader.read(), "Read[" + i + "] of '" + expected + "'");
-        }
-    }
-
-    private void checkReadEof(final Reader reader) throws IOException {
-        for (int i = 0; i < 10; i++) {
-            assertEquals(-1, reader.read());
-        }
-    }
-
-    private static class CustomReader extends Reader {
-
-        boolean closed;
-
-        protected void checkOpen() throws IOException {
-            if (closed) {
-                throw new IOException("emptyReader already closed");
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            closed = true;
-        }
-
-        public boolean isClosed() {
-            return closed;
-        }
-
-        @Override
-        public int read(final char[] cbuf, final int off, final int len) throws IOException {
-            checkOpen();
-            close();
-            return EOF;
-        }
-    }
-
+    /**
+     * Tests that after a {@link SequenceReader} is closed, subsequent calls to {@code read()}
+     * consistently return {@code EOF}, as per the {@link Reader#close()} contract.
+     *
+     * @throws IOException if an I/O error occurs.
+     */
     @Test
-    void testClose() throws IOException {
+    void readAfterCloseShouldReturnEof() throws IOException {
+        // Arrange: Create a SequenceReader with some data.
         final Reader reader = new SequenceReader(new CharSequenceReader("FooBar"));
-        checkRead(reader, "Foo");
+
+        // Act & Assert (Pre-condition): Read some data to confirm the reader is active
+        // and not at the end of the stream.
+        assertEquals('F', reader.read());
+        assertEquals('o', reader.read());
+        assertEquals('o', reader.read());
+
+        // Act: Close the reader. This is the action under test.
         reader.close();
-        checkReadEof(reader);
+
+        // Assert: Verify that subsequent reads return EOF.
+        assertEquals(EOF, reader.read(), "First read after close should return EOF.");
+        assertEquals(EOF, reader.read(), "Second read after close should also return EOF to ensure state.");
     }
 }
