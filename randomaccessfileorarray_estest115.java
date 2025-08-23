@@ -1,34 +1,31 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
-import com.itextpdf.text.io.IndependentRandomAccessSource;
-import com.itextpdf.text.io.RandomAccessSource;
-import com.itextpdf.text.io.WindowRandomAccessSource;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.net.URL;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.net.MockURL;
-import org.evosuite.runtime.testdata.EvoSuiteFile;
-import org.evosuite.runtime.testdata.FileSystemHandling;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
-public class RandomAccessFileOrArray_ESTestTest115 extends RandomAccessFileOrArray_ESTest_scaffolding {
+/**
+ * Contains tests for the skip() method in the {@link RandomAccessFileOrArray} class.
+ */
+public class RandomAccessFileOrArrayTest {
 
-    @Test(timeout = 4000)
-    public void test114() throws Throwable {
-        byte[] byteArray0 = new byte[1];
-        RandomAccessFileOrArray randomAccessFileOrArray0 = new RandomAccessFileOrArray(byteArray0);
-        long long0 = randomAccessFileOrArray0.skip((-2015L));
-        assertEquals(0L, long0);
-        assertEquals(0L, randomAccessFileOrArray0.getFilePointer());
+    /**
+     * Verifies that calling skip() with a negative value does not move the file pointer
+     * and returns 0, adhering to the general contract for skip methods in Java I/O.
+     */
+    @Test
+    public void skip_withNegativeValue_shouldReturnZeroAndNotMovePointer() throws IOException {
+        // Arrange: Create a RandomAccessFileOrArray with some data.
+        // The initial file pointer is at position 0.
+        byte[] sourceData = new byte[]{10, 20, 30};
+        RandomAccessFileOrArray fileOrArray = new RandomAccessFileOrArray(sourceData);
+        long negativeBytesToSkip = -2015L;
+
+        // Act: Attempt to skip a negative number of bytes.
+        long actualBytesSkipped = fileOrArray.skip(negativeBytesToSkip);
+
+        // Assert: The method should return 0, and the file pointer's position should be unchanged.
+        assertEquals("Calling skip() with a negative value should return 0.", 0L, actualBytesSkipped);
+        assertEquals("The file pointer should not change after a negative skip.", 0L, fileOrArray.getFilePointer());
     }
 }
