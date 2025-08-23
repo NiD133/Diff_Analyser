@@ -1,46 +1,56 @@
 package com.itextpdf.text.pdf.parser;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.itextpdf.text.pdf.CMapAwareDocumentFont;
-import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfIndirectReference;
-import com.itextpdf.text.pdf.PdfOCProperties;
-import com.itextpdf.text.pdf.PdfSigLockDictionary;
 import com.itextpdf.text.pdf.PdfString;
+import org.junit.Test;
+
 import java.nio.charset.IllegalCharsetNameException;
-import java.util.Collection;
-import java.util.LinkedList;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import java.util.Collections;
 
-public class LocationTextExtractionStrategy_ESTestTest17 extends LocationTextExtractionStrategy_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-    @Test(timeout = 4000)
-    public void test16() throws Throwable {
-        GraphicsState graphicsState0 = new GraphicsState();
-        PdfOCProperties pdfOCProperties0 = new PdfOCProperties();
-        CMapAwareDocumentFont cMapAwareDocumentFont0 = new CMapAwareDocumentFont(pdfOCProperties0);
-        graphicsState0.font = cMapAwareDocumentFont0;
-        LinkedList<MarkedContentInfo> linkedList0 = new LinkedList<MarkedContentInfo>();
-        LocationTextExtractionStrategy locationTextExtractionStrategy0 = new LocationTextExtractionStrategy();
-        PdfString pdfString0 = new PdfString("],", ".notdef");
-        Matrix matrix0 = new Matrix(9, 1374.654F, 644.4266F, 23, 2, 3.1684228E7F);
-        TextRenderInfo textRenderInfo0 = new TextRenderInfo(pdfString0, graphicsState0, matrix0, linkedList0);
-        // Undeclared exception!
+/**
+ * Test suite for the {@link LocationTextExtractionStrategy} class.
+ */
+public class LocationTextExtractionStrategyTest {
+
+    /**
+     * Verifies that the renderText method throws an IllegalCharsetNameException
+     * when the provided TextRenderInfo contains a PdfString with an invalid encoding name.
+     */
+    @Test
+    public void renderText_whenGivenTextWithInvalidEncoding_throwsIllegalCharsetNameException() {
+        // Arrange
+        final String invalidEncodingName = ".notdef";
+
+        // Create a TextRenderInfo object containing a PdfString with an unsupported encoding.
+        // The specific values for the font, matrix, and text content are not critical for this test,
+        // as the exception occurs during character set lookup before text processing.
+        GraphicsState graphicsState = new GraphicsState();
+        graphicsState.font = new CMapAwareDocumentFont(new PdfDictionary());
+
+        PdfString textWithInvalidEncoding = new PdfString("any text", invalidEncodingName);
+        Matrix textMatrix = new Matrix();
+
+        TextRenderInfo renderInfo = new TextRenderInfo(
+                textWithInvalidEncoding,
+                graphicsState,
+                textMatrix,
+                Collections.emptyList()
+        );
+
+        LocationTextExtractionStrategy strategy = new LocationTextExtractionStrategy();
+
+        // Act & Assert
         try {
-            locationTextExtractionStrategy0.renderText(textRenderInfo0);
-            fail("Expecting exception: IllegalCharsetNameException");
+            strategy.renderText(renderInfo);
+            fail("Expected an IllegalCharsetNameException to be thrown due to invalid encoding.");
         } catch (IllegalCharsetNameException e) {
-            //
-            // .notdef
-            //
-            verifyException("java.nio.charset.Charset", e);
+            // Verify that the exception was thrown for the correct reason.
+            assertEquals("The exception should report the invalid charset name.",
+                    invalidEncodingName, e.getCharsetName());
         }
     }
 }
