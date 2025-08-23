@@ -1,33 +1,25 @@
 package org.locationtech.spatial4j.shape.impl;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.HashMap;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 import org.locationtech.spatial4j.context.SpatialContext;
-import org.locationtech.spatial4j.context.SpatialContextFactory;
-import org.locationtech.spatial4j.distance.CartesianDistCalc;
-import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.Rectangle;
-import org.locationtech.spatial4j.shape.Shape;
-import org.locationtech.spatial4j.shape.SpatialRelation;
 
-public class BufferedLine_ESTestTest25 extends BufferedLine_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link BufferedLine} class.
+ */
+public class BufferedLineTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        SpatialContext spatialContext0 = SpatialContext.GEO;
-        BufferedLine bufferedLine0 = null;
-        try {
-            bufferedLine0 = new BufferedLine((Point) null, (Point) null, 2693.6085181, spatialContext0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * Verifies that the constructor throws a NullPointerException when provided with null points.
+     * The constructor must have valid start and end points to perform its calculations.
+     */
+    @Test(expected = NullPointerException.class)
+    public void constructorShouldThrowNullPointerExceptionForNullPoints() {
+        // Arrange
+        SpatialContext context = SpatialContext.GEO;
+        double bufferDistance = 10.0; // The specific buffer value is not relevant for this test.
+
+        // Act: Attempt to create a BufferedLine with null start and end points.
+        // Assert: The test framework will assert that a NullPointerException is thrown.
+        new BufferedLine(null, null, bufferDistance, context);
     }
 }
