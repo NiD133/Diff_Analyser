@@ -1,39 +1,40 @@
 package org.apache.commons.compress.archivers.zip;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Enumeration;
-import java.util.zip.Deflater;
-import org.apache.commons.compress.parallel.ScatterGatherBackingStore;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.junit.runner.RunWith;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * This class contains tests for the StreamCompressor, focusing on specific behaviors.
+ * The original test class name 'StreamCompressor_ESTestTest23' is kept for context,
+ * but in a real-world scenario, it would be part of a single 'StreamCompressorTest' class.
+ */
 public class StreamCompressor_ESTestTest23 extends StreamCompressor_ESTest_scaffolding {
 
+    /**
+     * Verifies that flushing a newly created StreamCompressor writes the
+     * DEFLATE empty block with a sync flush marker, which is 2 bytes long.
+     * This ensures the internal byte counter is updated correctly after a flush operation
+     * on an empty stream.
+     */
     @Test(timeout = 4000)
-    public void test22() throws Throwable {
-        PipedOutputStream pipedOutputStream0 = new PipedOutputStream();
-        PipedInputStream pipedInputStream0 = new PipedInputStream(pipedOutputStream0);
-        StreamCompressor streamCompressor0 = StreamCompressor.create((OutputStream) pipedOutputStream0);
-        streamCompressor0.flushDeflater();
-        long long0 = streamCompressor0.getBytesWrittenForLastEntry();
-        assertEquals(2L, long0);
+    public void flushOnNewCompressorShouldWriteTwoBytes() throws IOException {
+        // Arrange: Create a compressor that writes to an in-memory byte array.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final StreamCompressor compressor = StreamCompressor.create(outputStream);
+
+        // Act: Flush the deflater without writing any data to it.
+        compressor.flushDeflater();
+        final long bytesWritten = compressor.getBytesWrittenForLastEntry();
+
+        // Assert: The flush operation on a new deflater writes a 2-byte sync flush marker.
+        final long expectedBytes = 2L;
+        assertEquals("The internal counter for bytes written should be 2 after the initial flush.",
+                expectedBytes, bytesWritten);
+        assertEquals("The underlying output stream should contain 2 bytes.",
+                expectedBytes, outputStream.size());
     }
 }
