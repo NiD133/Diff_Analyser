@@ -2,28 +2,28 @@ package org.jfree.chart;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.entity.StandardEntityCollection;
-import org.jfree.chart.plot.CombinedRangeCategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.junit.runner.RunWith;
 
-public class ChartRenderingInfo_ESTestTest18 extends ChartRenderingInfo_ESTest_scaffolding {
+/**
+ * Tests for the {@link ChartRenderingInfo} class, focusing on the clone() method.
+ */
+public class ChartRenderingInfoTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        ChartRenderingInfo chartRenderingInfo0 = new ChartRenderingInfo();
-        chartRenderingInfo0.setEntityCollection((EntityCollection) null);
-        Object object0 = chartRenderingInfo0.clone();
-        assertNotSame(object0, chartRenderingInfo0);
+    /**
+     * Verifies that cloning a ChartRenderingInfo object with a null entity collection
+     * results in a new, distinct object that is still logically equal to the original.
+     */
+    @Test
+    public void clone_withNullEntityCollection_createsEqualAndDistinctObject() throws CloneNotSupportedException {
+        // Arrange: Create a ChartRenderingInfo instance and set its entity collection to null.
+        ChartRenderingInfo originalInfo = new ChartRenderingInfo();
+        originalInfo.setEntityCollection(null);
+
+        // Act: Clone the original object.
+        ChartRenderingInfo clonedInfo = (ChartRenderingInfo) originalInfo.clone();
+
+        // Assert: The cloned object should be a different instance but have the same state.
+        assertNotSame("The cloned object should be a new instance.", originalInfo, clonedInfo);
+        assertEquals("The cloned object should be logically equal to the original.", originalInfo, clonedInfo);
+        assertNull("The entity collection in the clone should also be null.", clonedInfo.getEntityCollection());
     }
 }
