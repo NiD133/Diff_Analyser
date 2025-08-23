@@ -1,58 +1,34 @@
 package org.apache.commons.collections4.bag;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Set;
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.SortedBag;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.ComparatorPredicate;
-import org.apache.commons.collections4.functors.ConstantTransformer;
-import org.apache.commons.collections4.functors.EqualPredicate;
-import org.apache.commons.collections4.functors.ExceptionPredicate;
-import org.apache.commons.collections4.functors.ExceptionTransformer;
-import org.apache.commons.collections4.functors.IdentityPredicate;
-import org.apache.commons.collections4.functors.IfClosure;
-import org.apache.commons.collections4.functors.IfTransformer;
-import org.apache.commons.collections4.functors.InstanceofPredicate;
-import org.apache.commons.collections4.functors.InvokerTransformer;
-import org.apache.commons.collections4.functors.NOPClosure;
-import org.apache.commons.collections4.functors.NullPredicate;
-import org.apache.commons.collections4.functors.TransformedPredicate;
-import org.apache.commons.collections4.functors.TransformerPredicate;
-import org.apache.commons.collections4.functors.UniquePredicate;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class CollectionSortedBag_ESTestTest45 extends CollectionSortedBag_ESTest_scaffolding {
+/**
+ * Tests for {@link CollectionSortedBag}.
+ */
+public class CollectionSortedBagTest {
 
-    @Test(timeout = 4000)
-    public void test44() throws Throwable {
-        TreeBag<IfClosure<Object>> treeBag0 = new TreeBag<IfClosure<Object>>();
-        CollectionSortedBag<IfClosure<Object>> collectionSortedBag0 = new CollectionSortedBag<IfClosure<Object>>(treeBag0);
-        Predicate<Object> predicate0 = ExceptionPredicate.exceptionPredicate();
-        Closure<Object> closure0 = NOPClosure.nopClosure();
-        IfClosure<Object> ifClosure0 = new IfClosure<Object>(predicate0, closure0);
-        // Undeclared exception!
-        try {
-            collectionSortedBag0.add(ifClosure0);
-            fail("Expecting exception: ClassCastException");
-        } catch (ClassCastException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-        }
+    /**
+     * A simple helper class that does not implement Comparable, used for testing.
+     */
+    private static class NonComparableObject {
+    }
+
+    @Test(expected = ClassCastException.class)
+    public void addNonComparableToUnderlyingTreeBagShouldThrowException() {
+        // Arrange
+        // A TreeBag without a custom comparator relies on the natural ordering of its elements.
+        // This means elements must implement the Comparable interface.
+        final SortedBag<Object> underlyingTreeBag = new TreeBag<>();
+        final SortedBag<Object> collectionSortedBag = new CollectionSortedBag<>(underlyingTreeBag);
+        final Object nonComparableObject = new NonComparableObject();
+
+        // Act
+        // Attempting to add an object that is not Comparable to a TreeBag will cause a
+        // ClassCastException when the bag tries to sort it.
+        collectionSortedBag.add(nonComparableObject);
+
+        // Assert
+        // A ClassCastException is expected, as declared in the @Test annotation.
     }
 }
