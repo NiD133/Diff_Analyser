@@ -1,48 +1,34 @@
 package org.threeten.extra.chrono;
 
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoPeriod;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.IsoEra;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.MinguoEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockZonedDateTime;
-import org.junit.runner.RunWith;
 
-public class BritishCutoverChronology_ESTestTest11 extends BritishCutoverChronology_ESTest_scaffolding {
+/**
+ * Tests for {@link BritishCutoverChronology}.
+ */
+public class BritishCutoverChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        BritishCutoverChronology britishCutoverChronology0 = BritishCutoverChronology.INSTANCE;
-        BritishCutoverDate britishCutoverDate0 = britishCutoverChronology0.dateNow();
-        BritishCutoverDate britishCutoverDate1 = britishCutoverChronology0.date((TemporalAccessor) britishCutoverDate0);
-        assertSame(britishCutoverDate0, britishCutoverDate1);
+    /**
+     * Tests that calling date(TemporalAccessor) with an existing BritishCutoverDate
+     * returns the same instance, verifying an implementation optimization.
+     */
+    @Test
+    public void date_fromTemporalAccessor_whenInputIsBritishCutoverDate_returnsSameInstance() {
+        // Arrange
+        BritishCutoverChronology chronology = BritishCutoverChronology.INSTANCE;
+        // Use a fixed, arbitrary date to make the test deterministic and easy to understand.
+        BritishCutoverDate originalDate = chronology.date(2023, 10, 27);
+
+        // Act
+        // The method under test should recognize the input is already the correct type.
+        BritishCutoverDate resultDate = chronology.date(originalDate);
+
+        // Assert
+        // The implementation is expected to return the exact same object, not just an equal one.
+        assertSame(
+                "The method should return the same instance if the input is already a BritishCutoverDate.",
+                originalDate,
+                resultDate);
     }
 }
