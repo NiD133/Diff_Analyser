@@ -1,24 +1,40 @@
 package org.mockito.internal.exceptions.stacktrace;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.lang.MockThrowable;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertSame;
 
-public class StackTraceFilter_ESTestTest2 extends StackTraceFilter_ESTest_scaffolding {
+/**
+ * Tests for {@link StackTraceFilter}.
+ */
+public class StackTraceFilterTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        StackTraceFilter stackTraceFilter0 = new StackTraceFilter();
-        StackTraceElement[] stackTraceElementArray0 = new StackTraceElement[1];
-        StackTraceElement stackTraceElement0 = new StackTraceElement("", "", "", 0);
-        stackTraceElementArray0[0] = stackTraceElement0;
-        MockThrowable mockThrowable0 = new MockThrowable();
-        mockThrowable0.setStackTrace(stackTraceElementArray0);
-        StackTraceElement stackTraceElement1 = stackTraceFilter0.filterFirst(mockThrowable0, false);
-        assertEquals("", stackTraceElement1.getMethodName());
+    @Test
+    public void filterFirst_shouldReturnFirstElement_whenItIsNotFiltered() {
+        // Arrange
+        StackTraceFilter stackTraceFilter = new StackTraceFilter();
+        
+        // Create a stack trace element that represents user code, which should not be filtered.
+        StackTraceElement userCodeElement = new StackTraceElement(
+            "com.example.myapp.MyClass", 
+            "myMethod", 
+            "MyClass.java", 
+            42
+        );
+        StackTraceElement[] stackTrace = { userCodeElement };
+
+        Throwable throwable = new Throwable();
+        throwable.setStackTrace(stackTrace);
+
+        // Act
+        // The 'isInline' parameter is false, indicating we should check the very first element.
+        StackTraceElement firstUnfilteredElement = stackTraceFilter.filterFirst(throwable, false);
+
+        // Assert
+        // Since the first element is user code, the filter should return it directly.
+        assertSame(
+            "Should return the first stack trace element as it's not a Mockito-internal class",
+            userCodeElement,
+            firstUnfilteredElement
+        );
     }
 }
