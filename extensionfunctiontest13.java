@@ -1,105 +1,89 @@
 package org.apache.commons.jxpath.ri.compiler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.List;
-import java.util.Locale;
 import org.apache.commons.jxpath.AbstractJXPathTest;
 import org.apache.commons.jxpath.ClassFunctions;
-import org.apache.commons.jxpath.ExpressionContext;
-import org.apache.commons.jxpath.Function;
 import org.apache.commons.jxpath.FunctionLibrary;
-import org.apache.commons.jxpath.Functions;
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.NodeSet;
-import org.apache.commons.jxpath.PackageFunctions;
-import org.apache.commons.jxpath.Pointer;
 import org.apache.commons.jxpath.TestBean;
-import org.apache.commons.jxpath.Variables;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.util.JXPath11CompatibleTypeConverter;
 import org.apache.commons.jxpath.util.TypeConverter;
 import org.apache.commons.jxpath.util.TypeUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ExtensionFunctionTestTest13 extends AbstractJXPathTest {
-
-    private Functions functions;
+/**
+ * Tests the behavior of JXPath when an extension function returns a NodeSet.
+ * It verifies that the returned NodeSet can be further navigated, iterated,
+ * and used in other XPath functions.
+ */
+public class ExtensionFunctionNodeSetReturnTest extends AbstractJXPathTest {
 
     private JXPathContext context;
-
     private TestBean testBean;
+    private TypeConverter originalTypeConverter;
 
-    private TypeConverter typeConverter;
-
-    @Override
     @BeforeEach
+    @Override
     public void setUp() {
-        if (context == null) {
-            testBean = new TestBean();
-            context = JXPathContext.newContext(testBean);
-            final Variables vars = context.getVariables();
-            vars.declareVariable("test", new TestFunctions(4, "test"));
-            final FunctionLibrary lib = new FunctionLibrary();
-            lib.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
-            lib.addFunctions(new ClassFunctions(TestFunctions2.class, "test"));
-            lib.addFunctions(new PackageFunctions("", "call"));
-            lib.addFunctions(new PackageFunctions("org.apache.commons.jxpath.ri.compiler.", "jxpathtest"));
-            lib.addFunctions(new PackageFunctions("", null));
-            context.setFunctions(lib);
-            context.getVariables().declareVariable("List.class", List.class);
-            context.getVariables().declareVariable("NodeSet.class", NodeSet.class);
-        }
-        functions = new ClassFunctions(TestFunctions.class, "test");
-        typeConverter = TypeUtils.getTypeConverter();
+        testBean = new TestBean();
+        context = JXPathContext.newContext(testBean);
+
+        // Register a function library where the "test" namespace is mapped
+        // to the static methods of the TestFunctions class.
+        FunctionLibrary functionLibrary = new FunctionLibrary();
+        functionLibrary.addFunctions(new ClassFunctions(TestFunctions.class, "test"));
+        context.setFunctions(functionLibrary);
+
+        // Preserve the original type converter to restore it after the test.
+        originalTypeConverter = TypeUtils.getTypeConverter();
     }
 
     @AfterEach
     public void tearDown() {
-        TypeUtils.setTypeConverter(typeConverter);
+        // Restore the original type converter to avoid side effects on other tests.
+        TypeUtils.setTypeConverter(originalTypeConverter);
     }
 
-    private static final class Context implements ExpressionContext {
-
-        private final Object object;
-
-        public Context(final Object object) {
-            this.object = object;
-        }
-
-        @Override
-        public List<Pointer> getContextNodeList() {
-            return null;
-        }
-
-        @Override
-        public Pointer getContextNodePointer() {
-            return NodePointer.newNodePointer(null, object, Locale.getDefault());
-        }
-
-        @Override
-        public JXPathContext getJXPathContext() {
-            return null;
-        }
-
-        @Override
-        public int getPosition() {
-            return 0;
-        }
-    }
-
+    /**
+     * Tests that a NodeSet returned by an extension function is correctly handled by the JXPath engine.
+     * The test verifies that the NodeSet can be iterated, counted, and that its members' properties
+     * and attributes can be accessed via subsequent path expressions.
+     */
     @Test
-    void testNodeSetReturn() {
-        assertXPathValueIterator(context, "test:nodeSet()/name", list("Name 1", "Name 2"));
-        assertXPathValueIterator(context, "test:nodeSet()", list(testBean.getBeans()[0], testBean.getBeans()[1]));
-        assertXPathPointerIterator(context, "test:nodeSet()/name", list("/beans[1]/name", "/beans[2]/name"));
-        assertXPathValueAndPointer(context, "test:nodeSet()/name", "Name 1", "/beans[1]/name");
-        assertXPathValueAndPointer(context, "test:nodeSet()/@name", "Name 1", "/beans[1]/@name");
-        assertEquals(2, ((Number) context.getValue("count(test:nodeSet())")).intValue());
-        assertXPathValue(context, "test:nodeSet()", testBean.getBeans()[0]);
+    void extensionFunctionReturningNodeSet_canBeNavigatedAndEvaluated() {
+        // Arrange: Define XPath expressions and expected results for clarity.
+        final String nodeSetFunction = "test:nodeSet()";
+        final Object expectedFirstBean = testBean.getBeans()[0];
+        final Object expectedSecondBean = testBean.getBeans()[1];
+
+        // --- Assertions for the NodeSet itself ---
+
+        // 1. Verify that iterating over the function result yields the correct node objects.
+        assertXPathValueIterator(context, nodeSetFunction, list(expectedFirstBean, expectedSecondBean));
+
+        // 2. Verify that when evaluated in a scalar context, the function returns the first node's value.
+        assertXPathValue(context, nodeSetFunction, expectedFirstBean);
+
+        // 3. Verify that the returned NodeSet can be used as an argument to other XPath functions (e.g., count()).
+        final String countXPath = "count(" + nodeSetFunction + ")";
+        assertEquals(2, ((Number) context.getValue(countXPath)).intValue(),
+                "count() should return the correct size of the NodeSet");
+
+        // --- Assertions for navigating within the NodeSet ---
+
+        // 4. Verify navigation to a child property ('name') within the NodeSet.
+        final String namePropertyPath = nodeSetFunction + "/name";
+        assertXPathValueIterator(context, namePropertyPath, list("Name 1", "Name 2"));
+        assertXPathPointerIterator(context, namePropertyPath, list("/beans[1]/name", "/beans[2]/name"));
+
+        // 5. Verify that accessing a property path in a scalar context returns the value from the first node.
+        assertXPathValueAndPointer(context, namePropertyPath, "Name 1", "/beans[1]/name");
+
+        // 6. Verify navigation to an attribute ('@name') within the NodeSet.
+        final String nameAttributePath = nodeSetFunction + "/@name";
+        assertXPathValueAndPointer(context, nameAttributePath, "Name 1", "/beans[1]/@name");
     }
 }
