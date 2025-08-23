@@ -1,24 +1,34 @@
 package org.apache.commons.lang3.reflect;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertNull;
 
-public class ConstructorUtils_ESTestTest25 extends ConstructorUtils_ESTest_scaffolding {
+/**
+ * Test suite for {@link ConstructorUtils}.
+ * This class focuses on improving the clarity of an auto-generated test case.
+ */
+public class ConstructorUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test24() throws Throwable {
-        Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 1);
-        Class<Object> class0 = Object.class;
-        Constructor<Object> constructor0 = ConstructorUtils.getAccessibleConstructor(class0, (Class<?>[]) classArray0);
-        assertNull(constructor0);
+    /**
+     * Tests that getAccessibleConstructor returns null when the parameter types array
+     * contains a null element, as no constructor can match a null type.
+     */
+    @Test
+    public void getAccessibleConstructorWithNullParameterTypeShouldReturnNull() {
+        // Arrange: Define the class to search and a parameter type array containing null.
+        // The Object class has only one constructor, Object(), which takes no arguments.
+        // We will search for a constructor that takes a single, undefined (null) parameter.
+        final Class<Object> classToSearch = Object.class;
+        final Class<?>[] parameterTypesWithNull = { null };
+
+        // Act: Attempt to find a constructor matching the specified signature.
+        final Constructor<Object> foundConstructor = ConstructorUtils.getAccessibleConstructor(
+                classToSearch,
+                parameterTypesWithNull
+        );
+
+        // Assert: Verify that no constructor was found.
+        assertNull("A constructor should not be found when the parameter type is null.", foundConstructor);
     }
 }
