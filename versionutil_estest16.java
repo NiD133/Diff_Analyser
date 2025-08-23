@@ -1,20 +1,32 @@
 package com.fasterxml.jackson.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.Version;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class VersionUtil_ESTestTest16 extends VersionUtil_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
 
-    @Test(timeout = 4000)
-    public void test15() throws Throwable {
-        ClassLoader classLoader0 = ClassLoader.getSystemClassLoader();
-        Version version0 = VersionUtil.mavenVersionFor(classLoader0, "[][.~r)|i/l/", "Ve");
-        assertEquals(0, version0.getMajorVersion());
+/**
+ * Unit tests for the {@link VersionUtil} class, focusing on Maven version resolution.
+ */
+public class VersionUtilTest {
+
+    /**
+     * Verifies that {@link VersionUtil#mavenVersionFor(ClassLoader, String, String)}
+     * returns {@link Version#unknownVersion()} when the corresponding Maven
+     * pom.properties file cannot be found for the given group and artifact IDs.
+     */
+    @Test
+    public void mavenVersionFor_whenPomPropertiesNotFound_returnsUnknownVersion() {
+        // Arrange: Define coordinates for a Maven artifact that does not exist.
+        final String nonExistentGroupId = "com.example.nonexistent";
+        final String nonExistentArtifactId = "non-existent-artifact";
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        final Version expectedVersion = Version.unknownVersion();
+
+        // Act: Attempt to load the version for the non-existent artifact.
+        Version actualVersion = VersionUtil.mavenVersionFor(classLoader, nonExistentGroupId, nonExistentArtifactId);
+
+        // Assert: The result should be the standard "unknown" version.
+        assertEquals(expectedVersion, actualVersion);
     }
 }
