@@ -1,55 +1,30 @@
 package org.threeten.extra.chrono;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.time.Clock;
-import java.time.DateTimeException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.chrono.Era;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.JapaneseEra;
-import java.time.chrono.ThaiBuddhistEra;
-import java.time.format.ResolverStyle;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
-import java.time.temporal.ValueRange;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockClock;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.evosuite.runtime.mock.java.time.MockLocalDate;
-import org.evosuite.runtime.mock.java.time.MockLocalDateTime;
-import org.evosuite.runtime.mock.java.time.MockOffsetDateTime;
-import org.evosuite.runtime.mock.java.time.chrono.MockHijrahDate;
-import org.evosuite.runtime.mock.java.time.chrono.MockJapaneseDate;
-import org.junit.runner.RunWith;
 
-public class JulianChronology_ESTestTest1 extends JulianChronology_ESTest_scaffolding {
+/**
+ * Tests for the {@link JulianChronology} class.
+ */
+public class JulianChronologyTest {
 
-    @Test(timeout = 4000)
-    public void test00() throws Throwable {
-        JulianChronology julianChronology0 = new JulianChronology();
-        JulianDate julianDate0 = julianChronology0.dateEpochDay((-11999976L));
-        assertEquals(JulianEra.BC, julianDate0.getEra());
+    /**
+     * Tests that creating a date from a negative epoch day correctly results
+     * in a date in the BC (Before Christ) era.
+     */
+    @Test
+    public void dateEpochDay_withNegativeEpochDay_returnsDateInBCEra() {
+        // Arrange: Define a known date in the BC era and find its corresponding epoch day.
+        // The proleptic year 0 in the Julian calendar corresponds to the year 1 BC.
+        JulianDate dateInBCEra = JulianDate.of(0, 1, 1); // Represents 1 BC, Jan 1st
+        long epochDay = dateInBCEra.toEpochDay();
+
+        // Act: Create a new JulianDate from this epoch day using the chronology.
+        JulianDate resultDate = JulianChronology.INSTANCE.dateEpochDay(epochDay);
+
+        // Assert: The resulting date should be in the BC era and equal to the original date.
+        assertEquals("The era should be BC", JulianEra.BC, resultDate.getEra());
+        assertEquals("The reconstructed date should match the original", dateInBCEra, resultDate);
     }
 }
