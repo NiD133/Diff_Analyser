@@ -1,43 +1,36 @@
 package com.fasterxml.jackson.core.io;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PushbackInputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.junit.runner.RunWith;
 
-public class MergedStream_ESTestTest12 extends MergedStream_ESTest_scaffolding {
+/**
+ * Contains tests for the {@link MergedStream} class, focusing on handling invalid arguments.
+ */
+public class MergedStreamTest {
 
-    @Test(timeout = 4000)
-    public void test11() throws Throwable {
-        PipedInputStream pipedInputStream0 = new PipedInputStream();
-        byte[] byteArray0 = new byte[12];
-        MergedStream mergedStream0 = new MergedStream((IOContext) null, pipedInputStream0, byteArray0, (-10), (-10));
-        // Undeclared exception!
-        try {
-            mergedStream0.read(byteArray0, (-10), (-10));
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-        }
+    /**
+     * Verifies that calling read(byte[], int, int) with a negative offset and length
+     * throws an ArrayIndexOutOfBoundsException, as required by the InputStream contract.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void readWithNegativeOffsetAndLengthShouldThrowException() throws IOException {
+        // Arrange: Create a MergedStream instance.
+        // A dummy input stream is required for the constructor, but its content is not used in this test.
+        InputStream dummyInputStream = new ByteArrayInputStream(new byte[0]);
+        byte[] buffer = new byte[12];
+
+        // The MergedStream is constructed with negative start/end indices.
+        // The constructor may allow this, but the subsequent read call is expected to fail
+        // due to its own argument validation.
+        int invalidIndex = -10;
+        MergedStream mergedStream = new MergedStream(null, dummyInputStream, buffer, invalidIndex, invalidIndex);
+
+        // Act & Assert: Attempt to read from the stream using a negative offset and length.
+        // The @Test(expected=...) annotation asserts that this call must throw
+        // an ArrayIndexOutOfBoundsException. If it doesn't, the test fails.
+        mergedStream.read(buffer, invalidIndex, invalidIndex);
     }
 }
