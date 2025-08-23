@@ -1,40 +1,50 @@
 package com.fasterxml.jackson.core.io;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
 import com.fasterxml.jackson.core.util.BufferRecycler;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import org.junit.Test;
+import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.io.Writer;
-import java.nio.CharBuffer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFileOutputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
+// Note: The original test class name and scaffolding are preserved as per the prompt's context.
+// In a real-world scenario, these would likely be refactored for better clarity.
 public class UTF8Writer_ESTestTest11 extends UTF8Writer_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        StreamReadConstraints streamReadConstraints0 = StreamReadConstraints.defaults();
-        StreamWriteConstraints streamWriteConstraints0 = StreamWriteConstraints.defaults();
-        ErrorReportConfiguration errorReportConfiguration0 = ErrorReportConfiguration.defaults();
-        BufferRecycler bufferRecycler0 = new BufferRecycler();
-        ContentReference contentReference0 = ContentReference.unknown();
-        IOContext iOContext0 = new IOContext(streamReadConstraints0, streamWriteConstraints0, errorReportConfiguration0, bufferRecycler0, contentReference0, true);
-        MockFileOutputStream mockFileOutputStream0 = new MockFileOutputStream("_C14\u0007{V6YYhZLLho", false);
-        UTF8Writer uTF8Writer0 = new UTF8Writer(iOContext0, mockFileOutputStream0);
-        char[] charArray0 = new char[26];
-        uTF8Writer0.write(charArray0, 1114111, Integer.MAX_VALUE);
-        assertEquals((-56613888), UTF8Writer.SURROGATE_BASE);
+    /**
+     * Verifies that calling {@code write(char[], int, int)} with an offset that is
+     * outside the bounds of the source array throws an {@code IndexOutOfBoundsException}.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void writeWithOffsetOutOfBoundsShouldThrowException() throws IOException {
+        // Arrange: Set up the writer and define an out-of-bounds write operation.
+        BufferRecycler bufferRecycler = new BufferRecycler();
+        IOContext ioContext = new IOContext(
+                StreamReadConstraints.defaults(),
+                StreamWriteConstraints.defaults(),
+                ErrorReportConfiguration.defaults(),
+                bufferRecycler,
+                ContentReference.unknown(),
+                true);
+
+        // A mock output stream is used since the test focuses on input validation,
+        // not the actual output.
+        OutputStream mockOutputStream = new MockFileOutputStream("test.tmp");
+        UTF8Writer writer = new UTF8Writer(ioContext, mockOutputStream);
+
+        char[] buffer = new char[10];
+        // Define an offset that is clearly beyond the buffer's capacity.
+        int invalidOffset = buffer.length + 1;
+        int length = 1;
+
+        // Act: Attempt to write from the buffer with the invalid offset.
+        // This call is expected to fail with an IndexOutOfBoundsException.
+        writer.write(buffer, invalidOffset, length);
+
+        // Assert: The test succeeds if the expected exception is thrown,
+        // which is handled by the @Test(expected = ...) annotation.
     }
 }
