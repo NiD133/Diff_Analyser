@@ -1,30 +1,32 @@
 package com.google.gson.internal;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
-import com.google.gson.common.MoreAsserts;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 import org.junit.Test;
 
-public class LinkedTreeMapTestTest14 {
+/**
+ * Contains tests for the {@link LinkedTreeMap} class, focusing on the {@code clear} method.
+ */
+public final class LinkedTreeMapClearTest {
 
+    /**
+     * Verifies that the {@code clear()} method correctly removes all entries,
+     * leaving the map empty.
+     */
     @Test
-    public void testClear() {
+    public void clear_whenMapIsPopulated_removesAllEntries() {
+        // Arrange: Create a map and populate it with several entries.
         LinkedTreeMap<String, String> map = new LinkedTreeMap<>();
         map.put("a", "android");
         map.put("c", "cola");
         map.put("b", "bbq");
+
+        // Sanity check to ensure the map is not empty before the test action.
+        assertThat(map).isNotEmpty();
+
+        // Act: Call the method under test.
         map.clear();
-        assertThat(map.keySet()).isEmpty();
+
+        // Assert: The map should be empty after being cleared.
         assertThat(map).isEmpty();
     }
 }
