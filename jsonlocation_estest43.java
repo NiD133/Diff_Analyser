@@ -1,24 +1,43 @@
 package com.fasterxml.jackson.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
 import com.fasterxml.jackson.core.io.ContentReference;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JsonLocation_ESTestTest43 extends JsonLocation_ESTest_scaffolding {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        JsonLocation jsonLocation0 = JsonLocation.NA;
-        JsonLocation jsonLocation1 = new JsonLocation((Object) null, 500, 500, 500);
-        boolean boolean0 = jsonLocation0.equals(jsonLocation1);
-        assertEquals(500, jsonLocation1.getColumnNr());
-        assertEquals(500L, jsonLocation1.getCharOffset());
-        assertFalse(boolean0);
-        assertEquals((-1L), jsonLocation1.getByteOffset());
-        assertEquals(500, jsonLocation1.getLineNr());
+/**
+ * Unit tests for the {@link JsonLocation} class, focusing on equality checks.
+ */
+public class JsonLocationTest {
+
+    /**
+     * Verifies that the special 'Not Applicable' (NA) instance of JsonLocation
+     * is not considered equal to a different, custom-defined location.
+     */
+    @Test
+    public void naLocation_shouldNotBeEqualTo_customLocation() {
+        // Arrange
+        final JsonLocation naLocation = JsonLocation.NA;
+
+        final long charOffset = 500L;
+        final int line = 500;
+        final int column = 500;
+        
+        // Create a distinct location. Using the modern, non-deprecated constructor.
+        // The original test used a constructor that implicitly set the byte offset to -1.
+        final JsonLocation customLocation = new JsonLocation(ContentReference.unknown(), -1L, charOffset, line, column);
+
+        // Pre-verify the state of the custom location to ensure it was created as expected.
+        assertEquals("Line number should match", line, customLocation.getLineNr());
+        assertEquals("Column number should match", column, customLocation.getColumnNr());
+        assertEquals("Character offset should match", charOffset, customLocation.getCharOffset());
+        assertEquals("Byte offset should be -1", -1L, customLocation.getByteOffset());
+
+        // Act
+        boolean areEqual = naLocation.equals(customLocation);
+
+        // Assert
+        assertFalse("JsonLocation.NA should not be equal to a different location instance", areEqual);
     }
 }
