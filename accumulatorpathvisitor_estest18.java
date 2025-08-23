@@ -1,37 +1,46 @@
 package org.apache.commons.io.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.apache.commons.io.filefilter.CanExecuteFileFilter;
-import org.apache.commons.io.filefilter.CanReadFileFilter;
-import org.apache.commons.io.filefilter.CanWriteFileFilter;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.PrefixFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.function.IOBiFunction;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockIOException;
-import org.junit.runner.RunWith;
 
-public class AccumulatorPathVisitor_ESTestTest18 extends AccumulatorPathVisitor_ESTest_scaffolding {
+/**
+ * Tests for {@link AccumulatorPathVisitor}, focusing on the equals() and hashCode() contract.
+ */
+public class AccumulatorPathVisitorTest {
 
-    @Test(timeout = 4000)
-    public void test17() throws Throwable {
-        AccumulatorPathVisitor accumulatorPathVisitor0 = AccumulatorPathVisitor.withLongCounters();
-        AccumulatorPathVisitor accumulatorPathVisitor1 = AccumulatorPathVisitor.withBigIntegerCounters();
-        boolean boolean0 = accumulatorPathVisitor0.equals(accumulatorPathVisitor1);
-        assertTrue(boolean0);
+    /**
+     * Tests that two newly created visitors are equal, even if they use different
+     * underlying counter implementations (long vs. BigInteger).
+     * <p>
+     * This is because their initial state (all counters at zero and empty path lists) is identical.
+     * The test also verifies that their hash codes are consistent with the equals contract.
+     * </p>
+     */
+    @Test
+    public void testEqualsAndHashCodeForNewVisitorsWithDifferentCounterTypes() {
+        // Arrange: Create two new visitors with different underlying counter types.
+        // Both are in their initial state, meaning their counters are zero and their
+        // file/directory lists are empty.
+        final AccumulatorPathVisitor visitorWithLongCounters = AccumulatorPathVisitor.withLongCounters();
+        final AccumulatorPathVisitor visitorWithBigIntegerCounters = AccumulatorPathVisitor.withBigIntegerCounters();
+
+        // Assert:
+        // 1. Sanity check that we are comparing two distinct objects.
+        assertNotSame("Visitors should be different instances",
+            visitorWithLongCounters, visitorWithBigIntegerCounters);
+
+        // 2. HashCode contract: equal objects must have equal hash codes.
+        assertEquals("Hash codes should be equal for equal objects",
+            visitorWithLongCounters.hashCode(), visitorWithBigIntegerCounters.hashCode());
+
+        // 3. Equals contract:
+        //    - They should be equal because their observable state is identical.
+        //    - Test for symmetry (a.equals(b) == b.equals(a)).
+        assertEquals("A visitor with long counters should equal one with BigInteger counters when both are new",
+            visitorWithLongCounters, visitorWithBigIntegerCounters);
+        assertEquals("The equals comparison should be symmetrical",
+            visitorWithBigIntegerCounters, visitorWithLongCounters);
     }
 }
