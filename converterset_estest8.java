@@ -1,34 +1,35 @@
 package org.joda.time.convert;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.joda.time.Hours;
-import org.joda.time.Interval;
-import org.joda.time.MutablePeriod;
-import org.joda.time.PeriodType;
-import org.joda.time.Seconds;
-import org.joda.time.chrono.CopticChronology;
-import org.junit.runner.RunWith;
 
-public class ConverterSet_ESTestTest8 extends ConverterSet_ESTest_scaffolding {
+/**
+ * Unit tests for {@link ConverterSet}.
+ */
+public class ConverterSetTest {
 
-    @Test(timeout = 4000)
-    public void test07() throws Throwable {
-        StringConverter stringConverter0 = StringConverter.INSTANCE;
-        Converter[] converterArray0 = new Converter[0];
-        ConverterSet converterSet0 = new ConverterSet(converterArray0);
-        // Undeclared exception!
-        try {
-            converterSet0.remove(stringConverter0, converterArray0);
-            fail("Expecting exception: ArrayIndexOutOfBoundsException");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //
-            // 0
-            //
-            verifyException("org.joda.time.convert.ConverterSet", e);
-        }
+    /**
+     * Tests that calling remove() for a non-existent converter with a zero-length
+     * 'removed' array throws an exception.
+     * <p>
+     * The implementation of {@link ConverterSet#remove(Converter, Converter[])} attempts
+     * to write {@code null} to {@code removed[0]} if the converter is not found.
+     * This test verifies that this behavior correctly throws an
+     * {@link ArrayIndexOutOfBoundsException} when a non-null, zero-length array
+     * is supplied.
+     */
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void remove_nonExistentConverterWithZeroLengthRemovedArray_throwsException() {
+        // Arrange: Create an empty ConverterSet.
+        ConverterSet emptySet = new ConverterSet(new Converter[0]);
+
+        // Arrange: Define a converter that is not in the set.
+        Converter converterToRemove = StringConverter.INSTANCE;
+
+        // Arrange: Create a non-null, but zero-length, array for the 'removed' out-parameter.
+        Converter[] zeroLengthRemovedArray = new Converter[0];
+
+        // Act: Attempt to remove the converter. This should throw an exception
+        // because the method tries to access index 0 of the zero-length array.
+        emptySet.remove(converterToRemove, zeroLengthRemovedArray);
     }
 }
