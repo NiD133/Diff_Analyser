@@ -1,24 +1,29 @@
 package org.apache.commons.io.file.attribute;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.math.BigDecimal;
-import java.nio.file.Path;
+import static org.junit.Assert.assertNull;
+
 import java.nio.file.attribute.FileTime;
-import java.time.DateTimeException;
-import java.time.Instant;
 import java.util.Date;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.time.MockInstant;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class FileTimes_ESTestTest43 extends FileTimes_ESTest_scaffolding {
+/**
+ * Tests for the {@link FileTimes} utility class.
+ */
+public class FileTimesTest {
 
-    @Test(timeout = 4000)
-    public void test42() throws Throwable {
-        FileTime fileTime0 = FileTimes.toFileTime((Date) null);
-        assertNull(fileTime0);
+    /**
+     * Tests that {@link FileTimes#toFileTime(Date)} correctly handles a null input
+     * by returning null, as specified in its contract.
+     */
+    @Test
+    public void toFileTime_withNullDate_shouldReturnNull() {
+        // Arrange: A null Date object.
+        final Date nullDate = null;
+
+        // Act: Attempt to convert the null Date to a FileTime.
+        final FileTime result = FileTimes.toFileTime(nullDate);
+
+        // Assert: The resulting FileTime should also be null.
+        assertNull("The conversion of a null Date should result in a null FileTime.", result);
     }
 }
