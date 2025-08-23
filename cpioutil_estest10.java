@@ -1,25 +1,29 @@
 package org.apache.commons.compress.archivers.cpio;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
 
-public class CpioUtil_ESTestTest10 extends CpioUtil_ESTest_scaffolding {
+/**
+ * Unit tests for the {@link CpioUtil} class.
+ */
+public class CpioUtilTest {
 
-    @Test(timeout = 4000)
-    public void test09() throws Throwable {
-        // Undeclared exception!
-        try {
-            CpioUtil.long2byteArray(701, 701, false);
-            fail("Expecting exception: UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.apache.commons.compress.archivers.cpio.CpioUtil", e);
-        }
+    /**
+     * Verifies that long2byteArray throws an UnsupportedOperationException
+     * when the provided length is not a multiple of two, as required by the CPIO format.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void long2byteArrayShouldThrowExceptionForInvalidLength() {
+        // Arrange: Define an invalid length that is not a multiple of two.
+        // The CPIO specification requires field lengths to be multiples of two.
+        final int invalidOddLength = 701;
+        
+        // The actual number and the swap flag are irrelevant for this specific exception.
+        final long anyNumber = 12345L;
+        final boolean swapHalfWord = false;
+
+        // Act: Attempt to convert a long to a byte array with an invalid length.
+        // Assert: The @Test(expected=...) annotation handles the assertion,
+        // ensuring an UnsupportedOperationException is thrown.
+        CpioUtil.long2byteArray(anyNumber, invalidOddLength, swapHalfWord);
     }
 }
