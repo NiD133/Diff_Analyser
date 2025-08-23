@@ -1,55 +1,36 @@
 package org.apache.commons.jxpath.ri.axes;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.Locale;
-import org.apache.commons.jxpath.BasicVariables;
-import org.apache.commons.jxpath.JXPathBasicBeanInfo;
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.ri.EvalContext;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.QName;
-import org.apache.commons.jxpath.ri.compiler.Constant;
-import org.apache.commons.jxpath.ri.compiler.CoreFunction;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationAnd;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationGreaterThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationLessThanOrEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMod;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationMultiply;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNegate;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationNotEqual;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationOr;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationSubtract;
-import org.apache.commons.jxpath.ri.compiler.CoreOperationUnion;
-import org.apache.commons.jxpath.ri.compiler.Expression;
-import org.apache.commons.jxpath.ri.compiler.NameAttributeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTest;
-import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
-import org.apache.commons.jxpath.ri.compiler.ProcessingInstructionTest;
-import org.apache.commons.jxpath.ri.compiler.Step;
-import org.apache.commons.jxpath.ri.compiler.VariableReference;
-import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.commons.jxpath.ri.model.VariablePointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPointer;
-import org.apache.commons.jxpath.ri.model.beans.BeanPropertyPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPointer;
-import org.apache.commons.jxpath.ri.model.beans.NullPropertyPointer;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SimplePathInterpreter_ESTestTest39 extends SimplePathInterpreter_ESTest_scaffolding {
 
-    @Test(timeout = 4000)
-    public void test38() throws Throwable {
-        Object object0 = new Object();
-        JXPathContext jXPathContext0 = JXPathContext.newContext(object0);
-        Object object1 = jXPathContext0.getValue("w4Wf+z:B0");
-        assertEquals(0.0, object1);
+    /**
+     * Tests that when an arithmetic XPath expression operates on paths that do not
+     * exist, JXPath treats their values as zero.
+     */
+    @Test
+    public void getValueWithAdditionOfNonExistentPathsShouldReturnZero() {
+        // Arrange
+        // An XPath expression that adds two properties that do not exist on the root bean.
+        final String xpathWithNonExistentPaths = "nonExistentProperty1 + nonExistentProperty2";
+
+        // A simple object that serves as the context root but lacks the properties in the XPath.
+        final Object rootBean = new Object();
+        final JXPathContext jxpathContext = JXPathContext.newContext(rootBean);
+
+        // JXPath is expected to convert non-existent paths (which evaluate to null)
+        // to the number 0 in a numeric context. Therefore, the expression effectively
+        // becomes 0.0 + 0.0.
+        final double expectedValue = 0.0;
+
+        // Act
+        final Object actualValue = jxpathContext.getValue(xpathWithNonExistentPaths);
+
+        // Assert
+        assertEquals("The sum of two non-existent paths should be treated as 0.0",
+                expectedValue, actualValue);
     }
 }
