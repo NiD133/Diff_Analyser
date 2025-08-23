@@ -1,27 +1,29 @@
 package com.itextpdf.text.pdf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.collection.PdfCollectionField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertFalse;
 
-public class PdfDictionary_ESTestTest44 extends PdfDictionary_ESTest_scaffolding {
+/**
+ * Contains unit tests for the {@link PdfDictionary} class.
+ */
+public class PdfDictionaryTest {
 
-    @Test(timeout = 4000)
-    public void test43() throws Throwable {
-        PdfResources pdfResources0 = new PdfResources();
-        boolean boolean0 = pdfResources0.checkType((PdfName) null);
-        assertFalse(boolean0);
+    /**
+     * Verifies that the checkType() method returns false when the provided type is null.
+     *
+     * A PDF dictionary's type cannot be null, so the method should correctly
+     * identify that a null input does not match the dictionary's type.
+     */
+    @Test
+    public void checkType_shouldReturnFalse_whenTypeIsNull() {
+        // Arrange: Create an instance of a PdfDictionary subclass.
+        // PdfResources is used here as a concrete implementation for the test.
+        PdfDictionary dictionary = new PdfResources();
+
+        // Act: Call the method under test with a null argument.
+        boolean result = dictionary.checkType(null);
+
+        // Assert: Verify that the method returned false.
+        assertFalse("checkType(null) should return false.", result);
     }
 }
