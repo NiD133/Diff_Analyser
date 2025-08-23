@@ -1,38 +1,29 @@
 package org.apache.commons.lang3;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Locale;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.mock.java.io.MockFile;
-import org.evosuite.runtime.mock.java.io.MockFileInputStream;
-import org.evosuite.runtime.mock.java.io.MockPrintStream;
-import org.junit.runner.RunWith;
 
-public class SerializationUtils_ESTestTest11 extends SerializationUtils_ESTest_scaffolding {
+/**
+ * Unit tests for {@link org.apache.commons.lang3.SerializationUtils}.
+ */
+public class SerializationUtilsTest {
 
-    @Test(timeout = 4000)
-    public void test10() throws Throwable {
-        // Undeclared exception!
+    /**
+     * Tests that calling {@link SerializationUtils#deserialize(byte[])} with a null
+     * input array throws a NullPointerException.
+     */
+    @Test
+    public void deserializeWithNullByteArrayShouldThrowNullPointerException() {
         try {
             SerializationUtils.deserialize((byte[]) null);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // objectData
-            //
-            verifyException("java.util.Objects", e);
+            fail("Expected a NullPointerException to be thrown for null input.");
+        } catch (final NullPointerException e) {
+            // The method's Javadoc guarantees a NullPointerException for null input.
+            // We can also assert on the message for a more specific test, as the
+            // underlying implementation uses Objects.requireNonNull with a message.
+            assertEquals("objectData", e.getMessage());
         }
     }
 }
