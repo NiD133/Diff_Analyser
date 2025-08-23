@@ -1,36 +1,46 @@
 package org.mockito.internal.verification;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.runtime.EvoAssertions.*;
-import java.util.NoSuchElementException;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.junit.runner.RunWith;
-import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.stubbing.InvocationContainerImpl;
 import org.mockito.internal.util.Timer;
-import org.mockito.internal.verification.api.VerificationData;
-import org.mockito.verification.After;
-import org.mockito.verification.Timeout;
 import org.mockito.verification.VerificationMode;
 
-public class VerificationOverTimeImpl_ESTestTest20 extends VerificationOverTimeImpl_ESTest_scaffolding {
+import static org.junit.Assert.assertThrows;
 
-    @Test(timeout = 4000)
-    public void test19() throws Throwable {
-        NoMoreInteractions noMoreInteractions0 = new NoMoreInteractions();
-        VerificationOverTimeImpl verificationOverTimeImpl0 = new VerificationOverTimeImpl(3058L, noMoreInteractions0, true, (Timer) null);
-        // Undeclared exception!
-        try {
-            verificationOverTimeImpl0.copyWithVerificationMode(noMoreInteractions0);
-            fail("Expecting exception: NullPointerException");
-        } catch (NullPointerException e) {
-            //
-            // no message in exception (getMessage() returned null)
-            //
-            verifyException("org.mockito.internal.verification.VerificationOverTimeImpl", e);
-        }
+/**
+ * Tests for {@link VerificationOverTimeImpl}.
+ */
+public class VerificationOverTimeImplTest {
+
+    /**
+     * This test verifies the behavior of the copyWithVerificationMode method
+     * when the VerificationOverTimeImpl instance is created with a null Timer.
+     *
+     * It ensures that the method correctly throws a NullPointerException,
+     * which is the expected behavior when an internal dependency (the timer) is null
+     * and its methods are subsequently accessed.
+     */
+    @Test
+    public void copyWithVerificationMode_whenConstructedWithNullTimer_throwsNullPointerException() {
+        // Arrange
+        // A dummy verification mode is needed for the constructor and method arguments.
+        VerificationMode dummyDelegateMode = new NoMoreInteractions();
+        long anyPollingPeriod = 100L;
+        boolean returnOnSuccess = true;
+
+        // Create the object under test with a null Timer. This is the specific
+        // condition we want to test.
+        VerificationOverTimeImpl verificationOverTime = new VerificationOverTimeImpl(
+            anyPollingPeriod,
+            dummyDelegateMode,
+            returnOnSuccess,
+            null // Pass a null Timer
+        );
+
+        // Act & Assert
+        // We expect a NullPointerException because the copyWithVerificationMode method
+        // likely attempts to use the null timer object internally.
+        assertThrows(NullPointerException.class, () -> {
+            verificationOverTime.copyWithVerificationMode(dummyDelegateMode);
+        });
     }
 }
