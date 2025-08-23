@@ -1,27 +1,37 @@
 package org.apache.ibatis.type;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.evosuite.shaded.org.mockito.Mockito.*;
-import static org.evosuite.runtime.EvoAssertions.*;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.YearMonth;
-import org.apache.ibatis.session.Configuration;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
-import org.evosuite.runtime.ViolatedAssumptionAnswer;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class BaseTypeHandler_ESTestTest2 extends BaseTypeHandler_ESTest_scaffolding {
+/**
+ * Unit tests for the BaseTypeHandler class, focusing on its interaction with JDBC.
+ * A concrete implementation (YearMonthTypeHandler) is used to test the base class behavior.
+ */
+public class BaseTypeHandlerTest {
 
-    @Test(timeout = 4000)
-    public void test01() throws Throwable {
-        YearMonthTypeHandler yearMonthTypeHandler0 = new YearMonthTypeHandler();
-        CallableStatement callableStatement0 = mock(CallableStatement.class, new ViolatedAssumptionAnswer());
-        doReturn((String) null).when(callableStatement0).getString(anyInt());
-        YearMonth yearMonth0 = yearMonthTypeHandler0.getResult(callableStatement0, 0);
-        assertNull(yearMonth0);
+    private final YearMonthTypeHandler typeHandler = new YearMonthTypeHandler();
+
+    /**
+     * Verifies that getResult(CallableStatement, int) correctly returns null
+     * when the underlying database value is SQL NULL.
+     */
+    @Test
+    public void shouldReturnNullWhenGettingResultFromCallableStatementAndValueIsNull() throws SQLException {
+        // Arrange: Create a mock CallableStatement that simulates retrieving a NULL value.
+        CallableStatement mockCallableStatement = mock(CallableStatement.class);
+        when(mockCallableStatement.getString(anyInt())).thenReturn(null);
+
+        // Act: Call the method under test.
+        YearMonth result = typeHandler.getResult(mockCallableStatement, 1);
+
+        // Assert: Verify that the result is null, as expected.
+        assertNull("The type handler should return a null object for a SQL NULL value.", result);
     }
 }
